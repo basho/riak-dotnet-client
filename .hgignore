@@ -1,0 +1,21 @@
+syntax: glob
+
+bin
+Bin
+BIN
+obj
+Obj
+OBJ
+debug
+Debug
+DEBUG
+release
+Release
+RELEASE
+
+*.ncb
+*.obj
+*.suo
+*.user
+*.swp
+*.*~
