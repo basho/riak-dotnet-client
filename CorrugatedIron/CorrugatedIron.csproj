@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{A2CA0CDC-85BB-489D-99D0-3EE1D135BE17}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CorrugatedIron</RootNamespace>
+    <AssemblyName>CorrugatedIron</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="protobuf-net">
+      <HintPath>..\lib\protobuf-net.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Comms\IRiakConnectionManager.cs" />
+    <Compile Include="Comms\IRiakConnection.cs" />
+    <Compile Include="Comms\RiakConnection.cs" />
+    <Compile Include="Comms\RiakConnectionManager.cs" />
+    <Compile Include="Extensions\StringExtensions.cs" />
+    <Compile Include="Messages\MessageCode.cs" />
+    <Compile Include="Messages\RpbBucketProps.cs" />
+    <Compile Include="Messages\RpbContent.cs" />
+    <Compile Include="Messages\RpbDelReq.cs" />
+    <Compile Include="Messages\RpbDelResp.cs" />
+    <Compile Include="Messages\RpbErrorResp.cs" />
+    <Compile Include="Messages\RpbGetBucketReq.cs" />
+    <Compile Include="Messages\RpbGetBucketResp.cs" />
+    <Compile Include="Messages\RpbGetClientIdReq.cs" />
+    <Compile Include="Messages\RpbGetClientIdResp.cs" />
+    <Compile Include="Messages\RpbGetReq.cs" />
+    <Compile Include="Messages\RpbGetResp.cs" />
+    <Compile Include="Messages\RpbGetServerInfoReq.cs" />
+    <Compile Include="Messages\RpbGetServerInfoResp.cs" />
+    <Compile Include="Messages\RpbLink.cs" />
+    <Compile Include="Messages\RpbListBucketsReq.cs" />
+    <Compile Include="Messages\RpbListBucketsResp.cs" />
+    <Compile Include="Messages\RpbListKeysReq.cs" />
+    <Compile Include="Messages\RpbListKeysResp.cs" />
+    <Compile Include="Messages\RpbMapRedReq.cs" />
+    <Compile Include="Messages\RpbMapRedResp.cs" />
+    <Compile Include="Messages\RpbPair.cs" />
+    <Compile Include="Messages\RpbPingReq.cs" />
+    <Compile Include="Messages\RpbPingResp.cs" />
+    <Compile Include="Messages\RpbPutReq.cs" />
+    <Compile Include="Messages\RpbPutResp.cs" />
+    <Compile Include="Messages\RpbSetBucketReq.cs" />
+    <Compile Include="Messages\RpbSetBucketResp.cs" />
+    <Compile Include="Messages\RpbSetClientIdReq.cs" />
+    <Compile Include="Messages\RpbSetClientIdResp.cs" />
+    <Compile Include="Encoding\MessageEncoder.cs" />
+    <Compile Include="Encoding\IMessageEncoder.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
