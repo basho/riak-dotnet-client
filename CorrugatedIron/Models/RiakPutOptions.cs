@@ -14,9 +14,32 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CorrugatedIron.Comms
+using CorrugatedIron.Messages;
+
+namespace CorrugatedIron.Models
 {
-    public interface IRiakConnectionManager
+    public class RiakPutOptions
     {
+        public uint? W { get; set; }
+        public uint? Dw { get; set; }
+        public bool ReturnBody { get; set; }
+
+        public RiakPutOptions()
+        {
+            ReturnBody = true;
+        }
+
+        public void Populate(RpbPutReq request)
+        {
+            request.ReturnBody = ReturnBody;
+            if (W.HasValue)
+            {
+                request.W = W.Value;
+            }
+            if (Dw.HasValue)
+            {
+                request.Dw = Dw.Value;
+            }
+        }
     }
 }

@@ -52,7 +52,7 @@ namespace CorrugatedIron.Messages
 
         [ProtoMember(6, Name = "links", DataFormat = DataFormat.Default)]
         [DefaultValue(null)]
-        public List<RpbLink> Links { get; private set; }
+        public List<RpbLink> Links { get; set; }
 
         [ProtoMember(7, IsRequired = false, Name = "last_mod", DataFormat = DataFormat.TwosComplement)]
         [DefaultValue(default(uint))]
@@ -64,6 +64,6 @@ namespace CorrugatedIron.Messages
 
         [ProtoMember(9, Name = "usermeta", DataFormat = DataFormat.Default)]
         [DefaultValue(null)]
-        public List<RpbPair> UserMeta { get; private set; }
+        public List<RpbPair> UserMeta { get; set; }
     }
 }
