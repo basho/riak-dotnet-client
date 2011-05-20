@@ -32,6 +32,8 @@ namespace CorrugatedIron.Comms
         RiakResult SetClientId(string clientId);
         RiakResult<RiakObject> Get(string bucket, string key, uint rVal = Constants.Defaults.RVal);
         RiakResult<RiakObject> Put(RiakObject value, RiakPutOptions options = null);
+		RiakResult Delete(string bucket, string key, uint rwVal = Constants.Defaults.RVal);
+        RiakResult<RpbMapRedResp> MapReduce(string request, string requestType = Constants.ContentTypes.ApplicationJson);
     }
 
     public class RiakConnection : IRiakConnection
@@ -102,6 +104,22 @@ namespace CorrugatedIron.Comms
                 ? new RiakObject(value.Bucket, value.Key, result.Value.Content.First(), result.Value.VectorClock)
                 : value);
         }
+		
+		public RiakResult Delete(string bucket, string key, uint rwVal = Constants.Defaults.RVal)
+		{
+			var request = new RpbDelReq { Bucket = bucket.ToRiakString(), Key = key.ToRiakString(), Rw = rwVal };
+			var result = WriteRead<RpbDelReq, RpbDelResp>(request);
+			
+			return result;
+		}
+		
+		public RiakResult<RpbMapRedResp> MapReduce(string request, string requestType = Constants.ContentTypes.ApplicationJson)
+		{
+			var mrrequest = new RpbMapRedReq { Request = request.ToRiakString(), ContentType = requestType.ToRiakString() };
+			var result = WriteRead<RpbMapRedReq, RpbMapRedResp>(mrrequest);
+			
+			return result;
+		}
 
         private RiakResult<TResult> Read<TResult>()
             where TResult : new()
