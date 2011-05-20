@@ -20,6 +20,9 @@ Global
 		{E765CC5E-3C83-42CB-9B9A-C8AF400AC0AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E765CC5E-3C83-42CB-9B9A-C8AF400AC0AC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = CorrugatedIron\CorrugatedIron.csproj
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
