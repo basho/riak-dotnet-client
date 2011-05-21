@@ -15,6 +15,19 @@
             public const string ImagePng = @"image/png";
 			public const string ErlangBinary = @"application/x-erlang-binary";
         }
+        
+        public static class MapReduceLanguage
+        {
+            public const string JavaScript = "javascript";
+            public const string Json = JavaScript;
+            public const string Erlang = Constants.ContentTypes.ErlangBinary;
+        }
+        
+        public static class MapReducePhaseType {
+            public const string Map = @"map";
+            public const string Reduce = @"reduce";
+            public const string Link = @"link";
+        }
 
         public static class CharSets
         {
