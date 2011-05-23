@@ -94,6 +94,7 @@ namespace CorrugatedIron.Comms
             try
             {
                 var result = _encoder.Decode<TResult>(ClientStream);
+                ClientStream.Flush();
                 return RiakResult<TResult>.Success(result);
             }
             catch (Exception ex)
@@ -107,6 +108,7 @@ namespace CorrugatedIron.Comms
             try
             {
                 _encoder.Encode(request, ClientStream);
+                ClientStream.Flush();
                 return RiakResult.Success();
             }
             catch (Exception ex)

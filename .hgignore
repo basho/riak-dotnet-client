@@ -20,3 +20,8 @@ RELEASE
 *.swp
 *.*~
 _Re*
+\.DS_Store
+*.userprefs
+*.pidb
+*.zip
+test-results/*
