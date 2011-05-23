@@ -23,29 +23,26 @@ namespace CorrugatedIron.Collections
     public class ResourcePool<TResource> : IDisposable
         where TResource : class
     {
-        private readonly Func<TResource> _resourceBuilder;
+        private readonly int _resourceWaitTimeout;
         private readonly Action<TResource> _resourceDestroyer;
-        private readonly ConcurrentQueue<TResource> _resources;
-        private int _poolSize;
+        private readonly ConcurrentStack<TResource> _resources;
+        private readonly Semaphore _resourceLock;
         private bool _disposing;
 
-        public ResourcePool(int poolSize, Func<TResource> resourceBuilder, Action<TResource> resourceDestroyer)
+        public ResourcePool(int poolSize, int resourceWaitTimeout, Func<TResource> resourceBuilder, Action<TResource> resourceDestroyer)
         {
-            _poolSize = poolSize;
-            _resourceBuilder = resourceBuilder;
+            _resourceWaitTimeout = resourceWaitTimeout;
             _resourceDestroyer = resourceDestroyer;
-            _resources = new ConcurrentQueue<TResource>();
+            _resources = new ConcurrentStack<TResource>();
+
+            _resourceLock = new Semaphore(0, poolSize);
 
             for (var i = 0; i < poolSize; ++i)
             {
-                _resources.Enqueue(resourceBuilder());
+                _resources.Push(resourceBuilder());
             }
-        }
 
-        public void AddInstance()
-        {
-            _resources.Enqueue(_resourceBuilder());
-            Interlocked.Increment(ref _poolSize);
+            _resourceLock.Release(poolSize);
         }
 
         public Tuple<bool, TResult> Consume<TResult>(Func<TResource, TResult> consumer)
@@ -55,10 +52,13 @@ namespace CorrugatedIron.Collections
             TResource instance = null;
             try
             {
-                if (_resources.TryDequeue(out instance))
+                if (_resourceLock.WaitOne(_resourceWaitTimeout))
                 {
-                    var result = consumer(instance);
-                    return Tuple.Create(true, result);
+                    if (_resources.TryPop(out instance))
+                    {
+                        var result = consumer(instance);
+                        return Tuple.Create(true, result);
+                    }
                 }
             }
             catch (Exception)
@@ -69,8 +69,9 @@ namespace CorrugatedIron.Collections
             {
                 if (instance != null)
                 {
-                    _resources.Enqueue(instance);
+                    _resources.Push(instance);
                 }
+                _resourceLock.Release();
             }
 
             return Tuple.Create(false, default(TResult));
@@ -82,8 +83,11 @@ namespace CorrugatedIron.Collections
 
             _disposing = true;
 
+            // TODO: make sure we clean up all the connections
+            // ie. do tracking of released resources
+
             TResource instance;
-            while (_resources.TryDequeue(out instance))
+            while (_resources.TryPop(out instance))
             {
                 _resourceDestroyer(instance);
             }

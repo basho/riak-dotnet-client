@@ -35,6 +35,7 @@
       <HintPath>..\lib\protobuf-net.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -44,10 +45,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Collections\ResourcePool.cs" />
+    <Compile Include="Comms\RiakClient.cs" />
     <Compile Include="Comms\RiakConnection.cs" />
+    <Compile Include="Comms\RiakConnectionIdler.cs" />
     <Compile Include="Comms\RiakConnectionManager.cs" />
     <Compile Include="Comms\RiakResult.cs" />
-    <Compile Include="Config\RiakConnectionConfiguration.cs" />
+    <Compile Include="Config\IRiakConnectionConfiguration.cs" />
+    <Compile Include="Config\RiakConnectionAutoConfiguration.cs" />
+    <Compile Include="Config\RiakConnectionManualConfiguration.cs" />
     <Compile Include="Models\RiakLink.cs" />
     <Compile Include="Models\RiakPutOptions.cs" />
     <Compile Include="Util\Constants.cs" />

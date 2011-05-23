@@ -14,19 +14,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
+
 namespace CorrugatedIron.Config
 {
-    public interface IRiakConnectionConfiguration
-    {
-        string HostAddress { get; }
-        int HostPort { get; }
-        int PoolSize { get; }
-    }
-
-    public class RiakConnectionConfiguration : IRiakConnectionConfiguration
+    public class RiakConnectionManualConfiguration : IRiakConnectionConfiguration
     {
         public string HostAddress { get; set; }
         public int HostPort { get; set; }
         public int PoolSize { get; set; }
+        public int AcquireTimeout { get; set; }
+        public int IdleTimeout { get; set; }
     }
 }

@@ -52,7 +52,9 @@
     <Compile Include="Live\LiveRiakConnectionTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Comms\" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CorrugatedIron\CorrugatedIron.csproj">
       <Project>{A2CA0CDC-85BB-489D-99D0-3EE1D135BE17}</Project>
