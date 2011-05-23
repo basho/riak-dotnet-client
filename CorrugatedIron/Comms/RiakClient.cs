@@ -28,6 +28,8 @@ namespace CorrugatedIron.Comms
         RiakResult SetClientId(string clientId);
         RiakResult<RiakObject> Get(string bucket, string key, uint rVal = Constants.Defaults.RVal);
         RiakResult<RiakObject> Put(RiakObject value, RiakPutOptions options = null);
+        RiakResult Delete(string bucket, string key, uint rwVal = Constants.Defaults.RVal);
+        RiakResult<RpbMapRedResp> MapReduce(string request, string requestType = Constants.ContentTypes.ApplicationJson);
     }
 
     public class RiakClient : IRiakClient
@@ -83,6 +85,22 @@ namespace CorrugatedIron.Comms
             return RiakResult<RiakObject>.Success(options.ReturnBody
                 ? new RiakObject(value.Bucket, value.Key, result.Value.Content.First(), result.Value.VectorClock)
                 : value);
+        }
+
+        public RiakResult Delete(string bucket, string key, uint rwVal = Constants.Defaults.RVal)
+        {
+            var request = new RpbDelReq { Bucket = bucket.ToRiakString(), Key = key.ToRiakString(), Rw = rwVal };
+            var result = _connectionManager.UseConnection(conn => conn.WriteRead<RpbDelReq, RpbDelResp>(request));
+
+            return result;
+        }
+
+        public RiakResult<RpbMapRedResp> MapReduce(string request, string requestType = Constants.ContentTypes.ApplicationJson)
+        {
+            var mapReqReq = new RpbMapRedReq { Request = request.ToRiakString(), ContentType = requestType.ToRiakString() };
+            var result = _connectionManager.UseConnection(conn => conn.WriteRead<RpbMapRedReq, RpbMapRedResp>(mapReqReq));
+
+            return result;
         }
     }
 }

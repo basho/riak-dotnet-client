@@ -41,14 +41,28 @@ namespace CorrugatedIron.Tests.Extensions
             Assert.IsInstanceOf<T>(actual);
         }
 
-        public static void ShouldBeFalse(this bool value)
+        public static void ShouldBeFalse(this bool value, string message = null)
         {
-            Assert.IsFalse(value);
+            if (string.IsNullOrEmpty(message))
+            {
+                Assert.IsFalse(value);
+            }
+            else
+            {
+                Assert.IsFalse(value, message);
+            }
         }
 
-        public static void ShouldBeTrue(this bool value)
+        public static void ShouldBeTrue(this bool value, string message = null)
         {
-            Assert.IsTrue(value);
+            if (string.IsNullOrEmpty(message))
+            {
+                Assert.IsTrue(value);
+            }
+            else
+            {
+                Assert.IsTrue(value, message);
+            }
         }
 
         public static void ShouldBeNullOrEmpty(this string value)

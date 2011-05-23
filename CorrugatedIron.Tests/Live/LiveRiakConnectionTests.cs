@@ -16,6 +16,8 @@
 
 using CorrugatedIron.Comms;
 using CorrugatedIron.Config;
+using CorrugatedIron.Extensions;
+using CorrugatedIron.Messages;
 using CorrugatedIron.Models;
 using CorrugatedIron.Tests.Extensions;
 using CorrugatedIron.Util;
@@ -30,14 +32,16 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
         protected const string TestBucket = "test_bucket";
         protected const string TestKey = "test_json";
         protected const string TestJson = "{\"string\":\"value\",\"int\":100,\"float\":2.34,\"array\":[1,2,3],\"dict\":{\"foo\":\"bar\"}}";
+        protected const string MapReduceBucket = "map_reduce_bucket";
+        protected const string TestMapReduce = @"{""inputs"":""map_reduce_bucket"",""query"":[{""map"":{""language"":""javascript"",""keep"":false,""source"":""function(o) {return [ 1 ];}""}},{""reduce"":{""language"":""javascript"",""keep"":true,""name"":""Riak.reduceSum""}}]}";
 
-        protected IRiakConnectionManager _connectionManager;
-        protected IRiakConnectionConfiguration _connectionConfig;
-        protected IRiakClient _client;
+        protected IRiakConnectionManager ConnectionManager;
+        protected IRiakConnectionConfiguration ConnectionConfig;
+        protected IRiakClient Client;
 
         public LiveRiakConnectionTestBase(int poolSize = 1, int idleTimeout = 10000)
         {
-            _connectionConfig = new RiakConnectionManualConfiguration
+            ConnectionConfig = new RiakConnectionManualConfiguration
             {
                 HostAddress = TestHost,
                 HostPort = TestHostPort,
@@ -51,16 +55,15 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
         [SetUp]
         public void SetUp()
         {
-            _connectionManager = new RiakConnectionManager(_connectionConfig);
-            _client = new RiakClient(_connectionManager);
+            ConnectionManager = new RiakConnectionManager(ConnectionConfig);
+            Client = new RiakClient(ConnectionManager);
         }
 
         [TearDown]
         public void TearDown()
         {
-            _connectionManager.Dispose();
+            ConnectionManager.Dispose();
         }
-
     }
 
     [TestFixture]
@@ -69,14 +72,14 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
         [Test]
         public void PingRequstResultsInPingResponse()
         {
-            var result = _client.Ping();
+            var result = Client.Ping();
             result.IsSuccess.ShouldBeTrue();
         }
 
         [Test]
         public void ReadingMissingValueDoesntBreak()
         {
-            var readResult = _client.Get("nobucket", "novalue");
+            var readResult = Client.Get("nobucket", "novalue");
             readResult.IsSuccess.ShouldBeFalse();
             readResult.ResultCode.ShouldEqual(ResultCode.NotFound);
         }
@@ -86,11 +89,11 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
         {
             var doc = new RiakObject(TestBucket, TestKey, TestJson, Constants.ContentTypes.ApplicationJson);
 
-            var writeResult = _client.Put(doc);
-            writeResult.IsSuccess.ShouldBeTrue();
+            var writeResult = Client.Put(doc);
+            writeResult.IsSuccess.ShouldBeTrue(writeResult.ErrorMessage);
 
-            var readResult = _client.Get(TestBucket, TestKey);
-            readResult.IsSuccess.ShouldBeTrue();
+            var readResult = Client.Get(TestBucket, TestKey);
+            readResult.IsSuccess.ShouldBeTrue(readResult.ErrorMessage);
 
             var loadedDoc = readResult.Value;
 
@@ -98,6 +101,47 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
             loadedDoc.Key.ShouldEqual(doc.Key);
             loadedDoc.Value.ShouldEqual(doc.Value);
             loadedDoc.VectorClock.ShouldNotBeNullOrEmpty();
+        }
+
+        [Test]
+        public void DeletingIsSuccessful()
+        {
+            var doc = new RiakObject(TestBucket, TestKey, TestJson, Constants.ContentTypes.ApplicationJson);
+            Client.Put(doc);
+
+            var result = Client.Get(TestBucket, TestKey);
+            result.IsSuccess.ShouldBeTrue();
+
+            Client.Delete(doc.Bucket, doc.Key);
+            result = Client.Get(TestBucket, TestKey);
+            result.IsSuccess.ShouldBeFalse();
+            result.ResultCode.ShouldEqual(ResultCode.NotFound);
+        }
+
+        [Test]
+        public void SettingTheClientIdIsSuccessful()
+        {
+            var result = Client.SetClientId("test");
+            result.IsSuccess.ShouldBeTrue();
+        }
+
+        [Test]
+        public void MapReduceQueriesReturnData()
+        {
+            const string dummyData = "{{ value: {0} }}";
+
+            for (var i = 1; i < 11; i++)
+            {
+                var newData = string.Format(dummyData, i);
+                var doc = new RiakObject(MapReduceBucket, i.ToString(), newData, Constants.ContentTypes.ApplicationJson);
+
+                Client.Put(doc);
+            }
+
+            var result = Client.MapReduce(TestMapReduce);
+            result.IsSuccess.ShouldBeTrue();
+            result.Value.Response.GetType().ShouldEqual(typeof(byte[]));
+            result.Value.Response.FromRiakString().ShouldEqual("[10]");
         }
     }
 
@@ -111,8 +155,8 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
 
         private IRiakConnection GetIdleConnection()
         {
-            var result = _connectionManager.UseConnection(RiakResult<IRiakConnection>.Success);
-            System.Threading.Thread.Sleep(_connectionConfig.IdleTimeout + 1000);
+            var result = ConnectionManager.UseConnection(RiakResult<IRiakConnection>.Success);
+            System.Threading.Thread.Sleep(ConnectionConfig.IdleTimeout + 1000);
             return result.Value;
         }
 
@@ -138,7 +182,7 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
         public void ConnectionIsRestoredOnNextUse()
         {
             GetIdleConnection();
-            var result = _client.Ping();
+            var result = Client.Ping();
             result.IsSuccess.ShouldBeTrue();
         }
 
@@ -146,7 +190,7 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
         public void IdleFlagIsUnsetOnNextUse()
         {
             var conn = GetIdleConnection();
-            _client.Ping();
+            Client.Ping();
             conn.IsIdle.ShouldBeFalse();
         }
     }

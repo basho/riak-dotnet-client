@@ -13,6 +13,7 @@
             public const string ImageJpg = @"image/jpeg";
             public const string ImageGif = @"image/gif";
             public const string ImagePng = @"image/png";
+            public const string ErlangBinary = @"application/x-erlang-binary";
         }
 
         public static class CharSets
