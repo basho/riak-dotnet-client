@@ -35,6 +35,7 @@
       <HintPath>..\lib\protobuf-net.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -43,10 +44,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Comms\IRiakConnectionManager.cs" />
-    <Compile Include="Comms\IRiakConnection.cs" />
+    <Compile Include="Collections\ResourcePool.cs" />
+    <Compile Include="Comms\RiakClient.cs" />
     <Compile Include="Comms\RiakConnection.cs" />
+    <Compile Include="Comms\RiakConnectionIdler.cs" />
     <Compile Include="Comms\RiakConnectionManager.cs" />
+    <Compile Include="Comms\RiakResult.cs" />
+    <Compile Include="Config\IRiakConnectionConfiguration.cs" />
+    <Compile Include="Config\RiakConnectionAutoConfiguration.cs" />
+    <Compile Include="Config\RiakConnectionManualConfiguration.cs" />
+    <Compile Include="Models\RiakLink.cs" />
+    <Compile Include="Models\RiakPutOptions.cs" />
+    <Compile Include="Util\Constants.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Messages\MessageCode.cs" />
     <Compile Include="Messages\RpbBucketProps.cs" />
@@ -79,7 +88,8 @@
     <Compile Include="Messages\RpbSetClientIdReq.cs" />
     <Compile Include="Messages\RpbSetClientIdResp.cs" />
     <Compile Include="Encoding\MessageEncoder.cs" />
-    <Compile Include="Encoding\IMessageEncoder.cs" />
+    <Compile Include="Models\RiakBucket.cs" />
+    <Compile Include="Models\RiakObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

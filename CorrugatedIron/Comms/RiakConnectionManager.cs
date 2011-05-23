@@ -14,9 +14,70 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
+using CorrugatedIron.Collections;
+using CorrugatedIron.Config;
+
 namespace CorrugatedIron.Comms
 {
+    public interface IRiakConnectionManager : IDisposable
+    {
+        RiakResult<TResult> UseConnection<TResult>(Func<IRiakConnection, RiakResult<TResult>> useFun);
+        RiakResult UseConnection(Func<IRiakConnection, RiakResult> useFun);
+    }
+
     public class RiakConnectionManager : IRiakConnectionManager
     {
+        private readonly IRiakConnectionConfiguration _connectionConfiguration;
+        private readonly ResourcePool<IRiakConnection> _connections;
+        private bool _disposing;
+
+        public RiakConnectionManager(IRiakConnectionConfiguration connectionConfiguration)
+        {
+            _connectionConfiguration = connectionConfiguration;
+            _connections = new ResourcePool<IRiakConnection>(connectionConfiguration.PoolSize,
+                connectionConfiguration.AcquireTimeout,
+                () => new RiakConnection(connectionConfiguration),
+                conn => conn.Dispose());
+        }
+
+        public RiakResult UseConnection(Func<IRiakConnection, RiakResult> useFun)
+        {
+            if (_disposing) return RiakResult.Error(ResultCode.ShuttingDown);
+
+            var response = _connections.Consume(useFun);
+            if (response.Item1)
+            {
+                return response.Item2;
+            }
+            return RiakResult.Error(ResultCode.CommunicationError);
+        }
+
+        public RiakResult<TResult> UseConnection<TResult>(Func<IRiakConnection, RiakResult<TResult>> useFun)
+        {
+            if (_disposing) return RiakResult<TResult>.Error(ResultCode.ShuttingDown);
+
+            Func<IRiakConnection, RiakResult<TResult>> wrapper = conn =>
+                {
+                    using (new RiakConnectionIdler(conn))
+                    {
+                        return useFun(conn);
+                    }
+                };
+
+            var response = _connections.Consume(wrapper);
+            if (response.Item1)
+            {
+                return response.Item2;
+            }
+            return RiakResult<TResult>.Error(ResultCode.CommunicationError);
+        }
+
+        public void Dispose()
+        {
+            _disposing = true;
+
+            _connections.Dispose();
+        }
     }
 }

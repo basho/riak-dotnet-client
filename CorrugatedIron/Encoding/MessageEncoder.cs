@@ -23,14 +23,22 @@ using System.Net;
 
 namespace CorrugatedIron.Encoding
 {
+    public interface IMessageEncoder
+    {
+        void Encode<T>(T message, Stream destination);
+        byte[] Encode<T>(T message);
+        T Decode<T>(Stream source) where T : new();
+        T Decode<T>(byte[] source) where T : new();
+    }
+
     public class MessageEncoder : IMessageEncoder
     {
-        private static readonly Dictionary<MessageCode, Type> _messageCodeToTypeMap;
-        private static readonly Dictionary<Type, MessageCode> _typeToMessageCodeMap;
+        private static readonly Dictionary<MessageCode, Type> MessageCodeToTypeMap;
+        private static readonly Dictionary<Type, MessageCode> TypeToMessageCodeMap;
 
         static MessageEncoder()
         {
-            _messageCodeToTypeMap = new Dictionary<MessageCode, Type>
+            MessageCodeToTypeMap = new Dictionary<MessageCode, Type>
             {
                 { MessageCode.ErrorResp, typeof(RpbErrorResp) },
                 { MessageCode.PingReq, typeof(RpbPingReq) },
@@ -59,11 +67,11 @@ namespace CorrugatedIron.Encoding
                 { MessageCode.MapRedResp, typeof(RpbMapRedResp) }
             };
 
-            _typeToMessageCodeMap = new Dictionary<Type, MessageCode>();
+            TypeToMessageCodeMap = new Dictionary<Type, MessageCode>();
 
-            foreach (var item in _messageCodeToTypeMap)
+            foreach (var item in MessageCodeToTypeMap)
             {
-                _typeToMessageCodeMap.Add(item.Value, item.Key);
+                TypeToMessageCodeMap.Add(item.Value, item.Key);
             }
         }
 
@@ -74,13 +82,11 @@ namespace CorrugatedIron.Encoding
             using (var memStream = new MemoryStream())
             {
                 Serializer.Serialize(memStream, message);
-                // TODO: make sure this does what we would expect it to do
-                // or do some other funky bits to get the sizes right.
                 messageBody = memStream.GetBuffer();
                 Array.Resize(ref messageBody, (int)memStream.Position);
             }
 
-            var messageCode = _typeToMessageCodeMap[typeof(T)];
+            var messageCode = TypeToMessageCodeMap[typeof(T)];
             var size = BitConverter.GetBytes(IPAddress.HostToNetworkOrder(messageBody.Length + 1));
             destination.Write(size, 0, size.Length);
             destination.WriteByte((byte)messageCode);
@@ -103,27 +109,31 @@ namespace CorrugatedIron.Encoding
 
         public T Decode<T>(Stream source) where T : new()
         {
-            var sizeBuffer = new byte[4];
-            source.Read(sizeBuffer, 0, 4);
+            var length = new byte[4];
+            source.Read(length, 0, length.Length);
+            var size = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(length, 0));
 
-            var size = default(int);
-            if (Serializer.TryReadLengthPrefix(source, PrefixStyle.Fixed32, out size))
+            // This message code validation is here to make sure that the caller
+            // is getting exactly what they expect. This "could" be removed from
+            // production code, but it's a good thing to have in here for dev.
+            var messageCode = (MessageCode)source.ReadByte();
+            if (MessageCodeToTypeMap[messageCode] != typeof(T))
             {
-                if (size <= 1)
-                {
-                    return new T();
-                }
-
-                var messageCode = (MessageCode)source.ReadByte();
-                if (_messageCodeToTypeMap[messageCode] != typeof(T))
-                {
-                    throw new InvalidOperationException(string.Format("Attempt to decode message to type '{0}' when received type '{1}'.", typeof(T).Name, _messageCodeToTypeMap[messageCode].Name));
-                }
-
-                return Serializer.Deserialize<T>(source);
+                throw new InvalidOperationException(string.Format("Attempt to decode message to type '{0}' when received type '{1}'.", typeof(T).Name, MessageCodeToTypeMap[messageCode].Name));
             }
 
-            throw new Exception("Unable to read size from source stream.");
+            if (size <= 1)
+            {
+                return new T();
+            }
+
+            var resultBuffer = new byte[size - 1];
+            source.Read(resultBuffer, 0, resultBuffer.Length);
+
+            using (var memStream = new MemoryStream(resultBuffer))
+            {
+                return Serializer.Deserialize<T>(memStream);
+            }
         }
 
         public T Decode<T>(byte[] source) where T : new()
