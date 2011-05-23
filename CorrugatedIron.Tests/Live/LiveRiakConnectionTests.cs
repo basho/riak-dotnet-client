@@ -23,27 +23,36 @@ using NUnit.Framework;
 
 namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
 {
-    [TestFixture]
-    public class WhenTalkingToRiak
+    public class LiveRiakConnectionTestBase
     {
-        private const string TestBucket = "test_bucket";
-        private const string TestKey = "test_json";
-        private const string TestJson = "{\"string\":\"value\",\"int\":100,\"float\":2.34,\"array\":[1,2,3],\"dict\":{\"foo\":\"bar\"}}";
+        protected const string TestHost = "riak-test";
+        protected const int TestHostPort = 8081;
+        protected const string TestBucket = "test_bucket";
+        protected const string TestKey = "test_json";
+        protected const string TestJson = "{\"string\":\"value\",\"int\":100,\"float\":2.34,\"array\":[1,2,3],\"dict\":{\"foo\":\"bar\"}}";
 
-        private IRiakConnectionManager _connectionManager;
-        private IRiakConnectionConfiguration _connectionConfig;
+        protected IRiakConnectionManager _connectionManager;
+        protected IRiakConnectionConfiguration _connectionConfig;
+        protected IRiakClient _client;
+
+        public LiveRiakConnectionTestBase(int poolSize = 1, int idleTimeout = 10000)
+        {
+            _connectionConfig = new RiakConnectionManualConfiguration
+            {
+                HostAddress = TestHost,
+                HostPort = TestHostPort,
+                PoolSize = poolSize,
+                AcquireTimeout = 4000,
+                IdleTimeout = idleTimeout
+            };
+
+        }
 
         [SetUp]
         public void SetUp()
         {
-            _connectionConfig = new RiakConnectionConfiguration
-            {
-                HostAddress = "10.5.26.39",
-                HostPort = 8081,
-                PoolSize = 1
-            };
-
             _connectionManager = new RiakConnectionManager(_connectionConfig);
+            _client = new RiakClient(_connectionManager);
         }
 
         [TearDown]
@@ -52,11 +61,24 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
             _connectionManager.Dispose();
         }
 
+    }
+
+    [TestFixture]
+    public class WhenTalkingToRiak : LiveRiakConnectionTestBase
+    {
         [Test]
         public void PingRequstResultsInPingResponse()
         {
-            var result = _connectionManager.UseConnection(conn => conn.Ping());
-            result.IsError.ShouldBeFalse();
+            var result = _client.Ping();
+            result.IsSuccess.ShouldBeTrue();
+        }
+
+        [Test]
+        public void ReadingMissingValueDoesntBreak()
+        {
+            var readResult = _client.Get("nobucket", "novalue");
+            readResult.IsSuccess.ShouldBeFalse();
+            readResult.ResultCode.ShouldEqual(ResultCode.NotFound);
         }
 
         [Test]
@@ -64,11 +86,11 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
         {
             var doc = new RiakObject(TestBucket, TestKey, TestJson, Constants.ContentTypes.ApplicationJson);
 
-            var writeResult = _connectionManager.UseConnection(conn => conn.Put(doc));
-            writeResult.IsError.ShouldBeFalse();
+            var writeResult = _client.Put(doc);
+            writeResult.IsSuccess.ShouldBeTrue();
 
-            var readResult = _connectionManager.UseConnection(conn => conn.Get(TestBucket, TestKey));
-            readResult.IsError.ShouldBeFalse();
+            var readResult = _client.Get(TestBucket, TestKey);
+            readResult.IsSuccess.ShouldBeTrue();
 
             var loadedDoc = readResult.Value;
 
@@ -76,6 +98,56 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
             loadedDoc.Key.ShouldEqual(doc.Key);
             loadedDoc.Value.ShouldEqual(doc.Value);
             loadedDoc.VectorClock.ShouldNotBeNullOrEmpty();
+        }
+    }
+
+    [TestFixture]
+    public class WhenConnectionGoesIdle : LiveRiakConnectionTestBase
+    {
+        public WhenConnectionGoesIdle()
+            : base(1, 1)
+        {
+        }
+
+        private IRiakConnection GetIdleConnection()
+        {
+            var result = _connectionManager.UseConnection(RiakResult<IRiakConnection>.Success);
+            System.Threading.Thread.Sleep(_connectionConfig.IdleTimeout + 1000);
+            return result.Value;
+        }
+
+        [Test]
+        public void IsIdleFlagIsSet()
+        {
+            var conn = GetIdleConnection();
+            conn.IsIdle.ShouldBeTrue();
+        }
+
+        [Test]
+        [Ignore("Please see function comments")]
+        public void ConnectionToRiakIsTerminated()
+        {
+            // TODO: should we do this? It would require
+            // diving into private members. I think this
+            // is overkill given that the IsIdle flag
+            // is based on the connection status anyway.
+            // Thoughts?
+        }
+
+        [Test]
+        public void ConnectionIsRestoredOnNextUse()
+        {
+            GetIdleConnection();
+            var result = _client.Ping();
+            result.IsSuccess.ShouldBeTrue();
+        }
+
+        [Test]
+        public void IdleFlagIsUnsetOnNextUse()
+        {
+            var conn = GetIdleConnection();
+            _client.Ping();
+            conn.IsIdle.ShouldBeFalse();
         }
     }
 }

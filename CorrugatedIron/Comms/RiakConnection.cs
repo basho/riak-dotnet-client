@@ -15,35 +15,44 @@
 // under the License.
 
 using System;
-using System.Linq;
 using System.Net.Sockets;
+using System.Threading;
 using CorrugatedIron.Config;
 using CorrugatedIron.Encoding;
-using CorrugatedIron.Extensions;
-using CorrugatedIron.Messages;
-using CorrugatedIron.Models;
-using CorrugatedIron.Util;
 
 namespace CorrugatedIron.Comms
 {
     public interface IRiakConnection : IDisposable
     {
-        RiakResult Ping();
-        RiakResult SetClientId(string clientId);
-        RiakResult<RiakObject> Get(string bucket, string key, uint rVal = Constants.Defaults.RVal);
-        RiakResult<RiakObject> Put(RiakObject value, RiakPutOptions options = null);
+        bool IsIdle { get; }
+        void BeginIdle();
+        void EndIdle();
+
+        RiakResult<TResult> Read<TResult>()
+            where TResult : new();
+        RiakResult Write<TRequest>(TRequest request);
+        RiakResult<TResult> WriteRead<TRequest, TResult>(TRequest request)
+            where TResult : new();
     }
 
     public class RiakConnection : IRiakConnection
     {
         private readonly IRiakConnectionConfiguration _connectionConfiguration;
         private readonly MessageEncoder _encoder;
+        private readonly object _idleTimerLock = new object();
         private TcpClient _client;
         private NetworkStream _clientStream;
+        private Timer _idleTimer;
+
+        public bool IsIdle
+        {
+            get { return _client == null; }
+        }
 
         private TcpClient Client
         {
-            get {
+            get
+            {
                 return _client ??
                        (_client = new TcpClient(_connectionConfiguration.HostAddress, _connectionConfiguration.HostPort));
             }
@@ -60,50 +69,26 @@ namespace CorrugatedIron.Comms
             _encoder = new MessageEncoder();
         }
 
-        public RiakResult Ping()
+        public void BeginIdle()
         {
-            var result = WriteRead<RpbPingReq, RpbPingResp>(new RpbPingReq());
-            return result;
-        }
+            if (IsIdle) return;
+            if (_idleTimer != null) return;
 
-        public RiakResult SetClientId(string clientId)
-        {
-            var result = WriteRead<RpbSetClientIdReq, RpbSetClientIdResp>(new RpbSetClientIdReq { ClientId = clientId.ToRiakString() });
-            return result;
-        }
-
-        public RiakResult<RiakObject> Get(string bucket, string key, uint rVal = Constants.Defaults.RVal)
-        {
-            var request = new RpbGetReq { Bucket = bucket.ToRiakString(), Key = key.ToRiakString(), R = rVal };
-            var result = WriteRead<RpbGetReq, RpbGetResp>(request);
-            if (result.IsError)
+            lock (_idleTimerLock)
             {
-                return RiakResult<RiakObject>.Error(result.ErrorMessage);
-            }
+                if (IsIdle) return;
+                if (_idleTimer != null) return;
 
-            return RiakResult<RiakObject>.Success(new RiakObject(bucket, key, result.Value.Content.First(), result.Value.VectorClock));
+                _idleTimer = new Timer(_ => GoIdle(), null, 0, _connectionConfiguration.IdleTimeout);
+            }
         }
 
-        public RiakResult<RiakObject> Put(RiakObject value, RiakPutOptions options = null)
+        public void EndIdle()
         {
-            options = options ?? new RiakPutOptions();
-
-            var request = value.ToMessage();
-            options.Populate(request);
-
-            var result = WriteRead<RpbPutReq, RpbPutResp>(request);
-
-            if (result.IsError)
-            {
-                return RiakResult<RiakObject>.Error(result.ErrorMessage);
-            }
-
-            return RiakResult<RiakObject>.Success(options.ReturnBody
-                ? new RiakObject(value.Bucket, value.Key, result.Value.Content.First(), result.Value.VectorClock)
-                : value);
+            CleanUpTimer();
         }
 
-        private RiakResult<TResult> Read<TResult>()
+        public RiakResult<TResult> Read<TResult>()
             where TResult : new()
         {
             try
@@ -113,11 +98,11 @@ namespace CorrugatedIron.Comms
             }
             catch (Exception ex)
             {
-                return RiakResult<TResult>.Error(ex.Message);
+                return RiakResult<TResult>.Error(ResultCode.CommunicationError, ex.Message);
             }
         }
 
-        private RiakResult Write<TRequest>(TRequest request)
+        public RiakResult Write<TRequest>(TRequest request)
         {
             try
             {
@@ -126,30 +111,59 @@ namespace CorrugatedIron.Comms
             }
             catch (Exception ex)
             {
-                return RiakResult.Error(ex.Message);
+                return RiakResult.Error(ResultCode.CommunicationError, ex.Message);
             }
         }
 
-        private RiakResult<TResult> WriteRead<TRequest, TResult>(TRequest request)
+        public RiakResult<TResult> WriteRead<TRequest, TResult>(TRequest request)
             where TResult : new()
         {
             var writeResult = Write(request);
-            if (!writeResult.IsError)
+            if (writeResult.IsSuccess)
             {
                 return Read<TResult>();
             }
-            return RiakResult<TResult>.Error(writeResult.ErrorMessage);
+            return RiakResult<TResult>.Error(writeResult.ResultCode, writeResult.ErrorMessage);
         }
 
         public void Dispose()
         {
-            if (_clientStream != null)
+            CleanUp();
+        }
+
+        private void GoIdle()
+        {
+            CleanUp();
+        }
+
+        private void CleanUp()
+        {
+            var client = _client;
+            _client = null;
+            var clientStream = _clientStream;
+            _clientStream = null;
+
+            if (clientStream != null)
             {
-                _clientStream.Dispose();
+                clientStream.Dispose();
             }
-            if (_client != null)
+            if (client != null)
             {
-                _client.Close();
+                client.Close();
+            }
+            CleanUpTimer();
+        }
+
+        private void CleanUpTimer()
+        {
+            if (_idleTimer == null) return;
+
+            lock (_idleTimerLock)
+            {
+                // ignore R#'s warning, this IS possible across threads.
+                if (_idleTimer == null) return;
+                _idleTimer.Dispose();
+                _idleTimer = null;
             }
         }
     }

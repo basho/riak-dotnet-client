@@ -36,32 +36,41 @@ namespace CorrugatedIron.Comms
         {
             _connectionConfiguration = connectionConfiguration;
             _connections = new ResourcePool<IRiakConnection>(connectionConfiguration.PoolSize,
+                connectionConfiguration.AcquireTimeout,
                 () => new RiakConnection(connectionConfiguration),
                 conn => conn.Dispose());
         }
 
         public RiakResult UseConnection(Func<IRiakConnection, RiakResult> useFun)
         {
-            if (_disposing) return RiakResult.Error("Shutting down");
+            if (_disposing) return RiakResult.Error(ResultCode.ShuttingDown);
 
             var response = _connections.Consume(useFun);
             if (response.Item1)
             {
                 return response.Item2;
             }
-            return RiakResult.Error();
+            return RiakResult.Error(ResultCode.CommunicationError);
         }
 
         public RiakResult<TResult> UseConnection<TResult>(Func<IRiakConnection, RiakResult<TResult>> useFun)
         {
-            if (_disposing) return RiakResult<TResult>.Error("Shutting down");
+            if (_disposing) return RiakResult<TResult>.Error(ResultCode.ShuttingDown);
 
-            var response = _connections.Consume(useFun);
+            Func<IRiakConnection, RiakResult<TResult>> wrapper = conn =>
+                {
+                    using (new RiakConnectionIdler(conn))
+                    {
+                        return useFun(conn);
+                    }
+                };
+
+            var response = _connections.Consume(wrapper);
             if (response.Item1)
             {
                 return response.Item2;
             }
-            return RiakResult<TResult>.Error();
+            return RiakResult<TResult>.Error(ResultCode.CommunicationError);
         }
 
         public void Dispose()
