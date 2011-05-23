@@ -22,12 +22,12 @@ namespace CorrugatedIron.Extensions
 
         public static byte[] ToRiakString(this string value)
         {
-            return RiakEncoding.GetBytes(value);
+            return value == null ? null : RiakEncoding.GetBytes(value);
         }
 
         public static string FromRiakString(this byte[] value)
         {
-            return RiakEncoding.GetString(value);
+            return value == null ? null : RiakEncoding.GetString(value);
         }
     }
 }

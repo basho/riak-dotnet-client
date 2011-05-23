@@ -14,15 +14,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.IO;
+using System;
 
-namespace CorrugatedIron.Encoding
+namespace CorrugatedIron.Config
 {
-    public interface IMessageEncoder
+    public class RiakConnectionManualConfiguration : IRiakConnectionConfiguration
     {
-        void Encode<T>(T message, Stream destination);
-        byte[] Encode<T>(T message);
-        T Decode<T>(Stream source) where T : new();
-        T Decode<T>(byte[] source) where T : new();
+        public string HostAddress { get; set; }
+        public int HostPort { get; set; }
+        public int PoolSize { get; set; }
+        public int AcquireTimeout { get; set; }
+        public int IdleTimeout { get; set; }
     }
 }

@@ -14,9 +14,13 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CorrugatedIron.Comms
+namespace CorrugatedIron.Models
 {
-    public interface IRiakConnection
+    public interface IRiakBucket
+    {
+    }
+
+    public class RiakBucket : IRiakBucket
     {
     }
 }
