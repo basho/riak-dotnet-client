@@ -30,5 +30,14 @@ namespace CorrugatedIron.KeyFilters
         {
             Set = set;
         }
+
+        protected override void WriteArguments(object[] arguments, Newtonsoft.Json.JsonWriter writer)
+        {
+            writer.WriteStartArray();
+            writer.WriteStartArray();
+            Set.ForEach(v => writer.WriteValue(v));
+            writer.WriteEndArray();
+            writer.WriteEndArray();
+        }
     }
 }
