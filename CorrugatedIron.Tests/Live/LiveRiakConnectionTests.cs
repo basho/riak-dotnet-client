@@ -161,17 +161,6 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
         }
 
         [Test]
-        [Ignore("Please see function comments")]
-        public void ConnectionToRiakIsTerminated()
-        {
-            // TODO: should we do this? It would require
-            // diving into private members. I think this
-            // is overkill given that the IsIdle flag
-            // is based on the connection status anyway.
-            // Thoughts?
-        }
-
-        [Test]
         public void ConnectionIsRestoredOnNextUse()
         {
             GetIdleConnection();
