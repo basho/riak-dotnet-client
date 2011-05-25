@@ -13,22 +13,20 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-using System;
-using System.Text;
-using System.IO;
-using Newtonsoft.Json;
 
 namespace CorrugatedIron.KeyFilters
 {
     /// <summary>
-    /// Splits the input on the string given as the first argument and returns the nth token specified by the second argument.
+    /// Splits the input on the string given as the first argument and returns the nth
+    /// token specified by the second argument.
     /// </summary>
     public class Tokenize : RiakNValueKeyFilter
     {
         public string Token { get; private set; }
         public uint Position { get; private set; }
         
-        public Tokenize (string token, uint position) : base("tokenize", token, position)
+        public Tokenize(string token, uint position)
+            : base("tokenize", token, position)
         {
             Token = token;
             Position = position;

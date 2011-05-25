@@ -21,9 +21,9 @@ namespace CorrugatedIron.KeyFilters
     /// </summary>
     public class LessThanOrEqualTo<T> : RiakNValueKeyFilter
     {
-        public LessThanOrEqualTo(T arg) : base("less_than_eq", arg)
+        public LessThanOrEqualTo(T arg)
+            : base("less_than_eq", arg)
         {
-            
         }
     }
 }

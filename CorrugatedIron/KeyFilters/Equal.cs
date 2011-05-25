@@ -21,9 +21,9 @@ namespace CorrugatedIron.KeyFilters
     /// </summary>
     public class Equal<T> : RiakNValueKeyFilter
     {
-        public Equal(T arg) : base("eq", arg)
+        public Equal(T arg)
+            : base("eq", arg)
         {
-            
         }
     }
 }

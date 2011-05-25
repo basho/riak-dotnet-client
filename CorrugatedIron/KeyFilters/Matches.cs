@@ -23,7 +23,8 @@ namespace CorrugatedIron.KeyFilters
     {
         public T Match { get; private set; }
         
-        public Matches(T arg) : base("matches", arg)
+        public Matches(T arg)
+            : base("matches", arg)
         {
             Match = arg;
         }

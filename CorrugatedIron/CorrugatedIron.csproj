@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -57,6 +57,7 @@
     <Compile Include="Config\IRiakConnectionConfiguration.cs" />
     <Compile Include="Config\RiakConnectionAutoConfiguration.cs" />
     <Compile Include="Config\RiakConnectionManualConfiguration.cs" />
+    <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="Models\RiakLink.cs" />
     <Compile Include="Models\RiakPutOptions.cs" />
     <Compile Include="Util\Constants.cs" />
@@ -92,7 +93,6 @@
     <Compile Include="Messages\RpbSetClientIdReq.cs" />
     <Compile Include="Messages\RpbSetClientIdResp.cs" />
     <Compile Include="Encoding\MessageEncoder.cs" />
-    <Compile Include="Models\RiakBucket.cs" />
     <Compile Include="Models\RiakObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Models\RiakMapReduce.cs" />
@@ -132,8 +132,5 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <ItemGroup>
-    <Folder Include="KeyFilters\" />
-    <Folder Include="Models\" />
-  </ItemGroup>
+  <ItemGroup />
 </Project>

@@ -13,28 +13,27 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-using System;
+
 using System.IO;
 using System.Text;
-using System.Collections.Generic;
+using CorrugatedIron.Extensions;
 using Newtonsoft.Json;
 
 namespace CorrugatedIron.KeyFilters
 {
-    public class RiakNValueKeyFilter : IRiakKeyFilter
+    public abstract class RiakNValueKeyFilter : IRiakKeyFilter
     {
         public string FunctionName { get; set; }
         public object[] Arguments {get; set;}
-        
-        public RiakNValueKeyFilter() 
+
+        protected RiakNValueKeyFilter() 
         {
-            
         }
-        
-        public RiakNValueKeyFilter (string functionName, params object[] args)
+
+        protected RiakNValueKeyFilter(string functionName, params object[] args)
         {
             FunctionName = functionName;
-            Arguments = args;
+            Arguments = args ?? new object[0];
         }
         
         public override string ToString()
@@ -44,16 +43,16 @@ namespace CorrugatedIron.KeyFilters
         
         public string ToJsonString()
         {
-            StringBuilder sb = new StringBuilder();
-            StringWriter sw = new StringWriter(sb);
+            var sb = new StringBuilder();
             
+            using(var sw = new StringWriter(sb))
             using (JsonWriter jw = new JsonTextWriter(sw))
             {
                 jw.WriteStartArray();
                 jw.WriteStartArray();
                 jw.WriteValue(FunctionName);
-                
-                (new List<object>(Arguments)).ForEach( arg => jw.WriteValue(arg) );
+
+                Arguments.ForEach(jw.WriteValue);
                 
                 jw.WriteEndArray();
                 jw.WriteEndArray();
