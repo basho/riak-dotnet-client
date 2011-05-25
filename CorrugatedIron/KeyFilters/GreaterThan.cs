@@ -21,9 +21,9 @@ namespace CorrugatedIron.KeyFilters
     /// </summary>
     public class GreatherThan<T> : RiakNValueKeyFilter
     {
-        public GreatherThan(T arg) : base("greater_than", arg)
+        public GreatherThan(T arg)
+            : base("greater_than", arg)
         {
-            
         }
     }
 }

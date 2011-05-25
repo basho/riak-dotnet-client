@@ -23,7 +23,8 @@ namespace CorrugatedIron.KeyFilters
     {
         public T Argument { get; private set; }
         
-        public NotEqual(T arg) : base("neq", arg)
+        public NotEqual(T arg)
+            : base("neq", arg)
         {
             Argument = arg;
         }

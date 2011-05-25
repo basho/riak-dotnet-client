@@ -21,7 +21,8 @@ namespace CorrugatedIron.KeyFilters
     /// </summary>
     public class And : RiakNValueKeyFilter
     {
-        public And (IRiakKeyFilter first, IRiakKeyFilter second) : base("and", first, second)
+        public And(IRiakKeyFilter first, IRiakKeyFilter second)
+            : base("and", first, second)
         {
             
         }

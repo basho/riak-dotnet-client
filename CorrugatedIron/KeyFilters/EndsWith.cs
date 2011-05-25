@@ -21,9 +21,9 @@ namespace CorrugatedIron.KeyFilters
     /// </summary>
     public class EndsWith : RiakNValueKeyFilter
     {
-        public EndsWith(string arg) : base("ends_with", arg)
+        public EndsWith(string arg)
+            : base("ends_with", arg)
         {
-            
         }
     }
 }

@@ -13,10 +13,6 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-using System;
-using System.Text;
-using System.IO;
-using Newtonsoft.Json;
 
 namespace CorrugatedIron.KeyFilters
 {
@@ -29,7 +25,8 @@ namespace CorrugatedIron.KeyFilters
         public IRiakKeyFilter First { get; private set; }
         public IRiakKeyFilter Second { get; private set; }
         
-        public Or (IRiakKeyFilter first, IRiakKeyFilter second) : base("or", first, second)
+        public Or(IRiakKeyFilter first, IRiakKeyFilter second)
+            : base("or", first, second)
         {
             First = first;
             Second = second;

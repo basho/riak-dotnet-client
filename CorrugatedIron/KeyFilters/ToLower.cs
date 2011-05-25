@@ -13,10 +13,6 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-using System;
-using System.Text;
-using System.IO;
-using Newtonsoft.Json;
 
 namespace CorrugatedIron.KeyFilters
 {
@@ -25,9 +21,9 @@ namespace CorrugatedIron.KeyFilters
     /// </summary>
     public class ToLower : RiakNValueKeyFilter
     {
-        public ToLower () : base("to_lower")
+        public ToLower()
+            : base("to_lower")
         {
-            
         }
     }
 }

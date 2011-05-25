@@ -13,16 +13,13 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
+
 using System;
 using System.Text;
 using System.IO;
-using System.Collections.Generic;
-using CorrugatedIron.Util;
-using CorrugatedIron.Messages;
-using CorrugatedIron.Extensions;
 using Newtonsoft.Json;
 
-namespace CorrugatedIron
+namespace CorrugatedIron.Models
 {
     /* Looks like there will be some custom work to do to get MapReduce phases into a 
      * string properly. JSON.NET won't let us designate this class with a title for 

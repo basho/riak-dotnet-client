@@ -21,9 +21,9 @@ namespace CorrugatedIron.KeyFilters
     /// </summary>
     public class StartsWith : RiakNValueKeyFilter
     {
-        public StartsWith(string arg) : base("starts_with", arg)
+        public StartsWith(string arg)
+            : base("starts_with", arg)
         {
-            
         }
     }
 }

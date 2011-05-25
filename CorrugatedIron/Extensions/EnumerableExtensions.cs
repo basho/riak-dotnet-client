@@ -14,13 +14,19 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CorrugatedIron.Models
-{
-    public interface IRiakBucket
-    {
-    }
+using System;
+using System.Collections.Generic;
 
-    public class RiakBucket : IRiakBucket
+namespace CorrugatedIron.Extensions
+{
+    public static class EnumerableExtensions
     {
+        public static void ForEach<T>(this IEnumerable<T> items, Action<T> action)
+        {
+            foreach (var item in items)
+            {
+                action(item);
+            }
+        }
     }
 }

@@ -13,6 +13,7 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
+
 using System.Collections.Generic;
 
 namespace CorrugatedIron.KeyFilters
@@ -23,7 +24,9 @@ namespace CorrugatedIron.KeyFilters
     public class SetMember<T> : RiakNValueKeyFilter
     {
         public List<T> Set { get; private set; }
-        public SetMember(List<T> set) : base("set_member", set.ToArray())
+
+        public SetMember(List<T> set)
+            : base("set_member", set.ToArray())
         {
             Set = set;
         }

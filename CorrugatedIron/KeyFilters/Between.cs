@@ -13,7 +13,6 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-using System.Collections.Generic;
 
 namespace CorrugatedIron.KeyFilters
 {
@@ -24,10 +23,9 @@ namespace CorrugatedIron.KeyFilters
     /// </summary>
     public class Between<T> : RiakNValueKeyFilter
     {
-        public Between(T first, T second, bool inclusive = true) : base ("between", first, second, inclusive)
+        public Between(T first, T second, bool inclusive = true)
+            : base("between", first, second, inclusive)
         {
-            
-            
         }
     }
 }

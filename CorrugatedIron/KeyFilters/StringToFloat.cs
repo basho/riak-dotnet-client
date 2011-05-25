@@ -13,21 +13,17 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-using System;
-using System.Text;
-using System.IO;
-using Newtonsoft.Json;
 
 namespace CorrugatedIron.KeyFilters
 {
     /// <summary>
-    /// Truns a string into a floating point number.
+    /// Turns a string into a floating point number.
     /// </summary>
     public class StringToFloat : RiakNValueKeyFilter
     {
-        public StringToFloat () : base("string_to_float")
+        public StringToFloat()
+            : base("string_to_float")
         {
-            
         }
     }
 }
