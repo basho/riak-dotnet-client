@@ -22,8 +22,8 @@ namespace CorrugatedIron.Comms
 {
     public interface IRiakConnectionManager : IDisposable
     {
-        RiakResult<TResult> UseConnection<TResult>(Func<IRiakConnection, RiakResult<TResult>> useFun);
-        RiakResult UseConnection(Func<IRiakConnection, RiakResult> useFun);
+        RiakResult<TResult> UseConnection<TResult>(Func<IRiakConnection, RiakResult<TResult>> useFun, bool setClientId = true);
+        RiakResult UseConnection(Func<IRiakConnection, RiakResult> useFun, bool setClientId = true);
     }
 
     public class RiakConnectionManager : IRiakConnectionManager
@@ -41,11 +41,19 @@ namespace CorrugatedIron.Comms
                 conn => conn.Dispose());
         }
 
-        public RiakResult UseConnection(Func<IRiakConnection, RiakResult> useFun)
+        public RiakResult UseConnection(Func<IRiakConnection, RiakResult> useFun, bool setClientId = true)
         {
             if (_disposing) return RiakResult.Error(ResultCode.ShuttingDown);
 
-            var response = _connections.Consume(useFun);
+            Func<IRiakConnection, RiakResult> wrapper = conn =>
+                {
+                    using (new RiakConnectionUsageManager(conn, setClientId))
+                    {
+                        return useFun(conn);
+                    }
+                };
+
+            var response = _connections.Consume(wrapper);
             if (response.Item1)
             {
                 return response.Item2;
@@ -53,13 +61,13 @@ namespace CorrugatedIron.Comms
             return RiakResult.Error(ResultCode.CommunicationError);
         }
 
-        public RiakResult<TResult> UseConnection<TResult>(Func<IRiakConnection, RiakResult<TResult>> useFun)
+        public RiakResult<TResult> UseConnection<TResult>(Func<IRiakConnection, RiakResult<TResult>> useFun, bool setClientId = true)
         {
             if (_disposing) return RiakResult<TResult>.Error(ResultCode.ShuttingDown);
 
             Func<IRiakConnection, RiakResult<TResult>> wrapper = conn =>
                 {
-                    using (new RiakConnectionIdler(conn))
+                    using (new RiakConnectionUsageManager(conn, setClientId))
                     {
                         return useFun(conn);
                     }

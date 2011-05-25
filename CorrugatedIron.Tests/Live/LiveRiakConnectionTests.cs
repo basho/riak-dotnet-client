@@ -119,13 +119,6 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
         }
 
         [Test]
-        public void SettingTheClientIdIsSuccessful()
-        {
-            var result = Client.SetClientId("test");
-            result.IsSuccess.ShouldBeTrue();
-        }
-
-        [Test]
         public void MapReduceQueriesReturnData()
         {
             const string dummyData = "{{ value: {0} }}";
