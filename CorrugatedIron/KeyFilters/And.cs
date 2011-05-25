@@ -19,12 +19,11 @@ namespace CorrugatedIron.KeyFilters
     /// <summary>
     /// Joins two or more key-filter operations with a logical AND operation.
     /// </summary>
-    public class And : RiakNValueKeyFilter
+    public class And : RiakCompositeNValueKeyFilter
     {
         public And(IRiakKeyFilter first, IRiakKeyFilter second)
             : base("and", first, second)
         {
-            
         }
     }
 }

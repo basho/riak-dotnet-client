@@ -25,5 +25,18 @@ namespace CorrugatedIron.KeyFilters
             : base("eq", arg)
         {
         }
+
+        protected override void WriteArguments(object[] arguments, Newtonsoft.Json.JsonWriter writer)
+        {
+            var filter = arguments[0] as IRiakKeyFilter;
+            if (filter != null)
+            {
+                writer.WriteRawValue(filter.ToJsonString());
+            }
+            else
+            {
+                base.WriteArguments(arguments, writer);
+            }
+        }
     }
 }

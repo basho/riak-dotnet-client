@@ -13,20 +13,19 @@
 // // KIND, either express or implied.  See the License for the
 // // specific language governing permissions and limitations
 // // under the License.
-using System;
+
 using CorrugatedIron.Models;
 using CorrugatedIron.Util;
 using CorrugatedIron.Tests.Extensions;
 using NUnit.Framework;
-using Newtonsoft.Json;
 
-namespace CorrugatedIron.Tests
+namespace CorrugatedIron.Tests.Models
 {
     [TestFixture]
     public class RiakMapReducePhaseTests
     {
-        private const string MRMapPhaseString = "{\"map\":{\"language\":\"javascript\",\"keep\":true,\"source\":\"function(o) { return [1]; }\"}}";
-        private const string MRReducePhaseString = "{\"reduce\":{\"language\":\"javascript\",\"keep\":true,\"name\":\"Riak.reduceSum\"}}";
+        private const string MrMapPhaseString = "{\"map\":{\"language\":\"javascript\",\"keep\":true,\"source\":\"function(o) { return [1]; }\"}}";
+        private const string MrReducePhaseString = "{\"reduce\":{\"language\":\"javascript\",\"keep\":true,\"name\":\"Riak.reduceSum\"}}";
         
         [SetUp]
         public void SetUp()
@@ -35,29 +34,33 @@ namespace CorrugatedIron.Tests
         [Test]
         public void ConvertingMapPhaseToPhaseStringProducesValidJson()
         {
-            var phase = new RiakMapReducePhase();
-            phase.Keep = true;
-            phase.Source = "function(o) { return [1]; }";
-            phase.MapReduceLanguage = Constants.MapReduceLanguage.JavaScript;
-            phase.MapReducePhaseType = Constants.MapReducePhaseType.Map;
-            
+            var phase = new RiakMapReducePhase
+                            {
+                                Keep = true,
+                                Source = "function(o) { return [1]; }",
+                                MapReduceLanguage = Constants.MapReduceLanguage.JavaScript,
+                                MapReducePhaseType = Constants.MapReducePhaseType.Map
+                            };
+
             var json = phase.ToJsonString();
             
-            json.ShouldEqual(MRMapPhaseString);
+            json.ShouldEqual(MrMapPhaseString);
         }
         
         [Test]
         public void ConvertingReducePhaseToPhaseStringProducesValidJson()
         {
-            var phase = new RiakMapReducePhase();
-            phase.Keep = true;
-            phase.Name = "Riak.reduceSum";
-            phase.MapReduceLanguage = Constants.MapReduceLanguage.JavaScript;
-            phase.MapReducePhaseType = Constants.MapReducePhaseType.Reduce;
-            
+            var phase = new RiakMapReducePhase
+                            {
+                                Keep = true,
+                                Name = "Riak.reduceSum",
+                                MapReduceLanguage = Constants.MapReduceLanguage.JavaScript,
+                                MapReducePhaseType = Constants.MapReducePhaseType.Reduce
+                            };
+
             var json = phase.ToJsonString();
             
-            json.ShouldEqual(MRReducePhaseString);
+            json.ShouldEqual(MrReducePhaseString);
         }
     }
 }

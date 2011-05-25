@@ -13,14 +13,13 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-using System;
+
 using System.Collections.Generic;
 using NUnit.Framework;
-using Newtonsoft.Json;
 using CorrugatedIron.KeyFilters;
 using CorrugatedIron.Tests.Extensions;
 
-namespace CorrugatedIron.Tests
+namespace CorrugatedIron.Tests.KeyFilters
 {
     [TestFixture]
     public class KeyFilterTests
@@ -42,13 +41,13 @@ namespace CorrugatedIron.Tests
         internal const string MatchesJson = @"[[""matches"",""solutions""]]";
         internal const string NotEqualJson = @"[[""neq"",""foo""]]";
         internal const string EqualJson = @"[[""eq"",""basho""]]";
-        internal const string SetMemberJson = @"[[""set_member"",""basho"",""google"",""yahoo""]]";
+        internal const string SetMemberJson = @"[[""set_member"",[[""basho"",""google"",""yahoo""]]]]";
         internal const string SimilarToJson = @"[[""similar_to"",""newyork"",3]]";
         internal const string StartsWithJson = @"[[""starts_with"",""closed""]]";
         internal const string EndsWithJson = @"[[""ends_with"",""0603""]]";
-        internal const string AndJson = @"[""and"",[[""ends_with"",""0603""]],[[""starts_with"",""basho""]]]";
-        internal const string OrJson = @"[""or"",[[""eq"",""google""]],[[""less_than"",""g""]]]";
-        internal const string NotJson = @"[""not"",[[""matches"",""solution""]]]";
+        internal const string AndJson = @"[[""and"",[[""ends_with"",""0603""]],[[""starts_with"",""basho""]]]]";
+        internal const string OrJson = @"[[""or"",[[""eq"",""google""]],[[""less_than"",""g""]]]]";
+        internal const string NotJson = @"[[""not"",[[""matches"",""solution""]]]]";
     }
     
     public class WhenConstructingKeyFilters : KeyFilterTests
@@ -159,7 +158,7 @@ namespace CorrugatedIron.Tests
         [Test]
         public void SetMemberCorrectlyConvertsToJson()
         {
-            var setMember = new SetMember<string>(new List<string>(){"basho","google","yahoo"});
+            var setMember = new SetMember<string>(new List<string>{"basho","google","yahoo"});
             setMember.ToString().ShouldEqual(SetMemberJson);
         }
         

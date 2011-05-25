@@ -14,19 +14,21 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Linq;
+using CorrugatedIron.Extensions;
+
 namespace CorrugatedIron.KeyFilters
 {
     /// <summary>
     /// Negates the result of key-filter operations.
     /// </summary>
-    public class Not : RiakNValueKeyFilter
+    public class Not : RiakCompositeNValueKeyFilter
     {
-        public IRiakKeyFilter First { get; private set; }
+        public IRiakKeyFilter First { get { return (IRiakKeyFilter)Arguments[0]; } }
         
         public Not(IRiakKeyFilter first)
             : base("not", first)
         {
-            First = first;
         }
     }
 }

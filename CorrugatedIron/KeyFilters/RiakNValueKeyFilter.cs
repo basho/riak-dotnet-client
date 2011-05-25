@@ -52,13 +52,18 @@ namespace CorrugatedIron.KeyFilters
                 jw.WriteStartArray();
                 jw.WriteValue(FunctionName);
 
-                Arguments.ForEach(jw.WriteValue);
+                WriteArguments(Arguments, jw);
                 
                 jw.WriteEndArray();
                 jw.WriteEndArray();
             }
             
             return sb.ToString();
+        }
+
+        protected virtual void WriteArguments(object[] arguments, JsonWriter writer)
+        {
+            arguments.ForEach(writer.WriteValue);
         }
     }
 }
