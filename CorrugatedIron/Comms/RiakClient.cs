@@ -25,7 +25,6 @@ namespace CorrugatedIron.Comms
     public interface IRiakClient
     {
         RiakResult Ping();
-        RiakResult SetClientId(string clientId);
         RiakResult<RiakObject> Get(string bucket, string key, uint rVal = Constants.Defaults.RVal);
         RiakResult<RiakObject> Put(RiakObject value, RiakPutOptions options = null);
         RiakResult Delete(string bucket, string key, uint rwVal = Constants.Defaults.RVal);
@@ -43,12 +42,7 @@ namespace CorrugatedIron.Comms
 
         public RiakResult Ping()
         {
-            return _connectionManager.UseConnection(conn => conn.WriteRead<RpbPingReq, RpbPingResp>(new RpbPingReq()));
-        }
-
-        public RiakResult SetClientId(string clientId)
-        {
-            return _connectionManager.UseConnection(conn => conn.WriteRead<RpbSetClientIdReq, RpbSetClientIdResp>(new RpbSetClientIdReq { ClientId = clientId.ToRiakString() }));
+            return _connectionManager.UseConnection(conn => conn.WriteRead<RpbPingReq, RpbPingResp>(new RpbPingReq()), false);
         }
 
         public RiakResult<RiakObject> Get(string bucket, string key, uint rVal = Constants.Defaults.RVal)
