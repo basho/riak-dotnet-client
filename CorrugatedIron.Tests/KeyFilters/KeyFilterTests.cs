@@ -22,7 +22,7 @@ using CorrugatedIron.Tests.Extensions;
 namespace CorrugatedIron.Tests.KeyFilters
 {
     [TestFixture]
-    public class KeyFilterTests
+    public abstract class KeyFilterTests
     {
         internal const string IntToStringJson = @"[[""int_to_string""]]";
         internal const string StringToIntJson = @"[[""string_to_int""]]";
