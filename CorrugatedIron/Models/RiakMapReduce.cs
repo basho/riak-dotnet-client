@@ -31,16 +31,29 @@ namespace CorrugatedIron.Models
 
         public string Bucket { get; set; }
         public string Request { get; set; }
+        public string ContentType { get; set; }
 
         public RiakMapReduce()
         {
             
         }
 
+        // TODO implement inputs as a single bucket 
+        // TODO implement inputs as a list of <Bucket, Key> 
+        // TODO implement inputs as a list of <Bucket, Key, KeyData>
+        // TODO implement inputs as a RiakSearch query
+
         // TODO create and implement Bucket class
-        public RiakMapReduce(string bucket, string request = "")
+        public RiakMapReduce(string request, string contentType = "")
+        {
+            Request = request;
+            ContentType = contentType;
+        }
+
+        public RiakMapReduce(string bucket, string contentType = "", string request = "")
         {
             Bucket = bucket;
+            ContentType = contentType;
             Request = request;
         }
 
