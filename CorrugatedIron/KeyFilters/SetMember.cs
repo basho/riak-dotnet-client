@@ -21,7 +21,7 @@ namespace CorrugatedIron.KeyFilters
     /// <summary>
     /// Tests that the input is contained in the set given as the arguments.
     /// </summary>
-    public class SetMember<T> : RiakNValueKeyFilter
+    public class SetMember<T> : RiakKeyFilterToken
     {
         public List<T> Set { get; private set; }
 

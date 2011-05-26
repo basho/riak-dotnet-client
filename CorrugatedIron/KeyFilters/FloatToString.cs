@@ -19,7 +19,7 @@ namespace CorrugatedIron.KeyFilters
     /// <summary>
     /// Turns a floating point number (previously extracted with string_to_float), into a string.
     /// </summary>
-    public class FloatToString : RiakNValueKeyFilter
+    public class FloatToString : RiakKeyFilterToken
     {
         public FloatToString()
             : base("float_to_string")

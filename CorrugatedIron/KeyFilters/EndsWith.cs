@@ -19,7 +19,7 @@ namespace CorrugatedIron.KeyFilters
     /// <summary>
     /// Tests that the input ends with the argument (a string).
     /// </summary>
-    public class EndsWith : RiakNValueKeyFilter
+    public class EndsWith : RiakKeyFilterToken
     {
         public EndsWith(string arg)
             : base("ends_with", arg)

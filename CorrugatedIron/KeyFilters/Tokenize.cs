@@ -20,7 +20,7 @@ namespace CorrugatedIron.KeyFilters
     /// Splits the input on the string given as the first argument and returns the nth
     /// token specified by the second argument.
     /// </summary>
-    public class Tokenize : RiakNValueKeyFilter
+    public class Tokenize : RiakKeyFilterToken
     {
         public string Token { get; private set; }
         public uint Position { get; private set; }

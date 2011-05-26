@@ -22,11 +22,11 @@ namespace CorrugatedIron.KeyFilters
     /// <summary>
     /// Negates the result of key-filter operations.
     /// </summary>
-    public class Not : RiakCompositeNValueKeyFilter
+    public class Not : RiakCompositeKeyFilterToken
     {
-        public IRiakKeyFilter First { get { return (IRiakKeyFilter)Arguments[0]; } }
+        public IRiakKeyFilterToken First { get { return (IRiakKeyFilterToken)Arguments[0]; } }
         
-        public Not(IRiakKeyFilter first)
+        public Not(IRiakKeyFilterToken first)
             : base("not", first)
         {
         }

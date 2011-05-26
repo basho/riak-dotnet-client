@@ -19,7 +19,7 @@ namespace CorrugatedIron.KeyFilters
     /// <summary>
     /// Tests that the input is not equal to the argument.
     /// </summary>
-    public class NotEqual<T> : RiakNValueKeyFilter
+    public class NotEqual<T> : RiakKeyFilterToken
     {
         public T Argument { get; private set; }
         

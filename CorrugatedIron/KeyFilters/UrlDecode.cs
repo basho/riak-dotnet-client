@@ -19,7 +19,7 @@ namespace CorrugatedIron.KeyFilters
     /// <summary>
     /// URL-decodes the string.
     /// </summary>
-    public class UrlDecode : RiakNValueKeyFilter
+    public class UrlDecode : RiakKeyFilterToken
     {
         public UrlDecode()
             : base("urldecode")

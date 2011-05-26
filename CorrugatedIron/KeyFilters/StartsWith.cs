@@ -19,7 +19,7 @@ namespace CorrugatedIron.KeyFilters
     /// <summary>
     /// Tests that the input begins with the argument (a string).
     /// </summary>
-    public class StartsWith : RiakNValueKeyFilter
+    public class StartsWith : RiakKeyFilterToken
     {
         public StartsWith(string arg)
             : base("starts_with", arg)
