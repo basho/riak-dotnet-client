@@ -28,7 +28,14 @@ namespace CorrugatedIron.KeyFilters
 
         protected override void WriteArguments(object[] arguments, Newtonsoft.Json.JsonWriter writer)
         {
-            arguments.Cast<IRiakKeyFilterToken>().ForEach(v => writer.WriteRawValue(v.ToJsonString()));
+            arguments.Cast<IRiakKeyFilterToken>().ForEach(v =>WriteArgumentAsArray(v, writer) );
+        }
+
+        protected void WriteArgumentAsArray(IRiakKeyFilterToken argument, Newtonsoft.Json.JsonWriter writer)
+        {
+            writer.WriteStartArray();
+            writer.WriteRawValue(argument.ToJsonString());
+            writer.WriteEndArray();
         }
     }
 }
