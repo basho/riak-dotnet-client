@@ -21,7 +21,7 @@ namespace CorrugatedIron.KeyFilters
     /// If the third argument is given, it is whether to treat the range as inclusive. 
     /// If the third argument is omitted, the range is treated as inclusive.
     /// </summary>
-    public class Between<T> : RiakNValueKeyFilter
+    public class Between<T> : RiakKeyFilterToken
     {
         public Between(T first, T second, bool inclusive = true)
             : base("between", first, second, inclusive)

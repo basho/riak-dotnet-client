@@ -19,7 +19,7 @@ namespace CorrugatedIron.KeyFilters
     /// <summary>
     /// Tests that the input is less than the argument.
     /// </summary>
-    public class LessThan<T> : RiakNValueKeyFilter
+    public class LessThan<T> : RiakKeyFilterToken
     {
         public LessThan(T arg)
             : base("less_than", arg)

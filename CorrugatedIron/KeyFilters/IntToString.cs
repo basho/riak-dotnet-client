@@ -19,7 +19,7 @@ namespace CorrugatedIron.KeyFilters
     /// <summary>
     /// Turns an integer (previously extracted with string_to_int), into a string.
     /// </summary>
-    public class IntToString : RiakNValueKeyFilter
+    public class IntToString : RiakKeyFilterToken
     {
         public IntToString ()
             : base("int_to_string")

@@ -19,7 +19,7 @@ namespace CorrugatedIron.KeyFilters
     /// <summary>
     /// Changes all letters to lowercase.
     /// </summary>
-    public class ToLower : RiakNValueKeyFilter
+    public class ToLower : RiakKeyFilterToken
     {
         public ToLower()
             : base("to_lower")

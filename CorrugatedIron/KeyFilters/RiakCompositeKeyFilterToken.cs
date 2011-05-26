@@ -19,16 +19,16 @@ using CorrugatedIron.Extensions;
 
 namespace CorrugatedIron.KeyFilters
 {
-    public abstract class RiakCompositeNValueKeyFilter : RiakNValueKeyFilter
+    public abstract class RiakCompositeKeyFilterToken : RiakKeyFilterToken
     {
-        protected RiakCompositeNValueKeyFilter(string functionName, params object[] args)
+        protected RiakCompositeKeyFilterToken(string functionName, params object[] args)
             : base(functionName, args)
         {
         }
 
         protected override void WriteArguments(object[] arguments, Newtonsoft.Json.JsonWriter writer)
         {
-            arguments.Cast<IRiakKeyFilter>().ForEach(v => writer.WriteRawValue(v.ToJsonString()));
+            arguments.Cast<IRiakKeyFilterToken>().ForEach(v => writer.WriteRawValue(v.ToJsonString()));
         }
     }
 }

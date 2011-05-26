@@ -19,7 +19,7 @@ namespace CorrugatedIron.KeyFilters
     /// <summary>
     /// Changes all letters to uppercase.
     /// </summary>
-    public class ToUpper : RiakNValueKeyFilter
+    public class ToUpper : RiakKeyFilterToken
     {
         public ToUpper()
             : base("to_upper")

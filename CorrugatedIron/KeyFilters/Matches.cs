@@ -19,7 +19,7 @@ namespace CorrugatedIron.KeyFilters
     /// <summary>
     /// Tests that the input matches the regular expression given in the argument.
     /// </summary>
-    public class Matches<T> : RiakNValueKeyFilter
+    public class Matches<T> : RiakKeyFilterToken
     {
         public T Match { get; private set; }
         

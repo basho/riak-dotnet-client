@@ -29,7 +29,7 @@ namespace CorrugatedIron.Models
         public string Request { get; set; }
         
         public string Bucket { get; set; }
-        public List<IRiakKeyFilter> Filters { get; set; }
+        public List<IRiakKeyFilterToken> Filters { get; set; }
         
         // TODO refactor to use phases to build map reduce request on the fly
         public RiakMapReduce (string bucket, string request = "") 

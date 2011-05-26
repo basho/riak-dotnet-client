@@ -19,7 +19,7 @@ namespace CorrugatedIron.KeyFilters
     /// <summary>
     /// Tests that the input is equal to the argument.
     /// </summary>
-    public class Equal<T> : RiakNValueKeyFilter
+    public class Equal<T> : RiakKeyFilterToken
     {
         public Equal(T arg)
             : base("eq", arg)
@@ -28,7 +28,7 @@ namespace CorrugatedIron.KeyFilters
 
         protected override void WriteArguments(object[] arguments, Newtonsoft.Json.JsonWriter writer)
         {
-            var filter = arguments[0] as IRiakKeyFilter;
+            var filter = arguments[0] as IRiakKeyFilterToken;
             if (filter != null)
             {
                 writer.WriteRawValue(filter.ToJsonString());

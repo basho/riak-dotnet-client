@@ -20,12 +20,12 @@ namespace CorrugatedIron.KeyFilters
     /// <summary>
     /// Joins two or more key-filter operations with a logical OR operation.
     /// </summary>
-    public class Or : RiakCompositeNValueKeyFilter
+    public class Or : RiakCompositeKeyFilterToken
     {
-        public IRiakKeyFilter First { get { return (IRiakKeyFilter)Arguments[0]; } }
-        public IRiakKeyFilter Second { get { return (IRiakKeyFilter)Arguments[1]; } }
+        public IRiakKeyFilterToken First { get { return (IRiakKeyFilterToken)Arguments[0]; } }
+        public IRiakKeyFilterToken Second { get { return (IRiakKeyFilterToken)Arguments[1]; } }
         
-        public Or(IRiakKeyFilter first, IRiakKeyFilter second)
+        public Or(IRiakKeyFilterToken first, IRiakKeyFilterToken second)
             : base("or", first, second)
         {
         }

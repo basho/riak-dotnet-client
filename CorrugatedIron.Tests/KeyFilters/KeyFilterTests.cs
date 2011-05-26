@@ -24,27 +24,27 @@ namespace CorrugatedIron.Tests.KeyFilters
     [TestFixture]
     public abstract class KeyFilterTests
     {
-        internal const string IntToStringJson = @"[[""int_to_string""]]";
-        internal const string StringToIntJson = @"[[""string_to_int""]]";
-        internal const string FloatToStringJson = @"[[""float_to_string""]]";
-        internal const string StringToFloatJson = @"[[""string_to_float""]]";
-        internal const string ToUpperJson = @"[[""to_upper""]]";
-        internal const string ToLowerJson = @"[[""to_lower""]]";
-        internal const string TokenizeJson = @"[[""tokenize"",""/"",4]]";
-        internal const string UrlDecodeJson = @"[[""urldecode""]]";
+        internal const string IntToStringJson = @"[""int_to_string""]";
+        internal const string StringToIntJson = @"[""string_to_int""]";
+        internal const string FloatToStringJson = @"[""float_to_string""]";
+        internal const string StringToFloatJson = @"[""string_to_float""]";
+        internal const string ToUpperJson = @"[""to_upper""]";
+        internal const string ToLowerJson = @"[""to_lower""]";
+        internal const string TokenizeJson = @"[""tokenize"",""/"",4]";
+        internal const string UrlDecodeJson = @"[""urldecode""]";
         
-        internal const string GreaterThanJson = @"[[""greater_than"",50]]";
-        internal const string LessThanJson = @"[[""less_than"",10]]";
-        internal const string GreaterThanOrEqualToJson = @"[[""greater_than_eq"",2000]]";
-        internal const string LessThanOrEqualToJson = @"[[""less_than_eq"",-2]]";
-        internal const string BetweenJson = @"[[""between"",10,20,false]]";
-        internal const string MatchesJson = @"[[""matches"",""solutions""]]";
-        internal const string NotEqualJson = @"[[""neq"",""foo""]]";
-        internal const string EqualJson = @"[[""eq"",""basho""]]";
-        internal const string SetMemberJson = @"[[""set_member"",""basho"",""google"",""yahoo""]]";
-        internal const string SimilarToJson = @"[[""similar_to"",""newyork"",3]]";
-        internal const string StartsWithJson = @"[[""starts_with"",""closed""]]";
-        internal const string EndsWithJson = @"[[""ends_with"",""0603""]]";
+        internal const string GreaterThanJson = @"[""greater_than"",50]";
+        internal const string LessThanJson = @"[""less_than"",10]";
+        internal const string GreaterThanOrEqualToJson = @"[""greater_than_eq"",2000]";
+        internal const string LessThanOrEqualToJson = @"[""less_than_eq"",-2]";
+        internal const string BetweenJson = @"[""between"",10,20,false]";
+        internal const string MatchesJson = @"[""matches"",""solutions""]";
+        internal const string NotEqualJson = @"[""neq"",""foo""]";
+        internal const string EqualJson = @"[""eq"",""basho""]";
+        internal const string SetMemberJson = @"[""set_member"",""basho"",""google"",""yahoo""]";
+        internal const string SimilarToJson = @"[""similar_to"",""newyork"",3]";
+        internal const string StartsWithJson = @"[""starts_with"",""closed""]";
+        internal const string EndsWithJson = @"[""ends_with"",""0603""]";
 
         internal const string AndJson = @"[""and"",[[""ends_with"",""0603""]],[[""starts_with"",""basho""]]]";
         internal const string OrJson = @"[""or"",[[""eq"",""google""]],[[""less_than"",""g""]]]";

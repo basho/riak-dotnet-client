@@ -21,16 +21,16 @@ using Newtonsoft.Json;
 
 namespace CorrugatedIron.KeyFilters
 {
-    public abstract class RiakNValueKeyFilter : IRiakKeyFilter
+    public abstract class RiakKeyFilterToken : IRiakKeyFilterToken
     {
         public string FunctionName { get; set; }
         public object[] Arguments {get; set;}
 
-        protected RiakNValueKeyFilter() 
+        protected RiakKeyFilterToken() 
         {
         }
 
-        protected RiakNValueKeyFilter(string functionName, params object[] args)
+        protected RiakKeyFilterToken(string functionName, params object[] args)
         {
             FunctionName = functionName;
             Arguments = args ?? new object[0];
@@ -49,12 +49,10 @@ namespace CorrugatedIron.KeyFilters
             using (JsonWriter jw = new JsonTextWriter(sw))
             {
                 jw.WriteStartArray();
-                jw.WriteStartArray();
                 jw.WriteValue(FunctionName);
 
                 WriteArguments(Arguments, jw);
                 
-                jw.WriteEndArray();
                 jw.WriteEndArray();
             }
             
