@@ -19,7 +19,7 @@ using System.Collections.Generic;
 namespace CorrugatedIron.KeyFilters
 {
     /// <summary>
-    /// Tests that the input is not equal to the argument.
+    /// Tests that the input is contained in the set given as the arguments.
     /// </summary>
     public class SetMember<T> : RiakNValueKeyFilter
     {
@@ -33,11 +33,7 @@ namespace CorrugatedIron.KeyFilters
 
         protected override void WriteArguments(object[] arguments, Newtonsoft.Json.JsonWriter writer)
         {
-            writer.WriteStartArray();
-            writer.WriteStartArray();
             Set.ForEach(v => writer.WriteValue(v));
-            writer.WriteEndArray();
-            writer.WriteEndArray();
         }
     }
 }
