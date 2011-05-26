@@ -31,11 +31,13 @@ namespace CorrugatedIron.Models
 
         public string Bucket { get; set; }
         public string Request { get; set; }
+        // TODO push this out to the client for a given request.
+        // This could be exposed via the client interface as part of a configuration object
         public string ContentType { get; set; }
 
         public RiakMapReduce()
         {
-            
+            MapReducePhases = new Dictionary<string, RiakMapReducePhase>();
         }
 
         // TODO implement inputs as a single bucket 
@@ -44,13 +46,13 @@ namespace CorrugatedIron.Models
         // TODO implement inputs as a RiakSearch query
 
         // TODO create and implement Bucket class
-        public RiakMapReduce(string request, string contentType = "")
+        public RiakMapReduce(string request, string contentType = Constants.ContentTypes.ApplicationJson) : this()
         {
             Request = request;
             ContentType = contentType;
         }
 
-        public RiakMapReduce(string bucket, string contentType = "", string request = "")
+        public RiakMapReduce(string bucket, string request = "", string contentType = Constants.ContentTypes.ApplicationJson) : this()
         {
             Bucket = bucket;
             ContentType = contentType;
@@ -58,23 +60,6 @@ namespace CorrugatedIron.Models
         }
 
         // TODO implement tests for transforming MR jobs into Json strings
-        public RpbMapRedReq ToMessage()
-        {
-            if (string.IsNullOrEmpty(Request))
-            {
-                var sb = new StringBuilder();
-                MapReducePhases.ForEach(mr => sb.Append(mr.Value.ToString()));
-                Request = sb.ToString();
-            }
-
-            var message = new RpbMapRedReq
-            {
-                Request = Request.ToRiakString()
-            };
-
-            return message;
-        }
-
         public RiakMapReduce Filter(IRiakKeyFilterToken filter)
         {
             Filters.Add(filter);
@@ -105,6 +90,24 @@ namespace CorrugatedIron.Models
         public RiakMapReduce Link()
         {
             throw new NotImplementedException();
+        }
+
+        public RpbMapRedReq ToMessage()
+        {
+            if (string.IsNullOrEmpty(Request))
+            {
+                var sb = new StringBuilder();
+                MapReducePhases.ForEach(mr => sb.Append(mr.Value.ToString()));
+                Request = sb.ToString();
+            }
+
+            var message = new RpbMapRedReq
+                              {
+                                  Request = Request.ToRiakString(),
+                                  ContentType = ContentType.ToRiakString()
+                              };
+
+            return message;
         }
 
         private void AddMapReducePhase(bool keep, string language, string source, string name, string mapReducePhaseType)

@@ -36,10 +36,12 @@ namespace CorrugatedIron.Tests.Models
         #endregion
 
         private const string MrJobText =
-            @"{""map"":{""language"":""javascript"",""source"":""function(v) { return [v]; }"",""keep"":true}}";
+            @"{""map"":{""language"":""javascript"",""keep"":true,""source"":""function(v) { return [v]; }""}}";
+
+        private const string MrContentType = Constants.ContentTypes.ApplicationJson;
 
         [Test]
-        public void ConvertingASinglePhaseMapReduceJobProducesValidJson()
+        public void ASimplePhaseMapReduceJobConvertsToByteArrays()
         {
             var mr = new RiakMapReduce
                          {
@@ -47,7 +49,22 @@ namespace CorrugatedIron.Tests.Models
                              ContentType = Constants.ContentTypes.ApplicationJson
                          };
 
-            RpbMapRedReq mrRequest = mr.ToMessage();
+            var mrRequest = mr.ToMessage();
+
+            mrRequest.ContentType.ShouldEqual(MrContentType.ToRiakString());
+            mrRequest.Request.ShouldEqual(MrJobText.ToRiakString());
+        }
+
+        [Test]
+        public void BuildingSimpleMapReduceJobsWithTheApiProducesByteArrays()
+        {
+            var mr = new RiakMapReduce
+                         {
+                             ContentType = Constants.ContentTypes.ApplicationJson
+                         };
+            mr.Map(true, Constants.MapReduceLanguage.Json, "function(v) { return [v]; }");
+
+            var mrRequest = mr.ToMessage();
 
             mrRequest.ContentType.ShouldEqual(Constants.ContentTypes.ApplicationJson.ToRiakString());
             mrRequest.Request.ShouldEqual(MrJobText.ToRiakString());
