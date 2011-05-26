@@ -41,16 +41,17 @@ namespace CorrugatedIron.Tests.KeyFilters
         internal const string MatchesJson = @"[[""matches"",""solutions""]]";
         internal const string NotEqualJson = @"[[""neq"",""foo""]]";
         internal const string EqualJson = @"[[""eq"",""basho""]]";
-        internal const string SetMemberJson = @"[[""set_member"",[[""basho"",""google"",""yahoo""]]]]";
+        internal const string SetMemberJson = @"[[""set_member"",""basho"",""google"",""yahoo""]]";
         internal const string SimilarToJson = @"[[""similar_to"",""newyork"",3]]";
         internal const string StartsWithJson = @"[[""starts_with"",""closed""]]";
         internal const string EndsWithJson = @"[[""ends_with"",""0603""]]";
-        internal const string AndJson = @"[[""and"",[[""ends_with"",""0603""]],[[""starts_with"",""basho""]]]]";
-        internal const string OrJson = @"[[""or"",[[""eq"",""google""]],[[""less_than"",""g""]]]]";
-        internal const string NotJson = @"[[""not"",[[""matches"",""solution""]]]]";
+
+        internal const string AndJson = @"[""and"",[[""ends_with"",""0603""]],[[""starts_with"",""basho""]]]";
+        internal const string OrJson = @"[""or"",[[""eq"",""google""]],[[""less_than"",""g""]]]";
+        internal const string NotJson = @"[""not"",[[""matches"",""solution""]]]";
     }
     
-    public class WhenConstructingKeyFilters : KeyFilterTests
+    public class WhenConstructingSimpleKeyFilters : KeyFilterTests
     {
         [Test]
         public void IntToStringCorrectlyConvertsToJson ()
@@ -98,7 +99,17 @@ namespace CorrugatedIron.Tests.KeyFilters
             var tokenize = new Tokenize("/", 4);
             tokenize.ToString().ShouldEqual(TokenizeJson);
         }
-  
+
+        [Test]
+        public void UrlDecodeCorrectlyConvertsToJson()
+        {
+            var ud = new UrlDecode();
+            ud.ToString().ShouldEqual(UrlDecodeJson);
+        }
+    }
+
+    public class WhenConstructingSimplePredicates : KeyFilterTests
+    {
         [Test]
         public void GreaterThanCorrectlyConvertsToJson()
         {
@@ -182,7 +193,10 @@ namespace CorrugatedIron.Tests.KeyFilters
             var ew = new EndsWith("0603");
             ew.ToString().ShouldEqual(EndsWithJson);
         }
-        
+    }
+
+    public class WhenConstructingComplexPredicates : KeyFilterTests
+    {
         [Test]
         public void AndCorrectlyConvertsToJson()
         {
