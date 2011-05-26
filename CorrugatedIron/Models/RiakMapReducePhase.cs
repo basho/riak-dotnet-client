@@ -15,8 +15,8 @@
 // under the License.
 
 using System;
-using System.Text;
 using System.IO;
+using System.Text;
 using Newtonsoft.Json;
 
 namespace CorrugatedIron.Models
@@ -27,88 +27,97 @@ namespace CorrugatedIron.Models
      * Dictionary<string, RiakMapReducePhase> on the RiakMapReduce object and use that 
      * to generate the appropriate JSON to send to Riak.
      */
+    // TODO It's probably safe to strip the JsonSerialization attributes from this class.
     [JsonObject(MemberSerialization.OptIn)]
     public class RiakMapReducePhase
     {
-        public string MapReducePhaseType { get; set; }
-        
-        [JsonProperty("keep")]
-        public bool Keep { get; set; }
-        
-        // function magic
-        
-        [JsonProperty("language")]
-        public string MapReduceLanguage { get; set; }
-        
-        [JsonProperty("name")]
-        public string Name { get; set; }
-        
-        [JsonProperty("source")]
-        public string Source { get; set; }
-        
-        public RiakMapReducePhase () { }
-        
-        
-        public RiakMapReducePhase (string mapReducePhaseType, 
-                                   string mapReduceLanguage,
-                                   bool keep = true            
-                                   )
+        public RiakMapReducePhase()
+        {
+        }
+
+
+        public RiakMapReducePhase(string mapReducePhaseType,
+                                  string mapReduceLanguage,
+                                  bool keep = true
+            )
         {
             MapReducePhaseType = mapReducePhaseType;
             MapReduceLanguage = mapReduceLanguage;
             Keep = keep;
         }
-        
-        public string ToJsonString() 
+
+        public string MapReducePhaseType { get; set; }
+
+        [JsonProperty("keep")]
+        public bool Keep { get; set; }
+
+        // function magic
+
+        [JsonProperty("language")]
+        public string MapReduceLanguage { get; set; }
+
+        [JsonProperty("name")]
+        public string Name { get; set; }
+
+        [JsonProperty("source")]
+        public string Source { get; set; }
+
+        public override string ToString()
         {
-            if (string.IsNullOrEmpty(Name) && string.IsNullOrEmpty(Source)) {
+            return ToJsonString();
+        }
+
+        public string ToJsonString()
+        {
+            if (string.IsNullOrEmpty(Name) && string.IsNullOrEmpty(Source))
+            {
                 throw new Exception("One of Name or Source must be supplied");
             }
-            
-            if (!string.IsNullOrEmpty(Name) && !string.IsNullOrEmpty(Source)) {
+
+            if (!string.IsNullOrEmpty(Name) && !string.IsNullOrEmpty(Source))
+            {
                 throw new Exception("Only one of Name and Source may be supplied");
             }
-            
-            StringBuilder sb = new StringBuilder();
-            StringWriter sw = new StringWriter(sb);
-             
+
+            var sb = new StringBuilder();
+            var sw = new StringWriter(sb);
+
             using (JsonWriter jw = new JsonTextWriter(sw))
             {
                 jw.WriteStartObject();
                 jw.WritePropertyName(MapReducePhaseType);
-                
+
                 // begin phase                
                 jw.WriteStartObject();
                 jw.WritePropertyName("language");
                 jw.WriteValue(MapReduceLanguage);
                 jw.WritePropertyName("keep");
                 jw.WriteValue(Keep);
-                
+
                 if (!string.IsNullOrEmpty(Name))
                 {
                     jw.WritePropertyName("name");
                     jw.WriteValue(Name);
                 }
-                
+
                 if (!string.IsNullOrEmpty(Source))
                 {
                     jw.WritePropertyName("source");
                     jw.WriteValue(Source);
-                }                
+                }
                 jw.WriteEndObject();
                 // end phase
-                
+
                 jw.WriteEndObject();
             }
-            
+
             return sb.ToString();
         }
-        
-        
+
+
         public static RiakMapReducePhase FromPhaseString(string phaseString)
         {
             throw new NotImplementedException();
         }
     }
 }
-

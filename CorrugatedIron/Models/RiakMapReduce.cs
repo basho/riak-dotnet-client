@@ -14,68 +14,90 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
 using System.Collections.Generic;
-using CorrugatedIron.Messages;
-using CorrugatedIron.Util;
+using System.Text;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.KeyFilters;
+using CorrugatedIron.Messages;
+using CorrugatedIron.Util;
 
 namespace CorrugatedIron.Models
 {
     public class RiakMapReduce
     {
-        public Dictionary<string, RiakMapReducePhase> MapReducePhases { get; set; }
-        
-        public string Request { get; set; }
-        
-        public string Bucket { get; set; }
         public List<IRiakKeyFilterToken> Filters { get; set; }
-        
-        // TODO refactor to use phases to build map reduce request on the fly
-        public RiakMapReduce (string bucket, string request = "") 
+        public Dictionary<string, RiakMapReducePhase> MapReducePhases { get; set; }
+
+        public string Bucket { get; set; }
+        public string Request { get; set; }
+
+        public RiakMapReduce()
+        {
+            
+        }
+
+        // TODO create and implement Bucket class
+        public RiakMapReduce(string bucket, string request = "")
         {
             Bucket = bucket;
             Request = request;
         }
-        
-        public RpbMapRedReq ToMessage() {
-            var message = new RpbMapRedReq {
-                Request = this.Request.ToRiakString()
+
+        // TODO implement tests for transforming MR jobs into Json strings
+        public RpbMapRedReq ToMessage()
+        {
+            if (string.IsNullOrEmpty(Request))
+            {
+                var sb = new StringBuilder();
+                MapReducePhases.ForEach(mr => sb.Append(mr.Value.ToString()));
+                Request = sb.ToString();
+            }
+
+            var message = new RpbMapRedReq
+            {
+                Request = Request.ToRiakString()
             };
-            
-           return message;
-        }
-        
-        // TODO add support for passing arguments
-        public RiakMapReduce Map (string module, string function, object[] args = null) 
-        {
-            throw new System.NotImplementedException();
-        }
-        
-        public RiakMapReduce Map (bool keep, string language, string source = "", string name = "") 
-        {
-            AddMapReducePhase (keep, language, source, name, Constants.MapReducePhaseType.Map);
-            
-            return this;
-        }
-        
-        public RiakMapReduce Reduce (bool keep, string language, string source = "", string name = "") 
-        {
-            AddMapReducePhase (keep, language, source, name, Constants.MapReducePhaseType.Reduce);
-            
-            return this;
-        }
-        
-        public RiakMapReduce Link () 
-        {
-            throw new System.NotImplementedException();
+
+            return message;
         }
 
-        private void AddMapReducePhase (bool keep, string language, string source, string name, string mapReducePhaseType)
+        public RiakMapReduce Filter(IRiakKeyFilterToken filter)
         {
-            var phase = new RiakMapReducePhase (mapReducePhaseType, language, keep) { Source = source, Name = name };
+            Filters.Add(filter);
+
+            return this;
+        }
+
+        // TODO add support for passing arguments
+        public RiakMapReduce Map(string module, string function, object[] args = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public RiakMapReduce Map(bool keep, string language, string source = "", string name = "")
+        {
+            AddMapReducePhase(keep, language, source, name, Constants.MapReducePhaseType.Map);
+
+            return this;
+        }
+
+        public RiakMapReduce Reduce(bool keep, string language, string source = "", string name = "")
+        {
+            AddMapReducePhase(keep, language, source, name, Constants.MapReducePhaseType.Reduce);
+
+            return this;
+        }
+
+        public RiakMapReduce Link()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void AddMapReducePhase(bool keep, string language, string source, string name, string mapReducePhaseType)
+        {
+            var phase = new RiakMapReducePhase(mapReducePhaseType, language, keep) {Source = source, Name = name};
             MapReducePhases.Add(phase.MapReducePhaseType, phase);
         }
     }
 }
-
