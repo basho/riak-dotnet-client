@@ -17,7 +17,6 @@
 using CorrugatedIron.Comms;
 using CorrugatedIron.Config;
 using CorrugatedIron.Extensions;
-using CorrugatedIron.Messages;
 using CorrugatedIron.Models;
 using CorrugatedIron.Tests.Extensions;
 using CorrugatedIron.Util;
@@ -27,6 +26,8 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
 {
     public class LiveRiakConnectionTestBase
     {
+        protected const int TestClientId = 42;
+        protected readonly static byte[] ClientId;
         protected const string TestHost = "riak-test";
         protected const int TestHostPort = 8081;
         protected const string TestBucket = "test_bucket";
@@ -38,6 +39,11 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
         protected IRiakConnectionManager ConnectionManager;
         protected IRiakConnectionConfiguration ConnectionConfig;
         protected IRiakClient Client;
+
+        static LiveRiakConnectionTestBase()
+        {
+            ClientId = RiakConnection.ToClientId(TestClientId);
+        }
 
         public LiveRiakConnectionTestBase(int poolSize = 1, int idleTimeout = 10000)
         {
@@ -148,7 +154,7 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
 
         private IRiakConnection GetIdleConnection()
         {
-            var result = ConnectionManager.UseConnection(RiakResult<IRiakConnection>.Success);
+            var result = ConnectionManager.UseConnection(ClientId, RiakResult<IRiakConnection>.Success);
             System.Threading.Thread.Sleep(ConnectionConfig.IdleTimeout + 1000);
             return result.Value;
         }

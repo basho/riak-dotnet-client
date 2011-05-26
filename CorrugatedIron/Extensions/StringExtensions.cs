@@ -29,5 +29,10 @@ namespace CorrugatedIron.Extensions
         {
             return value == null ? null : RiakEncoding.GetString(value);
         }
+
+        public static string Fmt(this string formatter, params object[] args)
+        {
+            return string.Format(formatter, args);
+        }
     }
 }

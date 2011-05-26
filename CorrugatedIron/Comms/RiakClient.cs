@@ -14,7 +14,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
 using System.Linq;
+using System.Net.NetworkInformation;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
 using CorrugatedIron.Models;
@@ -34,21 +36,45 @@ namespace CorrugatedIron.Comms
     public class RiakClient : IRiakClient
     {
         private readonly IRiakConnectionManager _connectionManager;
+        private byte[] _clientId;
 
         public RiakClient(IRiakConnectionManager connectionManager)
+            : this(connectionManager, GetClientId())
+        {
+        }
+
+        public RiakClient(IRiakConnectionManager connectionManager, int clientId)
+            : this(connectionManager, RiakConnection.ToClientId(clientId))
+        {
+        }
+
+        public RiakClient(IRiakConnectionManager connectionManager, byte[] clientId)
         {
             _connectionManager = connectionManager;
+            ClientId = clientId;
+        }
+
+        public byte[] ClientId
+        {
+            get { return _clientId; }
+            set
+            {
+                System.Diagnostics.Debug.Assert(value != null && value.Length == Constants.ClientIdLength,
+                    "Client ID must be exactly {0} bytes long.".Fmt(Constants.ClientIdLength));
+
+                _clientId = value;
+            }
         }
 
         public RiakResult Ping()
         {
-            return _connectionManager.UseConnection(conn => conn.WriteRead<RpbPingReq, RpbPingResp>(new RpbPingReq()), false);
+            return _connectionManager.UseConnection(_clientId, conn => conn.WriteRead<RpbPingReq, RpbPingResp>(new RpbPingReq()), false);
         }
 
         public RiakResult<RiakObject> Get(string bucket, string key, uint rVal = Constants.Defaults.RVal)
         {
             var request = new RpbGetReq { Bucket = bucket.ToRiakString(), Key = key.ToRiakString(), R = rVal };
-            var result = _connectionManager.UseConnection(conn => conn.WriteRead<RpbGetReq, RpbGetResp>(request));
+            var result = _connectionManager.UseConnection(_clientId, conn => conn.WriteRead<RpbGetReq, RpbGetResp>(request));
 
             if (!result.IsSuccess)
             {
@@ -69,7 +95,7 @@ namespace CorrugatedIron.Comms
             var request = value.ToMessage();
             options.Populate(request);
 
-            var result = _connectionManager.UseConnection(conn => conn.WriteRead<RpbPutReq, RpbPutResp>(request));
+            var result = _connectionManager.UseConnection(_clientId, conn => conn.WriteRead<RpbPutReq, RpbPutResp>(request));
 
             if (!result.IsSuccess)
             {
@@ -84,7 +110,7 @@ namespace CorrugatedIron.Comms
         public RiakResult Delete(string bucket, string key, uint rwVal = Constants.Defaults.RVal)
         {
             var request = new RpbDelReq { Bucket = bucket.ToRiakString(), Key = key.ToRiakString(), Rw = rwVal };
-            var result = _connectionManager.UseConnection(conn => conn.WriteRead<RpbDelReq, RpbDelResp>(request));
+            var result = _connectionManager.UseConnection(_clientId, conn => conn.WriteRead<RpbDelReq, RpbDelResp>(request));
 
             return result;
         }
@@ -92,9 +118,17 @@ namespace CorrugatedIron.Comms
         public RiakResult<RpbMapRedResp> MapReduce(string request, string requestType = Constants.ContentTypes.ApplicationJson)
         {
             var mapReqReq = new RpbMapRedReq { Request = request.ToRiakString(), ContentType = requestType.ToRiakString() };
-            var result = _connectionManager.UseConnection(conn => conn.WriteRead<RpbMapRedReq, RpbMapRedResp>(mapReqReq));
+            var result = _connectionManager.UseConnection(_clientId, conn => conn.WriteRead<RpbMapRedReq, RpbMapRedResp>(mapReqReq));
 
             return result;
+        }
+
+        private static byte[] GetClientId()
+        {
+            var nic = NetworkInterface.GetAllNetworkInterfaces().First(i => i.OperationalStatus == OperationalStatus.Up);
+            var mac = nic.GetPhysicalAddress().GetAddressBytes();
+            Array.Resize(ref mac, 4);
+            return mac;
         }
     }
 }
