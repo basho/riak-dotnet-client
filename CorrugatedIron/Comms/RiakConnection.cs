@@ -69,6 +69,11 @@ namespace CorrugatedIron.Comms
             _encoder = new MessageEncoder();
         }
 
+        public static byte[] ToClientId(int id)
+        {
+            return BitConverter.GetBytes(id);
+        }
+
         public void BeginIdle()
         {
             if (IsIdle) return;
