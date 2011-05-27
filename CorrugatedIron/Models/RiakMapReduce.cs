@@ -35,6 +35,12 @@ namespace CorrugatedIron.Models
 
     public class RiakMapReduce
     {
+        public RiakMapReduce()
+        {
+            MapReducePhases = new Dictionary<string, IRiakMapReducePhase>();
+            Filters = new List<IRiakKeyFilterToken>();
+        }
+
         public List<IRiakKeyFilterToken> Filters { get; set; }
         public Dictionary<string, IRiakMapReducePhase> MapReducePhases { get; set; }
 
@@ -45,14 +51,7 @@ namespace CorrugatedIron.Models
         // This could be exposed via the client interface as part of a configuration object
         public string ContentType { get; set; }
 
-        public RiakMapReduce()
-        {
-            MapReducePhases = new Dictionary<string, RiakMapReducePhase>();
-            Filters = new List<IRiakKeyFilterToken>();
-        }
-
         // TODO create and implement Bucket class
-
 
         /// <summary>
         /// Set the inputs property of the MapReduce job to a single bucket
@@ -179,7 +178,7 @@ namespace CorrugatedIron.Models
 
                     jw.WriteEndObject();
                 }
-                
+
                 Request = sb.ToString();
             }
 
@@ -198,7 +197,7 @@ namespace CorrugatedIron.Models
             var phase = new RiakMapReducePhase
                             {
                                 MapReducePhaseType = mapReducePhaseType,
-                                MapReduceLanguage =  language,
+                                MapReduceLanguage = language,
                                 Keep = keep,
                                 Source = source,
                                 Name = name,
