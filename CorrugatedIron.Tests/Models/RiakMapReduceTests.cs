@@ -38,6 +38,9 @@ namespace CorrugatedIron.Tests.Models
         private const string MrJobText =
             @"{""map"":{""language"":""javascript"",""keep"":true,""source"":""function(v) { return [v]; }""}}";
 
+        private const string ComplexMrJobText =
+            @"{""inputs"":""animals"",""query"":[{""map"":{""language"":""javascript"",""keep"":false,""source"":""function(o) { if (o.key.indexOf('spider') != -1) return [1]; else return []; }""}},{""reduce"":{""language"":""javascript"",""keep"":true,""name"":""Riak.reduceSum""}}]}";
+
         private const string MrContentType = Constants.ContentTypes.ApplicationJson;
 
         [Test]
@@ -68,6 +71,18 @@ namespace CorrugatedIron.Tests.Models
 
             mrRequest.ContentType.ShouldEqual(Constants.ContentTypes.ApplicationJson.ToRiakString());
             mrRequest.Request.ShouldEqual(MrJobText.ToRiakString());
+        }
+
+        [Test]
+        public void BuildingComplexMapReduceJobsWithTheApiProducesTheCorrectCommand()
+        {
+            var mr = new RiakMapReduce();
+            mr.SetInputs("animals")
+                .Map(false, Constants.MapReduceLanguage.JavaScript,
+                     "function(o) { if (o.key.indexOf('spider') != -1) return [1]; else return []; }")
+                .Reduce(true, Constants.MapReduceLanguage.JavaScript, "", "Riak.reduceSum");
+
+            mr.ToMessage().Request.ShouldEqual(ComplexMrJobText.ToRiakString());
         }
     }
 }
