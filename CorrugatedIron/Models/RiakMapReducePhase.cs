@@ -27,40 +27,25 @@ namespace CorrugatedIron.Models
      * Dictionary<string, RiakMapReducePhase> on the RiakMapReduce object and use that 
      * to generate the appropriate JSON to send to Riak.
      */
-    // TODO It's probably safe to strip the JsonSerialization attributes from this class.
-    [JsonObject(MemberSerialization.OptIn)]
     public class RiakMapReducePhase
     {
         public RiakMapReducePhase()
         {
         }
 
-
-        public RiakMapReducePhase(string mapReducePhaseType,
-                                  string mapReduceLanguage,
-                                  bool keep = true
-            )
-        {
-            MapReducePhaseType = mapReducePhaseType;
-            MapReduceLanguage = mapReduceLanguage;
-            Keep = keep;
-        }
-
         public string MapReducePhaseType { get; set; }
 
-        [JsonProperty("keep")]
         public bool Keep { get; set; }
 
         // function magic
 
-        [JsonProperty("language")]
         public string MapReduceLanguage { get; set; }
 
-        [JsonProperty("name")]
         public string Name { get; set; }
 
-        [JsonProperty("source")]
         public string Source { get; set; }
+
+        public string Argument { get; set; }
 
         public override string ToString()
         {
@@ -105,6 +90,13 @@ namespace CorrugatedIron.Models
                     jw.WritePropertyName("source");
                     jw.WriteValue(Source);
                 }
+
+                if (!string.IsNullOrEmpty(Argument))
+                {
+                    jw.WritePropertyName("arg");
+                    jw.WriteValue(Argument);
+                }
+
                 jw.WriteEndObject();
                 // end phase
 
