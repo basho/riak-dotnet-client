@@ -34,6 +34,8 @@ namespace CorrugatedIron.Comms
         RiakResult<RpbMapRedResp> MapReduce(RpbMapRedReq request);
         RiakResult<RpbListBucketsResp> ListBuckets();
         RiakResult<RpbListKeysResp> ListKeys(string bucket);
+        RiakResult<RpbGetBucketResp> GetBucketProperties(string bucket);
+        RiakResult<RpbSetBucketResp> SetBucketProperties(string bucket, RpbBucketProps properties);
     }
 
     public class RiakClient : IRiakClient
@@ -145,6 +147,24 @@ namespace CorrugatedIron.Comms
             var lkReq = new RpbListKeysReq {Bucket = bucket.ToRiakString()};
             var result = _connectionManager.UseConnection(_clientId,
                                                           conn => conn.WriteRead<RpbListKeysReq, RpbListKeysResp>(lkReq));
+            return result;
+        }
+
+        public RiakResult<RpbGetBucketResp> GetBucketProperties(string bucket)
+        {
+            var bpReq = new RpbGetBucketReq {Bucket = bucket.ToRiakString()};
+            var result = _connectionManager.UseConnection(_clientId,
+                                                          conn => conn.WriteRead<RpbGetBucketReq, RpbGetBucketResp>(bpReq));
+
+            return result;
+        }
+
+        public RiakResult<RpbSetBucketResp> SetBucketProperties(string bucket, RpbBucketProps properties)
+        {
+            var bpReq = new RpbSetBucketReq {Bucket = bucket.ToRiakString(), Props = properties};
+            var result = _connectionManager.UseConnection(_clientId,
+                                                          conn =>
+                                                          conn.WriteRead<RpbSetBucketReq, RpbSetBucketResp>(bpReq));
             return result;
         }
 
