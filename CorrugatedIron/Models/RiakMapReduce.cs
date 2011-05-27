@@ -160,7 +160,23 @@ namespace CorrugatedIron.Models
             if (string.IsNullOrEmpty(Request))
             {
                 var sb = new StringBuilder();
-                MapReducePhases.ForEach(mr => sb.Append(mr.Value.ToString()));
+                var sw = new StringWriter(sb);
+
+                using (JsonWriter jw = new JsonTextWriter(sw))
+                {
+                    jw.WriteStartObject();
+
+                    jw.WritePropertyName("inputs");
+                    jw.WriteValue(Inputs);
+
+                    jw.WritePropertyName("query");
+                    jw.WriteStartArray();
+                    MapReducePhases.ForEach(mr => jw.WriteRawValue(mr.Value.ToString()));
+                    jw.WriteEndArray();
+
+                    jw.WriteEndObject();
+                }
+                
                 Request = sb.ToString();
             }
 
@@ -176,7 +192,7 @@ namespace CorrugatedIron.Models
         private void AddMapReducePhase(bool keep, string language, string source, string name, string mapReducePhaseType,
                                        string arg)
         {
-            var phase = new RiakMapReducePhase()
+            var phase = new RiakMapReducePhase
                             {
                                 MapReducePhaseType = mapReducePhaseType,
                                 MapReduceLanguage =  language,
