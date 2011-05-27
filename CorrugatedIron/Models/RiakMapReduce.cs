@@ -127,7 +127,7 @@ namespace CorrugatedIron.Models
 
         public RiakMapReduce Map(RiakMapReducePhase map)
         {
-            if (map.MapReducePhaseType != Constants.MapReducePhaseType.Reduce)
+            if (map.MapReducePhaseType != Constants.MapReducePhaseType.Map)
                 throw new Exception("Must add a Map phase");
 
             MapReducePhases.Add("map", map);

@@ -42,7 +42,7 @@ namespace CorrugatedIron.Tests.Models
         private const string ComplexMrJobText =
             @"{""inputs"":""animals"",""query"":[{""map"":{""language"":""javascript"",""keep"":false,""source"":""function(o) { if (o.key.indexOf('spider') != -1) return [1]; else return []; }""}},{""reduce"":{""language"":""javascript"",""keep"":true,""name"":""Riak.reduceSum""}}]}";
 
-        private const string CompleMrJobWithFilterText =
+        private const string ComplexMrJobWithFilterText =
             @"{""inputs"":""animals"",""key_filters"":[[""matches"",""spider""]],""query"":[{""map"":{""language"":""javascript"",""keep"":false,""source"":""function(o) { return [1]; }""}},{""reduce"":{""language"":""javascript"",""keep"":true,""name"":""Riak.reduceSum""}}]}";
 
         private const string MrContentType = Constants.ContentTypes.ApplicationJson;
@@ -100,7 +100,31 @@ namespace CorrugatedIron.Tests.Models
                      "function(o) { return [1]; }")
                 .Reduce(true, Constants.MapReduceLanguage.JavaScript, "", "Riak.reduceSum");
             
-            mr.ToMessage().Request.ShouldEqual(CompleMrJobWithFilterText.ToRiakString());
+            mr.ToMessage().Request.ShouldEqual(ComplexMrJobWithFilterText.ToRiakString());
+        }
+
+        [Test]
+        public void BuildingComplexMapReduceJobsWithObjectInitializersProducesTheCorrectCommand()
+        {
+            var mr = new RiakMapReduce();
+            mr.SetInputs("animals")
+                .Filter(new Matches<string>("spider"))
+                .Map(new RiakMapReducePhase
+                         {
+                             Keep = false,
+                             MapReduceLanguage = Constants.MapReduceLanguage.JavaScript,
+                             MapReducePhaseType = Constants.MapReducePhaseType.Map,
+                             Source = "function(o) { return [1]; }"
+                         })
+                .Reduce(new RiakMapReducePhase
+                            {
+                                Keep = true,
+                                MapReduceLanguage = Constants.MapReduceLanguage.JavaScript,
+                                MapReducePhaseType = Constants.MapReducePhaseType.Reduce,
+                                Name = "Riak.reduceSum"
+                            });
+
+            mr.ToMessage().Request.ShouldEqual(ComplexMrJobWithFilterText.ToRiakString());
         }
     }
 }
