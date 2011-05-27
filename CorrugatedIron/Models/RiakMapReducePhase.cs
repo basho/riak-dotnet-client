@@ -27,25 +27,18 @@ namespace CorrugatedIron.Models
      * Dictionary<string, RiakMapReducePhase> on the RiakMapReduce object and use that 
      * to generate the appropriate JSON to send to Riak.
      */
-    public class RiakMapReducePhase
+    public class RiakMapReducePhase : IRiakMapReducePhase
     {
+        public string MapReducePhaseType { get; set; }
+        public bool Keep { get; set; }
+        public string MapReduceLanguage { get; set; }
+        public string Name { get; set; }
+        public string Source { get; set; }
+        public string Argument { get; set; }
+
         public RiakMapReducePhase()
         {
         }
-
-        public string MapReducePhaseType { get; set; }
-
-        public bool Keep { get; set; }
-
-        // function magic
-
-        public string MapReduceLanguage { get; set; }
-
-        public string Name { get; set; }
-
-        public string Source { get; set; }
-
-        public string Argument { get; set; }
 
         public override string ToString()
         {
@@ -105,7 +98,6 @@ namespace CorrugatedIron.Models
 
             return sb.ToString();
         }
-
 
         public static RiakMapReducePhase FromPhaseString(string phaseString)
         {
