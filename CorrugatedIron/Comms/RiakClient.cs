@@ -31,6 +31,9 @@ namespace CorrugatedIron.Comms
         RiakResult<RiakObject> Put(RiakObject value, RiakPutOptions options = null);
         RiakResult Delete(string bucket, string key, uint rwVal = Constants.Defaults.RVal);
         RiakResult<RpbMapRedResp> MapReduce(string request, string requestType = Constants.ContentTypes.ApplicationJson);
+        RiakResult<RpbMapRedResp> MapReduce(RpbMapRedReq request);
+        RiakResult<RpbListBucketsResp> ListBuckets();
+        RiakResult<RpbListKeysResp> ListKeys(string bucket);
     }
 
     public class RiakClient : IRiakClient
@@ -117,9 +120,31 @@ namespace CorrugatedIron.Comms
 
         public RiakResult<RpbMapRedResp> MapReduce(string request, string requestType = Constants.ContentTypes.ApplicationJson)
         {
-            var mapReqReq = new RpbMapRedReq { Request = request.ToRiakString(), ContentType = requestType.ToRiakString() };
-            var result = _connectionManager.UseConnection(_clientId, conn => conn.WriteRead<RpbMapRedReq, RpbMapRedResp>(mapReqReq));
+            var mapRedReq = new RpbMapRedReq { Request = request.ToRiakString(), ContentType = requestType.ToRiakString() };
+            return MapReduce(mapRedReq);
+        }
 
+        public RiakResult<RpbMapRedResp> MapReduce(RpbMapRedReq request)
+        {
+            var result = _connectionManager.UseConnection(_clientId, conn => conn.WriteRead<RpbMapRedReq, RpbMapRedResp>(request));
+            return result;
+        }
+
+        public RiakResult<RpbListBucketsResp> ListBuckets()
+        {
+            var lbReq = new RpbListBucketsReq();
+            var result = _connectionManager.UseConnection(_clientId,
+                                                          conn =>
+                                                          conn.WriteRead<RpbListBucketsReq, RpbListBucketsResp>(lbReq));
+
+            return result;
+        }
+
+        public RiakResult<RpbListKeysResp> ListKeys(string bucket)
+        {
+            var lkReq = new RpbListKeysReq {Bucket = bucket.ToRiakString()};
+            var result = _connectionManager.UseConnection(_clientId,
+                                                          conn => conn.WriteRead<RpbListKeysReq, RpbListKeysResp>(lkReq));
             return result;
         }
 

@@ -17,6 +17,7 @@
 using CorrugatedIron.Comms;
 using CorrugatedIron.Config;
 using CorrugatedIron.Extensions;
+using CorrugatedIron.Messages;
 using CorrugatedIron.Models;
 using CorrugatedIron.Tests.Extensions;
 using CorrugatedIron.Util;
@@ -141,6 +142,17 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
             result.IsSuccess.ShouldBeTrue();
             result.Value.Response.GetType().ShouldEqual(typeof(byte[]));
             result.Value.Response.FromRiakString().ShouldEqual("[10]");
+        }
+
+        [Test]
+        public void ListBucketsIncludesTestBucket ()
+        {
+            var doc = new RiakObject(TestBucket, TestKey, TestJson, Constants.ContentTypes.ApplicationJson);
+            Client.Put(doc);
+
+            var result = Client.ListBuckets();
+            result.IsSuccess.ShouldBeTrue();
+            Assert.Contains(TestBucket.ToRiakString(), result.Value.Buckets);
         }
     }
 
