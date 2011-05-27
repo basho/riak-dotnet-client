@@ -131,7 +131,17 @@ namespace CorrugatedIron.Comms
             var result = _connectionManager.UseConnection(_clientId, conn => conn.WriteRead<RpbMapRedReq, RpbMapRedResp>(request));
             return result;
         }
-
+        
+        public System.Collections.Generic.IList<string> ListBucketNames()
+        {
+            var buckets = ListBuckets();
+            var names = new System.Collections.Generic.List<string> ();
+            
+            buckets.Value.Buckets.ForEach(b => names.Add(b.FromRiakString()));
+            
+            return names;
+        }
+        
         public RiakResult<RpbListBucketsResp> ListBuckets()
         {
             var lbReq = new RpbListBucketsReq();
@@ -141,7 +151,17 @@ namespace CorrugatedIron.Comms
 
             return result;
         }
-
+  
+        public System.Collections.Generic.IList<string> LiskKeyNames(string bucket)
+        {
+            var keys = ListKeys(bucket);
+            var names = new System.Collections.Generic.List<string>();
+            
+            keys.Value.Keys.ForEach(k => names.Add(k.FromRiakString()));
+            
+            return names;
+        }
+        
         public RiakResult<RpbListKeysResp> ListKeys(string bucket)
         {
             var lkReq = new RpbListKeysReq {Bucket = bucket.ToRiakString()};
