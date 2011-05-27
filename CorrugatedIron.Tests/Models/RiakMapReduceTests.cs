@@ -15,6 +15,7 @@
 // under the License.
 
 using CorrugatedIron.Extensions;
+using CorrugatedIron.KeyFilters;
 using CorrugatedIron.Messages;
 using CorrugatedIron.Models;
 using CorrugatedIron.Tests.Extensions;
@@ -36,10 +37,13 @@ namespace CorrugatedIron.Tests.Models
         #endregion
 
         private const string MrJobText =
-            @"{""map"":{""language"":""javascript"",""keep"":true,""source"":""function(v) { return [v]; }""}}";
+            @"{""inputs"":""animals"",""query"":[{""map"":{""language"":""javascript"",""keep"":true,""source"":""function(v) { return [v]; }""}}]}";
 
         private const string ComplexMrJobText =
             @"{""inputs"":""animals"",""query"":[{""map"":{""language"":""javascript"",""keep"":false,""source"":""function(o) { if (o.key.indexOf('spider') != -1) return [1]; else return []; }""}},{""reduce"":{""language"":""javascript"",""keep"":true,""name"":""Riak.reduceSum""}}]}";
+
+        private const string CompleMrJobWithFilterText =
+            @"{""inputs"":""animals"",""key_filters"":[[""matches"",""spider""]],""query"":[{""map"":{""language"":""javascript"",""keep"":false,""source"":""function(o) { return [1]; }""}},{""reduce"":{""language"":""javascript"",""keep"":true,""name"":""Riak.reduceSum""}}]}";
 
         private const string MrContentType = Constants.ContentTypes.ApplicationJson;
 
@@ -65,7 +69,8 @@ namespace CorrugatedIron.Tests.Models
                          {
                              ContentType = Constants.ContentTypes.ApplicationJson
                          };
-            mr.Map(true, Constants.MapReduceLanguage.Json, "function(v) { return [v]; }");
+            mr.SetInputs("animals")
+                .Map(true, Constants.MapReduceLanguage.Json, "function(v) { return [v]; }");
 
             var mrRequest = mr.ToMessage();
 
@@ -83,6 +88,19 @@ namespace CorrugatedIron.Tests.Models
                 .Reduce(true, Constants.MapReduceLanguage.JavaScript, "", "Riak.reduceSum");
 
             mr.ToMessage().Request.ShouldEqual(ComplexMrJobText.ToRiakString());
+        }
+
+        [Test]
+        public void BuildingComplexMapReduceJobsWithFiltersProducesTheCorrectCommand()
+        {
+            var mr = new RiakMapReduce();
+            mr.SetInputs("animals")
+                .Filter(new Matches<string>("spider"))
+                .Map(false, Constants.MapReduceLanguage.JavaScript,
+                     "function(o) { return [1]; }")
+                .Reduce(true, Constants.MapReduceLanguage.JavaScript, "", "Riak.reduceSum");
+            
+            mr.ToMessage().Request.ShouldEqual(CompleMrJobWithFilterText.ToRiakString());
         }
     }
 }
