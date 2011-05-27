@@ -154,6 +154,17 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
             result.IsSuccess.ShouldBeTrue();
             Assert.Contains(TestBucket.ToRiakString(), result.Value.Buckets);
         }
+
+        [Test]
+        public void ListKeysIncludesTestKey()
+        {
+            var doc = new RiakObject(TestBucket, TestKey, TestJson, Constants.ContentTypes.ApplicationJson);
+            Client.Put(doc);
+
+            var result = Client.ListKeys(TestBucket);
+            result.IsSuccess.ShouldBeTrue();
+            Assert.Contains(TestKey.ToRiakString(), result.Value.Keys);
+        }
     }
 
     [TestFixture]
