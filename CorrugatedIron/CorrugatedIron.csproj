@@ -59,7 +59,9 @@
     <Compile Include="Config\RiakConnectionManualConfiguration.cs" />
     <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="KeyFilters\RiakCompositeKeyFilterToken.cs" />
+    <Compile Include="Models\IRiakMapReducePhase.cs" />
     <Compile Include="Models\RiakLink.cs" />
+    <Compile Include="Models\RiakLinkPhase.cs" />
     <Compile Include="Models\RiakPutOptions.cs" />
     <Compile Include="Util\Constants.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />

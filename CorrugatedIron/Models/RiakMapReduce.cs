@@ -36,7 +36,7 @@ namespace CorrugatedIron.Models
     public class RiakMapReduce
     {
         public List<IRiakKeyFilterToken> Filters { get; set; }
-        public Dictionary<string, RiakMapReducePhase> MapReducePhases { get; set; }
+        public Dictionary<string, IRiakMapReducePhase> MapReducePhases { get; set; }
 
         public string Bucket { get; set; }
         public string Request { get; set; }
@@ -110,8 +110,6 @@ namespace CorrugatedIron.Models
         }
 
         // TODO implement inputs as a RiakSearch query
-
-        // TODO implement tests for transforming MR jobs into Json strings
         public RiakMapReduce Filter(IRiakKeyFilterToken filter)
         {
             Filters.Add(filter);
@@ -119,13 +117,13 @@ namespace CorrugatedIron.Models
             return this;
         }
 
-        // TODO add support for passing arguments
+        // TODO add support for passing arguments to Erlang terms
         public RiakMapReduce Map(string module, string function, object[] args = null)
         {
             throw new NotImplementedException();
         }
 
-        public RiakMapReduce Map(RiakMapReducePhase map)
+        public RiakMapReduce Map(IRiakMapReducePhase map)
         {
             if (map.MapReducePhaseType != Constants.MapReducePhaseType.Map)
                 throw new Exception("Must add a Map phase");
@@ -135,14 +133,7 @@ namespace CorrugatedIron.Models
             return this;
         }
 
-        public RiakMapReduce Map(bool keep, string language, string source = "", string name = "", string arg = "")
-        {
-            AddMapReducePhase(keep, language, source, name, Constants.MapReducePhaseType.Map, arg);
-
-            return this;
-        }
-
-        public RiakMapReduce Reduce(RiakMapReducePhase reduce)
+        public RiakMapReduce Reduce(IRiakMapReducePhase reduce)
         {
             if (reduce.MapReducePhaseType != Constants.MapReducePhaseType.Reduce)
                 throw new Exception("Must add a Reduce phase");
@@ -152,16 +143,11 @@ namespace CorrugatedIron.Models
             return this;
         }
 
-        public RiakMapReduce Reduce(bool keep, string language, string source = "", string name = "")
+        public RiakMapReduce Link(IRiakMapReducePhase link)
         {
-            AddMapReducePhase(keep, language, source, name, Constants.MapReducePhaseType.Reduce, "");
+            MapReducePhases.Add("link", link);
 
             return this;
-        }
-
-        public RiakMapReduce Link()
-        {
-            throw new NotImplementedException();
         }
 
         public RpbMapRedReq ToMessage()
