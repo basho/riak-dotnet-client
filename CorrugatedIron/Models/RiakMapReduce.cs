@@ -35,26 +35,6 @@ namespace CorrugatedIron.Models
 
     public class RiakMapReduce
     {
-        public RiakMapReduce()
-        {
-            MapReducePhases = new Dictionary<string, RiakMapReducePhase>();
-        }
-
-        // TODO create and implement Bucket class
-        public RiakMapReduce(string request, string contentType = Constants.ContentTypes.ApplicationJson) : this()
-        {
-            Request = request;
-            ContentType = contentType;
-        }
-
-        public RiakMapReduce(string bucket, string request = "",
-                             string contentType = Constants.ContentTypes.ApplicationJson) : this()
-        {
-            Bucket = bucket;
-            ContentType = contentType;
-            Request = request;
-        }
-
         public List<IRiakKeyFilterToken> Filters { get; set; }
         public Dictionary<string, RiakMapReducePhase> MapReducePhases { get; set; }
 
@@ -64,6 +44,15 @@ namespace CorrugatedIron.Models
         // TODO push this out to the client for a given request.
         // This could be exposed via the client interface as part of a configuration object
         public string ContentType { get; set; }
+
+        public RiakMapReduce()
+        {
+            MapReducePhases = new Dictionary<string, RiakMapReducePhase>();
+            Filters = new List<IRiakKeyFilterToken>();
+        }
+
+        // TODO create and implement Bucket class
+
 
         /// <summary>
         /// Set the inputs property of the MapReduce job to a single bucket
@@ -136,9 +125,29 @@ namespace CorrugatedIron.Models
             throw new NotImplementedException();
         }
 
+        public RiakMapReduce Map(RiakMapReducePhase map)
+        {
+            if (map.MapReducePhaseType != Constants.MapReducePhaseType.Reduce)
+                throw new Exception("Must add a Map phase");
+
+            MapReducePhases.Add("map", map);
+
+            return this;
+        }
+
         public RiakMapReduce Map(bool keep, string language, string source = "", string name = "", string arg = "")
         {
             AddMapReducePhase(keep, language, source, name, Constants.MapReducePhaseType.Map, arg);
+
+            return this;
+        }
+
+        public RiakMapReduce Reduce(RiakMapReducePhase reduce)
+        {
+            if (reduce.MapReducePhaseType != Constants.MapReducePhaseType.Reduce)
+                throw new Exception("Must add a Reduce phase");
+
+            MapReducePhases.Add("reduce", reduce);
 
             return this;
         }
@@ -168,6 +177,14 @@ namespace CorrugatedIron.Models
 
                     jw.WritePropertyName("inputs");
                     jw.WriteValue(Inputs);
+
+                    if (Filters.Count > 0)
+                    {
+                        jw.WritePropertyName("key_filters");
+                        jw.WriteStartArray();
+                        Filters.ForEach(f => jw.WriteRawValue(f.ToString()));
+                        jw.WriteEndArray();
+                    }
 
                     jw.WritePropertyName("query");
                     jw.WriteStartArray();
