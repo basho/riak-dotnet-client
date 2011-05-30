@@ -70,7 +70,13 @@ namespace CorrugatedIron.Tests.Models
                              ContentType = Constants.ContentTypes.ApplicationJson
                          };
             mr.SetInputs("animals")
-                .Map(true, Constants.MapReduceLanguage.Json, "function(v) { return [v]; }");
+                .Map(new RiakMapReducePhase
+                    {
+                        Keep = true,
+                        MapReduceLanguage = Constants.MapReduceLanguage.JavaScript,
+                        MapReducePhaseType = Constants.MapReducePhaseType.Map,
+                        Source = "function(v) { return [v]; }"
+                    });
 
             var mrRequest = mr.ToMessage();
 
@@ -83,9 +89,20 @@ namespace CorrugatedIron.Tests.Models
         {
             var mr = new RiakMapReduce();
             mr.SetInputs("animals")
-                .Map(false, Constants.MapReduceLanguage.JavaScript,
-                     "function(o) { if (o.key.indexOf('spider') != -1) return [1]; else return []; }")
-                .Reduce(true, Constants.MapReduceLanguage.JavaScript, "", "Riak.reduceSum");
+                .Map(new RiakMapReducePhase
+                    {
+                        Keep = false,
+                        MapReduceLanguage = Constants.MapReduceLanguage.JavaScript,
+                        MapReducePhaseType = Constants.MapReducePhaseType.Map,
+                        Source = "function(o) { if (o.key.indexOf('spider') != -1) return [1]; else return []; }"
+                    })
+                .Reduce(new RiakMapReducePhase
+                            {
+                                Keep = true,
+                                MapReduceLanguage = Constants.MapReduceLanguage.JavaScript,
+                                MapReducePhaseType = Constants.MapReducePhaseType.Reduce,
+                                Name = "Riak.reduceSum"
+                            });
 
             mr.ToMessage().Request.ShouldEqual(ComplexMrJobText.ToRiakString());
         }
@@ -96,9 +113,20 @@ namespace CorrugatedIron.Tests.Models
             var mr = new RiakMapReduce();
             mr.SetInputs("animals")
                 .Filter(new Matches<string>("spider"))
-                .Map(false, Constants.MapReduceLanguage.JavaScript,
-                     "function(o) { return [1]; }")
-                .Reduce(true, Constants.MapReduceLanguage.JavaScript, "", "Riak.reduceSum");
+                .Map(new RiakMapReducePhase
+                    {
+                        Keep = false,
+                        MapReduceLanguage = Constants.MapReduceLanguage.JavaScript,
+                        MapReducePhaseType = Constants.MapReducePhaseType.Map,
+                        Source = "function(o) { return [1]; }"
+                    })
+                .Reduce(new RiakMapReducePhase
+                            {
+                                Keep = true,
+                                MapReduceLanguage = Constants.MapReduceLanguage.JavaScript,
+                                MapReducePhaseType = Constants.MapReducePhaseType.Reduce,
+                                Name = "Riak.reduceSum"
+                            });
             
             mr.ToMessage().Request.ShouldEqual(ComplexMrJobWithFilterText.ToRiakString());
         }
