@@ -135,10 +135,7 @@ namespace CorrugatedIron.Comms
         public System.Collections.Generic.IList<string> ListBucketNames()
         {
             var buckets = ListBuckets();
-            var names = new System.Collections.Generic.List<string> ();
-            
-            buckets.Value.Buckets.ForEach(b => names.Add(b.FromRiakString()));
-            
+            var names = buckets.Value.Buckets.Select(b => b.FromRiakString()).ToList();
             return names;
         }
         
@@ -155,10 +152,7 @@ namespace CorrugatedIron.Comms
         public System.Collections.Generic.IList<string> LiskKeyNames(string bucket)
         {
             var keys = ListKeys(bucket);
-            var names = new System.Collections.Generic.List<string>();
-            
-            keys.Value.Keys.ForEach(k => names.Add(k.FromRiakString()));
-            
+            var names = keys.Value.Keys.Select(k => k.FromRiakString()).ToList();
             return names;
         }
         
