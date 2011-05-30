@@ -51,6 +51,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Comms\RiakConnectionTests.cs" />
     <Compile Include="Encoding\MessageEncoderUnitTests.cs" />
     <Compile Include="Extensions\UnitTestExtensions.cs" />
     <Compile Include="Live\LiveRiakConnectionTests.cs" />
@@ -59,9 +60,7 @@
     <Compile Include="Models\RiakMapReducePhaseTests.cs" />
     <Compile Include="KeyFilters\KeyFilterTests.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Comms\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\CorrugatedIron\CorrugatedIron.csproj">
       <Project>{A2CA0CDC-85BB-489D-99D0-3EE1D135BE17}</Project>
