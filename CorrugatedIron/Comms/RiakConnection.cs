@@ -22,19 +22,6 @@ using CorrugatedIron.Encoding;
 
 namespace CorrugatedIron.Comms
 {
-    public interface IRiakConnection : IDisposable
-    {
-        bool IsIdle { get; }
-        void BeginIdle();
-        void EndIdle();
-
-        RiakResult<TResult> Read<TResult>()
-            where TResult : new();
-        RiakResult Write<TRequest>(TRequest request);
-        RiakResult<TResult> WriteRead<TRequest, TResult>(TRequest request)
-            where TResult : new();
-    }
-
     public class RiakConnection : IRiakConnection
     {
         private readonly IRiakConnectionConfiguration _connectionConfiguration;
