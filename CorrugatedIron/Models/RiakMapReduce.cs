@@ -42,7 +42,7 @@ namespace CorrugatedIron.Models
         }
 
         public List<IRiakKeyFilterToken> Filters { get; set; }
-        public Dictionary<string, IRiakMapReducePhase> MapReducePhases { get; set; }
+        public Dictionary<string, IRiakMapReducePhase> MapReducePhases { get; private set; }
 
         public string Bucket { get; set; }
         public string Request { get; set; }
