@@ -52,6 +52,7 @@
     <Compile Include="Comms\IRiakConnection.cs" />
     <Compile Include="Comms\RiakClient.cs" />
     <Compile Include="Comms\RiakConnection.cs" />
+    <Compile Include="Comms\RiakConnectionFactory.cs" />
     <Compile Include="Comms\RiakConnectionUsageManager.cs" />
     <Compile Include="Comms\RiakConnectionManager.cs" />
     <Compile Include="Comms\RiakResult.cs" />

@@ -37,6 +37,7 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
         protected const string TestMapReduce = @"{""inputs"":""map_reduce_bucket"",""query"":[{""map"":{""language"":""javascript"",""keep"":false,""source"":""function(o) {return [ 1 ];}""}},{""reduce"":{""language"":""javascript"",""keep"":true,""name"":""Riak.reduceSum""}}]}";
 
         protected IRiakConnectionManager ConnectionManager;
+        protected IRiakConnectionFactory ConnectionFactory;
         protected IRiakConnectionConfiguration ConnectionConfig;
         protected IRiakClient Client;
 
@@ -56,12 +57,13 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
                 IdleTimeout = idleTimeout
             };
 
+            ConnectionFactory = new RiakConnectionFactory(ConnectionConfig);
         }
 
         [SetUp]
         public void SetUp()
         {
-            ConnectionManager = new RiakConnectionManager(ConnectionConfig);
+            ConnectionManager = new RiakConnectionManager(ConnectionConfig, ConnectionFactory);
             Client = new RiakClient(ConnectionManager);
         }
 

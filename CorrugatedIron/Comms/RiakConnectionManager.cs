@@ -28,46 +28,34 @@ namespace CorrugatedIron.Comms
 
     public class RiakConnectionManager : IRiakConnectionManager
     {
-        private readonly IRiakConnectionConfiguration _connectionConfiguration;
         private readonly ResourcePool<IRiakConnection> _connections;
         private bool _disposing;
 
-        public RiakConnectionManager(IRiakConnectionConfiguration connectionConfiguration)
+        public RiakConnectionManager(IRiakConnectionConfiguration connectionConfiguration, IRiakConnectionFactory connectionFactory)
         {
-            _connectionConfiguration = connectionConfiguration;
             _connections = new ResourcePool<IRiakConnection>(connectionConfiguration.PoolSize,
-                connectionConfiguration.AcquireTimeout,
-                () => new RiakConnection(connectionConfiguration),
+                connectionConfiguration.AcquireTimeout, connectionFactory.CreateConnection,
                 conn => conn.Dispose());
         }
 
         public RiakResult UseConnection(byte[] clientId, Func<IRiakConnection, RiakResult> useFun, bool setClientId = true)
         {
-            if (_disposing) return RiakResult.Error(ResultCode.ShuttingDown);
-
-            Func<IRiakConnection, RiakResult> wrapper = conn =>
-                {
-                    using (new RiakConnectionUsageManager(conn, clientId))
-                    {
-                        return useFun(conn);
-                    }
-                };
-
-            var response = _connections.Consume(wrapper);
-            if (response.Item1)
-            {
-                return response.Item2;
-            }
-            return RiakResult.Error(ResultCode.CommunicationError);
+            return UseConnection(clientId, useFun, code => RiakResult.Error(code), setClientId);
         }
 
         public RiakResult<TResult> UseConnection<TResult>(byte[] clientId, Func<IRiakConnection, RiakResult<TResult>> useFun, bool setClientId = true)
         {
-            if (_disposing) return RiakResult<TResult>.Error(ResultCode.ShuttingDown);
+            return UseConnection(clientId, useFun, code => RiakResult<TResult>.Error(code), setClientId);
+        }
 
-            Func<IRiakConnection, RiakResult<TResult>> wrapper = conn =>
+        private TRiakResult UseConnection<TRiakResult>(byte[] clientId, Func<IRiakConnection, TRiakResult> useFun, Func<ResultCode, TRiakResult> onError, bool setClientId = true)
+            where TRiakResult : RiakResult
+        {
+            if (_disposing) return onError(ResultCode.ShuttingDown);
+
+            Func<IRiakConnection, TRiakResult> wrapper = conn =>
                 {
-                    using (new RiakConnectionUsageManager(conn, clientId))
+                    using (new RiakConnectionUsageManager(conn, clientId, setClientId))
                     {
                         return useFun(conn);
                     }
@@ -78,7 +66,7 @@ namespace CorrugatedIron.Comms
             {
                 return response.Item2;
             }
-            return RiakResult<TResult>.Error(ResultCode.CommunicationError);
+            return onError(ResultCode.CommunicationError);
         }
 
         public void Dispose()

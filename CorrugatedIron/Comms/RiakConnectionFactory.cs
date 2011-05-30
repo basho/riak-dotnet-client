@@ -14,30 +14,27 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
-using System.Threading;
-using CorrugatedIron.Messages;
+using CorrugatedIron.Config;
 
 namespace CorrugatedIron.Comms
 {
-    public class RiakConnectionUsageManager : IDisposable
+    public interface IRiakConnectionFactory
     {
-        private readonly IRiakConnection _connection;
+        IRiakConnection CreateConnection();
+    }
 
-        public RiakConnectionUsageManager(IRiakConnection connection, byte[] clientId, bool setClientId = true)
+    public class RiakConnectionFactory : IRiakConnectionFactory
+    {
+        private readonly IRiakConnectionConfiguration _connectionConfiguration;
+
+        public RiakConnectionFactory(IRiakConnectionConfiguration connectionConfiguration)
         {
-            _connection = connection;
-            _connection.EndIdle();
-
-            if (setClientId)
-            {
-                connection.WriteRead<RpbSetClientIdReq, RpbSetClientIdResp>(new RpbSetClientIdReq { ClientId = clientId });
-            }
+            _connectionConfiguration = connectionConfiguration;
         }
 
-        public void Dispose()
+        public IRiakConnection CreateConnection()
         {
-            _connection.BeginIdle();
+            return new RiakConnection(_connectionConfiguration);
         }
     }
 }
