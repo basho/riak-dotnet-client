@@ -104,6 +104,16 @@ namespace CorrugatedIron.Tests.Extensions
             }
         }
 
+        public static void ShouldContain<T>(this IEnumerable<T> items, T value)
+        {
+            items.Contains(value).ShouldBeTrue();
+        }
+
+        public static void ShouldNotContain<T>(this IEnumerable<T> items, T value)
+        {
+            items.Contains(value).ShouldBeFalse();
+        }
+
         public static string DisplayString<T>(this T items) where T : IEnumerable
         {
             var sb = new StringBuilder();

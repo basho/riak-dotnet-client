@@ -17,7 +17,6 @@
 using CorrugatedIron.Comms;
 using CorrugatedIron.Config;
 using CorrugatedIron.Extensions;
-using CorrugatedIron.Messages;
 using CorrugatedIron.Models;
 using CorrugatedIron.Tests.Extensions;
 using CorrugatedIron.Util;
@@ -152,7 +151,7 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
 
             var result = Client.ListBuckets();
             result.IsSuccess.ShouldBeTrue();
-            Assert.Contains(TestBucket.ToRiakString(), result.Value.Buckets);
+            result.Value.ShouldContain(TestBucket);
         }
 
         [Test]
@@ -163,7 +162,7 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
 
             var result = Client.ListKeys(TestBucket);
             result.IsSuccess.ShouldBeTrue();
-            Assert.Contains(TestKey.ToRiakString(), result.Value.Keys);
+            result.Value.ShouldContain(TestKey);
         }
     }
 

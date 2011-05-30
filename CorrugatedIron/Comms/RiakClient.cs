@@ -15,6 +15,7 @@
 // under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.NetworkInformation;
 using CorrugatedIron.Extensions;
@@ -32,10 +33,10 @@ namespace CorrugatedIron.Comms
         RiakResult Delete(string bucket, string key, uint rwVal = Constants.Defaults.RVal);
         RiakResult<RpbMapRedResp> MapReduce(string request, string requestType = Constants.ContentTypes.ApplicationJson);
         RiakResult<RpbMapRedResp> MapReduce(RpbMapRedReq request);
-        RiakResult<RpbListBucketsResp> ListBuckets();
-        RiakResult<RpbListKeysResp> ListKeys(string bucket);
-        RiakResult<RpbGetBucketResp> GetBucketProperties(string bucket);
-        RiakResult<RpbSetBucketResp> SetBucketProperties(string bucket, RpbBucketProps properties);
+        RiakResult<IEnumerable<string>> ListBuckets();
+        RiakResult<IEnumerable<string>> ListKeys(string bucket);
+        RiakResult<RiakBucketProperties> GetBucketProperties(string bucket);
+        RiakResult SetBucketProperties(string bucket, RpbBucketProps properties);
     }
 
     public class RiakClient : IRiakClient
@@ -132,48 +133,50 @@ namespace CorrugatedIron.Comms
             return result;
         }
         
-        public System.Collections.Generic.IList<string> ListBucketNames()
-        {
-            var buckets = ListBuckets();
-            var names = buckets.Value.Buckets.Select(b => b.FromRiakString()).ToList();
-            return names;
-        }
-        
-        public RiakResult<RpbListBucketsResp> ListBuckets()
+        public RiakResult<IEnumerable<string>> ListBuckets()
         {
             var lbReq = new RpbListBucketsReq();
             var result = _connectionManager.UseConnection(_clientId,
                                                           conn =>
                                                           conn.WriteRead<RpbListBucketsReq, RpbListBucketsResp>(lbReq));
 
-            return result;
+            if (result.IsSuccess)
+            {
+                var buckets = result.Value.Buckets.Select(b => b.FromRiakString());
+                return RiakResult<IEnumerable<string>>.Success(buckets);
+            }
+            return RiakResult<IEnumerable<string>>.Error(result.ResultCode, result.ErrorMessage);
         }
   
-        public System.Collections.Generic.IList<string> LiskKeyNames(string bucket)
-        {
-            var keys = ListKeys(bucket);
-            var names = keys.Value.Keys.Select(k => k.FromRiakString()).ToList();
-            return names;
-        }
-        
-        public RiakResult<RpbListKeysResp> ListKeys(string bucket)
+        public RiakResult<IEnumerable<string>> ListKeys(string bucket)
         {
             var lkReq = new RpbListKeysReq {Bucket = bucket.ToRiakString()};
             var result = _connectionManager.UseConnection(_clientId,
                                                           conn => conn.WriteRead<RpbListKeysReq, RpbListKeysResp>(lkReq));
-            return result;
+
+            if (result.IsSuccess)
+            {
+                var keys = result.Value.Keys.Select(k => k.FromRiakString());
+                return RiakResult<IEnumerable<string>>.Success(keys);
+            }
+            return RiakResult<IEnumerable<string>>.Error(result.ResultCode, result.ErrorMessage);
         }
 
-        public RiakResult<RpbGetBucketResp> GetBucketProperties(string bucket)
+        public RiakResult<RiakBucketProperties> GetBucketProperties(string bucket)
         {
             var bpReq = new RpbGetBucketReq {Bucket = bucket.ToRiakString()};
             var result = _connectionManager.UseConnection(_clientId,
                                                           conn => conn.WriteRead<RpbGetBucketReq, RpbGetBucketResp>(bpReq));
 
-            return result;
+            if (result.IsSuccess)
+            {
+                var props = new RiakBucketProperties(result.Value.Props);
+                return RiakResult<RiakBucketProperties>.Success(props);
+            }
+            return RiakResult<RiakBucketProperties>.Error(result.ResultCode, result.ErrorMessage);
         }
 
-        public RiakResult<RpbSetBucketResp> SetBucketProperties(string bucket, RpbBucketProps properties)
+        public RiakResult SetBucketProperties(string bucket, RpbBucketProps properties)
         {
             var bpReq = new RpbSetBucketReq {Bucket = bucket.ToRiakString(), Props = properties};
             var result = _connectionManager.UseConnection(_clientId,
