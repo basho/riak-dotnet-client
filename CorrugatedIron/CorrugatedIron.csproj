@@ -48,17 +48,20 @@
     <Reference Include="System.Configuration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Collections\ConcurrentEnumerable.cs" />
+    <Compile Include="Collections\ConcurrentEnumerator.cs" />
     <Compile Include="Collections\ResourcePool.cs" />
-    <Compile Include="Comms\IRiakConnection.cs" />
     <Compile Include="Comms\RiakClient.cs" />
     <Compile Include="Comms\RiakConnection.cs" />
     <Compile Include="Comms\RiakConnectionFactory.cs" />
     <Compile Include="Comms\RiakConnectionUsageManager.cs" />
-    <Compile Include="Comms\RiakConnectionManager.cs" />
+    <Compile Include="Comms\RiakCluster.cs" />
+    <Compile Include="Comms\RiakNode.cs" />
+    <Compile Include="Comms\RiakNodeFactory.cs" />
     <Compile Include="Comms\RiakResult.cs" />
-    <Compile Include="Config\IRiakConnectionConfiguration.cs" />
-    <Compile Include="Config\RiakConnectionAutoConfiguration.cs" />
-    <Compile Include="Config\RiakConnectionManualConfiguration.cs" />
+    <Compile Include="Config\RiakClusterConfiguration.cs" />
+    <Compile Include="Config\RiakNodeConfiguration.cs" />
+    <Compile Include="Config\RiakNodeConfigurationCollection.cs" />
     <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="KeyFilters\RiakCompositeKeyFilterToken.cs" />
     <Compile Include="Models\IRiakMapReducePhase.cs" />

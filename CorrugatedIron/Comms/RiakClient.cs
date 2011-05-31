@@ -41,22 +41,22 @@ namespace CorrugatedIron.Comms
 
     public class RiakClient : IRiakClient
     {
-        private readonly IRiakConnectionManager _connectionManager;
+        private readonly IRiakCluster _cluster;
         private byte[] _clientId;
 
-        public RiakClient(IRiakConnectionManager connectionManager)
-            : this(connectionManager, GetClientId())
+        public RiakClient(IRiakCluster cluster)
+            : this(cluster, GetClientId())
         {
         }
 
-        public RiakClient(IRiakConnectionManager connectionManager, int clientId)
-            : this(connectionManager, RiakConnection.ToClientId(clientId))
+        public RiakClient(IRiakCluster cluster, int clientId)
+            : this(cluster, RiakConnection.ToClientId(clientId))
         {
         }
 
-        public RiakClient(IRiakConnectionManager connectionManager, byte[] clientId)
+        public RiakClient(IRiakCluster cluster, byte[] clientId)
         {
-            _connectionManager = connectionManager;
+            _cluster = cluster;
             ClientId = clientId;
         }
 
@@ -74,13 +74,13 @@ namespace CorrugatedIron.Comms
 
         public RiakResult Ping()
         {
-            return _connectionManager.UseConnection(_clientId, conn => conn.WriteRead<RpbPingReq, RpbPingResp>(new RpbPingReq()), false);
+            return _cluster.UseConnection(_clientId, conn => conn.PbcWriteRead<RpbPingReq, RpbPingResp>(new RpbPingReq()));
         }
 
         public RiakResult<RiakObject> Get(string bucket, string key, uint rVal = Constants.Defaults.RVal)
         {
             var request = new RpbGetReq { Bucket = bucket.ToRiakString(), Key = key.ToRiakString(), R = rVal };
-            var result = _connectionManager.UseConnection(_clientId, conn => conn.WriteRead<RpbGetReq, RpbGetResp>(request));
+            var result = _cluster.UseConnection(_clientId, conn => conn.PbcWriteRead<RpbGetReq, RpbGetResp>(request));
 
             if (!result.IsSuccess)
             {
@@ -101,7 +101,7 @@ namespace CorrugatedIron.Comms
             var request = value.ToMessage();
             options.Populate(request);
 
-            var result = _connectionManager.UseConnection(_clientId, conn => conn.WriteRead<RpbPutReq, RpbPutResp>(request));
+            var result = _cluster.UseConnection(_clientId, conn => conn.PbcWriteRead<RpbPutReq, RpbPutResp>(request));
 
             if (!result.IsSuccess)
             {
@@ -116,7 +116,7 @@ namespace CorrugatedIron.Comms
         public RiakResult Delete(string bucket, string key, uint rwVal = Constants.Defaults.RVal)
         {
             var request = new RpbDelReq { Bucket = bucket.ToRiakString(), Key = key.ToRiakString(), Rw = rwVal };
-            var result = _connectionManager.UseConnection(_clientId, conn => conn.WriteRead<RpbDelReq, RpbDelResp>(request));
+            var result = _cluster.UseConnection(_clientId, conn => conn.PbcWriteRead<RpbDelReq, RpbDelResp>(request));
 
             return result;
         }
@@ -129,16 +129,16 @@ namespace CorrugatedIron.Comms
 
         public RiakResult<RpbMapRedResp> MapReduce(RpbMapRedReq request)
         {
-            var result = _connectionManager.UseConnection(_clientId, conn => conn.WriteRead<RpbMapRedReq, RpbMapRedResp>(request));
+            var result = _cluster.UseConnection(_clientId, conn => conn.PbcWriteRead<RpbMapRedReq, RpbMapRedResp>(request));
             return result;
         }
         
         public RiakResult<IEnumerable<string>> ListBuckets()
         {
             var lbReq = new RpbListBucketsReq();
-            var result = _connectionManager.UseConnection(_clientId,
+            var result = _cluster.UseConnection(_clientId,
                                                           conn =>
-                                                          conn.WriteRead<RpbListBucketsReq, RpbListBucketsResp>(lbReq));
+                                                          conn.PbcWriteRead<RpbListBucketsReq, RpbListBucketsResp>(lbReq));
 
             if (result.IsSuccess)
             {
@@ -151,8 +151,8 @@ namespace CorrugatedIron.Comms
         public RiakResult<IEnumerable<string>> ListKeys(string bucket)
         {
             var lkReq = new RpbListKeysReq {Bucket = bucket.ToRiakString()};
-            var result = _connectionManager.UseConnection(_clientId,
-                                                          conn => conn.WriteRead<RpbListKeysReq, RpbListKeysResp>(lkReq));
+            var result = _cluster.UseConnection(_clientId,
+                                                          conn => conn.PbcWriteRead<RpbListKeysReq, RpbListKeysResp>(lkReq));
 
             if (result.IsSuccess)
             {
@@ -165,8 +165,8 @@ namespace CorrugatedIron.Comms
         public RiakResult<RiakBucketProperties> GetBucketProperties(string bucket)
         {
             var bpReq = new RpbGetBucketReq {Bucket = bucket.ToRiakString()};
-            var result = _connectionManager.UseConnection(_clientId,
-                                                          conn => conn.WriteRead<RpbGetBucketReq, RpbGetBucketResp>(bpReq));
+            var result = _cluster.UseConnection(_clientId,
+                                                          conn => conn.PbcWriteRead<RpbGetBucketReq, RpbGetBucketResp>(bpReq));
 
             if (result.IsSuccess)
             {
@@ -179,9 +179,9 @@ namespace CorrugatedIron.Comms
         public RiakResult SetBucketProperties(string bucket, RpbBucketProps properties)
         {
             var bpReq = new RpbSetBucketReq {Bucket = bucket.ToRiakString(), Props = properties};
-            var result = _connectionManager.UseConnection(_clientId,
+            var result = _cluster.UseConnection(_clientId,
                                                           conn =>
-                                                          conn.WriteRead<RpbSetBucketReq, RpbSetBucketResp>(bpReq));
+                                                          conn.PbcWriteRead<RpbSetBucketReq, RpbSetBucketResp>(bpReq));
             return result;
         }
 

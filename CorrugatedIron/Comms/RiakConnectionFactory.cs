@@ -20,21 +20,17 @@ namespace CorrugatedIron.Comms
 {
     public interface IRiakConnectionFactory
     {
-        IRiakConnection CreateConnection();
+        IRiakConnection CreateConnection(IRiakNodeConfiguration nodeConfiguration);
     }
 
     public class RiakConnectionFactory : IRiakConnectionFactory
     {
-        private readonly IRiakConnectionConfiguration _connectionConfiguration;
-
-        public RiakConnectionFactory(IRiakConnectionConfiguration connectionConfiguration)
+        public IRiakConnection CreateConnection(IRiakNodeConfiguration nodeConfiguration)
         {
-            _connectionConfiguration = connectionConfiguration;
-        }
-
-        public IRiakConnection CreateConnection()
-        {
-            return new RiakConnection(_connectionConfiguration);
+            // As pointless as this seems, it serves the purpose of decoupling the
+            // creation of the connections to the node itself. Also means we can
+            // pull it apart to test it
+            return new RiakConnection(nodeConfiguration);
         }
     }
 }

@@ -15,7 +15,6 @@
 // under the License.
 
 using System;
-using System.Threading;
 using CorrugatedIron.Messages;
 
 namespace CorrugatedIron.Comms
@@ -24,15 +23,11 @@ namespace CorrugatedIron.Comms
     {
         private readonly IRiakConnection _connection;
 
-        public RiakConnectionUsageManager(IRiakConnection connection, byte[] clientId, bool setClientId = true)
+        public RiakConnectionUsageManager(IRiakConnection connection, byte[] clientId)
         {
             _connection = connection;
             _connection.EndIdle();
-
-            if (setClientId)
-            {
-                connection.WriteRead<RpbSetClientIdReq, RpbSetClientIdResp>(new RpbSetClientIdReq { ClientId = clientId });
-            }
+            connection.PbcWriteRead<RpbSetClientIdReq, RpbSetClientIdResp>(new RpbSetClientIdReq { ClientId = clientId });
         }
 
         public void Dispose()
