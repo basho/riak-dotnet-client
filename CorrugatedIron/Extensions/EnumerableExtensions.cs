@@ -28,5 +28,16 @@ namespace CorrugatedIron.Extensions
                 action(item);
             }
         }
+
+        public static IEnumerable<T> Cycle<T>(this IEnumerable<T> items)
+        {
+            while (true)
+            {
+                foreach (var item in items)
+                {
+                    yield return item;
+                }
+            }
+        }
     }
 }

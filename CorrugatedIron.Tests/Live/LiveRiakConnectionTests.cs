@@ -29,48 +29,39 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
         protected const int TestClientId = 42;
         protected readonly static byte[] ClientId;
         protected const string TestHost = "riak-test";
-        protected const int TestHostPort = 8081;
+        protected const int TestPbcPort = 8081;
+        protected const int TestHttpPort = 8091;
         protected const string TestBucket = "test_bucket";
         protected const string TestKey = "test_json";
         protected const string TestJson = "{\"string\":\"value\",\"int\":100,\"float\":2.34,\"array\":[1,2,3],\"dict\":{\"foo\":\"bar\"}}";
         protected const string MapReduceBucket = "map_reduce_bucket";
         protected const string TestMapReduce = @"{""inputs"":""map_reduce_bucket"",""query"":[{""map"":{""language"":""javascript"",""keep"":false,""source"":""function(o) {return [ 1 ];}""}},{""reduce"":{""language"":""javascript"",""keep"":true,""name"":""Riak.reduceSum""}}]}";
 
-        protected IRiakConnectionManager ConnectionManager;
-        protected IRiakConnectionFactory ConnectionFactory;
-        protected IRiakConnectionConfiguration ConnectionConfig;
+        protected IRiakCluster Cluster;
         protected IRiakClient Client;
+        protected IRiakClusterConfiguration ClusterConfig;
 
         static LiveRiakConnectionTestBase()
         {
             ClientId = RiakConnection.ToClientId(TestClientId);
         }
 
-        public LiveRiakConnectionTestBase(int poolSize = 1, int idleTimeout = 10000)
+        public LiveRiakConnectionTestBase(string section = "riak3NodeConfiguration")
         {
-            ConnectionConfig = new RiakConnectionManualConfiguration
-            {
-                HostAddress = TestHost,
-                HostPort = TestHostPort,
-                PoolSize = poolSize,
-                AcquireTimeout = 4000,
-                IdleTimeout = idleTimeout
-            };
-
-            ConnectionFactory = new RiakConnectionFactory(ConnectionConfig);
+            ClusterConfig = RiakClusterConfiguration.LoadFromConfig(section);
         }
 
         [SetUp]
         public void SetUp()
         {
-            ConnectionManager = new RiakConnectionManager(ConnectionConfig, ConnectionFactory);
-            Client = new RiakClient(ConnectionManager);
+            Cluster = new RiakCluster(ClusterConfig, new RiakNodeFactory(), new RiakConnectionFactory());
+            Client = new RiakClient(Cluster);
         }
 
         [TearDown]
         public void TearDown()
         {
-            ConnectionManager.Dispose();
+            Cluster.Dispose();
         }
     }
 
@@ -172,14 +163,14 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
     public class WhenConnectionGoesIdle : LiveRiakConnectionTestBase
     {
         public WhenConnectionGoesIdle()
-            : base(1, 1)
+            : base("riak1NodeConfiguration")
         {
         }
 
         private IRiakConnection GetIdleConnection()
         {
-            var result = ConnectionManager.UseConnection(ClientId, RiakResult<IRiakConnection>.Success);
-            System.Threading.Thread.Sleep(ConnectionConfig.IdleTimeout + 1000);
+            var result = Cluster.UseConnection(ClientId, RiakResult<IRiakConnection>.Success);
+            System.Threading.Thread.Sleep(ClusterConfig.RiakNodes[0].IdleTimeout + 1000);
             return result.Value;
         }
 

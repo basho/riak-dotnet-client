@@ -22,37 +22,50 @@ using CorrugatedIron.Encoding;
 
 namespace CorrugatedIron.Comms
 {
+    public interface IRiakConnection : IDisposable
+    {
+        bool IsIdle { get; }
+        void BeginIdle();
+        void EndIdle();
+
+        RiakResult<TResult> PbcRead<TResult>()
+            where TResult : new();
+        RiakResult PbcWrite<TRequest>(TRequest request);
+        RiakResult<TResult> PbcWriteRead<TRequest, TResult>(TRequest request)
+            where TResult : new();
+    }
+
     public class RiakConnection : IRiakConnection
     {
-        private readonly IRiakConnectionConfiguration _connectionConfiguration;
+        private readonly IRiakNodeConfiguration _nodeConfiguration;
         private readonly MessageEncoder _encoder;
         private readonly object _idleTimerLock = new object();
-        private TcpClient _client;
-        private NetworkStream _clientStream;
+        private TcpClient _pbcClient;
+        private NetworkStream _pbcClientStream;
         private Timer _idleTimer;
 
         public bool IsIdle
         {
-            get { return _client == null; }
+            get { return _pbcClient == null; }
         }
 
-        private TcpClient Client
+        private TcpClient PbcClient
         {
             get
             {
-                return _client ??
-                       (_client = new TcpClient(_connectionConfiguration.HostAddress, _connectionConfiguration.HostPort));
+                return _pbcClient ??
+                       (_pbcClient = new TcpClient(_nodeConfiguration.HostAddress, _nodeConfiguration.PbcPort));
             }
         }
 
-        private NetworkStream ClientStream
+        private NetworkStream PbcClientStream
         {
-            get { return _clientStream ?? (_clientStream = Client.GetStream()); }
+            get { return _pbcClientStream ?? (_pbcClientStream = PbcClient.GetStream()); }
         }
 
-        public RiakConnection(IRiakConnectionConfiguration connectionConfiguration)
+        public RiakConnection(IRiakNodeConfiguration nodeConfiguration)
         {
-            _connectionConfiguration = connectionConfiguration;
+            _nodeConfiguration = nodeConfiguration;
             _encoder = new MessageEncoder();
         }
 
@@ -71,7 +84,7 @@ namespace CorrugatedIron.Comms
                 if (IsIdle) return;
                 if (_idleTimer != null) return;
 
-                _idleTimer = new Timer(_ => GoIdle(), null, 0, _connectionConfiguration.IdleTimeout);
+                _idleTimer = new Timer(_ => GoIdle(), null, 0, _nodeConfiguration.IdleTimeout);
             }
         }
 
@@ -80,13 +93,13 @@ namespace CorrugatedIron.Comms
             CleanUpTimer();
         }
 
-        public RiakResult<TResult> Read<TResult>()
+        public RiakResult<TResult> PbcRead<TResult>()
             where TResult : new()
         {
             try
             {
-                var result = _encoder.Decode<TResult>(ClientStream);
-                ClientStream.Flush();
+                var result = _encoder.Decode<TResult>(PbcClientStream);
+                PbcClientStream.Flush();
                 return RiakResult<TResult>.Success(result);
             }
             catch (Exception ex)
@@ -95,12 +108,12 @@ namespace CorrugatedIron.Comms
             }
         }
 
-        public RiakResult Write<TRequest>(TRequest request)
+        public RiakResult PbcWrite<TRequest>(TRequest request)
         {
             try
             {
-                _encoder.Encode(request, ClientStream);
-                ClientStream.Flush();
+                _encoder.Encode(request, PbcClientStream);
+                PbcClientStream.Flush();
                 return RiakResult.Success();
             }
             catch (Exception ex)
@@ -109,13 +122,13 @@ namespace CorrugatedIron.Comms
             }
         }
 
-        public RiakResult<TResult> WriteRead<TRequest, TResult>(TRequest request)
+        public RiakResult<TResult> PbcWriteRead<TRequest, TResult>(TRequest request)
             where TResult : new()
         {
-            var writeResult = Write(request);
+            var writeResult = PbcWrite(request);
             if (writeResult.IsSuccess)
             {
-                return Read<TResult>();
+                return PbcRead<TResult>();
             }
             return RiakResult<TResult>.Error(writeResult.ResultCode, writeResult.ErrorMessage);
         }
@@ -132,10 +145,10 @@ namespace CorrugatedIron.Comms
 
         private void CleanUp()
         {
-            var client = _client;
-            _client = null;
-            var clientStream = _clientStream;
-            _clientStream = null;
+            var client = _pbcClient;
+            _pbcClient = null;
+            var clientStream = _pbcClientStream;
+            _pbcClientStream = null;
 
             if (clientStream != null)
             {
