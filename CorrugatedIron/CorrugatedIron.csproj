@@ -138,6 +138,7 @@
     <Compile Include="KeyFilters\ToUpper.cs" />
     <Compile Include="KeyFilters\UrlDecode.cs" />
     <Compile Include="KeyFilters\RiakKeyFilterToken.cs" />
+    <Compile Include="Models\MapReduce\RiakReducePhase.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

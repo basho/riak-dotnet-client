@@ -79,9 +79,7 @@ namespace CorrugatedIron.Comms
         /// Returns false if Riak is unavailable or returns a 'pang' response. </returns>
         public RiakResult Ping()
         {
-            return _connectionManager.UseConnection(_clientId, 
-                                                    conn => conn.WriteRead<RpbPingReq, RpbPingResp>(new RpbPingReq()), 
-                                                    false);
+            return _cluster.UseConnection(_clientId, conn => conn.PbcWriteRead<RpbPingReq, RpbPingResp>(new RpbPingReq()));
         }
   
         /// <summary>
