@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -63,11 +63,20 @@
     <Compile Include="Config\RiakNodeConfiguration.cs" />
     <Compile Include="Config\RiakNodeConfigurationCollection.cs" />
     <Compile Include="Extensions\EnumerableExtensions.cs" />
+    <Compile Include="Extensions\JsonExtensions.cs" />
     <Compile Include="KeyFilters\RiakCompositeKeyFilterToken.cs" />
-    <Compile Include="Models\IRiakMapReducePhase.cs" />
     <Compile Include="Models\RiakBucketProperties.cs" />
+    <Compile Include="Models\MapReduce\Inputs\IRiakPhaseInput.cs" />
+    <Compile Include="Models\MapReduce\Inputs\RiakPhaseInputs.cs" />
+    <Compile Include="Models\MapReduce\Inputs\RiakBucketKeyArgInput.cs" />
+    <Compile Include="Models\MapReduce\Inputs\RiakBucketKeyInput.cs" />
+    <Compile Include="Models\MapReduce\RiakLinkPhase.cs" />
+    <Compile Include="Models\MapReduce\RiakActionPhase.cs" />
+    <Compile Include="Models\MapReduce\RiakMapPhase.cs" />
+    <Compile Include="Models\MapReduce\RiakMapReduceQuery.cs" />
+    <Compile Include="Models\MapReduce\RiakPhase.cs" />
+    <Compile Include="Models\MapReduce\Inputs\RiakBucketInput.cs" />
     <Compile Include="Models\RiakLink.cs" />
-    <Compile Include="Models\RiakLinkPhase.cs" />
     <Compile Include="Models\RiakPutOptions.cs" />
     <Compile Include="Util\Constants.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
@@ -104,8 +113,6 @@
     <Compile Include="Encoding\MessageEncoder.cs" />
     <Compile Include="Models\RiakObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Models\RiakMapReduce.cs" />
-    <Compile Include="Models\RiakMapReducePhase.cs" />
     <Compile Include="KeyFilters\IRiakKeyFilterToken.cs" />
     <Compile Include="KeyFilters\And.cs" />
     <Compile Include="KeyFilters\Between.cs" />
