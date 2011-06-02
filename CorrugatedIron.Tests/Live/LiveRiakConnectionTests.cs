@@ -155,7 +155,9 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
 
             var result = Client.ListKeys(TestBucket);
             result.IsSuccess.ShouldBeTrue();
-            result.Value.ShouldContain(TestKey);
+
+            Assert.Contains(TestKey.ToRiakString(), result.Value.Keys);
+            Assert.Contains(TestKey, result.Value.KeyNames);
         }
     }
 

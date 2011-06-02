@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using CorrugatedIron.Extensions;
 using ProtoBuf;
 
 namespace CorrugatedIron.Messages
@@ -36,5 +37,14 @@ namespace CorrugatedIron.Messages
         [ProtoMember(2, IsRequired = false, Name = "done", DataFormat = DataFormat.Default)]
         [DefaultValue(default(bool))]
         public bool Done { get; set; }
+        
+        public List<string> KeyNames {
+            get {
+                var keys = new List<string>();
+                Keys.ForEach(k => keys.Add(k.FromRiakString()));
+                
+                return keys;
+            }
+        }
     }
 }

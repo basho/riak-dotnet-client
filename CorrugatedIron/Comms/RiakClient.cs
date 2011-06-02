@@ -71,12 +71,38 @@ namespace CorrugatedIron.Comms
                 _clientId = value;
             }
         }
-
+  
+        /// <summary>
+        /// Ping this instance of Riak
+        /// </summary>
+        /// <returns>Returns true if the Riak instance has returned a 'pong' response. 
+        /// Returns false if Riak is unavailable or returns a 'pang' response. </returns>
         public RiakResult Ping()
         {
-            return _cluster.UseConnection(_clientId, conn => conn.PbcWriteRead<RpbPingReq, RpbPingResp>(new RpbPingReq()));
+            return _connectionManager.UseConnection(_clientId, 
+                                                    conn => conn.WriteRead<RpbPingReq, RpbPingResp>(new RpbPingReq()), 
+                                                    false);
         }
-
+  
+        /// <summary>
+        /// Get the specified <paramref name="key"/> from the <paramref name="bucket"/>.
+        /// Optionally can be read from <paramref name="rval"/> instances.
+        /// </summary>
+        /// <param name='bucket'>
+        /// The name of the bucket containing the <paramref name="key"/>
+        /// </param>
+        /// <param name='key'>
+        /// The key.
+        /// </param>
+        /// <param name='rVal'>
+        /// The number of nodes required to successfully respond to the read before the read is considered a success.
+        /// </param>
+        /// <remarks>If a node does not respond, that does not necessarily mean that the 
+        /// <paramref name="bucket"/>/<paramref name="key"/> combination is not available. It simply means
+        /// that less than <paramref name="rVal"> nodes successfully responded to the read request. Unfortunatley, 
+        /// the Riak API does not allow us to distinguish between a 404 resulting from less than <paramref name="rVal"/>
+        /// nodes successfully responding and a <paramref name="bucket"/>/<paramref name="key"/> combination
+        /// not being found in Riak.</remarks>
         public RiakResult<RiakObject> Get(string bucket, string key, uint rVal = Constants.Defaults.RVal)
         {
             var request = new RpbGetReq { Bucket = bucket.ToRiakString(), Key = key.ToRiakString(), R = rVal };
