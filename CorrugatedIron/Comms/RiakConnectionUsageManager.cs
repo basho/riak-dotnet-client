@@ -27,7 +27,7 @@ namespace CorrugatedIron.Comms
         {
             _connection = connection;
             _connection.EndIdle();
-            connection.PbcWriteRead<RpbSetClientIdReq, RpbSetClientIdResp>(new RpbSetClientIdReq { ClientId = clientId });
+            _connection.SetClientId(clientId);
         }
 
         public void Dispose()

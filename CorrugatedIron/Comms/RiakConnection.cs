@@ -21,10 +21,12 @@ using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using System.Threading;
 using CorrugatedIron.Config;
 using CorrugatedIron.Encoding;
 using CorrugatedIron.Extensions;
+using CorrugatedIron.Messages;
 using CorrugatedIron.Models;
 using CorrugatedIron.Util;
 
@@ -45,6 +47,7 @@ namespace CorrugatedIron.Comms
 
         // REST interface
         RiakResult<RiakRestResponse> RestRequest(RiakRestRequest request);
+        void SetClientId(byte[] clientId);
     }
 
     public class RiakConnection : IRiakConnection
@@ -56,6 +59,7 @@ namespace CorrugatedIron.Comms
         private TcpClient _pbcClient;
         private NetworkStream _pbcClientStream;
         private Timer _idleTimer;
+        private string _restClientId;
 
         public bool IsIdle
         {
@@ -112,6 +116,12 @@ namespace CorrugatedIron.Comms
             CleanUpTimer();
         }
 
+        public void SetClientId(byte[] clientId)
+        {
+            PbcWriteRead<RpbSetClientIdReq, RpbSetClientIdResp>(new RpbSetClientIdReq { ClientId = clientId });
+            _restClientId = Convert.ToBase64String(clientId);
+        }
+
         public RiakResult<TResult> PbcRead<TResult>()
             where TResult : new()
         {
@@ -154,8 +164,17 @@ namespace CorrugatedIron.Comms
 
         public RiakResult<RiakRestResponse> RestRequest(RiakRestRequest request)
         {
-            var finalUri = new Uri(_restRootUrl + request.Uri);
-            var req = (HttpWebRequest)WebRequest.Create(finalUri);
+            var baseUri = new StringBuilder(_restRootUrl).Append(request.Uri);
+            if (request.QueryParams.Count > 0)
+            {
+                baseUri.Append(baseUri).Append("?");
+                var first = request.QueryParams.First();
+                baseUri.Append(first.Key.UrlEncoded()).Append("=").Append(first.Value.UrlEncoded());
+                request.QueryParams.Skip(1).ForEach(kv => baseUri.Append("&").Append(kv.Key.UrlEncoded()).Append("=").Append(kv.Value.UrlEncoded()));
+            }
+            var targetUri = new Uri(baseUri.ToString());
+
+            var req = (HttpWebRequest)WebRequest.Create(targetUri);
             req.KeepAlive = true;
             req.Method = request.Method;
             req.Credentials = CredentialCache.DefaultCredentials;
@@ -169,6 +188,8 @@ namespace CorrugatedIron.Comms
             {
                 req.Headers.Set(Constants.Rest.HttpHeaders.DisableCacheKey, Constants.Rest.HttpHeaders.DisableCacheValue);
             }
+
+            request.Headers.Add(Constants.Rest.HttpHeaders.ClientId, _restClientId);
 
             request.Headers.ForEach(h => req.Headers.Set(h.Key, h.Value));
 
