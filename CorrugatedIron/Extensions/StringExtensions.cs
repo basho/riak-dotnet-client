@@ -14,6 +14,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Web;
+
 namespace CorrugatedIron.Extensions
 {
     public static class StringExtensions
@@ -33,6 +35,11 @@ namespace CorrugatedIron.Extensions
         public static string Fmt(this string formatter, params object[] args)
         {
             return string.Format(formatter, args);
+        }
+
+        public static string UrlEncoded(this string value)
+        {
+            return HttpUtility.UrlEncode(value);
         }
     }
 }
