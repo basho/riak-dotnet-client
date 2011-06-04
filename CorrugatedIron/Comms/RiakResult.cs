@@ -21,7 +21,8 @@ namespace CorrugatedIron.Comms
         Success = 0,
         ShuttingDown,
         NotFound,
-        CommunicationError
+        CommunicationError,
+        InvalidResponse
     }
 
     public class RiakResult

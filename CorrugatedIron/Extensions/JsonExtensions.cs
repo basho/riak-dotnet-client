@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using Newtonsoft.Json;
 
 namespace CorrugatedIron.Extensions
 {
@@ -8,6 +9,26 @@ namespace CorrugatedIron.Extensions
         {
             writer.WritePropertyName(name);
             writer.WriteValue(value);
+            return writer;
+        }
+
+        public static JsonWriter WriteNonNullProperty<T>(this JsonWriter writer, string name, T value)
+            where T : class
+        {
+            if (value != null)
+            {
+                writer.WriteProperty(name, value);
+            }
+            return writer;
+        }
+
+        public static JsonWriter WriteNullableProperty<T>(this JsonWriter writer, string name, T? value)
+            where T : struct
+        {
+            if (value.HasValue)
+            {
+                writer.WriteProperty(name, value.Value);
+            }
             return writer;
         }
 

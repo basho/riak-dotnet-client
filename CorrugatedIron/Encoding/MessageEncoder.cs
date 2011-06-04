@@ -113,6 +113,7 @@ namespace CorrugatedIron.Encoding
             source.Read(length, 0, length.Length);
             var size = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(length, 0));
 
+#if DEBUG
             // This message code validation is here to make sure that the caller
             // is getting exactly what they expect. This "could" be removed from
             // production code, but it's a good thing to have in here for dev.
@@ -121,6 +122,7 @@ namespace CorrugatedIron.Encoding
             {
                 throw new InvalidOperationException(string.Format("Attempt to decode message to type '{0}' when received type '{1}'.", typeof(T).Name, MessageCodeToTypeMap[messageCode].Name));
             }
+#endif
 
             if (size <= 1)
             {

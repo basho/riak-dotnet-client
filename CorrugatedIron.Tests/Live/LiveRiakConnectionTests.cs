@@ -17,7 +17,6 @@
 using CorrugatedIron.Comms;
 using CorrugatedIron.Config;
 using CorrugatedIron.Extensions;
-using CorrugatedIron.Messages;
 using CorrugatedIron.Models;
 using CorrugatedIron.Tests.Extensions;
 using CorrugatedIron.Util;
@@ -37,8 +36,8 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
         protected const string TestJson = "{\"string\":\"value\",\"int\":100,\"float\":2.34,\"array\":[1,2,3],\"dict\":{\"foo\":\"bar\"}}";
         protected const string MapReduceBucket = "map_reduce_bucket";
         protected const string TestMapReduce = @"{""inputs"":""map_reduce_bucket"",""query"":[{""map"":{""language"":""javascript"",""keep"":false,""source"":""function(o) {return [ 1 ];}""}},{""reduce"":{""language"":""javascript"",""keep"":true,""name"":""Riak.reduceSum""}}]}";
-        protected const string MultiBucket = "multi_bucket";
-        protected const string MultiKey = "test_multi";
+        protected const string MultiBucket = "test_multi_bucket";
+        protected const string MultiKey = "test_multi_key";
         protected const string MultiBodyOne = @"{""dishes"": 9}";
         protected const string MultiBodyTwo = @"{""dishes"": 11}";
 
@@ -142,7 +141,7 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
         }
 
         [Test]
-        public void ListBucketsIncludesTestBucket ()
+        public void ListBucketsIncludesTestBucket()
         {
             var doc = new RiakObject(TestBucket, TestKey, TestJson, Constants.ContentTypes.ApplicationJson);
             Client.Put(doc);
@@ -166,14 +165,14 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
         [Test]
         public void WritesWithAllowMultProducesMultiple()
         {
-            var props = new RpbBucketProps() { AllowMultiple = true };
-            Client.SetBucketProperties(MultiBucket, props);
+            var props = new RiakBucketProperties().SetAllowMultiple(true).SetLastWriteWins(false);
+            Client.SetBucketProperties(MultiBucket, props).IsSuccess.ShouldBeTrue();
 
             var doc = new RiakObject(MultiBucket, MultiKey, MultiBodyOne, Constants.ContentTypes.ApplicationJson);
-            Client.Put(doc);
+            Client.Put(doc).IsSuccess.ShouldBeTrue();
 
             doc = new RiakObject(MultiBucket, MultiKey, MultiBodyTwo, Constants.ContentTypes.ApplicationJson);
-            Client.Put(doc);
+            Client.Put(doc).IsSuccess.ShouldBeTrue();
 
             var result = Client.Get(MultiBucket, MultiKey);
             Assert.GreaterOrEqual(result.Value.Siblings.Count, 2);
@@ -182,14 +181,14 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
         [Test]
         public void WritesWithAllowMultProducesMultipleVTags()
         {
-            var props = new RpbBucketProps() { AllowMultiple = true };
-            Client.SetBucketProperties(MultiBucket, props);
+            var props = new RiakBucketProperties().SetAllowMultiple(true).SetLastWriteWins(false);
+            Client.SetBucketProperties(MultiBucket, props).IsSuccess.ShouldBeTrue();
 
             var doc = new RiakObject(MultiBucket, MultiKey, MultiBodyOne, Constants.ContentTypes.ApplicationJson);
-            Client.Put(doc);
+            Client.Put(doc).IsSuccess.ShouldBeTrue();
 
             doc = new RiakObject(MultiBucket, MultiKey, MultiBodyTwo, Constants.ContentTypes.ApplicationJson);
-            Client.Put(doc);
+            Client.Put(doc).IsSuccess.ShouldBeTrue();
 
             var result = Client.Get(MultiBucket, MultiKey);
 

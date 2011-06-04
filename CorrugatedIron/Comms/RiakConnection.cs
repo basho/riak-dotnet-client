@@ -15,10 +15,18 @@
 // under the License.
 
 using System;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Net.Security;
 using System.Net.Sockets;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using CorrugatedIron.Config;
 using CorrugatedIron.Encoding;
+using CorrugatedIron.Extensions;
+using CorrugatedIron.Models;
+using CorrugatedIron.Util;
 
 namespace CorrugatedIron.Comms
 {
@@ -28,11 +36,15 @@ namespace CorrugatedIron.Comms
         void BeginIdle();
         void EndIdle();
 
+        // PBC interface
         RiakResult<TResult> PbcRead<TResult>()
             where TResult : new();
         RiakResult PbcWrite<TRequest>(TRequest request);
         RiakResult<TResult> PbcWriteRead<TRequest, TResult>(TRequest request)
             where TResult : new();
+
+        // REST interface
+        RiakResult<RiakRestResponse> RestRequest(RiakRestRequest request);
     }
 
     public class RiakConnection : IRiakConnection
@@ -40,6 +52,7 @@ namespace CorrugatedIron.Comms
         private readonly IRiakNodeConfiguration _nodeConfiguration;
         private readonly MessageEncoder _encoder;
         private readonly object _idleTimerLock = new object();
+        private readonly string _restRootUrl;
         private TcpClient _pbcClient;
         private NetworkStream _pbcClientStream;
         private Timer _idleTimer;
@@ -63,9 +76,15 @@ namespace CorrugatedIron.Comms
             get { return _pbcClientStream ?? (_pbcClientStream = PbcClient.GetStream()); }
         }
 
+        static RiakConnection()
+        {
+            ServicePointManager.ServerCertificateValidationCallback += ServerValidationCallback;
+        }
+
         public RiakConnection(IRiakNodeConfiguration nodeConfiguration)
         {
             _nodeConfiguration = nodeConfiguration;
+            _restRootUrl = @"{0}://{1}:{2}".Fmt(nodeConfiguration.RestScheme, nodeConfiguration.HostAddress, nodeConfiguration.RestPort);
             _encoder = new MessageEncoder();
         }
 
@@ -131,6 +150,77 @@ namespace CorrugatedIron.Comms
                 return PbcRead<TResult>();
             }
             return RiakResult<TResult>.Error(writeResult.ResultCode, writeResult.ErrorMessage);
+        }
+
+        public RiakResult<RiakRestResponse> RestRequest(RiakRestRequest request)
+        {
+            var finalUri = new Uri(_restRootUrl + request.Uri);
+            var req = (HttpWebRequest)WebRequest.Create(finalUri);
+            req.KeepAlive = true;
+            req.Method = request.Method;
+            req.Credentials = CredentialCache.DefaultCredentials;
+
+            if (!string.IsNullOrWhiteSpace(request.ContentType))
+            {
+                req.ContentType = request.ContentType;
+            }
+
+            if (!request.Cache)
+            {
+                req.Headers.Set(Constants.Rest.HttpHeaders.DisableCacheKey, Constants.Rest.HttpHeaders.DisableCacheValue);
+            }
+
+            request.Headers.ForEach(h => req.Headers.Set(h.Key, h.Value));
+
+            if (request.Body != null && request.Body.Length > 0)
+            {
+                req.ContentLength = request.Body.Length;
+                using (var writer = req.GetRequestStream())
+                {
+                    writer.Write(request.Body, 0, request.Body.Length);
+                }
+            }
+            else
+            {
+                req.ContentLength = 0;
+            }
+
+            try
+            {
+                var response = (HttpWebResponse)req.GetResponse();
+
+                var result = new RiakRestResponse
+                {
+                    ContentLength = response.ContentLength,
+                    StatusCode = response.StatusCode,
+                    Headers = response.Headers.AllKeys.ToDictionary(k => k, k => response.Headers[k])
+                };
+
+                if(!string.IsNullOrWhiteSpace(response.ContentEncoding))
+                {
+                    result.ContentEncoding = System.Text.Encoding.GetEncoding(response.ContentEncoding);
+                }
+
+                if (response.ContentLength > 0)
+                {
+                    using (var responseStream = response.GetResponseStream())
+                    using (var reader = new StreamReader(responseStream, result.ContentEncoding))
+                    {
+                        result.Body = reader.ReadToEnd();
+                    }
+                }
+
+                return RiakResult<RiakRestResponse>.Success(result);
+            }
+            catch (Exception ex)
+            {
+                return RiakResult<RiakRestResponse>.Error(ResultCode.CommunicationError, ex.Message);
+            }
+        }
+
+        private static bool ServerValidationCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+        {
+            return true;
         }
 
         public void Dispose()
