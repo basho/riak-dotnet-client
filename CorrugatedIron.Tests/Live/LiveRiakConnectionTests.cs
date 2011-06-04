@@ -99,7 +99,7 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
             var readResult = Client.Get(TestBucket, TestKey);
             readResult.IsSuccess.ShouldBeTrue(readResult.ErrorMessage);
 
-            var loadedDoc = readResult.Value[0];
+            var loadedDoc = readResult.Value;
 
             loadedDoc.Bucket.ShouldEqual(doc.Bucket);
             loadedDoc.Key.ShouldEqual(doc.Key);
@@ -164,7 +164,7 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
         }
 
         [Test]
-        public void WritesWithAllowMultProducesVtags()
+        public void WritesWithAllowMultProducesMultiple()
         {
             var props = new RpbBucketProps() { AllowMultiple = true };
             Client.SetBucketProperties(MultiBucket, props);
@@ -176,7 +176,7 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
             Client.Put(doc);
 
             var result = Client.Get(MultiBucket, MultiKey);
-            Assert.GreaterOrEqual(result.Value.Count, 2);
+            Assert.GreaterOrEqual(result.Value.Siblings.Count, 2);
         }
     }
 
