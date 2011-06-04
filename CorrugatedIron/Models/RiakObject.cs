@@ -37,6 +37,21 @@ namespace CorrugatedIron.Models
         public int LastModifiedUsec { get; private set; }
         public IList<RiakLink> Links { get; private set; }
         public IList<RiakObject> Siblings { get; set; }
+        public List<string> VTags
+        {
+            get
+            {
+                if (Siblings.Count == 0)
+                {
+                    return new List<string> { VTag };
+                }
+
+                var tags = new List<string>();
+                Siblings.ForEach(s => tags.Add(s.VTag));
+
+                return tags;
+            }
+        }
 
         public RiakObject(string bucket, string key, string value)
             : this(bucket, key, value, Constants.Defaults.ContentType)

@@ -178,6 +178,24 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
             var result = Client.Get(MultiBucket, MultiKey);
             Assert.GreaterOrEqual(result.Value.Siblings.Count, 2);
         }
+
+        [Test]
+        public void WritesWithAllowMultProducesMultipleVTags()
+        {
+            var props = new RpbBucketProps() { AllowMultiple = true };
+            Client.SetBucketProperties(MultiBucket, props);
+
+            var doc = new RiakObject(MultiBucket, MultiKey, MultiBodyOne, Constants.ContentTypes.ApplicationJson);
+            Client.Put(doc);
+
+            doc = new RiakObject(MultiBucket, MultiKey, MultiBodyTwo, Constants.ContentTypes.ApplicationJson);
+            Client.Put(doc);
+
+            var result = Client.Get(MultiBucket, MultiKey);
+
+            Assert.GreaterOrEqual(result.Value.VTags.Count, 2);
+            Assert.IsNotNull(result.Value.VTags);
+        }
     }
 
     [TestFixture]
