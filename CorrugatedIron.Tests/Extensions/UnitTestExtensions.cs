@@ -75,14 +75,19 @@ namespace CorrugatedIron.Tests.Extensions
             Assert.IsNotNullOrEmpty(value);
         }
 
-        public static void ShouldNotBeNull<T>(T obj) where T : class
+        public static void ShouldNotBeNull<T>(this T obj) where T : class
         {
             Assert.IsNotNull(obj);
         }
 
-        public static void ShouldBeNull<T>(T obj) where T : class
+        public static void ShouldBeNull<T>(this T obj) where T : class
         {
             Assert.IsNull(obj);
+        }
+
+        public static void IsAtLeast(this int val, int min)
+        {
+            Assert.Less(min - 1, val);
         }
 
         public static void ContentsShouldEqual<T>(this T actual, T expected) where T : IEnumerable

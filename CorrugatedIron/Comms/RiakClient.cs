@@ -216,8 +216,9 @@ namespace CorrugatedIron.Comms
         {
             if (properties.CanUsePbc)
             {
-                var request = properties.ToMessage();
-                var result = _cluster.UseConnection(_clientId, conn => conn.PbcWriteRead<RpbBucketProps, RpbSetBucketResp>(request));
+                var request = new RpbSetBucketReq { Bucket = bucket.ToRiakString(), Props = properties.ToMessage() };
+                var result = _cluster.UseConnection(_clientId, conn => conn.PbcWriteRead<RpbSetBucketReq, RpbSetBucketResp>(request));
+                return result;
             }
             else
             {
