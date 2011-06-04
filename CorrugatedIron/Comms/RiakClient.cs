@@ -28,10 +28,10 @@ namespace CorrugatedIron.Comms
     public interface IRiakClient
     {
         RiakResult Ping();
-        RiakResult<RiakObject> Get(string bucket, string key, uint rVal = Constants.Defaults.RVal);
+        RiakResult<List<RiakObject>> Get(string bucket, string key, uint rVal = Constants.Defaults.RVal);
         RiakResult<RiakObject> Put(RiakObject value, RiakPutOptions options = null);
         RiakResult Delete(string bucket, string key, uint rwVal = Constants.Defaults.RVal);
-        RiakResult<RpbMapRedResp> MapReduce(string request, string requestType = Constants.ContentTypes.ApplicationJson);
+        RiakResult<RpbMapRedResp> MapReduce(string request, string requestType = Constants.ContentTypes.ApplicationJson);  
         RiakResult<RpbMapRedResp> MapReduce(RpbMapRedReq request);
         RiakResult<IEnumerable<string>> ListBuckets();
         RiakResult<IEnumerable<string>> ListKeys(string bucket);
@@ -84,7 +84,8 @@ namespace CorrugatedIron.Comms
   
         /// <summary>
         /// Get the specified <paramref name="key"/> from the <paramref name="bucket"/>.
-        /// Optionally can be read from <paramref name="rval"/> instances.
+        /// Optionally can be read from <paramref name="rval"/> instances. By default, the server's
+        /// r-value will be used, but can be overridden by <paramref name="rval"/>.
         /// </summary>
         /// <param name='bucket'>
         /// The name of the bucket containing the <paramref name="key"/>
@@ -97,25 +98,31 @@ namespace CorrugatedIron.Comms
         /// </param>
         /// <remarks>If a node does not respond, that does not necessarily mean that the 
         /// <paramref name="bucket"/>/<paramref name="key"/> combination is not available. It simply means
-        /// that less than <paramref name="rVal"> nodes successfully responded to the read request. Unfortunatley, 
+        /// that less than <paramref name="rVal" /> nodes successfully responded to the read request. Unfortunatley, 
         /// the Riak API does not allow us to distinguish between a 404 resulting from less than <paramref name="rVal"/>
         /// nodes successfully responding and a <paramref name="bucket"/>/<paramref name="key"/> combination
-        /// not being found in Riak.</remarks>
-        public RiakResult<RiakObject> Get(string bucket, string key, uint rVal = Constants.Defaults.RVal)
+        /// not being found in Riak.
+        /// 
+        /// </remarks>
+        public RiakResult<List<RiakObject>> Get(string bucket, string key, uint rVal = Constants.Defaults.RVal)
         {
             var request = new RpbGetReq { Bucket = bucket.ToRiakString(), Key = key.ToRiakString(), R = rVal };
             var result = _cluster.UseConnection(_clientId, conn => conn.PbcWriteRead<RpbGetReq, RpbGetResp>(request));
 
             if (!result.IsSuccess)
             {
-                return RiakResult<RiakObject>.Error(result.ResultCode, result.ErrorMessage);
+                return RiakResult<List<RiakObject>>.Error(result.ResultCode, result.ErrorMessage);
             }
 
             if (result.Value.VectorClock == null)
             {
-                return RiakResult<RiakObject>.Error(ResultCode.NotFound);
+                return RiakResult<List<RiakObject>>.Error(ResultCode.NotFound);
             }
-            return RiakResult<RiakObject>.Success(new RiakObject(bucket, key, result.Value.Content.First(), result.Value.VectorClock));
+
+            var objects = new List<RiakObject>();
+            result.Value.Content.ForEach(c => objects.Add(new RiakObject(bucket, key, c, result.Value.VectorClock)));
+
+            return RiakResult<List<RiakObject>>.Success(objects);
         }
 
         public RiakResult<RiakObject> Put(RiakObject value, RiakPutOptions options = null)
