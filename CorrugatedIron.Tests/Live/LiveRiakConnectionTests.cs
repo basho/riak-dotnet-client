@@ -17,6 +17,7 @@
 using CorrugatedIron.Comms;
 using CorrugatedIron.Config;
 using CorrugatedIron.Extensions;
+using CorrugatedIron.Messages;
 using CorrugatedIron.Models;
 using CorrugatedIron.Tests.Extensions;
 using CorrugatedIron.Util;
@@ -36,6 +37,10 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
         protected const string TestJson = "{\"string\":\"value\",\"int\":100,\"float\":2.34,\"array\":[1,2,3],\"dict\":{\"foo\":\"bar\"}}";
         protected const string MapReduceBucket = "map_reduce_bucket";
         protected const string TestMapReduce = @"{""inputs"":""map_reduce_bucket"",""query"":[{""map"":{""language"":""javascript"",""keep"":false,""source"":""function(o) {return [ 1 ];}""}},{""reduce"":{""language"":""javascript"",""keep"":true,""name"":""Riak.reduceSum""}}]}";
+        protected const string MultiBucket = "multi_bucket";
+        protected const string MultiKey = "test_multi";
+        protected const string MultiBodyOne = @"{""dishes"": 9}";
+        protected const string MultiBodyTwo = @"{""dishes"": 11}";
 
         protected IRiakCluster Cluster;
         protected IRiakClient Client;
@@ -94,7 +99,7 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
             var readResult = Client.Get(TestBucket, TestKey);
             readResult.IsSuccess.ShouldBeTrue(readResult.ErrorMessage);
 
-            var loadedDoc = readResult.Value;
+            var loadedDoc = readResult.Value[0];
 
             loadedDoc.Bucket.ShouldEqual(doc.Bucket);
             loadedDoc.Key.ShouldEqual(doc.Key);
@@ -156,6 +161,22 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
             var result = Client.ListKeys(TestBucket);
             result.IsSuccess.ShouldBeTrue();
             result.Value.ShouldContain(TestKey);
+        }
+
+        [Test]
+        public void WritesWithAllowMultProducesVtags()
+        {
+            var props = new RpbBucketProps() { AllowMultiple = true };
+            Client.SetBucketProperties(MultiBucket, props);
+
+            var doc = new RiakObject(MultiBucket, MultiKey, MultiBodyOne, Constants.ContentTypes.ApplicationJson);
+            Client.Put(doc);
+
+            doc = new RiakObject(MultiBucket, MultiKey, MultiBodyTwo, Constants.ContentTypes.ApplicationJson);
+            Client.Put(doc);
+
+            var result = Client.Get(MultiBucket, MultiKey);
+            Assert.GreaterOrEqual(result.Value.Count, 2);
         }
     }
 
