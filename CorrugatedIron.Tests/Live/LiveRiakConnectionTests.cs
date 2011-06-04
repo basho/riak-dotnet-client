@@ -110,12 +110,12 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
         public void DeletingIsSuccessful()
         {
             var doc = new RiakObject(TestBucket, TestKey, TestJson, Constants.ContentTypes.ApplicationJson);
-            Client.Put(doc);
+            Client.Put(doc).IsSuccess.ShouldBeTrue();
 
             var result = Client.Get(TestBucket, TestKey);
             result.IsSuccess.ShouldBeTrue();
 
-            Client.Delete(doc.Bucket, doc.Key);
+            Client.Delete(doc.Bucket, doc.Key).IsSuccess.ShouldBeTrue();
             result = Client.Get(TestBucket, TestKey);
             result.IsSuccess.ShouldBeFalse();
             result.ResultCode.ShouldEqual(ResultCode.NotFound);
@@ -131,7 +131,7 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
                 var newData = string.Format(dummyData, i);
                 var doc = new RiakObject(MapReduceBucket, i.ToString(), newData, Constants.ContentTypes.ApplicationJson);
 
-                Client.Put(doc);
+                Client.Put(doc).IsSuccess.ShouldBeTrue();
             }
 
             var result = Client.MapReduce(TestMapReduce);
@@ -144,7 +144,7 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
         public void ListBucketsIncludesTestBucket()
         {
             var doc = new RiakObject(TestBucket, TestKey, TestJson, Constants.ContentTypes.ApplicationJson);
-            Client.Put(doc);
+            Client.Put(doc).IsSuccess.ShouldBeTrue();
 
             var result = Client.ListBuckets();
             result.IsSuccess.ShouldBeTrue();
@@ -155,7 +155,7 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
         public void ListKeysIncludesTestKey()
         {
             var doc = new RiakObject(TestBucket, TestKey, TestJson, Constants.ContentTypes.ApplicationJson);
-            Client.Put(doc);
+            Client.Put(doc).IsSuccess.ShouldBeTrue();
 
             var result = Client.ListKeys(TestBucket);
             result.IsSuccess.ShouldBeTrue();
@@ -165,7 +165,9 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
         [Test]
         public void WritesWithAllowMultProducesMultiple()
         {
+            // Do this via the REST interface - will be substantially slower than PBC
             var props = new RiakBucketProperties().SetAllowMultiple(true).SetLastWriteWins(false);
+            props.CanUsePbc.ShouldBeFalse();
             Client.SetBucketProperties(MultiBucket, props).IsSuccess.ShouldBeTrue();
 
             var doc = new RiakObject(MultiBucket, MultiKey, MultiBodyOne, Constants.ContentTypes.ApplicationJson);
@@ -175,13 +177,15 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
             Client.Put(doc).IsSuccess.ShouldBeTrue();
 
             var result = Client.Get(MultiBucket, MultiKey);
-            Assert.GreaterOrEqual(result.Value.Siblings.Count, 2);
+            result.Value.Siblings.Count.IsAtLeast(2);
         }
 
         [Test]
         public void WritesWithAllowMultProducesMultipleVTags()
         {
-            var props = new RiakBucketProperties().SetAllowMultiple(true).SetLastWriteWins(false);
+            // Do this via the PBC - noticable quicker than REST
+            var props = new RiakBucketProperties().SetAllowMultiple(true);
+            props.CanUsePbc.ShouldBeTrue();
             Client.SetBucketProperties(MultiBucket, props).IsSuccess.ShouldBeTrue();
 
             var doc = new RiakObject(MultiBucket, MultiKey, MultiBodyOne, Constants.ContentTypes.ApplicationJson);
@@ -192,8 +196,8 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
 
             var result = Client.Get(MultiBucket, MultiKey);
 
-            Assert.GreaterOrEqual(result.Value.VTags.Count, 2);
-            Assert.IsNotNull(result.Value.VTags);
+            result.Value.VTags.ShouldNotBeNull();
+            result.Value.VTags.Count.IsAtLeast(2);
         }
     }
 
