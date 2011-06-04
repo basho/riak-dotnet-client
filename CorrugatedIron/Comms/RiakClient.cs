@@ -28,7 +28,7 @@ namespace CorrugatedIron.Comms
     public interface IRiakClient
     {
         RiakResult Ping();
-        RiakResult<List<RiakObject>> Get(string bucket, string key, uint rVal = Constants.Defaults.RVal);
+        RiakResult<RiakObject> Get(string bucket, string key, uint rVal = Constants.Defaults.RVal);
         RiakResult<RiakObject> Put(RiakObject value, RiakPutOptions options = null);
         RiakResult Delete(string bucket, string key, uint rwVal = Constants.Defaults.RVal);
         RiakResult<RpbMapRedResp> MapReduce(string request, string requestType = Constants.ContentTypes.ApplicationJson);  
@@ -104,25 +104,29 @@ namespace CorrugatedIron.Comms
         /// not being found in Riak.
         /// 
         /// </remarks>
-        public RiakResult<List<RiakObject>> Get(string bucket, string key, uint rVal = Constants.Defaults.RVal)
+        public RiakResult<RiakObject> Get(string bucket, string key, uint rVal = Constants.Defaults.RVal)
         {
             var request = new RpbGetReq { Bucket = bucket.ToRiakString(), Key = key.ToRiakString(), R = rVal };
             var result = _cluster.UseConnection(_clientId, conn => conn.PbcWriteRead<RpbGetReq, RpbGetResp>(request));
 
             if (!result.IsSuccess)
             {
-                return RiakResult<List<RiakObject>>.Error(result.ResultCode, result.ErrorMessage);
+                return RiakResult<RiakObject>.Error(result.ResultCode, result.ErrorMessage);
             }
 
             if (result.Value.VectorClock == null)
             {
-                return RiakResult<List<RiakObject>>.Error(ResultCode.NotFound);
+                return RiakResult<RiakObject>.Error(ResultCode.NotFound);
             }
 
-            var objects = new List<RiakObject>();
-            result.Value.Content.ForEach(c => objects.Add(new RiakObject(bucket, key, c, result.Value.VectorClock)));
+            var o = new RiakObject(bucket, key, result.Value.Content.First(), result.Value.VectorClock);
 
-            return RiakResult<List<RiakObject>>.Success(objects);
+            if (result.Value.Content.Count > 1)
+            {
+                result.Value.Content.ForEach(c => o.Siblings.Add(new RiakObject(bucket, key, c, result.Value.VectorClock)));
+            }
+
+            return RiakResult<RiakObject>.Success(o);
         }
 
         public RiakResult<RiakObject> Put(RiakObject value, RiakPutOptions options = null)

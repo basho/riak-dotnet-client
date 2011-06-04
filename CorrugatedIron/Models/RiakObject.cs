@@ -36,6 +36,7 @@ namespace CorrugatedIron.Models
         public int LastModified { get; private set; }
         public int LastModifiedUsec { get; private set; }
         public IList<RiakLink> Links { get; private set; }
+        public IList<RiakObject> Siblings { get; set; }
 
         public RiakObject(string bucket, string key, string value)
             : this(bucket, key, value, Constants.Defaults.ContentType)
@@ -61,6 +62,7 @@ namespace CorrugatedIron.Models
             CharSet = charSet;
             UserMetaData = new Dictionary<string, string>();
             Links = new List<RiakLink>();
+            Siblings = new List<RiakObject>();
         }
 
         public RiakObject(string bucket, string key, RpbContent content, byte[] vectorClock)
@@ -75,6 +77,7 @@ namespace CorrugatedIron.Models
             ContentType = content.ContentType.FromRiakString();
             UserMetaData = content.UserMeta.ToDictionary(p => p.Key.FromRiakString(), p => p.Value.FromRiakString());
             Links = content.Links.Select(l => new RiakLink(l)).ToList();
+            Siblings = new List<RiakObject>();
         }
 
         public RpbPutReq ToMessage()
