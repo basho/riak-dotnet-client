@@ -14,6 +14,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
+
 namespace CorrugatedIron.Util
 {
     public static class Constants
@@ -94,6 +96,7 @@ namespace CorrugatedIron.Util
             {
                 public const string DisableCacheKey = @"Pragma";
                 public const string DisableCacheValue = @"no-cache";
+                public const string ClientId = @"X-Riak-ClientId";
             }
 
             public static class HttpMethod
