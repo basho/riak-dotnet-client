@@ -19,7 +19,7 @@ namespace CorrugatedIron.KeyFilters
     public interface IRiakKeyFilterToken
     {
         string FunctionName { get; set; }
-        string ToJsonString ();
+        string ToJsonString();
     }
 }
 

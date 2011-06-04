@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -78,6 +78,8 @@
     <Compile Include="Models\MapReduce\Inputs\RiakBucketInput.cs" />
     <Compile Include="Models\RiakLink.cs" />
     <Compile Include="Models\RiakPutOptions.cs" />
+    <Compile Include="Models\RiakRestRequest.cs" />
+    <Compile Include="Models\RiakRestResponse.cs" />
     <Compile Include="Util\Constants.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Messages\MessageCode.cs" />

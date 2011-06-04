@@ -23,7 +23,8 @@ namespace CorrugatedIron.Config
         string Name { get; }
         string HostAddress { get; }
         int PbcPort { get; }
-        int HttpPort { get; }
+        string RestScheme { get; }
+        int RestPort { get; }
         int PoolSize { get; }
         int AcquireTimeout { get; }
         int IdleTimeout { get; }
@@ -52,11 +53,18 @@ namespace CorrugatedIron.Config
             set { this["pbcPort"] = value; }
         }
 
-        [ConfigurationProperty("httpPort", DefaultValue = 8098, IsRequired = false)]
-        public int HttpPort
+        [ConfigurationProperty("restScheme", DefaultValue = "http", IsRequired = false)]
+        public string RestScheme
         {
-            get { return (int)this["httpPort"]; }
-            set { this["httpPort"] = value; }
+            get { return (string)this["restScheme"]; }
+            set { this["restScheme"] = value; }
+        }
+
+        [ConfigurationProperty("restPort", DefaultValue = 8098, IsRequired = false)]
+        public int RestPort
+        {
+            get { return (int)this["restPort"]; }
+            set { this["restPort"] = value; }
         }
 
         [ConfigurationProperty("poolSize", DefaultValue = 30, IsRequired = false)]

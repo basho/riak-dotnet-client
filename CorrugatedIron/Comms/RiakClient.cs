@@ -25,6 +25,7 @@ using CorrugatedIron.Util;
 
 namespace CorrugatedIron.Comms
 {
+    // TODO: remove the Rpb* classes from the interface
     public interface IRiakClient
     {
         RiakResult Ping();
@@ -36,7 +37,7 @@ namespace CorrugatedIron.Comms
         RiakResult<IEnumerable<string>> ListBuckets();
         RiakResult<IEnumerable<string>> ListKeys(string bucket);
         RiakResult<RiakBucketProperties> GetBucketProperties(string bucket);
-        RiakResult SetBucketProperties(string bucket, RpbBucketProps properties);
+        RiakResult SetBucketProperties(string bucket, RiakBucketProperties properties);
     }
 
     public class RiakClient : IRiakClient
@@ -211,13 +212,28 @@ namespace CorrugatedIron.Comms
             return RiakResult<RiakBucketProperties>.Error(result.ResultCode, result.ErrorMessage);
         }
 
-        public RiakResult SetBucketProperties(string bucket, RpbBucketProps properties)
+        public RiakResult SetBucketProperties(string bucket, RiakBucketProperties properties)
         {
-            var bpReq = new RpbSetBucketReq {Bucket = bucket.ToRiakString(), Props = properties};
-            var result = _cluster.UseConnection(_clientId,
-                                                          conn =>
-                                                          conn.PbcWriteRead<RpbSetBucketReq, RpbSetBucketResp>(bpReq));
-            return result;
+            if (properties.CanUsePbc)
+            {
+                var request = properties.ToMessage();
+                var result = _cluster.UseConnection(_clientId, conn => conn.PbcWriteRead<RpbBucketProps, RpbSetBucketResp>(request));
+            }
+            else
+            {
+                var request = new RiakRestRequest(ToBucketUri(bucket), Constants.Rest.HttpMethod.Put)
+                {
+                    Body = properties.ToJsonString().ToRiakString(),
+                    ContentType = Constants.ContentTypes.ApplicationJson,
+
+                };
+                var result = _cluster.UseConnection(_clientId, conn => conn.RestRequest(request));
+                if (result.IsSuccess && result.Value.StatusCode != System.Net.HttpStatusCode.NoContent)
+                {
+                    return RiakResult.Error(ResultCode.InvalidResponse, "Unexpected Status Code: {0} ({1})".Fmt(result.Value.StatusCode, (int)result.Value.StatusCode));
+                }
+                return result;
+            }
         }
 
         private static byte[] GetClientId()
@@ -226,6 +242,16 @@ namespace CorrugatedIron.Comms
             var mac = nic.GetPhysicalAddress().GetAddressBytes();
             Array.Resize(ref mac, 4);
             return mac;
+        }
+
+        private static string ToBucketUri(string bucket)
+        {
+            return "{0}/{1}".Fmt(Constants.Rest.Uri.RiakRoot, bucket);
+        }
+
+        private static string ToKey(string bucket, string key)
+        {
+            return "{0}/{1}/{2}".Fmt(Constants.Rest.Uri.RiakRoot, bucket, key);
         }
     }
 }

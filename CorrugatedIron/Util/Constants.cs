@@ -54,6 +54,11 @@ namespace CorrugatedIron.Util
 
         public static class Defaults
         {
+            public static class Rest
+            {
+                public const int Timeout = 30000;
+            }
+
             public const uint RVal = 2;
             public const string ContentType = ContentTypes.ApplicationOctetStream;
             public const string CharSet = CharSets.Utf8;
@@ -68,6 +73,36 @@ namespace CorrugatedIron.Util
             public const string ToUpper = @"to_upper";
             public const string ToLower = @"to_lower";
             public const string Tokenize = @"tokenize";
+        }
+
+        public static class Rest
+        {
+            public const string UserAgent = "CorrugatedIron v0.1 (REST)";
+
+            public static class Uri
+            {
+                public const string RiakRoot = "/riak";
+                public const string MapReduce = "/mapred";
+            }
+
+            public static class Scheme
+            {
+                public const string Ssl = @"https";
+            }
+
+            public static class HttpHeaders
+            {
+                public const string DisableCacheKey = @"Pragma";
+                public const string DisableCacheValue = @"no-cache";
+            }
+
+            public static class HttpMethod
+            {
+                public const string Get = "GET";
+                public const string Post = "POST";
+                public const string Put = "PUT";
+                public const string Delete = "DELETE";
+            }
         }
     }
 }
