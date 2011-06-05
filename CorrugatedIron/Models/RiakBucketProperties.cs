@@ -1,27 +1,19 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using CorrugatedIron.Containers;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
 using CorrugatedIron.Util;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace CorrugatedIron.Models
 {
-    // TODO: handle pre/post commits
+    // TODO: handle pre/post commit hooks
     public class RiakBucketProperties
     {
-        // TODO: figure out what to do with these fields given that they can
-        // be of different types. How would a "getter" work in this scenario?
-        private uint? _rVal;
-        private string _rValString;
-        private uint? _rwVal;
-        private string _rwValString;
-        private uint? _dwVal;
-        private string _dwValString;
-        private uint? _wVal;
-        private string _wValString;
-
         // At the moment, only the NVal and AllowMult can be set via the PBC
         // so if the request has any other value set, we can't use that interface.
         // We check those values and if they're missing we go with PBC as it's
@@ -31,25 +23,23 @@ namespace CorrugatedIron.Models
             get
             {
                 return !LastWriteWins.HasValue
-                    && !_rVal.HasValue
-                    && string.IsNullOrEmpty(_rValString)
-                    && !_rwVal.HasValue
-                    && string.IsNullOrEmpty(_rwValString)
-                    && !_wVal.HasValue
-                    && string.IsNullOrEmpty(_wValString)
-                    && !_dwVal.HasValue
-                    && string.IsNullOrEmpty(_dwValString)
+                    && RVal == null
+                    && RwVal == null
+                    && DwVal == null
+                    && WVal == null
                     && string.IsNullOrEmpty(Backend);
             }
         }
 
         public bool? LastWriteWins { get; private set; }
-
         public uint? NVal { get; private set; }
-
         public bool? AllowMultiple { get; private set; }
-
         public string Backend { get; private set; }
+
+        public Either<uint, string> RVal { get; private set; }
+        public Either<uint, string> RwVal { get; private set; }
+        public Either<uint, string> DwVal { get; private set; }
+        public Either<uint, string> WVal { get; private set; }
 
         public RiakBucketProperties SetAllowMultiple(bool value)
         {
@@ -71,42 +61,42 @@ namespace CorrugatedIron.Models
 
         public RiakBucketProperties SetRVal(uint value)
         {
-            return WriteQuorum(value, ref _rVal, ref _rValString);
+            return WriteQuorum(value, v => RVal = v);
         }
 
         public RiakBucketProperties SetRVal(string value)
         {
-            return WriteQuorum(value, ref _rVal, ref _rValString);
+            return WriteQuorum(value, v => RVal = v);
         }
 
         public RiakBucketProperties SetRwVal(uint value)
         {
-            return WriteQuorum(value, ref _rwVal, ref _rwValString);
+            return WriteQuorum(value, v => RwVal = v);
         }
 
         public RiakBucketProperties SetRwVal(string value)
         {
-            return WriteQuorum(value, ref _rwVal, ref _rwValString);
+            return WriteQuorum(value, v => RwVal = v);
         }
 
         public RiakBucketProperties SetDwVal(uint value)
         {
-            return WriteQuorum(value, ref _dwVal, ref _dwValString);
+            return WriteQuorum(value, v => DwVal = v);
         }
 
         public RiakBucketProperties SetDwVal(string value)
         {
-            return WriteQuorum(value, ref _dwVal, ref _dwValString);
+            return WriteQuorum(value, v => DwVal = v);
         }
 
         public RiakBucketProperties SetWVal(uint value)
         {
-            return WriteQuorum(value, ref _wVal, ref _wValString);
+            return WriteQuorum(value, v => WVal = v);
         }
 
         public RiakBucketProperties SetWVal(string value)
         {
-            return WriteQuorum(value, ref _wVal, ref _wValString);
+            return WriteQuorum(value, v => WVal = v);
         }
 
         public RiakBucketProperties SetBackend(string backend)
@@ -115,19 +105,17 @@ namespace CorrugatedIron.Models
             return this;
         }
 
-        private RiakBucketProperties WriteQuorum(uint value, ref uint? targetVal, ref string targetString)
+        private RiakBucketProperties WriteQuorum(uint value, Action<Either<uint, string>> setter)
         {
-            System.Diagnostics.Debug.Assert(value > 1);
-            targetVal = value;
-            targetString = null;
+            System.Diagnostics.Debug.Assert(value >= 1);
+            setter(new Either<uint, string>(value));
             return this;
         }
 
-        private RiakBucketProperties WriteQuorum(string value, ref uint? targetVal, ref string targetString)
+        private RiakBucketProperties WriteQuorum(string value, Action<Either<uint, string>> setter)
         {
             System.Diagnostics.Debug.Assert(new HashSet<string> { "all", "quorum", "one" }.Contains(value), "Incorrect quorum value");
-            targetVal = null;
-            targetString = value;
+            setter(new Either<uint, string>(value));
             return this;
         }
 
@@ -138,9 +126,34 @@ namespace CorrugatedIron.Models
         public RiakBucketProperties(RiakRestResponse response)
         {
             System.Diagnostics.Debug.Assert(response.ContentType == Constants.ContentTypes.ApplicationJson);
+
+            var json = JObject.Parse(response.Body);
+            var props = (JObject)json["props"];
+            NVal = props.Value<uint?>("n_val");
+            AllowMultiple = props.Value<bool?>("allow_mult");
+            LastWriteWins = props.Value<bool?>("last_write_wins");
+            Backend = props.Value<string>("backend");
+
+            ReadQuorum(props, "r", v => RVal = v);
+            ReadQuorum(props, "rw", v => RwVal = v);
+            ReadQuorum(props, "dw", v => DwVal = v);
+            ReadQuorum(props, "w", v => WVal = v);
         }
 
-        public RiakBucketProperties(RpbBucketProps bucketProps)
+        private static void ReadQuorum(JObject props, string key, Action<Either<uint, string>> setter)
+        {
+            if (props[key].Type == JTokenType.String)
+            {
+                setter(new Either<uint, string>(props.Value<string>(key)));
+            }
+            else
+            {
+                setter(new Either<uint, string>(props.Value<uint>(key)));
+            }
+        }
+
+        internal RiakBucketProperties(RpbBucketProps bucketProps)
+            : this()
         {
             AllowMultiple = bucketProps.AllowMultiple;
             NVal = bucketProps.NVal;
@@ -173,15 +186,12 @@ namespace CorrugatedIron.Models
                 jw.WriteNullableProperty("n_val", NVal)
                     .WriteNullableProperty("allow_mult", AllowMultiple)
                     .WriteNullableProperty("last_write_wins", LastWriteWins)
-                    .WriteNullableProperty("r", _rVal)
-                    .WriteNonNullProperty("r", _rValString)
-                    .WriteNullableProperty("rw", _rwVal)
-                    .WriteNonNullProperty("rw", _rwValString)
-                    .WriteNullableProperty("dw", _dwVal)
-                    .WriteNonNullProperty("dw", _dwValString)
-                    .WriteNullableProperty("w", _wVal)
-                    .WriteNonNullProperty("w", _wValString)
-                    .WriteNonNullProperty("backend", _wValString);
+                    .WriteEither("r", RVal)
+                    .WriteEither("rw", RwVal)
+                    .WriteEither("dw", DwVal)
+                    .WriteEither("w", WVal)
+                    .WriteNonNullProperty("backend", Backend);
+
                 jw.WriteEndObject();
                 jw.WriteEndObject();
             }

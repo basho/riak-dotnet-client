@@ -36,7 +36,7 @@ namespace CorrugatedIron.Comms
         RiakResult<RpbMapRedResp> MapReduce(RpbMapRedReq request);
         RiakResult<IEnumerable<string>> ListBuckets();
         RiakResult<IEnumerable<string>> ListKeys(string bucket);
-        RiakResult<RiakBucketProperties> GetBucketProperties(string bucket);
+        RiakResult<RiakBucketProperties> GetBucketProperties(string bucket, bool extended = false);
         RiakResult SetBucketProperties(string bucket, RiakBucketProperties properties);
     }
 
@@ -198,18 +198,37 @@ namespace CorrugatedIron.Comms
             return RiakResult<IEnumerable<string>>.Error(result.ResultCode, result.ErrorMessage);
         }
 
-        public RiakResult<RiakBucketProperties> GetBucketProperties(string bucket)
+        public RiakResult<RiakBucketProperties> GetBucketProperties(string bucket, bool extended = false)
         {
-            var bpReq = new RpbGetBucketReq {Bucket = bucket.ToRiakString()};
-            var result = _cluster.UseConnection(_clientId,
-                                                          conn => conn.PbcWriteRead<RpbGetBucketReq, RpbGetBucketResp>(bpReq));
-
-            if (result.IsSuccess)
+            if (extended)
             {
-                var props = new RiakBucketProperties(result.Value.Props);
-                return RiakResult<RiakBucketProperties>.Success(props);
+                var request = new RiakRestRequest(ToBucketUri(bucket), Constants.Rest.HttpMethod.Get)
+                    .AddQueryParam(Constants.Rest.QueryParameters.Bucket.GetPropertiesKey, Constants.Rest.QueryParameters.Bucket.GetPropertiesValue);
+
+                var result = _cluster.UseConnection(_clientId, conn => conn.RestRequest(request));
+                if (result.IsSuccess)
+                {
+                    if (result.Value.StatusCode == System.Net.HttpStatusCode.OK)
+                    {
+                        var response = new RiakBucketProperties(result.Value);
+                        return RiakResult<RiakBucketProperties>.Success(response);
+                    }
+                    return RiakResult<RiakBucketProperties>.Error(ResultCode.InvalidResponse, "Unexpected Status Code: {0} ({1})".Fmt(result.Value.StatusCode, (int)result.Value.StatusCode));
+                }
+                return RiakResult<RiakBucketProperties>.Error(result.ResultCode, result.ErrorMessage);
             }
-            return RiakResult<RiakBucketProperties>.Error(result.ResultCode, result.ErrorMessage);
+            else
+            {
+                var bpReq = new RpbGetBucketReq { Bucket = bucket.ToRiakString() };
+                var result = _cluster.UseConnection(_clientId, conn => conn.PbcWriteRead<RpbGetBucketReq, RpbGetBucketResp>(bpReq));
+
+                if (result.IsSuccess)
+                {
+                    var props = new RiakBucketProperties(result.Value.Props);
+                    return RiakResult<RiakBucketProperties>.Success(props);
+                }
+                return RiakResult<RiakBucketProperties>.Error(result.ResultCode, result.ErrorMessage);
+            }
         }
 
         public RiakResult SetBucketProperties(string bucket, RiakBucketProperties properties)
@@ -225,9 +244,9 @@ namespace CorrugatedIron.Comms
                 var request = new RiakRestRequest(ToBucketUri(bucket), Constants.Rest.HttpMethod.Put)
                 {
                     Body = properties.ToJsonString().ToRiakString(),
-                    ContentType = Constants.ContentTypes.ApplicationJson,
-
+                    ContentType = Constants.ContentTypes.ApplicationJson
                 };
+
                 var result = _cluster.UseConnection(_clientId, conn => conn.RestRequest(request));
                 if (result.IsSuccess && result.Value.StatusCode != System.Net.HttpStatusCode.NoContent)
                 {
