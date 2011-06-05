@@ -67,6 +67,10 @@
     <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="Extensions\JsonExtensions.cs" />
     <Compile Include="KeyFilters\RiakCompositeKeyFilterToken.cs" />
+    <Compile Include="Models\CommitHook\RiakErlangCommitHook.cs" />
+    <Compile Include="Models\CommitHook\RiakJavascriptCommitHook.cs" />
+    <Compile Include="Models\CommitHook\IRiakPostCommitHook.cs" />
+    <Compile Include="Models\CommitHook\IRiakPreCommitHook.cs" />
     <Compile Include="Models\RiakBucketProperties.cs" />
     <Compile Include="Models\MapReduce\Inputs\IRiakPhaseInput.cs" />
     <Compile Include="Models\MapReduce\Inputs\RiakPhaseInputs.cs" />
@@ -78,6 +82,7 @@
     <Compile Include="Models\MapReduce\RiakMapReduceQuery.cs" />
     <Compile Include="Models\MapReduce\RiakPhase.cs" />
     <Compile Include="Models\MapReduce\Inputs\RiakBucketInput.cs" />
+    <Compile Include="Models\CommitHook\RiakCommitHook.cs" />
     <Compile Include="Models\RiakLink.cs" />
     <Compile Include="Models\RiakPutOptions.cs" />
     <Compile Include="Models\RiakRestRequest.cs" />

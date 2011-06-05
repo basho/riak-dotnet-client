@@ -18,6 +18,7 @@ using CorrugatedIron.Comms;
 using CorrugatedIron.Config;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Models;
+using CorrugatedIron.Models.CommitHook;
 using CorrugatedIron.Tests.Extensions;
 using CorrugatedIron.Util;
 using NUnit.Framework;
@@ -40,6 +41,7 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
         protected const string MultiKey = "test_multi_key";
         protected const string MultiBodyOne = @"{""dishes"": 9}";
         protected const string MultiBodyTwo = @"{""dishes"": 11}";
+        protected const string PropertiesTestBucket = @"propertiestestbucket";
 
         protected IRiakCluster Cluster;
         protected IRiakClient Client;
@@ -66,6 +68,80 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
         public void TearDown()
         {
             Cluster.Dispose();
+        }
+    }
+
+    [TestFixture]
+    public class WhenDealingWithBucketProperties : LiveRiakConnectionTestBase
+    {
+        // use the one node configuration here because we might run the risk
+        // of hitting different nodes in the configuration before the props
+        // are replicated to other nodes.
+        public WhenDealingWithBucketProperties()
+            :base("riak1NodeConfiguration")
+        {
+        }
+
+        [Test]
+        public void GettingWithoutExtendedFlagDoesNotReturnExtraProperties()
+        {
+            var result = Client.GetBucketProperties(PropertiesTestBucket);
+            result.IsSuccess.ShouldBeTrue();
+            result.Value.AllowMultiple.HasValue.ShouldBeTrue();
+            result.Value.NVal.HasValue.ShouldBeTrue();
+            result.Value.LastWriteWins.HasValue.ShouldBeFalse();
+            result.Value.RVal.ShouldBeNull();
+            result.Value.RwVal.ShouldBeNull();
+            result.Value.DwVal.ShouldBeNull();
+            result.Value.WVal.ShouldBeNull();
+        }
+
+        [Test]
+        public void GettingWithExtendedFlagReturnsExtraProperties()
+        {
+            var result = Client.GetBucketProperties(PropertiesTestBucket, true);
+            result.IsSuccess.ShouldBeTrue();
+            result.Value.AllowMultiple.HasValue.ShouldBeTrue();
+            result.Value.NVal.HasValue.ShouldBeTrue();
+            result.Value.LastWriteWins.HasValue.ShouldBeTrue();
+            result.Value.RVal.ShouldNotBeNull();
+            result.Value.RwVal.ShouldNotBeNull();
+            result.Value.DwVal.ShouldNotBeNull();
+            result.Value.WVal.ShouldNotBeNull();
+        }
+
+        [Test]
+        public void CommitHooksAreStoredAndLoadedProperly()
+        {
+            // make sure we're all clear first
+            var result = Client.GetBucketProperties(PropertiesTestBucket, true);
+            result.IsSuccess.ShouldBeTrue();
+            var props = result.Value;
+            props.ClearPostCommitHooks().ClearPreCommitHooks();
+            Client.SetBucketProperties(PropertiesTestBucket, props).IsSuccess.ShouldBeTrue();
+
+            // when we load, the commit hook lists should be null
+            result = Client.GetBucketProperties(PropertiesTestBucket, true);
+            result.IsSuccess.ShouldBeTrue();
+            props = result.Value;
+            props.PreCommitHooks.ShouldBeNull();
+            props.PostCommitHooks.ShouldBeNull();
+
+            // we then store something in each
+            props.AddPreCommitHook(new RiakJavascriptCommitHook("Foo.doBar"))
+                .AddPreCommitHook(new RiakErlangCommitHook("my_mod", "do_fun"))
+                .AddPostCommitHook(new RiakErlangCommitHook("my_other_mod", "do_more"));
+            Client.SetBucketProperties(PropertiesTestBucket, props).IsSuccess.ShouldBeTrue();
+
+            // load them out again and make sure they got loaded up
+            result = Client.GetBucketProperties(PropertiesTestBucket, true);
+            result.IsSuccess.ShouldBeTrue();
+            props = result.Value;
+
+            props.PreCommitHooks.ShouldNotBeNull();
+            props.PreCommitHooks.Count.ShouldEqual(2);
+            props.PostCommitHooks.ShouldNotBeNull();
+            props.PostCommitHooks.Count.ShouldEqual(1);
         }
     }
 
@@ -198,34 +274,6 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
 
             result.Value.VTags.ShouldNotBeNull();
             result.Value.VTags.Count.IsAtLeast(2);
-        }
-
-        [Test]
-        public void GettingBucketPropertiesWithoutExtendedFlagDoesNotReturnExtraProperties()
-        {
-            var result = Client.GetBucketProperties(MultiBucket);
-            result.IsSuccess.ShouldBeTrue();
-            result.Value.AllowMultiple.HasValue.ShouldBeTrue();
-            result.Value.NVal.HasValue.ShouldBeTrue();
-            result.Value.LastWriteWins.HasValue.ShouldBeFalse();
-            result.Value.RVal.ShouldBeNull();
-            result.Value.RwVal.ShouldBeNull();
-            result.Value.DwVal.ShouldBeNull();
-            result.Value.WVal.ShouldBeNull();
-        }
-
-        [Test]
-        public void GettingBucketPropertiesWithExtendedFlagReturnsExtraProperties()
-        {
-            var result = Client.GetBucketProperties(MultiBucket, true);
-            result.IsSuccess.ShouldBeTrue();
-            result.Value.AllowMultiple.HasValue.ShouldBeTrue();
-            result.Value.NVal.HasValue.ShouldBeTrue();
-            result.Value.LastWriteWins.HasValue.ShouldBeTrue();
-            result.Value.RVal.ShouldNotBeNull();
-            result.Value.RwVal.ShouldNotBeNull();
-            result.Value.DwVal.ShouldNotBeNull();
-            result.Value.WVal.ShouldNotBeNull();
         }
     }
 
