@@ -28,6 +28,7 @@ using CorrugatedIron.Encoding;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
 using CorrugatedIron.Models;
+using CorrugatedIron.Models.Rest;
 using CorrugatedIron.Util;
 
 namespace CorrugatedIron.Comms
@@ -215,12 +216,11 @@ namespace CorrugatedIron.Comms
                     ContentLength = response.ContentLength,
                     ContentType = response.ContentType,
                     StatusCode = response.StatusCode,
-                    Headers = response.Headers.AllKeys.ToDictionary(k => k, k => response.Headers[k])
+                    Headers = response.Headers.AllKeys.ToDictionary(k => k, k => response.Headers[k]),
+                    ContentEncoding = !string.IsNullOrWhiteSpace(response.ContentEncoding)
+                                          ? System.Text.Encoding.GetEncoding(response.ContentEncoding)
+                                          : System.Text.Encoding.Default
                 };
-
-                result.ContentEncoding = !string.IsNullOrWhiteSpace(response.ContentEncoding)
-                    ? System.Text.Encoding.GetEncoding(response.ContentEncoding)
-                    : System.Text.Encoding.Default;
 
                 if (response.ContentLength > 0)
                 {

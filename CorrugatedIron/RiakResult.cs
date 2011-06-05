@@ -14,7 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CorrugatedIron.Comms
+namespace CorrugatedIron
 {
     public enum ResultCode
     {

@@ -18,12 +18,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.NetworkInformation;
+using CorrugatedIron.Comms;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
 using CorrugatedIron.Models;
+using CorrugatedIron.Models.Rest;
 using CorrugatedIron.Util;
 
-namespace CorrugatedIron.Comms
+namespace CorrugatedIron
 {
     // TODO: remove the Rpb* classes from the interface
     public interface IRiakClient

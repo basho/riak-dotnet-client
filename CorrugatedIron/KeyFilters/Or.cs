@@ -16,7 +16,6 @@
 
 namespace CorrugatedIron.KeyFilters
 {
-    
     /// <summary>
     /// Joins two or more key-filter operations with a logical OR operation.
     /// </summary>
