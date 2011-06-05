@@ -18,7 +18,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Threading;
 
-namespace CorrugatedIron.Collections
+namespace CorrugatedIron.Containers
 {
     public class ResourcePool<TResource> : IDisposable
         where TResource : class

@@ -15,8 +15,8 @@
 // under the License.
 
 using System;
-using CorrugatedIron.Collections;
 using CorrugatedIron.Config;
+using CorrugatedIron.Containers;
 
 namespace CorrugatedIron.Comms
 {

@@ -1,4 +1,5 @@
 ﻿using System;
+using CorrugatedIron.Containers;
 using Newtonsoft.Json;
 
 namespace CorrugatedIron.Extensions
@@ -18,6 +19,22 @@ namespace CorrugatedIron.Extensions
             if (value != null)
             {
                 writer.WriteProperty(name, value);
+            }
+            return writer;
+        }
+
+        public static JsonWriter WriteEither<TLeft, TRight>(this JsonWriter writer, string name, Either<TLeft, TRight> either)
+        {
+            if (either != null)
+            {
+                if (either.IsLeft)
+                {
+                    writer.WriteProperty(name, either.Left);
+                }
+                else
+                {
+                    writer.WriteProperty(name, either.Right);
+                }
             }
             return writer;
         }

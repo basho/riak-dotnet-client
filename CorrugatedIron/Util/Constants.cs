@@ -81,6 +81,15 @@ namespace CorrugatedIron.Util
         {
             public const string UserAgent = "CorrugatedIron v0.1 (REST)";
 
+            public static class QueryParameters
+            {
+                public static class Bucket
+                {
+                    public const string GetPropertiesKey = @"props";
+                    public const string GetPropertiesValue = @"true";
+                }
+            }
+
             public static class Uri
             {
                 public const string RiakRoot = "/riak";

@@ -16,7 +16,7 @@
 
 using System.Collections.Generic;
 
-namespace CorrugatedIron.Collections
+namespace CorrugatedIron.Containers
 {
     public interface IConcurrentEnumerable<T>
     {

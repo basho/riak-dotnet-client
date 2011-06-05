@@ -199,6 +199,17 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
             result.Value.VTags.ShouldNotBeNull();
             result.Value.VTags.Count.IsAtLeast(2);
         }
+
+        [Test]
+        public void GettingBucketPropertiesWithExtendedFlagReturnsExtraProperties()
+        {
+            var result = Client.GetBucketProperties(MultiBucket, true);
+            result.IsSuccess.ShouldBeTrue();
+            result.Value.AllowMultiple.HasValue.ShouldBeTrue();
+            result.Value.NVal.HasValue.ShouldBeTrue();
+            result.Value.LastWriteWins.HasValue.ShouldBeTrue();
+            result.Value.RVal.ShouldNotBeNull();
+        }
     }
 
     [TestFixture]

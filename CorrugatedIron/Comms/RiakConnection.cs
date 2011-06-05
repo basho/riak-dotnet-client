@@ -167,7 +167,7 @@ namespace CorrugatedIron.Comms
             var baseUri = new StringBuilder(_restRootUrl).Append(request.Uri);
             if (request.QueryParams.Count > 0)
             {
-                baseUri.Append(baseUri).Append("?");
+                baseUri.Append("?");
                 var first = request.QueryParams.First();
                 baseUri.Append(first.Key.UrlEncoded()).Append("=").Append(first.Value.UrlEncoded());
                 request.QueryParams.Skip(1).ForEach(kv => baseUri.Append("&").Append(kv.Key.UrlEncoded()).Append("=").Append(kv.Value.UrlEncoded()));
@@ -213,14 +213,14 @@ namespace CorrugatedIron.Comms
                 var result = new RiakRestResponse
                 {
                     ContentLength = response.ContentLength,
+                    ContentType = response.ContentType,
                     StatusCode = response.StatusCode,
                     Headers = response.Headers.AllKeys.ToDictionary(k => k, k => response.Headers[k])
                 };
 
-                if(!string.IsNullOrWhiteSpace(response.ContentEncoding))
-                {
-                    result.ContentEncoding = System.Text.Encoding.GetEncoding(response.ContentEncoding);
-                }
+                result.ContentEncoding = !string.IsNullOrWhiteSpace(response.ContentEncoding)
+                    ? System.Text.Encoding.GetEncoding(response.ContentEncoding)
+                    : System.Text.Encoding.Default;
 
                 if (response.ContentLength > 0)
                 {
