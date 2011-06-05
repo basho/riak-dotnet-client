@@ -201,6 +201,20 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
         }
 
         [Test]
+        public void GettingBucketPropertiesWithoutExtendedFlagDoesNotReturnExtraProperties()
+        {
+            var result = Client.GetBucketProperties(MultiBucket);
+            result.IsSuccess.ShouldBeTrue();
+            result.Value.AllowMultiple.HasValue.ShouldBeTrue();
+            result.Value.NVal.HasValue.ShouldBeTrue();
+            result.Value.LastWriteWins.HasValue.ShouldBeFalse();
+            result.Value.RVal.ShouldBeNull();
+            result.Value.RwVal.ShouldBeNull();
+            result.Value.DwVal.ShouldBeNull();
+            result.Value.WVal.ShouldBeNull();
+        }
+
+        [Test]
         public void GettingBucketPropertiesWithExtendedFlagReturnsExtraProperties()
         {
             var result = Client.GetBucketProperties(MultiBucket, true);
@@ -209,6 +223,9 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
             result.Value.NVal.HasValue.ShouldBeTrue();
             result.Value.LastWriteWins.HasValue.ShouldBeTrue();
             result.Value.RVal.ShouldNotBeNull();
+            result.Value.RwVal.ShouldNotBeNull();
+            result.Value.DwVal.ShouldNotBeNull();
+            result.Value.WVal.ShouldNotBeNull();
         }
     }
 
