@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using CorrugatedIron.Containers;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
+using CorrugatedIron.Models.CommitHook;
 using CorrugatedIron.Util;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -35,6 +37,8 @@ namespace CorrugatedIron.Models
         public uint? NVal { get; private set; }
         public bool? AllowMultiple { get; private set; }
         public string Backend { get; private set; }
+        public List<IRiakPreCommitHook> PreCommitHooks { get; private set; }
+        public List<IRiakPostCommitHook> PostCommitHooks { get; private set; }
 
         public Either<uint, string> RVal { get; private set; }
         public Either<uint, string> RwVal { get; private set; }
@@ -105,6 +109,30 @@ namespace CorrugatedIron.Models
             return this;
         }
 
+        public RiakBucketProperties AddPreCommitHook(IRiakPreCommitHook commitHook)
+        {
+            (PreCommitHooks ?? (PreCommitHooks = new List<IRiakPreCommitHook>())).Add(commitHook);
+            return this;
+        }
+
+        public RiakBucketProperties AddPostCommitHook(IRiakPostCommitHook commitHook)
+        {
+            (PostCommitHooks ?? (PostCommitHooks = new List<IRiakPostCommitHook>())).Add(commitHook);
+            return this;
+        }
+
+        public RiakBucketProperties ClearPreCommitHooks()
+        {
+            (PreCommitHooks ?? (PreCommitHooks = new List<IRiakPreCommitHook>())).Clear();
+            return this;
+        }
+
+        public RiakBucketProperties ClearPostCommitHooks()
+        {
+            (PostCommitHooks ?? (PostCommitHooks = new List<IRiakPostCommitHook>())).Clear();
+            return this;
+        }
+
         private RiakBucketProperties WriteQuorum(uint value, Action<Either<uint, string>> setter)
         {
             System.Diagnostics.Debug.Assert(value >= 1);
@@ -138,6 +166,37 @@ namespace CorrugatedIron.Models
             ReadQuorum(props, "rw", v => RwVal = v);
             ReadQuorum(props, "dw", v => DwVal = v);
             ReadQuorum(props, "w", v => WVal = v);
+
+            var preCommitHooks = props.Value<JArray>("precommit");
+            if (preCommitHooks.Count > 0)
+            {
+                PreCommitHooks = preCommitHooks.Cast<JObject>().Select(LoadPreCommitHook).ToList();
+            }
+
+            var postCommitHooks = props.Value<JArray>("postcommit");
+            if (postCommitHooks.Count > 0)
+            {
+                PostCommitHooks = postCommitHooks.Cast<JObject>().Select(LoadPostCommitHook).ToList();
+            }
+        }
+
+        private static IRiakPreCommitHook LoadPreCommitHook(JObject hook)
+        {
+            JToken token;
+            if (hook.TryGetValue("name", out token))
+            {
+                // must be a javascript hook
+                return new RiakJavascriptCommitHook(token.Value<string>());
+            }
+
+            // otherwise it has to be erlang
+            return new RiakErlangCommitHook(hook.Value<string>("mod"), hook.Value<string>("fun"));
+        }
+
+        private static IRiakPostCommitHook LoadPostCommitHook(JObject hook)
+        {
+            // only erlang hooks are supported
+            return new RiakErlangCommitHook(hook.Value<string>("mod"), hook.Value<string>("fun"));
         }
 
         private static void ReadQuorum(JObject props, string key, Action<Either<uint, string>> setter)
@@ -191,6 +250,22 @@ namespace CorrugatedIron.Models
                     .WriteEither("dw", DwVal)
                     .WriteEither("w", WVal)
                     .WriteNonNullProperty("backend", Backend);
+
+                if (PreCommitHooks != null)
+                {
+                    jw.WritePropertyName("precommit");
+                    jw.WriteStartArray();
+                    PreCommitHooks.ForEach(hook => hook.WriteJson(jw));
+                    jw.WriteEndArray();
+                }
+
+                if (PostCommitHooks != null)
+                {
+                    jw.WritePropertyName("postcommit");
+                    jw.WriteStartArray();
+                    PostCommitHooks.ForEach(hook => hook.WriteJson(jw));
+                    jw.WriteEndArray();
+                }
 
                 jw.WriteEndObject();
                 jw.WriteEndObject();
