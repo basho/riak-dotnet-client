@@ -53,14 +53,14 @@
     <Compile Include="Containers\ConcurrentEnumerator.cs" />
     <Compile Include="Containers\Either.cs" />
     <Compile Include="Containers\ResourcePool.cs" />
-    <Compile Include="Comms\RiakClient.cs" />
+    <Compile Include="RiakClient.cs" />
     <Compile Include="Comms\RiakConnection.cs" />
     <Compile Include="Comms\RiakConnectionFactory.cs" />
     <Compile Include="Comms\RiakConnectionUsageManager.cs" />
     <Compile Include="Comms\RiakCluster.cs" />
     <Compile Include="Comms\RiakNode.cs" />
     <Compile Include="Comms\RiakNodeFactory.cs" />
-    <Compile Include="Comms\RiakResult.cs" />
+    <Compile Include="RiakResult.cs" />
     <Compile Include="Config\RiakClusterConfiguration.cs" />
     <Compile Include="Config\RiakNodeConfiguration.cs" />
     <Compile Include="Config\RiakNodeConfigurationCollection.cs" />
@@ -85,8 +85,8 @@
     <Compile Include="Models\CommitHook\RiakCommitHook.cs" />
     <Compile Include="Models\RiakLink.cs" />
     <Compile Include="Models\RiakPutOptions.cs" />
-    <Compile Include="Models\RiakRestRequest.cs" />
-    <Compile Include="Models\RiakRestResponse.cs" />
+    <Compile Include="Models\Rest\RiakRestRequest.cs" />
+    <Compile Include="Models\Rest\RiakRestResponse.cs" />
     <Compile Include="Util\Constants.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Messages\MessageCode.cs" />

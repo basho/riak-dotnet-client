@@ -19,8 +19,7 @@ namespace CorrugatedIron.KeyFilters
     /// <summary>
     /// Tests that input is within the Levenshtein distance of the first argument given by the second argument.
     /// </summary>
-    public class SimilarTo<T>
-        : RiakKeyFilterToken
+    public class SimilarTo<T> : RiakKeyFilterToken
     {
         public SimilarTo(T arg, int distance)
             : base("similar_to", arg, distance)

@@ -14,13 +14,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CorrugatedIron.Models.MapReduce
+using System.Collections.Generic;
+using System.Net;
+
+namespace CorrugatedIron.Models.Rest
 {
-    public class RiakReducePhase : RiakActionPhase
+    public class RiakRestResponse
     {
-        public override string PhaseType
+        public string ContentType { get; set; }
+        public long ContentLength { get; set; }
+        public System.Text.Encoding ContentEncoding { get; set; }
+        public string Body { get; set; }
+        public HttpStatusCode StatusCode { get; set; }
+        public Dictionary<string, string> Headers { get; set; }
+        public string ErrorMessage { get; set; }
+
+        public RiakRestResponse()
         {
-            get { return "reduce"; }
         }
     }
 }

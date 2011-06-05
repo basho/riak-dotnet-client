@@ -14,9 +14,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.Linq;
-using CorrugatedIron.Extensions;
-
 namespace CorrugatedIron.KeyFilters
 {
     /// <summary>
