@@ -260,7 +260,11 @@ namespace CorrugatedIron
 
         private static byte[] GetClientId()
         {
-            var nic = NetworkInterface.GetAllNetworkInterfaces().First(i => i.OperationalStatus == OperationalStatus.Up);
+            var nic = NetworkInterface.GetAllNetworkInterfaces().Where(i => (i.OperationalStatus == OperationalStatus.Up) || 
+                                                                            ((i.NetworkInterfaceType != NetworkInterfaceType.Loopback) &&
+                                                                             (i.NetworkInterfaceType != NetworkInterfaceType.Unknown)
+                                                                            )).First();
+            
             var mac = nic.GetPhysicalAddress().GetAddressBytes();
             Array.Resize(ref mac, 4);
             return mac;
