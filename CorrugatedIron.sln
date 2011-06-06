@@ -7,6 +7,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CorrugatedIron.Tests", "Cor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CorrugatedIron.Tests.Live", "CorrugatedIron.Tests.Live\CorrugatedIron.Tests.Live.csproj", "{5D52E2FA-931C-4E77-BF2B-3A9F0D0CD834}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Metadata", "Metadata", "{C6E7CFF8-CC0A-49A4-B235-DDF0F23EB2A6}"
+	ProjectSection(SolutionItems) = preProject
+		Metadata\VersionInfo.cs = Metadata\VersionInfo.cs
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
