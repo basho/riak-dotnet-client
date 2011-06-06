@@ -52,6 +52,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Metadata\VersionInfo.cs">
+      <Link>Properties\VersionInfo.cs</Link>
+    </Compile>
     <Compile Include="Comms\RiakClientSetBucketPropertiesTests.cs" />
     <Compile Include="Comms\RiakClientTestBase.cs" />
     <Compile Include="Comms\RiakClientPingTests.cs" />
