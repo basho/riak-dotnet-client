@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CorrugatedIron", "Corrugate
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CorrugatedIron.Tests", "CorrugatedIron.Tests\CorrugatedIron.Tests.csproj", "{E765CC5E-3C83-42CB-9B9A-C8AF400AC0AC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CorrugatedIron.Tests.Live", "CorrugatedIron.Tests.Live\CorrugatedIron.Tests.Live.csproj", "{5D52E2FA-931C-4E77-BF2B-3A9F0D0CD834}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -19,6 +21,13 @@ Global
 		{E765CC5E-3C83-42CB-9B9A-C8AF400AC0AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E765CC5E-3C83-42CB-9B9A-C8AF400AC0AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E765CC5E-3C83-42CB-9B9A-C8AF400AC0AC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D52E2FA-931C-4E77-BF2B-3A9F0D0CD834}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D52E2FA-931C-4E77-BF2B-3A9F0D0CD834}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D52E2FA-931C-4E77-BF2B-3A9F0D0CD834}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D52E2FA-931C-4E77-BF2B-3A9F0D0CD834}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = CorrugatedIron\CorrugatedIron.csproj
@@ -37,8 +46,5 @@ Global
 		$0.StandardHeader = $4
 		$4.Text = @Copyright (c) 2010 - OJ Reeves & Jeremiah Peschka\r\n\nThis file is provided to you under the Apache License,\r\nVersion 2.0 (the "License"); you may not use this file\r\nexcept in compliance with the License.  You may obtain\r\na copy of the License at\r\n\r\n   http://www.apache.org/licenses/LICENSE-2.0\r\n\nUnless required by applicable law or agreed to in writing,\r\nsoftware distributed under the License is distributed on an\r\n"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY\r\nKIND, either express or implied.  See the License for the\r\nspecific language governing permissions and limitations\r\nunder the License.
 		$4.IncludeInNewFiles = True
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal
