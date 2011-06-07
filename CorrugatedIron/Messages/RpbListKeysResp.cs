@@ -24,7 +24,7 @@ namespace CorrugatedIron.Messages
 {
     [Serializable]
     [ProtoContract(Name = "RpbListKeysResp")]
-    public class RpbListKeysResp
+    internal class RpbListKeysResp
     {
         public RpbListKeysResp()
         {
@@ -32,13 +32,14 @@ namespace CorrugatedIron.Messages
         }
 
         [ProtoMember(1, Name = "keys", DataFormat = DataFormat.Default)]
-        public List<byte[]> Keys { get; set; }
+        internal List<byte[]> Keys { get; set; }
 
         [ProtoMember(2, IsRequired = false, Name = "done", DataFormat = DataFormat.Default)]
         [DefaultValue(default(bool))]
-        public bool Done { get; set; }
-        
-        public List<string> KeyNames {
+        internal bool Done { get; set; }
+
+        internal List<string> KeyNames
+        {
             get {
                 var keys = new List<string>();
                 Keys.ForEach(k => keys.Add(k.FromRiakString()));

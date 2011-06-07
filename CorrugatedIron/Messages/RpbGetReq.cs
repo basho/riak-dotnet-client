@@ -22,16 +22,16 @@ namespace CorrugatedIron.Messages
 {
     [Serializable]
     [ProtoContract(Name = "RpbGetReq")]
-    public class RpbGetReq
+    internal class RpbGetReq
     {
         [ProtoMember(1, IsRequired = true, Name = "bucket", DataFormat = DataFormat.Default)]
-        public byte[] Bucket { get; set; }
+        internal byte[] Bucket { get; set; }
 
         [ProtoMember(2, IsRequired = true, Name = "key", DataFormat = DataFormat.Default)]
-        public byte[] Key { get; set; }
+        internal byte[] Key { get; set; }
 
         [ProtoMember(3, IsRequired = false, Name = "r", DataFormat = DataFormat.TwosComplement)]
         [DefaultValue(default(uint))]
-        public uint R { get; set; }
+        internal uint R { get; set; }
     }
 }

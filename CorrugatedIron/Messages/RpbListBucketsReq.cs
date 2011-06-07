@@ -21,7 +21,7 @@ namespace CorrugatedIron.Messages
 {
     [Serializable]
     [ProtoContract(Name = "RpbListBucketsReq")]
-    public class RpbListBucketsReq
+    internal class RpbListBucketsReq
     {
     }
 }

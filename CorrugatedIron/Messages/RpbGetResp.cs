@@ -23,7 +23,7 @@ namespace CorrugatedIron.Messages
 {
     [Serializable]
     [ProtoContract(Name = "RpbGetResp")]
-    public class RpbGetResp
+    internal class RpbGetResp
     {
         public RpbGetResp()
         {
@@ -31,10 +31,10 @@ namespace CorrugatedIron.Messages
         }
 
         [ProtoMember(1, Name = "content", DataFormat = DataFormat.Default)]
-        public List<RpbContent> Content { get; private set; }
+        internal List<RpbContent> Content { get; private set; }
 
         [ProtoMember(2, IsRequired = false, Name = "vclock", DataFormat = DataFormat.Default)]
         [DefaultValue(null)]
-        public byte[] VectorClock { get; set; }
+        internal byte[] VectorClock { get; set; }
     }
 }

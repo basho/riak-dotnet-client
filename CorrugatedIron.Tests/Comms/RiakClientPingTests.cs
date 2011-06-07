@@ -23,7 +23,7 @@ using NUnit.Framework;
 
 namespace CorrugatedIron.Tests.Comms.RiakClientPingTests
 {
-    public abstract class RiakClientPingTestBase : RiakClientTestBase<RpbPingResp>
+    public abstract class RiakClientPingTestBase : RiakClientTestBase
     {
         protected RiakResult Response;
 
@@ -36,7 +36,7 @@ namespace CorrugatedIron.Tests.Comms.RiakClientPingTests
         [Test]
         public void PbcClientIsInvoked()
         {
-            Cluster.Verify(m => m.UseConnection(It.IsAny<byte[]>(), It.IsAny<Func<IRiakConnection, RiakResult<RpbPingResp>>>()), Times.Once());
+            Cluster.Verify(m => m.UseConnection(It.IsAny<byte[]>(), It.IsAny<Func<IRiakConnection, RiakResult>>()), Times.Once());
         }
     }
 
@@ -46,7 +46,7 @@ namespace CorrugatedIron.Tests.Comms.RiakClientPingTests
         [SetUp]
         public override void SetUp()
         {
-            Result = RiakResult<RpbPingResp>.Error(ResultCode.CommunicationError);
+            Result = RiakResult.Error(ResultCode.CommunicationError);
             base.SetUp();
         }
 
@@ -64,7 +64,7 @@ namespace CorrugatedIron.Tests.Comms.RiakClientPingTests
         [SetUp]
         public override void SetUp()
         {
-            Result = RiakResult<RpbPingResp>.Success(new RpbPingResp());
+            Result = RiakResult.Success();
             base.SetUp();
         }
 

@@ -21,7 +21,7 @@ namespace CorrugatedIron.Messages
 {
     [Serializable]
     [ProtoContract(Name = "RpbSetClientIdResp")]
-    public class RpbSetClientIdResp
+    internal class RpbSetClientIdResp
     {
     }
 }

@@ -22,31 +22,31 @@ namespace CorrugatedIron.Messages
 {
     [Serializable]
     [ProtoContract(Name = "RpbPutReq")]
-    public class RpbPutReq
+    internal class RpbPutReq
     {
         [ProtoMember(1, IsRequired = true, Name = "bucket", DataFormat = DataFormat.Default)]
-        public byte[] Bucket { get; set; }
+        internal byte[] Bucket { get; set; }
     
         [ProtoMember(2, IsRequired = true, Name = "key", DataFormat = DataFormat.Default)]
-        public byte[] Key { get; set; }
+        internal byte[] Key { get; set; }
     
         [ProtoMember(3, IsRequired = false, Name = "vclock", DataFormat = DataFormat.Default)]
         [DefaultValue(null)]
-        public byte[] VectorClock { get; set; }
+        internal byte[] VectorClock { get; set; }
 
         [ProtoMember(4, IsRequired = true, Name = "content", DataFormat = DataFormat.Default)]
-        public RpbContent Content { get; set; }
+        internal RpbContent Content { get; set; }
     
         [ProtoMember(5, IsRequired = false, Name = "w", DataFormat = DataFormat.TwosComplement)]
         [DefaultValue(default(uint))]
-        public uint W { get; set; }
+        internal uint W { get; set; }
     
         [ProtoMember(6, IsRequired = false, Name = "dw", DataFormat = DataFormat.TwosComplement)]
         [DefaultValue(default(uint))]
-        public uint Dw { get; set; }
+        internal uint Dw { get; set; }
     
         [ProtoMember(7, IsRequired = false, Name = "return_body", DataFormat = DataFormat.Default)]
         [DefaultValue(default(bool))]
-        public bool ReturnBody { get; set; }
+        internal bool ReturnBody { get; set; }
     }
 }

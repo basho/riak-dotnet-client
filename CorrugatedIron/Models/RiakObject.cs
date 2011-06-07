@@ -80,7 +80,7 @@ namespace CorrugatedIron.Models
             Siblings = new List<RiakObject>();
         }
 
-        public RiakObject(string bucket, string key, RpbContent content, byte[] vectorClock)
+        internal RiakObject(string bucket, string key, RpbContent content, byte[] vectorClock)
         {
             Bucket = bucket;
             Key = key;
@@ -95,7 +95,7 @@ namespace CorrugatedIron.Models
             Siblings = new List<RiakObject>();
         }
 
-        public RpbPutReq ToMessage()
+        internal RpbPutReq ToMessage()
         {
             var message = new RpbPutReq
             {

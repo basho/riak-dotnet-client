@@ -22,18 +22,18 @@ namespace CorrugatedIron.Messages
 {
     [Serializable]
     [ProtoContract(Name = "RpbLink")]
-    public class RpbLink
+    internal class RpbLink
     {
         [ProtoMember(1, IsRequired = false, Name = "bucket", DataFormat = DataFormat.Default)]
         [DefaultValue(null)]
-        public byte[] Bucket { get; set; }
+        internal byte[] Bucket { get; set; }
 
         [ProtoMember(2, IsRequired = false, Name = "key", DataFormat = DataFormat.Default)]
         [DefaultValue(null)]
-        public byte[] Key { get; set; }
+        internal byte[] Key { get; set; }
 
         [ProtoMember(3, IsRequired = false, Name = "tag", DataFormat = DataFormat.Default)]
         [DefaultValue(null)]
-        public byte[] Tag { get; set; }
+        internal byte[] Tag { get; set; }
     }
 }

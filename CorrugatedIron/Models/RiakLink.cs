@@ -32,14 +32,14 @@ namespace CorrugatedIron.Models
             Tag = tag;
         }
 
-        public RiakLink(RpbLink link)
+        internal RiakLink(RpbLink link)
         {
             Bucket = link.Bucket.FromRiakString();
             Key = link.Key.FromRiakString();
             Tag = link.Tag.FromRiakString();
         }
 
-        public RpbLink ToMessage()
+        internal RpbLink ToMessage()
         {
             var message = new RpbLink
             {

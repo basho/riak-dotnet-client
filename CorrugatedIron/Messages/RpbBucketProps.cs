@@ -22,14 +22,14 @@ namespace CorrugatedIron.Messages
 {
     [Serializable]
     [ProtoContract(Name = "RpbBucketProps")]
-    public class RpbBucketProps
+    internal class RpbBucketProps
     {
         [ProtoMember(1, IsRequired = false, Name = "n_val", DataFormat = DataFormat.TwosComplement)]
         [DefaultValue(default(uint))]
-        public uint NVal { get; set; }
+        internal uint NVal { get; set; }
 
         [ProtoMember(2, IsRequired = false, Name = "allow_mult", DataFormat = DataFormat.Default)]
         [DefaultValue(default(bool))]
-        public bool AllowMultiple { get; set; }
+        internal bool AllowMultiple { get; set; }
     }
 }

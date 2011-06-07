@@ -23,47 +23,47 @@ namespace CorrugatedIron.Messages
 {
     [Serializable]
     [ProtoContract(Name = "RpbContent")]
-    public class RpbContent
+    internal class RpbContent
     {
-        public RpbContent()
+        internal RpbContent()
         {
             Links = new List<RpbLink>();
             UserMeta = new List<RpbPair>();
         }
 
         [ProtoMember(1, IsRequired = true, Name = "value", DataFormat = DataFormat.Default)]
-        public byte[] Value { get; set; }
+        internal byte[] Value { get; set; }
 
         [ProtoMember(2, IsRequired = false, Name = "content_type", DataFormat = DataFormat.Default)]
         [DefaultValue(null)]
-        public byte[] ContentType { get; set; }
+        internal byte[] ContentType { get; set; }
 
         [ProtoMember(3, IsRequired = false, Name = "charset", DataFormat = DataFormat.Default)]
         [DefaultValue(null)]
-        public byte[] CharacterSet { get; set; }
+        internal byte[] CharacterSet { get; set; }
 
         [ProtoMember(4, IsRequired = false, Name = "content_encoding", DataFormat = DataFormat.Default)]
         [DefaultValue(null)]
-        public byte[] ContentEncoding { get; set; }
+        internal byte[] ContentEncoding { get; set; }
 
         [ProtoMember(5, IsRequired = false, Name = "vtag", DataFormat = DataFormat.Default)]
         [DefaultValue(null)]
-        public byte[] VTag { get; set; }
+        internal byte[] VTag { get; set; }
 
         [ProtoMember(6, Name = "links", DataFormat = DataFormat.Default)]
         [DefaultValue(null)]
-        public List<RpbLink> Links { get; set; }
+        internal List<RpbLink> Links { get; set; }
 
         [ProtoMember(7, IsRequired = false, Name = "last_mod", DataFormat = DataFormat.TwosComplement)]
         [DefaultValue(default(uint))]
-        public uint LastMod { get; set; }
+        internal uint LastMod { get; set; }
 
         [ProtoMember(8, IsRequired = false, Name = "last_mod_usecs", DataFormat = DataFormat.TwosComplement)]
         [DefaultValue(default(uint))]
-        public uint LastModUSecs { get; set; }
+        internal uint LastModUSecs { get; set; }
 
         [ProtoMember(9, Name = "usermeta", DataFormat = DataFormat.Default)]
         [DefaultValue(null)]
-        public List<RpbPair> UserMeta { get; set; }
+        internal List<RpbPair> UserMeta { get; set; }
     }
 }

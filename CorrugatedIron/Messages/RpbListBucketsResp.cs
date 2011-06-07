@@ -23,7 +23,7 @@ namespace CorrugatedIron.Messages
 {
     [Serializable]
     [ProtoContract(Name = "RpbListBucketsResp")]
-    public class RpbListBucketsResp
+    internal class RpbListBucketsResp
     {
         public RpbListBucketsResp()
         {
@@ -31,9 +31,10 @@ namespace CorrugatedIron.Messages
         }
 
         [ProtoMember(1, Name = "buckets", DataFormat = DataFormat.Default)]
-        public List<byte[]> Buckets { get; set; }
-        
-        public List<string> BucketNames {
+        internal List<byte[]> Buckets { get; set; }
+
+        internal List<string> BucketNames
+        {
             get {
                 var buckets = new List<string>(Buckets.Capacity);
                 Buckets.ForEach(b => buckets.Add(b.FromRiakString()));
