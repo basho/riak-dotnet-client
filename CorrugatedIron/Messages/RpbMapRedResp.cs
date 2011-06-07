@@ -22,18 +22,18 @@ namespace CorrugatedIron.Messages
 {
     [Serializable]
     [ProtoContract(Name = "RpbMapRedResp")]
-    public class RpbMapRedResp
+    internal class RpbMapRedResp
     {
         [ProtoMember(1, IsRequired = true, Name = "phase", DataFormat = DataFormat.TwosComplement)]
         [DefaultValue(default(uint))]
-        public uint Phase { get; set; }
+        internal uint Phase { get; set; }
 
         [ProtoMember(2, IsRequired = false, Name = "response", DataFormat = DataFormat.Default)]
         [DefaultValue(null)]
-        public byte[] Response { get; set; }
+        internal byte[] Response { get; set; }
 
         [ProtoMember(3, IsRequired = false, Name = "done", DataFormat = DataFormat.Default)]
         [DefaultValue(default(bool))]
-        public bool Done { get; set; }
+        internal bool Done { get; set; }
     }
 }

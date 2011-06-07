@@ -21,12 +21,12 @@ namespace CorrugatedIron.Messages
 {
     [Serializable]
     [ProtoContract(Name = "RpbErrorResp")]
-    public class RpbErrorResp
+    internal class RpbErrorResp
     {
         [ProtoMember(1, IsRequired = true, Name = "errmsg", DataFormat = DataFormat.Default)]
-        public byte[] ErrorMessage { get; set; }
+        internal byte[] ErrorMessage { get; set; }
 
         [ProtoMember(2, IsRequired = true, Name = "errcode", DataFormat = DataFormat.TwosComplement)]
-        public uint ErrorCode { get; set; }
+        internal uint ErrorCode { get; set; }
     }
 }

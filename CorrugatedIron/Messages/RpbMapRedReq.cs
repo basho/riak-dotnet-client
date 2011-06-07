@@ -21,12 +21,12 @@ namespace CorrugatedIron.Messages
 {
     [Serializable]
     [ProtoContract(Name = "RpbMapRedReq")]
-    public class RpbMapRedReq
+    internal class RpbMapRedReq
     {
         [ProtoMember(1, IsRequired = true, Name = "request", DataFormat = DataFormat.Default)]
-        public byte[] Request { get; set; }
+        internal byte[] Request { get; set; }
 
         [ProtoMember(2, IsRequired = true, Name = "content_type", DataFormat = DataFormat.Default)]
-        public byte[] ContentType { get; set; }
+        internal byte[] ContentType { get; set; }
     }
 }

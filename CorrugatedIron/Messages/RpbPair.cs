@@ -22,13 +22,13 @@ namespace CorrugatedIron.Messages
 {
     [Serializable]
     [ProtoContract(Name = "RpbPair")]
-    public class RpbPair
+    internal class RpbPair
     {
         [ProtoMember(1, IsRequired = true, Name = "key", DataFormat = DataFormat.Default)]
-        public byte[] Key { get; set; }
+        internal byte[] Key { get; set; }
 
         [ProtoMember(2, IsRequired = false, Name = "value", DataFormat = DataFormat.Default)]
         [DefaultValue(null)]
-        public byte[] Value { get; set; }
+        internal byte[] Value { get; set; }
     }
 }

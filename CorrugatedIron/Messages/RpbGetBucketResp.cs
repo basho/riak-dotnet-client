@@ -21,9 +21,9 @@ namespace CorrugatedIron.Messages
 {
     [Serializable]
     [ProtoContract(Name = "RpbGetBucketResp")]
-    public class RpbGetBucketResp
+    internal class RpbGetBucketResp
     {
         [ProtoMember(1, IsRequired = true, Name = "props", DataFormat = DataFormat.Default)]
-        public RpbBucketProps Props { get; set; }
+        internal RpbBucketProps Props { get; set; }
     }
 }

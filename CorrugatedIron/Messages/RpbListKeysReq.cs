@@ -21,9 +21,9 @@ namespace CorrugatedIron.Messages
 {
     [Serializable]
     [ProtoContract(Name = "RpbListKeysReq")]
-    public class RpbListKeysReq
+    internal class RpbListKeysReq
     {
         [ProtoMember(1, IsRequired = true, Name = "bucket", DataFormat = DataFormat.Default)]
-        public byte[] Bucket { get; set; }
+        internal byte[] Bucket { get; set; }
     }
 }

@@ -110,7 +110,7 @@ namespace CorrugatedIron.Models.MapReduce
             _query = sb.ToString();
         }
 
-        public RpbMapRedReq ToMessage()
+        internal RpbMapRedReq ToMessage()
         {
             Compile();
             var message = new RpbMapRedReq

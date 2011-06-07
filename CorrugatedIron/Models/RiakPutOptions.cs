@@ -29,7 +29,7 @@ namespace CorrugatedIron.Models
             ReturnBody = true;
         }
 
-        public void Populate(RpbPutReq request)
+        internal void Populate(RpbPutReq request)
         {
             request.ReturnBody = ReturnBody;
             if (W.HasValue)

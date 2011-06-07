@@ -22,14 +22,14 @@ namespace CorrugatedIron.Messages
 {
     [Serializable]
     [ProtoContract(Name = "RpbGetServerInfoResp")]
-    public class RpbGetServerInfoResp
+    internal class RpbGetServerInfoResp
     {
         [ProtoMember(1, IsRequired = false, Name = "node", DataFormat = DataFormat.Default)]
         [DefaultValue(null)]
-        public byte[] Node { get; set; }
+        internal byte[] Node { get; set; }
 
         [ProtoMember(2, IsRequired = false, Name = "server_version", DataFormat = DataFormat.Default)]
         [DefaultValue(null)]
-        public byte[] ServerVersion { get; set; }
+        internal byte[] ServerVersion { get; set; }
     }
 }
