@@ -221,7 +221,9 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
             result.IsSuccess.ShouldBeTrue();
             result.Value.Response.ShouldNotBeNull();
             result.Value.Response.GetType().ShouldEqual(typeof(byte[]));
-            result.Value.Response.FromRiakString().ShouldEqual("[10]");
+
+            var json = JArray.Parse(result.Value.Response.FromRiakString());
+            json[0].Value<int>().ShouldEqual(10);
         }
 
         [Test]
