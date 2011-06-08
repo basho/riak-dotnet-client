@@ -22,6 +22,7 @@ using CorrugatedIron.Comms;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
 using CorrugatedIron.Models;
+using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Models.Rest;
 using CorrugatedIron.Util;
 
@@ -35,7 +36,6 @@ namespace CorrugatedIron
         RiakResult<RiakObject> Put(RiakObject value, RiakPutOptions options = null);
         RiakResult Delete(string bucket, string key, uint rwVal = Constants.Defaults.RVal);
         RiakResult<RiakMapReduceResult> MapReduce(string request, string requestType = Constants.ContentTypes.ApplicationJson);
-        //RiakResult<RiakMapReduceResult> MapReduce(RpbMapRedReq request);
         RiakResult<IEnumerable<string>> ListBuckets();
         RiakResult<IEnumerable<string>> ListKeys(string bucket);
         RiakResult<RiakBucketProperties> GetBucketProperties(string bucket, bool extended = false);

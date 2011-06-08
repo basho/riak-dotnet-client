@@ -14,61 +14,38 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
+using System.Collections.Generic;
 using CorrugatedIron.Comms;
+using CorrugatedIron.Config;
 using Moq;
 
 namespace CorrugatedIron.Tests.Comms
 {
-    public abstract class RiakClientTestBase
+    public abstract class RiakClientTestBase<TRequest, TResult>
+        where TResult : new()
     {
-        protected Mock<IRiakCluster> Cluster;
-        protected Mock<IRiakConnection> Conn;
-        protected RiakClient Client;
-        protected RiakResult Result;
-        protected byte[] ClientId;
-
-        protected void SetUpInternal()
-        {
-            Conn = new Mock<IRiakConnection>();
-            Cluster = new Mock<IRiakCluster>();
-
-            if(ClientId != null)
-            {
-                Cluster.Setup(m => m.UseConnection(ClientId, It.IsAny<Func<IRiakConnection, RiakResult>>())).Returns(Result);
-                Client = new RiakClient(Cluster.Object, ClientId);
-            }
-            else
-            {
-                Cluster.Setup(m => m.UseConnection(It.IsAny<byte[]>(), It.IsAny<Func<IRiakConnection, RiakResult>>())).Returns(Result);
-                Client = new RiakClient(Cluster.Object);
-            }
-        }
-    }
-
-    public abstract class RiakClientTestBase<TResult>
-    {
-        protected Mock<IRiakCluster> Cluster;
-        protected Mock<IRiakConnection> Conn;
-        protected RiakClient Client;
         protected RiakResult<TResult> Result;
-        protected byte[] ClientId;
+        protected Mock<IRiakConnection> ConnMock;
+        protected Mock<IRiakNodeConfiguration> NodeConfigMock;
+        protected Mock<IRiakClusterConfiguration> ClusterConfigMock;
+        protected Mock<IRiakConnectionFactory> ConnFactoryMock;
+        protected RiakCluster Cluster;
+        protected RiakClient Client;
 
         protected void SetUpInternal()
         {
-            Conn = new Mock<IRiakConnection>();
-            Cluster = new Mock<IRiakCluster>();
+            ConnMock = new Mock<IRiakConnection>();
+            ClusterConfigMock = new Mock<IRiakClusterConfiguration>();
+            ConnFactoryMock = new Mock<IRiakConnectionFactory>();
+            NodeConfigMock = new Mock<IRiakNodeConfiguration>();
 
-            if(ClientId != null)
-            {
-                Cluster.Setup(m => m.UseConnection(ClientId, It.IsAny<Func<IRiakConnection, RiakResult<TResult>>>())).Returns(Result);
-                Client = new RiakClient(Cluster.Object, ClientId);
-            }
-            else
-            {
-                Cluster.Setup(m => m.UseConnection(It.IsAny<byte[]>(), It.IsAny<Func<IRiakConnection, RiakResult<TResult>>>())).Returns(Result);
-                Client = new RiakClient(Cluster.Object);
-            }
+            ConnMock.Setup(m => m.PbcWriteRead<TRequest, TResult>(It.IsAny<TRequest>())).Returns(() => Result);
+            ConnFactoryMock.Setup(m => m.CreateConnection(It.IsAny<IRiakNodeConfiguration>())).Returns(ConnMock.Object);
+            NodeConfigMock.SetupGet(m => m.PoolSize).Returns(1);
+            ClusterConfigMock.SetupGet(m => m.RiakNodes).Returns(new List<IRiakNodeConfiguration> { NodeConfigMock.Object });
+
+            Cluster = new RiakCluster(ClusterConfigMock.Object, new RiakNodeFactory(), ConnFactoryMock.Object);
+            Client = new RiakClient(Cluster);
         }
     }
 }

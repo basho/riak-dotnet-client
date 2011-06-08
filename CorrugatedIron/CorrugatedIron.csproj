@@ -34,8 +34,7 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>
-    </AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\Metadata\CorrugatedIron.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -136,7 +135,7 @@
     <Compile Include="Comms\RiakCluster.cs" />
     <Compile Include="Comms\RiakNode.cs" />
     <Compile Include="Comms\RiakNodeFactory.cs" />
-    <Compile Include="Models\RiakMapReduceResult.cs" />
+    <Compile Include="Models\MapReduce\RiakMapReduceResult.cs" />
     <Compile Include="RiakResult.cs" />
     <Compile Include="Config\RiakClusterConfiguration.cs" />
     <Compile Include="Config\RiakNodeConfiguration.cs" />
@@ -203,6 +202,11 @@
     <Compile Include="KeyFilters\ToUpper.cs" />
     <Compile Include="KeyFilters\UrlDecode.cs" />
     <Compile Include="KeyFilters\RiakKeyFilterToken.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Metadata\CorrugatedIron.snk">
+      <Link>CorrugatedIron.snk</Link>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

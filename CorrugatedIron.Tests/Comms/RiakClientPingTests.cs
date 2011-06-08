@@ -14,8 +14,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
-using CorrugatedIron.Comms;
 using CorrugatedIron.Tests.Extensions;
 using CorrugatedIron.Messages;
 using Moq;
@@ -23,7 +21,7 @@ using NUnit.Framework;
 
 namespace CorrugatedIron.Tests.Comms.RiakClientPingTests
 {
-    public abstract class RiakClientPingTestBase : RiakClientTestBase
+    internal abstract class RiakClientPingTestBase : RiakClientTestBase<RpbPingReq, RpbPingResp>
     {
         protected RiakResult Response;
 
@@ -36,17 +34,17 @@ namespace CorrugatedIron.Tests.Comms.RiakClientPingTests
         [Test]
         public void PbcClientIsInvoked()
         {
-            Cluster.Verify(m => m.UseConnection(It.IsAny<byte[]>(), It.IsAny<Func<IRiakConnection, RiakResult>>()), Times.Once());
+            ConnMock.Verify(m => m.PbcWriteRead<RpbPingReq, RpbPingResp>(It.IsAny<RpbPingReq>()), Times.Once());
         }
     }
 
     [TestFixture]
-    public class WhenCallingPingWithError : RiakClientPingTestBase
+    internal class WhenCallingPingWithError : RiakClientPingTestBase
     {
         [SetUp]
         public override void SetUp()
         {
-            Result = RiakResult.Error(ResultCode.CommunicationError);
+            Result = RiakResult<RpbPingResp>.Error(ResultCode.CommunicationError);
             base.SetUp();
         }
 
@@ -59,12 +57,12 @@ namespace CorrugatedIron.Tests.Comms.RiakClientPingTests
     }
 
     [TestFixture]
-    public class WhenCallingPingSuccessfully : RiakClientPingTestBase
+    internal class WhenCallingPingSuccessfully : RiakClientPingTestBase
     {
         [SetUp]
         public override void SetUp()
         {
-            Result = RiakResult.Success();
+            Result = RiakResult<RpbPingResp>.Success(new RpbPingResp());
             base.SetUp();
         }
 
