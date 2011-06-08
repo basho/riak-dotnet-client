@@ -22,6 +22,7 @@ using CorrugatedIron.Extensions;
 using CorrugatedIron.KeyFilters;
 using CorrugatedIron.Messages;
 using CorrugatedIron.Models.MapReduce.Inputs;
+using CorrugatedIron.Util;
 using Newtonsoft.Json;
 
 namespace CorrugatedIron.Models.MapReduce
@@ -39,6 +40,7 @@ namespace CorrugatedIron.Models.MapReduce
         {
             _phases = new List<RiakPhase>();
             _filters = new List<IRiakKeyFilterToken>();
+            ContentType = Constants.ContentTypes.ApplicationJson;
         }
 
         public RiakMapReduceQuery Inputs(RiakPhaseInputs inputs)
@@ -79,6 +81,7 @@ namespace CorrugatedIron.Models.MapReduce
 
         public void Compile()
         {
+            System.Diagnostics.Debug.Assert(_inputs != null);
             if (!string.IsNullOrWhiteSpace(_query)) return;
 
             var sb = new StringBuilder();

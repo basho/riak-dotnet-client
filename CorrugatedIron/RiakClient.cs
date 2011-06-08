@@ -35,7 +35,7 @@ namespace CorrugatedIron
         RiakResult<RiakObject> Get(string bucket, string key, uint rVal = Constants.Defaults.RVal);
         RiakResult<RiakObject> Put(RiakObject value, RiakPutOptions options = null);
         RiakResult Delete(string bucket, string key, uint rwVal = Constants.Defaults.RVal);
-        RiakResult<RiakMapReduceResult> MapReduce(string request, string requestType = Constants.ContentTypes.ApplicationJson);
+        RiakResult<RiakMapReduceResult> MapReduce(RiakMapReduceQuery query);
         RiakResult<IEnumerable<string>> ListBuckets();
         RiakResult<IEnumerable<string>> ListKeys(string bucket);
         RiakResult<RiakBucketProperties> GetBucketProperties(string bucket, bool extended = false);
@@ -159,17 +159,11 @@ namespace CorrugatedIron
             return result;
         }
 
-        public RiakResult<RiakMapReduceResult> MapReduce(string request, string requestType = Constants.ContentTypes.ApplicationJson)
+        public RiakResult<RiakMapReduceResult> MapReduce(RiakMapReduceQuery query)
         {
-            var mapRedReq = new RpbMapRedReq { Request = request.ToRiakString(), ContentType = requestType.ToRiakString() };
-            return MapReduce(mapRedReq);
-        }
-
-        internal RiakResult<RiakMapReduceResult> MapReduce(RpbMapRedReq request)
-        {
+            var request = query.ToMessage();
             var response = _cluster.UseConnection(_clientId, conn => conn.PbcWriteRead<RpbMapRedReq, RpbMapRedResp>(request));
             var result = RiakResult<RiakMapReduceResult>.Success(new RiakMapReduceResult(response.Value));
-            
             return result;
         }
         

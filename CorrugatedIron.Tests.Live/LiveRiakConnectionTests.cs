@@ -19,8 +19,11 @@ using CorrugatedIron.Config;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.CommitHook;
+using CorrugatedIron.Models.MapReduce;
+using CorrugatedIron.Models.MapReduce.Inputs;
 using CorrugatedIron.Tests.Extensions;
 using CorrugatedIron.Util;
+using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 
 namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
@@ -36,7 +39,6 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
         protected const string TestKey = "test_json";
         protected const string TestJson = "{\"string\":\"value\",\"int\":100,\"float\":2.34,\"array\":[1,2,3],\"dict\":{\"foo\":\"bar\"}}";
         protected const string MapReduceBucket = "map_reduce_bucket";
-        protected const string TestMapReduce = @"{""inputs"":""map_reduce_bucket"",""query"":[{""map"":{""language"":""javascript"",""keep"":false,""source"":""function(o) {return [ 1 ];}""}},{""reduce"":{""language"":""javascript"",""keep"":true,""name"":""Riak.reduceSum""}}]}";
         protected const string MultiBucket = "test_multi_bucket";
         protected const string MultiKey = "test_multi_key";
         protected const string MultiBodyOne = @"{""dishes"": 9}";
@@ -210,8 +212,14 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
                 Client.Put(doc).IsSuccess.ShouldBeTrue();
             }
 
-            var result = Client.MapReduce(TestMapReduce);
+            var query = new RiakMapReduceQuery()
+                .Inputs(new RiakPhaseInputs(MapReduceBucket))
+                .Map(m => m.Source(@"function(o) {return [ 1 ];}"))
+                .Reduce(r => r.Name(@"Riak.reduceSum").Keep(true));
+
+            var result = Client.MapReduce(query);
             result.IsSuccess.ShouldBeTrue();
+            result.Value.Response.ShouldNotBeNull();
             result.Value.Response.GetType().ShouldEqual(typeof(byte[]));
             result.Value.Response.FromRiakString().ShouldEqual("[10]");
         }
