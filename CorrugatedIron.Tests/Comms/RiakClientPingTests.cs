@@ -14,6 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Threading;
 using CorrugatedIron.Tests.Extensions;
 using CorrugatedIron.Messages;
 using Moq;
@@ -70,6 +71,34 @@ namespace CorrugatedIron.Tests.Comms.RiakClientPingTests
         public void SuccessResultIsReturned()
         {
             Response.IsSuccess.ShouldBeTrue();
+        }
+    }
+
+    [TestFixture]
+    internal class WhenCallingPingAsynchronously : RiakClientTestBase<RpbPingReq, RpbPingResp>
+    {
+        private readonly ManualResetEvent _indicator = new ManualResetEvent(false);
+        private volatile bool _done = false;
+
+        [SetUp]
+        public void SetUp()
+        {
+            Result = RiakResult<RpbPingResp>.Success(new RpbPingResp());
+            SetUpInternal();
+        }
+
+        [Test]
+        public void CallbackIsInvokedCorrectly()
+        {
+            Client.Ping(Callback);
+            _indicator.WaitOne();
+            _done.ShouldBeTrue();
+        }
+
+        public void Callback(RiakResult result)
+        {
+            _done = result.IsSuccess;
+            _indicator.Set();
         }
     }
 }
