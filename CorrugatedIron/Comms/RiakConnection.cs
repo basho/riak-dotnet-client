@@ -15,6 +15,7 @@
 // under the License.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -27,7 +28,6 @@ using CorrugatedIron.Config;
 using CorrugatedIron.Encoding;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
-using CorrugatedIron.Models;
 using CorrugatedIron.Models.Rest;
 using CorrugatedIron.Util;
 
@@ -44,6 +44,11 @@ namespace CorrugatedIron.Comms
             where TResult : new();
         RiakResult PbcWrite<TRequest>(TRequest request);
         RiakResult<TResult> PbcWriteRead<TRequest, TResult>(TRequest request)
+            where TResult : new();
+
+        RiakResult<IEnumerable<TResult>> PbcRepeatRead<TResult>(Func<TResult, bool> repeatRead)
+            where TResult : new();
+        RiakResult<IEnumerable<TResult>> PbcWriteRead<TRequest, TResult>(TRequest request, Func<TResult, bool> repeatRead)
             where TResult : new();
 
         // REST interface
@@ -129,7 +134,6 @@ namespace CorrugatedIron.Comms
             try
             {
                 var result = _encoder.Decode<TResult>(PbcClientStream);
-                PbcClientStream.Flush();
                 return RiakResult<TResult>.Success(result);
             }
             catch (Exception ex)
@@ -138,12 +142,32 @@ namespace CorrugatedIron.Comms
             }
         }
 
+        public RiakResult<IEnumerable<TResult>> PbcRepeatRead<TResult>(Func<TResult, bool> repeatRead)
+            where TResult : new()
+        {
+            try
+            {
+                var results = new List<TResult>();
+                var result = default(TResult);
+                do
+                {
+                    result = _encoder.Decode<TResult>(PbcClientStream);
+                    results.Add(result);
+                } while (repeatRead(result));
+
+                return RiakResult<IEnumerable<TResult>>.Success(results);
+            }
+            catch (Exception ex)
+            {
+                return RiakResult<IEnumerable<TResult>>.Error(ResultCode.CommunicationError, ex.Message);
+            }
+        }
+
         public RiakResult PbcWrite<TRequest>(TRequest request)
         {
             try
             {
                 _encoder.Encode(request, PbcClientStream);
-                PbcClientStream.Flush();
                 return RiakResult.Success();
             }
             catch (Exception ex)
@@ -161,6 +185,17 @@ namespace CorrugatedIron.Comms
                 return PbcRead<TResult>();
             }
             return RiakResult<TResult>.Error(writeResult.ResultCode, writeResult.ErrorMessage);
+        }
+
+        public RiakResult<IEnumerable<TResult>> PbcWriteRead<TRequest, TResult>(TRequest request, Func<TResult, bool> repeatRead)
+            where TResult : new()
+        {
+            var writeResult = PbcWrite(request);
+            if (writeResult.IsSuccess)
+            {
+                return PbcRepeatRead(repeatRead);
+            }
+            return RiakResult<IEnumerable<TResult>>.Error(writeResult.ResultCode, writeResult.ErrorMessage);
         }
 
         public RiakResult<RiakRestResponse> RestRequest(RiakRestRequest request)
