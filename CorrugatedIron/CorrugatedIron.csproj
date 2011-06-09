@@ -116,6 +116,7 @@
     <Compile Include="Models\Rest\RiakRestResponse.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Models\RiakObjectId.cs" />
     <Compile Include="Models\RiakBucketProperties.cs">
       <SubType>Code</SubType>
     </Compile>
