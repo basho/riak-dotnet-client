@@ -14,6 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Linq;
 using CorrugatedIron.Comms;
 using CorrugatedIron.Config;
 using CorrugatedIron.Extensions;
@@ -182,6 +183,25 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
             loadedDoc.Key.ShouldEqual(doc.Key);
             loadedDoc.Value.ShouldEqual(doc.Value);
             loadedDoc.VectorClock.ShouldNotBeNullOrEmpty();
+        }
+
+        [Test]
+        public void BulkInsertFetchDeleteWorksAsExpected()
+        {
+            var keys = new[] { 1, 2, 3, 4, 5 }.Select(i => TestKey + i);
+            var docs = keys.Select(k => new RiakObject(TestBucket, k, TestJson, Constants.ContentTypes.ApplicationJson)).ToList();
+
+            var writeResult = Client.Put(docs);
+
+            writeResult.All(r => r.IsSuccess).ShouldBeTrue();
+
+            var objectIds = keys.Select(k => new RiakObjectId(TestBucket, k)).ToList();
+            var loadedDocs = Client.Get(objectIds);
+            loadedDocs.All(d => d.IsSuccess).ShouldBeTrue();
+            loadedDocs.All(d => d.Value != null).ShouldBeTrue();
+
+            var deleteResults = Client.Delete(objectIds);
+            deleteResults.All(r => r.IsSuccess).ShouldBeTrue();
         }
 
         [Test]
