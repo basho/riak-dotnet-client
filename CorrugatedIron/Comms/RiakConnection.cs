@@ -75,19 +75,19 @@ namespace CorrugatedIron.Comms
             get { return _pbcClient == null; }
         }
 
-        //private TcpClient PbcClient
-        //{
-        //    get
-        //    {
-        //        return _pbcClient ??
-        //               (_pbcClient = new TcpClient(_nodeConfiguration.HostAddress, _nodeConfiguration.PbcPort));
-        //    }
-        //}
+        private TcpClient PbcClient
+        {
+            get
+            {
+                return _pbcClient ??
+                       (_pbcClient = new TcpClient(_nodeConfiguration.HostAddress, _nodeConfiguration.PbcPort));
+            }
+        }
 
-        //private NetworkStream PbcClientStream
-        //{
-        //    get { return _pbcClientStream ?? (_pbcClientStream = PbcClient.GetStream()); }
-        //}
+        private NetworkStream PbcClientStream
+        {
+            get { return _pbcClientStream ?? (_pbcClientStream = PbcClient.GetStream()); }
+        }
 
         static RiakConnection()
         {
@@ -123,8 +123,6 @@ namespace CorrugatedIron.Comms
         public void EndIdle()
         {
             CleanUpTimer();
-            _pbcClient = _pbcClient ?? new TcpClient(_nodeConfiguration.HostAddress, _nodeConfiguration.PbcPort);
-            _pbcClientStream = _pbcClientStream ?? _pbcClient.GetStream();
         }
 
         public RiakResult SetClientId(byte[] clientId)
@@ -145,7 +143,7 @@ namespace CorrugatedIron.Comms
             {
                 lock (_locker)
                 {
-                    var result = _encoder.Decode<TResult>(_pbcClientStream);
+                    var result = _encoder.Decode<TResult>(PbcClientStream);
                     return RiakResult<TResult>.Success(result);
                 }
             }
@@ -168,7 +166,7 @@ namespace CorrugatedIron.Comms
                 {
                     lock (_locker)
                     {
-                        _encoder.Encode(request, _pbcClientStream);
+                        _encoder.Encode(request, PbcClientStream);
                     }
                     return RiakResult.Success();
                 }
