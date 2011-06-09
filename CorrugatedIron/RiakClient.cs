@@ -329,8 +329,13 @@ namespace CorrugatedIron
         {
             var request = query.ToMessage();
             var response = _cluster.UseConnection(_clientId, conn => conn.PbcWriteRead<RpbMapRedReq, RpbMapRedResp>(request));
-            var result = RiakResult<RiakMapReduceResult>.Success(new RiakMapReduceResult(response.Value));
-            return result;
+
+            if (response.IsSuccess)
+            {
+                return RiakResult<RiakMapReduceResult>.Success(new RiakMapReduceResult(response.Value));
+            }
+
+            return RiakResult<RiakMapReduceResult>.Error(response.ResultCode, response.ErrorMessage);
         }
 
         public void MapReduce(RiakMapReduceQuery query, Action<RiakResult<RiakMapReduceResult>> callback)
