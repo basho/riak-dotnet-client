@@ -325,6 +325,30 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
             result.Value.VTags.ShouldNotBeNull();
             result.Value.VTags.Count.IsAtLeast(2);
         }
+
+        [Test]
+        public void DeleteBucketDeletesAllKeysInABucket()
+        {
+            // add multiple keys
+            const string dummyData = "{{ value: {0} }}";
+
+            for (var i = 1; i < 11; i++)
+            {
+                var newData = string.Format(dummyData, i);
+                var doc = new RiakObject(MapReduceBucket, i.ToString(), newData, Constants.ContentTypes.ApplicationJson);
+
+                Client.Put(doc);
+            }
+
+            var keyList = Client.ListKeys(MapReduceBucket);
+            keyList.Value.Count().ShouldEqual(10);
+
+            Client.DeleteBucket(MapReduceBucket);
+            
+            keyList = Client.ListKeys(MapReduceBucket);
+            keyList.Value.Count().ShouldEqual(0);
+            Client.ListBuckets().Value.Contains(MapReduceBucket).ShouldBeFalse();
+        }
     }
 
     [TestFixture]
