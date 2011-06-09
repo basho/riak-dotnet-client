@@ -61,7 +61,11 @@ namespace CorrugatedIron.Containers
                     }
                 }
             }
+#if DEBUG
+            catch (Exception ex)
+#else
             catch (Exception)
+#endif
             {
                 return Tuple.Create(false, default(TResult));
             }

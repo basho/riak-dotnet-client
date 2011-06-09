@@ -39,5 +39,24 @@ namespace CorrugatedIron.Extensions
                 }
             }
         }
+
+        public static IEnumerable<T> Cycle<T>(this Func<IEnumerable<T>> generator)
+        {
+            while (true)
+            {
+                foreach (var item in generator())
+                {
+                    yield return item;
+                }
+            }
+        }
+
+        public static IEnumerable<T> Replicate<T>(this T obj, int times)
+        {
+            while (times-- > 0)
+            {
+                yield return obj;
+            }
+        }
     }
 }

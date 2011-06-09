@@ -17,22 +17,27 @@
 using System;
 using CorrugatedIron.Config;
 using CorrugatedIron.Containers;
+using CorrugatedIron.Exceptions;
 
 namespace CorrugatedIron.Comms
 {
     public interface IRiakNode : IDisposable
     {
+        string Name { get; }
         RiakResult UseConnection(byte[] clientId, Func<IRiakConnection, RiakResult> useFun);
         RiakResult<TResult> UseConnection<TResult>(byte[] clientId, Func<IRiakConnection, RiakResult<TResult>> useFun);
     }
 
-    public class RiakNode : IRiakNode
+    internal class RiakNode : IRiakNode
     {
         private readonly ResourcePool<IRiakConnection> _connections;
         private bool _disposing;
 
+        public string Name { get; private set; }
+
         public RiakNode(IRiakNodeConfiguration nodeConfiguration, IRiakConnectionFactory connectionFactory)
         {
+            Name = nodeConfiguration.Name;
             _connections = new ResourcePool<IRiakConnection>(nodeConfiguration.PoolSize,
                 nodeConfiguration.AcquireTimeout, () => connectionFactory.CreateConnection(nodeConfiguration),
                 conn => conn.Dispose());
@@ -40,33 +45,44 @@ namespace CorrugatedIron.Comms
 
         public RiakResult UseConnection(byte[] clientId, Func<IRiakConnection, RiakResult> useFun)
         {
-            return UseConnection(clientId, useFun, code => RiakResult.Error(code));
+            return UseConnection(clientId, useFun, RiakResult.Error);
         }
 
         public RiakResult<TResult> UseConnection<TResult>(byte[] clientId, Func<IRiakConnection, RiakResult<TResult>> useFun)
         {
-            return UseConnection(clientId, useFun, code => RiakResult<TResult>.Error(code));
+            return UseConnection(clientId, useFun, RiakResult<TResult>.Error);
         }
 
-        private TRiakResult UseConnection<TRiakResult>(byte[] clientId, Func<IRiakConnection, TRiakResult> useFun, Func<ResultCode, TRiakResult> onError)
+        private TRiakResult UseConnection<TRiakResult>(byte[] clientId, Func<IRiakConnection, TRiakResult> useFun, Func<ResultCode, string, TRiakResult> onError)
             where TRiakResult : RiakResult
         {
-            if (_disposing) return onError(ResultCode.ShuttingDown);
+            if (_disposing) return onError(ResultCode.ShuttingDown, null);
 
             Func<IRiakConnection, TRiakResult> wrapper = conn =>
                 {
-                    using (new RiakConnectionUsageManager(conn, clientId))
+                    using (var mgr = new RiakConnectionUsageManager(conn, clientId))
                     {
-                        return useFun(conn);
+                        if (mgr.SetupResult.IsSuccess)
+                        {
+                            return useFun(conn);
+                        }
+                        return onError(mgr.SetupResult.ResultCode, mgr.SetupResult.ErrorMessage);
                     }
                 };
 
-            var response = _connections.Consume(wrapper);
-            if (response.Item1)
+            try
             {
-                return response.Item2;
+                var response = _connections.Consume(wrapper);
+                if (response.Item1)
+                {
+                    return response.Item2;
+                }
+                return onError(ResultCode.CommunicationError, null);
             }
-            return onError(ResultCode.CommunicationError);
+            catch (RiakException ex)
+            {
+                return onError(ResultCode.RiakError, ex.Message);
+            }
         }
 
         public void Dispose()

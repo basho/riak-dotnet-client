@@ -15,23 +15,34 @@
 // under the License.
 
 using System;
-using CorrugatedIron.Messages;
 
 namespace CorrugatedIron.Comms
 {
-    public class RiakConnectionUsageManager : IDisposable
+    internal class RiakConnectionUsageManager : IDisposable
     {
         private readonly IRiakConnection _connection;
+        public RiakResult SetupResult { get; private set; }
 
         public RiakConnectionUsageManager(IRiakConnection connection, byte[] clientId)
         {
+#if DEBUG
+            if (connection.InUse)
+            {
+                // If you get here, we're in big trouble.
+                System.Diagnostics.Debugger.Break();
+            }
+            connection.InUse = true;
+#endif
             _connection = connection;
             _connection.EndIdle();
-            _connection.SetClientId(clientId);
+            SetupResult = _connection.SetClientId(clientId);
         }
 
         public void Dispose()
         {
+#if DEBUG
+            _connection.InUse = false;
+#endif
             _connection.BeginIdle();
         }
     }
