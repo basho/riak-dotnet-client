@@ -52,6 +52,9 @@ namespace CorrugatedIron
         IEnumerable<RiakResult> Delete(IEnumerable<RiakObjectId> objectIds, uint rwVal = Constants.Defaults.RVal);
         void Delete(IEnumerable<RiakObjectId> objectIds, Action<IEnumerable<RiakResult>> callback, uint rwVal = Constants.Defaults.RVal);
 
+        IEnumerable<RiakResult> DeleteBucket(string bucket, uint rwVal = Constants.Defaults.RVal);
+        void DeleteBucket(string bucket, Action<IEnumerable<RiakResult>> callback, uint rwVal = Constants.Defaults.RVal);
+
         RiakResult<RiakMapReduceResult> MapReduce(RiakMapReduceQuery query);
         void MapReduce(RiakMapReduceQuery query, Action<RiakResult<RiakMapReduceResult>> callback);
 
@@ -325,6 +328,22 @@ namespace CorrugatedIron
             ExecAsync(() => callback(Delete(objectIds, rwVal)));
         }
 
+        public IEnumerable<RiakResult> DeleteBucket(string bucket, uint rwVal = Constants.Defaults.RVal)
+        {
+            var keys = ListKeys(bucket);
+            var objectIds = keys.Value.Select(key => new RiakObjectId(bucket, key)).ToList();
+
+            return Delete(objectIds, rwVal);
+        }
+
+        public void DeleteBucket(string bucket, Action<IEnumerable<RiakResult>> callback, uint rwVal = Constants.Defaults.RVal)
+        {
+            var keys = ListKeys(bucket);
+            var objectIds = keys.Value.Select(key => new RiakObjectId(bucket, key)).ToList();
+
+            Delete(objectIds, callback, rwVal);
+        }
+
         public RiakResult<RiakMapReduceResult> MapReduce(RiakMapReduceQuery query)
         {
             var request = query.ToMessage();
@@ -367,7 +386,7 @@ namespace CorrugatedIron
         {
             var lkReq = new RpbListKeysReq {Bucket = bucket.ToRiakString()};
             var result = _cluster.UseConnection(_clientId,
-                                                          conn => conn.PbcWriteRead<RpbListKeysReq, RpbListKeysResp>(lkReq, lkr => !lkr.Done));
+                                                conn => conn.PbcWriteRead<RpbListKeysReq, RpbListKeysResp>(lkReq, lkr => !lkr.Done));
 
             if (result.IsSuccess)
             {
