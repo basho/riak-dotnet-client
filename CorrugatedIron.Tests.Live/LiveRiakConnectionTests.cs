@@ -14,6 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
 using System.Linq;
 using CorrugatedIron.Comms;
 using CorrugatedIron.Config;
@@ -83,6 +84,19 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
         public WhenDealingWithBucketProperties()
             :base("riak1NodeConfiguration")
         {
+        }
+
+        [Test]
+        public void ListKeysReturnsAllkeys()
+        {
+            Func<string> generator = () => Guid.NewGuid().ToString();
+            var bucket = generator();
+            var pairs = generator.Replicate(10).Select(f => new RiakObject(bucket, f(), "foo", Constants.ContentTypes.TextPlain)).ToList();
+            Client.Put(pairs);
+
+            var results = Client.ListKeys(bucket);
+            results.IsSuccess.ShouldBeTrue();
+            results.Value.Count().ShouldEqual(10);
         }
 
         [Test]

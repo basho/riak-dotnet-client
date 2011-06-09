@@ -367,11 +367,11 @@ namespace CorrugatedIron
         {
             var lkReq = new RpbListKeysReq {Bucket = bucket.ToRiakString()};
             var result = _cluster.UseConnection(_clientId,
-                                                          conn => conn.PbcWriteRead<RpbListKeysReq, RpbListKeysResp>(lkReq));
+                                                          conn => conn.PbcWriteRead<RpbListKeysReq, RpbListKeysResp>(lkReq, lkr => !lkr.Done));
 
             if (result.IsSuccess)
             {
-                var keys = result.Value.Keys.Select(k => k.FromRiakString());
+                var keys = result.Value.SelectMany(r => r.KeyNames).ToList();
                 return RiakResult<IEnumerable<string>>.Success(keys);
             }
             return RiakResult<IEnumerable<string>>.Error(result.ResultCode, result.ErrorMessage);

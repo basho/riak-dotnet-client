@@ -29,6 +29,14 @@ namespace CorrugatedIron.Extensions
             }
         }
 
+        public static IEnumerable<T> Replicate<T>(this T obj, int count)
+        {
+            while (count-- > 0)
+            {
+                yield return obj;
+            }
+        }
+
         public static IEnumerable<T> Cycle<T>(this IEnumerable<T> items)
         {
             while (true)
