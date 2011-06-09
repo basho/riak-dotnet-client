@@ -37,19 +37,18 @@ namespace CorrugatedIron.Models
         public int LastModifiedUsec { get; private set; }
         public IList<RiakLink> Links { get; private set; }
         public IList<RiakObject> Siblings { get; set; }
+
+        private List<string> _vtags;
+
         public List<string> VTags
         {
             get
             {
-                if (Siblings.Count == 0)
+                if (_vtags != null)
                 {
-                    return new List<string> { VTag };
+                    _vtags = Siblings.Count == 0 ? new List<string> { VTag } : Siblings.Select(s => s.VTag).ToList();
                 }
-
-                var tags = new List<string>();
-                Siblings.ForEach(s => tags.Add(s.VTag));
-
-                return tags;
+                return _vtags;
             }
         }
 

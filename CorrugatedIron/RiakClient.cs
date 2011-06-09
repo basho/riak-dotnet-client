@@ -156,7 +156,7 @@ namespace CorrugatedIron
 
             if (result.Value.Content.Count > 1)
             {
-                result.Value.Content.ForEach(c => o.Siblings.Add(new RiakObject(bucket, key, c, result.Value.VectorClock)));
+                o.Siblings = result.Value.Content.Select(c => new RiakObject(bucket, key, c, result.Value.VectorClock)).ToList();
             }
 
             return RiakResult<RiakObject>.Success(o);
@@ -202,7 +202,7 @@ namespace CorrugatedIron
 
                     if (result.Item1.Value.Content.Count > 1)
                     {
-                        result.Item1.Value.Content.ForEach(c => o.Siblings.Add(new RiakObject(result.Item2.Bucket, result.Item2.Key, c, result.Item1.Value.VectorClock)));
+                        o.Siblings = result.Item1.Value.Content.Select(c => new RiakObject(result.Item2.Bucket, result.Item2.Key, c, result.Item1.Value.VectorClock)).ToList();
                     }
 
                     return RiakResult<RiakObject>.Success(o);
@@ -228,9 +228,16 @@ namespace CorrugatedIron
                 return RiakResult<RiakObject>.Error(result.ResultCode, result.ErrorMessage);
             }
 
-            return RiakResult<RiakObject>.Success(options.ReturnBody
+            var finalResult = options.ReturnBody
                 ? new RiakObject(value.Bucket, value.Key, result.Value.Content.First(), result.Value.VectorClock)
-                : value);
+                : value;
+
+            if (options.ReturnBody && result.Value.Content.Count > 1)
+            {
+                finalResult.Siblings = result.Value.Content.Select(c => new RiakObject(value.Bucket, value.Key, c, result.Value.VectorClock)).ToList();
+            }
+
+            return RiakResult<RiakObject>.Success(finalResult);
         }
 
         public void Put(RiakObject value, Action<RiakResult<RiakObject>> callback, RiakPutOptions options = null)
@@ -258,9 +265,16 @@ namespace CorrugatedIron
                 {
                     if (t.Item1.IsSuccess)
                     {
-                        return RiakResult<RiakObject>.Success(options.ReturnBody
+                        var finalResult = options.ReturnBody
                             ? new RiakObject(t.Item2.Bucket, t.Item2.Key, t.Item1.Value.Content.First(), t.Item1.Value.VectorClock)
-                            : t.Item2);
+                            : t.Item2;
+
+                        if (options.ReturnBody && t.Item1.Value.Content.Count > 1)
+                        {
+                            finalResult.Siblings = t.Item1.Value.Content.Select(c => new RiakObject(t.Item2.Bucket, t.Item2.Key, c, t.Item1.Value.VectorClock)).ToList();
+                        }
+
+                        return RiakResult<RiakObject>.Success(finalResult);
                     }
                     return RiakResult<RiakObject>.Error(t.Item1.ResultCode, t.Item1.ErrorMessage);
                 });

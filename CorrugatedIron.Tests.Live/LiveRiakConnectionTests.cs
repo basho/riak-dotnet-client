@@ -271,19 +271,25 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
         [Test]
         public void WritesWithAllowMultProducesMultiple()
         {
+            // delete first if something does exist
+            Client.Delete(MultiBucket, MultiKey);
+
             // Do this via the REST interface - will be substantially slower than PBC
             var props = new RiakBucketProperties().SetAllowMultiple(true).SetLastWriteWins(false);
             props.CanUsePbc.ShouldBeFalse();
             Client.SetBucketProperties(MultiBucket, props).IsSuccess.ShouldBeTrue();
 
             var doc = new RiakObject(MultiBucket, MultiKey, MultiBodyOne, Constants.ContentTypes.ApplicationJson);
-            Client.Put(doc).IsSuccess.ShouldBeTrue();
+            var writeResult1 = Client.Put(doc);
+            writeResult1.IsSuccess.ShouldBeTrue();
 
             doc = new RiakObject(MultiBucket, MultiKey, MultiBodyTwo, Constants.ContentTypes.ApplicationJson);
-            Client.Put(doc).IsSuccess.ShouldBeTrue();
+            var writeResult2 = Client.Put(doc);
+            writeResult2.IsSuccess.ShouldBeTrue();
+            writeResult2.Value.Siblings.Count.ShouldEqual(2);
 
             var result = Client.Get(MultiBucket, MultiKey);
-            result.Value.Siblings.Count.IsAtLeast(2);
+            result.Value.Siblings.Count.ShouldEqual(2);
         }
 
         [Test]
