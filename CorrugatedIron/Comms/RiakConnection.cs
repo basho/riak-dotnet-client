@@ -64,7 +64,6 @@ namespace CorrugatedIron.Comms
         private NetworkStream _pbcClientStream;
         private Timer _idleTimer;
         private string _restClientId;
-        private static readonly object _locker = new object();
 
 #if DEBUG
         public bool InUse { get; set; }
@@ -141,11 +140,8 @@ namespace CorrugatedIron.Comms
         {
             try
             {
-                lock (_locker)
-                {
-                    var result = _encoder.Decode<TResult>(PbcClientStream);
-                    return RiakResult<TResult>.Success(result);
-                }
+                var result = _encoder.Decode<TResult>(PbcClientStream);
+                return RiakResult<TResult>.Success(result);
             }
             catch (SocketException ex)
             {
@@ -155,33 +151,15 @@ namespace CorrugatedIron.Comms
 
         public RiakResult PbcWrite<TRequest>(TRequest request)
         {
-            return PbcWrite(request, 2);
-        }
-
-        private RiakResult PbcWrite<TRequest>(TRequest request, int attempts)
-        {
-            while (attempts-- > 0)
+            try
             {
-                try
-                {
-                    lock (_locker)
-                    {
-                        _encoder.Encode(request, PbcClientStream);
-                    }
-                    return RiakResult.Success();
-                }
-                catch (SocketException ex)
-                {
-                    return RiakResult.Error(ResultCode.CommunicationError, ex.Message);
-                }
-                catch (InvalidOperationException)
-                {
-                    // happens sometimes when the connection isn't happy
-                    CleanUp();
-                }
+                _encoder.Encode(request, PbcClientStream);
+                return RiakResult.Success();
             }
-
-            return RiakResult.Error(ResultCode.CommunicationError, "Unable to write to the PBC stream");
+            catch (SocketException ex)
+            {
+                return RiakResult.Error(ResultCode.CommunicationError, ex.Message);
+            }
         }
 
         public RiakResult<TResult> PbcWriteRead<TRequest, TResult>(TRequest request)
