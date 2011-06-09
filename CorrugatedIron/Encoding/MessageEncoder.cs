@@ -14,6 +14,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using CorrugatedIron.Exceptions;
+using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
 using System;
 using System.Collections.Generic;
@@ -118,12 +120,32 @@ namespace CorrugatedIron.Encoding
             // is getting exactly what they expect. This "could" be removed from
             // production code, but it's a good thing to have in here for dev.
             var messageCode = (MessageCode)source.ReadByte();
+            if (messageCode == MessageCode.ErrorResp)
+            {
+                var error = DeserializeInstance<RpbErrorResp>(source, size);
+                throw new RiakException(error.ErrorCode, error.ErrorMessage.FromRiakString());
+            }
+
             if (MessageCodeToTypeMap[messageCode] != typeof(T))
             {
                 throw new InvalidOperationException(string.Format("Attempt to decode message to type '{0}' when received type '{1}'.", typeof(T).Name, MessageCodeToTypeMap[messageCode].Name));
             }
 #endif
 
+            return DeserializeInstance<T>(source, size);
+        }
+
+        public T Decode<T>(byte[] source) where T : new()
+        {
+            using (var memStream = new MemoryStream(source, false))
+            {
+                return Decode<T>(memStream);
+            }
+        }
+
+        private static T DeserializeInstance<T>(Stream source, int size)
+            where T : new()
+        {
             if (size <= 1)
             {
                 return new T();
@@ -135,14 +157,6 @@ namespace CorrugatedIron.Encoding
             using (var memStream = new MemoryStream(resultBuffer))
             {
                 return Serializer.Deserialize<T>(memStream);
-            }
-        }
-
-        public T Decode<T>(byte[] source) where T : new()
-        {
-            using (var memStream = new MemoryStream(source, false))
-            {
-                return Decode<T>(memStream);
             }
         }
     }

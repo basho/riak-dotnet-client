@@ -27,7 +27,6 @@ using CorrugatedIron.Config;
 using CorrugatedIron.Encoding;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
-using CorrugatedIron.Models;
 using CorrugatedIron.Models.Rest;
 using CorrugatedIron.Util;
 
@@ -48,7 +47,11 @@ namespace CorrugatedIron.Comms
 
         // REST interface
         RiakResult<RiakRestResponse> RestRequest(RiakRestRequest request);
-        void SetClientId(byte[] clientId);
+        RiakResult SetClientId(byte[] clientId);
+
+#if DEBUG
+        bool InUse { get; set; }
+#endif
     }
 
     public class RiakConnection : IRiakConnection
@@ -61,25 +64,30 @@ namespace CorrugatedIron.Comms
         private NetworkStream _pbcClientStream;
         private Timer _idleTimer;
         private string _restClientId;
+        private static readonly object _locker = new object();
+
+#if DEBUG
+        public bool InUse { get; set; }
+#endif
 
         public bool IsIdle
         {
             get { return _pbcClient == null; }
         }
 
-        private TcpClient PbcClient
-        {
-            get
-            {
-                return _pbcClient ??
-                       (_pbcClient = new TcpClient(_nodeConfiguration.HostAddress, _nodeConfiguration.PbcPort));
-            }
-        }
+        //private TcpClient PbcClient
+        //{
+        //    get
+        //    {
+        //        return _pbcClient ??
+        //               (_pbcClient = new TcpClient(_nodeConfiguration.HostAddress, _nodeConfiguration.PbcPort));
+        //    }
+        //}
 
-        private NetworkStream PbcClientStream
-        {
-            get { return _pbcClientStream ?? (_pbcClientStream = PbcClient.GetStream()); }
-        }
+        //private NetworkStream PbcClientStream
+        //{
+        //    get { return _pbcClientStream ?? (_pbcClientStream = PbcClient.GetStream()); }
+        //}
 
         static RiakConnection()
         {
@@ -115,12 +123,19 @@ namespace CorrugatedIron.Comms
         public void EndIdle()
         {
             CleanUpTimer();
+            _pbcClient = _pbcClient ?? new TcpClient(_nodeConfiguration.HostAddress, _nodeConfiguration.PbcPort);
+            _pbcClientStream = _pbcClientStream ?? _pbcClient.GetStream();
         }
 
-        public void SetClientId(byte[] clientId)
+        public RiakResult SetClientId(byte[] clientId)
         {
-            PbcWriteRead<RpbSetClientIdReq, RpbSetClientIdResp>(new RpbSetClientIdReq { ClientId = clientId });
-            _restClientId = Convert.ToBase64String(clientId);
+            var result = PbcWriteRead<RpbSetClientIdReq, RpbSetClientIdResp>(new RpbSetClientIdReq { ClientId = clientId });
+
+            if (result.IsSuccess)
+            {
+                _restClientId = Convert.ToBase64String(clientId);
+            }
+            return result;
         }
 
         public RiakResult<TResult> PbcRead<TResult>()
@@ -128,11 +143,13 @@ namespace CorrugatedIron.Comms
         {
             try
             {
-                var result = _encoder.Decode<TResult>(PbcClientStream);
-                PbcClientStream.Flush();
-                return RiakResult<TResult>.Success(result);
+                lock (_locker)
+                {
+                    var result = _encoder.Decode<TResult>(_pbcClientStream);
+                    return RiakResult<TResult>.Success(result);
+                }
             }
-            catch (Exception ex)
+            catch (SocketException ex)
             {
                 return RiakResult<TResult>.Error(ResultCode.CommunicationError, ex.Message);
             }
@@ -140,16 +157,33 @@ namespace CorrugatedIron.Comms
 
         public RiakResult PbcWrite<TRequest>(TRequest request)
         {
-            try
+            return PbcWrite(request, 2);
+        }
+
+        private RiakResult PbcWrite<TRequest>(TRequest request, int attempts)
+        {
+            while (attempts-- > 0)
             {
-                _encoder.Encode(request, PbcClientStream);
-                PbcClientStream.Flush();
-                return RiakResult.Success();
+                try
+                {
+                    lock (_locker)
+                    {
+                        _encoder.Encode(request, _pbcClientStream);
+                    }
+                    return RiakResult.Success();
+                }
+                catch (SocketException ex)
+                {
+                    return RiakResult.Error(ResultCode.CommunicationError, ex.Message);
+                }
+                catch (InvalidOperationException)
+                {
+                    // happens sometimes when the connection isn't happy
+                    CleanUp();
+                }
             }
-            catch (Exception ex)
-            {
-                return RiakResult.Error(ResultCode.CommunicationError, ex.Message);
-            }
+
+            return RiakResult.Error(ResultCode.CommunicationError, "Unable to write to the PBC stream");
         }
 
         public RiakResult<TResult> PbcWriteRead<TRequest, TResult>(TRequest request)
