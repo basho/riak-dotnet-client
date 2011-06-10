@@ -328,7 +328,7 @@ namespace CorrugatedIron
         public RiakResult<RiakMapReduceResult> MapReduce(RiakMapReduceQuery query)
         {
             var request = query.ToMessage();
-            var response = _cluster.UseConnection(_clientId, conn => conn.PbcWriteRead<RpbMapRedReq, RpbMapRedResp>(request));
+            var response = _cluster.UseConnection(_clientId, conn => conn.PbcWriteRead<RpbMapRedReq, RpbMapRedResp>(request, r => !r.Done));
 
             if (response.IsSuccess)
             {
@@ -367,7 +367,7 @@ namespace CorrugatedIron
         {
             var lkReq = new RpbListKeysReq {Bucket = bucket.ToRiakString()};
             var result = _cluster.UseConnection(_clientId,
-                                                          conn => conn.PbcWriteRead<RpbListKeysReq, RpbListKeysResp>(lkReq, lkr => !lkr.Done));
+                                                          conn => conn.PbcWriteRead<RpbListKeysReq, RpbListKeysResp>(lkReq, r => !r.Done));
 
             if (result.IsSuccess)
             {

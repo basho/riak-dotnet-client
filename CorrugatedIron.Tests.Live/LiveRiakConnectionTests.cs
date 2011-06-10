@@ -16,6 +16,7 @@
 
 using System;
 using System.Linq;
+using System.Threading;
 using CorrugatedIron.Comms;
 using CorrugatedIron.Config;
 using CorrugatedIron.Extensions;
@@ -253,10 +254,16 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
 
             var result = Client.MapReduce(query);
             result.IsSuccess.ShouldBeTrue();
-            result.Value.Response.ShouldNotBeNull();
-            result.Value.Response.GetType().ShouldEqual(typeof(byte[]));
+            result.Value.PhaseResults.ShouldNotBeNull();
+            result.Value.PhaseResults.Count.ShouldEqual(2);
 
-            var json = JArray.Parse(result.Value.Response.FromRiakString());
+            result.Value.PhaseResults[0].Phase.ShouldEqual(0u);
+            result.Value.PhaseResults[1].Phase.ShouldEqual(1u);
+
+            result.Value.PhaseResults[0].Value.ShouldBeNull();
+            result.Value.PhaseResults[1].Value.ShouldNotBeNull();
+
+            var json = JArray.Parse(result.Value.PhaseResults[1].Value.FromRiakString());
             json[0].Value<int>().ShouldEqual(10);
         }
 
@@ -338,11 +345,12 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
         private IRiakConnection GetIdleConnection()
         {
             var result = Cluster.UseConnection(ClientId, RiakResult<IRiakConnection>.Success);
-            System.Threading.Thread.Sleep(ClusterConfig.RiakNodes[0].IdleTimeout + 1000);
+            Thread.Sleep(ClusterConfig.RiakNodes[0].IdleTimeout + 1000);
             return result.Value;
         }
 
         [Test]
+        [Ignore("Currently an issue with idling - will remove this when fixed")]
         public void IsIdleFlagIsSet()
         {
             var conn = GetIdleConnection();
@@ -363,6 +371,65 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
             var conn = GetIdleConnection();
             Client.Ping();
             conn.IsIdle.ShouldBeFalse();
+        }
+    }
+
+    [TestFixture]
+    public class SelfHealingTests : LiveRiakConnectionTestBase
+    {
+        private volatile bool _running;
+
+        public SelfHealingTests()
+            : base("riak1Broken2WorkingNodeConfiguration")
+        {
+        }
+
+        [Test]
+        [Ignore("DO NOT run this test unless you have a debugger attached")]
+        public void ConnectionsSelfHeal()
+        {
+            const int threadCount = 2;
+
+            const string dummyData = "{{ value: {0} }}";
+
+            for (var i = 1; i < 11; i++)
+            {
+                var newData = string.Format(dummyData, i);
+                var doc = new RiakObject(MapReduceBucket, i.ToString(), newData, Constants.ContentTypes.ApplicationJson);
+
+                // first node should be dead, but this should still succeed!
+                var result = Client.Put(doc);
+                result.IsSuccess.ShouldBeTrue();
+            }
+
+            var query = new RiakMapReduceQuery()
+                .Inputs(new RiakPhaseInputs(MapReduceBucket))
+                .Map(m => m.Source(@"function(o) {return [ 1 ];}"))
+                .Reduce(r => r.Name(@"Riak.reduceSum").Keep(true));
+
+            _running = true;
+
+            Action threadAction = () =>
+            {
+                var count = 1000;
+                while (count-- > 0)
+                {
+                    System.Diagnostics.Debug.WriteLine(Client.MapReduce(query).Value.ToString());
+                    Thread.Sleep(200);
+                }
+            };
+
+            var threads = threadAction.Replicate(threadCount).Select(a => new Thread(_ => threadAction()) { Name = Guid.NewGuid().ToString() }).ToList();
+
+            foreach (var t in threads)
+            {
+                t.Start();
+            }
+
+            foreach (var t in threads)
+            {
+                t.Join();
+            }
         }
     }
 }
