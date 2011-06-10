@@ -50,10 +50,10 @@ namespace CorrugatedIron.Tests.Comms.RiakClientPingTests
         }
 
         [Test]
-        public void SuccessResultIsReturned()
+        public void FailureResultIsReturned()
         {
             Response.IsSuccess.ShouldBeFalse();
-            Response.ResultCode.ShouldEqual(ResultCode.CommunicationError);
+            Response.ResultCode.ShouldEqual(ResultCode.ClusterOffline);
         }
     }
 
