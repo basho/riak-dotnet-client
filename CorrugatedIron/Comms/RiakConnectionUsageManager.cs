@@ -15,6 +15,7 @@
 // under the License.
 
 using System;
+using System.Threading;
 
 namespace CorrugatedIron.Comms
 {
@@ -25,14 +26,11 @@ namespace CorrugatedIron.Comms
 
         public RiakConnectionUsageManager(IRiakConnection connection, byte[] clientId)
         {
-#if DEBUG
-            if (connection.InUse)
+            var count = Interlocked.Increment(ref ((RiakConnection)connection).RefCount);
+            if (count > 1)
             {
-                // If you get here, we're in big trouble.
                 System.Diagnostics.Debugger.Break();
             }
-            connection.InUse = true;
-#endif
             _connection = connection;
             _connection.EndIdle();
             SetupResult = _connection.SetClientId(clientId);
@@ -40,10 +38,8 @@ namespace CorrugatedIron.Comms
 
         public void Dispose()
         {
-#if DEBUG
-            _connection.InUse = false;
-#endif
             _connection.BeginIdle();
+            Interlocked.Decrement(ref ((RiakConnection)_connection).RefCount);
         }
     }
 }

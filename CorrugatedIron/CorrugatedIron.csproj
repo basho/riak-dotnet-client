@@ -58,10 +58,12 @@
     <Compile Include="..\Metadata\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
+    <Compile Include="Comms\RiakPbcClientSocket.cs" />
     <Compile Include="Containers\ConcurrentEnumerable.cs" />
     <Compile Include="Containers\ConcurrentEnumerator.cs" />
     <Compile Include="Containers\Either.cs" />
     <Compile Include="Containers\ResourcePool.cs" />
+    <Compile Include="Exceptions\RiakSocketException.cs" />
     <Compile Include="Exceptions\RiakException.cs" />
     <Compile Include="Models\CommitHook\IRiakPostCommitHook.cs">
       <SubType>Code</SubType>
