@@ -31,46 +31,95 @@ namespace CorrugatedIron.Comms
 
     public class RiakCluster : IRiakCluster
     {
-        private bool _disposing;
-        private readonly List<IRiakNode> _nodes;
+        private readonly object _nodeMoveLock = new object();
+        private readonly Dictionary<string, IRiakNode> _liveNodes;
+        private readonly Dictionary<string, IRiakNode> _brokenNodes;
         private readonly IConcurrentEnumerator<IRiakNode> _roundRobin;
+        private List<IRiakNode> _activeNodes;
+        private bool _disposing;
 
         public RiakCluster(IRiakClusterConfiguration clusterConfiguration, IRiakNodeFactory nodeFactory, IRiakConnectionFactory connectionFactory)
         {
-            _nodes = clusterConfiguration.RiakNodes.Select(rn => nodeFactory.CreateNode(rn, connectionFactory)).ToList();
+            _brokenNodes = new Dictionary<string, IRiakNode>();
+            _liveNodes = clusterConfiguration.RiakNodes.Select(rn => nodeFactory.CreateNode(rn, connectionFactory)).ToDictionary(n => n.Name);
+            _activeNodes = _liveNodes.Values.ToList();
             
-            _roundRobin = new ConcurrentEnumerable<IRiakNode>(_nodes.Cycle()).GetEnumerator();
+            _roundRobin = new ConcurrentEnumerable<IRiakNode>(RoundRobin()).GetEnumerator();
         }
 
         public RiakResult UseConnection(byte[] clientId, Func<IRiakConnection, RiakResult> useFun)
         {
-            return UseConnection(clientId, useFun, code => RiakResult.Error(code));
+            return UseConnection(clientId, useFun, RiakResult.Error);
         }
 
         public RiakResult<TResult> UseConnection<TResult>(byte[] clientId, Func<IRiakConnection, RiakResult<TResult>> useFun)
         {
-            return UseConnection(clientId, useFun, code => RiakResult<TResult>.Error(code));
+            return UseConnection(clientId, useFun, RiakResult<TResult>.Error);
         }
 
-        private TRiakResult UseConnection<TRiakResult>(byte[] clientId, Func<IRiakConnection, TRiakResult> useFun, Func<ResultCode, TRiakResult> onError)
+        private TRiakResult UseConnection<TRiakResult>(byte[] clientId, Func<IRiakConnection, TRiakResult> useFun, Func<ResultCode, string, TRiakResult> onError)
             where TRiakResult : RiakResult
         {
-            if (_disposing) return onError(ResultCode.ShuttingDown);
+            if (_disposing) return onError(ResultCode.ShuttingDown, "The application is in the process of shutting down");
 
             IRiakNode node;
-            if (_roundRobin.TryMoveNext(out node))
+            if (_roundRobin.TryMoveNext(out node) && node != null)
             {
-                var result = (TRiakResult)node.UseConnection(clientId, useFun);
-                return result;
+                var result = node.UseConnection(clientId, useFun);
+
+                if (!result.IsSuccess && result.ResultCode == ResultCode.CommunicationError)
+                {
+                    // node is misbehaving, pull it from the pool
+                    DeactivateNode(node);
+
+                    // try again on another node
+                    return UseConnection(clientId, useFun, onError);
+                }
+                return (TRiakResult)result;
             }
-            return onError(ResultCode.CommunicationError);
+            return onError(ResultCode.ClusterOffline, "No functioning nodes left in the cluster.");
         }
 
         public void Dispose()
         {
             _disposing = true;
 
-            _nodes.ForEach(n => n.Dispose());
+            _liveNodes.ForEach(n => n.Value.Dispose());
+            _brokenNodes.ForEach(n => n.Value.Dispose());
         }
+
+        private void DeactivateNode(IRiakNode node)
+        {
+            lock (_nodeMoveLock)
+            {
+                if (_liveNodes.ContainsKey(node.Name))
+                {
+                    _liveNodes.Remove(node.Name);
+                    _brokenNodes.Add(node.Name, node);
+                    _activeNodes = _liveNodes.Values.ToList();
+                }
+            }
+        }
+
+        private IEnumerable<IRiakNode> RoundRobin()
+        {
+            while (true)
+            {
+                var e = _activeNodes.GetEnumerator();
+                if (e.MoveNext())
+                {
+                    do
+                    {
+                        yield return e.Current;
+                    }
+                    while (e.MoveNext());
+                }
+                else
+                {
+                    yield return null;
+                }
+            }
+        }
+
     }
 }
