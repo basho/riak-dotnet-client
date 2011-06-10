@@ -32,13 +32,13 @@ namespace CorrugatedIron.Messages
         }
 
         [ProtoMember(1, Name = "keys", DataFormat = DataFormat.Default)]
-        internal List<byte[]> Keys { get; set; }
+        public List<byte[]> Keys { get; set; }
 
         [ProtoMember(2, IsRequired = false, Name = "done", DataFormat = DataFormat.Default)]
         [DefaultValue(default(bool))]
-        internal bool Done { get; set; }
+        public bool Done { get; set; }
 
-        internal List<string> KeyNames
+        public List<string> KeyNames
         {
             get {
                 var keys = new List<string>();

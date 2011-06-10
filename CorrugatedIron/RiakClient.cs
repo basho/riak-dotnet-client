@@ -338,16 +338,13 @@ namespace CorrugatedIron
 
         public void DeleteBucket(string bucket, Action<IEnumerable<RiakResult>> callback, uint rwVal = Constants.Defaults.RVal)
         {
-            var keys = ListKeys(bucket);
-            var objectIds = keys.Value.Select(key => new RiakObjectId(bucket, key)).ToList();
-
-            Delete(objectIds, callback, rwVal);
+            ExecAsync(() => callback(DeleteBucket(bucket, rwVal)));
         }
 
         public RiakResult<RiakMapReduceResult> MapReduce(RiakMapReduceQuery query)
         {
             var request = query.ToMessage();
-            var response = _cluster.UseConnection(_clientId, conn => conn.PbcWriteRead<RpbMapRedReq, RpbMapRedResp>(request));
+            var response = _cluster.UseConnection(_clientId, conn => conn.PbcWriteRead<RpbMapRedReq, RpbMapRedResp>(request, r => !r.Done));
 
             if (response.IsSuccess)
             {
