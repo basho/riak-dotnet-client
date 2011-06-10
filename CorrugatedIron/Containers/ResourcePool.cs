@@ -83,7 +83,7 @@ namespace CorrugatedIron.Containers
 
             _disposing = true;
 
-            // TODO: make sure we clean up all the connections
+            // TODO: make sure we clean up all the resources
             // ie. do tracking of released resources
 
             TResource instance;
