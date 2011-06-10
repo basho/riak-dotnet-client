@@ -365,6 +365,7 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
         }
 
         [Test]
+        [Ignore("DO NOT run this test unless you have a debugger attached")]
         public void ConnectionsSelfHeal()
         {
             const int threadCount = 2;
@@ -392,7 +393,7 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
             {
                 while (_running)
                 {
-                    Console.Write(Client.MapReduce(query).Value.ToString());
+                    System.Diagnostics.Debug.WriteLine(Client.MapReduce(query).Value.ToString());
                     Thread.Sleep(200);
                 }
             };

@@ -44,7 +44,7 @@ namespace CorrugatedIron.Models
         {
             get
             {
-                if (_vtags != null)
+                if (_vtags == null)
                 {
                     _vtags = Siblings.Count == 0 ? new List<string> { VTag } : Siblings.Select(s => s.VTag).ToList();
                 }
