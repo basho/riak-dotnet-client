@@ -62,6 +62,7 @@
     <Compile Include="Containers\ConcurrentEnumerator.cs" />
     <Compile Include="Containers\Either.cs" />
     <Compile Include="Containers\ResourcePool.cs" />
+    <Compile Include="Exceptions\RiakException.cs" />
     <Compile Include="Models\CommitHook\IRiakPostCommitHook.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -104,6 +105,7 @@
     <Compile Include="Models\MapReduce\RiakMapReduceQuery.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Models\MapReduce\RiakMapReduceResultPhase.cs" />
     <Compile Include="Models\MapReduce\RiakPhase.cs">
       <SubType>Code</SubType>
     </Compile>

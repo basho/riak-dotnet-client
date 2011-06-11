@@ -14,19 +14,19 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.Collections.Generic;
-using System.Linq;
 using CorrugatedIron.Messages;
 
 namespace CorrugatedIron.Models.MapReduce
 {
-    public class RiakMapReduceResult
+    public class RiakMapReduceResultPhase
     {
-        public List<RiakMapReduceResultPhase> PhaseResults { get; private set; }
+        public uint Phase { get; private set; }
+        public byte[] Value { get; private set; }
 
-        internal RiakMapReduceResult(IEnumerable<RpbMapRedResp> response)
+        internal RiakMapReduceResultPhase(RpbMapRedResp result)
         {
-            PhaseResults = response.OrderBy(r => r.Phase).Select(r => new RiakMapReduceResultPhase(r)).ToList();
+            Phase = result.Phase;
+            Value = result.Response;
         }
     }
 }

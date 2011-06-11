@@ -40,18 +40,18 @@ namespace CorrugatedIron.Comms
 
         public RiakResult UseConnection(byte[] clientId, Func<IRiakConnection, RiakResult> useFun)
         {
-            return UseConnection(clientId, useFun, code => RiakResult.Error(code));
+            return UseConnection(clientId, useFun, RiakResult.Error);
         }
 
         public RiakResult<TResult> UseConnection<TResult>(byte[] clientId, Func<IRiakConnection, RiakResult<TResult>> useFun)
         {
-            return UseConnection(clientId, useFun, code => RiakResult<TResult>.Error(code));
+            return UseConnection(clientId, useFun, RiakResult<TResult>.Error);
         }
 
-        private TRiakResult UseConnection<TRiakResult>(byte[] clientId, Func<IRiakConnection, TRiakResult> useFun, Func<ResultCode, TRiakResult> onError)
+        private TRiakResult UseConnection<TRiakResult>(byte[] clientId, Func<IRiakConnection, TRiakResult> useFun, Func<ResultCode, string, TRiakResult> onError)
             where TRiakResult : RiakResult
         {
-            if (_disposing) return onError(ResultCode.ShuttingDown);
+            if (_disposing) return onError(ResultCode.ShuttingDown, "Connection is shutting down");
 
             Func<IRiakConnection, TRiakResult> wrapper = conn =>
                 {
@@ -66,7 +66,7 @@ namespace CorrugatedIron.Comms
             {
                 return response.Item2;
             }
-            return onError(ResultCode.CommunicationError);
+            return onError(ResultCode.NoConnections, "Unable to acquire connection");
         }
 
         public void Dispose()

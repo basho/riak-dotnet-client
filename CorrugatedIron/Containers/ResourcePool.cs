@@ -70,8 +70,8 @@ namespace CorrugatedIron.Containers
                 if (instance != null)
                 {
                     _resources.Push(instance);
+                    _resourceLock.Release();
                 }
-                _resourceLock.Release();
             }
 
             return Tuple.Create(false, default(TResult));

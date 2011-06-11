@@ -286,7 +286,8 @@ namespace CorrugatedIron.Comms
 
         private void GoIdle()
         {
-            CleanUp();
+            // TODO: put this back in when threading is fixed
+            //CleanUp();
         }
 
         private void CleanUp()

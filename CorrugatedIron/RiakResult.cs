@@ -22,7 +22,9 @@ namespace CorrugatedIron
         ShuttingDown,
         NotFound,
         CommunicationError,
-        InvalidResponse
+        InvalidResponse,
+        ClusterOffline,
+        NoConnections
     }
 
     public class RiakResult

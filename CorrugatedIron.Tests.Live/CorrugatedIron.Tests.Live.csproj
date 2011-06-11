@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -58,7 +58,11 @@
     <Compile Include="..\Metadata\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
-    <Compile Include="LiveRiakConnectionTests.cs" />
+    <Compile Include="BucketPropertyTests.cs" />
+    <Compile Include="GeneralIntegrationTests.cs" />
+    <Compile Include="IdleTests.cs" />
+    <Compile Include="LiveRiakConnectionTestBase.cs" />
+    <Compile Include="LoadTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

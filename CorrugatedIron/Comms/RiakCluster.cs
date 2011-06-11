@@ -44,26 +44,44 @@ namespace CorrugatedIron.Comms
 
         public RiakResult UseConnection(byte[] clientId, Func<IRiakConnection, RiakResult> useFun)
         {
-            return UseConnection(clientId, useFun, code => RiakResult.Error(code));
+            return UseConnection(clientId, useFun, RiakResult.Error);
         }
 
         public RiakResult<TResult> UseConnection<TResult>(byte[] clientId, Func<IRiakConnection, RiakResult<TResult>> useFun)
         {
-            return UseConnection(clientId, useFun, code => RiakResult<TResult>.Error(code));
+            return UseConnection(clientId, useFun, RiakResult<TResult>.Error);
         }
 
-        private TRiakResult UseConnection<TRiakResult>(byte[] clientId, Func<IRiakConnection, TRiakResult> useFun, Func<ResultCode, TRiakResult> onError)
+        private TRiakResult UseConnection<TRiakResult>(byte[] clientId, Func<IRiakConnection, TRiakResult> useFun, Func<ResultCode, string, TRiakResult> onError)
             where TRiakResult : RiakResult
         {
-            if (_disposing) return onError(ResultCode.ShuttingDown);
+            if (_disposing) return onError(ResultCode.ShuttingDown, "System currently shutting down");
 
             IRiakNode node;
             if (_roundRobin.TryMoveNext(out node))
             {
-                var result = (TRiakResult)node.UseConnection(clientId, useFun);
-                return result;
+                var result = node.UseConnection(clientId, useFun);
+                if (!result.IsSuccess)
+                {
+                    if (result.ResultCode == ResultCode.NoConnections)
+                    {
+                        // TODO: this is where we need to retry on another node
+                        //return UseConnection(clientId, useFun, onError);
+                    }
+
+                    if (result.ResultCode == ResultCode.CommunicationError)
+                    {
+                        // TODO: pull this node from the cluster and retry on another node
+                        // DeactivateNode(node);
+                        //return UseConnection(clientId, useFun, onError);
+                    }
+
+                    // use the onError function so that we know the return value is the right type
+                    return onError(result.ResultCode, result.ErrorMessage);
+                }
+                return (TRiakResult)result;
             }
-            return onError(ResultCode.CommunicationError);
+            return onError(ResultCode.ClusterOffline, "Unable to access functioning Riak node");
         }
 
         public void Dispose()
