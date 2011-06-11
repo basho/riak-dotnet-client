@@ -14,154 +14,19 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
 using System.Linq;
-using CorrugatedIron.Comms;
-using CorrugatedIron.Config;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Models;
-using CorrugatedIron.Models.CommitHook;
 using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Models.MapReduce.Inputs;
 using CorrugatedIron.Tests.Extensions;
+using CorrugatedIron.Tests.Live.LiveRiakConnectionTests;
 using CorrugatedIron.Util;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 
-namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
+namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
 {
-    public class LiveRiakConnectionTestBase
-    {
-        protected const int TestClientId = 42;
-        protected readonly static byte[] ClientId;
-        protected const string TestHost = "riak-test";
-        protected const int TestPbcPort = 8081;
-        protected const int TestHttpPort = 8091;
-        protected const string TestBucket = "test_bucket";
-        protected const string TestKey = "test_json";
-        protected const string TestJson = "{\"string\":\"value\",\"int\":100,\"float\":2.34,\"array\":[1,2,3],\"dict\":{\"foo\":\"bar\"}}";
-        protected const string MapReduceBucket = "map_reduce_bucket";
-        protected const string MultiBucket = "test_multi_bucket";
-        protected const string MultiKey = "test_multi_key";
-        protected const string MultiBodyOne = @"{""dishes"": 9}";
-        protected const string MultiBodyTwo = @"{""dishes"": 11}";
-        protected const string PropertiesTestBucket = @"propertiestestbucket";
-
-        protected IRiakCluster Cluster;
-        protected IRiakClient Client;
-        protected IRiakClusterConfiguration ClusterConfig;
-
-        static LiveRiakConnectionTestBase()
-        {
-            ClientId = RiakConnection.ToClientId(TestClientId);
-        }
-
-        public LiveRiakConnectionTestBase(string section = "riak3NodeConfiguration")
-        {
-            ClusterConfig = RiakClusterConfiguration.LoadFromConfig(section);
-        }
-
-        [SetUp]
-        public void SetUp()
-        {
-            Cluster = new RiakCluster(ClusterConfig, new RiakNodeFactory(), new RiakConnectionFactory());
-            Client = new RiakClient(Cluster);
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            Cluster.Dispose();
-        }
-    }
-
-    [TestFixture]
-    public class WhenDealingWithBucketProperties : LiveRiakConnectionTestBase
-    {
-        // use the one node configuration here because we might run the risk
-        // of hitting different nodes in the configuration before the props
-        // are replicated to other nodes.
-        public WhenDealingWithBucketProperties()
-            :base("riak1NodeConfiguration")
-        {
-        }
-
-        [Test]
-        public void ListKeysReturnsAllkeys()
-        {
-            Func<string> generator = () => Guid.NewGuid().ToString();
-            var bucket = generator();
-            var pairs = generator.Replicate(10).Select(f => new RiakObject(bucket, f(), "foo", Constants.ContentTypes.TextPlain)).ToList();
-            Client.Put(pairs);
-
-            var results = Client.ListKeys(bucket);
-            results.IsSuccess.ShouldBeTrue();
-            results.Value.Count().ShouldEqual(10);
-        }
-
-        [Test]
-        public void GettingWithoutExtendedFlagDoesNotReturnExtraProperties()
-        {
-            var result = Client.GetBucketProperties(PropertiesTestBucket);
-            result.IsSuccess.ShouldBeTrue();
-            result.Value.AllowMultiple.HasValue.ShouldBeTrue();
-            result.Value.NVal.HasValue.ShouldBeTrue();
-            result.Value.LastWriteWins.HasValue.ShouldBeFalse();
-            result.Value.RVal.ShouldBeNull();
-            result.Value.RwVal.ShouldBeNull();
-            result.Value.DwVal.ShouldBeNull();
-            result.Value.WVal.ShouldBeNull();
-        }
-
-        [Test]
-        public void GettingWithExtendedFlagReturnsExtraProperties()
-        {
-            var result = Client.GetBucketProperties(PropertiesTestBucket, true);
-            result.IsSuccess.ShouldBeTrue();
-            result.Value.AllowMultiple.HasValue.ShouldBeTrue();
-            result.Value.NVal.HasValue.ShouldBeTrue();
-            result.Value.LastWriteWins.HasValue.ShouldBeTrue();
-            result.Value.RVal.ShouldNotBeNull();
-            result.Value.RwVal.ShouldNotBeNull();
-            result.Value.DwVal.ShouldNotBeNull();
-            result.Value.WVal.ShouldNotBeNull();
-        }
-
-        [Test]
-        public void CommitHooksAreStoredAndLoadedProperly()
-        {
-            // make sure we're all clear first
-            var result = Client.GetBucketProperties(PropertiesTestBucket, true);
-            result.IsSuccess.ShouldBeTrue();
-            var props = result.Value;
-            props.ClearPostCommitHooks().ClearPreCommitHooks();
-            Client.SetBucketProperties(PropertiesTestBucket, props).IsSuccess.ShouldBeTrue();
-
-            // when we load, the commit hook lists should be null
-            result = Client.GetBucketProperties(PropertiesTestBucket, true);
-            result.IsSuccess.ShouldBeTrue();
-            props = result.Value;
-            props.PreCommitHooks.ShouldBeNull();
-            props.PostCommitHooks.ShouldBeNull();
-
-            // we then store something in each
-            props.AddPreCommitHook(new RiakJavascriptCommitHook("Foo.doBar"))
-                .AddPreCommitHook(new RiakErlangCommitHook("my_mod", "do_fun"))
-                .AddPostCommitHook(new RiakErlangCommitHook("my_other_mod", "do_more"));
-            Client.SetBucketProperties(PropertiesTestBucket, props).IsSuccess.ShouldBeTrue();
-
-            // load them out again and make sure they got loaded up
-            result = Client.GetBucketProperties(PropertiesTestBucket, true);
-            result.IsSuccess.ShouldBeTrue();
-            props = result.Value;
-
-            props.PreCommitHooks.ShouldNotBeNull();
-            props.PreCommitHooks.Count.ShouldEqual(2);
-            props.PostCommitHooks.ShouldNotBeNull();
-            props.PostCommitHooks.Count.ShouldEqual(1);
-        }
-    }
-
     [TestFixture]
     public class WhenTalkingToRiak : LiveRiakConnectionTestBase
     {
@@ -253,10 +118,18 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
 
             var result = Client.MapReduce(query);
             result.IsSuccess.ShouldBeTrue();
-            result.Value.Response.ShouldNotBeNull();
-            result.Value.Response.GetType().ShouldEqual(typeof(byte[]));
 
-            var json = JArray.Parse(result.Value.Response.FromRiakString());
+            var mrRes = result.Value;
+            mrRes.PhaseResults.ShouldNotBeNull();
+            mrRes.PhaseResults.Count.ShouldEqual(2);
+
+            mrRes.PhaseResults[0].Phase.ShouldEqual(0u);
+            mrRes.PhaseResults[1].Phase.ShouldEqual(1u);
+
+            mrRes.PhaseResults[0].Value.ShouldBeNull();
+            mrRes.PhaseResults[1].Value.ShouldNotBeNull();
+
+            var json = JArray.Parse(result.Value.PhaseResults[1].Value.FromRiakString());
             json[0].Value<int>().ShouldEqual(10);
         }
 
@@ -348,45 +221,6 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
             keyList = Client.ListKeys(MapReduceBucket);
             keyList.Value.Count().ShouldEqual(0);
             Client.ListBuckets().Value.Contains(MapReduceBucket).ShouldBeFalse();
-        }
-    }
-
-    [TestFixture]
-    public class WhenConnectionGoesIdle : LiveRiakConnectionTestBase
-    {
-        public WhenConnectionGoesIdle()
-            : base("riak1NodeConfiguration")
-        {
-        }
-
-        private IRiakConnection GetIdleConnection()
-        {
-            var result = Cluster.UseConnection(ClientId, RiakResult<IRiakConnection>.Success);
-            System.Threading.Thread.Sleep(ClusterConfig.RiakNodes[0].IdleTimeout + 1000);
-            return result.Value;
-        }
-
-        [Test]
-        public void IsIdleFlagIsSet()
-        {
-            var conn = GetIdleConnection();
-            conn.IsIdle.ShouldBeTrue();
-        }
-
-        [Test]
-        public void ConnectionIsRestoredOnNextUse()
-        {
-            GetIdleConnection();
-            var result = Client.Ping();
-            result.IsSuccess.ShouldBeTrue();
-        }
-
-        [Test]
-        public void IdleFlagIsUnsetOnNextUse()
-        {
-            var conn = GetIdleConnection();
-            Client.Ping();
-            conn.IsIdle.ShouldBeFalse();
         }
     }
 }

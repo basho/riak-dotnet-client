@@ -14,6 +14,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using CorrugatedIron.Exceptions;
+using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
 using System;
 using System.Collections.Generic;
@@ -113,11 +115,17 @@ namespace CorrugatedIron.Encoding
             source.Read(length, 0, length.Length);
             var size = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(length, 0));
 
+            var messageCode = (MessageCode)source.ReadByte();
+            if (messageCode == MessageCode.ErrorResp)
+            {
+                var error = DeserializeInstance<RpbErrorResp>(source, size);
+                throw new RiakException(error.ErrorCode, error.ErrorMessage.FromRiakString());
+            }
+
 #if DEBUG
             // This message code validation is here to make sure that the caller
             // is getting exactly what they expect. This "could" be removed from
             // production code, but it's a good thing to have in here for dev.
-            var messageCode = (MessageCode)source.ReadByte();
             if (MessageCodeToTypeMap[messageCode] != typeof(T))
             {
                 throw new InvalidOperationException(string.Format("Attempt to decode message to type '{0}' when received type '{1}'.", typeof(T).Name, MessageCodeToTypeMap[messageCode].Name));
@@ -143,6 +151,23 @@ namespace CorrugatedIron.Encoding
             using (var memStream = new MemoryStream(source, false))
             {
                 return Decode<T>(memStream);
+            }
+        }
+
+        private static T DeserializeInstance<T>(Stream source, int size)
+            where T : new()
+        {
+            if (size <= 1)
+            {
+                return new T();
+            }
+
+            var resultBuffer = new byte[size - 1];
+            source.Read(resultBuffer, 0, resultBuffer.Length);
+
+            using (var memStream = new MemoryStream(resultBuffer))
+            {
+                return Serializer.Deserialize<T>(memStream);
             }
         }
     }

@@ -47,5 +47,21 @@ namespace CorrugatedIron.Extensions
                 }
             }
         }
+
+        public static void Times(this int count, Action action)
+        {
+            while (count-- > 0)
+            {
+                action();
+            }
+        }
+
+        public static IEnumerable<T> Times<T>(this int count, Func<T> generator)
+        {
+            while (count-- > 0)
+            {
+                yield return generator();
+            }
+        }
     }
 }
