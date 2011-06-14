@@ -40,7 +40,7 @@ namespace CorrugatedIron.Tests.Live.LoadTests
         // functioning and the load-balancing strategies
         // are in place.
         private const int ThreadCount = 60;
-        private const int ActionCount = 20;
+        private const int ActionCount = 30;
 
         public WhenUnderLoad()
             : base("riakLoadTestConfiguration")
@@ -68,20 +68,26 @@ namespace CorrugatedIron.Tests.Live.LoadTests
                 .Inputs(new RiakPhaseInputs(keys.Select(k => new RiakBucketKeyInput(MapReduceBucket, k)).ToList()))
                 .Map(m => m.Source(@"function(o){return[1];}"))
                 .Reduce(r => r.Name(@"Riak.reduceSum").Keep(true));
+            query.Compile();
 
             var batch = ThreadCount.Times(() => Tuple.Create(query, new Thread(DoMapRed), new List<RiakResult<RiakMapReduceResult>>())).ToArray();
             batch.ForEach(b => b.Item2.Start(b));
-            batch.ForEach(b => b.Item2.Join());
-            batch.ForEach(b => b.Item3.ForEach(r =>
-                {
-                    r.IsSuccess.ShouldBeTrue();
-                    var json = JArray.Parse(r.Value.PhaseResults[1].Value.FromRiakString());
-                    json[0].Value<int>().ShouldEqual(10);
-                }));
+
+            foreach(var b in batch)
+            {
+                b.Item2.Join();
+                b.Item3.ForEach(r =>
+                                    {
+                                        r.IsSuccess.ShouldBeTrue();
+                                        var json = JArray.Parse(r.Value.PhaseResults[1].Value.FromRiakString());
+                                        json[0].Value<int>().ShouldEqual(10);
+                                    });
+            }
         }
 
         private void DoMapRed(object input)
         {
+            Thread.CurrentThread.Name = "TestThread - " + Guid.NewGuid();
             var inputs = (Tuple<RiakMapReduceQuery, Thread, List<RiakResult<RiakMapReduceResult>>>)input;
             var query = inputs.Item1;
             var results = inputs.Item3;
