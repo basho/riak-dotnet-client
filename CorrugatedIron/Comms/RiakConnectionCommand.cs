@@ -15,24 +15,36 @@
 // under the License.
 
 using System;
-using CorrugatedIron.Messages;
+using System.Threading;
 
 namespace CorrugatedIron.Comms
 {
-    public class RiakConnectionUsageManager : IDisposable
+    internal class RiakConnectionCommand
     {
-        private readonly IRiakConnection _connection;
+        private readonly Action<RiakConnection> _commandAction;
+        private readonly EventWaitHandle _signaller;
 
-        public RiakConnectionUsageManager(IRiakConnection connection, byte[] clientId)
+        public RiakConnectionCommand(Action<RiakConnection> commandAction)
         {
-            _connection = connection;
-            _connection.EndIdle();
-            _connection.SetClientId(clientId);
+            _commandAction = commandAction;
+            _signaller = new ManualResetEvent(false);
         }
 
-        public void Dispose()
+        public void Execute(RiakConnection conn)
         {
-            _connection.BeginIdle();
+            try
+            {
+                _commandAction(conn);
+            }
+            finally
+            {
+                _signaller.Set();
+            }
+        }
+
+        public void Wait()
+        {
+            _signaller.WaitOne();
         }
     }
 }

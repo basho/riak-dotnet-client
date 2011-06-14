@@ -58,6 +58,7 @@
     <Compile Include="..\Metadata\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
+    <Compile Include="Comms\RiakConnectionCommand.cs" />
     <Compile Include="Containers\ConcurrentEnumerable.cs" />
     <Compile Include="Containers\ConcurrentEnumerator.cs" />
     <Compile Include="Containers\Either.cs" />
@@ -134,7 +135,6 @@
     <Compile Include="RiakClient.cs" />
     <Compile Include="Comms\RiakConnection.cs" />
     <Compile Include="Comms\RiakConnectionFactory.cs" />
-    <Compile Include="Comms\RiakConnectionUsageManager.cs" />
     <Compile Include="Comms\RiakCluster.cs" />
     <Compile Include="Comms\RiakNode.cs" />
     <Compile Include="Comms\RiakNodeFactory.cs" />

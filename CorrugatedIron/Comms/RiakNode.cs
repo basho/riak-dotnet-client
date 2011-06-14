@@ -55,10 +55,8 @@ namespace CorrugatedIron.Comms
 
             Func<IRiakConnection, TRiakResult> wrapper = conn =>
                 {
-                    using (new RiakConnectionUsageManager(conn, clientId))
-                    {
-                        return useFun(conn);
-                    }
+                    conn.SetClientId(clientId);
+                    return useFun(conn);
                 };
 
             var response = _connections.Consume(wrapper);
