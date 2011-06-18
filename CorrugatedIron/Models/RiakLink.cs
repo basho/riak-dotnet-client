@@ -16,6 +16,7 @@
 
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
+using Newtonsoft.Json;
 
 namespace CorrugatedIron.Models
 {
@@ -30,6 +31,23 @@ namespace CorrugatedIron.Models
             Bucket = bucket;
             Key = key;
             Tag = tag;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj.GetType() != typeof(RiakLink))
+                return false;
+
+            var l = (RiakLink) obj;
+
+            return ((l.Bucket == Bucket) && (l.Key == Key) && (l.Tag == Tag));
+        }
+        
+        public static RiakLink FromJsonString(string jsonString)
+        {
+            var rawLink = JsonConvert.DeserializeObject<string[]>(jsonString);
+
+            return new RiakLink(rawLink[0], rawLink[1], rawLink[2]);
         }
 
         internal RiakLink(RpbLink link)
