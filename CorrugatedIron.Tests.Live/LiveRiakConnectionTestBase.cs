@@ -64,6 +64,7 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
         [TearDown]
         public void TearDown()
         {
+            Client.DeleteBucket(TestBucket);
             Cluster.Dispose();
         }
     }
