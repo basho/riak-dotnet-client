@@ -79,6 +79,11 @@ namespace CorrugatedIron.Models
             Siblings = new List<RiakObject>();
         }
 
+        public RiakLink ToRiakLink(string tag)
+        {
+            return new RiakLink(Bucket, Key, tag);
+        }
+
         internal RiakObject(string bucket, string key, RpbContent content, byte[] vectorClock)
         {
             Bucket = bucket;
