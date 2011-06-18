@@ -38,7 +38,7 @@ namespace CorrugatedIron.Util
         {
             public const string JavaScript = "javascript";
             public const string Json = JavaScript;
-            public const string Erlang = ContentTypes.ErlangBinary;
+            public const string Erlang = "erlang";
         }
         
         public static class MapReducePhaseType {
