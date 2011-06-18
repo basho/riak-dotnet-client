@@ -27,11 +27,13 @@ namespace CorrugatedIron.Models.MapReduce
     {
         public enum PhaseLanguage
         {
-            Javascript
+            Javascript,
+            Erlang
         }
 
         public abstract string PhaseType { get; }
         public bool _keep;
+        public bool _empty;
 
         protected RiakPhase()
         {
@@ -61,7 +63,8 @@ namespace CorrugatedIron.Models.MapReduce
                 // phase start
                 writer.WriteStartObject();
                 WriteJson(writer);
-                writer.WriteProperty("keep", _keep);
+                if (!_empty)
+                    writer.WriteProperty("keep", _keep);
                 writer.WriteEndObject();
                 // phase end
 
@@ -79,6 +82,8 @@ namespace CorrugatedIron.Models.MapReduce
             {
                 case PhaseLanguage.Javascript:
                     return Constants.MapReduceLanguage.JavaScript;
+                case PhaseLanguage.Erlang:
+                    return Constants.MapReduceLanguage.Erlang;
                 default:
                     throw new Exception("Unknown Map/Reduce language: {0}".Fmt(language));
             }

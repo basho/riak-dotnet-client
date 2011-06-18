@@ -48,6 +48,12 @@ namespace CorrugatedIron.Models.MapReduce
             return this;
         }
 
+        public RiakLinkPhase Empty()
+        {
+            _empty = true;
+            return this;
+        }
+
         protected override void WriteJson(JsonWriter writer)
         {
             writer.WriteSpecifiedProperty("bucket", _bucket)
