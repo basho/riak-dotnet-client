@@ -33,24 +33,30 @@ namespace CorrugatedIron.Models.MapReduce
         public RiakLinkPhase Bucket(string bucket)
         {
             _bucket = bucket;
+            _empty = false;
             return this;
         }
 
         public RiakLinkPhase Tag(string tag)
         {
             _tag = tag;
+            _empty = false;
             return this;
         }
 
         public RiakLinkPhase Key(string key)
         {
             _key = key;
+            _empty = false;
             return this;
         }
 
         public RiakLinkPhase Empty()
         {
             _empty = true;
+            _bucket = default(string);
+            _key = default(string);
+            _tag = default(string);
             return this;
         }
 
