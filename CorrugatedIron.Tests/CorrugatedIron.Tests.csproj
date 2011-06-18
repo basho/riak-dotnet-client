@@ -67,6 +67,7 @@
     <Compile Include="Encoding\MessageEncoderUnitTests.cs" />
     <Compile Include="Extensions\UnitTestExtensions.cs" />
     <Compile Include="Models\MapReduce\RiakMapReduceTests.cs" />
+    <Compile Include="Models\RiakLinkTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="KeyFilters\KeyFilterTests.cs" />
   </ItemGroup>
