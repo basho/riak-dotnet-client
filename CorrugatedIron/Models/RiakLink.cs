@@ -14,6 +14,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Collections.Generic;
+using System.Linq;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
 using Newtonsoft.Json;
@@ -33,22 +35,25 @@ namespace CorrugatedIron.Models
             Tag = tag;
         }
 
-        public override bool Equals(object obj)
-        {
-            if (obj.GetType() != typeof(RiakLink))
-                return false;
-
-            var l = (RiakLink) obj;
-
-            return ((l.Bucket == Bucket) && (l.Key == Key) && (l.Tag == Tag));
-        }
-        
         public static RiakLink FromJsonString(string jsonString)
         {
             var rawLink = JsonConvert.DeserializeObject<string[]>(jsonString);
 
             return new RiakLink(rawLink[0], rawLink[1], rawLink[2]);
         }
+
+        public static IList<RiakLink> ParseArrayFromJsonString(string jsonString)
+        {
+            var rawLinks = JsonConvert.DeserializeObject<IList<IList<string>>>(jsonString);
+
+            return rawLinks.Select(FromArray).ToList();
+        }
+
+        private static RiakLink FromArray(IList<string> rawLink)
+        {
+            return new RiakLink(rawLink[0], rawLink[1], rawLink[2]);
+        }
+
 
         internal RiakLink(RpbLink link)
         {
@@ -67,6 +72,32 @@ namespace CorrugatedIron.Models
             };
 
             return message;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != typeof(RiakLink)) return false;
+            return Equals((RiakLink)obj);
+        }
+
+        public bool Equals(RiakLink other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return Equals(other.Bucket, Bucket) && Equals(other.Key, Key) && Equals(other.Tag, Tag);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int result = (Bucket != null ? Bucket.GetHashCode() : 0);
+                result = (result*397) ^ (Key != null ? Key.GetHashCode() : 0);
+                result = (result*397) ^ (Tag != null ? Tag.GetHashCode() : 0);
+                return result;
+            }
         }
     }
 }
