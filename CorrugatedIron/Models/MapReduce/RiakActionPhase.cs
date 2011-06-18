@@ -26,6 +26,8 @@ namespace CorrugatedIron.Models.MapReduce
         private string _name;
         private string _source;
         private string _argument;
+        private string _module;
+        private string _function;
 
         public RiakActionPhase Langauge(PhaseLanguage language)
         {
@@ -51,22 +53,36 @@ namespace CorrugatedIron.Models.MapReduce
             return this;
         }
 
+        public RiakActionPhase Module(string module)
+        {
+            _module = module;
+            return this;
+        }
+
+        public RiakActionPhase Function(string function)
+        {
+            _function = function;
+            return this;
+        }
+
         protected override void WriteJson(JsonWriter writer)
         {
-            if (string.IsNullOrEmpty(_name) && string.IsNullOrEmpty(_source))
+            if (string.IsNullOrEmpty(_name) && string.IsNullOrEmpty(_source) && (string.IsNullOrEmpty(_module) && string.IsNullOrEmpty(_function)))
             {
-                throw new Exception("One of Name or Source must be supplied");
+                throw new Exception("One of Name, Source, or Module/Function must be supplied");
             }
 
-            if (!string.IsNullOrEmpty(_name) && !string.IsNullOrEmpty(_source))
+            if (!string.IsNullOrEmpty(_name) && !string.IsNullOrEmpty(_source) && (!string.IsNullOrEmpty(_module) && !string.IsNullOrEmpty(_function)))
             {
-                throw new Exception("Only one of Name and Source may be supplied");
+                throw new Exception("Only one of Name, Source, and Module/Function may be supplied");
             }
 
             writer.WriteProperty("language", ToString(_language))
                 .WriteSpecifiedProperty("name", _name)
                 .WriteSpecifiedProperty("source", _source)
-                .WriteSpecifiedProperty("arg", _argument);
+                .WriteSpecifiedProperty("arg", _argument)
+                .WriteSpecifiedProperty("module", _module)
+                .WriteSpecifiedProperty("function", _function);
         }
     }
 }
