@@ -44,12 +44,18 @@ namespace CorrugatedIron.Tests.Live
                                        Constants.ContentTypes.ApplicationJson);
             var rob = new RiakObject(TestBucket, Rob, @"{""name"":""rob""}", Constants.ContentTypes.ApplicationJson);
 
-            oj.Links.Add(jeremiah.ToRiakLink("friends"));
-            oj.Links.Add(jeremiah.ToRiakLink("coworkers"));
-            jeremiah.Links.Add(brent.ToRiakLink("friends"));
-            jeremiah.Links.Add(brent.ToRiakLink("coworkers"));
-            jeremiah.Links.Add(rob.ToRiakLink("ozzies"));
-            jeremiah.Links.Add(oj.ToRiakLink("ozzies"));
+            oj.LinkTo(jeremiah, "friends");
+            oj.LinkTo(jeremiah, "coworkers");
+            
+            jeremiah.LinkTo(oj, "friends");
+            jeremiah.LinkTo(oj, "coworkers");
+            jeremiah.LinkTo(oj, "ozzies");
+            jeremiah.LinkTo(brent, "friends");
+            jeremiah.LinkTo(brent, "coworkers");
+            jeremiah.LinkTo(rob, "ozzies");
+
+            brent.LinkTo(jeremiah, "coworkers");
+            brent.LinkTo(jeremiah, "friends");
 
             Client.Put(oj);
             Client.Put(jeremiah);
@@ -118,6 +124,49 @@ namespace CorrugatedIron.Tests.Live
             var mrResult = result.Value;
             mrResult.PhaseResults.ShouldNotBeNull();
             mrResult.PhaseResults.Count.ShouldEqual(2);
+        }
+
+        [Test]
+        public void LinksAreRemovedSuccessfullyInMemory()
+        {
+            var jeremiah = Client.Get(TestBucket, Jeremiah).Value;
+            var linkToRemove = new RiakLink(TestBucket, OJ, "ozzies");
+
+            jeremiah.RemoveLink(linkToRemove);
+
+            var ojLinks = new List<RiakLink>
+                              {
+                                  new RiakLink(TestBucket, OJ, "friends"),
+                                  new RiakLink(TestBucket, OJ, "coworkers")
+                              };
+
+            jeremiah.Links.ShouldNotContain(linkToRemove);
+
+            ojLinks.ForEach(l => jeremiah.Links.ShouldContain(l));
+        }
+
+        [Test]
+        public void LinksAreRemovedAfterSaving()
+        {
+            var jeremiah = Client.Get(TestBucket, Jeremiah).Value;
+            var linkToRemove = new RiakLink(TestBucket, OJ, "ozzies");
+
+            jeremiah.RemoveLink(linkToRemove);
+
+            var result = Client.Put(jeremiah, new RiakPutOptions{ ReturnBody = true });
+            result.IsSuccess.ShouldBeTrue();
+
+            jeremiah = result.Value;
+
+            var ojLinks = new List<RiakLink>
+                              {
+                                  new RiakLink(TestBucket, OJ, "friends"),
+                                  new RiakLink(TestBucket, OJ, "coworkers")
+                              };
+
+            jeremiah.Links.ShouldNotContain(linkToRemove);
+
+            ojLinks.ForEach(l => jeremiah.Links.ShouldContain(l));
         }
     }
 }
