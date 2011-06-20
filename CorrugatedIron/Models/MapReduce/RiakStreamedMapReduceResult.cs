@@ -14,23 +14,27 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
 using System.Collections.Generic;
-using CorrugatedIron.Extensions;
-using ProtoBuf;
+using System.Linq;
+using CorrugatedIron.Messages;
 
-namespace CorrugatedIron.Messages
+namespace CorrugatedIron.Models.MapReduce
 {
-    [Serializable]
-    [ProtoContract(Name = "RpbListBucketsResp")]
-    internal class RpbListBucketsResp
+    public class RiakStreamedMapReduceResult
     {
-        public RpbListBucketsResp()
+        private readonly IEnumerable<RpbMapRedResp> _responseReader;
+
+        internal RiakStreamedMapReduceResult(IEnumerable<RpbMapRedResp> responseReader)
         {
-            Buckets = new List<byte[]>();
+            _responseReader = responseReader;
         }
 
-        [ProtoMember(1, Name = "buckets", DataFormat = DataFormat.Default)]
-        internal List<byte[]> Buckets { get; set; }
+        public IEnumerable<RiakMapReduceResultPhase> PhaseResults
+        {
+            get
+            {
+                return _responseReader.Select(item => new RiakMapReduceResultPhase(item));
+            }
+        }
     }
 }

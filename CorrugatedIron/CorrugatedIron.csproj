@@ -113,6 +113,7 @@
     <Compile Include="Models\MapReduce\RiakReducePhase.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Models\MapReduce\RiakStreamedMapReduceResult.cs" />
     <Compile Include="Models\Rest\RiakRestRequest.cs">
       <SubType>Code</SubType>
     </Compile>

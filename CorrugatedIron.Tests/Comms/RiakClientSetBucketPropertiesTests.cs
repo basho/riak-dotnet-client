@@ -15,6 +15,7 @@
 // under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using CorrugatedIron.Comms;
 using CorrugatedIron.Messages;
@@ -42,6 +43,11 @@ namespace CorrugatedIron.Tests.Comms.RiakClientSetBucketPropertiesTests
         public RiakResult UseConnection(byte[] clientId, Func<IRiakConnection, RiakResult> useFun)
         {
             return useFun(ConnectionMock.Object);
+        }
+
+        public RiakResult<IEnumerable<TResult>> UseStreamConnection<TResult>(byte[] clientId, Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun)
+        {
+            throw new NotImplementedException();
         }
     }
 
