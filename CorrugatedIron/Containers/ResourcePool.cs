@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace CorrugatedIron.Containers
@@ -72,6 +73,42 @@ namespace CorrugatedIron.Containers
                     _resources.Push(instance);
                     _resourceLock.Release();
                 }
+            }
+
+            return Tuple.Create(false, default(TResult));
+        }
+
+        public Tuple<bool, TResult> StreamConsume<TResult>(Func<TResource, Action, TResult> consumer)
+        {
+            if (_disposing) return Tuple.Create(false, default(TResult));
+
+            TResource instance = null;
+            try
+            {
+                if (_resourceLock.WaitOne(_resourceWaitTimeout))
+                {
+                    if (_resources.TryPop(out instance))
+                    {
+                        Action cleanup = () =>
+                            {
+                                var i = instance;
+                                instance = null;
+                                _resources.Push(i);
+                                _resourceLock.Release();
+                            };
+                        var result = consumer(instance, cleanup);
+                        return Tuple.Create(true, result);
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                if (instance != null)
+                {
+                    _resources.Push(instance);
+                    _resourceLock.Release();
+                }
+                return Tuple.Create(false, default(TResult));
             }
 
             return Tuple.Create(false, default(TResult));

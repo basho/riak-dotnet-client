@@ -27,6 +27,7 @@ namespace CorrugatedIron.Comms
     {
         RiakResult<TResult> UseConnection<TResult>(byte[] clientId, Func<IRiakConnection, RiakResult<TResult>> useFun);
         RiakResult UseConnection(byte[] clientId, Func<IRiakConnection, RiakResult> useFun);
+        RiakResult<IEnumerable<TResult>> UseStreamConnection<TResult>(byte[] clientId, Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun);
     }
 
     public class RiakCluster : IRiakCluster
@@ -82,6 +83,34 @@ namespace CorrugatedIron.Comms
                 return (TRiakResult)result;
             }
             return onError(ResultCode.ClusterOffline, "Unable to access functioning Riak node");
+        }
+
+        public RiakResult<IEnumerable<TResult>> UseStreamConnection<TResult>(byte[] clientId, Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun)
+        {
+            if (_disposing) return RiakResult<IEnumerable<TResult>>.Error(ResultCode.ShuttingDown, "System currently shutting down");
+
+            IRiakNode node;
+            if (_roundRobin.TryMoveNext(out node))
+            {
+                var result = node.UseStreamConnection(clientId, useFun);
+                if (!result.IsSuccess)
+                {
+                    if (result.ResultCode == ResultCode.NoConnections)
+                    {
+                        // TODO: this is where we need to retry on another node
+                        //return UseConnection(clientId, useFun, onError);
+                    }
+
+                    if (result.ResultCode == ResultCode.CommunicationError)
+                    {
+                        // TODO: pull this node from the cluster and retry on another node
+                        // DeactivateNode(node);
+                        //return UseConnection(clientId, useFun, onError);
+                    }
+                }
+                return result;
+            }
+            return RiakResult<IEnumerable<TResult>>.Error(ResultCode.ClusterOffline, "Unable to access functioning Riak node");
         }
 
         public void Dispose()

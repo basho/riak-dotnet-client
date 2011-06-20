@@ -14,25 +14,27 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
+using System.Collections.Generic;
+using System.Linq;
 using CorrugatedIron.Messages;
 
-namespace CorrugatedIron.Comms
+namespace CorrugatedIron.Models.MapReduce
 {
-    public class RiakConnectionUsageManager : IDisposable
+    public class RiakStreamedMapReduceResult
     {
-        private readonly IRiakConnection _connection;
+        private readonly IEnumerable<RpbMapRedResp> _responseReader;
 
-        public RiakConnectionUsageManager(IRiakConnection connection, byte[] clientId)
+        internal RiakStreamedMapReduceResult(IEnumerable<RpbMapRedResp> responseReader)
         {
-            _connection = connection;
-            _connection.EndIdle();
-            _connection.SetClientId(clientId);
+            _responseReader = responseReader;
         }
 
-        public void Dispose()
+        public IEnumerable<RiakMapReduceResultPhase> PhaseResults
         {
-            _connection.BeginIdle();
+            get
+            {
+                return _responseReader.Select(item => new RiakMapReduceResultPhase(item));
+            }
         }
     }
 }

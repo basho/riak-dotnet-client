@@ -32,15 +32,5 @@ namespace CorrugatedIron.Messages
 
         [ProtoMember(1, Name = "buckets", DataFormat = DataFormat.Default)]
         internal List<byte[]> Buckets { get; set; }
-
-        internal List<string> BucketNames
-        {
-            get {
-                var buckets = new List<string>(Buckets.Capacity);
-                Buckets.ForEach(b => buckets.Add(b.FromRiakString()));
-                
-                return buckets;
-            }
-        }
     }
 }

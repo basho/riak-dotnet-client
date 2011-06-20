@@ -58,11 +58,17 @@ namespace CorrugatedIron
         RiakResult<RiakMapReduceResult> MapReduce(RiakMapReduceQuery query);
         void MapReduce(RiakMapReduceQuery query, Action<RiakResult<RiakMapReduceResult>> callback);
 
+        RiakResult<RiakStreamedMapReduceResult> StreamMapReduce(RiakMapReduceQuery query);
+        void StreamMapReduce(RiakMapReduceQuery query, Action<RiakResult<RiakStreamedMapReduceResult>> callback);
+
         RiakResult<IEnumerable<string>> ListBuckets();
         void ListBuckets(Action<RiakResult<IEnumerable<string>>> callback);
 
         RiakResult<IEnumerable<string>> ListKeys(string bucket);
         void ListKeys(string bucket, Action<RiakResult<IEnumerable<string>>> callback);
+
+        RiakResult<IEnumerable<string>> StreamListKeys(string bucket);
+        void StreamListKeys(string bucket, Action<RiakResult<IEnumerable<string>>> callback);
 
         RiakResult<RiakBucketProperties> GetBucketProperties(string bucket, bool extended = false);
         void GetBucketProperties(string bucket, Action<RiakResult<RiakBucketProperties>> callback, bool extended = false);
@@ -330,6 +336,7 @@ namespace CorrugatedIron
 
         public IEnumerable<RiakResult> DeleteBucket(string bucket, uint rwVal = Constants.Defaults.RVal)
         {
+            // TODO: change this to do the whole op with a single connection and with streaming
             var keys = ListKeys(bucket);
             var objectIds = keys.Value.Select(key => new RiakObjectId(bucket, key)).ToList();
 
@@ -358,7 +365,24 @@ namespace CorrugatedIron
         {
             ExecAsync(() => callback(MapReduce(query)));
         }
-        
+
+        public RiakResult<RiakStreamedMapReduceResult> StreamMapReduce(RiakMapReduceQuery query)
+        {
+            var request = query.ToMessage();
+            var response = _cluster.UseStreamConnection(_clientId, (conn, onFinish) => conn.PbcWriteStreamRead<RpbMapRedReq, RpbMapRedResp>(request, r => !r.Done, onFinish));
+
+            if (response.IsSuccess)
+            {
+                return RiakResult<RiakStreamedMapReduceResult>.Success(new RiakStreamedMapReduceResult(response.Value));
+            }
+            return RiakResult<RiakStreamedMapReduceResult>.Error(response.ResultCode, response.ErrorMessage);
+        }
+
+        public void StreamMapReduce(RiakMapReduceQuery query, Action<RiakResult<RiakStreamedMapReduceResult>> callback)
+        {
+            ExecAsync(() => callback(StreamMapReduce(query)));
+        }
+
         public RiakResult<IEnumerable<string>> ListBuckets()
         {
             var lbReq = new RpbListBucketsReq();
@@ -396,6 +420,25 @@ namespace CorrugatedIron
         public void ListKeys(string bucket, Action<RiakResult<IEnumerable<string>>> callback)
         {
             ExecAsync(() => callback(ListKeys(bucket)));
+        }
+
+        public RiakResult<IEnumerable<string>> StreamListKeys(string bucket)
+        {
+            var lkReq = new RpbListKeysReq {Bucket = bucket.ToRiakString()};
+            var result = _cluster.UseStreamConnection(_clientId,
+                (conn, onFinish) => conn.PbcWriteStreamRead<RpbListKeysReq, RpbListKeysResp>(lkReq, lkr => !lkr.Done, onFinish));
+
+            if (result.IsSuccess)
+            {
+                var keys = result.Value.SelectMany(r => r.KeyNames);
+                return RiakResult<IEnumerable<string>>.Success(keys);
+            }
+            return RiakResult<IEnumerable<string>>.Error(result.ResultCode, result.ErrorMessage);
+        }
+
+        public void StreamListKeys(string bucket, Action<RiakResult<IEnumerable<string>>> callback)
+        {
+            ExecAsync(() => callback(StreamListKeys(bucket)));
         }
 
         public RiakResult<RiakBucketProperties> GetBucketProperties(string bucket, bool extended = false)
