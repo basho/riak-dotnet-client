@@ -14,6 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using CorrugatedIron.Extensions;
@@ -79,7 +80,54 @@ namespace CorrugatedIron.Models
             Siblings = new List<RiakObject>();
         }
 
-        public RiakLink ToRiakLink(string tag)
+        public void LinkTo(string bucket, string key, string tag)
+        {
+            Links.Add(new RiakLink(bucket, key, tag));
+        }
+
+        public void LinkTo(RiakObjectId riakObjectId, string tag)
+        {
+            Links.Add(riakObjectId.ToRiakLink(tag));
+        }
+
+        public void LinkTo(RiakObject riakObject, string tag)
+        {
+            Links.Add(riakObject.ToRiakLink(tag));
+        }
+
+        public void RemoveLink(string bucket, string key, string tag)
+        {
+            var link = new RiakLink(bucket, key, tag);
+            RemoveLink(link);
+        }
+
+        public void RemoveLink(RiakObjectId riakObjectId, string tag)
+        {
+            var link = new RiakLink(riakObjectId.Bucket, riakObjectId.Key, tag);
+            RemoveLink(link);
+        }
+
+        public void RemoveLink(RiakLink link)
+        {
+            Links.Remove(link);
+        }
+
+        public void RemoveLinks(RiakObject riakObject)
+        {
+            RemoveLinks(new RiakObjectId(riakObject.Bucket, riakObject.Key));
+        }
+
+        public void RemoveLinks(RiakObjectId riakObjectId)
+        {
+            var linksToRemove = from link in Links
+                                where link.Bucket == riakObjectId.Bucket
+                                      && link.Key == riakObjectId.Key
+                                select link;
+
+            linksToRemove.ForEach(l => Links.Remove(l));
+        }
+        
+        internal RiakLink ToRiakLink(string tag)
         {
             return new RiakLink(Bucket, Key, tag);
         }

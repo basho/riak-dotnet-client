@@ -10,5 +10,10 @@
             Bucket = bucket;
             Key = key;
         }
+
+        internal RiakLink ToRiakLink(string tag)
+        {
+            return new RiakLink(Bucket, Key, tag);
+        }
     }
 }
