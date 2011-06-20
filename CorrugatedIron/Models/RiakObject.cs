@@ -14,7 +14,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using CorrugatedIron.Extensions;
@@ -45,7 +44,7 @@ namespace CorrugatedIron.Models
         {
             get
             {
-                if (_vtags != null)
+                if (_vtags == null)
                 {
                     _vtags = Siblings.Count == 0 ? new List<string> { VTag } : Siblings.Select(s => s.VTag).ToList();
                 }
@@ -104,6 +103,12 @@ namespace CorrugatedIron.Models
         public void RemoveLink(RiakObjectId riakObjectId, string tag)
         {
             var link = new RiakLink(riakObjectId.Bucket, riakObjectId.Key, tag);
+            RemoveLink(link);
+        }
+
+        public void RemoveLink(RiakObject riakObject, string tag)
+        {
+            var link = new RiakLink(riakObject.Bucket, riakObject.Key, tag);
             RemoveLink(link);
         }
 

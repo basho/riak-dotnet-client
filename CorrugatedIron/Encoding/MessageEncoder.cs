@@ -94,6 +94,8 @@ namespace CorrugatedIron.Encoding
             destination.WriteByte((byte)messageCode);
             if (messageBody.Length > 0)
             {
+                //messageBody.ForEach(b => System.Diagnostics.Debug.Write("{0:X}".Fmt(b)));
+                //System.Diagnostics.Debug.WriteLine("");
                 destination.Write(messageBody, 0, messageBody.Length);
             }
         }

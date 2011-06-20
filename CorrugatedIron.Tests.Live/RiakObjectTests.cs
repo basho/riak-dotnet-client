@@ -30,8 +30,6 @@ namespace CorrugatedIron.Tests.Live
     [TestFixture]
     public class WhenCreatingLinks : LiveRiakConnectionTestBase
     {
-        #region Setup/Teardown
-
         [SetUp]
         public new void SetUp()
         {
@@ -59,11 +57,12 @@ namespace CorrugatedIron.Tests.Live
 
             Client.Put(oj);
             Client.Put(jeremiah);
+            //jeremiah = Client.Get(TestBucket, Jeremiah).Value;
+            //jeremiah.RemoveLink(oj, "ozzies");
+            //Client.Put(jeremiah);
             Client.Put(brent);
             Client.Put(rob);
         }
-
-        #endregion
 
         private const string Jeremiah = "jeremiah";
         private const string OJ = "oj";

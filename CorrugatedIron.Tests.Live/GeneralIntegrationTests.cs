@@ -14,6 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
 using System.Linq;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Models;
@@ -102,17 +103,18 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         public void MapReduceQueriesReturnData()
         {
             const string dummyData = "{{ value: {0} }}";
+            var bucket = Guid.NewGuid().ToString();
 
             for (var i = 1; i < 11; i++)
             {
                 var newData = string.Format(dummyData, i);
-                var doc = new RiakObject(MapReduceBucket, i.ToString(), newData, Constants.ContentTypes.ApplicationJson);
+                var doc = new RiakObject(bucket, i.ToString(), newData, Constants.ContentTypes.ApplicationJson);
 
                 Client.Put(doc).IsSuccess.ShouldBeTrue();
             }
 
             var query = new RiakMapReduceQuery()
-                .Inputs(new RiakPhaseInputs(MapReduceBucket))
+                .Inputs(new RiakPhaseInputs(bucket))
                 .Map(m => m.Source(@"function(o) {return [ 1 ];}"))
                 .Reduce(r => r.Name(@"Riak.reduceSum").Keep(true));
 
@@ -151,6 +153,17 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             Client.Put(doc).IsSuccess.ShouldBeTrue();
 
             var result = Client.ListKeys(TestBucket);
+            result.IsSuccess.ShouldBeTrue();
+            result.Value.ShouldContain(TestKey);
+        }
+
+        [Test]
+        public void StreamListKeysIncludesTestKey()
+        {
+            var doc = new RiakObject(TestBucket, TestKey, TestJson, Constants.ContentTypes.ApplicationJson);
+            Client.Put(doc).IsSuccess.ShouldBeTrue();
+
+            var result = Client.StreamListKeys(TestBucket);
             result.IsSuccess.ShouldBeTrue();
             result.Value.ShouldContain(TestKey);
         }
@@ -204,23 +217,24 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         {
             // add multiple keys
             const string dummyData = "{{ value: {0} }}";
+            var bucket = Guid.NewGuid().ToString();
 
             for (var i = 1; i < 11; i++)
             {
                 var newData = string.Format(dummyData, i);
-                var doc = new RiakObject(MapReduceBucket, i.ToString(), newData, Constants.ContentTypes.ApplicationJson);
+                var doc = new RiakObject(bucket, i.ToString(), newData, Constants.ContentTypes.ApplicationJson);
 
                 Client.Put(doc);
             }
 
-            var keyList = Client.ListKeys(MapReduceBucket);
+            var keyList = Client.ListKeys(bucket);
             keyList.Value.Count().ShouldEqual(10);
 
-            Client.DeleteBucket(MapReduceBucket);
+            Client.DeleteBucket(bucket);
             
-            keyList = Client.ListKeys(MapReduceBucket);
+            keyList = Client.ListKeys(bucket);
             keyList.Value.Count().ShouldEqual(0);
-            Client.ListBuckets().Value.Contains(MapReduceBucket).ShouldBeFalse();
+            Client.ListBuckets().Value.Contains(bucket).ShouldBeFalse();
         }
     }
 }
