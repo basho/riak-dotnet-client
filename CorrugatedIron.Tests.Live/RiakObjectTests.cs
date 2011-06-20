@@ -118,7 +118,7 @@ namespace CorrugatedIron.Tests.Live
                                  .Keep(true)
                 );
 
-            RiakResult<RiakMapReduceResult> result = Client.MapReduce(query);
+            var result = Client.MapReduce(query);
             result.IsSuccess.ShouldBeTrue();
 
             var mrResult = result.Value;
