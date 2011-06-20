@@ -156,6 +156,17 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         }
 
         [Test]
+        public void StreamListKeysIncludesTestKey()
+        {
+            var doc = new RiakObject(TestBucket, TestKey, TestJson, Constants.ContentTypes.ApplicationJson);
+            Client.Put(doc).IsSuccess.ShouldBeTrue();
+
+            var result = Client.StreamListKeys(TestBucket);
+            result.IsSuccess.ShouldBeTrue();
+            result.Value.ShouldContain(TestKey);
+        }
+
+        [Test]
         public void WritesWithAllowMultProducesMultiple()
         {
             // delete first if something does exist

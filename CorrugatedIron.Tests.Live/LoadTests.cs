@@ -41,6 +41,8 @@ namespace CorrugatedIron.Tests.Live.LoadTests
         // are in place.
         private const int ThreadCount = 60;
         private const int ActionCount = 30;
+        //private const int ThreadCount = 1;
+        //private const int ActionCount = 1;
 
         public WhenUnderLoad()
             : base("riakLoadTestConfiguration")
@@ -94,6 +96,59 @@ namespace CorrugatedIron.Tests.Live.LoadTests
             var client = ClientGenerator();
 
             ActionCount.Times(() => results.Add(client.MapReduce(query)));
+        }
+
+        [Test]
+        public void LotsOfConcurrentStreamingMapRedRequestsShouldWork()
+        {
+            const string dummyData = "{{ value: {0} }}";
+            var keys = new List<string>();
+
+            for (var i = 1; i < 11; i++)
+            {
+                var key = "key" + i;
+                var newData = string.Format(dummyData, i);
+                var doc = new RiakObject(MapReduceBucket, key, newData, Constants.ContentTypes.ApplicationJson);
+                keys.Add(key);
+
+                var result = Client.Put(doc, new RiakPutOptions { ReturnBody = true });
+                result.IsSuccess.ShouldBeTrue();
+            }
+
+            var query = new RiakMapReduceQuery()
+                .Inputs(new RiakPhaseInputs(keys.Select(k => new RiakBucketKeyInput(MapReduceBucket, k)).ToList()))
+                .Map(m => m.Source(@"function(o){return[1];}"))
+                .Reduce(r => r.Name(@"Riak.reduceSum").Keep(true));
+            query.Compile();
+
+            var batch = ThreadCount.Times(() => Tuple.Create(query, new Thread(DoStreamingMapRed), new List<RiakMapReduceResultPhase>())).ToArray();
+            batch.ForEach(b => b.Item2.Start(b));
+
+            foreach(var b in batch)
+            {
+                b.Item2.Join();
+                var finalResult = b.Item3.OrderByDescending(r => r.Phase).First();
+                var json = JArray.Parse(finalResult.Value.FromRiakString());
+                json[0].Value<int>().ShouldEqual(10);
+            }
+        }
+
+        private void DoStreamingMapRed(object input)
+        {
+            Thread.CurrentThread.Name = "TestThread - " + Guid.NewGuid();
+            var inputs = (Tuple<RiakMapReduceQuery, Thread, List<RiakMapReduceResultPhase>>)input;
+            var query = inputs.Item1;
+            var results = inputs.Item3;
+            var client = ClientGenerator();
+
+            ActionCount.Times(() =>
+                {
+                    var streamedResults = client.StreamMapReduce(query);
+                    if (streamedResults.IsSuccess)
+                    {
+                        streamedResults.Value.PhaseResults.ForEach(results.Add);
+                    }
+                });
         }
     }
 }

@@ -15,6 +15,7 @@
 // under the License.
 
 using System;
+using System.Collections.Generic;
 using CorrugatedIron.Config;
 using CorrugatedIron.Containers;
 
@@ -24,6 +25,7 @@ namespace CorrugatedIron.Comms
     {
         RiakResult UseConnection(byte[] clientId, Func<IRiakConnection, RiakResult> useFun);
         RiakResult<TResult> UseConnection<TResult>(byte[] clientId, Func<IRiakConnection, RiakResult<TResult>> useFun);
+        RiakResult<IEnumerable<TResult>> UseStreamConnection<TResult>(byte[] clientId, Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun);
     }
 
     public class RiakNode : IRiakNode
@@ -65,6 +67,24 @@ namespace CorrugatedIron.Comms
                 return response.Item2;
             }
             return onError(ResultCode.NoConnections, "Unable to acquire connection");
+        }
+
+        public RiakResult<IEnumerable<TResult>> UseStreamConnection<TResult>(byte[] clientId, Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun)
+        {
+            if (_disposing) return RiakResult<IEnumerable<TResult>>.Error(ResultCode.ShuttingDown, "Connection is shutting down");
+
+            Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> wrapper = (conn, onFinish) =>
+                {
+                    conn.SetClientId(clientId);
+                    return useFun(conn, onFinish);
+                };
+
+            var response = _connections.StreamConsume(wrapper);
+            if (response.Item1)
+            {
+                return response.Item2;
+            }
+            return RiakResult<IEnumerable<TResult>>.Error(ResultCode.NoConnections, "Unable to acquire connection");
         }
 
         public void Dispose()

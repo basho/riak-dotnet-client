@@ -50,6 +50,11 @@ namespace CorrugatedIron.Comms
         RiakResult<IEnumerable<TResult>> PbcWriteRead<TRequest, TResult>(TRequest request, Func<TResult, bool> repeatRead)
             where TResult : new();
 
+        RiakResult<IEnumerable<TResult>> PbcStreamRead<TResult>(Func<TResult, bool> repeatRead, Action onFinish)
+            where TResult : new();
+        RiakResult<IEnumerable<TResult>> PbcWriteStreamRead<TRequest, TResult>(TRequest request, Func<TResult, bool> repeatRead, Action onFinish)
+            where TResult : new();
+
         // REST interface
         RiakResult<RiakRestResponse> RestRequest(RiakRestRequest request);
         void SetClientId(byte[] clientId);
@@ -236,6 +241,60 @@ namespace CorrugatedIron.Comms
             return RiakResult<IEnumerable<TResult>>.Error(writeResult.ResultCode, writeResult.ErrorMessage);
         }
 
+
+        public RiakResult<IEnumerable<TResult>> PbcStreamRead<TResult>(Func<TResult, bool> repeatRead, Action onFinish)
+            where TResult : new()
+        {
+            return ExecuteCommand(conn => conn.PbcStreamReadInternal(repeatRead, onFinish));
+        }
+
+        private RiakResult<IEnumerable<TResult>> PbcStreamReadInternal<TResult>(Func<TResult, bool> repeatRead, Action onFinish)
+            where TResult : new()
+        {
+            var streamer = PbcStreamReadIterator(repeatRead, onFinish);
+            return RiakResult<IEnumerable<TResult>>.Success(streamer);
+        }
+
+        private IEnumerable<TResult> PbcStreamReadIterator<TResult>(Func<TResult, bool> repeatRead, Action onFinish)
+            where TResult : new()
+        {
+            var result = default(RiakResult<TResult>);
+
+            do
+            {
+                result = PbcReadInternal<TResult>();
+                if (!result.IsSuccess) break;
+                yield return result.Value;
+            } while (repeatRead(result.Value));
+
+            onFinish();
+        }
+
+        public RiakResult<IEnumerable<TResult>> PbcWriteStreamRead<TRequest, TResult>(TRequest request, Func<TResult, bool> repeatRead, Action onFinish)
+            where TResult : new()
+        {
+            return ExecuteCommand(conn => conn.PbcWriteStreamReadInternal(request, repeatRead, onFinish));
+        }
+
+        private RiakResult<IEnumerable<TResult>> PbcWriteStreamReadInternal<TRequest, TResult>(TRequest request, Func<TResult, bool> repeatRead, Action onFinish)
+            where TResult : new()
+        {
+            var streamer = PbcWriteStreamReadIterator(request, repeatRead, onFinish);
+            return RiakResult<IEnumerable<TResult>>.Success(streamer);
+        }
+
+        private IEnumerable<TResult> PbcWriteStreamReadIterator<TRequest, TResult>(TRequest request, Func<TResult, bool> repeatRead, Action onFinish)
+            where TResult : new()
+        {
+            var writeResult = PbcWriteInternal(request);
+            if (writeResult.IsSuccess)
+            {
+                return PbcStreamReadIterator(repeatRead, onFinish);
+            }
+            onFinish();
+            return default(TResult).Replicate(0);
+        }
+
         public RiakResult<RiakRestResponse> RestRequest(RiakRestRequest request)
         {
             var baseUri = new StringBuilder(_restRootUrl).Append(request.Uri);
@@ -341,12 +400,12 @@ namespace CorrugatedIron.Comms
             }
         }
 
-        private void ExecuteCommand(Action<RiakConnection> func)
-        {
-            var cmd = new RiakConnectionCommand(func);
-            _commands.Enqueue(cmd);
-            cmd.Wait();
-        }
+        //private void ExecuteCommand(Action<RiakConnection> func)
+        //{
+        //    var cmd = new RiakConnectionCommand(func);
+        //    _commands.Enqueue(cmd);
+        //    cmd.Wait();
+        //}
 
         private TResult ExecuteCommand<TResult>(Func<RiakConnection, TResult> func)
         {
