@@ -44,6 +44,7 @@ namespace CorrugatedIron.Models
 
         public static IList<RiakLink> ParseArrayFromJsonString(string jsonString)
         {
+            // TODO test me
             var rawLinks = JsonConvert.DeserializeObject<IList<IList<string>>>(jsonString);
 
             return rawLinks.Select(FromArray).ToList();
@@ -53,7 +54,6 @@ namespace CorrugatedIron.Models
         {
             return new RiakLink(rawLink[0], rawLink[1], rawLink[2]);
         }
-
 
         internal RiakLink(RpbLink link)
         {
