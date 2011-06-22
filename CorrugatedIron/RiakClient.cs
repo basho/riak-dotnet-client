@@ -24,6 +24,7 @@ using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
+using CorrugatedIron.Models.MapReduce.Inputs;
 using CorrugatedIron.Models.Rest;
 using CorrugatedIron.Util;
 
@@ -75,6 +76,8 @@ namespace CorrugatedIron
 
         RiakResult SetBucketProperties(string bucket, RiakBucketProperties properties);
         void SetBucketProperties(string bucket, RiakBucketProperties properties, Action<RiakResult> callback);
+
+        IList<RiakObject> WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks);
     }
 
     public class RiakClient : IRiakClient
@@ -508,6 +511,29 @@ namespace CorrugatedIron
         {
             ExecAsync(() => callback(SetBucketProperties(bucket, properties)));
         }
+
+        public IList<RiakObject> WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks)
+        {
+            var query =
+                new RiakMapReduceQuery().Inputs(
+                    new RiakPhaseInputs(new List<RiakBucketKeyInput> { new RiakBucketKeyInput(riakObject.Bucket, riakObject.Key) }));
+
+            foreach (var riakLink in riakLinks)
+            {
+                var link = riakLink;
+                var keep = (link == riakLinks.Last());
+
+                query.Link(l => l.FromRiakLink(link)
+                                .Keep(keep));
+            }
+
+            var linkResults = MapReduce(query).Value.PhaseResults.Last();
+            var linkResultString = linkResults.Value.FromRiakString();
+            var rawLinks = RiakLink.ParseArrayFromJsonString(linkResultString);
+            var oids = rawLinks.Select(riakLink => new RiakObjectId(riakLink.Bucket, riakLink.Key)).ToList();
+
+            return Get(oids).Select(r => r.Value).ToList();
+         }
 
         private static byte[] GetClientId()
         {

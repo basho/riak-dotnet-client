@@ -32,8 +32,8 @@ namespace CorrugatedIron.Models.MapReduce
         }
 
         public abstract string PhaseType { get; }
-        public bool _keep;
-        public bool _empty;
+        protected bool _keep;
+        protected bool _empty;
 
         protected RiakPhase()
         {

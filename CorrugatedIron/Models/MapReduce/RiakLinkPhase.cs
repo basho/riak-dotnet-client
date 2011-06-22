@@ -14,6 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
 using CorrugatedIron.Extensions;
 using Newtonsoft.Json;
 
@@ -21,9 +22,76 @@ namespace CorrugatedIron.Models.MapReduce
 {
     public class RiakLinkPhase : RiakPhase
     {
+        private const string EmptyRestPhase = "_,_,_";
+
         private string _bucket;
         private string _tag;
         private string _key;
+
+        public RiakLinkPhase()
+        {
+            
+        }
+
+        public RiakLinkPhase(string restPhase)
+        {
+            if (string.IsNullOrEmpty(restPhase))
+            {
+                Empty();
+            }
+
+            if (restPhase == EmptyRestPhase)
+            {
+                Empty();
+            }
+            else
+            {
+                var phases = restPhase.Split(',');
+
+                if (phases.Length != 3)
+                {
+                    throw new ArgumentException("When building a phase from a string, the phase must be in three parts <<bucket>>,<<key>>,<<tag>>.");
+                }
+
+                _bucket = !string.IsNullOrEmpty(phases[0]) ? phases[0] : default(string);
+                _key = !string.IsNullOrEmpty(phases[1]) ? phases[1] : default(string);
+                _tag = !string.IsNullOrEmpty(phases[2]) ? phases[2] : default(string);
+            }
+        }
+
+        public RiakLinkPhase(RiakLink riakLink)
+        {
+            if (string.IsNullOrEmpty(riakLink.Bucket)
+                && string.IsNullOrEmpty(riakLink.Key)
+                && string.IsNullOrEmpty(riakLink.Tag))
+            {
+                Empty();
+            }
+            else
+            {
+                _bucket = riakLink.Bucket;
+                _key = riakLink.Key;
+                _tag = riakLink.Tag;
+            }
+        }
+
+        public RiakLinkPhase FromRiakLink(RiakLink riakLink)
+        {
+            if (string.IsNullOrEmpty(riakLink.Bucket)
+                && string.IsNullOrEmpty(riakLink.Key)
+                && string.IsNullOrEmpty(riakLink.Tag))
+            {
+                Empty();
+            }
+            else
+            {
+                _bucket = riakLink.Bucket;
+                _key = riakLink.Key;
+                _tag = riakLink.Tag;
+            }
+            
+            return this;
+        }
 
         public override string PhaseType
         {

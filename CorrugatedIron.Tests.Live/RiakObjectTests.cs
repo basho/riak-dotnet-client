@@ -14,6 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
 using System.Collections.Generic;
 using CorrugatedIron.KeyFilters;
 using CorrugatedIron.Models;
@@ -166,6 +167,21 @@ namespace CorrugatedIron.Tests.Live
             jeremiah.Links.ShouldNotContain(linkToRemove);
 
             ojLinks.ForEach(l => jeremiah.Links.ShouldContain(l));
+        }
+
+        [Test]
+        public void LinkWalkingSuccessfullyRetrievesNLevels()
+        {
+            var jeremiah = Client.Get(TestBucket, OJ).Value;
+            var linkPhases = new List<RiakLink>
+                                 {
+                                     new RiakLink("", "", "") ,
+                                     new RiakLink("", "", "")
+                                 };
+
+
+            var linkPeople = Client.WalkLinks(jeremiah, linkPhases);
+            linkPeople.Count.ShouldEqual(6);
         }
     }
 }
