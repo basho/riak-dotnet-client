@@ -14,6 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using CorrugatedIron.Extensions;
@@ -33,10 +34,17 @@ namespace CorrugatedIron.Models
         public string VectorClock { get; private set; }
         public string VTag { get; private set; }
         public IDictionary<string, string> UserMetaData { get; set; }
-        public int LastModified { get; private set; }
-        public int LastModifiedUsec { get; private set; }
+        public int LastModified { get; internal set; }
+        public int LastModifiedUsec { get; internal set; }
         public IList<RiakLink> Links { get; private set; }
         public IList<RiakObject> Siblings { get; set; }
+
+        internal int hashCode;
+
+        internal bool IsDirty()
+        {
+            throw new System.NotImplementedException();
+        }
 
         private List<string> _vtags;
 
@@ -131,6 +139,14 @@ namespace CorrugatedIron.Models
 
             linksToRemove.ForEach(l => Links.Remove(l));
         }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != typeof (RiakObject)) return false;
+            return Equals((RiakObject) obj);
+        }
         
         internal RiakLink ToRiakLink(string tag)
         {
@@ -150,6 +166,8 @@ namespace CorrugatedIron.Models
             UserMetaData = content.UserMeta.ToDictionary(p => p.Key.FromRiakString(), p => p.Value.FromRiakString());
             Links = content.Links.Select(l => new RiakLink(l)).ToList();
             Siblings = new List<RiakObject>();
+
+            hashCode = GetHashCode();
         }
 
         internal RpbPutReq ToMessage()
@@ -170,6 +188,52 @@ namespace CorrugatedIron.Models
             };
 
             return message;
+        }
+
+        public bool Equals(RiakObject other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return Equals(other.Bucket, Bucket) && Equals(other.Key, Key) && Equals(other.Value, Value) && Equals(other.ContentType, ContentType) && Equals(other.ContentEncoding, ContentEncoding) && Equals(other.CharSet, CharSet) && Equals(other.VectorClock, VectorClock) && Equals(other.VTag, VTag) && Equals(other.UserMetaData, UserMetaData) && other.LastModified == LastModified && other.LastModifiedUsec == LastModifiedUsec && Equals(other.Links, Links);
+        }
+
+        public override sealed int GetHashCode()
+        {
+            unchecked
+            {
+                int result = (Bucket != null ? Bucket.GetHashCode() : 0);
+                result = (result*397) ^ (Key != null ? Key.GetHashCode() : 0);
+                result = (result*397) ^ (Value != null ? Value.GetHashCode() : 0);
+                result = (result*397) ^ (ContentType != null ? ContentType.GetHashCode() : 0);
+                result = (result*397) ^ (ContentEncoding != null ? ContentEncoding.GetHashCode() : 0);
+                result = (result*397) ^ (CharSet != null ? CharSet.GetHashCode() : 0);
+                result = (result*397) ^ (VectorClock != null ? VectorClock.GetHashCode() : 0);
+                result = (result*397) ^ (VTag != null ? VTag.GetHashCode() : 0);
+                result = (result*397) ^ (UserMetaData != null ? UserMetaData.GetHashCode() : 0);
+                result = (result*397) ^ LastModified;
+                result = (result*397) ^ LastModifiedUsec;
+                result = (result*397) ^ (Links != null ? Links.GetHashCode() : 0);
+                return result;
+            }
+        }
+
+        public static bool operator ==(RiakObject left, RiakObject right)
+        {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(RiakObject left, RiakObject right)
+        {
+            return !Equals(left, right);
+        }
+
+        internal void UpdateLastModified()
+        {
+            var t = (DateTime.UtcNow - new DateTime(1970, 1, 1));
+            var ms = t.TotalMilliseconds;
+
+            LastModified = (int)(ms / 1000d);
+            LastModifiedUsec = (int)((ms - (LastModified * 1000d)) * 100d);
         }
     }
 }

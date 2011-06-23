@@ -228,6 +228,11 @@ namespace CorrugatedIron
 
         public RiakResult<RiakObject> Put(RiakObject value, RiakPutOptions options = null)
         {
+            if (value.hashCode != value.GetHashCode())
+            {
+                value.UpdateLastModified();
+            }
+
             options = options ?? new RiakPutOptions();
 
             var request = value.ToMessage();
@@ -260,6 +265,11 @@ namespace CorrugatedIron
         public IEnumerable<RiakResult<RiakObject>> Put(IEnumerable<RiakObject> values, RiakPutOptions options = null)
         {
             options = options ?? new RiakPutOptions();
+            foreach (var riakObject in values.Where(riakObject => riakObject.hashCode != riakObject.GetHashCode()))
+            {
+                riakObject.UpdateLastModified();
+            }
+
             var messages = values.Select(v =>
                 {
                     var m = v.ToMessage();
