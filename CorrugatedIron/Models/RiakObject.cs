@@ -34,8 +34,8 @@ namespace CorrugatedIron.Models
         public string VectorClock { get; private set; }
         public string VTag { get; private set; }
         public IDictionary<string, string> UserMetaData { get; set; }
-        public int LastModified { get; internal set; }
-        public int LastModifiedUsec { get; internal set; }
+        public uint LastModified { get; internal set; }
+        public uint LastModifiedUsec { get; internal set; }
         public IList<RiakLink> Links { get; private set; }
         public IList<RiakObject> Siblings { get; set; }
 
@@ -140,14 +140,6 @@ namespace CorrugatedIron.Models
             linksToRemove.ForEach(l => Links.Remove(l));
         }
 
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != typeof (RiakObject)) return false;
-            return Equals((RiakObject) obj);
-        }
-        
         internal RiakLink ToRiakLink(string tag)
         {
             return new RiakLink(Bucket, Key, tag);
@@ -166,6 +158,8 @@ namespace CorrugatedIron.Models
             UserMetaData = content.UserMeta.ToDictionary(p => p.Key.FromRiakString(), p => p.Value.FromRiakString());
             Links = content.Links.Select(l => new RiakLink(l)).ToList();
             Siblings = new List<RiakObject>();
+            LastModified = content.LastMod;
+            LastModifiedUsec = content.LastModUSecs;
 
             hashCode = GetHashCode();
         }
@@ -183,6 +177,8 @@ namespace CorrugatedIron.Models
                     Value = Value,
                     VTag = VTag.ToRiakString(),
                     UserMeta = UserMetaData.Select(kv => new RpbPair { Key = kv.Key.ToRiakString(), Value = kv.Value.ToRiakString() }).ToList(),
+                    LastMod = LastModified,
+                    LastModUSecs = LastModifiedUsec,
                     Links = Links.Select(l => l.ToMessage()).ToList()
                 }
             };
@@ -190,14 +186,31 @@ namespace CorrugatedIron.Models
             return message;
         }
 
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != typeof (RiakObject)) return false;
+            return Equals((RiakObject) obj);
+        }
+
+        internal void UpdateLastModified()
+        {
+            var t = (DateTime.UtcNow - new DateTime(1970, 1, 1));
+            var ms = t.TotalMilliseconds;
+
+            LastModified = (uint)(ms / 1000d);
+            LastModifiedUsec = (uint)((ms - (LastModified * 1000d)) * 100d);
+        }
+
         public bool Equals(RiakObject other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Equals(other.Bucket, Bucket) && Equals(other.Key, Key) && Equals(other.Value, Value) && Equals(other.ContentType, ContentType) && Equals(other.ContentEncoding, ContentEncoding) && Equals(other.CharSet, CharSet) && Equals(other.VectorClock, VectorClock) && Equals(other.VTag, VTag) && Equals(other.UserMetaData, UserMetaData) && other.LastModified == LastModified && other.LastModifiedUsec == LastModifiedUsec && Equals(other.Links, Links);
+            return Equals(other.Bucket, Bucket) && Equals(other.Key, Key) && Equals(other.Value, Value) && Equals(other.ContentType, ContentType) && Equals(other.ContentEncoding, ContentEncoding) && Equals(other.CharSet, CharSet) && Equals(other.VectorClock, VectorClock) && Equals(other.UserMetaData, UserMetaData) && other.LastModified == LastModified && other.LastModifiedUsec == LastModifiedUsec && Equals(other.Links, Links) && Equals(other._vtags, _vtags);
         }
 
-        public override sealed int GetHashCode()
+        public override int GetHashCode()
         {
             unchecked
             {
@@ -208,32 +221,13 @@ namespace CorrugatedIron.Models
                 result = (result*397) ^ (ContentEncoding != null ? ContentEncoding.GetHashCode() : 0);
                 result = (result*397) ^ (CharSet != null ? CharSet.GetHashCode() : 0);
                 result = (result*397) ^ (VectorClock != null ? VectorClock.GetHashCode() : 0);
-                result = (result*397) ^ (VTag != null ? VTag.GetHashCode() : 0);
                 result = (result*397) ^ (UserMetaData != null ? UserMetaData.GetHashCode() : 0);
-                result = (result*397) ^ LastModified;
-                result = (result*397) ^ LastModifiedUsec;
+                result = (result*397) ^ LastModified.GetHashCode();
+                result = (result*397) ^ LastModifiedUsec.GetHashCode();
                 result = (result*397) ^ (Links != null ? Links.GetHashCode() : 0);
+                result = (result*397) ^ (_vtags != null ? _vtags.GetHashCode() : 0);
                 return result;
             }
-        }
-
-        public static bool operator ==(RiakObject left, RiakObject right)
-        {
-            return Equals(left, right);
-        }
-
-        public static bool operator !=(RiakObject left, RiakObject right)
-        {
-            return !Equals(left, right);
-        }
-
-        internal void UpdateLastModified()
-        {
-            var t = (DateTime.UtcNow - new DateTime(1970, 1, 1));
-            var ms = t.TotalMilliseconds;
-
-            LastModified = (int)(ms / 1000d);
-            LastModifiedUsec = (int)((ms - (LastModified * 1000d)) * 100d);
         }
     }
 }

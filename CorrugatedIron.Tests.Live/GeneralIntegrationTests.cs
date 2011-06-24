@@ -16,6 +16,7 @@
 
 using System;
 using System.Linq;
+using System.Net.Mime;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
@@ -235,6 +236,37 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             keyList = Client.ListKeys(bucket);
             keyList.Value.Count().ShouldEqual(0);
             Client.ListBuckets().Value.Contains(bucket).ShouldBeFalse();
+        }
+
+        [Test]
+        public void LastModifiedShouldChangeAfterAPutRequest()
+        {
+            const string dummyData = "{{ value: 1234; }}";
+            const string changedData = "{{ value: 12345 }}";
+            var o = new RiakObject(TestBucket, "1234", dummyData, Constants.ContentTypes.ApplicationJson);
+
+            var lm1 = o.LastModified;
+            var lmu1 = o.LastModifiedUsec;
+
+            o = Client.Put(o, new RiakPutOptions { ReturnBody = true}).Value;
+
+            var lm2 = o.LastModified;
+            var lmu2 = o.LastModifiedUsec;
+
+            System.Threading.Thread.Sleep(1000);
+
+            o = new RiakObject(TestBucket, "1234", changedData);
+            o = Client.Put(o, new RiakPutOptions { ReturnBody = true }).Value;
+
+            var lm3 = o.LastModified;
+            var lmu3 = o.LastModifiedUsec;
+
+            lm1.ShouldNotEqual(lm2);
+            lm1.ShouldNotEqual(lm3);
+            lmu1.ShouldNotEqual(lmu2);
+            lmu1.ShouldNotEqual(lmu3);
+            lm2.ShouldNotEqual(lm3);
+            lmu2.ShouldNotEqual(lmu3);
         }
     }
 }
