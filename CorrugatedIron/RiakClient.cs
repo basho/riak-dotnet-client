@@ -80,6 +80,7 @@ namespace CorrugatedIron
         IList<RiakObject> WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks);
 
         RiakResult<RiakServerInfo> GetServerInfo();
+        void GetServerInfo(Action<RiakResult<RiakServerInfo>> callback);
     }
 
     public class RiakClient : IRiakClient
@@ -563,6 +564,11 @@ namespace CorrugatedIron
                 return RiakResult<RiakServerInfo>.Success(new RiakServerInfo(result.Value));
             }
             return RiakResult<RiakServerInfo>.Error(result.ResultCode, result.ErrorMessage);
+        }
+
+        public void GetServerInfo(Action<RiakResult<RiakServerInfo>> callback)
+        {
+            ExecAsync(() => callback(GetServerInfo()));
         }
 
         private static byte[] GetClientId()

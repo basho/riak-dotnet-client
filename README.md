@@ -10,15 +10,20 @@ Authors
 Current Features
 ----------------
 
-<small>*&hearts; denotes availability of both blocking and asynchronous APIs*</small>
+<small>*&hearts;: denotes availability of both blocking and asynchronous APIs*<br/>
+*&laquo;: denotes availability of both streaming and non-streaming APIs*</small>
 
-* Server ping.
+* Server ping. &nbsp;&nbsp;&nbsp;&hearts;
+* Get server information/version. &nbsp;&nbsp;&nbsp;&hearts;
 * Simple Get/Put/Delete operations. &nbsp;&nbsp;&nbsp;&hearts;
 * Bulk Get/Put/Delete operations. &nbsp;&nbsp;&nbsp;&hearts;
-* List buckets and keys. &nbsp;&nbsp;&nbsp;&hearts;
-* Semi-fluent Map/Reduce. &nbsp;&nbsp;&nbsp;&hearts;
-* Set/Get bucket properties.
-* Graceful degrade to HTTP/REST API when the request isn't supported via PBC.
+* List buckets. &nbsp;&nbsp;&nbsp;&hearts;
+* List keys. &nbsp;&nbsp;&nbsp;&hearts;&nbsp;&nbsp;&laquo;
+* Semi-fluent Map/Reduce. &nbsp;&nbsp;&nbsp;&hearts;&nbsp;&nbsp;&laquo;
+* Link walking. &nbsp;&nbsp;&nbsp;&hearts;
+* Delete buckets. &nbsp;&nbsp;&nbsp;&hearts;
+* Set/Get bucket properties. &nbsp;&nbsp;&nbsp;&hearts;
+* Graceful degrade to HTTP/REST API when the request isn't supported via Protocol Buffers.
 * Riak cluster support:
     * One or more nodes in the cluster.
     * Load-balancing of connections across the nodes.
@@ -35,8 +40,6 @@ Current Features
 v0.1 Features (in development)
 ----------------------
 
-* Link walking. &nbsp;&nbsp;&nbsp;&hearts;
-* Delete buckets. &nbsp;&nbsp;&nbsp;&hearts;
 * Connection self-healing and node management.
 * .NET 3.5 support.
 
