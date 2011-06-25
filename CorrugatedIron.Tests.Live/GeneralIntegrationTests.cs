@@ -32,6 +32,13 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
     public class WhenTalkingToRiak : LiveRiakConnectionTestBase
     {
         [Test]
+        public void ServerInfoIsSuccessfullyExtracted()
+        {
+            var result = Client.GetServerInfo();
+            result.IsSuccess.ShouldBeTrue();
+        }
+
+        [Test]
         public void PingRequstResultsInPingResponse()
         {
             var result = Client.Ping();
