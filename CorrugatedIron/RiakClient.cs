@@ -78,6 +78,8 @@ namespace CorrugatedIron
         void SetBucketProperties(string bucket, RiakBucketProperties properties, Action<RiakResult> callback);
 
         IList<RiakObject> WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks);
+
+        RiakResult<RiakServerInfo> GetServerInfo();
     }
 
     public class RiakClient : IRiakClient
@@ -544,6 +546,24 @@ namespace CorrugatedIron
 
             return Get(oids).Select(r => r.Value).ToList();
          }
+
+        /// <summary>
+        /// Get the server information from the connected cluster.
+        /// </summary>
+        /// <returns>Model containing information gathered from a node in the cluster.</returns>
+        /// <remarks>This function will assume that all of the nodes in the cluster are running
+        /// the same version of Riak. It will only get executed on a single node, and the content
+        /// that is returned technically only relates to that node. All nodes in a cluster should
+        /// run on the same version of Riak.</remarks>
+        public RiakResult<RiakServerInfo> GetServerInfo()
+        {
+            var result = _cluster.UseConnection(_clientId, conn => conn.PbcWriteRead<RpbGetServerInfoReq, RpbGetServerInfoResp>(new RpbGetServerInfoReq()));
+            if (result.IsSuccess)
+            {
+                return RiakResult<RiakServerInfo>.Success(new RiakServerInfo(result.Value));
+            }
+            return RiakResult<RiakServerInfo>.Error(result.ResultCode, result.ErrorMessage);
+        }
 
         private static byte[] GetClientId()
         {
