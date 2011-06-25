@@ -46,7 +46,9 @@ namespace CorrugatedIron.Extensions
                     yield return item;
                 }
             }
+// ReSharper disable FunctionNeverReturns
         }
+// ReSharper restore FunctionNeverReturns
 
         public static void Times(this int count, Action action)
         {

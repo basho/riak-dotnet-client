@@ -79,6 +79,9 @@
     <Compile Include="Models\CommitHook\RiakJavascriptCommitHook.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Models\MapReduce\Fluent\RiakFluentLinkPhase.cs" />
+    <Compile Include="Models\MapReduce\Fluent\RiakFluentActionPhaseErlang.cs" />
+    <Compile Include="Models\MapReduce\Fluent\RiakFluentActionPhaseJavascript.cs" />
     <Compile Include="Models\MapReduce\Inputs\IRiakPhaseInput.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -94,23 +97,26 @@
     <Compile Include="Models\MapReduce\Inputs\RiakPhaseInputs.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Models\MapReduce\RiakActionPhase.cs">
+    <Compile Include="Models\MapReduce\Languages\IRiakPhaseLanguage.cs" />
+    <Compile Include="Models\MapReduce\Languages\RiakPhaseLanguageErlang.cs" />
+    <Compile Include="Models\MapReduce\Languages\RiakPhaseLanguageJavascript.cs" />
+    <Compile Include="Models\MapReduce\Phases\RiakActionPhase.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Models\MapReduce\RiakLinkPhase.cs">
+    <Compile Include="Models\MapReduce\Phases\RiakLinkPhase.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Models\MapReduce\RiakMapPhase.cs">
+    <Compile Include="Models\MapReduce\Phases\RiakMapPhase.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Models\MapReduce\RiakMapReduceQuery.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Models\MapReduce\RiakMapReduceResultPhase.cs" />
-    <Compile Include="Models\MapReduce\RiakPhase.cs">
+    <Compile Include="Models\MapReduce\Phases\RiakPhase.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Models\MapReduce\RiakReducePhase.cs">
+    <Compile Include="Models\MapReduce\Phases\RiakReducePhase.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Models\MapReduce\RiakStreamedMapReduceResult.cs" />

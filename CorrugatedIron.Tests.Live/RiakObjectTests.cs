@@ -58,9 +58,6 @@ namespace CorrugatedIron.Tests.Live
 
             Client.Put(oj);
             Client.Put(jeremiah);
-            //jeremiah = Client.Get(TestBucket, Jeremiah).Value;
-            //jeremiah.RemoveLink(oj, "ozzies");
-            //Client.Put(jeremiah);
             Client.Put(brent);
             Client.Put(rob);
         }
@@ -89,7 +86,7 @@ namespace CorrugatedIron.Tests.Live
                                                 {
                                                     new RiakBucketKeyInput(TestBucket, Jeremiah )
                                                 }))
-                .Link(l => l.Empty());
+                .Link(l => l.Empty().Keep(true));
 
             var mrResult = Client.MapReduce(query);
             mrResult.IsSuccess.ShouldBeTrue();
@@ -110,13 +107,8 @@ namespace CorrugatedIron.Tests.Live
             var query = new RiakMapReduceQuery()
                 .Inputs(new RiakPhaseInputs(TestBucket))
                 .Filter(new Matches<string>(Jeremiah))
-                .Link(l => l.Tag("friends")
-                               .Bucket(TestBucket))
-                .Reduce(r => r.Langauge(RiakPhase.PhaseLanguage.Erlang)
-                                 .Module("riak_kv_mapreduce")
-                                 .Function("reduce_set_union")
-                                 .Keep(true)
-                );
+                .Link(l => l.Tag("friends").Bucket(TestBucket))
+                .ReduceErlang(r => r.ModFun("riak_kv_mapreduce", "reduce_set_union").Keep(true));
 
             var result = Client.MapReduce(query);
             result.IsSuccess.ShouldBeTrue();

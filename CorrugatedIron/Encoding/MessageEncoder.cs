@@ -79,7 +79,7 @@ namespace CorrugatedIron.Encoding
 
         public void Encode<T>(T message, Stream destination)
         {
-            var messageBody = default(byte[]);
+            byte[] messageBody;
 
             using (var memStream = new MemoryStream())
             {

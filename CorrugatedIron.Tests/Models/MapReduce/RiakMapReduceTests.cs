@@ -46,7 +46,7 @@ namespace CorrugatedIron.Tests.Models.MapReduce
                     ContentType = MrContentType
                 }
                 .Inputs(new RiakBucketInput("animals"))
-                .Map(m => m.Source("function(v) { return [v]; }").Keep(true));
+                .MapJs(m => m.Source("function(v) { return [v]; }").Keep(true));
 
             var request = query.ToMessage();
             request.ContentType.ShouldEqual(MrContentType.ToRiakString());
@@ -61,8 +61,8 @@ namespace CorrugatedIron.Tests.Models.MapReduce
                     ContentType = MrContentType
                 }
                 .Inputs(new RiakBucketInput("animals"))
-                .Map(m => m.Source("function(o) { if (o.key.indexOf('spider') != -1) return [1]; return []; }"))
-                .Reduce(r => r.Name("Riak.reduceSum").Keep(true));
+                .MapJs(m => m.Source("function(o) { if (o.key.indexOf('spider') != -1) return [1]; return []; }"))
+                .ReduceJs(r => r.Name("Riak.reduceSum").Keep(true));
 
             var request = query.ToMessage();
             request.Request.ShouldEqual(ComplexMrJobText.ToRiakString());
@@ -77,8 +77,8 @@ namespace CorrugatedIron.Tests.Models.MapReduce
                 }
                 .Inputs(new RiakBucketInput("animals"))
                 .Filter(new Matches<string>("spider"))
-                .Map(m => m.Source("function(o) { return [1]; }"))
-                .Reduce(r => r.Name("Riak.reduceSum").Keep(true));
+                .MapJs(m => m.Source("function(o) { return [1]; }"))
+                .ReduceJs(r => r.Name("Riak.reduceSum").Keep(true));
 
             var request = query.ToMessage();
             request.Request.ShouldEqual(ComplexMrJobWithFilterText.ToRiakString());

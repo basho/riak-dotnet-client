@@ -14,13 +14,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CorrugatedIron.Models.MapReduce
+using CorrugatedIron.Models.MapReduce.Languages;
+
+namespace CorrugatedIron.Models.MapReduce.Phases
 {
-    public class RiakReducePhase : RiakActionPhase
+    internal class RiakMapPhase<TLanguage> : RiakActionPhase<TLanguage>
+        where TLanguage : IRiakPhaseLanguage, new()
     {
         public override string PhaseType
         {
-            get { return "reduce"; }
+            get { return "map"; }
         }
     }
 }
