@@ -27,10 +27,10 @@ namespace CorrugatedIron.Models
     {
         public string Bucket { get; private set; }
         public string Key { get; private set; }
-        public byte[] Value { get; private set; }
-        public string ContentType { get; private set; }
-        public string ContentEncoding { get; private set; }
-        public string CharSet { get; private set; }
+        public byte[] Value { get; set; }
+        public string ContentType { get; set; }
+        public string ContentEncoding { get; set; }
+        public string CharSet { get; set; }
         public string VectorClock { get; private set; }
         public string VTag { get; private set; }
         public IDictionary<string, string> UserMetaData { get; set; }
