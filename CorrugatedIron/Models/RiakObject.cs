@@ -39,24 +39,19 @@ namespace CorrugatedIron.Models
         public IList<RiakLink> Links { get; private set; }
         public IList<RiakObject> Siblings { get; set; }
 
-        internal int hashCode;
-
-        internal bool IsDirty()
-        {
-            throw new System.NotImplementedException();
-        }
-
         private List<string> _vtags;
+        private int _hashCode;
+
+        public bool HasChanged
+        {
+            get { return _hashCode == CalculateHashCode(); }
+        }
 
         public List<string> VTags
         {
             get
             {
-                if (_vtags == null)
-                {
-                    _vtags = Siblings.Count == 0 ? new List<string> { VTag } : Siblings.Select(s => s.VTag).ToList();
-                }
-                return _vtags;
+                return _vtags ?? (_vtags = Siblings.Count == 0 ? new List<string> {VTag} : Siblings.Select(s => s.VTag).ToList());
             }
         }
 
@@ -161,11 +156,12 @@ namespace CorrugatedIron.Models
             LastModified = content.LastMod;
             LastModifiedUsec = content.LastModUSecs;
 
-            hashCode = GetHashCode();
+            _hashCode = CalculateHashCode();
         }
 
         internal RpbPutReq ToMessage()
         {
+            UpdateLastModified();
             var message = new RpbPutReq
             {
                 Bucket = Bucket.ToRiakString(),
@@ -194,27 +190,57 @@ namespace CorrugatedIron.Models
             return Equals((RiakObject) obj);
         }
 
-        internal void UpdateLastModified()
+        private void UpdateLastModified()
         {
-            var t = (DateTime.UtcNow - new DateTime(1970, 1, 1));
-            var ms = t.TotalMilliseconds;
+            if (HasChanged)
+            {
+                var t = DateTime.UtcNow - new DateTime(1970, 1, 1);
+                var ms = (ulong)Math.Round(t.TotalMilliseconds);
 
-            LastModified = (uint)(ms / 1000d);
-            LastModifiedUsec = (uint)((ms - (LastModified * 1000d)) * 100d);
+                LastModified = (uint)(ms / 1000u);
+                LastModifiedUsec = (uint)((ms - LastModified * 1000u) * 100u);
+
+                // TODO: figure out if we should be doing this or not, or should we isntead
+                // be exposing a "mark as clean" function which does this instead.
+                //_hashCode = CalculateHashCode();
+            }
         }
 
         public bool Equals(RiakObject other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Equals(other.Bucket, Bucket) && Equals(other.Key, Key) && Equals(other.Value, Value) && Equals(other.ContentType, ContentType) && Equals(other.ContentEncoding, ContentEncoding) && Equals(other.CharSet, CharSet) && Equals(other.VectorClock, VectorClock) && Equals(other.UserMetaData, UserMetaData) && other.LastModified == LastModified && other.LastModifiedUsec == LastModifiedUsec && Equals(other.Links, Links) && Equals(other._vtags, _vtags);
+            return Equals(other.Bucket, Bucket)
+                && Equals(other.Key, Key)
+                && Equals(other.Value, Value)
+                && Equals(other.ContentType, ContentType)
+                && Equals(other.ContentEncoding, ContentEncoding)
+                && Equals(other.CharSet, CharSet)
+                && Equals(other.VectorClock, VectorClock)
+                && Equals(other.UserMetaData, UserMetaData)
+                && other.LastModified == LastModified
+                && other.LastModifiedUsec == LastModifiedUsec
+                && Equals(other.Links, Links)
+                && Equals(other._vtags, _vtags)
+                && other.Links.SequenceEqual(Links)
+                && other.UserMetaData.SequenceEqual(UserMetaData);
         }
 
         public override int GetHashCode()
         {
+            return CalculateHashCode();
+        }
+
+        /// <summary>
+        /// This was moved into its own function that isn't virtual so that it could
+        /// be called inside the object's constructor.
+        /// </summary>
+        /// <returns>The Object's hash code.</returns>
+        private int CalculateHashCode()
+        {
             unchecked
             {
-                int result = (Bucket != null ? Bucket.GetHashCode() : 0);
+                var result = (Bucket != null ? Bucket.GetHashCode() : 0);
                 result = (result*397) ^ (Key != null ? Key.GetHashCode() : 0);
                 result = (result*397) ^ (Value != null ? Value.GetHashCode() : 0);
                 result = (result*397) ^ (ContentType != null ? ContentType.GetHashCode() : 0);
