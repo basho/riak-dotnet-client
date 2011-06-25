@@ -14,33 +14,32 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.IO;
-using System.Text;
+using CorrugatedIron.Extensions;
+using CorrugatedIron.Models.MapReduce.Languages;
 using Newtonsoft.Json;
 
-namespace CorrugatedIron.Models.CommitHook
+namespace CorrugatedIron.Models.MapReduce.Phases
 {
-    public interface IRiakCommitHook
+    internal abstract class RiakActionPhase<TLanguage> : RiakPhase
+        where TLanguage : IRiakPhaseLanguage, new()
     {
-        string ToJsonString();
-        void WriteJson(JsonWriter writer);
-    }
+        private string _argument;
+        public TLanguage Language { get; private set; }
 
-    public abstract class RiakCommitHook : IRiakCommitHook
-    {
-        public string ToJsonString()
+        protected RiakActionPhase()
         {
-            var sb = new StringBuilder();
-            
-            using(var sw = new StringWriter(sb))
-            using (JsonWriter writer = new JsonTextWriter(sw))
-            {
-                WriteJson(writer);
-            }
-            
-            return sb.ToString();
+            Language = new TLanguage();
         }
 
-        public abstract void WriteJson(JsonWriter writer);
+        public void Argument(string argument)
+        {
+            _argument = argument;
+        }
+
+        protected override void WriteJson(JsonWriter writer)
+        {
+            Language.WriteJson(writer);
+            writer.WriteSpecifiedProperty("arg", _argument);
+        }
     }
 }

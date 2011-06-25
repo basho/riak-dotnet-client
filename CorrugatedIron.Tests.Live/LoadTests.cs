@@ -68,8 +68,8 @@ namespace CorrugatedIron.Tests.Live.LoadTests
 
             var query = new RiakMapReduceQuery()
                 .Inputs(new RiakPhaseInputs(keys.Select(k => new RiakBucketKeyInput(MapReduceBucket, k)).ToList()))
-                .Map(m => m.Source(@"function(o){return[1];}"))
-                .Reduce(r => r.Name(@"Riak.reduceSum").Keep(true));
+                .MapJs(m => m.Source(@"function(o){return[1];}"))
+                .ReduceJs(r => r.Name(@"Riak.reduceSum").Keep(true));
             query.Compile();
 
             var batch = ThreadCount.Times(() => Tuple.Create(query, new Thread(DoMapRed), new List<RiakResult<RiakMapReduceResult>>())).ToArray();
@@ -117,8 +117,8 @@ namespace CorrugatedIron.Tests.Live.LoadTests
 
             var query = new RiakMapReduceQuery()
                 .Inputs(new RiakPhaseInputs(keys.Select(k => new RiakBucketKeyInput(MapReduceBucket, k)).ToList()))
-                .Map(m => m.Source(@"function(o){return[1];}"))
-                .Reduce(r => r.Name(@"Riak.reduceSum").Keep(true));
+                .MapJs(m => m.Source(@"function(o){return[1];}"))
+                .ReduceJs(r => r.Name(@"Riak.reduceSum").Keep(true));
             query.Compile();
 
             var batch = ThreadCount.Times(() => Tuple.Create(query, new Thread(DoStreamingMapRed), new List<RiakMapReduceResultPhase>())).ToArray();

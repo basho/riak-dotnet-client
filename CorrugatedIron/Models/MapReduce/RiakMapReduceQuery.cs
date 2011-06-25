@@ -21,7 +21,10 @@ using System.Text;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.KeyFilters;
 using CorrugatedIron.Messages;
+using CorrugatedIron.Models.MapReduce.Fluent;
 using CorrugatedIron.Models.MapReduce.Inputs;
+using CorrugatedIron.Models.MapReduce.Languages;
+using CorrugatedIron.Models.MapReduce.Phases;
 using CorrugatedIron.Util;
 using Newtonsoft.Json;
 
@@ -49,33 +52,54 @@ namespace CorrugatedIron.Models.MapReduce
             return this;
         }
 
-        public RiakMapReduceQuery Map(Action<RiakMapPhase> setup)
+        public RiakMapReduceQuery MapErlang(Action<RiakFluentActionPhaseErlang> setup)
         {
-            return Phase(setup);
+            var phase = new RiakMapPhase<RiakPhaseLanguageErlang>();
+            var fluent = new RiakFluentActionPhaseErlang(phase);
+            setup(fluent);
+            _phases.Add(phase);
+            return this;
         }
 
-        public RiakMapReduceQuery Reduce(Action<RiakReducePhase> setup)
+        public RiakMapReduceQuery MapJs(Action<RiakFluentActionPhaseJavascript> setup)
         {
-            return Phase(setup);
+            var phase = new RiakMapPhase<RiakPhaseLanguageJavascript>();
+            var fluent = new RiakFluentActionPhaseJavascript(phase);
+            setup(fluent);
+            _phases.Add(phase);
+            return this;
         }
 
-        public RiakMapReduceQuery Link(Action<RiakLinkPhase> setup)
+        public RiakMapReduceQuery ReduceErlang(Action<RiakFluentActionPhaseErlang> setup)
         {
-            return Phase(setup);
+            var phase = new RiakReducePhase<RiakPhaseLanguageErlang>();
+            var fluent = new RiakFluentActionPhaseErlang(phase);
+            setup(fluent);
+            _phases.Add(phase);
+            return this;
+        }
+
+        public RiakMapReduceQuery ReduceJs(Action<RiakFluentActionPhaseJavascript> setup)
+        {
+            var phase = new RiakReducePhase<RiakPhaseLanguageJavascript>();
+            var fluent = new RiakFluentActionPhaseJavascript(phase);
+            setup(fluent);
+            _phases.Add(phase);
+            return this;
+        }
+
+        public RiakMapReduceQuery Link(Action<RiakFluentLinkPhase> setup)
+        {
+            var phase = new RiakLinkPhase();
+            var fluent = new RiakFluentLinkPhase(phase);
+            setup(fluent);
+            _phases.Add(phase);
+            return this;
         }
 
         public RiakMapReduceQuery Filter(IRiakKeyFilterToken filter)
         {
             _filters.Add(filter);
-            return this;
-        }
-
-        private RiakMapReduceQuery Phase<TPhase>(Action<TPhase> setup)
-            where TPhase : RiakPhase, new()
-        {
-            var phase = new TPhase();
-            setup(phase);
-            _phases.Add(phase);
             return this;
         }
 

@@ -113,7 +113,7 @@ namespace CorrugatedIron.Comms
             Thread.CurrentThread.Name = "CommandRunner - " + Guid.NewGuid();
             while(_commandThreadRunning)
             {
-                RiakConnectionCommand cmd = null;
+                RiakConnectionCommand cmd;
                 if(_commands.TryDequeue(out cmd))
                 {
                     cmd.Execute(this);
@@ -173,7 +173,7 @@ namespace CorrugatedIron.Comms
             try
             {
                 var results = new List<TResult>();
-                var result = default(TResult);
+                TResult result;
                 do
                 {
                     result = _encoder.Decode<TResult>(PbcClientStream);
@@ -258,7 +258,7 @@ namespace CorrugatedIron.Comms
         private IEnumerable<TResult> PbcStreamReadIterator<TResult>(Func<TResult, bool> repeatRead, Action onFinish)
             where TResult : new()
         {
-            var result = default(RiakResult<TResult>);
+            RiakResult<TResult> result;
 
             do
             {
@@ -357,9 +357,14 @@ namespace CorrugatedIron.Comms
                 if (response.ContentLength > 0)
                 {
                     using (var responseStream = response.GetResponseStream())
-                    using (var reader = new StreamReader(responseStream, result.ContentEncoding))
                     {
-                        result.Body = reader.ReadToEnd();
+                        if (responseStream != null)
+                        {
+                            using (var reader = new StreamReader(responseStream, result.ContentEncoding))
+                            {
+                                result.Body = reader.ReadToEnd();
+                            }
+                        }
                     }
                 }
 

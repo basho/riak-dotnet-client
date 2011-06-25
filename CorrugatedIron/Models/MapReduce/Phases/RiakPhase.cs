@@ -14,40 +14,26 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
 using System.IO;
 using System.Text;
 using CorrugatedIron.Extensions;
-using CorrugatedIron.Util;
 using Newtonsoft.Json;
 
-namespace CorrugatedIron.Models.MapReduce
+namespace CorrugatedIron.Models.MapReduce.Phases
 {
-    public abstract class RiakPhase
+    internal abstract class RiakPhase
     {
-        public enum PhaseLanguage
-        {
-            Javascript,
-            Erlang
-        }
-
         public abstract string PhaseType { get; }
-        protected bool _keep;
-        protected bool _empty;
-
-        protected RiakPhase()
-        {
-        }
+        private bool _keep;
 
         public override string ToString()
         {
             return ToJsonString();
         }
 
-        public RiakPhase Keep(bool keep)
+        public void Keep(bool keep)
         {
             _keep = keep;
-            return this;
         }
 
         public string ToJsonString()
@@ -63,8 +49,7 @@ namespace CorrugatedIron.Models.MapReduce
                 // phase start
                 writer.WriteStartObject();
                 WriteJson(writer);
-                if (!_empty)
-                    writer.WriteProperty("keep", _keep);
+                writer.WriteProperty("keep", _keep);
                 writer.WriteEndObject();
                 // phase end
 
@@ -75,18 +60,5 @@ namespace CorrugatedIron.Models.MapReduce
         }
 
         protected abstract void WriteJson(JsonWriter writer);
-
-        protected static string ToString(PhaseLanguage language)
-        {
-            switch (language)
-            {
-                case PhaseLanguage.Javascript:
-                    return Constants.MapReduceLanguage.JavaScript;
-                case PhaseLanguage.Erlang:
-                    return Constants.MapReduceLanguage.Erlang;
-                default:
-                    throw new Exception("Unknown Map/Reduce language: {0}".Fmt(language));
-            }
-        }
     }
 }

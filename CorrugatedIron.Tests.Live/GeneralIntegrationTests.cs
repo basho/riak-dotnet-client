@@ -16,7 +16,6 @@
 
 using System;
 using System.Linq;
-using System.Net.Mime;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
@@ -116,8 +115,8 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
 
             var query = new RiakMapReduceQuery()
                 .Inputs(new RiakPhaseInputs(bucket))
-                .Map(m => m.Source(@"function(o) {return [ 1 ];}"))
-                .Reduce(r => r.Name(@"Riak.reduceSum").Keep(true));
+                .MapJs(m => m.Source(@"function(o) {return [ 1 ];}"))
+                .ReduceJs(r => r.Name(@"Riak.reduceSum").Keep(true));
 
             var result = Client.MapReduce(query);
             result.IsSuccess.ShouldBeTrue();

@@ -18,24 +18,22 @@ using System;
 using CorrugatedIron.Extensions;
 using Newtonsoft.Json;
 
-namespace CorrugatedIron.Models.MapReduce
+namespace CorrugatedIron.Models.MapReduce.Phases
 {
-    public class RiakLinkPhase : RiakPhase
+    internal class RiakLinkPhase : RiakPhase
     {
         private const string EmptyRestPhase = "_,_,_";
 
         private string _bucket;
         private string _tag;
-        private string _key;
 
         public RiakLinkPhase()
         {
-            
         }
 
         public RiakLinkPhase(string restPhase)
         {
-            if (string.IsNullOrEmpty(restPhase))
+            if (string.IsNullOrWhiteSpace(restPhase))
             {
                 Empty();
             }
@@ -50,43 +48,43 @@ namespace CorrugatedIron.Models.MapReduce
 
                 if (phases.Length != 3)
                 {
-                    throw new ArgumentException("When building a phase from a string, the phase must be in three parts <<bucket>>,<<key>>,<<tag>>.");
+                    throw new ArgumentException("When building a phase from a string, the phase must be in three parts <<bucket>>,,<<tag>>,<<keep>>.");
                 }
 
-                _bucket = !string.IsNullOrEmpty(phases[0]) ? phases[0] : default(string);
-                _key = !string.IsNullOrEmpty(phases[1]) ? phases[1] : default(string);
-                _tag = !string.IsNullOrEmpty(phases[2]) ? phases[2] : default(string);
+                _bucket = !string.IsNullOrWhiteSpace(phases[0]) ? phases[0] : default(string);
+                _tag = !string.IsNullOrWhiteSpace(phases[2]) ? phases[2] : default(string);
+
+                var keep = !string.IsNullOrWhiteSpace(phases[1]) && phases[1] == "1";
+                Keep(keep);
             }
         }
 
         public RiakLinkPhase(RiakLink riakLink)
         {
-            if (string.IsNullOrEmpty(riakLink.Bucket)
-                && string.IsNullOrEmpty(riakLink.Key)
-                && string.IsNullOrEmpty(riakLink.Tag))
+            if (string.IsNullOrWhiteSpace(riakLink.Bucket)
+                && string.IsNullOrWhiteSpace(riakLink.Key)
+                && string.IsNullOrWhiteSpace(riakLink.Tag))
             {
                 Empty();
             }
             else
             {
                 _bucket = riakLink.Bucket;
-                _key = riakLink.Key;
                 _tag = riakLink.Tag;
             }
         }
 
         public RiakLinkPhase FromRiakLink(RiakLink riakLink)
         {
-            if (string.IsNullOrEmpty(riakLink.Bucket)
-                && string.IsNullOrEmpty(riakLink.Key)
-                && string.IsNullOrEmpty(riakLink.Tag))
+            if (string.IsNullOrWhiteSpace(riakLink.Bucket)
+                && string.IsNullOrWhiteSpace(riakLink.Key)
+                && string.IsNullOrWhiteSpace(riakLink.Tag))
             {
                 Empty();
             }
             else
             {
                 _bucket = riakLink.Bucket;
-                _key = riakLink.Key;
                 _tag = riakLink.Tag;
             }
             
@@ -101,38 +99,27 @@ namespace CorrugatedIron.Models.MapReduce
         public RiakLinkPhase Bucket(string bucket)
         {
             _bucket = bucket;
-            _empty = false;
             return this;
         }
 
         public RiakLinkPhase Tag(string tag)
         {
             _tag = tag;
-            _empty = false;
-            return this;
-        }
-
-        public RiakLinkPhase Key(string key)
-        {
-            _key = key;
-            _empty = false;
             return this;
         }
 
         public RiakLinkPhase Empty()
         {
-            _empty = true;
             _bucket = default(string);
-            _key = default(string);
             _tag = default(string);
+            Keep(false);
             return this;
         }
 
         protected override void WriteJson(JsonWriter writer)
         {
             writer.WriteSpecifiedProperty("bucket", _bucket)
-                .WriteSpecifiedProperty("tag", _tag)
-                .WriteSpecifiedProperty("key", _key);
+                .WriteSpecifiedProperty("tag", _tag);
         }
     }
 }
