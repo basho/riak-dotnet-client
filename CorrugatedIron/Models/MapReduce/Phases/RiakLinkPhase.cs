@@ -22,41 +22,11 @@ namespace CorrugatedIron.Models.MapReduce.Phases
 {
     internal class RiakLinkPhase : RiakPhase
     {
-        private const string EmptyRestPhase = "_,_,_";
-
         private string _bucket;
         private string _tag;
 
         public RiakLinkPhase()
         {
-        }
-
-        public RiakLinkPhase(string restPhase)
-        {
-            if (string.IsNullOrWhiteSpace(restPhase))
-            {
-                Empty();
-            }
-
-            if (restPhase == EmptyRestPhase)
-            {
-                Empty();
-            }
-            else
-            {
-                var phases = restPhase.Split(',');
-
-                if (phases.Length != 3)
-                {
-                    throw new ArgumentException("When building a phase from a string, the phase must be in three parts <<bucket>>,,<<tag>>,<<keep>>.");
-                }
-
-                _bucket = !string.IsNullOrWhiteSpace(phases[0]) ? phases[0] : default(string);
-                _tag = !string.IsNullOrWhiteSpace(phases[2]) ? phases[2] : default(string);
-
-                var keep = !string.IsNullOrWhiteSpace(phases[1]) && phases[1] == "1";
-                Keep(keep);
-            }
         }
 
         public RiakLinkPhase(RiakLink riakLink)
