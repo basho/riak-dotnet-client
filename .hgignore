@@ -26,3 +26,4 @@ _Re*
 *.pidb
 *.zip
 test-results/*
+*.dotCover
