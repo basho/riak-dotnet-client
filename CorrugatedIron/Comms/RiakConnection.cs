@@ -319,10 +319,10 @@ namespace CorrugatedIron.Comms
 
             if (!request.Cache)
             {
-                req.Headers.Set(Constants.Rest.HttpHeaders.DisableCacheKey, Constants.Rest.HttpHeaders.DisableCacheValue);
+                req.Headers.Set(RiakConstants.Rest.HttpHeaders.DisableCacheKey, RiakConstants.Rest.HttpHeaders.DisableCacheValue);
             }
 
-            request.Headers.Add(Constants.Rest.HttpHeaders.ClientId, _restClientId);
+            request.Headers.Add(RiakConstants.Rest.HttpHeaders.ClientId, _restClientId);
 
             request.Headers.ForEach(h => req.Headers.Set(h.Key, h.Value));
 

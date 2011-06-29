@@ -36,7 +36,7 @@ namespace CorrugatedIron.Models.MapReduce.Languages
             System.Diagnostics.Debug.Assert(!string.IsNullOrWhiteSpace(_module), "Module must be set");
             System.Diagnostics.Debug.Assert(!string.IsNullOrWhiteSpace(_function), "Function must be set");
 
-            writer.WriteSpecifiedProperty("language", Constants.MapReduceLanguage.Erlang)
+            writer.WriteSpecifiedProperty("language", RiakConstants.MapReduceLanguage.Erlang)
                 .WriteSpecifiedProperty("module", _module)
                 .WriteSpecifiedProperty("function", _function);
         }

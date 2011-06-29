@@ -36,7 +36,7 @@ namespace CorrugatedIron.Models.Rest
             Method = method;
             Headers = new Dictionary<string, string>();
             QueryParams = new Dictionary<string, string>();
-            Timeout = Constants.Defaults.Rest.Timeout;
+            Timeout = RiakConstants.Defaults.Rest.Timeout;
             Cache = false;
         }
 

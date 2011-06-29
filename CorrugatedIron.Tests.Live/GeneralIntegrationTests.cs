@@ -56,7 +56,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         [Test]
         public void WritingThenReadingJsonIsSuccessful()
         {
-            var doc = new RiakObject(TestBucket, TestKey, TestJson, Constants.ContentTypes.ApplicationJson);
+            var doc = new RiakObject(TestBucket, TestKey, TestJson, RiakConstants.ContentTypes.ApplicationJson);
 
             var writeResult = Client.Put(doc);
             writeResult.IsSuccess.ShouldBeTrue(writeResult.ErrorMessage);
@@ -76,7 +76,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         public void BulkInsertFetchDeleteWorksAsExpected()
         {
             var keys = new[] { 1, 2, 3, 4, 5 }.Select(i => TestKey + i);
-            var docs = keys.Select(k => new RiakObject(TestBucket, k, TestJson, Constants.ContentTypes.ApplicationJson)).ToList();
+            var docs = keys.Select(k => new RiakObject(TestBucket, k, TestJson, RiakConstants.ContentTypes.ApplicationJson)).ToList();
 
             var writeResult = Client.Put(docs);
 
@@ -94,7 +94,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         [Test]
         public void DeletingIsSuccessful()
         {
-            var doc = new RiakObject(TestBucket, TestKey, TestJson, Constants.ContentTypes.ApplicationJson);
+            var doc = new RiakObject(TestBucket, TestKey, TestJson, RiakConstants.ContentTypes.ApplicationJson);
             Client.Put(doc).IsSuccess.ShouldBeTrue();
 
             var result = Client.Get(TestBucket, TestKey);
@@ -115,7 +115,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             for (var i = 1; i < 11; i++)
             {
                 var newData = string.Format(dummyData, i);
-                var doc = new RiakObject(bucket, i.ToString(), newData, Constants.ContentTypes.ApplicationJson);
+                var doc = new RiakObject(bucket, i.ToString(), newData, RiakConstants.ContentTypes.ApplicationJson);
 
                 Client.Put(doc).IsSuccess.ShouldBeTrue();
             }
@@ -145,7 +145,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         [Test]
         public void ListBucketsIncludesTestBucket()
         {
-            var doc = new RiakObject(TestBucket, TestKey, TestJson, Constants.ContentTypes.ApplicationJson);
+            var doc = new RiakObject(TestBucket, TestKey, TestJson, RiakConstants.ContentTypes.ApplicationJson);
             Client.Put(doc).IsSuccess.ShouldBeTrue();
 
             var result = Client.ListBuckets();
@@ -156,7 +156,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         [Test]
         public void ListKeysIncludesTestKey()
         {
-            var doc = new RiakObject(TestBucket, TestKey, TestJson, Constants.ContentTypes.ApplicationJson);
+            var doc = new RiakObject(TestBucket, TestKey, TestJson, RiakConstants.ContentTypes.ApplicationJson);
             Client.Put(doc).IsSuccess.ShouldBeTrue();
 
             var result = Client.ListKeys(TestBucket);
@@ -167,7 +167,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         [Test]
         public void StreamListKeysIncludesTestKey()
         {
-            var doc = new RiakObject(TestBucket, TestKey, TestJson, Constants.ContentTypes.ApplicationJson);
+            var doc = new RiakObject(TestBucket, TestKey, TestJson, RiakConstants.ContentTypes.ApplicationJson);
             Client.Put(doc).IsSuccess.ShouldBeTrue();
 
             var result = Client.StreamListKeys(TestBucket);
@@ -186,11 +186,11 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             props.CanUsePbc.ShouldBeFalse();
             Client.SetBucketProperties(MultiBucket, props).IsSuccess.ShouldBeTrue();
 
-            var doc = new RiakObject(MultiBucket, MultiKey, MultiBodyOne, Constants.ContentTypes.ApplicationJson);
+            var doc = new RiakObject(MultiBucket, MultiKey, MultiBodyOne, RiakConstants.ContentTypes.ApplicationJson);
             var writeResult1 = Client.Put(doc);
             writeResult1.IsSuccess.ShouldBeTrue();
 
-            doc = new RiakObject(MultiBucket, MultiKey, MultiBodyTwo, Constants.ContentTypes.ApplicationJson);
+            doc = new RiakObject(MultiBucket, MultiKey, MultiBodyTwo, RiakConstants.ContentTypes.ApplicationJson);
             var writeResult2 = Client.Put(doc);
             writeResult2.IsSuccess.ShouldBeTrue();
             writeResult2.Value.Siblings.Count.ShouldEqual(2);
@@ -207,10 +207,10 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             props.CanUsePbc.ShouldBeTrue();
             Client.SetBucketProperties(MultiBucket, props).IsSuccess.ShouldBeTrue();
 
-            var doc = new RiakObject(MultiBucket, MultiKey, MultiBodyOne, Constants.ContentTypes.ApplicationJson);
+            var doc = new RiakObject(MultiBucket, MultiKey, MultiBodyOne, RiakConstants.ContentTypes.ApplicationJson);
             Client.Put(doc).IsSuccess.ShouldBeTrue();
 
-            doc = new RiakObject(MultiBucket, MultiKey, MultiBodyTwo, Constants.ContentTypes.ApplicationJson);
+            doc = new RiakObject(MultiBucket, MultiKey, MultiBodyTwo, RiakConstants.ContentTypes.ApplicationJson);
             Client.Put(doc).IsSuccess.ShouldBeTrue();
 
             var result = Client.Get(MultiBucket, MultiKey);
@@ -229,7 +229,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             for (var i = 1; i < 11; i++)
             {
                 var newData = string.Format(dummyData, i);
-                var doc = new RiakObject(bucket, i.ToString(), newData, Constants.ContentTypes.ApplicationJson);
+                var doc = new RiakObject(bucket, i.ToString(), newData, RiakConstants.ContentTypes.ApplicationJson);
 
                 Client.Put(doc);
             }
@@ -249,7 +249,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         {
             const string dummyData = "{{ value: 1234; }}";
             const string changedData = "{{ value: 12345 }}";
-            var o = new RiakObject(TestBucket, "1234", dummyData, Constants.ContentTypes.ApplicationJson);
+            var o = new RiakObject(TestBucket, "1234", dummyData, RiakConstants.ContentTypes.ApplicationJson);
 
             var lm1 = o.LastModified;
             var lmu1 = o.LastModifiedUsec;
@@ -278,7 +278,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         [Test]
         public void DeletingAnObjectDeletesAnObject()
         {
-            var doc = new RiakObject(TestBucket, TestKey, TestJson, Constants.ContentTypes.ApplicationJson);
+            var doc = new RiakObject(TestBucket, TestKey, TestJson, RiakConstants.ContentTypes.ApplicationJson);
             Client.Put(doc).IsSuccess.ShouldBeTrue();
 
             var deleteResult = Client.Delete(doc.Bucket, doc.Key);

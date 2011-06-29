@@ -56,12 +56,12 @@ namespace CorrugatedIron.Models
         }
 
         public RiakObject(string bucket, string key, string value)
-            : this(bucket, key, value, Constants.Defaults.ContentType)
+            : this(bucket, key, value, RiakConstants.Defaults.ContentType)
         {
         }
 
         public RiakObject(string bucket, string key, string value, string contentType)
-            : this(bucket, key, value, contentType, Constants.Defaults.CharSet)
+            : this(bucket, key, value, contentType, RiakConstants.Defaults.CharSet)
         {
         }
 

@@ -16,7 +16,7 @@
 
 namespace CorrugatedIron.Util
 {
-    public static class Constants
+    public static class RiakConstants
     {
         public static class ContentTypes
         {

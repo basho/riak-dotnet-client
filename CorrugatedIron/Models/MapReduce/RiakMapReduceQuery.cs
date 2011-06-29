@@ -43,7 +43,7 @@ namespace CorrugatedIron.Models.MapReduce
         {
             _phases = new List<RiakPhase>();
             _filters = new List<IRiakKeyFilterToken>();
-            ContentType = Constants.ContentTypes.ApplicationJson;
+            ContentType = RiakConstants.ContentTypes.ApplicationJson;
         }
 
         public RiakMapReduceQuery Inputs(RiakPhaseInputs inputs)
