@@ -54,6 +54,24 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         }
 
         [Test]
+        public void GetsReturnObjects()
+        {
+            var doc = new RiakObject(TestBucket, TestKey, TestJson, RiakConstants.ContentTypes.ApplicationJson);
+            var writeResult = Client.Put(doc);
+
+            writeResult.IsSuccess.ShouldBeTrue();
+            writeResult.Value.ShouldNotBeNull();
+
+            var readResult = Client.Get(TestBucket, TestKey);
+            readResult.IsSuccess.ShouldBeTrue();
+            readResult.Value.ShouldNotBeNull();
+
+            var otherDoc = readResult.Value;
+            otherDoc.Bucket.ShouldEqual(doc.Bucket);
+            otherDoc.Key.ShouldEqual(doc.Key);
+        }
+
+        [Test]
         public void WritingThenReadingJsonIsSuccessful()
         {
             var doc = new RiakObject(TestBucket, TestKey, TestJson, RiakConstants.ContentTypes.ApplicationJson);
