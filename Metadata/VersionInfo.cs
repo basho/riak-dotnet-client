@@ -1,15 +1,13 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("CorrugatedIron")]
+[assembly: AssemblyCompany("Distributed Nonsense")]
 [assembly: AssemblyProduct("CorrugatedIron")]
 [assembly: AssemblyCopyright("Copyright © OJ Reeves & Jeremiah Peschka 2011")]
-[assembly: AssemblyTrademark("CorrugatedIron")]
+[assembly: AssemblyTrademark("CorrugatedIron - Distributed Nonsense")]
 [assembly: AssemblyCulture("")]
 
 // version: Major.Minor.Revision.Build
@@ -18,5 +16,5 @@ using System.Runtime.InteropServices;
 // move to the Major version number.
 // We'll use the revision number for hot fix release and probably leave the build
 // number alone. It's left here because Windows binaries use 4 numbers.
-[assembly: AssemblyVersion("0.0.1.0")]
-[assembly: AssemblyFileVersion("0.0.1.0")]
+[assembly: AssemblyVersion("0.0.2.0")]
+[assembly: AssemblyFileVersion("0.0.2.0")]
