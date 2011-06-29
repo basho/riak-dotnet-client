@@ -274,5 +274,20 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             lm2.ShouldNotEqual(lm3);
             lmu2.ShouldNotEqual(lmu3);
         }
+
+        [Test]
+        public void DeletingAnObjectDeletesAnObject()
+        {
+            var doc = new RiakObject(TestBucket, TestKey, TestJson, Constants.ContentTypes.ApplicationJson);
+            Client.Put(doc).IsSuccess.ShouldBeTrue();
+
+            var deleteResult = Client.Delete(doc.Bucket, doc.Key);
+            deleteResult.IsSuccess.ShouldBeTrue();
+
+            var getResult = Client.Get(doc.Bucket, doc.Key);
+            getResult.IsSuccess.ShouldBeFalse();
+            getResult.Value.ShouldBeNull();
+            getResult.ResultCode.ShouldEqual(ResultCode.NotFound);
+        }
     }
 }
