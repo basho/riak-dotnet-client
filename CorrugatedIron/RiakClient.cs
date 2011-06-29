@@ -583,10 +583,5 @@ namespace CorrugatedIron
         {
             return "{0}/{1}".Fmt(Constants.Rest.Uri.RiakRoot, bucket);
         }
-
-        private static string ToKey(string bucket, string key)
-        {
-            return "{0}/{1}/{2}".Fmt(Constants.Rest.Uri.RiakRoot, bucket, key);
-        }
     }
 }
