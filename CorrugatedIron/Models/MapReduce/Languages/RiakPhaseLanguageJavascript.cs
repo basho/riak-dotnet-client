@@ -63,7 +63,7 @@ namespace CorrugatedIron.Models.MapReduce.Languages
                 System.Diagnostics.Debug.Assert(!string.IsNullOrWhiteSpace(_key), "Key should not be empty");
             }
 
-            writer.WriteSpecifiedProperty("language", Constants.MapReduceLanguage.JavaScript)
+            writer.WriteSpecifiedProperty("language", RiakConstants.MapReduceLanguage.JavaScript)
                 .WriteSpecifiedProperty("source", _source)
                 .WriteSpecifiedProperty("name", _name)
                 .WriteSpecifiedProperty("bucket", _bucket)

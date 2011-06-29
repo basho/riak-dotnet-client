@@ -81,8 +81,8 @@ namespace CorrugatedIron.Tests.Comms.RiakClientSetBucketPropertiesTests
         [Test]
         public void RestInterfaceIsInvokedWithAppropriateValues()
         {
-            Cluster.ConnectionMock.Verify(m => m.RestRequest(It.Is<RiakRestRequest>(r => r.ContentType == Constants.ContentTypes.ApplicationJson
-                && r.Method == Constants.Rest.HttpMethod.Put)), Times.Once());
+            Cluster.ConnectionMock.Verify(m => m.RestRequest(It.Is<RiakRestRequest>(r => r.ContentType == RiakConstants.ContentTypes.ApplicationJson
+                && r.Method == RiakConstants.Rest.HttpMethod.Put)), Times.Once());
         }
     }
 

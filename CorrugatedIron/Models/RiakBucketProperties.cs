@@ -170,7 +170,7 @@ namespace CorrugatedIron.Models
 
         public RiakBucketProperties(RiakRestResponse response)
         {
-            System.Diagnostics.Debug.Assert(response.ContentType == Constants.ContentTypes.ApplicationJson);
+            System.Diagnostics.Debug.Assert(response.ContentType == RiakConstants.ContentTypes.ApplicationJson);
 
             var json = JObject.Parse(response.Body);
             var props = (JObject)json["props"];

@@ -36,12 +36,12 @@ namespace CorrugatedIron.Tests.Live
         {
             base.SetUp();
 
-            var oj = new RiakObject(TestBucket, OJ, @"{""name"":""oj""}", Constants.ContentTypes.ApplicationJson);
+            var oj = new RiakObject(TestBucket, OJ, @"{""name"":""oj""}", RiakConstants.ContentTypes.ApplicationJson);
             var jeremiah = new RiakObject(TestBucket, Jeremiah, @"{""name"":""jeremiah""}",
-                                          Constants.ContentTypes.ApplicationJson);
+                                          RiakConstants.ContentTypes.ApplicationJson);
             var brent = new RiakObject(TestBucket, Brent, @"{""name"":""brent""}",
-                                       Constants.ContentTypes.ApplicationJson);
-            var rob = new RiakObject(TestBucket, Rob, @"{""name"":""rob""}", Constants.ContentTypes.ApplicationJson);
+                                       RiakConstants.ContentTypes.ApplicationJson);
+            var rob = new RiakObject(TestBucket, Rob, @"{""name"":""rob""}", RiakConstants.ContentTypes.ApplicationJson);
 
             oj.LinkTo(jeremiah, "friends");
             oj.LinkTo(jeremiah, "coworkers");

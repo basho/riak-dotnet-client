@@ -36,7 +36,7 @@ namespace CorrugatedIron.Tests.Models.MapReduce
         private const string ComplexMrJobWithFilterText =
             @"{""inputs"":""animals"",""key_filters"":[[""matches"",""spider""]],""query"":[{""map"":{""language"":""javascript"",""source"":""function(o) { return [1]; }"",""keep"":false}},{""reduce"":{""language"":""javascript"",""name"":""Riak.reduceSum"",""keep"":true}}]}";
 
-        private const string MrContentType = Constants.ContentTypes.ApplicationJson;
+        private const string MrContentType = RiakConstants.ContentTypes.ApplicationJson;
 
         [Test]
         public void BuildingSimpleMapReduceJobsWithTheApiProducesByteArrays()

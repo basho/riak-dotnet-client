@@ -59,7 +59,7 @@ namespace CorrugatedIron.Tests.Live.LoadTests
             {
                 var key = "key" + i;
                 var newData = string.Format(dummyData, i);
-                var doc = new RiakObject(MapReduceBucket, key, newData, Constants.ContentTypes.ApplicationJson);
+                var doc = new RiakObject(MapReduceBucket, key, newData, RiakConstants.ContentTypes.ApplicationJson);
                 keys.Add(key);
 
                 var result = Client.Put(doc, new RiakPutOptions { ReturnBody = true });
@@ -108,7 +108,7 @@ namespace CorrugatedIron.Tests.Live.LoadTests
             {
                 var key = "key" + i;
                 var newData = string.Format(dummyData, i);
-                var doc = new RiakObject(MapReduceBucket, key, newData, Constants.ContentTypes.ApplicationJson);
+                var doc = new RiakObject(MapReduceBucket, key, newData, RiakConstants.ContentTypes.ApplicationJson);
                 keys.Add(key);
 
                 var result = Client.Put(doc, new RiakPutOptions { ReturnBody = true });

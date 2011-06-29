@@ -42,7 +42,7 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
         {
             Func<string> generator = () => Guid.NewGuid().ToString();
             var bucket = generator();
-            var pairs = generator.Replicate(10).Select(f => new RiakObject(bucket, f(), "foo", Constants.ContentTypes.TextPlain)).ToList();
+            var pairs = generator.Replicate(10).Select(f => new RiakObject(bucket, f(), "foo", RiakConstants.ContentTypes.TextPlain)).ToList();
             Client.Put(pairs);
 
             var results = Client.ListKeys(bucket);

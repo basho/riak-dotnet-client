@@ -154,7 +154,7 @@
     <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="Extensions\JsonExtensions.cs" />
     <Compile Include="KeyFilters\RiakCompositeKeyFilterToken.cs" />
-    <Compile Include="Util\Constants.cs" />
+    <Compile Include="Util\RiakConstants.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Messages\MessageCode.cs" />
     <Compile Include="Messages\RpbBucketProps.cs" />
