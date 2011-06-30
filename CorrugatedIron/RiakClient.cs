@@ -89,19 +89,9 @@ namespace CorrugatedIron
         private byte[] _clientId;
 
         public RiakClient(IRiakCluster cluster)
-            : this(cluster, GetClientId())
-        {
-        }
-
-        public RiakClient(IRiakCluster cluster, int clientId)
-            : this(cluster, RiakConnection.ToClientId(clientId))
-        {
-        }
-
-        public RiakClient(IRiakCluster cluster, byte[] clientId)
         {
             _cluster = cluster;
-            ClientId = clientId;
+            ClientId = GetClientId();
         }
 
         public byte[] ClientId
@@ -109,8 +99,10 @@ namespace CorrugatedIron
             get { return _clientId; }
             set
             {
-                System.Diagnostics.Debug.Assert(value != null && value.Length == RiakConstants.ClientIdLength,
-                    "Client ID must be exactly {0} bytes long.".Fmt(RiakConstants.ClientIdLength));
+                if(value == null || value.Length != RiakConstants.ClientIdLength)
+                {
+                    throw new ArgumentException("Client ID must be exactly {0} bytes long.".Fmt(RiakConstants.ClientIdLength), "value");
+                }
 
                 _clientId = value;
             }

@@ -31,7 +31,7 @@ namespace CorrugatedIron.Models
         public string ContentType { get; set; }
         public string ContentEncoding { get; set; }
         public string CharSet { get; set; }
-        public string VectorClock { get; private set; }
+        public byte[] VectorClock { get; private set; }
         public string VTag { get; private set; }
         public IDictionary<string, string> UserMetaData { get; set; }
         public uint LastModified { get; internal set; }
@@ -144,7 +144,7 @@ namespace CorrugatedIron.Models
         {
             Bucket = bucket;
             Key = key;
-            VectorClock = vectorClock.FromRiakString();
+            VectorClock = vectorClock;
 
             Value = content.Value;
             VTag = content.VTag.FromRiakString();
@@ -166,7 +166,7 @@ namespace CorrugatedIron.Models
             {
                 Bucket = Bucket.ToRiakString(),
                 Key = Key.ToRiakString(),
-                VectorClock = VectorClock.ToRiakString(),
+                VectorClock = VectorClock,
                 Content = new RpbContent
                 {
                     ContentType = ContentType.ToRiakString(),
