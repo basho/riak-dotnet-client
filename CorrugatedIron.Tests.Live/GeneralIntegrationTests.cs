@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
@@ -60,6 +61,45 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             var readResult = Client.Get("nobucket", "novalue");
             readResult.IsSuccess.ShouldBeFalse();
             readResult.ResultCode.ShouldEqual(ResultCode.NotFound);
+        }
+
+        [Test]
+        public void GetsWithBucketAndKeyReturnObjects()
+        {
+            var doc = new RiakObject(TestBucket, TestKey, TestJson, RiakConstants.ContentTypes.ApplicationJson);
+            var writeResult = Client.Put(doc);
+
+            writeResult.IsSuccess.ShouldBeTrue();
+            writeResult.Value.ShouldNotBeNull();
+
+            var readResult = Client.Get(TestBucket, TestKey);
+            readResult.IsSuccess.ShouldBeTrue();
+            readResult.Value.ShouldNotBeNull();
+
+            var otherDoc = readResult.Value;
+            otherDoc.Bucket.ShouldEqual(TestBucket);
+            otherDoc.Bucket.ShouldEqual(doc.Bucket);
+            otherDoc.Key.ShouldEqual(TestKey);
+            otherDoc.Key.ShouldEqual(doc.Key);
+        }
+
+        [Test]
+        public void GetsWithRiakObjectIdReturnObjects()
+        {
+            var doc = new RiakObject(TestBucket, TestKey, TestJson, RiakConstants.ContentTypes.ApplicationJson);
+            var writeResult = Client.Put(doc);
+
+            writeResult.IsSuccess.ShouldBeTrue();
+            writeResult.Value.ShouldNotBeNull();
+
+            var riakObjectId = new RiakObjectId(TestBucket, TestKey);
+            var readResult = Client.Get(riakObjectId);
+
+            var otherDoc = readResult.Value;
+            otherDoc.Bucket.ShouldEqual(TestBucket);
+            otherDoc.Bucket.ShouldEqual(doc.Bucket);
+            otherDoc.Key.ShouldEqual(TestKey);
+            otherDoc.Key.ShouldEqual(doc.Key);
         }
 
         [Test]
@@ -324,6 +364,33 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             getResult.IsSuccess.ShouldBeFalse();
             getResult.Value.ShouldBeNull();
             getResult.ResultCode.ShouldEqual(ResultCode.NotFound);
+        }
+
+        [Test]
+        public void AsyncListKeysReturnsTheCorrectNumberOfResults()
+        {
+            const string dummyData = "{{ value: {0} }}";
+            
+            for (var i = 1; i < 11; i++)
+            {
+                var newData = string.Format(dummyData, i);
+                var doc = new RiakObject(TestBucket, i.ToString(), newData, RiakConstants.ContentTypes.ApplicationJson);
+
+                Client.Put(doc).IsSuccess.ShouldBeTrue();
+            }
+
+            RiakResult<IEnumerable<string>> theResult = null;
+            var resetEvnt = new AutoResetEvent(false);
+            Client.ListKeys(TestBucket, result =>
+                                            {
+                                                theResult = result;
+                                                resetEvnt.Set();
+                                            });
+
+            resetEvnt.WaitOne();
+            theResult.IsSuccess.ShouldBeTrue();
+            theResult.Value.ShouldNotBeNull();
+            theResult.Value.ToList().Count.ShouldEqual(10);
         }
     }
 }
