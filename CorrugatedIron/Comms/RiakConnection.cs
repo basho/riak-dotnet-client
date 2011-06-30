@@ -383,9 +383,9 @@ namespace CorrugatedIron.Comms
 
         public void Dispose()
         {
-            CleanUp();
             _commandThreadRunning = false;
             _commandThread.Join();
+            CleanUp();
         }
 
         private void CleanUp()

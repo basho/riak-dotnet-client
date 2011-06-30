@@ -15,6 +15,7 @@
 // under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Models;
@@ -36,6 +37,14 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         {
             var result = Client.GetServerInfo();
             result.IsSuccess.ShouldBeTrue();
+        }
+
+        [Test]
+        public void ServerInfoIsSuccessfullyExtractedAsynchronously()
+        {
+            var asyncTester = new AsyncMethodTester<RiakResult<RiakServerInfo>>();
+            Client.GetServerInfo(asyncTester.HandleResult);
+            asyncTester.Result.IsSuccess.ShouldBeTrue();
         }
 
         [Test]
@@ -69,7 +78,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             loadedDoc.Bucket.ShouldEqual(doc.Bucket);
             loadedDoc.Key.ShouldEqual(doc.Key);
             loadedDoc.Value.ShouldEqual(doc.Value);
-            loadedDoc.VectorClock.ShouldNotBeNullOrEmpty();
+            loadedDoc.VectorClock.ShouldNotBeNull();
         }
 
         [Test]
@@ -238,6 +247,33 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             keyList.Value.Count().ShouldEqual(10);
 
             Client.DeleteBucket(bucket);
+            
+            keyList = Client.ListKeys(bucket);
+            keyList.Value.Count().ShouldEqual(0);
+            Client.ListBuckets().Value.Contains(bucket).ShouldBeFalse();
+        }
+
+        [Test]
+        public void DeleteBucketDeletesAllKeysInABucketAsynchronously()
+        {
+            // add multiple keys
+            const string dummyData = "{{ value: {0} }}";
+            var bucket = Guid.NewGuid().ToString();
+
+            for (var i = 1; i < 11; i++)
+            {
+                var newData = string.Format(dummyData, i);
+                var doc = new RiakObject(bucket, i.ToString(), newData, RiakConstants.ContentTypes.ApplicationJson);
+
+                Client.Put(doc);
+            }
+
+            var keyList = Client.ListKeys(bucket);
+            keyList.Value.Count().ShouldEqual(10);
+
+            var asyncTester = new AsyncMethodTester<IEnumerable<RiakResult>>();
+            Client.DeleteBucket(bucket, asyncTester.HandleResult);
+            var result = asyncTester.Result;
             
             keyList = Client.ListKeys(bucket);
             keyList.Value.Count().ShouldEqual(0);
