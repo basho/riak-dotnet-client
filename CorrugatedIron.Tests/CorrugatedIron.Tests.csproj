@@ -64,6 +64,7 @@
     <Compile Include="Comms\RiakClientSetBucketPropertiesTests.cs" />
     <Compile Include="Comms\RiakClientTestBase.cs" />
     <Compile Include="Comms\RiakClientPingTests.cs" />
+    <Compile Include="Comms\RiakClientTests.cs" />
     <Compile Include="Encoding\MessageEncoderUnitTests.cs" />
     <Compile Include="Extensions\UnitTestExtensions.cs" />
     <Compile Include="Models\MapReduce\RiakMapReduceTests.cs" />
