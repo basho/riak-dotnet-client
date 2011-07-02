@@ -46,6 +46,8 @@ namespace CorrugatedIron
 
         IEnumerable<RiakResult<RiakObject>> Get(IEnumerable<RiakObjectId> bucketKeyPairs,
                                                 uint rVal = RiakConstants.Defaults.RVal);
+        void Get(IEnumerable<RiakObjectId> bucketKeyPairs, Action<IEnumerable<RiakResult<RiakObject>>> callback,
+                 uint rVal = RiakConstants.Defaults.RVal);
 
         RiakResult<RiakObject> Put(RiakObject value, RiakPutOptions options = null);
         void Put(RiakObject value, Action<RiakResult<RiakObject>> callback, RiakPutOptions options = null);
