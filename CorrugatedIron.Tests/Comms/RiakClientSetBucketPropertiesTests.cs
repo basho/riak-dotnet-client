@@ -61,7 +61,7 @@ namespace CorrugatedIron.Tests.Comms.RiakClientSetBucketPropertiesTests
         {
             Cluster = new MockCluster();
             ClientId = System.Text.Encoding.Default.GetBytes("fadjskl").Take(4).ToArray();
-            Client = new RiakClient(Cluster, ClientId);
+            Client = new RiakClient(Cluster) {ClientId = ClientId};
         }
     }
 
