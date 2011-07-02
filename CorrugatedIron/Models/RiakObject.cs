@@ -140,6 +140,11 @@ namespace CorrugatedIron.Models
             return new RiakLink(Bucket, Key, tag);
         }
 
+        public RiakObjectId ToRiakObjectId()
+        {
+            return new RiakObjectId(Bucket, Key);
+        }
+
         internal RiakObject(string bucket, string key, RpbContent content, byte[] vectorClock)
         {
             Bucket = bucket;
