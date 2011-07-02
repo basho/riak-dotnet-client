@@ -459,7 +459,7 @@ namespace CorrugatedIron
 
         public void Delete(RiakObjectId objectId, Action<RiakResult> callback, uint rwVal = RiakConstants.Defaults.RVal)
         {
-            ExecAsync(() => callback(Delete(objectId.Bucket, objectId.Key, rwVal)));
+            Delete(objectId.Bucket, objectId.Key, callback, rwVal);
         }
 
         public IEnumerable<RiakResult> Delete(IEnumerable<RiakObjectId> objectIds,
