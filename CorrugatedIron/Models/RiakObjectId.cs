@@ -5,6 +5,11 @@
         public string Bucket { get; set; }
         public string Key { get; set; }
 
+        public RiakObjectId()
+        {
+            
+        }
+
         public RiakObjectId(string bucket, string key)
         {
             Bucket = bucket;

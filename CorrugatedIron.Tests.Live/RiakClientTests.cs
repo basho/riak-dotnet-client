@@ -14,7 +14,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Collections;
+using System.Collections.Generic;
 using System.Threading;
+using CorrugatedIron.Extensions;
 using CorrugatedIron.Models;
 using CorrugatedIron.Tests.Extensions;
 using CorrugatedIron.Tests.Live.LiveRiakConnectionTests;
@@ -69,6 +72,147 @@ namespace CorrugatedIron.Tests.Live
             getResult.IsSuccess.ShouldBeFalse();
             getResult.ResultCode.ShouldEqual(ResultCode.NotFound);
             getResult.Value.ShouldBeNull();
+        }
+
+        [Test]
+        public void AsyncDeleteMultipleIsSuccessful()
+        {
+            var one = new RiakObject(TestBucket, "one", TestJson, RiakConstants.ContentTypes.ApplicationJson);
+            var two = new RiakObject(TestBucket, "two", TestJson, RiakConstants.ContentTypes.ApplicationJson);
+
+            Client.Put(one);
+            Client.Put(two);
+
+            var oneObjectId = one.ToRiakObjectId();
+            var twoObjectId = two.ToRiakObjectId();
+
+            IEnumerable<RiakResult> theResults = null;
+
+            var list = new List<RiakObjectId> { oneObjectId, twoObjectId };
+
+            var resetEvent = new AutoResetEvent(false);
+
+            Client.Delete(list, results =>
+                                    {
+                                        theResults = results;
+                                        resetEvent.Set();
+                                    });
+            resetEvent.WaitOne();
+
+            foreach (var riakResult in theResults)
+            {
+                riakResult.IsSuccess.ShouldBeTrue();
+            }
+
+            var oneResult = Client.Get(oneObjectId);
+            oneResult.IsSuccess.ShouldBeFalse();
+            oneResult.ResultCode.ShouldEqual(ResultCode.NotFound);
+            oneResult.Value.ShouldBeNull();
+
+            var twoResult = Client.Get(twoObjectId);
+            twoResult.IsSuccess.ShouldBeFalse();
+            twoResult.ResultCode.ShouldEqual(ResultCode.NotFound);
+            twoResult.Value.ShouldBeNull();
+        }
+
+        [Test]
+        public void AsyncGetMultipleReturnsAllObjects()
+        {
+            var one = new RiakObject(TestBucket, "one", TestJson, RiakConstants.ContentTypes.ApplicationJson);
+            var two = new RiakObject(TestBucket, "two", TestJson, RiakConstants.ContentTypes.ApplicationJson);
+
+            Client.Put(one);
+            Client.Put(two);
+
+            var oneObjectId = one.ToRiakObjectId();
+            var twoObjectId = two.ToRiakObjectId();
+
+            IEnumerable<RiakResult<RiakObject>> theResults = null;
+
+            var list = new List<RiakObjectId> {oneObjectId, twoObjectId};
+
+            var resetEvent = new AutoResetEvent(false);
+
+            Client.Get(list, results =>
+                                 {
+                                     theResults = results;
+                                     resetEvent.Set();
+                                 });
+            resetEvent.WaitOne();
+
+            foreach (var result in theResults)
+            {
+                result.IsSuccess.ShouldBeTrue();
+                result.Value.ShouldNotBeNull();
+            }
+        }
+
+        [Test]
+        public void AsyncGetWithRiakObjectIdReturnsData()
+        {
+            var riakObject = new RiakObject(TestBucket, TestKey, TestJson, RiakConstants.ContentTypes.ApplicationJson);
+            var riakObjectId = riakObject.ToRiakObjectId();
+
+            Client.Put(riakObject);
+
+            RiakResult<RiakObject> theResult = null;
+            var resetEvent = new AutoResetEvent(false);
+
+            Client.Get(riakObjectId, result =>
+                                         {
+                                             theResult = result;
+                                             resetEvent.Set();
+                                         });
+            resetEvent.WaitOne();
+
+            theResult.IsSuccess.ShouldBeTrue();
+            theResult.Value.ShouldNotBeNull();
+            theResult.Value.Bucket.ShouldEqual(TestBucket);
+            theResult.Value.Key.ShouldEqual(TestKey);
+            theResult.Value.Value.FromRiakString().ShouldEqual(TestJson);
+        }
+
+        [Test]
+        public void AsyncPutIsSuccessful()
+        {
+            var riakObject = new RiakObject(TestBucket, TestKey, TestJson, RiakConstants.ContentTypes.ApplicationJson);
+
+            RiakResult<RiakObject> theResult = null;
+
+            var resetEvent = new AutoResetEvent(false);
+
+            Client.Put(riakObject, result =>
+                                       {
+                                           theResult = result;
+                                           resetEvent.Set();
+                                       });
+            resetEvent.WaitOne();
+            
+            theResult.IsSuccess.ShouldBeTrue();
+            theResult.Value.ShouldNotBeNull();
+        }
+
+        [Test]
+        public void AsyncPutMultipleIsSuccessful()
+        {
+            var one = new RiakObject(TestBucket, "one", TestJson, RiakConstants.ContentTypes.ApplicationJson);
+            var two = new RiakObject(TestBucket, "two", TestJson, RiakConstants.ContentTypes.ApplicationJson);
+
+            IEnumerable<RiakResult<RiakObject>> theResults = null;
+            var resetEvent = new AutoResetEvent(false);
+
+            Client.Put(new List<RiakObject> {one, two}, result =>
+                                                            {
+                                                                theResults = result;
+                                                                resetEvent.Set();
+                                                            });
+            resetEvent.WaitOne();
+
+            foreach (var riakResult in theResults)
+            {
+                riakResult.IsSuccess.ShouldBeTrue();
+                riakResult.Value.ShouldNotBeNull();
+            }
         }
     }
 }
