@@ -59,7 +59,7 @@ namespace CorrugatedIron.Tests.Live
             RiakResult theResult = null;
             var resetEvent = new AutoResetEvent(false);
 
-            Client.Delete(riakObjectId, result =>
+            Client.Async.Delete(riakObjectId, result =>
                                             {
                                                 theResult = result;
                                                 resetEvent.Set();
@@ -92,7 +92,7 @@ namespace CorrugatedIron.Tests.Live
 
             var resetEvent = new AutoResetEvent(false);
 
-            Client.Delete(list, results =>
+            Client.Async.Delete(list, results =>
                                     {
                                         theResults = results;
                                         resetEvent.Set();
@@ -133,7 +133,7 @@ namespace CorrugatedIron.Tests.Live
 
             var resetEvent = new AutoResetEvent(false);
 
-            Client.Get(list, results =>
+            Client.Async.Get(list, results =>
                                  {
                                      theResults = results;
                                      resetEvent.Set();
@@ -158,7 +158,7 @@ namespace CorrugatedIron.Tests.Live
             RiakResult<RiakObject> theResult = null;
             var resetEvent = new AutoResetEvent(false);
 
-            Client.Get(riakObjectId, result =>
+            Client.Async.Get(riakObjectId, result =>
                                          {
                                              theResult = result;
                                              resetEvent.Set();
@@ -181,7 +181,7 @@ namespace CorrugatedIron.Tests.Live
 
             var resetEvent = new AutoResetEvent(false);
 
-            Client.Put(riakObject, result =>
+            Client.Async.Put(riakObject, result =>
                                        {
                                            theResult = result;
                                            resetEvent.Set();
@@ -201,7 +201,7 @@ namespace CorrugatedIron.Tests.Live
             IEnumerable<RiakResult<RiakObject>> theResults = null;
             var resetEvent = new AutoResetEvent(false);
 
-            Client.Put(new List<RiakObject> {one, two}, result =>
+            Client.Async.Put(new List<RiakObject> {one, two}, result =>
                                                             {
                                                                 theResults = result;
                                                                 resetEvent.Set();

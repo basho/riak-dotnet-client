@@ -90,7 +90,7 @@ namespace CorrugatedIron.Tests.Comms.RiakClientPingTests
         [Test]
         public void CallbackIsInvokedCorrectly()
         {
-            Client.Ping(Callback);
+            Client.Async.Ping(Callback);
             _indicator.WaitOne();
             _done.ShouldBeTrue();
         }

@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CorrugatedIron.Extensions
 {
@@ -64,6 +65,11 @@ namespace CorrugatedIron.Extensions
             {
                 yield return generator();
             }
+        }
+
+        public static bool In<T>(this T val, IEnumerable<T> items)
+        {
+            return items.Contains(val);
         }
     }
 }
