@@ -5,7 +5,7 @@ using CorrugatedIron.Tests.Extensions;
 using Moq;
 using NUnit.Framework;
 
-namespace CorrugatedIron.Tests.Comms
+namespace CorrugatedIron.Tests.RiakClientTests
 {
     [TestFixture]
     internal class RiakClientTests
