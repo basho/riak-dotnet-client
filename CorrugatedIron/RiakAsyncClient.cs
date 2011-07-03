@@ -73,16 +73,19 @@ namespace CorrugatedIron
             ExecAsync(() => callback(_client.Ping()));
         }
 
-        public void Get(string bucket, string key, Action<RiakResult<RiakObject>> callback,
-                        uint rVal = RiakConstants.Defaults.RVal)
+        public void Get(string bucket, string key, Action<RiakResult<RiakObject>> callback, uint rVal = RiakConstants.Defaults.RVal)
         {
             ExecAsync(() => callback(_client.Get(bucket, key, rVal)));
         }
 
-        public void Get(RiakObjectId objectId, Action<RiakResult<RiakObject>> callback,
-                        uint rVal = RiakConstants.Defaults.RVal)
+        public void Get(RiakObjectId objectId, Action<RiakResult<RiakObject>> callback, uint rVal = RiakConstants.Defaults.RVal)
         {
             ExecAsync(() => callback(_client.Get(objectId.Bucket, objectId.Key, rVal)));
+        }
+
+        public void Get(IEnumerable<RiakObjectId> bucketKeyPairs, Action<IEnumerable<RiakResult<RiakObject>>> callback, uint rVal = RiakConstants.Defaults.RVal)
+        {
+            ExecAsync(() => callback(_client.Get(bucketKeyPairs, rVal)));
         }
 
         public void Put(IEnumerable<RiakObject> values, Action<IEnumerable<RiakResult<RiakObject>>> callback, RiakPutOptions options)
@@ -95,8 +98,7 @@ namespace CorrugatedIron
             ExecAsync(() => callback(_client.Put(value, options)));
         }
 
-        public void Delete(string bucket, string key, Action<RiakResult> callback,
-                           uint rwVal = RiakConstants.Defaults.RVal)
+        public void Delete(string bucket, string key, Action<RiakResult> callback, uint rwVal = RiakConstants.Defaults.RVal)
         {
             ExecAsync(() => callback(_client.Delete(bucket, key, rwVal)));
         }
@@ -141,8 +143,7 @@ namespace CorrugatedIron
             ExecAsync(() => callback(_client.StreamListKeys(bucket)));
         }
 
-        public void GetBucketProperties(string bucket, Action<RiakResult<RiakBucketProperties>> callback,
-                                        bool extended = false)
+        public void GetBucketProperties(string bucket, Action<RiakResult<RiakBucketProperties>> callback, bool extended = false)
         {
             ExecAsync(() => callback(_client.GetBucketProperties(bucket, extended)));
         }
@@ -160,12 +161,6 @@ namespace CorrugatedIron
         public void GetServerInfo(Action<RiakResult<RiakServerInfo>> callback)
         {
             ExecAsync(() => callback(_client.GetServerInfo()));
-        }
-
-        public void Get(IEnumerable<RiakObjectId> bucketKeyPairs, Action<IEnumerable<RiakResult<RiakObject>>> callback,
-                        uint rVal = RiakConstants.Defaults.RVal)
-        {
-            ExecAsync(() => callback(_client.Get(bucketKeyPairs, rVal)));
         }
 
         private static void ExecAsync(Action action)
