@@ -140,6 +140,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Models\RiakServerInfo.cs" />
+    <Compile Include="RiakAsyncClient.cs" />
     <Compile Include="RiakClient.cs" />
     <Compile Include="Comms\RiakConnection.cs" />
     <Compile Include="Comms\RiakConnectionFactory.cs" />

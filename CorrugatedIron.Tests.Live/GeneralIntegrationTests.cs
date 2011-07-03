@@ -44,7 +44,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         public void ServerInfoIsSuccessfullyExtractedAsynchronously()
         {
             var asyncTester = new AsyncMethodTester<RiakResult<RiakServerInfo>>();
-            Client.GetServerInfo(asyncTester.HandleResult);
+            Client.Async.GetServerInfo(asyncTester.HandleResult);
             asyncTester.Result.IsSuccess.ShouldBeTrue();
         }
 
@@ -312,7 +312,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             keyList.Value.Count().ShouldEqual(10);
 
             var asyncTester = new AsyncMethodTester<IEnumerable<RiakResult>>();
-            Client.DeleteBucket(bucket, asyncTester.HandleResult);
+            Client.Async.DeleteBucket(bucket, asyncTester.HandleResult);
             var result = asyncTester.Result;
             
             keyList = Client.ListKeys(bucket);
@@ -335,7 +335,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             var lm2 = o.LastModified;
             var lmu2 = o.LastModifiedUsec;
 
-            System.Threading.Thread.Sleep(1000);
+            Thread.Sleep(1000);
 
             o = new RiakObject(TestBucket, "1234", changedData);
             o = Client.Put(o, new RiakPutOptions { ReturnBody = true }).Value;
@@ -381,7 +381,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
 
             RiakResult<IEnumerable<string>> theResult = null;
             var resetEvnt = new AutoResetEvent(false);
-            Client.ListKeys(TestBucket, result =>
+            Client.Async.ListKeys(TestBucket, result =>
                                             {
                                                 theResult = result;
                                                 resetEvnt.Set();
