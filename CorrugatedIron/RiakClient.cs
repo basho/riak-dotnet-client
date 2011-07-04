@@ -467,13 +467,28 @@ namespace CorrugatedIron
 
         private static byte[] GetClientId()
         {
-            var nic = NetworkInterface.GetAllNetworkInterfaces().Where(IsValidNic)
-                .OrderBy(i => i.Id)
-                .First();
 
-            var mac = nic.GetPhysicalAddress().GetAddressBytes();
-            Array.Resize(ref mac, 4);
-            return mac;
+            byte[] clientId;
+
+            var nicList = NetworkInterface.GetAllNetworkInterfaces().Where(IsValidNic)
+                .OrderBy(i => i.Id);
+
+            if (nicList.Count() > 0)
+            {
+                var nic = nicList.First();
+
+                clientId = nic.GetPhysicalAddress().GetAddressBytes();
+            }
+            else
+            {
+                var hostname = Environment.MachineName;
+
+                var sha = new System.Security.Cryptography.SHA1CryptoServiceProvider();
+                clientId = sha.ComputeHash(hostname.ToRiakString());
+            }
+
+            Array.Resize(ref clientId, 4);
+            return clientId;
         }
 
         private static bool IsValidNic(NetworkInterface nic)
