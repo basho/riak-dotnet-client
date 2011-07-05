@@ -60,7 +60,7 @@ namespace CorrugatedIron.Comms
         void SetClientId(byte[] clientId);
     }
 
-    public class RiakConnection : IRiakConnection
+    internal class RiakConnection : IRiakConnection
     {
         private readonly IRiakNodeConfiguration _nodeConfiguration;
         private readonly MessageEncoder _encoder;
