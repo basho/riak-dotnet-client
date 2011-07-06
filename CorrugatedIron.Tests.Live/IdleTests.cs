@@ -22,6 +22,7 @@ using NUnit.Framework;
 namespace CorrugatedIron.Tests.Live.IdleTests
 {
     [TestFixture]
+    [Ignore("Idling is undergoing rework, so these tests are currently invalid")]
     public class WhenConnectionGoesIdle : LiveRiakConnectionTestBase
     {
         public WhenConnectionGoesIdle()

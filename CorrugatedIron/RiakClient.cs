@@ -17,8 +17,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.NetworkInformation;
-using System.Threading;
 using CorrugatedIron.Comms;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
@@ -32,55 +32,40 @@ namespace CorrugatedIron
 {
     public interface IRiakClient
     {
+        IRiakAsyncClient Async { get; }
+
         RiakResult Ping();
-        void Ping(Action<RiakResult> callback);
 
         RiakResult<RiakObject> Get(string bucket, string key, uint rVal = RiakConstants.Defaults.RVal);
-        void Get(string bucket, string key, Action<RiakResult<RiakObject>> callback, uint rVal = RiakConstants.Defaults.RVal);
         RiakResult<RiakObject> Get(RiakObjectId objectId, uint rVal = RiakConstants.Defaults.RVal);
-        void Get(RiakObjectId objectId, Action<RiakResult<RiakObject>> callback, uint rVal = RiakConstants.Defaults.RVal);
         IEnumerable<RiakResult<RiakObject>> Get(IEnumerable<RiakObjectId> bucketKeyPairs, uint rVal = RiakConstants.Defaults.RVal);
 
         RiakResult<RiakObject> Put(RiakObject value, RiakPutOptions options = null);
-        void Put(RiakObject value, Action<RiakResult<RiakObject>> callback, RiakPutOptions options = null);
         IEnumerable<RiakResult<RiakObject>> Put(IEnumerable<RiakObject> values, RiakPutOptions options = null);
-        void Put(IEnumerable<RiakObject> values, Action<IEnumerable<RiakResult<RiakObject>>> callback, RiakPutOptions options = null);
 
         RiakResult Delete(string bucket, string key, uint rwVal = RiakConstants.Defaults.RVal);
-        void Delete(string bucket, string key, Action<RiakResult> callback, uint rwVal = RiakConstants.Defaults.RVal);
         RiakResult Delete(RiakObjectId objectId, uint rwVal = RiakConstants.Defaults.RVal);
-        void Delete(RiakObjectId objectId, Action<RiakResult> callback, uint rwVal = RiakConstants.Defaults.RVal);
         IEnumerable<RiakResult> Delete(IEnumerable<RiakObjectId> objectIds, uint rwVal = RiakConstants.Defaults.RVal);
-        void Delete(IEnumerable<RiakObjectId> objectIds, Action<IEnumerable<RiakResult>> callback, uint rwVal = RiakConstants.Defaults.RVal);
 
         IEnumerable<RiakResult> DeleteBucket(string bucket, uint rwVal = RiakConstants.Defaults.RVal);
-        void DeleteBucket(string bucket, Action<IEnumerable<RiakResult>> callback, uint rwVal = RiakConstants.Defaults.RVal);
 
         RiakResult<RiakMapReduceResult> MapReduce(RiakMapReduceQuery query);
-        void MapReduce(RiakMapReduceQuery query, Action<RiakResult<RiakMapReduceResult>> callback);
 
         RiakResult<RiakStreamedMapReduceResult> StreamMapReduce(RiakMapReduceQuery query);
-        void StreamMapReduce(RiakMapReduceQuery query, Action<RiakResult<RiakStreamedMapReduceResult>> callback);
 
         RiakResult<IEnumerable<string>> ListBuckets();
-        void ListBuckets(Action<RiakResult<IEnumerable<string>>> callback);
 
         RiakResult<IEnumerable<string>> ListKeys(string bucket);
-        void ListKeys(string bucket, Action<RiakResult<IEnumerable<string>>> callback);
 
         RiakResult<IEnumerable<string>> StreamListKeys(string bucket);
-        void StreamListKeys(string bucket, Action<RiakResult<IEnumerable<string>>> callback);
 
         RiakResult<RiakBucketProperties> GetBucketProperties(string bucket, bool extended = false);
-        void GetBucketProperties(string bucket, Action<RiakResult<RiakBucketProperties>> callback, bool extended = false);
 
         RiakResult SetBucketProperties(string bucket, RiakBucketProperties properties);
-        void SetBucketProperties(string bucket, RiakBucketProperties properties, Action<RiakResult> callback);
 
         IList<RiakObject> WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks);
 
         RiakResult<RiakServerInfo> GetServerInfo();
-        void GetServerInfo(Action<RiakResult<RiakServerInfo>> callback);
     }
 
     public class RiakClient : IRiakClient
@@ -88,10 +73,17 @@ namespace CorrugatedIron
         private readonly IRiakCluster _cluster;
         private byte[] _clientId;
 
+        public IRiakAsyncClient Async
+        {
+            get;
+            private set;
+        }
+
         public RiakClient(IRiakCluster cluster)
         {
             _cluster = cluster;
             ClientId = GetClientId();
+            Async = new RiakAsyncClient(this);
         }
 
         public byte[] ClientId
@@ -99,15 +91,16 @@ namespace CorrugatedIron
             get { return _clientId; }
             set
             {
-                if(value == null || value.Length != RiakConstants.ClientIdLength)
+                if (value == null || value.Length != RiakConstants.ClientIdLength)
                 {
-                    throw new ArgumentException("Client ID must be exactly {0} bytes long.".Fmt(RiakConstants.ClientIdLength), "value");
+                    throw new ArgumentException(
+                        "Client ID must be exactly {0} bytes long.".Fmt(RiakConstants.ClientIdLength), "value");
                 }
 
                 _clientId = value;
             }
         }
-  
+
         /// <summary>
         /// Ping this instance of Riak
         /// </summary>
@@ -118,11 +111,6 @@ namespace CorrugatedIron
             return _cluster.UseConnection(_clientId, conn => conn.PbcWriteRead<RpbPingReq, RpbPingResp>(new RpbPingReq()));
         }
 
-        public void Ping(Action<RiakResult> callback)
-        {
-            ExecAsync(() => callback(Ping()));
-        }
-  
         /// <summary>
         /// Get the specified <paramref name="key"/> from the <paramref name="bucket"/>.
         /// Optionally can be read from <paramref name="rVal"/> instances. By default, the server's
@@ -146,7 +134,7 @@ namespace CorrugatedIron
         /// </remarks>
         public RiakResult<RiakObject> Get(string bucket, string key, uint rVal = RiakConstants.Defaults.RVal)
         {
-            var request = new RpbGetReq { Bucket = bucket.ToRiakString(), Key = key.ToRiakString(), R = rVal };
+            var request = new RpbGetReq {Bucket = bucket.ToRiakString(), Key = key.ToRiakString(), R = rVal};
             var result = _cluster.UseConnection(_clientId, conn => conn.PbcWriteRead<RpbGetReq, RpbGetResp>(request));
 
             if (!result.IsSuccess)
@@ -174,19 +162,10 @@ namespace CorrugatedIron
             return Get(objectId.Bucket, objectId.Key, rVal);
         }
 
-        public void Get(string bucket, string key, Action<RiakResult<RiakObject>> callback, uint rVal = RiakConstants.Defaults.RVal)
-        {
-            ExecAsync(() => callback(Get(bucket, key, rVal)));
-        }
-
-        public void Get(RiakObjectId objectId, Action<RiakResult<RiakObject>> callback, uint rVal = RiakConstants.Defaults.RVal)
-        {
-            ExecAsync(() => callback(Get(objectId.Bucket, objectId.Key, rVal)));
-        }
-
         public IEnumerable<RiakResult<RiakObject>> Get(IEnumerable<RiakObjectId> bucketKeyPairs, uint rVal = RiakConstants.Defaults.RVal)
         {
-            var requests = bucketKeyPairs.Select(bk => new RpbGetReq { Bucket = bk.Bucket.ToRiakString(), Key = bk.Key.ToRiakString(), R = rVal }).ToList();
+            var requests = bucketKeyPairs.Select(
+                    bk => new RpbGetReq {Bucket = bk.Bucket.ToRiakString(), Key = bk.Key.ToRiakString(), R = rVal}). ToList();
             var results = _cluster.UseConnection(_clientId, conn =>
                 {
                     var responses = requests.Select(conn.PbcWriteRead<RpbGetReq, RpbGetResp>).ToList();
@@ -209,16 +188,12 @@ namespace CorrugatedIron
 
                     if (result.Item1.Value.Content.Count > 1)
                     {
-                        o.Siblings = result.Item1.Value.Content.Select(c => new RiakObject(result.Item2.Bucket, result.Item2.Key, c, result.Item1.Value.VectorClock)).ToList();
+                        o.Siblings = result.Item1.Value.Content.Select(c =>
+                            new RiakObject(result.Item2.Bucket, result.Item2.Key, c, result.Item1.Value.VectorClock)).ToList();
                     }
 
                     return RiakResult<RiakObject>.Success(o);
                 });
-        }
-
-        public void Get(IEnumerable<RiakObjectId> bucketKeyPairs, Action<IEnumerable<RiakResult<RiakObject>>> callback, uint rVal = RiakConstants.Defaults.RVal)
-        {
-            ExecAsync(() => callback(Get(bucketKeyPairs, rVal)));
         }
 
         public RiakResult<RiakObject> Put(RiakObject value, RiakPutOptions options = null)
@@ -241,15 +216,12 @@ namespace CorrugatedIron
 
             if (options.ReturnBody && result.Value.Content.Count > 1)
             {
-                finalResult.Siblings = result.Value.Content.Select(c => new RiakObject(value.Bucket, value.Key, c, result.Value.VectorClock)).ToList();
+                finalResult.Siblings =
+                    result.Value.Content.Select(
+                        c => new RiakObject(value.Bucket, value.Key, c, result.Value.VectorClock)).ToList();
             }
 
             return RiakResult<RiakObject>.Success(finalResult);
-        }
-
-        public void Put(RiakObject value, Action<RiakResult<RiakObject>> callback, RiakPutOptions options = null)
-        {
-            ExecAsync(() => callback(Put(value, options)));
         }
 
         public IEnumerable<RiakResult<RiakObject>> Put(IEnumerable<RiakObject> values, RiakPutOptions options = null)
@@ -271,7 +243,7 @@ namespace CorrugatedIron
 
             return results.Value.Zip(values, Tuple.Create).Select(t =>
                 {
-                    if (t.Item1.IsSuccess)
+                    if(t.Item1.IsSuccess)
                     {
                         var finalResult = options.ReturnBody
                             ? new RiakObject(t.Item2.Bucket, t.Item2.Key, t.Item1.Value.Content.First(), t.Item1.Value.VectorClock)
@@ -279,23 +251,20 @@ namespace CorrugatedIron
 
                         if (options.ReturnBody && t.Item1.Value.Content.Count > 1)
                         {
-                            finalResult.Siblings = t.Item1.Value.Content.Select(c => new RiakObject(t.Item2.Bucket, t.Item2.Key, c, t.Item1.Value.VectorClock)).ToList();
+                            finalResult.Siblings = t.Item1.Value.Content.Select(c =>
+                                new RiakObject(t.Item2.Bucket, t.Item2.Key, c, t.Item1.Value.VectorClock)).ToList();
                         }
 
                         return RiakResult<RiakObject>.Success(finalResult);
                     }
+
                     return RiakResult<RiakObject>.Error(t.Item1.ResultCode, t.Item1.ErrorMessage);
                 });
         }
 
-        public void Put(IEnumerable<RiakObject> values, Action<IEnumerable<RiakResult<RiakObject>>> callback, RiakPutOptions options = null)
-        {
-            ExecAsync(() => callback(Put(values, options)));
-        }
-
         public RiakResult Delete(string bucket, string key, uint rwVal = RiakConstants.Defaults.RVal)
         {
-            var request = new RpbDelReq { Bucket = bucket.ToRiakString(), Key = key.ToRiakString(), Rw = rwVal };
+            var request = new RpbDelReq {Bucket = bucket.ToRiakString(), Key = key.ToRiakString(), Rw = rwVal};
             var result = _cluster.UseConnection(_clientId, conn => conn.PbcWriteRead<RpbDelReq, RpbDelResp>(request));
 
             return result;
@@ -306,19 +275,10 @@ namespace CorrugatedIron
             return Delete(objectId.Bucket, objectId.Key, rwVal);
         }
 
-        public void Delete(string bucket, string key, Action<RiakResult> callback, uint rwVal = RiakConstants.Defaults.RVal)
+        public IEnumerable<RiakResult> Delete(IEnumerable<RiakObjectId> objectIds,
+                                              uint rwVal = RiakConstants.Defaults.RVal)
         {
-            ExecAsync(() => callback(Delete(bucket, key, rwVal)));
-        }
-
-        public void Delete(RiakObjectId objectId, Action<RiakResult> callback, uint rwVal = RiakConstants.Defaults.RVal)
-        {
-            ExecAsync(() => callback(Delete(objectId.Bucket, objectId.Key, rwVal)));
-        }
-
-        public IEnumerable<RiakResult> Delete(IEnumerable<RiakObjectId> objectIds, uint rwVal = RiakConstants.Defaults.RVal)
-        {
-            var requests = objectIds.Select(id => new RpbDelReq { Bucket = id.Bucket.ToRiakString(), Key = id.Key.ToRiakString(), Rw = rwVal }).ToList();
+            var requests = objectIds.Select(id => new RpbDelReq {Bucket = id.Bucket.ToRiakString(), Key = id.Key.ToRiakString(), Rw = rwVal}).ToList();
             var results = _cluster.UseConnection(_clientId, conn =>
                 {
                     var responses = requests.Select(conn.PbcWriteRead<RpbDelReq, RpbDelResp>).ToList();
@@ -328,11 +288,6 @@ namespace CorrugatedIron
             return results.Value;
         }
 
-        public void Delete(IEnumerable<RiakObjectId> objectIds, Action<IEnumerable<RiakResult>> callback, uint rwVal = RiakConstants.Defaults.RVal)
-        {
-            ExecAsync(() => callback(Delete(objectIds, rwVal)));
-        }
-
         public IEnumerable<RiakResult> DeleteBucket(string bucket, uint rwVal = RiakConstants.Defaults.RVal)
         {
             // TODO: change this to do the whole op with a single connection and with streaming
@@ -340,11 +295,6 @@ namespace CorrugatedIron
             var objectIds = keys.Value.Select(key => new RiakObjectId(bucket, key)).ToList();
 
             return Delete(objectIds, rwVal);
-        }
-
-        public void DeleteBucket(string bucket, Action<IEnumerable<RiakResult>> callback, uint rwVal = RiakConstants.Defaults.RVal)
-        {
-            ExecAsync(() => callback(DeleteBucket(bucket, rwVal)));
         }
 
         public RiakResult<RiakMapReduceResult> MapReduce(RiakMapReduceQuery query)
@@ -360,15 +310,11 @@ namespace CorrugatedIron
             return RiakResult<RiakMapReduceResult>.Error(response.ResultCode, response.ErrorMessage);
         }
 
-        public void MapReduce(RiakMapReduceQuery query, Action<RiakResult<RiakMapReduceResult>> callback)
-        {
-            ExecAsync(() => callback(MapReduce(query)));
-        }
-
         public RiakResult<RiakStreamedMapReduceResult> StreamMapReduce(RiakMapReduceQuery query)
         {
             var request = query.ToMessage();
-            var response = _cluster.UseStreamConnection(_clientId, (conn, onFinish) => conn.PbcWriteStreamRead<RpbMapRedReq, RpbMapRedResp>(request, r => !r.Done, onFinish));
+            var response = _cluster.UseStreamConnection(_clientId, (conn, onFinish) =>
+                conn.PbcWriteStreamRead<RpbMapRedReq, RpbMapRedResp>(request, r => !r.Done, onFinish));
 
             if (response.IsSuccess)
             {
@@ -377,17 +323,10 @@ namespace CorrugatedIron
             return RiakResult<RiakStreamedMapReduceResult>.Error(response.ResultCode, response.ErrorMessage);
         }
 
-        public void StreamMapReduce(RiakMapReduceQuery query, Action<RiakResult<RiakStreamedMapReduceResult>> callback)
-        {
-            ExecAsync(() => callback(StreamMapReduce(query)));
-        }
-
         public RiakResult<IEnumerable<string>> ListBuckets()
         {
             var lbReq = new RpbListBucketsReq();
-            var result = _cluster.UseConnection(_clientId,
-                                                          conn =>
-                                                          conn.PbcWriteRead<RpbListBucketsReq, RpbListBucketsResp>(lbReq));
+            var result = _cluster.UseConnection(_clientId, conn => conn.PbcWriteRead<RpbListBucketsReq, RpbListBucketsResp>(lbReq));
 
             if (result.IsSuccess)
             {
@@ -397,16 +336,10 @@ namespace CorrugatedIron
             return RiakResult<IEnumerable<string>>.Error(result.ResultCode, result.ErrorMessage);
         }
 
-        public void ListBuckets(Action<RiakResult<IEnumerable<string>>> callback)
-        {
-            ExecAsync(() => callback(ListBuckets()));
-        }
-  
         public RiakResult<IEnumerable<string>> ListKeys(string bucket)
         {
             var lkReq = new RpbListKeysReq {Bucket = bucket.ToRiakString()};
-            var result = _cluster.UseConnection(_clientId,
-                                                conn => conn.PbcWriteRead<RpbListKeysReq, RpbListKeysResp>(lkReq, lkr => !lkr.Done));
+            var result = _cluster.UseConnection(_clientId, conn => conn.PbcWriteRead<RpbListKeysReq, RpbListKeysResp>(lkReq, lkr => !lkr.Done));
 
             if (result.IsSuccess)
             {
@@ -416,16 +349,11 @@ namespace CorrugatedIron
             return RiakResult<IEnumerable<string>>.Error(result.ResultCode, result.ErrorMessage);
         }
 
-        public void ListKeys(string bucket, Action<RiakResult<IEnumerable<string>>> callback)
-        {
-            ExecAsync(() => callback(ListKeys(bucket)));
-        }
-
         public RiakResult<IEnumerable<string>> StreamListKeys(string bucket)
         {
             var lkReq = new RpbListKeysReq {Bucket = bucket.ToRiakString()};
-            var result = _cluster.UseStreamConnection(_clientId,
-                (conn, onFinish) => conn.PbcWriteStreamRead<RpbListKeysReq, RpbListKeysResp>(lkReq, lkr => !lkr.Done, onFinish));
+            var result = _cluster.UseStreamConnection(_clientId, (conn, onFinish) =>
+                conn.PbcWriteStreamRead<RpbListKeysReq, RpbListKeysResp>(lkReq, lkr => !lkr. Done, onFinish));
 
             if (result.IsSuccess)
             {
@@ -433,11 +361,6 @@ namespace CorrugatedIron
                 return RiakResult<IEnumerable<string>>.Success(keys);
             }
             return RiakResult<IEnumerable<string>>.Error(result.ResultCode, result.ErrorMessage);
-        }
-
-        public void StreamListKeys(string bucket, Action<RiakResult<IEnumerable<string>>> callback)
-        {
-            ExecAsync(() => callback(StreamListKeys(bucket)));
         }
 
         public RiakResult<RiakBucketProperties> GetBucketProperties(string bucket, bool extended = false)
@@ -448,20 +371,22 @@ namespace CorrugatedIron
                     .AddQueryParam(RiakConstants.Rest.QueryParameters.Bucket.GetPropertiesKey, RiakConstants.Rest.QueryParameters.Bucket.GetPropertiesValue);
 
                 var result = _cluster.UseConnection(_clientId, conn => conn.RestRequest(request));
+
                 if (result.IsSuccess)
                 {
-                    if (result.Value.StatusCode == System.Net.HttpStatusCode.OK)
+                    if (result.Value.StatusCode == HttpStatusCode.OK)
                     {
                         var response = new RiakBucketProperties(result.Value);
                         return RiakResult<RiakBucketProperties>.Success(response);
                     }
-                    return RiakResult<RiakBucketProperties>.Error(ResultCode.InvalidResponse, "Unexpected Status Code: {0} ({1})".Fmt(result.Value.StatusCode, (int)result.Value.StatusCode));
+                    return RiakResult<RiakBucketProperties>.Error(ResultCode.InvalidResponse,
+                        "Unexpected Status Code: {0} ({1})".Fmt(result.Value.StatusCode, (int) result.Value.StatusCode));
                 }
                 return RiakResult<RiakBucketProperties>.Error(result.ResultCode, result.ErrorMessage);
             }
             else
             {
-                var bpReq = new RpbGetBucketReq { Bucket = bucket.ToRiakString() };
+                var bpReq = new RpbGetBucketReq {Bucket = bucket.ToRiakString()};
                 var result = _cluster.UseConnection(_clientId, conn => conn.PbcWriteRead<RpbGetBucketReq, RpbGetBucketResp>(bpReq));
 
                 if (result.IsSuccess)
@@ -473,54 +398,43 @@ namespace CorrugatedIron
             }
         }
 
-        public void GetBucketProperties(string bucket, Action<RiakResult<RiakBucketProperties>> callback, bool extended = false)
-        {
-            ExecAsync(() => callback(GetBucketProperties(bucket, extended)));
-        }
-
         public RiakResult SetBucketProperties(string bucket, RiakBucketProperties properties)
         {
             if (properties.CanUsePbc)
             {
-                var request = new RpbSetBucketReq { Bucket = bucket.ToRiakString(), Props = properties.ToMessage() };
+                var request = new RpbSetBucketReq {Bucket = bucket.ToRiakString(), Props = properties.ToMessage()};
                 var result = _cluster.UseConnection(_clientId, conn => conn.PbcWriteRead<RpbSetBucketReq, RpbSetBucketResp>(request));
                 return result;
             }
             else
             {
                 var request = new RiakRestRequest(ToBucketUri(bucket), RiakConstants.Rest.HttpMethod.Put)
-                {
-                    Body = properties.ToJsonString().ToRiakString(),
-                    ContentType = RiakConstants.ContentTypes.ApplicationJson
-                };
+                                  {
+                                      Body = properties.ToJsonString().ToRiakString(),
+                                      ContentType = RiakConstants.ContentTypes.ApplicationJson
+                                  };
 
                 var result = _cluster.UseConnection(_clientId, conn => conn.RestRequest(request));
-                if (result.IsSuccess && result.Value.StatusCode != System.Net.HttpStatusCode.NoContent)
+                if (result.IsSuccess && result.Value.StatusCode != HttpStatusCode.NoContent)
                 {
-                    return RiakResult.Error(ResultCode.InvalidResponse, "Unexpected Status Code: {0} ({1})".Fmt(result.Value.StatusCode, (int)result.Value.StatusCode));
+                    return RiakResult.Error(ResultCode.InvalidResponse,
+                        "Unexpected Status Code: {0} ({1})".Fmt(result.Value.StatusCode, (int)result.Value.StatusCode));
                 }
                 return result;
             }
         }
 
-        public void SetBucketProperties(string bucket, RiakBucketProperties properties, Action<RiakResult> callback)
-        {
-            ExecAsync(() => callback(SetBucketProperties(bucket, properties)));
-        }
-
         public IList<RiakObject> WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks)
         {
-            var query =
-                new RiakMapReduceQuery().Inputs(
-                    new RiakPhaseInputs(new List<RiakBucketKeyInput> { new RiakBucketKeyInput(riakObject.Bucket, riakObject.Key) }));
+            var query = new RiakMapReduceQuery()
+                .Inputs(new RiakPhaseInputs(new List<RiakBucketKeyInput>{new RiakBucketKeyInput(riakObject.Bucket, riakObject.Key)}));
 
             foreach (var riakLink in riakLinks)
             {
                 var link = riakLink;
-                var keep = (link == riakLinks.Last());
+                var keep = link == riakLinks.Last();
 
-                query.Link(l => l.FromRiakLink(link)
-                                .Keep(keep));
+                query.Link(l => l.FromRiakLink(link).Keep(keep));
             }
 
             var linkResults = MapReduce(query).Value.PhaseResults.Last();
@@ -528,8 +442,9 @@ namespace CorrugatedIron
             var rawLinks = RiakLink.ParseArrayFromJsonString(linkResultString);
             var oids = rawLinks.Select(riakLink => new RiakObjectId(riakLink.Bucket, riakLink.Key)).ToList();
 
+            // TODO: what happens when this errors?
             return Get(oids).Select(r => r.Value).ToList();
-         }
+        }
 
         /// <summary>
         /// Get the server information from the connected cluster.
@@ -542,6 +457,7 @@ namespace CorrugatedIron
         public RiakResult<RiakServerInfo> GetServerInfo()
         {
             var result = _cluster.UseConnection(_clientId, conn => conn.PbcWriteRead<RpbGetServerInfoReq, RpbGetServerInfoResp>(new RpbGetServerInfoReq()));
+
             if (result.IsSuccess)
             {
                 return RiakResult<RiakServerInfo>.Success(new RiakServerInfo(result.Value));
@@ -549,26 +465,40 @@ namespace CorrugatedIron
             return RiakResult<RiakServerInfo>.Error(result.ResultCode, result.ErrorMessage);
         }
 
-        public void GetServerInfo(Action<RiakResult<RiakServerInfo>> callback)
-        {
-            ExecAsync(() => callback(GetServerInfo()));
-        }
-
         private static byte[] GetClientId()
         {
-            var nic = NetworkInterface.GetAllNetworkInterfaces().Where(i => (i.OperationalStatus == OperationalStatus.Up) || 
-                                                                            ((i.NetworkInterfaceType != NetworkInterfaceType.Loopback) &&
-                                                                             (i.NetworkInterfaceType != NetworkInterfaceType.Unknown)
-                                                                            )).First();
-            
-            var mac = nic.GetPhysicalAddress().GetAddressBytes();
-            Array.Resize(ref mac, 4);
-            return mac;
+
+            byte[] clientId;
+
+            var nicList = NetworkInterface.GetAllNetworkInterfaces().Where(IsValidNic)
+                .OrderBy(i => i.Id);
+
+            if (nicList.Count() > 0)
+            {
+                var nic = nicList.First();
+
+                clientId = nic.GetPhysicalAddress().GetAddressBytes();
+            }
+            else
+            {
+                var hostname = Environment.MachineName;
+
+                var sha = new System.Security.Cryptography.SHA1CryptoServiceProvider();
+                clientId = sha.ComputeHash(hostname.ToRiakString());
+            }
+
+            Array.Resize(ref clientId, 4);
+            return clientId;
         }
 
-        private static void ExecAsync(Action action)
+        private static bool IsValidNic(NetworkInterface nic)
         {
-            ThreadPool.QueueUserWorkItem(o => action());
+            return nic.OperationalStatus == OperationalStatus.Up
+                && !nic.NetworkInterfaceType.In(new[] { NetworkInterfaceType.Loopback, NetworkInterfaceType.Unknown, NetworkInterfaceType.Tunnel })
+                // eliminate virtual devices and MS supplied ones masquerading as physical devices
+                && nic.Id.IndexOf("Root") != 0
+                && nic.Description.IndexOf("Root") != 0
+                && !nic.Description.Contains("Microsoft");
         }
 
         private static string ToBucketUri(string bucket)
