@@ -24,7 +24,7 @@ namespace CorrugatedIron.Comms
     {
         RiakResult UseConnection(byte[] clientId, Func<IRiakConnection, RiakResult> useFun);
         RiakResult<TResult> UseConnection<TResult>(byte[] clientId, Func<IRiakConnection, RiakResult<TResult>> useFun);
-        RiakResult<IEnumerable<TResult>> UseStreamConnection<TResult>(byte[] clientId, Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun);
+        RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(byte[] clientId, Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun);
     }
 
     public class RiakNode : IRiakNode
@@ -66,7 +66,7 @@ namespace CorrugatedIron.Comms
             return onError(ResultCode.NoConnections, "Unable to acquire connection");
         }
 
-        public RiakResult<IEnumerable<TResult>> UseStreamConnection<TResult>(byte[] clientId, Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun)
+        public RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(byte[] clientId, Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun)
         {
             if (_disposing) return RiakResult<IEnumerable<TResult>>.Error(ResultCode.ShuttingDown, "Connection is shutting down");
 
@@ -76,7 +76,7 @@ namespace CorrugatedIron.Comms
                     return useFun(conn, onFinish);
                 };
 
-            var response = _connections.StreamConsume(wrapper);
+            var response = _connections.DelayedConsume(wrapper);
             if (response.Item1)
             {
                 return response.Item2;
