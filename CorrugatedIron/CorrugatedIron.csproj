@@ -62,7 +62,7 @@
     <Compile Include="Containers\ConcurrentEnumerable.cs" />
     <Compile Include="Containers\ConcurrentEnumerator.cs" />
     <Compile Include="Containers\Either.cs" />
-    <Compile Include="Containers\ResourcePool.cs" />
+    <Compile Include="Comms\RiakConnectionPool.cs" />
     <Compile Include="Exceptions\RiakException.cs" />
     <Compile Include="Models\CommitHook\IRiakPostCommitHook.cs">
       <SubType>Code</SubType>
@@ -140,6 +140,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Models\RiakServerInfo.cs" />
+    <Compile Include="RiakAsyncClient.cs" />
     <Compile Include="RiakClient.cs" />
     <Compile Include="Comms\RiakConnection.cs" />
     <Compile Include="Comms\RiakConnectionFactory.cs" />
