@@ -15,7 +15,6 @@
 // under the License.
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -24,7 +23,6 @@ using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using System.Threading;
 using CorrugatedIron.Config;
 using CorrugatedIron.Encoding;
 using CorrugatedIron.Extensions;
@@ -65,9 +63,6 @@ namespace CorrugatedIron.Comms
         private readonly IRiakNodeConfiguration _nodeConfiguration;
         private readonly MessageEncoder _encoder;
         private readonly string _restRootUrl;
-        private readonly ConcurrentQueue<RiakConnectionCommand> _commands;
-        private readonly Thread _commandThread;
-        private volatile bool _commandThreadRunning;
         private TcpClient _pbcClient;
         private NetworkStream _pbcClientStream;
         private string _restClientId;
@@ -101,33 +96,6 @@ namespace CorrugatedIron.Comms
             _nodeConfiguration = nodeConfiguration;
             _restRootUrl = @"{0}://{1}:{2}".Fmt(nodeConfiguration.RestScheme, nodeConfiguration.HostAddress, nodeConfiguration.RestPort);
             _encoder = new MessageEncoder();
-            _commands = new ConcurrentQueue<RiakConnectionCommand>();
-            _commandThread = new Thread(CommandRunner);
-            _commandThreadRunning = true;
-            _commandThread.Start();
-        }
-
-        private void CommandRunner(object ignored)
-        {
-            var lastRun = DateTime.Now;
-            Thread.CurrentThread.Name = "CommandRunner - " + Guid.NewGuid();
-            while(_commandThreadRunning)
-            {
-                RiakConnectionCommand cmd;
-                if(_commands.TryDequeue(out cmd))
-                {
-                    cmd.Execute(this);
-                    lastRun = DateTime.Now;
-                }
-                else
-                {
-                    Thread.Sleep(200);
-                    if(!IsIdle && _commands.Count == 0 && (DateTime.Now - lastRun).TotalMilliseconds >= _nodeConfiguration.IdleTimeout)
-                    {
-                        CleanUp();
-                    }
-                }
-            }
         }
 
         public static byte[] ToClientId(int id)
@@ -144,12 +112,6 @@ namespace CorrugatedIron.Comms
         public RiakResult<TResult> PbcRead<TResult>()
             where TResult : new()
         {
-            return ExecuteCommand(conn => conn.PbcReadInternal<TResult>());
-        }
-
-        private RiakResult<TResult> PbcReadInternal<TResult>()
-            where TResult : new()
-        {
             try
             {
                 var result = _encoder.Decode<TResult>(PbcClientStream);
@@ -162,12 +124,6 @@ namespace CorrugatedIron.Comms
         }
 
         public RiakResult<IEnumerable<TResult>> PbcRepeatRead<TResult>(Func<TResult, bool> repeatRead)
-            where TResult : new()
-        {
-            return ExecuteCommand(conn => conn.PbcRepeatReadInternal(repeatRead));
-        }
-
-        private RiakResult<IEnumerable<TResult>> PbcRepeatReadInternal<TResult>(Func<TResult, bool> repeatRead)
             where TResult : new()
         {
             try
@@ -190,11 +146,6 @@ namespace CorrugatedIron.Comms
 
         public RiakResult PbcWrite<TRequest>(TRequest request)
         {
-            return ExecuteCommand(conn => conn.PbcWriteInternal(request));
-        }
-
-        internal RiakResult PbcWriteInternal<TRequest>(TRequest request)
-        {
             try
             {
                 _encoder.Encode(request, PbcClientStream);
@@ -209,17 +160,10 @@ namespace CorrugatedIron.Comms
         public RiakResult<TResult> PbcWriteRead<TRequest, TResult>(TRequest request)
             where TResult : new()
         {
-            return ExecuteCommand(conn => conn.PbcWriteReadInternal<TRequest, TResult>(request));
-        }
-
-
-        private RiakResult<TResult> PbcWriteReadInternal<TRequest, TResult>(TRequest request)
-            where TResult : new()
-        {
-            var writeResult = PbcWriteInternal(request);
+            var writeResult = PbcWrite(request);
             if (writeResult.IsSuccess)
             {
-                return PbcReadInternal<TResult>();
+                return PbcRead<TResult>();
             }
             return RiakResult<TResult>.Error(writeResult.ResultCode, writeResult.ErrorMessage);
         }
@@ -227,28 +171,16 @@ namespace CorrugatedIron.Comms
         public RiakResult<IEnumerable<TResult>> PbcWriteRead<TRequest, TResult>(TRequest request, Func<TResult, bool> repeatRead)
             where TResult : new()
         {
-            return ExecuteCommand(conn => conn.PbcWriteReadInternal(request, repeatRead));
-        }
-
-        private RiakResult<IEnumerable<TResult>> PbcWriteReadInternal<TRequest, TResult>(TRequest request, Func<TResult, bool> repeatRead)
-            where TResult : new()
-        {
-            var writeResult = PbcWriteInternal(request);
+            var writeResult = PbcWrite(request);
             if (writeResult.IsSuccess)
             {
-                return PbcRepeatReadInternal(repeatRead);
+                return PbcRepeatRead(repeatRead);
             }
             return RiakResult<IEnumerable<TResult>>.Error(writeResult.ResultCode, writeResult.ErrorMessage);
         }
 
 
         public RiakResult<IEnumerable<TResult>> PbcStreamRead<TResult>(Func<TResult, bool> repeatRead, Action onFinish)
-            where TResult : new()
-        {
-            return ExecuteCommand(conn => conn.PbcStreamReadInternal(repeatRead, onFinish));
-        }
-
-        private RiakResult<IEnumerable<TResult>> PbcStreamReadInternal<TResult>(Func<TResult, bool> repeatRead, Action onFinish)
             where TResult : new()
         {
             var streamer = PbcStreamReadIterator(repeatRead, onFinish);
@@ -262,7 +194,7 @@ namespace CorrugatedIron.Comms
 
             do
             {
-                result = PbcReadInternal<TResult>();
+                result = PbcRead<TResult>();
                 if (!result.IsSuccess) break;
                 yield return result.Value;
             } while (repeatRead(result.Value));
@@ -273,12 +205,6 @@ namespace CorrugatedIron.Comms
         public RiakResult<IEnumerable<TResult>> PbcWriteStreamRead<TRequest, TResult>(TRequest request, Func<TResult, bool> repeatRead, Action onFinish)
             where TResult : new()
         {
-            return ExecuteCommand(conn => conn.PbcWriteStreamReadInternal(request, repeatRead, onFinish));
-        }
-
-        private RiakResult<IEnumerable<TResult>> PbcWriteStreamReadInternal<TRequest, TResult>(TRequest request, Func<TResult, bool> repeatRead, Action onFinish)
-            where TResult : new()
-        {
             var streamer = PbcWriteStreamReadIterator(request, repeatRead, onFinish);
             return RiakResult<IEnumerable<TResult>>.Success(streamer);
         }
@@ -286,7 +212,7 @@ namespace CorrugatedIron.Comms
         private IEnumerable<TResult> PbcWriteStreamReadIterator<TRequest, TResult>(TRequest request, Func<TResult, bool> repeatRead, Action onFinish)
             where TResult : new()
         {
-            var writeResult = PbcWriteInternal(request);
+            var writeResult = PbcWrite(request);
             if (writeResult.IsSuccess)
             {
                 return PbcStreamReadIterator(repeatRead, onFinish);
@@ -383,8 +309,6 @@ namespace CorrugatedIron.Comms
 
         public void Dispose()
         {
-            _commandThreadRunning = false;
-            _commandThread.Join();
             CleanUp();
         }
 
@@ -403,22 +327,6 @@ namespace CorrugatedIron.Comms
             {
                 client.Close();
             }
-        }
-
-        //private void ExecuteCommand(Action<RiakConnection> func)
-        //{
-        //    var cmd = new RiakConnectionCommand(func);
-        //    _commands.Enqueue(cmd);
-        //    cmd.Wait();
-        //}
-
-        private TResult ExecuteCommand<TResult>(Func<RiakConnection, TResult> func)
-        {
-            var result = default(TResult);
-            var cmd = new RiakConnectionCommand(conn => result = func(conn));
-            _commands.Enqueue(cmd);
-            cmd.Wait();
-            return result;
         }
     }
 }

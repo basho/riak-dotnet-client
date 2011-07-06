@@ -17,7 +17,6 @@
 using System;
 using System.Collections.Generic;
 using CorrugatedIron.Config;
-using CorrugatedIron.Containers;
 
 namespace CorrugatedIron.Comms
 {
@@ -30,14 +29,12 @@ namespace CorrugatedIron.Comms
 
     public class RiakNode : IRiakNode
     {
-        private readonly ResourcePool<IRiakConnection> _connections;
+        private readonly RiakConnectionPool _connections;
         private bool _disposing;
 
         public RiakNode(IRiakNodeConfiguration nodeConfiguration, IRiakConnectionFactory connectionFactory)
         {
-            _connections = new ResourcePool<IRiakConnection>(nodeConfiguration.PoolSize,
-                nodeConfiguration.AcquireTimeout, () => connectionFactory.CreateConnection(nodeConfiguration),
-                conn => conn.Dispose());
+            _connections = new RiakConnectionPool(nodeConfiguration, connectionFactory);
         }
 
         public RiakResult UseConnection(byte[] clientId, Func<IRiakConnection, RiakResult> useFun)
@@ -90,7 +87,6 @@ namespace CorrugatedIron.Comms
         public void Dispose()
         {
             _disposing = true;
-
             _connections.Dispose();
         }
     }
