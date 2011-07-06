@@ -56,10 +56,7 @@ namespace CorrugatedIron.Tests.Live
             brent.LinkTo(jeremiah, "coworkers");
             brent.LinkTo(jeremiah, "friends");
 
-            Client.Put(oj);
-            Client.Put(jeremiah);
-            Client.Put(brent);
-            Client.Put(rob);
+            Client.Put(new[] { oj, jeremiah, brent, rob });
         }
 
         private const string Jeremiah = "jeremiah";

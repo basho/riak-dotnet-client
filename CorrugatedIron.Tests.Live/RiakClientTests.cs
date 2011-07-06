@@ -48,6 +48,27 @@ namespace CorrugatedIron.Tests.Live
         }
 
         [Test]
+        public void DeleteIsSuccessfulInBatch()
+        {
+            Client.Batch(batch =>
+                {
+                    var riakObject = new RiakObject(TestBucket, TestKey, TestJson, RiakConstants.ContentTypes.ApplicationJson);
+                    var riakObjectId = riakObject.ToRiakObjectId();
+
+                    var putResult = batch.Put(riakObject);
+                    putResult.IsSuccess.ShouldBeTrue();
+
+                    var delResult = batch.Delete(riakObjectId);
+                    delResult.IsSuccess.ShouldBeTrue();
+
+                    var getResult = batch.Get(riakObjectId);
+                    getResult.IsSuccess.ShouldBeFalse();
+                    getResult.ResultCode.ShouldEqual(ResultCode.NotFound);
+                    getResult.Value.ShouldBeNull();
+                });
+        }
+
+        [Test]
         public void AsyncDeleteIsSuccessful()
         {
             var riakObject = new RiakObject(TestBucket, TestKey, TestJson, RiakConstants.ContentTypes.ApplicationJson);
