@@ -30,7 +30,7 @@ using CorrugatedIron.Util;
 
 namespace CorrugatedIron
 {
-    public interface IRiakBatchClient
+    public interface IRiakClient
     {
         RiakResult Ping();
 
@@ -64,20 +64,17 @@ namespace CorrugatedIron
         IList<RiakObject> WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks);
 
         RiakResult<RiakServerInfo> GetServerInfo();
-    }
 
-    public interface IRiakClient : IRiakBatchClient
-    {
+        void Batch(Action<IRiakClient> batchAction);
+
         IRiakAsyncClient Async { get; }
-
-        void Batch(Action<IRiakBatchClient> batchAction);
     }
 
     public class RiakClient : IRiakClient
     {
         private readonly IRiakCluster _cluster;
         private byte[] _clientId;
-        private IRiakConnection _batchConnection;
+        private readonly IRiakConnection _batchConnection;
 
         public IRiakAsyncClient Async
         {
@@ -89,6 +86,13 @@ namespace CorrugatedIron
         {
             _cluster = cluster;
             ClientId = GetClientId();
+            Async = new RiakAsyncClient(this);
+        }
+
+        private RiakClient(IRiakConnection batchConnection, byte[] clientId)
+        {
+            _batchConnection = batchConnection;
+            ClientId = clientId;
             Async = new RiakAsyncClient(this);
         }
 
@@ -170,6 +174,8 @@ namespace CorrugatedIron
 
         public IEnumerable<RiakResult<RiakObject>> Get(IEnumerable<RiakObjectId> bucketKeyPairs, uint rVal = RiakConstants.Defaults.RVal)
         {
+            bucketKeyPairs = bucketKeyPairs.ToList();
+
             var requests = bucketKeyPairs.Select(
                     bk => new RpbGetReq {Bucket = bk.Bucket.ToRiakString(), Key = bk.Key.ToRiakString(), R = rVal}). ToList();
             var results = UseConnection(conn =>
@@ -234,6 +240,7 @@ namespace CorrugatedIron
         {
             options = options ?? new RiakPutOptions();
 
+            values = values.ToList();
             var messages = values.Select(v =>
                 {
                     var m = v.ToMessage();
@@ -471,14 +478,13 @@ namespace CorrugatedIron
             return RiakResult<RiakServerInfo>.Error(result.ResultCode, result.ErrorMessage);
         }
 
-        public void Batch(Action<IRiakBatchClient> batchAction)
+        public void Batch(Action<IRiakClient> batchAction)
         {
             Func<IRiakConnection, Action, RiakResult<IEnumerable<object>>> batchFun = (conn, onFinish) =>
                 {
-                    _batchConnection = conn;
                     try
                     {
-                        batchAction(this);
+                        batchAction(new RiakClient(conn, _clientId));
                         return RiakResult<IEnumerable<object>>.Success(null);
                     }
                     catch (Exception ex)
@@ -487,7 +493,6 @@ namespace CorrugatedIron
                     }
                     finally
                     {
-                        _batchConnection = null;
                         onFinish();
                     }
                 };
