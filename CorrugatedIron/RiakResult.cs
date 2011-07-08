@@ -24,7 +24,8 @@ namespace CorrugatedIron
         CommunicationError,
         InvalidResponse,
         ClusterOffline,
-        NoConnections
+        NoConnections,
+        BatchException
     }
 
     public class RiakResult

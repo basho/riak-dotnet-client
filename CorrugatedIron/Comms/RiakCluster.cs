@@ -27,7 +27,7 @@ namespace CorrugatedIron.Comms
     {
         RiakResult<TResult> UseConnection<TResult>(byte[] clientId, Func<IRiakConnection, RiakResult<TResult>> useFun);
         RiakResult UseConnection(byte[] clientId, Func<IRiakConnection, RiakResult> useFun);
-        RiakResult<IEnumerable<TResult>> UseStreamConnection<TResult>(byte[] clientId, Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun);
+        RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(byte[] clientId, Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun);
     }
 
     public class RiakCluster : IRiakCluster
@@ -85,14 +85,14 @@ namespace CorrugatedIron.Comms
             return onError(ResultCode.ClusterOffline, "Unable to access functioning Riak node");
         }
 
-        public RiakResult<IEnumerable<TResult>> UseStreamConnection<TResult>(byte[] clientId, Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun)
+        public RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(byte[] clientId, Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun)
         {
             if (_disposing) return RiakResult<IEnumerable<TResult>>.Error(ResultCode.ShuttingDown, "System currently shutting down");
 
             IRiakNode node;
             if (_roundRobin.TryMoveNext(out node))
             {
-                var result = node.UseStreamConnection(clientId, useFun);
+                var result = node.UseDelayedConnection(clientId, useFun);
                 if (!result.IsSuccess)
                 {
                     if (result.ResultCode == ResultCode.NoConnections)

@@ -76,7 +76,7 @@ namespace CorrugatedIron.Comms
             return Tuple.Create(false, default(TResult));
         }
 
-        public Tuple<bool, TResult> StreamConsume<TResult>(Func<IRiakConnection, Action, TResult> consumer)
+        public Tuple<bool, TResult> DelayedConsume<TResult>(Func<IRiakConnection, Action, TResult> consumer)
         {
             if (_disposing) return Tuple.Create(false, default(TResult));
 

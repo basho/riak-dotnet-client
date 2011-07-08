@@ -45,7 +45,7 @@ namespace CorrugatedIron.Tests.RiakClientSetBucketPropertiesTests
             return useFun(ConnectionMock.Object);
         }
 
-        public RiakResult<IEnumerable<TResult>> UseStreamConnection<TResult>(byte[] clientId, Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun)
+        public RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(byte[] clientId, Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun)
         {
             throw new NotImplementedException();
         }
