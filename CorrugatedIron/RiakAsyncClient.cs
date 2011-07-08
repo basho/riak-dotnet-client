@@ -57,6 +57,8 @@ namespace CorrugatedIron
         void WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks, Action<IList<RiakObject>> callback);
 
         void GetServerInfo(Action<RiakResult<RiakServerInfo>> callback);
+
+        void Batch(Action<IRiakClient> batchAction);
     }
 
     public class RiakAsyncClient : IRiakAsyncClient
@@ -161,6 +163,11 @@ namespace CorrugatedIron
         public void GetServerInfo(Action<RiakResult<RiakServerInfo>> callback)
         {
             ExecAsync(() => callback(_client.GetServerInfo()));
+        }
+
+        public void Batch(Action<IRiakClient> batchAction)
+        {
+            ExecAsync(() => _client.Batch(batchAction));
         }
 
         private static void ExecAsync(Action action)
