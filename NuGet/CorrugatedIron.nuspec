@@ -1,4 +1,5 @@
-<package>
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
         <id>CorrugatedIron</id>
 	<version>0.1.0.0</version>
@@ -18,7 +19,7 @@ CorrugatedIron - a .NET client for Riak.
 	<iconUrl>http://corrugatediron.org/nugeticon.png</iconUrl>
 	<licenseUrl>http://corrugatediron.org/LICENSE</licenseUrl>
 	<requireLicenseAcceptance>false</requireLicenseAcceptance>
-	<tags>Riak</tags>
+	<tags>Riak CorrugatedIron Corrugated Iron NoSQL Client Driver</tags>
 	<dependencies>
             <dependency id="Newtonsoft.Json" version="4.0.2" />
             <dependency id="protobuf-net" version="1.0.0.280" />
