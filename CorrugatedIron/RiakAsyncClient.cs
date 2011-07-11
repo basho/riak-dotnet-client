@@ -58,7 +58,7 @@ namespace CorrugatedIron
 
         void GetServerInfo(Action<RiakResult<RiakServerInfo>> callback);
 
-        void Batch(Action<IRiakClient> batchAction);
+        void Batch(Action<IRiakBatchClient> batchAction);
     }
 
     public class RiakAsyncClient : IRiakAsyncClient
@@ -165,7 +165,7 @@ namespace CorrugatedIron
             ExecAsync(() => callback(_client.GetServerInfo()));
         }
 
-        public void Batch(Action<IRiakClient> batchAction)
+        public void Batch(Action<IRiakBatchClient> batchAction)
         {
             ExecAsync(() => _client.Batch(batchAction));
         }
