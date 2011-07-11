@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2010 - OJ Reeves & Jeremiah Peschka
+﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -14,7 +14,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
 using System.Collections.Generic;
 using CorrugatedIron.KeyFilters;
 using CorrugatedIron.Models;
@@ -37,10 +36,8 @@ namespace CorrugatedIron.Tests.Live
             base.SetUp();
 
             var oj = new RiakObject(TestBucket, OJ, @"{""name"":""oj""}", RiakConstants.ContentTypes.ApplicationJson);
-            var jeremiah = new RiakObject(TestBucket, Jeremiah, @"{""name"":""jeremiah""}",
-                                          RiakConstants.ContentTypes.ApplicationJson);
-            var brent = new RiakObject(TestBucket, Brent, @"{""name"":""brent""}",
-                                       RiakConstants.ContentTypes.ApplicationJson);
+            var jeremiah = new RiakObject(TestBucket, Jeremiah, @"{""name"":""jeremiah""}", RiakConstants.ContentTypes.ApplicationJson);
+            var brent = new RiakObject(TestBucket, Brent, @"{""name"":""brent""}", RiakConstants.ContentTypes.ApplicationJson);
             var rob = new RiakObject(TestBucket, Rob, @"{""name"":""rob""}", RiakConstants.ContentTypes.ApplicationJson);
 
             oj.LinkTo(jeremiah, "friends");

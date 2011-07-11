@@ -6,7 +6,8 @@
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Distributed Nonsense")]
 [assembly: AssemblyProduct("CorrugatedIron")]
-[assembly: AssemblyCopyright("Copyright © OJ Reeves & Jeremiah Peschka 2011")]
+[assembly: AssemblyCopyright("Copyright © 201" +
+    "1 OJ Reeves & Jeremiah Peschka 2011")]
 [assembly: AssemblyTrademark("CorrugatedIron - Distributed Nonsense")]
 [assembly: AssemblyCulture("")]
 
