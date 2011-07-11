@@ -34,7 +34,7 @@ namespace CorrugatedIron.Models.MapReduce.Fluent
             return this;
         }
 
-        public RiakFluentActionPhaseJavascript Argument(string argument)
+        public RiakFluentActionPhaseJavascript Argument<T>(T argument)
         {
             _phase.Argument(argument);
             return this;

@@ -34,7 +34,7 @@ namespace CorrugatedIron.Models.MapReduce.Fluent
             return this;
         }
 
-        public RiakFluentActionPhaseErlang Argument(string argument)
+        public RiakFluentActionPhaseErlang Argument<T>(T argument)
         {
             _phase.Argument(argument);
             return this;
