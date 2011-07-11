@@ -10,6 +10,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Metadata", "Metadata", "{C6E7CFF8-CC0A-49A4-B235-DDF0F23EB2A6}"
 	ProjectSection(SolutionItems) = preProject
 		Metadata\CorrugatedIron.snk = Metadata\CorrugatedIron.snk
+		Metadata\VersionInfo.cs = Metadata\VersionInfo.cs
 	EndProjectSection
 EndProject
 Global
