@@ -15,11 +15,13 @@
 // under the License.
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using CorrugatedIron.Comms.LoadBalancing;
 using CorrugatedIron.Config;
-using CorrugatedIron.Containers;
-using CorrugatedIron.Extensions;
+using CorrugatedIron.Messages;
 
 namespace CorrugatedIron.Comms
 {
@@ -32,15 +34,22 @@ namespace CorrugatedIron.Comms
 
     public class RiakCluster : IRiakCluster
     {
-        private bool _disposing;
+        private readonly byte[] _pollClientId = new byte[] { 1, 1, 1, 1 };
+        private readonly RoundRobinStrategy _loadBalancer;
         private readonly List<IRiakNode> _nodes;
-        private readonly IConcurrentEnumerator<IRiakNode> _roundRobin;
+        private readonly ConcurrentQueue<IRiakNode> _offlineNodes;
+        private readonly int _nodePollTime;
+        private bool _disposing;
 
         public RiakCluster(IRiakClusterConfiguration clusterConfiguration, IRiakNodeFactory nodeFactory, IRiakConnectionFactory connectionFactory)
         {
+            _nodePollTime = clusterConfiguration.NodePollTime;
             _nodes = clusterConfiguration.RiakNodes.Select(rn => nodeFactory.CreateNode(rn, connectionFactory)).ToList();
-            
-            _roundRobin = new ConcurrentEnumerable<IRiakNode>(_nodes.Cycle()).GetEnumerator();
+            _loadBalancer = new RoundRobinStrategy();
+            _loadBalancer.Initialise(_nodes);
+            _offlineNodes = new ConcurrentQueue<IRiakNode>();
+
+            ThreadPool.QueueUserWorkItem(NodeMonitor);
         }
 
         public RiakResult UseConnection(byte[] clientId, Func<IRiakConnection, RiakResult> useFun)
@@ -58,23 +67,22 @@ namespace CorrugatedIron.Comms
         {
             if (_disposing) return onError(ResultCode.ShuttingDown, "System currently shutting down");
 
-            IRiakNode node;
-            if (_roundRobin.TryMoveNext(out node))
+            var node = _loadBalancer.SelectNode();
+
+            if (node != null)
             {
                 var result = node.UseConnection(clientId, useFun);
                 if (!result.IsSuccess)
                 {
                     if (result.ResultCode == ResultCode.NoConnections)
                     {
-                        // TODO: this is where we need to retry on another node
-                        //return UseConnection(clientId, useFun, onError);
+                        return UseConnection(clientId, useFun, onError);
                     }
 
                     if (result.ResultCode == ResultCode.CommunicationError)
                     {
-                        // TODO: pull this node from the cluster and retry on another node
-                        // DeactivateNode(node);
-                        //return UseConnection(clientId, useFun, onError);
+                        DeactivateNode(node);
+                        return UseConnection(clientId, useFun, onError);
                     }
 
                     // use the onError function so that we know the return value is the right type
@@ -89,28 +97,63 @@ namespace CorrugatedIron.Comms
         {
             if (_disposing) return RiakResult<IEnumerable<TResult>>.Error(ResultCode.ShuttingDown, "System currently shutting down");
 
-            IRiakNode node;
-            if (_roundRobin.TryMoveNext(out node))
+            var node = _loadBalancer.SelectNode();
+
+            if (node != null)
             {
                 var result = node.UseDelayedConnection(clientId, useFun);
                 if (!result.IsSuccess)
                 {
                     if (result.ResultCode == ResultCode.NoConnections)
                     {
-                        // TODO: this is where we need to retry on another node
-                        //return UseConnection(clientId, useFun, onError);
+                        return UseDelayedConnection(clientId, useFun);
                     }
 
                     if (result.ResultCode == ResultCode.CommunicationError)
                     {
-                        // TODO: pull this node from the cluster and retry on another node
-                        // DeactivateNode(node);
-                        //return UseConnection(clientId, useFun, onError);
+                        DeactivateNode(node);
+                        return UseDelayedConnection(clientId, useFun);
                     }
                 }
                 return result;
             }
             return RiakResult<IEnumerable<TResult>>.Error(ResultCode.ClusterOffline, "Unable to access functioning Riak node");
+        }
+
+        private void DeactivateNode(IRiakNode node)
+        {
+            _offlineNodes.Enqueue(node);
+        }
+
+        private void NodeMonitor(object _)
+        {
+            while (!_disposing)
+            {
+                var deadNodes = new List<IRiakNode>();
+                IRiakNode node = null;
+                while (_offlineNodes.TryDequeue(out node) && !_disposing)
+                {
+                    var result = node.UseConnection(_pollClientId, c => c.PbcWriteRead<RpbPingReq, RpbPingResp>(new RpbPingReq()));
+                    if (result.IsSuccess)
+                    {
+                        _loadBalancer.AddNode(node);
+                    }
+                    else
+                    {
+                        deadNodes.Add(node);
+                    }
+                }
+
+                if (!_disposing)
+                {
+                    foreach (var deadNode in deadNodes)
+                    {
+                        _offlineNodes.Enqueue(deadNode);
+                    }
+
+                    Thread.Sleep(_nodePollTime);
+                }
+            }
         }
 
         public void Dispose()
