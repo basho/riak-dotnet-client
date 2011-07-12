@@ -23,6 +23,7 @@ namespace CorrugatedIron.Config
     public interface IRiakClusterConfiguration
     {
         IList<IRiakNodeConfiguration> RiakNodes { get; }
+        int NodePollTime { get; }
     }
 
     public class RiakClusterConfiguration : ConfigurationSection, IRiakClusterConfiguration
@@ -43,6 +44,13 @@ namespace CorrugatedIron.Config
         IList<IRiakNodeConfiguration> IRiakClusterConfiguration.RiakNodes
         {
             get { return Nodes.Cast<IRiakNodeConfiguration>().ToList(); }
+        }
+
+        [ConfigurationProperty("nodePollTime", DefaultValue = 5000, IsRequired = false)]
+        public int NodePollTime
+        {
+            get { return (int)this["nodePollTime"]; }
+            set { this["nodePollTime"] = value; }
         }
     }
 }

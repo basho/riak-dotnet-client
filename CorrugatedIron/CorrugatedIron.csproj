@@ -58,6 +58,8 @@
     <Compile Include="..\Metadata\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
+    <Compile Include="Comms\LoadBalancing\ILoadBalancingStrategy.cs" />
+    <Compile Include="Comms\LoadBalancing\RoundRobinStrategy.cs" />
     <Compile Include="Comms\RiakConnectionCommand.cs" />
     <Compile Include="Containers\ConcurrentEnumerable.cs" />
     <Compile Include="Containers\ConcurrentEnumerator.cs" />
