@@ -25,6 +25,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using CorrugatedIron.Config;
 using CorrugatedIron.Encoding;
+using CorrugatedIron.Exceptions;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
 using CorrugatedIron.Models.Rest;
