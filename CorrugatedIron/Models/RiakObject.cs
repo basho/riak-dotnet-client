@@ -44,7 +44,7 @@ namespace CorrugatedIron.Models
 
         public bool HasChanged
         {
-            get { return _hashCode == CalculateHashCode(); }
+            get { return _hashCode != CalculateHashCode(); }
         }
 
         public List<string> VTags
@@ -162,6 +162,16 @@ namespace CorrugatedIron.Models
             LastModifiedUsec = content.LastModUSecs;
 
             _hashCode = CalculateHashCode();
+        }
+
+        internal RiakObject(string bucket, string key, ICollection<RpbContent> contents, byte[] vectorClock)
+            : this(bucket, key, contents.First(), vectorClock)
+        {
+            if (contents.Count > 1)
+            {
+                Siblings = contents.Select(c => new RiakObject(bucket, key, c, vectorClock)).ToList();
+                _hashCode = CalculateHashCode();
+            }
         }
 
         internal RpbPutReq ToMessage()

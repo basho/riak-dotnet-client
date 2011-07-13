@@ -64,6 +64,20 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         }
 
         [Test]
+        public void GetsWithBucketAndKeyReturnObjectsThatAreMarkedAsNotChanged()
+        {
+            var doc = new RiakObject(TestBucket, TestKey, TestJson, RiakConstants.ContentTypes.ApplicationJson);
+            var writeResult = Client.Put(doc);
+            writeResult.IsSuccess.ShouldBeTrue();
+            writeResult.Value.ShouldNotBeNull();
+
+            var readResult = Client.Get(TestBucket, TestKey);
+            readResult.IsSuccess.ShouldBeTrue();
+            readResult.Value.ShouldNotBeNull();
+            readResult.Value.HasChanged.ShouldBeFalse();
+        }
+
+        [Test]
         public void GetsWithBucketAndKeyReturnObjects()
         {
             var doc = new RiakObject(TestBucket, TestKey, TestJson, RiakConstants.ContentTypes.ApplicationJson);
@@ -494,7 +508,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
 
             Thread.Sleep(1000);
 
-            o = new RiakObject(TestBucket, "1234", changedData);
+            o.Value = changedData.ToRiakString();
             o = Client.Put(o, new RiakPutOptions { ReturnBody = true }).Value;
 
             var lm3 = o.LastModified;
@@ -545,18 +559,19 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         public void AsyncListKeysReturnsTheCorrectNumberOfResults()
         {
             const string dummyData = "{{ value: {0} }}";
+            var bucket = Guid.NewGuid().ToString();
             
             for (var i = 1; i < 11; i++)
             {
                 var newData = string.Format(dummyData, i);
-                var doc = new RiakObject(TestBucket, i.ToString(), newData, RiakConstants.ContentTypes.ApplicationJson);
+                var doc = new RiakObject(bucket, i.ToString(), newData, RiakConstants.ContentTypes.ApplicationJson);
 
                 Client.Put(doc).IsSuccess.ShouldBeTrue();
             }
 
             RiakResult<IEnumerable<string>> theResult = null;
             var resetEvnt = new AutoResetEvent(false);
-            Client.Async.ListKeys(TestBucket, result =>
+            Client.Async.ListKeys(bucket, result =>
                                             {
                                                 theResult = result;
                                                 resetEvnt.Set();
