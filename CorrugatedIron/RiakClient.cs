@@ -306,7 +306,7 @@ namespace CorrugatedIron
             if (result.IsSuccess)
             {
                 var buckets = result.Value.Buckets.Select(b => b.FromRiakString());
-                return RiakResult<IEnumerable<string>>.Success(buckets);
+                return RiakResult<IEnumerable<string>>.Success(buckets.ToList());
             }
             return RiakResult<IEnumerable<string>>.Error(result.ResultCode, result.ErrorMessage);
         }
