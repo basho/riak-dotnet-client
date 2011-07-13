@@ -124,12 +124,7 @@ namespace CorrugatedIron
                 return RiakResult<RiakObject>.Error(ResultCode.NotFound);
             }
 
-            var o = new RiakObject(bucket, key, result.Value.Content.First(), result.Value.VectorClock);
-
-            if (result.Value.Content.Count > 1)
-            {
-                o.Siblings = result.Value.Content.Select(c => new RiakObject(bucket, key, c, result.Value.VectorClock)).ToList();
-            }
+            var o = new RiakObject(bucket, key, result.Value.Content, result.Value.VectorClock);
 
             return RiakResult<RiakObject>.Success(o);
         }
@@ -323,7 +318,7 @@ namespace CorrugatedIron
 
             if (result.IsSuccess)
             {
-                var keys = result.Value.Where(r => r.IsSuccess).SelectMany(r => r.Value.KeyNames).ToList();
+                var keys = result.Value.Where(r => r.IsSuccess).SelectMany(r => r.Value.KeyNames).Distinct().ToList();
                 return RiakResult<IEnumerable<string>>.Success(keys);
             }
             return RiakResult<IEnumerable<string>>.Error(result.ResultCode, result.ErrorMessage);
