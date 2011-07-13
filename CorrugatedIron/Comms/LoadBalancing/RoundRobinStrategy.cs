@@ -14,6 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using CorrugatedIron.Containers;
@@ -25,11 +26,13 @@ namespace CorrugatedIron.Comms.LoadBalancing
         private readonly object _nodesLock = new object();
         private List<IRiakNode> _nodes;
         private IConcurrentEnumerator<IRiakNode> _roundRobin;
+        private Func<IEnumerable<IRiakNode>> _generator;
 
         public void Initialise(IEnumerable<IRiakNode> nodes)
         {
             _nodes = nodes.ToList();
-
+            var list = _nodes.ToList();
+            _generator = () => list;
             _roundRobin = new ConcurrentEnumerable<IRiakNode>(RoundRobin()).GetEnumerator();
         }
 
@@ -48,6 +51,8 @@ namespace CorrugatedIron.Comms.LoadBalancing
             lock (_nodesLock)
             {
                 _nodes.Remove(node);
+                var list = _nodes.ToList();
+                _generator = () => list;
             }
         }
 
@@ -56,6 +61,8 @@ namespace CorrugatedIron.Comms.LoadBalancing
             lock (_nodesLock)
             {
                 _nodes.Add(node);
+                var list = _nodes.ToList();
+                _generator = () => list;
             }
         }
 
@@ -63,10 +70,18 @@ namespace CorrugatedIron.Comms.LoadBalancing
         {
             while (true)
             {
-                var nodes = _nodes.GetEnumerator();
-                while (nodes.MoveNext() && nodes.Current != null)
+                var list = _generator().ToList();
+                if (list.Count > 0)
                 {
-                    yield return nodes.Current;
+                    var nodes = list.GetEnumerator();
+                    while (nodes.MoveNext() && nodes.Current != null)
+                    {
+                        yield return nodes.Current;
+                    }
+                }
+                else
+                {
+                    yield return null;
                 }
             }
         }
