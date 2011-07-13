@@ -54,7 +54,7 @@ namespace CorrugatedIron
 
         void SetBucketProperties(string bucket, RiakBucketProperties properties, Action<RiakResult> callback);
 
-        void WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks, Action<IList<RiakObject>> callback);
+        void WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks, Action<RiakResult<IList<RiakObject>>> callback);
 
         void GetServerInfo(Action<RiakResult<RiakServerInfo>> callback);
 
@@ -155,7 +155,7 @@ namespace CorrugatedIron
             ExecAsync(() => callback(_client.SetBucketProperties(bucket, properties)));
         }
 
-        public void WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks, Action<IList<RiakObject>> callback)
+        public void WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks, Action<RiakResult<IList<RiakObject>>> callback)
         {
             ExecAsync(() => callback(_client.WalkLinks(riakObject, riakLinks)));
         }

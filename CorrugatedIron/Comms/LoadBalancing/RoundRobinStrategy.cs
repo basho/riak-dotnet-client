@@ -50,9 +50,12 @@ namespace CorrugatedIron.Comms.LoadBalancing
         {
             lock (_nodesLock)
             {
-                _nodes.Remove(node);
-                var list = _nodes.ToList();
-                _generator = () => list;
+                if (_nodes.Contains(node))
+                {
+                    _nodes.Remove(node);
+                    var list = _nodes.ToList();
+                    _generator = () => list;
+                }
             }
         }
 
@@ -60,9 +63,12 @@ namespace CorrugatedIron.Comms.LoadBalancing
         {
             lock (_nodesLock)
             {
-                _nodes.Add(node);
-                var list = _nodes.ToList();
-                _generator = () => list;
+                if (!_nodes.Contains(node))
+                {
+                    _nodes.Add(node);
+                    var list = _nodes.ToList();
+                    _generator = () => list;
+                }
             }
         }
 

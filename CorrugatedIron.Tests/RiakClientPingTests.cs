@@ -32,12 +32,6 @@ namespace CorrugatedIron.Tests.RiakClientPingTests
             SetUpInternal();
             Response = Client.Ping();
         }
-
-        [Test]
-        public void PbcClientIsInvoked()
-        {
-            ConnMock.Verify(m => m.PbcWriteRead<RpbPingReq, RpbPingResp>(It.IsAny<RpbPingReq>()), Times.Once());
-        }
     }
 
     [TestFixture]
@@ -51,10 +45,10 @@ namespace CorrugatedIron.Tests.RiakClientPingTests
         }
 
         [Test]
-        public void SuccessResultIsReturned()
+        public void CorrectResultIsReturned()
         {
             Response.IsSuccess.ShouldBeFalse();
-            Response.ResultCode.ShouldEqual(ResultCode.CommunicationError);
+            Response.ResultCode.ShouldEqual(ResultCode.ClusterOffline);
         }
     }
 
@@ -72,6 +66,12 @@ namespace CorrugatedIron.Tests.RiakClientPingTests
         public void SuccessResultIsReturned()
         {
             Response.IsSuccess.ShouldBeTrue();
+        }
+
+        [Test]
+        public void PbcClientIsInvoked()
+        {
+            ConnMock.Verify(m => m.PbcWriteRead<RpbPingReq, RpbPingResp>(It.IsAny<RpbPingReq>()), Times.Once());
         }
     }
 
