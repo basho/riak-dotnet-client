@@ -29,7 +29,8 @@ namespace CorrugatedIron.Comms
     {
         RiakResult<TResult> UseConnection<TResult>(byte[] clientId, Func<IRiakConnection, RiakResult<TResult>> useFun);
         RiakResult UseConnection(byte[] clientId, Func<IRiakConnection, RiakResult> useFun);
-        RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(byte[] clientId, Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun);
+        RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(byte[] clientId, Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun)
+            where TResult : RiakResult;
     }
 
     public class RiakCluster : IRiakCluster
@@ -94,6 +95,7 @@ namespace CorrugatedIron.Comms
         }
 
         public RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(byte[] clientId, Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun)
+            where TResult : RiakResult
         {
             if (_disposing) return RiakResult<IEnumerable<TResult>>.Error(ResultCode.ShuttingDown, "System currently shutting down");
 
@@ -122,7 +124,14 @@ namespace CorrugatedIron.Comms
 
         private void DeactivateNode(IRiakNode node)
         {
-            _offlineNodes.Enqueue(node);
+            lock (node)
+            {
+                if (!_offlineNodes.Contains(node))
+                {
+                    _loadBalancer.RemoveNode(node);
+                    _offlineNodes.Enqueue(node);
+                }
+            }
         }
 
         private void NodeMonitor(object _)

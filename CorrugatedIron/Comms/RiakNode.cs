@@ -24,7 +24,8 @@ namespace CorrugatedIron.Comms
     {
         RiakResult UseConnection(byte[] clientId, Func<IRiakConnection, RiakResult> useFun);
         RiakResult<TResult> UseConnection<TResult>(byte[] clientId, Func<IRiakConnection, RiakResult<TResult>> useFun);
-        RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(byte[] clientId, Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun);
+        RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(byte[] clientId, Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun)
+            where TResult : RiakResult;
     }
 
     public class RiakNode : IRiakNode
@@ -55,7 +56,12 @@ namespace CorrugatedIron.Comms
             Func<IRiakConnection, TRiakResult> wrapper = conn =>
                 {
                     conn.SetClientId(clientId);
-                    return useFun(conn);
+                    var result = useFun(conn);
+                    if (!result.IsSuccess && result.ResultCode == ResultCode.CommunicationError)
+                    {
+                        conn.Disconnect();
+                    }
+                    return result;
                 };
 
             var response = _connections.Consume(wrapper);
@@ -67,6 +73,7 @@ namespace CorrugatedIron.Comms
         }
 
         public RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(byte[] clientId, Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun)
+            where TResult : RiakResult
         {
             if (_disposing) return RiakResult<IEnumerable<TResult>>.Error(ResultCode.ShuttingDown, "Connection is shutting down");
 

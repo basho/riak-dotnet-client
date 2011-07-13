@@ -36,6 +36,8 @@ namespace CorrugatedIron.Comms
     {
         bool IsIdle { get; }
 
+        void Disconnect();
+
         // PBC interface
         RiakResult<TResult> PbcRead<TResult>()
             where TResult : new();
@@ -43,14 +45,14 @@ namespace CorrugatedIron.Comms
         RiakResult<TResult> PbcWriteRead<TRequest, TResult>(TRequest request)
             where TResult : new();
 
-        RiakResult<IEnumerable<TResult>> PbcRepeatRead<TResult>(Func<TResult, bool> repeatRead)
+        RiakResult<IEnumerable<RiakResult<TResult>>> PbcRepeatRead<TResult>(Func<RiakResult<TResult>, bool> repeatRead)
             where TResult : new();
-        RiakResult<IEnumerable<TResult>> PbcWriteRead<TRequest, TResult>(TRequest request, Func<TResult, bool> repeatRead)
+        RiakResult<IEnumerable<RiakResult<TResult>>> PbcWriteRead<TRequest, TResult>(TRequest request, Func<RiakResult<TResult>, bool> repeatRead)
             where TResult : new();
 
-        RiakResult<IEnumerable<TResult>> PbcStreamRead<TResult>(Func<TResult, bool> repeatRead, Action onFinish)
+        RiakResult<IEnumerable<RiakResult<TResult>>> PbcStreamRead<TResult>(Func<RiakResult<TResult>, bool> repeatRead, Action onFinish)
             where TResult : new();
-        RiakResult<IEnumerable<TResult>> PbcWriteStreamRead<TRequest, TResult>(TRequest request, Func<TResult, bool> repeatRead, Action onFinish)
+        RiakResult<IEnumerable<RiakResult<TResult>>> PbcWriteStreamRead<TRequest, TResult>(TRequest request, Func<RiakResult<TResult>, bool> repeatRead, Action onFinish)
             where TResult : new();
 
         // REST interface
@@ -123,24 +125,24 @@ namespace CorrugatedIron.Comms
             }
         }
 
-        public RiakResult<IEnumerable<TResult>> PbcRepeatRead<TResult>(Func<TResult, bool> repeatRead)
+        public RiakResult<IEnumerable<RiakResult<TResult>>> PbcRepeatRead<TResult>(Func<RiakResult<TResult>, bool> repeatRead)
             where TResult : new()
         {
+            var results = new List<RiakResult<TResult>>();
             try
             {
-                var results = new List<TResult>();
-                TResult result;
+                RiakResult<TResult> result;
                 do
                 {
-                    result = _encoder.Decode<TResult>(PbcClientStream);
+                    result = RiakResult<TResult>.Success(_encoder.Decode<TResult>(PbcClientStream));
                     results.Add(result);
                 } while (repeatRead(result));
 
-                return RiakResult<IEnumerable<TResult>>.Success(results);
+                return RiakResult<IEnumerable<RiakResult<TResult>>>.Success(results);
             }
             catch (Exception ex)
             {
-                return RiakResult<IEnumerable<TResult>>.Error(ResultCode.CommunicationError, ex.Message);
+                return RiakResult<IEnumerable<RiakResult<TResult>>>.Error(ResultCode.CommunicationError, ex.Message);
             }
         }
 
@@ -168,7 +170,7 @@ namespace CorrugatedIron.Comms
             return RiakResult<TResult>.Error(writeResult.ResultCode, writeResult.ErrorMessage);
         }
 
-        public RiakResult<IEnumerable<TResult>> PbcWriteRead<TRequest, TResult>(TRequest request, Func<TResult, bool> repeatRead)
+        public RiakResult<IEnumerable<RiakResult<TResult>>> PbcWriteRead<TRequest, TResult>(TRequest request, Func<RiakResult<TResult>, bool> repeatRead)
             where TResult : new()
         {
             var writeResult = PbcWrite(request);
@@ -176,18 +178,18 @@ namespace CorrugatedIron.Comms
             {
                 return PbcRepeatRead(repeatRead);
             }
-            return RiakResult<IEnumerable<TResult>>.Error(writeResult.ResultCode, writeResult.ErrorMessage);
+            return RiakResult<IEnumerable<RiakResult<TResult>>>.Error(writeResult.ResultCode, writeResult.ErrorMessage);
         }
 
 
-        public RiakResult<IEnumerable<TResult>> PbcStreamRead<TResult>(Func<TResult, bool> repeatRead, Action onFinish)
+        public RiakResult<IEnumerable<RiakResult<TResult>>> PbcStreamRead<TResult>(Func<RiakResult<TResult>, bool> repeatRead, Action onFinish)
             where TResult : new()
         {
             var streamer = PbcStreamReadIterator(repeatRead, onFinish);
-            return RiakResult<IEnumerable<TResult>>.Success(streamer);
+            return RiakResult<IEnumerable<RiakResult<TResult>>>.Success(streamer);
         }
 
-        private IEnumerable<TResult> PbcStreamReadIterator<TResult>(Func<TResult, bool> repeatRead, Action onFinish)
+        private IEnumerable<RiakResult<TResult>> PbcStreamReadIterator<TResult>(Func<RiakResult<TResult>, bool> repeatRead, Action onFinish)
             where TResult : new()
         {
             RiakResult<TResult> result;
@@ -196,20 +198,20 @@ namespace CorrugatedIron.Comms
             {
                 result = PbcRead<TResult>();
                 if (!result.IsSuccess) break;
-                yield return result.Value;
-            } while (repeatRead(result.Value));
+                yield return result;
+            } while (repeatRead(result));
 
             onFinish();
         }
 
-        public RiakResult<IEnumerable<TResult>> PbcWriteStreamRead<TRequest, TResult>(TRequest request, Func<TResult, bool> repeatRead, Action onFinish)
+        public RiakResult<IEnumerable<RiakResult<TResult>>> PbcWriteStreamRead<TRequest, TResult>(TRequest request, Func<RiakResult<TResult>, bool> repeatRead, Action onFinish)
             where TResult : new()
         {
             var streamer = PbcWriteStreamReadIterator(request, repeatRead, onFinish);
-            return RiakResult<IEnumerable<TResult>>.Success(streamer);
+            return RiakResult<IEnumerable<RiakResult<TResult>>>.Success(streamer);
         }
 
-        private IEnumerable<TResult> PbcWriteStreamReadIterator<TRequest, TResult>(TRequest request, Func<TResult, bool> repeatRead, Action onFinish)
+        private IEnumerable<RiakResult<TResult>> PbcWriteStreamReadIterator<TRequest, TResult>(TRequest request, Func<RiakResult<TResult>, bool> repeatRead, Action onFinish)
             where TResult : new()
         {
             var writeResult = PbcWrite(request);
@@ -218,7 +220,7 @@ namespace CorrugatedIron.Comms
                 return PbcStreamReadIterator(repeatRead, onFinish);
             }
             onFinish();
-            return default(TResult).Replicate(0);
+            return new[] { RiakResult<TResult>.Error(writeResult.ResultCode, writeResult.ErrorMessage) };
         }
 
         public RiakResult<RiakRestResponse> RestRequest(RiakRestRequest request)
@@ -309,10 +311,10 @@ namespace CorrugatedIron.Comms
 
         public void Dispose()
         {
-            CleanUp();
+            Disconnect();
         }
 
-        private void CleanUp()
+        public void Disconnect()
         {
             var client = _pbcClient;
             _pbcClient = null;

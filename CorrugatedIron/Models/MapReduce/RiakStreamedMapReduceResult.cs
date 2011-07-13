@@ -22,9 +22,9 @@ namespace CorrugatedIron.Models.MapReduce
 {
     public class RiakStreamedMapReduceResult
     {
-        private readonly IEnumerable<RpbMapRedResp> _responseReader;
+        private readonly IEnumerable<RiakResult<RpbMapRedResp>> _responseReader;
 
-        internal RiakStreamedMapReduceResult(IEnumerable<RpbMapRedResp> responseReader)
+        internal RiakStreamedMapReduceResult(IEnumerable<RiakResult<RpbMapRedResp>> responseReader)
         {
             _responseReader = responseReader;
         }
@@ -33,7 +33,7 @@ namespace CorrugatedIron.Models.MapReduce
         {
             get
             {
-                return _responseReader.Select(item => new RiakMapReduceResultPhase(item));
+                return _responseReader.Select(item => item.IsSuccess ? new RiakMapReduceResultPhase(item.Value) : new RiakMapReduceResultPhase());
             }
         }
     }

@@ -158,7 +158,7 @@ namespace CorrugatedIron.Tests.Live
         [Test]
         public void LinkWalkingSuccessfullyRetrievesNLevels()
         {
-            var jeremiah = Client.Get(TestBucket, OJ).Value;
+            var oj = Client.Get(TestBucket, OJ).Value;
             var linkPhases = new List<RiakLink>
                                  {
                                      new RiakLink("", "", "") ,
@@ -166,8 +166,9 @@ namespace CorrugatedIron.Tests.Live
                                  };
 
 
-            var linkPeople = Client.WalkLinks(jeremiah, linkPhases);
-            linkPeople.Count.ShouldEqual(6);
+            var linkPeople = Client.WalkLinks(oj, linkPhases);
+            linkPeople.IsSuccess.ShouldBeTrue();
+            linkPeople.Value.Count.ShouldEqual(5);
         }
     }
 }

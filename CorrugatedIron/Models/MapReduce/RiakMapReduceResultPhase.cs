@@ -20,6 +20,7 @@ namespace CorrugatedIron.Models.MapReduce
 {
     public class RiakMapReduceResultPhase
     {
+        public bool Success { get; private set; }
         public uint Phase { get; private set; }
         public byte[] Value { get; private set; }
 
@@ -27,6 +28,12 @@ namespace CorrugatedIron.Models.MapReduce
         {
             Phase = result.Phase;
             Value = result.Response;
+            Success = true;
+        }
+
+        internal RiakMapReduceResultPhase()
+        {
+            Success = false;
         }
     }
 }
