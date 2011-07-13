@@ -124,15 +124,15 @@ namespace CorrugatedIron.Encoding
                 throw new RiakException(error.ErrorCode, error.ErrorMessage.FromRiakString());
             }
 
+            if (!MessageCodeToTypeMap.ContainsKey(messageCode))
+            {
+                throw new RiakBrokenConnectionException((byte)messageCode);
+            }
+
 #if DEBUG
             // This message code validation is here to make sure that the caller
             // is getting exactly what they expect. This "could" be removed from
             // production code, but it's a good thing to have in here for dev.
-            if (!MessageCodeToTypeMap.ContainsKey(messageCode))
-            {
-                throw new InvalidOperationException("Invalid message code received: {0}".Fmt(messageCode));
-            }
-
             if (MessageCodeToTypeMap[messageCode] != typeof(T))
             {
                 throw new InvalidOperationException(string.Format("Attempt to decode message to type '{0}' when received type '{1}'.", typeof(T).Name, MessageCodeToTypeMap[messageCode].Name));

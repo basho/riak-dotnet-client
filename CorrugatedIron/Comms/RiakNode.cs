@@ -56,12 +56,7 @@ namespace CorrugatedIron.Comms
             Func<IRiakConnection, TRiakResult> wrapper = conn =>
                 {
                     conn.SetClientId(clientId);
-                    var result = useFun(conn);
-                    if (!result.IsSuccess && result.ResultCode == ResultCode.CommunicationError)
-                    {
-                        conn.Disconnect();
-                    }
-                    return result;
+                    return useFun(conn);
                 };
 
             var response = _connections.Consume(wrapper);
