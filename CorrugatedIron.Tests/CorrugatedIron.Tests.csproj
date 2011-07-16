@@ -62,6 +62,8 @@
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
     <Compile Include="AsyncMethodTester.cs" />
+    <Compile Include="Json\RiakObjectConversionTests.cs" />
+    <Compile Include="Json\TestObjects.cs" />
     <Compile Include="RiakAsyncClientTests.cs" />
     <Compile Include="RiakClientSetBucketPropertiesTests.cs" />
     <Compile Include="RiakClientTestBase.cs" />
