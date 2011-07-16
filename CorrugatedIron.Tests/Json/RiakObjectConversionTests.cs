@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Models;
 using CorrugatedIron.Tests.Extensions;
@@ -66,6 +67,52 @@ namespace CorrugatedIron.Tests.Json.RiakObjectConversionTests
         {
             var obj = new RiakObject("bucket", "key", "{\"Name\":{\"FirstName\":\"OJ\",\"Surname\":\"Reeves\"},\"PhoneNumbers\":[{\"Number\":\"12345678\",\"NumberType\":1}],\"DateOfBirth\":\"\\/Date(281664000000)\\/\",\"Email\":\"oj@buffered.io\"}", RiakConstants.ContentTypes.TextPlain);
             obj.GetValue<Person>();
+        }
+
+        [Test]
+        public void JsonConversionTimerTest()
+        {
+            var testPerson = new Person
+            {
+                DateOfBirth = new DateTime(1978, 12, 5, 0, 0, 0, DateTimeKind.Utc),
+                Email = "oj@buffered.io",
+                Name = new Name
+                {
+                    FirstName = "OJ",
+                    Surname = "Reeves"
+                },
+                PhoneNumbers = new List<PhoneNumber>
+                {
+                    new PhoneNumber
+                    {
+                        Number = "12345678",
+                        NumberType = PhoneNumberType.Home
+                    }
+                }
+            };
+            var obj = new RiakObject("bucket", "key");
+
+            var sw = new Stopwatch();
+            sw.Start();
+            const int iterations = 1000000;
+
+            for (var i = 0; i < iterations; ++i)
+            {
+                obj.SetValue(testPerson);
+            }
+            sw.Stop();
+            Console.WriteLine("Serialisation took a total of {0} - {1} per iteration", sw.Elapsed, new TimeSpan(sw.ElapsedTicks / iterations));
+
+            sw.Reset();
+            sw.Start();
+
+            for (var i = 0; i < iterations; ++i)
+            {
+                var result = obj.GetValue<Person>();
+            }
+            sw.Stop();
+            Console.WriteLine("De" +
+                "serialisation took a total of {0} - {1} per iteration", sw.Elapsed, new TimeSpan(sw.ElapsedTicks / iterations));
         }
     }
 }
