@@ -25,7 +25,6 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using CorrugatedIron.Config;
 using CorrugatedIron.Encoding;
-using CorrugatedIron.Exceptions;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
 using CorrugatedIron.Models.Rest;
@@ -122,6 +121,7 @@ namespace CorrugatedIron.Comms
             }
             catch (Exception ex)
             {
+                Disconnect();
                 return RiakResult<TResult>.Error(ResultCode.CommunicationError, ex.Message);
             }
         }
@@ -143,6 +143,7 @@ namespace CorrugatedIron.Comms
             }
             catch (Exception ex)
             {
+                Disconnect();
                 return RiakResult<IEnumerable<RiakResult<TResult>>>.Error(ResultCode.CommunicationError, ex.Message);
             }
         }
@@ -156,6 +157,7 @@ namespace CorrugatedIron.Comms
             }
             catch (Exception ex)
             {
+                Disconnect();
                 return RiakResult.Error(ResultCode.CommunicationError, ex.Message);
             }
         }
@@ -202,7 +204,11 @@ namespace CorrugatedIron.Comms
                 yield return result;
             } while (repeatRead(result));
 
+            // clean up first..
             onFinish();
+
+            // then return the failure to the client to indicate failure
+            yield return result;
         }
 
         public RiakResult<IEnumerable<RiakResult<TResult>>> PbcWriteStreamRead<TRequest, TResult>(TRequest request, Func<RiakResult<TResult>, bool> repeatRead, Action onFinish)
