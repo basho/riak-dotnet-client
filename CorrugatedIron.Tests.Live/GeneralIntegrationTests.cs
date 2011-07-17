@@ -21,7 +21,6 @@ using System.Threading;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
-using CorrugatedIron.Models.MapReduce.Inputs;
 using CorrugatedIron.Tests.Extensions;
 using CorrugatedIron.Tests.Live.LiveRiakConnectionTests;
 using CorrugatedIron.Util;
@@ -211,14 +210,11 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         [Test]
         public void MapReduceQueriesReturnData()
         {
-
-            const string dummyData = "{{ value: {0} }}";
             var bucket = Guid.NewGuid().ToString();
 
             for (var i = 1; i < 11; i++)
             {
-                var newData = string.Format(dummyData, i);
-                var doc = new RiakObject(bucket, i.ToString(), newData, RiakConstants.ContentTypes.ApplicationJson);
+                var doc = new RiakObject(bucket, i.ToString(), new { value = i });
 
                 Client.Put(doc).IsSuccess.ShouldBeTrue();
             }
@@ -241,23 +237,20 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             mrRes.PhaseResults[0].Value.ShouldBeNull();
             mrRes.PhaseResults[1].Value.ShouldNotBeNull();
 
-            var values = result.Value.PhaseResults[1].Value.As<int[]>();
+            var values = result.Value.PhaseResults[1].GetObject<int[]>();
             values[0].ShouldEqual(10);
         }
 
         [Test]
         public void MapReduceQueriesReturnDataInBatch()
         {
-            const string dummyData = "{{ value: {0} }}";
             var bucket = Guid.NewGuid().ToString();
 
             Client.Batch(batch =>
                 {
                     for (var i = 1; i < 11; i++)
                     {
-                        var newData = string.Format(dummyData, i);
-                        var doc = new RiakObject(bucket, i.ToString(), newData, RiakConstants.ContentTypes.ApplicationJson);
-
+                        var doc = new RiakObject(bucket, i.ToString(), new { value = i });
                         batch.Put(doc).IsSuccess.ShouldBeTrue();
                     }
 
@@ -279,7 +272,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
                     mrRes.PhaseResults[0].Value.ShouldBeNull();
                     mrRes.PhaseResults[1].Value.ShouldNotBeNull();
 
-                    var values = result.Value.PhaseResults[1].Value.As<int[]>();
+                    var values = result.Value.PhaseResults[1].GetObject<int[]>();
                     values[0].ShouldEqual(10);
                 });
         }

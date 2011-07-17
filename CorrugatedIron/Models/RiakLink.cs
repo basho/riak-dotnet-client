@@ -27,6 +27,13 @@ namespace CorrugatedIron.Models
         public string Key { get; private set; }
         public string Tag { get; private set; }
 
+        public static readonly RiakLink AllLinks;
+
+        static RiakLink()
+        {
+            AllLinks = new RiakLink("", "", "");
+        }
+
         public RiakLink(string bucket, string key, string tag)
         {
             Bucket = bucket;

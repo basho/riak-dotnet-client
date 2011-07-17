@@ -65,6 +65,11 @@ namespace CorrugatedIron.Models
         {
         }
 
+        public RiakObject(string bucket, string key, object value)
+            : this(bucket, key, value.ToJson(), RiakConstants.ContentTypes.ApplicationJson)
+        {
+        }
+
         public RiakObject(string bucket, string key, string value, string contentType)
             : this(bucket, key, value, contentType, RiakConstants.Defaults.CharSet)
         {
@@ -276,7 +281,7 @@ namespace CorrugatedIron.Models
             }
         }
 
-        public void SetValue<T>(T value)
+        public void SetObject<T>(T value)
             where T : class
         {
             var json = value.Serialize();
@@ -284,7 +289,7 @@ namespace CorrugatedIron.Models
             ContentType = RiakConstants.ContentTypes.ApplicationJson;
         }
 
-        public T GetValue<T>()
+        public T GetObject<T>()
         {
             if (ContentType != RiakConstants.ContentTypes.ApplicationJson)
             {
@@ -292,6 +297,11 @@ namespace CorrugatedIron.Models
             }
 
             return Value.As<T>();
+        }
+
+        public dynamic GetObject()
+        {
+            return Value.As<dynamic>();
         }
     }
 }

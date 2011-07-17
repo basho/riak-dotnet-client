@@ -52,14 +52,12 @@ namespace CorrugatedIron.Tests.Live.LoadTests
         [Test]
         public void LotsOfConcurrentMapRedRequestsShouldWork()
         {
-            const string dummyData = "{{ value: {0} }}";
             var keys = new List<string>();
 
             for (var i = 1; i < 11; i++)
             {
                 var key = "key" + i;
-                var newData = string.Format(dummyData, i);
-                var doc = new RiakObject(MapReduceBucket, key, newData, RiakConstants.ContentTypes.ApplicationJson);
+                var doc = new RiakObject(MapReduceBucket, key, new { value = i });
                 keys.Add(key);
 
                 var result = Client.Put(doc, new RiakPutOptions { ReturnBody = true });
@@ -101,14 +99,12 @@ namespace CorrugatedIron.Tests.Live.LoadTests
         [Test]
         public void LotsOfConcurrentStreamingMapRedRequestsShouldWork()
         {
-            const string dummyData = "{{ value: {0} }}";
             var keys = new List<string>();
 
             for (var i = 1; i < 11; i++)
             {
                 var key = "key" + i;
-                var newData = string.Format(dummyData, i);
-                var doc = new RiakObject(MapReduceBucket, key, newData, RiakConstants.ContentTypes.ApplicationJson);
+                var doc = new RiakObject(MapReduceBucket, key, new { value = i });
                 keys.Add(key);
 
                 var result = Client.Put(doc, new RiakPutOptions { ReturnBody = true });

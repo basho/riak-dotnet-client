@@ -22,7 +22,6 @@ using CorrugatedIron.Models.MapReduce.Inputs;
 using CorrugatedIron.Tests.Extensions;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Tests.Live.LiveRiakConnectionTests;
-using CorrugatedIron.Util;
 using NUnit.Framework;
 
 namespace CorrugatedIron.Tests.Live
@@ -35,10 +34,10 @@ namespace CorrugatedIron.Tests.Live
         {
             base.SetUp();
 
-            var oj = new RiakObject(TestBucket, OJ, @"{""name"":""oj""}", RiakConstants.ContentTypes.ApplicationJson);
-            var jeremiah = new RiakObject(TestBucket, Jeremiah, @"{""name"":""jeremiah""}", RiakConstants.ContentTypes.ApplicationJson);
-            var brent = new RiakObject(TestBucket, Brent, @"{""name"":""brent""}", RiakConstants.ContentTypes.ApplicationJson);
-            var rob = new RiakObject(TestBucket, Rob, @"{""name"":""rob""}", RiakConstants.ContentTypes.ApplicationJson);
+            var oj = new RiakObject(TestBucket, OJ, new { name = "oj" });
+            var jeremiah = new RiakObject(TestBucket, Jeremiah, new { name = "jeremiah" });
+            var brent = new RiakObject(TestBucket, Brent, new { name = "brent" });
+            var rob = new RiakObject(TestBucket, Rob, new { name = "rob" });
 
             oj.LinkTo(jeremiah, "friends");
             oj.LinkTo(jeremiah, "coworkers");
@@ -161,8 +160,8 @@ namespace CorrugatedIron.Tests.Live
             var oj = Client.Get(TestBucket, OJ).Value;
             var linkPhases = new List<RiakLink>
                                  {
-                                     new RiakLink("", "", "") ,
-                                     new RiakLink("", "", "")
+                                     RiakLink.AllLinks,
+                                     RiakLink.AllLinks
                                  };
 
 
