@@ -16,32 +16,26 @@
 
 using System;
 using System.Collections.Concurrent;
-using System.Threading;
 using CorrugatedIron.Config;
 
 namespace CorrugatedIron.Comms
 {
     internal class RiakConnectionPool : IDisposable
     {
-        private readonly int _resourceWaitTimeout;
         private readonly ConcurrentStack<IRiakConnection> _resources;
-        private readonly Semaphore _resourceLock;
         private bool _disposing;
 
         public RiakConnectionPool(IRiakNodeConfiguration nodeConfig, IRiakConnectionFactory connFactory)
         {
             var poolSize = nodeConfig.PoolSize;
-            _resourceWaitTimeout = nodeConfig.AcquireTimeout;
-            _resources = new ConcurrentStack<IRiakConnection>();
-
-            _resourceLock = new Semaphore(0, poolSize);
+            var resources = new ConcurrentStack<IRiakConnection>();
 
             for (var i = 0; i < poolSize; ++i)
             {
-                _resources.Push(connFactory.CreateConnection(nodeConfig));
+                resources.Push(connFactory.CreateConnection(nodeConfig));
             }
 
-            _resourceLock.Release(poolSize);
+            _resources = resources;
         }
 
         public Tuple<bool, TResult> Consume<TResult>(Func<IRiakConnection, TResult> consumer)
@@ -51,13 +45,10 @@ namespace CorrugatedIron.Comms
             IRiakConnection instance = null;
             try
             {
-                if (_resourceLock.WaitOne(_resourceWaitTimeout))
+                if (_resources.TryPop(out instance))
                 {
-                    if (_resources.TryPop(out instance))
-                    {
-                        var result = consumer(instance);
-                        return Tuple.Create(true, result);
-                    }
+                    var result = consumer(instance);
+                    return Tuple.Create(true, result);
                 }
             }
             catch (Exception)
@@ -69,7 +60,6 @@ namespace CorrugatedIron.Comms
                 if (instance != null)
                 {
                     _resources.Push(instance);
-                    _resourceLock.Release();
                 }
             }
 
@@ -83,20 +73,16 @@ namespace CorrugatedIron.Comms
             IRiakConnection instance = null;
             try
             {
-                if (_resourceLock.WaitOne(_resourceWaitTimeout))
+                if (_resources.TryPop(out instance))
                 {
-                    if (_resources.TryPop(out instance))
-                    {
-                        Action cleanup = () =>
-                            {
-                                var i = instance;
-                                instance = null;
-                                _resources.Push(i);
-                                _resourceLock.Release();
-                            };
-                        var result = consumer(instance, cleanup);
-                        return Tuple.Create(true, result);
-                    }
+                    Action cleanup = () =>
+                        {
+                            var i = instance;
+                            instance = null;
+                            _resources.Push(i);
+                        };
+                    var result = consumer(instance, cleanup);
+                    return Tuple.Create(true, result);
                 }
             }
             catch (Exception)
@@ -104,7 +90,6 @@ namespace CorrugatedIron.Comms
                 if (instance != null)
                 {
                     _resources.Push(instance);
-                    _resourceLock.Release();
                 }
                 return Tuple.Create(false, default(TResult));
             }
