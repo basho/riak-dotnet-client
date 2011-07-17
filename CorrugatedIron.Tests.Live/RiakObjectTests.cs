@@ -76,10 +76,10 @@ namespace CorrugatedIron.Tests.Live
             var jLinks = jeremiah.Links;
 
             var query = new RiakMapReduceQuery()
-                .Inputs(new RiakPhaseInputs(new List<RiakBucketKeyInput>
-                                                {
-                                                    new RiakBucketKeyInput(TestBucket, Jeremiah )
-                                                }))
+                .Inputs(new List<RiakBucketKeyInput>
+                        {
+                            new RiakBucketKeyInput(TestBucket, Jeremiah )
+                        })
                 .Link(l => l.Empty().Keep(true));
 
             var mrResult = Client.MapReduce(query);
@@ -99,7 +99,7 @@ namespace CorrugatedIron.Tests.Live
         public void LinksAreRetrievedWithAMapReducePhase()
         {
             var query = new RiakMapReduceQuery()
-                .Inputs(new RiakPhaseInputs(TestBucket))
+                .Inputs(TestBucket)
                 .Filter(new Matches<string>(Jeremiah))
                 .Link(l => l.Tag("friends").Bucket(TestBucket))
                 .ReduceErlang(r => r.ModFun("riak_kv_mapreduce", "reduce_set_union").Keep(true));

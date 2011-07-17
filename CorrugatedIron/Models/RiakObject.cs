@@ -55,6 +55,11 @@ namespace CorrugatedIron.Models
             }
         }
 
+        public RiakObject(string bucket, string key)
+            : this(bucket, key, null, RiakConstants.Defaults.ContentType)
+        {
+        }
+
         public RiakObject(string bucket, string key, string value)
             : this(bucket, key, value, RiakConstants.Defaults.ContentType)
         {
@@ -269,6 +274,24 @@ namespace CorrugatedIron.Models
                 result = (result*397) ^ (_vtags != null ? _vtags.GetHashCode() : 0);
                 return result;
             }
+        }
+
+        public void SetValue<T>(T value)
+            where T : class
+        {
+            var json = value.Serialize();
+            Value = json.ToRiakString();
+            ContentType = RiakConstants.ContentTypes.ApplicationJson;
+        }
+
+        public T GetValue<T>()
+        {
+            if (ContentType != RiakConstants.ContentTypes.ApplicationJson)
+            {
+                throw new InvalidOperationException("Unable to convert Riak Object value to type '{0}'. Content type required: '{1}'. Actual type: '{2}'".Fmt(typeof(T).Name, RiakConstants.ContentTypes.ApplicationJson, ContentType));
+            }
+
+            return Value.As<T>();
         }
     }
 }
