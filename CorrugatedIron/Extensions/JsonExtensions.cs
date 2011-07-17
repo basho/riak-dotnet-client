@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2010 - OJ Reeves & Jeremiah Peschka
+﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -21,6 +21,26 @@ namespace CorrugatedIron.Extensions
 {
     public static class JsonExtensions
     {
+        public static T As<T>(this string jsonString)
+        {
+            return JsonConvert.DeserializeObject<T>(jsonString);
+        }
+
+        public static T As<T>(this byte[] jsonBytes)
+        {
+            return JsonConvert.DeserializeObject<T>(jsonBytes.FromRiakString());
+        }
+
+        public static string ToJson<T>(this T value)
+        {
+            return JsonConvert.SerializeObject(value);
+        }
+
+        public static string Serialize<T>(this T obj) where T : class
+        {
+            return JsonConvert.SerializeObject(obj);
+        }
+
         public static JsonWriter WriteProperty<T>(this JsonWriter writer, string name, T value)
         {
             writer.WritePropertyName(name);

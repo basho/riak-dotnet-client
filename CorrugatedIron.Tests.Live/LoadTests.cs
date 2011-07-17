@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2010 - OJ Reeves & Jeremiah Peschka
+﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -24,7 +24,6 @@ using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Models.MapReduce.Inputs;
 using CorrugatedIron.Tests.Extensions;
 using CorrugatedIron.Tests.Live.LiveRiakConnectionTests;
-using CorrugatedIron.Util;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 
@@ -39,7 +38,7 @@ namespace CorrugatedIron.Tests.Live.LoadTests
         // connection recovery/retry across nodes is
         // functioning and the load-balancing strategies
         // are in place.
-        private const int ThreadCount = 60;
+        private const int ThreadCount = 80;
         private const int ActionCount = 30;
         //private const int ThreadCount = 1;
         //private const int ActionCount = 1;
@@ -52,14 +51,12 @@ namespace CorrugatedIron.Tests.Live.LoadTests
         [Test]
         public void LotsOfConcurrentMapRedRequestsShouldWork()
         {
-            const string dummyData = "{{ value: {0} }}";
             var keys = new List<string>();
 
             for (var i = 1; i < 11; i++)
             {
                 var key = "key" + i;
-                var newData = string.Format(dummyData, i);
-                var doc = new RiakObject(MapReduceBucket, key, newData, RiakConstants.ContentTypes.ApplicationJson);
+                var doc = new RiakObject(MapReduceBucket, key, new { value = i });
                 keys.Add(key);
 
                 var result = Client.Put(doc, new RiakPutOptions { ReturnBody = true });
@@ -67,7 +64,7 @@ namespace CorrugatedIron.Tests.Live.LoadTests
             }
 
             var query = new RiakMapReduceQuery()
-                .Inputs(new RiakPhaseInputs(keys.Select(k => new RiakBucketKeyInput(MapReduceBucket, k)).ToList()))
+                .Inputs(keys.Select(k => new RiakBucketKeyInput(MapReduceBucket, k)).ToList())
                 .MapJs(m => m.Source(@"function(o){return[1];}"))
                 .ReduceJs(r => r.Name(@"Riak.reduceSum").Keep(true));
             query.Compile();
@@ -101,14 +98,12 @@ namespace CorrugatedIron.Tests.Live.LoadTests
         [Test]
         public void LotsOfConcurrentStreamingMapRedRequestsShouldWork()
         {
-            const string dummyData = "{{ value: {0} }}";
             var keys = new List<string>();
 
             for (var i = 1; i < 11; i++)
             {
                 var key = "key" + i;
-                var newData = string.Format(dummyData, i);
-                var doc = new RiakObject(MapReduceBucket, key, newData, RiakConstants.ContentTypes.ApplicationJson);
+                var doc = new RiakObject(MapReduceBucket, key, new { value = i });
                 keys.Add(key);
 
                 var result = Client.Put(doc, new RiakPutOptions { ReturnBody = true });
@@ -116,7 +111,7 @@ namespace CorrugatedIron.Tests.Live.LoadTests
             }
 
             var query = new RiakMapReduceQuery()
-                .Inputs(new RiakPhaseInputs(keys.Select(k => new RiakBucketKeyInput(MapReduceBucket, k)).ToList()))
+                .Inputs(keys.Select(k => new RiakBucketKeyInput(MapReduceBucket, k)).ToList())
                 .MapJs(m => m.Source(@"function(o){return[1];}"))
                 .ReduceJs(r => r.Name(@"Riak.reduceSum").Keep(true));
             query.Compile();

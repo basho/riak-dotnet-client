@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2010 - OJ Reeves & Jeremiah Peschka
+﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -20,11 +20,9 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Security;
-using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using CorrugatedIron.Config;
-using CorrugatedIron.Encoding;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
 using CorrugatedIron.Models.Rest;
@@ -36,6 +34,8 @@ namespace CorrugatedIron.Comms
     {
         bool IsIdle { get; }
 
+        void Disconnect();
+
         // PBC interface
         RiakResult<TResult> PbcRead<TResult>()
             where TResult : new();
@@ -43,14 +43,14 @@ namespace CorrugatedIron.Comms
         RiakResult<TResult> PbcWriteRead<TRequest, TResult>(TRequest request)
             where TResult : new();
 
-        RiakResult<IEnumerable<TResult>> PbcRepeatRead<TResult>(Func<TResult, bool> repeatRead)
+        RiakResult<IEnumerable<RiakResult<TResult>>> PbcRepeatRead<TResult>(Func<RiakResult<TResult>, bool> repeatRead)
             where TResult : new();
-        RiakResult<IEnumerable<TResult>> PbcWriteRead<TRequest, TResult>(TRequest request, Func<TResult, bool> repeatRead)
+        RiakResult<IEnumerable<RiakResult<TResult>>> PbcWriteRead<TRequest, TResult>(TRequest request, Func<RiakResult<TResult>, bool> repeatRead)
             where TResult : new();
 
-        RiakResult<IEnumerable<TResult>> PbcStreamRead<TResult>(Func<TResult, bool> repeatRead, Action onFinish)
+        RiakResult<IEnumerable<RiakResult<TResult>>> PbcStreamRead<TResult>(Func<RiakResult<TResult>, bool> repeatRead, Action onFinish)
             where TResult : new();
-        RiakResult<IEnumerable<TResult>> PbcWriteStreamRead<TRequest, TResult>(TRequest request, Func<TResult, bool> repeatRead, Action onFinish)
+        RiakResult<IEnumerable<RiakResult<TResult>>> PbcWriteStreamRead<TRequest, TResult>(TRequest request, Func<RiakResult<TResult>, bool> repeatRead, Action onFinish)
             where TResult : new();
 
         // REST interface
@@ -60,30 +60,13 @@ namespace CorrugatedIron.Comms
 
     internal class RiakConnection : IRiakConnection
     {
-        private readonly IRiakNodeConfiguration _nodeConfiguration;
-        private readonly MessageEncoder _encoder;
         private readonly string _restRootUrl;
-        private TcpClient _pbcClient;
-        private NetworkStream _pbcClientStream;
+        private readonly RiakPbcSocket _socket;
         private string _restClientId;
 
         public bool IsIdle
         {
-            get { return _pbcClient == null; }
-        }
-
-        private TcpClient PbcClient
-        {
-            get
-            {
-                return _pbcClient ??
-                       (_pbcClient = new TcpClient(_nodeConfiguration.HostAddress, _nodeConfiguration.PbcPort));
-            }
-        }
-
-        private NetworkStream PbcClientStream
-        {
-            get { return _pbcClientStream ?? (_pbcClientStream = PbcClient.GetStream()); }
+            get { return _socket.IsConnected; }
         }
 
         static RiakConnection()
@@ -93,9 +76,8 @@ namespace CorrugatedIron.Comms
 
         public RiakConnection(IRiakNodeConfiguration nodeConfiguration)
         {
-            _nodeConfiguration = nodeConfiguration;
             _restRootUrl = @"{0}://{1}:{2}".Fmt(nodeConfiguration.RestScheme, nodeConfiguration.HostAddress, nodeConfiguration.RestPort);
-            _encoder = new MessageEncoder();
+            _socket = new RiakPbcSocket(nodeConfiguration.HostAddress, nodeConfiguration.PbcPort, nodeConfiguration.NetworkReadTimeout, nodeConfiguration.NetworkWriteTimeout);
         }
 
         public static byte[] ToClientId(int id)
@@ -114,33 +96,35 @@ namespace CorrugatedIron.Comms
         {
             try
             {
-                var result = _encoder.Decode<TResult>(PbcClientStream);
+                var result = _socket.Read<TResult>();
                 return RiakResult<TResult>.Success(result);
             }
             catch (Exception ex)
             {
+                Disconnect();
                 return RiakResult<TResult>.Error(ResultCode.CommunicationError, ex.Message);
             }
         }
 
-        public RiakResult<IEnumerable<TResult>> PbcRepeatRead<TResult>(Func<TResult, bool> repeatRead)
+        public RiakResult<IEnumerable<RiakResult<TResult>>> PbcRepeatRead<TResult>(Func<RiakResult<TResult>, bool> repeatRead)
             where TResult : new()
         {
+            var results = new List<RiakResult<TResult>>();
             try
             {
-                var results = new List<TResult>();
-                TResult result;
+                RiakResult<TResult> result;
                 do
                 {
-                    result = _encoder.Decode<TResult>(PbcClientStream);
+                    result = RiakResult<TResult>.Success(_socket.Read<TResult>());
                     results.Add(result);
                 } while (repeatRead(result));
 
-                return RiakResult<IEnumerable<TResult>>.Success(results);
+                return RiakResult<IEnumerable<RiakResult<TResult>>>.Success(results);
             }
             catch (Exception ex)
             {
-                return RiakResult<IEnumerable<TResult>>.Error(ResultCode.CommunicationError, ex.Message);
+                Disconnect();
+                return RiakResult<IEnumerable<RiakResult<TResult>>>.Error(ResultCode.CommunicationError, ex.Message);
             }
         }
 
@@ -148,11 +132,12 @@ namespace CorrugatedIron.Comms
         {
             try
             {
-                _encoder.Encode(request, PbcClientStream);
+                _socket.Write(request);
                 return RiakResult.Success();
             }
             catch (Exception ex)
             {
+                Disconnect();
                 return RiakResult.Error(ResultCode.CommunicationError, ex.Message);
             }
         }
@@ -168,7 +153,7 @@ namespace CorrugatedIron.Comms
             return RiakResult<TResult>.Error(writeResult.ResultCode, writeResult.ErrorMessage);
         }
 
-        public RiakResult<IEnumerable<TResult>> PbcWriteRead<TRequest, TResult>(TRequest request, Func<TResult, bool> repeatRead)
+        public RiakResult<IEnumerable<RiakResult<TResult>>> PbcWriteRead<TRequest, TResult>(TRequest request, Func<RiakResult<TResult>, bool> repeatRead)
             where TResult : new()
         {
             var writeResult = PbcWrite(request);
@@ -176,18 +161,18 @@ namespace CorrugatedIron.Comms
             {
                 return PbcRepeatRead(repeatRead);
             }
-            return RiakResult<IEnumerable<TResult>>.Error(writeResult.ResultCode, writeResult.ErrorMessage);
+            return RiakResult<IEnumerable<RiakResult<TResult>>>.Error(writeResult.ResultCode, writeResult.ErrorMessage);
         }
 
 
-        public RiakResult<IEnumerable<TResult>> PbcStreamRead<TResult>(Func<TResult, bool> repeatRead, Action onFinish)
+        public RiakResult<IEnumerable<RiakResult<TResult>>> PbcStreamRead<TResult>(Func<RiakResult<TResult>, bool> repeatRead, Action onFinish)
             where TResult : new()
         {
             var streamer = PbcStreamReadIterator(repeatRead, onFinish);
-            return RiakResult<IEnumerable<TResult>>.Success(streamer);
+            return RiakResult<IEnumerable<RiakResult<TResult>>>.Success(streamer);
         }
 
-        private IEnumerable<TResult> PbcStreamReadIterator<TResult>(Func<TResult, bool> repeatRead, Action onFinish)
+        private IEnumerable<RiakResult<TResult>> PbcStreamReadIterator<TResult>(Func<RiakResult<TResult>, bool> repeatRead, Action onFinish)
             where TResult : new()
         {
             RiakResult<TResult> result;
@@ -196,20 +181,24 @@ namespace CorrugatedIron.Comms
             {
                 result = PbcRead<TResult>();
                 if (!result.IsSuccess) break;
-                yield return result.Value;
-            } while (repeatRead(result.Value));
+                yield return result;
+            } while (repeatRead(result));
 
+            // clean up first..
             onFinish();
+
+            // then return the failure to the client to indicate failure
+            yield return result;
         }
 
-        public RiakResult<IEnumerable<TResult>> PbcWriteStreamRead<TRequest, TResult>(TRequest request, Func<TResult, bool> repeatRead, Action onFinish)
+        public RiakResult<IEnumerable<RiakResult<TResult>>> PbcWriteStreamRead<TRequest, TResult>(TRequest request, Func<RiakResult<TResult>, bool> repeatRead, Action onFinish)
             where TResult : new()
         {
             var streamer = PbcWriteStreamReadIterator(request, repeatRead, onFinish);
-            return RiakResult<IEnumerable<TResult>>.Success(streamer);
+            return RiakResult<IEnumerable<RiakResult<TResult>>>.Success(streamer);
         }
 
-        private IEnumerable<TResult> PbcWriteStreamReadIterator<TRequest, TResult>(TRequest request, Func<TResult, bool> repeatRead, Action onFinish)
+        private IEnumerable<RiakResult<TResult>> PbcWriteStreamReadIterator<TRequest, TResult>(TRequest request, Func<RiakResult<TResult>, bool> repeatRead, Action onFinish)
             where TResult : new()
         {
             var writeResult = PbcWrite(request);
@@ -218,7 +207,7 @@ namespace CorrugatedIron.Comms
                 return PbcStreamReadIterator(repeatRead, onFinish);
             }
             onFinish();
-            return default(TResult).Replicate(0);
+            return new[] { RiakResult<TResult>.Error(writeResult.ResultCode, writeResult.ErrorMessage) };
         }
 
         public RiakResult<RiakRestResponse> RestRequest(RiakRestRequest request)
@@ -309,24 +298,13 @@ namespace CorrugatedIron.Comms
 
         public void Dispose()
         {
-            CleanUp();
+            _socket.Dispose();
+            Disconnect();
         }
 
-        private void CleanUp()
+        public void Disconnect()
         {
-            var client = _pbcClient;
-            _pbcClient = null;
-            var clientStream = _pbcClientStream;
-            _pbcClientStream = null;
-
-            if (clientStream != null)
-            {
-                clientStream.Dispose();
-            }
-            if (client != null)
-            {
-                client.Close();
-            }
+            _socket.Disconnect();
         }
     }
 }

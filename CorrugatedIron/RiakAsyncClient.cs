@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2010 - OJ Reeves & Jeremiah Peschka
+﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -54,12 +54,14 @@ namespace CorrugatedIron
 
         void SetBucketProperties(string bucket, RiakBucketProperties properties, Action<RiakResult> callback);
 
-        void WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks, Action<IList<RiakObject>> callback);
+        void WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks, Action<RiakResult<IList<RiakObject>>> callback);
 
         void GetServerInfo(Action<RiakResult<RiakServerInfo>> callback);
+
+        void Batch(Action<IRiakBatchClient> batchAction);
     }
 
-    public class RiakAsyncClient : IRiakAsyncClient
+    internal class RiakAsyncClient : IRiakAsyncClient
     {
         private readonly IRiakClient _client;
 
@@ -153,7 +155,7 @@ namespace CorrugatedIron
             ExecAsync(() => callback(_client.SetBucketProperties(bucket, properties)));
         }
 
-        public void WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks, Action<IList<RiakObject>> callback)
+        public void WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks, Action<RiakResult<IList<RiakObject>>> callback)
         {
             ExecAsync(() => callback(_client.WalkLinks(riakObject, riakLinks)));
         }
@@ -161,6 +163,11 @@ namespace CorrugatedIron
         public void GetServerInfo(Action<RiakResult<RiakServerInfo>> callback)
         {
             ExecAsync(() => callback(_client.GetServerInfo()));
+        }
+
+        public void Batch(Action<IRiakBatchClient> batchAction)
+        {
+            ExecAsync(() => _client.Batch(batchAction));
         }
 
         private static void ExecAsync(Action action)

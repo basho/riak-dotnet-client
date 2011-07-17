@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2010 - OJ Reeves & Jeremiah Peschka
+﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -14,12 +14,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
+using Newtonsoft.Json;
 
 namespace CorrugatedIron.Models.MapReduce
 {
     public class RiakMapReduceResultPhase
     {
+        public bool Success { get; private set; }
         public uint Phase { get; private set; }
         public byte[] Value { get; private set; }
 
@@ -27,6 +30,22 @@ namespace CorrugatedIron.Models.MapReduce
         {
             Phase = result.Phase;
             Value = result.Response;
+            Success = true;
+        }
+
+        internal RiakMapReduceResultPhase()
+        {
+            Success = false;
+        }
+
+        public T GetObject<T>()
+        {
+            return JsonConvert.DeserializeObject<T>(Value.FromRiakString());
+        }
+
+        public dynamic GetObject()
+        {
+            return JsonConvert.DeserializeObject<dynamic>(Value.FromRiakString());
         }
     }
 }

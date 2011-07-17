@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2010 - OJ Reeves & Jeremiah Peschka
+﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -47,9 +47,21 @@ namespace CorrugatedIron.Models.MapReduce
         }
 
         // TODO: tidy this part of the interface up, it's way too verbose.
-        public RiakMapReduceQuery Inputs(RiakPhaseInputs inputs)
+        public RiakMapReduceQuery Inputs(string bucket)
         {
-            _inputs = inputs;
+            _inputs = new RiakBucketInput(bucket);
+            return this;
+        }
+
+        public RiakMapReduceQuery Inputs(List<RiakBucketKeyInput> inputs)
+        {
+            _inputs = new RiakPhaseInputs(inputs);
+            return this;
+        }
+
+        public RiakMapReduceQuery Inputs(List<RiakBucketKeyArgInput> inputs)
+        {
+            _inputs = new RiakPhaseInputs(inputs);
             return this;
         }
 

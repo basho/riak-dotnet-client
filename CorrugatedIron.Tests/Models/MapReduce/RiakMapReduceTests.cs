@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2010 - OJ Reeves & Jeremiah Peschka
+﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -45,7 +45,7 @@ namespace CorrugatedIron.Tests.Models.MapReduce
                 {
                     ContentType = MrContentType
                 }
-                .Inputs(new RiakBucketInput("animals"))
+                .Inputs("animals")
                 .MapJs(m => m.Source("function(v) { return [v]; }").Keep(true));
 
             var request = query.ToMessage();
@@ -60,7 +60,7 @@ namespace CorrugatedIron.Tests.Models.MapReduce
                 {
                     ContentType = MrContentType
                 }
-                .Inputs(new RiakBucketInput("animals"))
+                .Inputs("animals")
                 .MapJs(m => m.Source("function(o) { if (o.key.indexOf('spider') != -1) return [1]; return []; }"))
                 .ReduceJs(r => r.Name("Riak.reduceSum").Keep(true));
 
@@ -75,7 +75,7 @@ namespace CorrugatedIron.Tests.Models.MapReduce
                 {
                     ContentType = MrContentType
                 }
-                .Inputs(new RiakBucketInput("animals"))
+                .Inputs("animals")
                 .Filter(new Matches<string>("spider"))
                 .MapJs(m => m.Source("function(o) { return [1]; }"))
                 .ReduceJs(r => r.Name("Riak.reduceSum").Keep(true));

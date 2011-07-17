@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2010 - OJ Reeves & Jeremiah Peschka
+﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -24,9 +24,9 @@ namespace CorrugatedIron.Models.MapReduce
     {
         public List<RiakMapReduceResultPhase> PhaseResults { get; private set; }
 
-        internal RiakMapReduceResult(IEnumerable<RpbMapRedResp> response)
+        internal RiakMapReduceResult(IEnumerable<RiakResult<RpbMapRedResp>> response)
         {
-            PhaseResults = response.OrderBy(r => r.Phase).Select(r => new RiakMapReduceResultPhase(r)).ToList();
+            PhaseResults = response.OrderBy(r => r.Value.Phase).Select(r => r.IsSuccess ? new RiakMapReduceResultPhase(r.Value) : new RiakMapReduceResultPhase()).ToList();
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2010 - OJ Reeves & Jeremiah Peschka
+﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -14,7 +14,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
 using System.Collections.Generic;
 using CorrugatedIron.KeyFilters;
 using CorrugatedIron.Models;
@@ -23,7 +22,6 @@ using CorrugatedIron.Models.MapReduce.Inputs;
 using CorrugatedIron.Tests.Extensions;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Tests.Live.LiveRiakConnectionTests;
-using CorrugatedIron.Util;
 using NUnit.Framework;
 
 namespace CorrugatedIron.Tests.Live
@@ -36,12 +34,10 @@ namespace CorrugatedIron.Tests.Live
         {
             base.SetUp();
 
-            var oj = new RiakObject(TestBucket, OJ, @"{""name"":""oj""}", RiakConstants.ContentTypes.ApplicationJson);
-            var jeremiah = new RiakObject(TestBucket, Jeremiah, @"{""name"":""jeremiah""}",
-                                          RiakConstants.ContentTypes.ApplicationJson);
-            var brent = new RiakObject(TestBucket, Brent, @"{""name"":""brent""}",
-                                       RiakConstants.ContentTypes.ApplicationJson);
-            var rob = new RiakObject(TestBucket, Rob, @"{""name"":""rob""}", RiakConstants.ContentTypes.ApplicationJson);
+            var oj = new RiakObject(TestBucket, OJ, new { name = "oj" });
+            var jeremiah = new RiakObject(TestBucket, Jeremiah, new { name = "jeremiah" });
+            var brent = new RiakObject(TestBucket, Brent, new { name = "brent" });
+            var rob = new RiakObject(TestBucket, Rob, new { name = "rob" });
 
             oj.LinkTo(jeremiah, "friends");
             oj.LinkTo(jeremiah, "coworkers");
@@ -56,10 +52,7 @@ namespace CorrugatedIron.Tests.Live
             brent.LinkTo(jeremiah, "coworkers");
             brent.LinkTo(jeremiah, "friends");
 
-            Client.Put(oj);
-            Client.Put(jeremiah);
-            Client.Put(brent);
-            Client.Put(rob);
+            Client.Put(new[] { oj, jeremiah, brent, rob });
         }
 
         private const string Jeremiah = "jeremiah";
@@ -82,10 +75,10 @@ namespace CorrugatedIron.Tests.Live
             var jLinks = jeremiah.Links;
 
             var query = new RiakMapReduceQuery()
-                .Inputs(new RiakPhaseInputs(new List<RiakBucketKeyInput>
-                                                {
-                                                    new RiakBucketKeyInput(TestBucket, Jeremiah )
-                                                }))
+                .Inputs(new List<RiakBucketKeyInput>
+                        {
+                            new RiakBucketKeyInput(TestBucket, Jeremiah )
+                        })
                 .Link(l => l.Empty().Keep(true));
 
             var mrResult = Client.MapReduce(query);
@@ -105,7 +98,7 @@ namespace CorrugatedIron.Tests.Live
         public void LinksAreRetrievedWithAMapReducePhase()
         {
             var query = new RiakMapReduceQuery()
-                .Inputs(new RiakPhaseInputs(TestBucket))
+                .Inputs(TestBucket)
                 .Filter(new Matches<string>(Jeremiah))
                 .Link(l => l.Tag("friends").Bucket(TestBucket))
                 .ReduceErlang(r => r.ModFun("riak_kv_mapreduce", "reduce_set_union").Keep(true));
@@ -164,16 +157,17 @@ namespace CorrugatedIron.Tests.Live
         [Test]
         public void LinkWalkingSuccessfullyRetrievesNLevels()
         {
-            var jeremiah = Client.Get(TestBucket, OJ).Value;
+            var oj = Client.Get(TestBucket, OJ).Value;
             var linkPhases = new List<RiakLink>
                                  {
-                                     new RiakLink("", "", "") ,
-                                     new RiakLink("", "", "")
+                                     RiakLink.AllLinks,
+                                     RiakLink.AllLinks
                                  };
 
 
-            var linkPeople = Client.WalkLinks(jeremiah, linkPhases);
-            linkPeople.Count.ShouldEqual(6);
+            var linkPeople = Client.WalkLinks(oj, linkPhases);
+            linkPeople.IsSuccess.ShouldBeTrue();
+            linkPeople.Value.Count.ShouldEqual(5);
         }
     }
 }
