@@ -23,20 +23,26 @@ namespace CorrugatedIron.Exceptions
 {
     public class RiakException : Exception
     {
+        private readonly string _errorMessage;
         public uint ErrorCode { get; private set; }
-        public string ErrorMessage { get; set; }
+        public string ErrorMessage { get { return _errorMessage; } }
 
         public RiakException(uint errorCode, string errorMessage)
         {
             ErrorCode = errorCode;
-            ErrorMessage = errorMessage;
+            _errorMessage = "Riak returned an error. Code '{0}'. Message: {1}".Fmt(ErrorCode, errorMessage);
+        }
+
+        public RiakException(string errorMessage)
+        {
+            _errorMessage = errorMessage;
         }
 
         public override string Message
         {
             get
             {
-                return "Riak returned an error. Code '{0}'. Message: {1}".Fmt(ErrorCode, ErrorMessage);
+                return _errorMessage;
             }
         }
 
