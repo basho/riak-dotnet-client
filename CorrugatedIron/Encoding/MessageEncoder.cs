@@ -115,7 +115,12 @@ namespace CorrugatedIron.Encoding
         {
             var length = new byte[4];
 
-            source.Read(length, 0, length.Length);
+            var bytesRead = source.Read(length, 0, length.Length);
+            if (bytesRead == 0)
+            {
+                throw new RiakException("Unable to read data from the source stream - Timed Out.");
+            }
+
             var size = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(length, 0));
 
             var messageCode = (MessageCode)source.ReadByte();
