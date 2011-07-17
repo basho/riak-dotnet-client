@@ -17,5 +17,5 @@
 // move to the Major version number.
 // We'll use the revision number for hot fix release and probably leave the build
 // number alone. It's left here because Windows binaries use 4 numbers.
-[assembly: AssemblyVersion("0.0.4.0")]
-[assembly: AssemblyFileVersion("0.0.4.0")]
+[assembly: AssemblyVersion("0.0.5.0")]
+[assembly: AssemblyFileVersion("0.0.5.0")]
