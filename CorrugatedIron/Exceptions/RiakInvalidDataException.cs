@@ -19,11 +19,11 @@ using CorrugatedIron.Extensions;
 
 namespace CorrugatedIron.Exceptions
 {
-    public class RiakBrokenConnectionException : Exception
+    public class RiakInvalidDataException : Exception
     {
         public byte MessageCode { get; private set; }
 
-        public RiakBrokenConnectionException(byte messageCode)
+        public RiakInvalidDataException(byte messageCode)
         {
             MessageCode = messageCode;
         }

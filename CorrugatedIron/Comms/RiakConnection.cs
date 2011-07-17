@@ -85,7 +85,17 @@ namespace CorrugatedIron.Comms
 
         private NetworkStream PbcClientStream
         {
-            get { return _pbcClientStream ?? (_pbcClientStream = PbcClient.GetStream()); }
+            get
+            {
+                if (_pbcClientStream == null)
+                {
+                    _pbcClientStream = PbcClient.GetStream();
+
+                    _pbcClientStream.WriteTimeout = _nodeConfiguration.NetworkReadTimeout;
+                    _pbcClientStream.ReadTimeout = _nodeConfiguration.NetworkWriteTimeout;
+                }
+                return _pbcClientStream;
+            }
         }
 
         static RiakConnection()

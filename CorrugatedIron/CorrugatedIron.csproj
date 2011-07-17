@@ -65,7 +65,7 @@
     <Compile Include="Containers\ConcurrentEnumerator.cs" />
     <Compile Include="Containers\Either.cs" />
     <Compile Include="Comms\RiakConnectionPool.cs" />
-    <Compile Include="Exceptions\RiakBrokenConnectionException.cs" />
+    <Compile Include="Exceptions\RiakInvalidDataException.cs" />
     <Compile Include="Exceptions\RiakException.cs" />
     <Compile Include="IRiakBatchClient.cs" />
     <Compile Include="Models\CommitHook\IRiakPostCommitHook.cs">
