@@ -20,7 +20,6 @@ using System.Linq;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
 using CorrugatedIron.Util;
-using Newtonsoft.Json;
 
 namespace CorrugatedIron.Models
 {
@@ -270,7 +269,7 @@ namespace CorrugatedIron.Models
         public void SetValue<T>(T value)
             where T : class
         {
-            var json = JsonConvert.SerializeObject(value);
+            var json = value.Serialize();
             Value = json.ToRiakString();
             ContentType = RiakConstants.ContentTypes.ApplicationJson;
         }
@@ -282,7 +281,7 @@ namespace CorrugatedIron.Models
                 throw new InvalidOperationException("Unable to convert Riak Object value to type '{0}'. Content type required: '{1}'. Actual type: '{2}'".Fmt(typeof(T).Name, RiakConstants.ContentTypes.ApplicationJson, ContentType));
             }
 
-            return JsonConvert.DeserializeObject<T>(Value.FromRiakString());
+            return Value.As<T>();
         }
     }
 }

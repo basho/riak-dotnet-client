@@ -18,7 +18,6 @@ using System.Collections.Generic;
 using System.Linq;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
-using Newtonsoft.Json;
 
 namespace CorrugatedIron.Models
 {
@@ -37,7 +36,7 @@ namespace CorrugatedIron.Models
 
         public static RiakLink FromJsonString(string jsonString)
         {
-            var rawLink = JsonConvert.DeserializeObject<string[]>(jsonString);
+            var rawLink = jsonString.As<string[]>();
 
             return new RiakLink(rawLink[0], rawLink[1], rawLink[2]);
         }
@@ -45,7 +44,7 @@ namespace CorrugatedIron.Models
         public static IList<RiakLink> ParseArrayFromJsonString(string jsonString)
         {
             // TODO test me
-            var rawLinks = JsonConvert.DeserializeObject<IList<IList<string>>>(jsonString);
+            var rawLinks = jsonString.As<IList<IList<string>>>();
 
             return rawLinks.Select(FromArray).ToList();
         }

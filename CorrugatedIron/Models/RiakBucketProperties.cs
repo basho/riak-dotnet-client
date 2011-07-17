@@ -30,7 +30,6 @@ using Newtonsoft.Json.Linq;
 
 namespace CorrugatedIron.Models
 {
-    // TODO: handle pre/post commit hooks
     public class RiakBucketProperties
     {
         // At the moment, only the NVal and AllowMult can be set via the PBC

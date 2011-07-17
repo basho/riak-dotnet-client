@@ -14,6 +14,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using Newtonsoft.Json;
+
 namespace CorrugatedIron.KeyFilters
 {
     /// <summary>
@@ -26,7 +28,7 @@ namespace CorrugatedIron.KeyFilters
         {
         }
 
-        protected override void WriteArguments(object[] arguments, Newtonsoft.Json.JsonWriter writer)
+        protected override void WriteArguments(object[] arguments, JsonWriter writer)
         {
             var filter = arguments[0] as IRiakKeyFilterToken;
             if (filter != null)

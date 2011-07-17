@@ -15,6 +15,7 @@
 // under the License.
 
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace CorrugatedIron.KeyFilters
 {
@@ -31,7 +32,7 @@ namespace CorrugatedIron.KeyFilters
             Set = set;
         }
 
-        protected override void WriteArguments(object[] arguments, Newtonsoft.Json.JsonWriter writer)
+        protected override void WriteArguments(object[] arguments, JsonWriter writer)
         {
             Set.ForEach(v => writer.WriteValue(v));
         }

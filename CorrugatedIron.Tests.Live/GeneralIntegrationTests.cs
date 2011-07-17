@@ -25,7 +25,6 @@ using CorrugatedIron.Models.MapReduce.Inputs;
 using CorrugatedIron.Tests.Extensions;
 using CorrugatedIron.Tests.Live.LiveRiakConnectionTests;
 using CorrugatedIron.Util;
-using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 
 namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
@@ -198,6 +197,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         [Test]
         public void MapReduceQueriesReturnData()
         {
+
             const string dummyData = "{{ value: {0} }}";
             var bucket = Guid.NewGuid().ToString();
 
@@ -210,7 +210,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             }
 
             var query = new RiakMapReduceQuery()
-                .Inputs(new RiakPhaseInputs(bucket))
+                .Inputs(bucket)
                 .MapJs(m => m.Source(@"function(o) {return [ 1 ];}"))
                 .ReduceJs(r => r.Name(@"Riak.reduceSum").Keep(true));
 
@@ -227,8 +227,8 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             mrRes.PhaseResults[0].Value.ShouldBeNull();
             mrRes.PhaseResults[1].Value.ShouldNotBeNull();
 
-            var json = JArray.Parse(result.Value.PhaseResults[1].Value.FromRiakString());
-            json[0].Value<int>().ShouldEqual(10);
+            var values = result.Value.PhaseResults[1].Value.As<int[]>();
+            values[0].ShouldEqual(10);
         }
 
         [Test]
@@ -248,7 +248,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
                     }
 
                     var query = new RiakMapReduceQuery()
-                        .Inputs(new RiakPhaseInputs(bucket))
+                        .Inputs(bucket)
                         .MapJs(m => m.Source(@"function(o) {return [ 1 ];}"))
                         .ReduceJs(r => r.Name(@"Riak.reduceSum").Keep(true));
 
@@ -265,8 +265,8 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
                     mrRes.PhaseResults[0].Value.ShouldBeNull();
                     mrRes.PhaseResults[1].Value.ShouldNotBeNull();
 
-                    var json = JArray.Parse(result.Value.PhaseResults[1].Value.FromRiakString());
-                    json[0].Value<int>().ShouldEqual(10);
+                    var values = result.Value.PhaseResults[1].Value.As<int[]>();
+                    values[0].ShouldEqual(10);
                 });
         }
 

@@ -45,7 +45,7 @@ namespace CorrugatedIron.Tests.Models.MapReduce
                 {
                     ContentType = MrContentType
                 }
-                .Inputs(new RiakBucketInput("animals"))
+                .Inputs("animals")
                 .MapJs(m => m.Source("function(v) { return [v]; }").Keep(true));
 
             var request = query.ToMessage();
@@ -60,7 +60,7 @@ namespace CorrugatedIron.Tests.Models.MapReduce
                 {
                     ContentType = MrContentType
                 }
-                .Inputs(new RiakBucketInput("animals"))
+                .Inputs("animals")
                 .MapJs(m => m.Source("function(o) { if (o.key.indexOf('spider') != -1) return [1]; return []; }"))
                 .ReduceJs(r => r.Name("Riak.reduceSum").Keep(true));
 
@@ -75,7 +75,7 @@ namespace CorrugatedIron.Tests.Models.MapReduce
                 {
                     ContentType = MrContentType
                 }
-                .Inputs(new RiakBucketInput("animals"))
+                .Inputs("animals")
                 .Filter(new Matches<string>("spider"))
                 .MapJs(m => m.Source("function(o) { return [1]; }"))
                 .ReduceJs(r => r.Name("Riak.reduceSum").Keep(true));

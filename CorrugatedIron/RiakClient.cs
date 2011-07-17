@@ -407,7 +407,7 @@ namespace CorrugatedIron
         public IList<RiakObject> WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks)
         {
             var query = new RiakMapReduceQuery()
-                .Inputs(new RiakPhaseInputs(new List<RiakBucketKeyInput>{new RiakBucketKeyInput(riakObject.Bucket, riakObject.Key)}));
+                .Inputs(new List<RiakBucketKeyInput> { new RiakBucketKeyInput(riakObject.Bucket, riakObject.Key) });
 
             foreach (var riakLink in riakLinks)
             {

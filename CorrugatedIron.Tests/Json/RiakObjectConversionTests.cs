@@ -70,6 +70,8 @@ namespace CorrugatedIron.Tests.Json.RiakObjectConversionTests
         }
 
         [Test]
+        [Ignore("Only run this if you're interested in some perf stats for Json conversio" +
+            "n")]
         public void JsonConversionTimerTest()
         {
             var testPerson = new Person
