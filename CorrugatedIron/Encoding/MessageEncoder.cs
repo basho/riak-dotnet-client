@@ -114,6 +114,7 @@ namespace CorrugatedIron.Encoding
         public T Decode<T>(Stream source) where T : new()
         {
             var length = new byte[4];
+
             source.Read(length, 0, length.Length);
             var size = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(length, 0));
 
@@ -126,7 +127,7 @@ namespace CorrugatedIron.Encoding
 
             if (!MessageCodeToTypeMap.ContainsKey(messageCode))
             {
-                throw new RiakBrokenConnectionException((byte)messageCode);
+                throw new RiakInvalidDataException((byte)messageCode);
             }
 
 #if DEBUG

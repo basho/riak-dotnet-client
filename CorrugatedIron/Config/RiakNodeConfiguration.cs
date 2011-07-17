@@ -28,6 +28,8 @@ namespace CorrugatedIron.Config
         int PoolSize { get; }
         int AcquireTimeout { get; }
         int IdleTimeout { get; }
+        int NetworkReadTimeout { get; }
+        int NetworkWriteTimeout { get; }
     }
 
     public class RiakNodeConfiguration : ConfigurationElement, IRiakNodeConfiguration
@@ -86,6 +88,20 @@ namespace CorrugatedIron.Config
         {
             get { return (int)this["idleTimeout"]; }
             set { this["idleTimeout"] = value; }
+        }
+
+        [ConfigurationProperty("networkReadTimeout", DefaultValue = 2000, IsRequired = false)]
+        public int NetworkReadTimeout
+        {
+            get { return (int)this["networkReadTimeout"]; }
+            set { this["networkReadTimeout"] = value; }
+        }
+
+        [ConfigurationProperty("networkWriteTimeout", DefaultValue = 2000, IsRequired = false)]
+        public int NetworkWriteTimeout
+        {
+            get { return (int)this["networkWriteTimeout"]; }
+            set { this["networkWriteTimeout"] = value; }
         }
     }
 }
