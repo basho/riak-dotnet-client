@@ -403,7 +403,7 @@ namespace CorrugatedIron
         {
             // TODO: make this all happen on a single connection
             var query = new RiakMapReduceQuery()
-                .Inputs(new RiakPhaseInputs(new List<RiakBucketKeyInput>{new RiakBucketKeyInput(riakObject.Bucket, riakObject.Key)}));
+                .Inputs(new List<RiakBucketKeyInput> { new RiakBucketKeyInput(riakObject.Bucket, riakObject.Key) });
 
             foreach (var riakLink in riakLinks)
             {

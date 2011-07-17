@@ -67,7 +67,7 @@ namespace CorrugatedIron.Tests.Live.LoadTests
             }
 
             var query = new RiakMapReduceQuery()
-                .Inputs(new RiakPhaseInputs(keys.Select(k => new RiakBucketKeyInput(MapReduceBucket, k)).ToList()))
+                .Inputs(keys.Select(k => new RiakBucketKeyInput(MapReduceBucket, k)).ToList())
                 .MapJs(m => m.Source(@"function(o){return[1];}"))
                 .ReduceJs(r => r.Name(@"Riak.reduceSum").Keep(true));
             query.Compile();
@@ -116,7 +116,7 @@ namespace CorrugatedIron.Tests.Live.LoadTests
             }
 
             var query = new RiakMapReduceQuery()
-                .Inputs(new RiakPhaseInputs(keys.Select(k => new RiakBucketKeyInput(MapReduceBucket, k)).ToList()))
+                .Inputs(keys.Select(k => new RiakBucketKeyInput(MapReduceBucket, k)).ToList())
                 .MapJs(m => m.Source(@"function(o){return[1];}"))
                 .ReduceJs(r => r.Name(@"Riak.reduceSum").Keep(true));
             query.Compile();

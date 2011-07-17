@@ -61,7 +61,7 @@ namespace CorrugatedIron
         void Batch(Action<IRiakBatchClient> batchAction);
     }
 
-    public class RiakAsyncClient : IRiakAsyncClient
+    internal class RiakAsyncClient : IRiakAsyncClient
     {
         private readonly IRiakClient _client;
 

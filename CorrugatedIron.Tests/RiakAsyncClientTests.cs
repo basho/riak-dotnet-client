@@ -25,7 +25,7 @@ using NUnit.Framework;
 
 namespace CorrugatedIron.Tests.RiakAsyncClientTests
 {
-    public abstract class RiakAsyncClientTestBase<TResult>
+    internal abstract class RiakAsyncClientTestBase<TResult>
     {
         protected Mock<IRiakClient> ClientMock;
         protected RiakAsyncClient AsyncClient;
@@ -41,7 +41,7 @@ namespace CorrugatedIron.Tests.RiakAsyncClientTests
     }
 
     [TestFixture]
-    public class WhenPingingServerAsync : RiakAsyncClientTestBase<RiakResult>
+    internal class WhenPingingServerAsync : RiakAsyncClientTestBase<RiakResult>
     {
         [SetUp]
         public void SetUp()
@@ -66,7 +66,7 @@ namespace CorrugatedIron.Tests.RiakAsyncClientTests
     }
 
     [TestFixture]
-    public class WhenCallingGetWithObjectIdAsync : RiakAsyncClientTestBase<RiakResult<RiakObject>>
+    internal class WhenCallingGetWithObjectIdAsync : RiakAsyncClientTestBase<RiakResult<RiakObject>>
     {
         [SetUp]
         public void SetUp()
@@ -95,7 +95,7 @@ namespace CorrugatedIron.Tests.RiakAsyncClientTests
     }
 
     [TestFixture]
-    public class WhenCallingGetWithBucketKeyAsync : RiakAsyncClientTestBase<RiakResult<RiakObject>>
+    internal class WhenCallingGetWithBucketKeyAsync : RiakAsyncClientTestBase<RiakResult<RiakObject>>
     {
         [SetUp]
         public void SetUp()
@@ -124,7 +124,7 @@ namespace CorrugatedIron.Tests.RiakAsyncClientTests
     }
 
     [TestFixture]
-    public class WhenCallingGetManyAsync : RiakAsyncClientTestBase<IEnumerable<RiakResult<RiakObject>>>
+    internal class WhenCallingGetManyAsync : RiakAsyncClientTestBase<IEnumerable<RiakResult<RiakObject>>>
     {
         [SetUp]
         public void SetUp()
