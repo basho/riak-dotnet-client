@@ -61,6 +61,7 @@
     <Compile Include="Comms\LoadBalancing\ILoadBalancingStrategy.cs" />
     <Compile Include="Comms\LoadBalancing\RoundRobinStrategy.cs" />
     <Compile Include="Comms\RiakConnectionCommand.cs" />
+    <Compile Include="Comms\RiakPbcSocket.cs" />
     <Compile Include="Containers\ConcurrentEnumerable.cs" />
     <Compile Include="Containers\ConcurrentEnumerator.cs" />
     <Compile Include="Containers\Either.cs" />
@@ -191,7 +192,6 @@
     <Compile Include="Messages\RpbSetBucketResp.cs" />
     <Compile Include="Messages\RpbSetClientIdReq.cs" />
     <Compile Include="Messages\RpbSetClientIdResp.cs" />
-    <Compile Include="Encoding\MessageEncoder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="KeyFilters\IRiakKeyFilterToken.cs" />
     <Compile Include="KeyFilters\And.cs" />

@@ -20,11 +20,9 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Security;
-using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using CorrugatedIron.Config;
-using CorrugatedIron.Encoding;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
 using CorrugatedIron.Models.Rest;
@@ -62,40 +60,13 @@ namespace CorrugatedIron.Comms
 
     internal class RiakConnection : IRiakConnection
     {
-        private readonly IRiakNodeConfiguration _nodeConfiguration;
-        private readonly MessageEncoder _encoder;
         private readonly string _restRootUrl;
-        private TcpClient _pbcClient;
-        private NetworkStream _pbcClientStream;
+        private readonly RiakPbcSocket _socket;
         private string _restClientId;
 
         public bool IsIdle
         {
-            get { return _pbcClient == null; }
-        }
-
-        private TcpClient PbcClient
-        {
-            get
-            {
-                return _pbcClient ??
-                       (_pbcClient = new TcpClient(_nodeConfiguration.HostAddress, _nodeConfiguration.PbcPort));
-            }
-        }
-
-        private NetworkStream PbcClientStream
-        {
-            get
-            {
-                if (_pbcClientStream == null)
-                {
-                    _pbcClientStream = PbcClient.GetStream();
-
-                    _pbcClientStream.WriteTimeout = _nodeConfiguration.NetworkReadTimeout;
-                    _pbcClientStream.ReadTimeout = _nodeConfiguration.NetworkWriteTimeout;
-                }
-                return _pbcClientStream;
-            }
+            get { return _socket.IsConnected; }
         }
 
         static RiakConnection()
@@ -105,9 +76,8 @@ namespace CorrugatedIron.Comms
 
         public RiakConnection(IRiakNodeConfiguration nodeConfiguration)
         {
-            _nodeConfiguration = nodeConfiguration;
             _restRootUrl = @"{0}://{1}:{2}".Fmt(nodeConfiguration.RestScheme, nodeConfiguration.HostAddress, nodeConfiguration.RestPort);
-            _encoder = new MessageEncoder();
+            _socket = new RiakPbcSocket(nodeConfiguration.HostAddress, nodeConfiguration.PbcPort, nodeConfiguration.NetworkReadTimeout, nodeConfiguration.NetworkWriteTimeout);
         }
 
         public static byte[] ToClientId(int id)
@@ -126,7 +96,7 @@ namespace CorrugatedIron.Comms
         {
             try
             {
-                var result = _encoder.Decode<TResult>(PbcClientStream);
+                var result = _socket.Read<TResult>();
                 return RiakResult<TResult>.Success(result);
             }
             catch (Exception ex)
@@ -145,7 +115,7 @@ namespace CorrugatedIron.Comms
                 RiakResult<TResult> result;
                 do
                 {
-                    result = RiakResult<TResult>.Success(_encoder.Decode<TResult>(PbcClientStream));
+                    result = RiakResult<TResult>.Success(_socket.Read<TResult>());
                     results.Add(result);
                 } while (repeatRead(result));
 
@@ -162,7 +132,7 @@ namespace CorrugatedIron.Comms
         {
             try
             {
-                _encoder.Encode(request, PbcClientStream);
+                _socket.Write(request);
                 return RiakResult.Success();
             }
             catch (Exception ex)
@@ -328,24 +298,13 @@ namespace CorrugatedIron.Comms
 
         public void Dispose()
         {
+            _socket.Dispose();
             Disconnect();
         }
 
         public void Disconnect()
         {
-            var client = _pbcClient;
-            _pbcClient = null;
-            var clientStream = _pbcClientStream;
-            _pbcClientStream = null;
-
-            if (clientStream != null)
-            {
-                clientStream.Dispose();
-            }
-            if (client != null)
-            {
-                client.Close();
-            }
+            _socket.Disconnect();
         }
     }
 }

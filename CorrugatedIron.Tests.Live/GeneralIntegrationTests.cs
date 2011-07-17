@@ -451,7 +451,9 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             keyList.Value.Count().ShouldEqual(10);
 
             Client.DeleteBucket(bucket);
-            
+
+            // damn you eventual consistency! :)
+            Thread.Sleep(1000);
             keyList = Client.ListKeys(bucket);
             keyList.Value.Count().ShouldEqual(0);
             Client.ListBuckets().Value.Contains(bucket).ShouldBeFalse();
@@ -479,6 +481,8 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             Client.Async.DeleteBucket(bucket, asyncTester.HandleResult);
             var result = asyncTester.Result;
             
+            // damn you eventual consistency! :)
+            Thread.Sleep(1000);
             keyList = Client.ListKeys(bucket);
             keyList.Value.Count().ShouldEqual(0);
             Client.ListBuckets().Value.Contains(bucket).ShouldBeFalse();
