@@ -62,12 +62,14 @@
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
     <Compile Include="AsyncMethodTester.cs" />
+    <Compile Include="Comms\RoundRobinStrategyTests.cs" />
+    <Compile Include="Json\RiakObjectConversionTests.cs" />
+    <Compile Include="Json\TestObjects.cs" />
     <Compile Include="RiakAsyncClientTests.cs" />
     <Compile Include="RiakClientSetBucketPropertiesTests.cs" />
     <Compile Include="RiakClientTestBase.cs" />
     <Compile Include="RiakClientPingTests.cs" />
     <Compile Include="RiakClientTests.cs" />
-    <Compile Include="Encoding\MessageEncoderUnitTests.cs" />
     <Compile Include="Extensions\UnitTestExtensions.cs" />
     <Compile Include="Models\MapReduce\RiakMapReduceTests.cs" />
     <Compile Include="Models\RiakLinkTests.cs" />
@@ -86,9 +88,7 @@
       <Name>CorrugatedIron</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Comms\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

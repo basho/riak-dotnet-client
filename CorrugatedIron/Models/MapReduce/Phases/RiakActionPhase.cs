@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2010 - OJ Reeves & Jeremiah Peschka
+﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -23,7 +23,7 @@ namespace CorrugatedIron.Models.MapReduce.Phases
     internal abstract class RiakActionPhase<TLanguage> : RiakPhase
         where TLanguage : IRiakPhaseLanguage, new()
     {
-        private string _argument;
+        private object _argument;
         public TLanguage Language { get; private set; }
 
         protected RiakActionPhase()
@@ -31,7 +31,7 @@ namespace CorrugatedIron.Models.MapReduce.Phases
             Language = new TLanguage();
         }
 
-        public void Argument(string argument)
+        public void Argument<T>(T argument)
         {
             _argument = argument;
         }
@@ -39,7 +39,8 @@ namespace CorrugatedIron.Models.MapReduce.Phases
         protected override void WriteJson(JsonWriter writer)
         {
             Language.WriteJson(writer);
-            writer.WriteSpecifiedProperty("arg", _argument);
+
+            writer.WriteNonNullProperty("arg", _argument);
         }
     }
 }

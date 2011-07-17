@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2010 - OJ Reeves & Jeremiah Peschka
+﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -23,6 +23,7 @@ namespace CorrugatedIron.Config
     public interface IRiakClusterConfiguration
     {
         IList<IRiakNodeConfiguration> RiakNodes { get; }
+        int NodePollTime { get; }
     }
 
     public class RiakClusterConfiguration : ConfigurationSection, IRiakClusterConfiguration
@@ -43,6 +44,13 @@ namespace CorrugatedIron.Config
         IList<IRiakNodeConfiguration> IRiakClusterConfiguration.RiakNodes
         {
             get { return Nodes.Cast<IRiakNodeConfiguration>().ToList(); }
+        }
+
+        [ConfigurationProperty("nodePollTime", DefaultValue = 5000, IsRequired = false)]
+        public int NodePollTime
+        {
+            get { return (int)this["nodePollTime"]; }
+            set { this["nodePollTime"] = value; }
         }
     }
 }

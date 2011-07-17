@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2010 - OJ Reeves & Jeremiah Peschka
+﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -44,7 +44,7 @@ namespace CorrugatedIron.Models
 
         public bool HasChanged
         {
-            get { return _hashCode == CalculateHashCode(); }
+            get { return _hashCode != CalculateHashCode(); }
         }
 
         public List<string> VTags
@@ -55,8 +55,18 @@ namespace CorrugatedIron.Models
             }
         }
 
+        public RiakObject(string bucket, string key)
+            : this(bucket, key, null, RiakConstants.Defaults.ContentType)
+        {
+        }
+
         public RiakObject(string bucket, string key, string value)
             : this(bucket, key, value, RiakConstants.Defaults.ContentType)
+        {
+        }
+
+        public RiakObject(string bucket, string key, object value)
+            : this(bucket, key, value.ToJson(), RiakConstants.ContentTypes.ApplicationJson)
         {
         }
 
@@ -164,6 +174,16 @@ namespace CorrugatedIron.Models
             _hashCode = CalculateHashCode();
         }
 
+        internal RiakObject(string bucket, string key, ICollection<RpbContent> contents, byte[] vectorClock)
+            : this(bucket, key, contents.First(), vectorClock)
+        {
+            if (contents.Count > 1)
+            {
+                Siblings = contents.Select(c => new RiakObject(bucket, key, c, vectorClock)).ToList();
+                _hashCode = CalculateHashCode();
+            }
+        }
+
         internal RpbPutReq ToMessage()
         {
             UpdateLastModified();
@@ -259,6 +279,29 @@ namespace CorrugatedIron.Models
                 result = (result*397) ^ (_vtags != null ? _vtags.GetHashCode() : 0);
                 return result;
             }
+        }
+
+        public void SetObject<T>(T value)
+            where T : class
+        {
+            var json = value.Serialize();
+            Value = json.ToRiakString();
+            ContentType = RiakConstants.ContentTypes.ApplicationJson;
+        }
+
+        public T GetObject<T>()
+        {
+            if (ContentType != RiakConstants.ContentTypes.ApplicationJson)
+            {
+                throw new InvalidOperationException("Unable to convert Riak Object value to type '{0}'. Content type required: '{1}'. Actual type: '{2}'".Fmt(typeof(T).Name, RiakConstants.ContentTypes.ApplicationJson, ContentType));
+            }
+
+            return Value.As<T>();
+        }
+
+        public dynamic GetObject()
+        {
+            return Value.As<dynamic>();
         }
     }
 }

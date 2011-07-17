@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2010 - OJ Reeves & Jeremiah Peschka
+﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -18,7 +18,6 @@ using System.Collections.Generic;
 using System.Linq;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
-using Newtonsoft.Json;
 
 namespace CorrugatedIron.Models
 {
@@ -27,6 +26,13 @@ namespace CorrugatedIron.Models
         public string Bucket { get; private set; }
         public string Key { get; private set; }
         public string Tag { get; private set; }
+
+        public static readonly RiakLink AllLinks;
+
+        static RiakLink()
+        {
+            AllLinks = new RiakLink("", "", "");
+        }
 
         public RiakLink(string bucket, string key, string tag)
         {
@@ -37,7 +43,7 @@ namespace CorrugatedIron.Models
 
         public static RiakLink FromJsonString(string jsonString)
         {
-            var rawLink = JsonConvert.DeserializeObject<string[]>(jsonString);
+            var rawLink = jsonString.As<string[]>();
 
             return new RiakLink(rawLink[0], rawLink[1], rawLink[2]);
         }
@@ -45,7 +51,7 @@ namespace CorrugatedIron.Models
         public static IList<RiakLink> ParseArrayFromJsonString(string jsonString)
         {
             // TODO test me
-            var rawLinks = JsonConvert.DeserializeObject<IList<IList<string>>>(jsonString);
+            var rawLinks = jsonString.As<IList<IList<string>>>();
 
             return rawLinks.Select(FromArray).ToList();
         }

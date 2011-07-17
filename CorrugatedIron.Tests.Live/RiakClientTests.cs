@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2010 - OJ Reeves & Jeremiah Peschka
+﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -45,6 +45,27 @@ namespace CorrugatedIron.Tests.Live
             getResult.IsSuccess.ShouldBeFalse();
             getResult.ResultCode.ShouldEqual(ResultCode.NotFound);
             getResult.Value.ShouldBeNull();
+        }
+
+        [Test]
+        public void DeleteIsSuccessfulInBatch()
+        {
+            Client.Batch(batch =>
+                {
+                    var riakObject = new RiakObject(TestBucket, TestKey, TestJson, RiakConstants.ContentTypes.ApplicationJson);
+                    var riakObjectId = riakObject.ToRiakObjectId();
+
+                    var putResult = batch.Put(riakObject);
+                    putResult.IsSuccess.ShouldBeTrue();
+
+                    var delResult = batch.Delete(riakObjectId);
+                    delResult.IsSuccess.ShouldBeTrue();
+
+                    var getResult = batch.Get(riakObjectId);
+                    getResult.IsSuccess.ShouldBeFalse();
+                    getResult.ResultCode.ShouldEqual(ResultCode.NotFound);
+                    getResult.Value.ShouldBeNull();
+                });
         }
 
         [Test]

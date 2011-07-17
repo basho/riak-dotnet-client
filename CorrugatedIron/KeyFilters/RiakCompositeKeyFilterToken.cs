@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2010 - OJ Reeves & Jeremiah Peschka
+﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -16,6 +16,7 @@
 
 using System.Linq;
 using CorrugatedIron.Extensions;
+using Newtonsoft.Json;
 
 namespace CorrugatedIron.KeyFilters
 {
@@ -26,12 +27,12 @@ namespace CorrugatedIron.KeyFilters
         {
         }
 
-        protected override void WriteArguments(object[] arguments, Newtonsoft.Json.JsonWriter writer)
+        protected override void WriteArguments(object[] arguments, JsonWriter writer)
         {
             arguments.Cast<IRiakKeyFilterToken>().ForEach(v =>WriteArgumentAsArray(v, writer) );
         }
 
-        protected void WriteArgumentAsArray(IRiakKeyFilterToken argument, Newtonsoft.Json.JsonWriter writer)
+        protected void WriteArgumentAsArray(IRiakKeyFilterToken argument, JsonWriter writer)
         {
             writer.WriteStartArray();
             writer.WriteRawValue(argument.ToJsonString());

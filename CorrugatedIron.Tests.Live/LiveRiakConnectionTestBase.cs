@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2010 - OJ Reeves & Jeremiah Peschka
+﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -15,8 +15,10 @@
 // under the License.
 
 using System;
+using System.Collections.Generic;
 using CorrugatedIron.Comms;
 using CorrugatedIron.Config;
+using CorrugatedIron.Extensions;
 using NUnit.Framework;
 
 namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
@@ -30,7 +32,7 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
         protected const int TestHttpPort = 8091;
         protected const string TestBucket = "test_bucket";
         protected const string TestKey = "test_json";
-        protected const string TestJson = "{\"string\":\"value\",\"int\":100,\"float\":2.34,\"array\":[1,2,3],\"dict\":{\"foo\":\"bar\"}}";
+        protected static readonly string TestJson;
         protected const string MapReduceBucket = "map_reduce_bucket";
         protected const string MultiBucket = "test_multi_bucket";
         protected const string MultiKey = "test_multi_key";
@@ -46,6 +48,7 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
         static LiveRiakConnectionTestBase()
         {
             ClientId = RiakConnection.ToClientId(TestClientId);
+            TestJson = new { @string = "value", @int = 100, @float = 2.34, array = new[] { 1, 2, 3 }, dict = new Dictionary<string, string> { { "foo", "bar" } } }.ToJson();
         }
 
         public LiveRiakConnectionTestBase(string section = "riak3NodeConfiguration")
@@ -64,7 +67,6 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
         [TearDown]
         public void TearDown()
         {
-            Client.DeleteBucket(TestBucket);
             Cluster.Dispose();
         }
     }
