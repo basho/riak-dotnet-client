@@ -31,6 +31,11 @@ namespace CorrugatedIron.Extensions
             return JsonConvert.DeserializeObject<T>(jsonBytes.FromRiakString());
         }
 
+        public static string ToJson<T>(this T value)
+        {
+            return JsonConvert.SerializeObject(value);
+        }
+
         public static string Serialize<T>(this T obj) where T : class
         {
             return JsonConvert.SerializeObject(obj);

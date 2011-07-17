@@ -50,14 +50,14 @@ namespace CorrugatedIron.Tests.Json.RiakObjectConversionTests
                 }
             };
             var obj = new RiakObject("bucket", "key");
-            obj.SetValue(testPerson);
+            obj.SetObject(testPerson);
             obj.Value.ShouldNotBeNull();
             obj.ContentType.ShouldEqual(RiakConstants.ContentTypes.ApplicationJson);
 
             var json = obj.Value.FromRiakString();
             json.ShouldEqual("{\"Name\":{\"FirstName\":\"OJ\",\"Surname\":\"Reeves\"},\"PhoneNumbers\":[{\"Number\":\"12345678\",\"NumberType\":1}],\"DateOfBirth\":\"\\/Date(281664000000)\\/\",\"Email\":\"oj@buffered.io\"}");
 
-            var deserialisedPerson = obj.GetValue<Person>();
+            var deserialisedPerson = obj.GetObject<Person>();
             deserialisedPerson.ShouldEqual(testPerson);
         }
 
@@ -66,7 +66,7 @@ namespace CorrugatedIron.Tests.Json.RiakObjectConversionTests
         public void NonJsonObjectsCantBeDeserialisedFromJson()
         {
             var obj = new RiakObject("bucket", "key", "{\"Name\":{\"FirstName\":\"OJ\",\"Surname\":\"Reeves\"},\"PhoneNumbers\":[{\"Number\":\"12345678\",\"NumberType\":1}],\"DateOfBirth\":\"\\/Date(281664000000)\\/\",\"Email\":\"oj@buffered.io\"}", RiakConstants.ContentTypes.TextPlain);
-            obj.GetValue<Person>();
+            obj.GetObject<Person>();
         }
 
         [Test]
@@ -100,7 +100,7 @@ namespace CorrugatedIron.Tests.Json.RiakObjectConversionTests
 
             for (var i = 0; i < iterations; ++i)
             {
-                obj.SetValue(testPerson);
+                obj.SetObject(testPerson);
             }
             sw.Stop();
             Console.WriteLine("Serialisation took a total of {0} - {1} per iteration", sw.Elapsed, new TimeSpan(sw.ElapsedTicks / iterations));
@@ -110,7 +110,7 @@ namespace CorrugatedIron.Tests.Json.RiakObjectConversionTests
 
             for (var i = 0; i < iterations; ++i)
             {
-                var result = obj.GetValue<Person>();
+                var result = obj.GetObject<Person>();
             }
             sw.Stop();
             Console.WriteLine("De" +
