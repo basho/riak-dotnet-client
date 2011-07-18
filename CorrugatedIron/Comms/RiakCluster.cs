@@ -22,27 +22,30 @@ using System.Threading;
 using CorrugatedIron.Comms.LoadBalancing;
 using CorrugatedIron.Config;
 using CorrugatedIron.Messages;
-using CorrugatedIron.Util;
 
 namespace CorrugatedIron.Comms
 {
     public interface IRiakCluster : IDisposable
     {
-        RiakResult<TResult> UseConnection<TResult>(byte[] clientId, Func<IRiakConnection, RiakResult<TResult>> useFun, int retryAttempts = RiakConstants.Defaults.RetryAttempts);
-        RiakResult UseConnection(byte[] clientId, Func<IRiakConnection, RiakResult> useFun, int retryAttempts = RiakConstants.Defaults.RetryAttempts);
-        RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(byte[] clientId, Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun, int retryAttempts = RiakConstants.Defaults.RetryAttempts)
+        IRiakClient CreateClient();
+        int RetryWaitTime { get; set; }
+        RiakResult<TResult> UseConnection<TResult>(byte[] clientId, Func<IRiakConnection, RiakResult<TResult>> useFun, int retryAttempts);
+        RiakResult UseConnection(byte[] clientId, Func<IRiakConnection, RiakResult> useFun, int retryAttempts);
+        RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(byte[] clientId, Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun, int retryAttempts)
             where TResult : RiakResult;
     }
 
     public class RiakCluster : IRiakCluster
     {
-        private const int RetryWait = 200;
         private readonly byte[] _pollClientId = new byte[] { 1, 1, 1, 1 };
         private readonly RoundRobinStrategy _loadBalancer;
         private readonly List<IRiakNode> _nodes;
         private readonly ConcurrentQueue<IRiakNode> _offlineNodes;
         private readonly int _nodePollTime;
+        private readonly int _defaultRetryCount;
         private bool _disposing;
+
+        public int RetryWaitTime { get; set; }
 
         public RiakCluster(IRiakClusterConfiguration clusterConfiguration, IRiakNodeFactory nodeFactory, IRiakConnectionFactory connectionFactory)
         {
@@ -51,16 +54,26 @@ namespace CorrugatedIron.Comms
             _loadBalancer = new RoundRobinStrategy();
             _loadBalancer.Initialise(_nodes);
             _offlineNodes = new ConcurrentQueue<IRiakNode>();
+            _defaultRetryCount = clusterConfiguration.DefaultRetryCount;
+            RetryWaitTime = clusterConfiguration.DefaultRetryWaitTime;
 
             ThreadPool.QueueUserWorkItem(NodeMonitor);
         }
 
-        public RiakResult UseConnection(byte[] clientId, Func<IRiakConnection, RiakResult> useFun, int retryAttempts = RiakConstants.Defaults.RetryAttempts)
+        public IRiakClient CreateClient()
+        {
+            return new RiakClient(this)
+            {
+                RetryCount = _defaultRetryCount
+            };
+        }
+
+        public RiakResult UseConnection(byte[] clientId, Func<IRiakConnection, RiakResult> useFun, int retryAttempts)
         {
             return UseConnection(clientId, useFun, RiakResult.Error, retryAttempts);
         }
 
-        public RiakResult<TResult> UseConnection<TResult>(byte[] clientId, Func<IRiakConnection, RiakResult<TResult>> useFun, int retryAttempts = RiakConstants.Defaults.RetryAttempts)
+        public RiakResult<TResult> UseConnection<TResult>(byte[] clientId, Func<IRiakConnection, RiakResult<TResult>> useFun, int retryAttempts)
         {
             return UseConnection(clientId, useFun, RiakResult<TResult>.Error, retryAttempts);
         }
@@ -68,7 +81,7 @@ namespace CorrugatedIron.Comms
         private TRiakResult UseConnection<TRiakResult>(byte[] clientId, Func<IRiakConnection, TRiakResult> useFun, Func<ResultCode, string, TRiakResult> onError, int retryAttempts)
             where TRiakResult : RiakResult
         {
-            if(retryAttempts == 0) return onError(ResultCode.NoRetries, "Unable to access a connection on the cluster.");
+            if(retryAttempts < 0) return onError(ResultCode.NoRetries, "Unable to access a connection on the cluster.");
             if (_disposing) return onError(ResultCode.ShuttingDown, "System currently shutting down");
 
             var node = _loadBalancer.SelectNode();
@@ -80,14 +93,14 @@ namespace CorrugatedIron.Comms
                 {
                     if (result.ResultCode == ResultCode.NoConnections)
                     {
-                        Thread.Sleep(RetryWait);
+                        Thread.Sleep(RetryWaitTime);
                         return UseConnection(clientId, useFun, onError, retryAttempts - 1);
                     }
 
                     if (result.ResultCode == ResultCode.CommunicationError)
                     {
                         DeactivateNode(node);
-                        Thread.Sleep(RetryWait);
+                        Thread.Sleep(RetryWaitTime);
                         return UseConnection(clientId, useFun, onError, retryAttempts - 1);
                     }
 
@@ -99,7 +112,7 @@ namespace CorrugatedIron.Comms
             return onError(ResultCode.ClusterOffline, "Unable to access functioning Riak node");
         }
 
-        public RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(byte[] clientId, Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun, int retryAttempts = RiakConstants.Defaults.RetryAttempts)
+        public RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(byte[] clientId, Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun, int retryAttempts)
             where TResult : RiakResult
         {
             if(retryAttempts == 0) return RiakResult<IEnumerable<TResult>>.Error(ResultCode.NoRetries, "Unable to access a connection on the cluster.");
@@ -114,14 +127,14 @@ namespace CorrugatedIron.Comms
                 {
                     if (result.ResultCode == ResultCode.NoConnections)
                     {
-                        Thread.Sleep(RetryWait);
+                        Thread.Sleep(RetryWaitTime);
                         return UseDelayedConnection(clientId, useFun, retryAttempts - 1);
                     }
 
                     if (result.ResultCode == ResultCode.CommunicationError)
                     {
                         DeactivateNode(node);
-                        Thread.Sleep(RetryWait);
+                        Thread.Sleep(RetryWaitTime);
                         return UseDelayedConnection(clientId, useFun, retryAttempts - 1);
                     }
                 }
