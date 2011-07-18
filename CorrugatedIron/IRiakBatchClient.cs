@@ -23,6 +23,7 @@ namespace CorrugatedIron
 {
     public interface IRiakBatchClient
     {
+        int RetryCount { get; set; }
         RiakResult Ping();
 
         RiakResult<RiakObject> Get(string bucket, string key, uint rVal = RiakConstants.Defaults.RVal);

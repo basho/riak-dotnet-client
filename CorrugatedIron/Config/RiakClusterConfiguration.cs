@@ -24,6 +24,8 @@ namespace CorrugatedIron.Config
     {
         IList<IRiakNodeConfiguration> RiakNodes { get; }
         int NodePollTime { get; }
+        int DefaultRetryWaitTime { get; }
+        int DefaultRetryCount { get; }
     }
 
     public class RiakClusterConfiguration : ConfigurationSection, IRiakClusterConfiguration
@@ -51,6 +53,20 @@ namespace CorrugatedIron.Config
         {
             get { return (int)this["nodePollTime"]; }
             set { this["nodePollTime"] = value; }
+        }
+
+        [ConfigurationProperty("defaultRetryWaitTime", DefaultValue = 200, IsRequired = false)]
+        public int DefaultRetryWaitTime
+        {
+            get { return (int)this["defaultRetryWaitTime"]; }
+            set { this["defaultRetryWaitTime"] = value; }
+        }
+
+        [ConfigurationProperty("defaultRetryCount", DefaultValue = 3, IsRequired = false)]
+        public int DefaultRetryCount
+        {
+            get { return (int)this["defaultRetryCount"]; }
+            set { this["defaultRetryCount"] = value; }
         }
     }
 }

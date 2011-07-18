@@ -32,8 +32,8 @@ namespace CorrugatedIron.Tests.Live.IdleTests
 
         private IRiakConnection GetIdleConnection()
         {
-            var result = Cluster.UseConnection(ClientId, RiakResult<IRiakConnection>.Success);
-            System.Threading.Thread.Sleep(ClusterConfig.RiakNodes[0].IdleTimeout + 1000);
+            var result = Cluster.UseConnection(ClientId, RiakResult<IRiakConnection>.Success, 1);
+            //System.Threading.Thread.Sleep(ClusterConfig.RiakNodes[0].IdleTimeout + 1000);
             return result.Value;
         }
 
