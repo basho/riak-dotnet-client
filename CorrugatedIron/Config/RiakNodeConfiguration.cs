@@ -26,8 +26,7 @@ namespace CorrugatedIron.Config
         string RestScheme { get; }
         int RestPort { get; }
         int PoolSize { get; }
-        int AcquireTimeout { get; }
-        int IdleTimeout { get; }
+        //int IdleTimeout { get; }
         int NetworkReadTimeout { get; }
         int NetworkWriteTimeout { get; }
     }
@@ -76,19 +75,13 @@ namespace CorrugatedIron.Config
             set { this["poolSize"] = value; }
         }
 
-        [ConfigurationProperty("acquireTimeout", DefaultValue = 5000, IsRequired = false)]
-        public int AcquireTimeout
-        {
-            get { return (int)this["acquireTimeout"]; }
-            set { this["acquireTimeout"] = value; }
-        }
-
-        [ConfigurationProperty("idleTimeout", DefaultValue = 15000, IsRequired = false)]
-        public int IdleTimeout
-        {
-            get { return (int)this["idleTimeout"]; }
-            set { this["idleTimeout"] = value; }
-        }
+        // -- TODO: put this back in when we've got the idling stuff figured out
+        //[ConfigurationProperty("idleTimeout", DefaultValue = 15000, IsRequired = false)]
+        //public int IdleTimeout
+        //{
+        //    get { return (int)this["idleTimeout"]; }
+        //    set { this["idleTimeout"] = value; }
+        //}
 
         [ConfigurationProperty("networkReadTimeout", DefaultValue = 2000, IsRequired = false)]
         public int NetworkReadTimeout
