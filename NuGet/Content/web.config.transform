@@ -3,32 +3,28 @@
         <section name="riakConfig" type="CorrugatedIron.Config.RiakClusterConfiguration, CorrugatedIron" />
     </configSections>
 
-    <riakConfig>
+    <riakConfig nodePollTime="5000"
+                defaultRetryWaitTime="200"
+                defaultRetryCount="3">
         <nodes>
             <node name="dev1"
                   hostAddress="riak-test"
                   pbcPort="8081"
                   restScheme="http"
                   restPort="8091"
-                  poolSize="20"
-                  acquireTimeout="4000"
-                  idleTimeout="15000" />
+                  poolSize="20" />
             <node name="dev2"
                   hostAddress="riak-test"
                   pbcPort="8082"
                   restScheme="http"
                   restPort="8092"
-                  poolSize="20"
-                  acquireTimeout="4000"
-                  idleTimeout="15000" />
+                  poolSize="20" />
             <node name="dev3"
                   hostAddress="riak-test"
                   pbcPort="8083"
                   restScheme="http"
                   restPort="8093"
-                  poolSize="20"
-                  acquireTimeout="4000"
-                  idleTimeout="15000" />
+                  poolSize="20" />
         </nodes>
     </riakConfig>
 </configuration>
