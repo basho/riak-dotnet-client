@@ -38,7 +38,7 @@ namespace CorrugatedIron.Tests.Live.LoadTests
         // connection recovery/retry across nodes is
         // functioning and the load-balancing strategies
         // are in place.
-        private const int ThreadCount = 80;
+        private const int ThreadCount = 70;
         private const int ActionCount = 30;
         //private const int ThreadCount = 1;
         //private const int ActionCount = 1;
@@ -72,16 +72,28 @@ namespace CorrugatedIron.Tests.Live.LoadTests
             var batch = ThreadCount.Times(() => Tuple.Create(query, new Thread(DoMapRed), new List<RiakResult<RiakMapReduceResult>>())).ToArray();
             batch.ForEach(b => b.Item2.Start(b));
 
+            int failures = 0;
             foreach(var b in batch)
             {
                 b.Item2.Join();
                 b.Item3.ForEach(r =>
                                     {
-                                        r.IsSuccess.ShouldBeTrue();
-                                        var json = JArray.Parse(r.Value.PhaseResults[1].Value.FromRiakString());
-                                        json[0].Value<int>().ShouldEqual(10);
+                                        if (r.IsSuccess)
+                                        {
+                                            var json = JArray.Parse(r.Value.PhaseResults[1].Value.FromRiakString());
+                                            json[0].Value<int>().ShouldEqual(10);
+                                        }
+                                        else
+                                        {
+                                            // the only acceptable result is that it ran out of retries when
+                                            // talking to the cluster (trying to get a connection)
+                                            r.ResultCode.ShouldEqual(ResultCode.NoRetries);
+                                            ++failures;
+                                        }
                                     });
             }
+
+            Console.WriteLine("Total of {0} out of {1} failed to execute due to connection contention", failures, ThreadCount * ActionCount);
         }
 
         private void DoMapRed(object input)
@@ -119,13 +131,23 @@ namespace CorrugatedIron.Tests.Live.LoadTests
             var batch = ThreadCount.Times(() => Tuple.Create(query, new Thread(DoStreamingMapRed), new List<RiakMapReduceResultPhase>())).ToArray();
             batch.ForEach(b => b.Item2.Start(b));
 
+            int failures = 0;
             foreach(var b in batch)
             {
                 b.Item2.Join();
-                var finalResult = b.Item3.OrderByDescending(r => r.Phase).First();
-                var json = JArray.Parse(finalResult.Value.FromRiakString());
-                json[0].Value<int>().ShouldEqual(10);
+
+                if (b.Item3.Count > 0)
+                {
+                    var finalResult = b.Item3.OrderByDescending(r => r.Phase).First();
+                    var json = JArray.Parse(finalResult.Value.FromRiakString());
+                    json[0].Value<int>().ShouldEqual(10);
+                }
+                else
+                {
+                    ++failures;
+                }
             }
+            Console.WriteLine("Total of {0} out of {1} failed to execute due to connection contention", failures, ThreadCount * ActionCount);
         }
 
         private void DoStreamingMapRed(object input)

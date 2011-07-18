@@ -16,32 +16,29 @@
 
 using System;
 using System.Collections.Concurrent;
-using System.Threading;
+using System.Collections.Generic;
 using CorrugatedIron.Config;
 
 namespace CorrugatedIron.Comms
 {
     internal class RiakConnectionPool : IDisposable
     {
-        private readonly int _resourceWaitTimeout;
+        private readonly List<IRiakConnection> _allResources;
         private readonly ConcurrentStack<IRiakConnection> _resources;
-        private readonly Semaphore _resourceLock;
         private bool _disposing;
 
         public RiakConnectionPool(IRiakNodeConfiguration nodeConfig, IRiakConnectionFactory connFactory)
         {
             var poolSize = nodeConfig.PoolSize;
-            _resourceWaitTimeout = nodeConfig.AcquireTimeout;
+            _allResources = new List<IRiakConnection>();
             _resources = new ConcurrentStack<IRiakConnection>();
-
-            _resourceLock = new Semaphore(0, poolSize);
 
             for (var i = 0; i < poolSize; ++i)
             {
-                _resources.Push(connFactory.CreateConnection(nodeConfig));
+                var conn = connFactory.CreateConnection(nodeConfig);
+                _allResources.Add(conn);
+                _resources.Push(conn);
             }
-
-            _resourceLock.Release(poolSize);
         }
 
         public Tuple<bool, TResult> Consume<TResult>(Func<IRiakConnection, TResult> consumer)
@@ -51,13 +48,10 @@ namespace CorrugatedIron.Comms
             IRiakConnection instance = null;
             try
             {
-                if (_resourceLock.WaitOne(_resourceWaitTimeout))
+                if (_resources.TryPop(out instance))
                 {
-                    if (_resources.TryPop(out instance))
-                    {
-                        var result = consumer(instance);
-                        return Tuple.Create(true, result);
-                    }
+                    var result = consumer(instance);
+                    return Tuple.Create(true, result);
                 }
             }
             catch (Exception)
@@ -69,7 +63,6 @@ namespace CorrugatedIron.Comms
                 if (instance != null)
                 {
                     _resources.Push(instance);
-                    _resourceLock.Release();
                 }
             }
 
@@ -83,20 +76,16 @@ namespace CorrugatedIron.Comms
             IRiakConnection instance = null;
             try
             {
-                if (_resourceLock.WaitOne(_resourceWaitTimeout))
+                if (_resources.TryPop(out instance))
                 {
-                    if (_resources.TryPop(out instance))
-                    {
-                        Action cleanup = () =>
-                            {
-                                var i = instance;
-                                instance = null;
-                                _resources.Push(i);
-                                _resourceLock.Release();
-                            };
-                        var result = consumer(instance, cleanup);
-                        return Tuple.Create(true, result);
-                    }
+                    Action cleanup = () =>
+                        {
+                            var i = instance;
+                            instance = null;
+                            _resources.Push(i);
+                        };
+                    var result = consumer(instance, cleanup);
+                    return Tuple.Create(true, result);
                 }
             }
             catch (Exception)
@@ -104,7 +93,6 @@ namespace CorrugatedIron.Comms
                 if (instance != null)
                 {
                     _resources.Push(instance);
-                    _resourceLock.Release();
                 }
                 return Tuple.Create(false, default(TResult));
             }
@@ -118,13 +106,9 @@ namespace CorrugatedIron.Comms
 
             _disposing = true;
 
-            // TODO: make sure we clean up all the connections
-            // ie. do tracking of released resources
-
-            IRiakConnection instance;
-            while (_resources.TryPop(out instance))
+            foreach(var conn in _allResources)
             {
-                instance.Dispose();
+                conn.Dispose();
             }
         }
     }
