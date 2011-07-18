@@ -62,7 +62,6 @@ namespace CorrugatedIron.Util
             public const uint RVal = 2;
             public const string ContentType = ContentTypes.ApplicationOctetStream;
             public const string CharSet = CharSets.Utf8;
-            public const int RetryAttempts = 3;
         }
         
         public static class KeyFilterTransforms
