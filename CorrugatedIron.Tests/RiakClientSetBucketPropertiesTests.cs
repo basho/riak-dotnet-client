@@ -35,17 +35,17 @@ namespace CorrugatedIron.Tests.RiakClientSetBucketPropertiesTests
         {
         }
 
-        public RiakResult<TResult> UseConnection<TResult>(byte[] clientId, Func<IRiakConnection, RiakResult<TResult>> useFun)
+        public RiakResult<TResult> UseConnection<TResult>(byte[] clientId, Func<IRiakConnection, RiakResult<TResult>> useFun, int retryAttempts = 3)
         {
             return useFun(ConnectionMock.Object);
         }
 
-        public RiakResult UseConnection(byte[] clientId, Func<IRiakConnection, RiakResult> useFun)
+        public RiakResult UseConnection(byte[] clientId, Func<IRiakConnection, RiakResult> useFun, int retryAttempts = 3)
         {
             return useFun(ConnectionMock.Object);
         }
 
-        public RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(byte[] clientId, Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun)
+        public RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(byte[] clientId, Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun, int retryAttempts = 3)
             where TResult : RiakResult
         {
             throw new NotImplementedException();
