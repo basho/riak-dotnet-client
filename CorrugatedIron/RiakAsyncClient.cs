@@ -16,7 +16,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Threading;
+using System.Threading.Tasks;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Util;
@@ -172,7 +172,7 @@ namespace CorrugatedIron
 
         private static void ExecAsync(Action action)
         {
-            ThreadPool.QueueUserWorkItem(o => action());
+            Task.Factory.StartNew(action);
         }
     }
 }
