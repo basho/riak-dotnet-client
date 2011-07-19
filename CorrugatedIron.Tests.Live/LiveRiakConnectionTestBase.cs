@@ -51,7 +51,7 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
             TestJson = new { @string = "value", @int = 100, @float = 2.34, array = new[] { 1, 2, 3 }, dict = new Dictionary<string, string> { { "foo", "bar" } } }.ToJson();
         }
 
-        public LiveRiakConnectionTestBase(string section = "riak3NodeConfiguration")
+        public LiveRiakConnectionTestBase(string section = "riak1NodeConfiguration")
         {
             ClusterConfig = RiakClusterConfiguration.LoadFromConfig(section);
         }

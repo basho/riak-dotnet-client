@@ -83,7 +83,6 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             writeResult.IsSuccess.ShouldBeTrue();
             writeResult.Value.ShouldNotBeNull();
 
-            Thread.Sleep(1000);
             var readResult = Client.Get(TestBucket, TestKey);
             readResult.IsSuccess.ShouldBeTrue();
             readResult.Value.ShouldNotBeNull();
@@ -198,7 +197,6 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
                     batch.Put(doc).IsSuccess.ShouldBeTrue();
 
                     // yup, just to be sure the data is there on the next node
-                    Thread.Sleep(1000);
                     var result = batch.Get(TestBucket, TestKey);
                     result.IsSuccess.ShouldBeTrue();
 
@@ -450,8 +448,6 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
 
             Client.DeleteBucket(bucket);
 
-            // damn you eventual consistency! :)
-            Thread.Sleep(1000);
             keyList = Client.ListKeys(bucket);
             keyList.Value.Count().ShouldEqual(0);
             Client.ListBuckets().Value.Contains(bucket).ShouldBeFalse();
@@ -477,8 +473,6 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             Client.Async.DeleteBucket(bucket, asyncTester.HandleResult);
             var result = asyncTester.Result;
             
-            // damn you eventual consistency! :)
-            Thread.Sleep(1000);
             keyList = Client.ListKeys(bucket);
             keyList.Value.Count().ShouldEqual(0);
             Client.ListBuckets().Value.Contains(bucket).ShouldBeFalse();
@@ -496,8 +490,6 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
 
             var lm2 = o.LastModified;
             var lmu2 = o.LastModifiedUsec;
-
-            Thread.Sleep(1000);
 
             o.SetObject(new { value = 12345 });
             o = Client.Put(o, new RiakPutOptions { ReturnBody = true }).Value;
