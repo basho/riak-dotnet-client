@@ -25,7 +25,7 @@ namespace CorrugatedIron.Tests.RiakClientTests
             ClusterConfigMock.SetupGet(m => m.RiakNodes).Returns(new List<IRiakNodeConfiguration>
                                                                      {NodeConfigMock.Object});
 
-            Cluster = new RiakCluster(ClusterConfigMock.Object, new RiakNodeFactory(), ConnFactoryMock.Object);
+            Cluster = new RiakCluster(ClusterConfigMock.Object, ConnFactoryMock.Object);
             Client = new RiakClient(Cluster);
         }
 
