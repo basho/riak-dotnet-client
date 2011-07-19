@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
@@ -69,42 +70,37 @@ namespace CorrugatedIron.Tests.Live.LoadTests
                 .ReduceJs(r => r.Name(@"Riak.reduceSum").Keep(true));
             query.Compile();
 
-            var batch = ThreadCount.Times(() => Tuple.Create(query, new Thread(DoMapRed), new List<RiakResult<RiakMapReduceResult>>())).ToArray();
-            batch.ForEach(b => b.Item2.Start(b));
+            var results = new List<RiakResult<RiakMapReduceResult>>[ThreadCount];
+            Parallel.For(0, ThreadCount, i =>
+                {
+                    results[i] = DoMapRed(query);
+                });
 
-            int failures = 0;
-            foreach(var b in batch)
+            var failures = 0;
+            foreach (var r in results.SelectMany(l => l))
             {
-                b.Item2.Join();
-                b.Item3.ForEach(r =>
-                                    {
-                                        if (r.IsSuccess)
-                                        {
-                                            var json = JArray.Parse(r.Value.PhaseResults[1].Value.FromRiakString());
-                                            json[0].Value<int>().ShouldEqual(10);
-                                        }
-                                        else
-                                        {
-                                            // the only acceptable result is that it ran out of retries when
-                                            // talking to the cluster (trying to get a connection)
-                                            r.ResultCode.ShouldEqual(ResultCode.NoRetries);
-                                            ++failures;
-                                        }
-                                    });
+                if (r.IsSuccess)
+                {
+                    r.Value.PhaseResults[1].GetObject<int[]>()[0].ShouldEqual(10);
+                }
+                else
+                {
+                    // the only acceptable result is that it ran out of retries when
+                    // talking to the cluster (trying to get a connection)
+                    r.ResultCode.ShouldEqual(ResultCode.NoRetries);
+                    ++failures;
+                }
             }
 
             Console.WriteLine("Total of {0} out of {1} failed to execute due to connection contention", failures, ThreadCount * ActionCount);
         }
 
-        private void DoMapRed(object input)
+        private List<RiakResult<RiakMapReduceResult>> DoMapRed(RiakMapReduceQuery query)
         {
-            Thread.CurrentThread.Name = "TestThread - " + Guid.NewGuid();
-            var inputs = (Tuple<RiakMapReduceQuery, Thread, List<RiakResult<RiakMapReduceResult>>>)input;
-            var query = inputs.Item1;
-            var results = inputs.Item3;
             var client = ClientGenerator();
 
-            ActionCount.Times(() => results.Add(client.MapReduce(query)));
+            var results = ActionCount.Times(() => client.MapReduce(query));
+            return results.ToList();
         }
 
         [Test]
@@ -128,19 +124,19 @@ namespace CorrugatedIron.Tests.Live.LoadTests
                 .ReduceJs(r => r.Name(@"Riak.reduceSum").Keep(true));
             query.Compile();
 
-            var batch = ThreadCount.Times(() => Tuple.Create(query, new Thread(DoStreamingMapRed), new List<RiakMapReduceResultPhase>())).ToArray();
-            batch.ForEach(b => b.Item2.Start(b));
-
-            int failures = 0;
-            foreach(var b in batch)
-            {
-                b.Item2.Join();
-
-                if (b.Item3.Count > 0)
+            var results = new List<RiakMapReduceResultPhase>[ThreadCount];
+            Parallel.For(0, ThreadCount, i =>
                 {
-                    var finalResult = b.Item3.OrderByDescending(r => r.Phase).First();
-                    var json = JArray.Parse(finalResult.Value.FromRiakString());
-                    json[0].Value<int>().ShouldEqual(10);
+                    results[i] = DoStreamingMapRed(query);
+                });
+
+            var failures = 0;
+            foreach (var result in results)
+            {
+                if (result.Count > 0)
+                {
+                    var lastResult = result.OrderByDescending(r => r.Phase).First();
+                    lastResult.GetObject<int[]>()[0].ShouldEqual(10);
                 }
                 else
                 {
@@ -150,22 +146,21 @@ namespace CorrugatedIron.Tests.Live.LoadTests
             Console.WriteLine("Total of {0} out of {1} failed to execute due to connection contention", failures, ThreadCount * ActionCount);
         }
 
-        private void DoStreamingMapRed(object input)
+        private List<RiakMapReduceResultPhase> DoStreamingMapRed(RiakMapReduceQuery query)
         {
-            Thread.CurrentThread.Name = "TestThread - " + Guid.NewGuid();
-            var inputs = (Tuple<RiakMapReduceQuery, Thread, List<RiakMapReduceResultPhase>>)input;
-            var query = inputs.Item1;
-            var results = inputs.Item3;
             var client = ClientGenerator();
 
-            ActionCount.Times(() =>
+            var results = ActionCount.Times(() =>
                 {
                     var streamedResults = client.StreamMapReduce(query);
                     if (streamedResults.IsSuccess)
                     {
-                        streamedResults.Value.PhaseResults.ForEach(results.Add);
+                        return streamedResults.Value.PhaseResults;
                     }
-                });
+                    return null;
+                }).Where(r => r != null).SelectMany(r => r);
+
+            return results.ToList();
         }
     }
 }
