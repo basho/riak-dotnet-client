@@ -18,7 +18,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using CorrugatedIron.Extensions;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Tests.Extensions;
@@ -411,15 +410,13 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         public void DeleteBucketDeletesAllKeysInABucketInBatch()
         {
             // add multiple keys
-            const string dummyData = "{{ value: {0} }}";
             var bucket = Guid.NewGuid().ToString();
 
             Client.Batch(batch =>
                 {
                     for (var i = 1; i < 11; i++)
                     {
-                        var newData = string.Format(dummyData, i);
-                        var doc = new RiakObject(bucket, i.ToString(), newData, RiakConstants.ContentTypes.ApplicationJson);
+                        var doc = new RiakObject(bucket, i.ToString(), new { value = i });
 
                         batch.Put(doc);
                     }
@@ -439,13 +436,11 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         public void DeleteBucketDeletesAllKeysInABucket()
         {
             // add multiple keys
-            const string dummyData = "{{ value: {0} }}";
             var bucket = Guid.NewGuid().ToString();
 
             for (var i = 1; i < 11; i++)
             {
-                var newData = string.Format(dummyData, i);
-                var doc = new RiakObject(bucket, i.ToString(), newData, RiakConstants.ContentTypes.ApplicationJson);
+                var doc = new RiakObject(bucket, i.ToString(), new { value = i });
 
                 Client.Put(doc);
             }
@@ -466,13 +461,11 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         public void DeleteBucketDeletesAllKeysInABucketAsynchronously()
         {
             // add multiple keys
-            const string dummyData = "{{ value: {0} }}";
             var bucket = Guid.NewGuid().ToString();
 
             for (var i = 1; i < 11; i++)
             {
-                var newData = string.Format(dummyData, i);
-                var doc = new RiakObject(bucket, i.ToString(), newData, RiakConstants.ContentTypes.ApplicationJson);
+                var doc = new RiakObject(bucket, i.ToString(), new { value = i });
 
                 Client.Put(doc);
             }
@@ -494,9 +487,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         [Test]
         public void LastModifiedShouldChangeAfterAPutRequest()
         {
-            const string dummyData = "{{ value: 1234; }}";
-            const string changedData = "{{ value: 12345 }}";
-            var o = new RiakObject(TestBucket, "1234", dummyData, RiakConstants.ContentTypes.ApplicationJson);
+            var o = new RiakObject(TestBucket, "1234", new { value = 1234 });
 
             var lm1 = o.LastModified;
             var lmu1 = o.LastModifiedUsec;
@@ -508,7 +499,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
 
             Thread.Sleep(1000);
 
-            o.Value = changedData.ToRiakString();
+            o.SetObject(new { value = 12345 });
             o = Client.Put(o, new RiakPutOptions { ReturnBody = true }).Value;
 
             var lm3 = o.LastModified;
@@ -558,13 +549,11 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         [Test]
         public void AsyncListKeysReturnsTheCorrectNumberOfResults()
         {
-            const string dummyData = "{{ value: {0} }}";
             var bucket = Guid.NewGuid().ToString();
             
             for (var i = 1; i < 11; i++)
             {
-                var newData = string.Format(dummyData, i);
-                var doc = new RiakObject(bucket, i.ToString(), newData, RiakConstants.ContentTypes.ApplicationJson);
+                var doc = new RiakObject(bucket, i.ToString(), new { value = i });
 
                 Client.Put(doc).IsSuccess.ShouldBeTrue();
             }
