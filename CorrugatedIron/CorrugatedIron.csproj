@@ -60,7 +60,6 @@
     </Compile>
     <Compile Include="Comms\LoadBalancing\ILoadBalancingStrategy.cs" />
     <Compile Include="Comms\LoadBalancing\RoundRobinStrategy.cs" />
-    <Compile Include="Comms\RiakConnectionCommand.cs" />
     <Compile Include="Comms\RiakPbcSocket.cs" />
     <Compile Include="Containers\ConcurrentEnumerable.cs" />
     <Compile Include="Containers\ConcurrentEnumerator.cs" />
