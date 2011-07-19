@@ -84,6 +84,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             writeResult.IsSuccess.ShouldBeTrue();
             writeResult.Value.ShouldNotBeNull();
 
+            Thread.Sleep(1000);
             var readResult = Client.Get(TestBucket, TestKey);
             readResult.IsSuccess.ShouldBeTrue();
             readResult.Value.ShouldNotBeNull();
@@ -197,6 +198,8 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
                     var doc = new RiakObject(TestBucket, TestKey, TestJson, RiakConstants.ContentTypes.ApplicationJson);
                     batch.Put(doc).IsSuccess.ShouldBeTrue();
 
+                    // yup, just to be sure the data is there on the next node
+                    Thread.Sleep(1000);
                     var result = batch.Get(TestBucket, TestKey);
                     result.IsSuccess.ShouldBeTrue();
 

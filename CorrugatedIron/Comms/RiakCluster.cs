@@ -19,6 +19,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using CorrugatedIron.Comms.LoadBalancing;
 using CorrugatedIron.Config;
 using CorrugatedIron.Messages;
@@ -57,7 +58,7 @@ namespace CorrugatedIron.Comms
             _defaultRetryCount = clusterConfiguration.DefaultRetryCount;
             RetryWaitTime = clusterConfiguration.DefaultRetryWaitTime;
 
-            ThreadPool.QueueUserWorkItem(NodeMonitor);
+            Task.Factory.StartNew(NodeMonitor);
         }
 
         public IRiakClient CreateClient()
@@ -155,7 +156,7 @@ namespace CorrugatedIron.Comms
             }
         }
 
-        private void NodeMonitor(object _)
+        private void NodeMonitor()
         {
             while (!_disposing)
             {
