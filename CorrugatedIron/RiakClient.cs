@@ -47,7 +47,7 @@ namespace CorrugatedIron
 
         public IRiakAsyncClient Async { get; private set; }
 
-        public RiakClient(IRiakCluster cluster)
+        internal RiakClient(IRiakCluster cluster)
         {
             _cluster = cluster;
             ClientId = GetClientId();
