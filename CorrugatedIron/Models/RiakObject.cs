@@ -187,6 +187,9 @@ namespace CorrugatedIron.Models
         internal RpbPutReq ToMessage()
         {
             UpdateLastModified();
+
+            // TODO: determine if this is the best place to do this. Does it belong in the Client as MarkClean() ?
+            _hashCode = CalculateHashCode();
             var message = new RpbPutReq
             {
                 Bucket = Bucket.ToRiakString(),
@@ -224,10 +227,6 @@ namespace CorrugatedIron.Models
 
                 LastModified = (uint)(ms / 1000u);
                 LastModifiedUsec = (uint)((ms - LastModified * 1000u) * 100u);
-
-                // TODO: figure out if we should be doing this or not, or should we isntead
-                // be exposing a "mark as clean" function which does this instead.
-                //_hashCode = CalculateHashCode();
             }
         }
 
