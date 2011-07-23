@@ -263,11 +263,17 @@ namespace CorrugatedIron
 
         public IEnumerable<RiakResult> DeleteBucket(string bucket, uint rwVal = RiakConstants.Defaults.RVal)
         {
-            // TODO: change this to do the whole op with a single connection and with streaming
-            var keys = ListKeys(bucket);
-            var objectIds = keys.Value.Select(key => new RiakObjectId(bucket, key)).ToList();
+            var results = UseConnection(conn =>
+                { 
+                    
+                    var keys = ListKeys(bucket);
+                    var objectIds = keys.Value.Select(key => new RiakObjectId(bucket, key)).ToList();
+                    var responses = Delete(objectIds, rwVal);
 
-            return Delete(objectIds, rwVal);
+                    return RiakResult<IEnumerable<RiakResult>>.Success(responses);
+                });
+
+            return results.Value;
         }
 
         public RiakResult<RiakMapReduceResult> MapReduce(RiakMapReduceQuery query)
