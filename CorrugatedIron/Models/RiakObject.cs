@@ -155,6 +155,11 @@ namespace CorrugatedIron.Models
             return new RiakObjectId(Bucket, Key);
         }
 
+        public void MarkClean()
+        {
+            _hashCode = CalculateHashCode();
+        }
+
         internal RiakObject(string bucket, string key, RpbContent content, byte[] vectorClock)
         {
             Bucket = bucket;
@@ -188,8 +193,6 @@ namespace CorrugatedIron.Models
         {
             UpdateLastModified();
 
-            // TODO: determine if this is the best place to do this. Does it belong in the Client as MarkClean() ?
-            _hashCode = CalculateHashCode();
             var message = new RpbPutReq
             {
                 Bucket = Bucket.ToRiakString(),
