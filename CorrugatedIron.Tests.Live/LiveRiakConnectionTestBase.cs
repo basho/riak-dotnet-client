@@ -59,7 +59,7 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
         [SetUp]
         public void SetUp()
         {
-            Cluster = new RiakCluster(ClusterConfig, new RiakNodeFactory(), new RiakConnectionFactory());
+            Cluster = new RiakCluster(ClusterConfig, new RiakConnectionFactory());
             ClientGenerator = () => new RiakClient(Cluster);
             Client = ClientGenerator();
         }

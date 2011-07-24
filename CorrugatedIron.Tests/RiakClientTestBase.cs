@@ -46,7 +46,7 @@ namespace CorrugatedIron.Tests.RiakClientTests
             ClusterConfigMock.SetupGet(m => m.DefaultRetryCount).Returns(100);
             ClusterConfigMock.SetupGet(m => m.DefaultRetryWaitTime).Returns(100);
 
-            Cluster = new RiakCluster(ClusterConfigMock.Object, new RiakNodeFactory(), ConnFactoryMock.Object);
+            Cluster = new RiakCluster(ClusterConfigMock.Object, ConnFactoryMock.Object);
             Client = (RiakClient)Cluster.CreateClient();
         }
     }

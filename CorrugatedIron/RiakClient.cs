@@ -193,6 +193,8 @@ namespace CorrugatedIron
                         c => new RiakObject(value.Bucket, value.Key, c, result.Value.VectorClock)).ToList();
             }
 
+            value.MarkClean();
+
             return RiakResult<RiakObject>.Success(finalResult);
         }
 
@@ -213,6 +215,16 @@ namespace CorrugatedIron
                     var responses = messages.Select(conn.PbcWriteRead<RpbPutReq, RpbPutResp>).ToList();
                     return RiakResult<IEnumerable<RiakResult<RpbPutResp>>>.Success(responses);
                 });
+
+            var resultsArray = results.Value.ToArray();
+
+            for (var i = 0; i < resultsArray.Length; i++)
+            {
+                if (resultsArray[i].IsSuccess)
+                {
+                    values.ElementAt(i).MarkClean();
+                }
+            }
 
             return results.Value.Zip(values, Tuple.Create).Select(t =>
                 {
@@ -248,26 +260,33 @@ namespace CorrugatedIron
             return Delete(objectId.Bucket, objectId.Key, rwVal);
         }
 
-        public IEnumerable<RiakResult> Delete(IEnumerable<RiakObjectId> objectIds,
-                                              uint rwVal = RiakConstants.Defaults.RVal)
+        public IEnumerable<RiakResult> Delete(IEnumerable<RiakObjectId> objectIds, uint rwVal = RiakConstants.Defaults.RVal)
         {
-            var requests = objectIds.Select(id => new RpbDelReq {Bucket = id.Bucket.ToRiakString(), Key = id.Key.ToRiakString(), Rw = rwVal}).ToList();
-            var results = UseConnection(conn =>
-                {
-                    var responses = requests.Select(conn.PbcWriteRead<RpbDelReq, RpbDelResp>).ToList();
-                    return RiakResult<IEnumerable<RiakResult>>.Success(responses);
-                });
-
+            var results = UseConnection(conn => Delete(conn, objectIds, rwVal));
             return results.Value;
         }
 
         public IEnumerable<RiakResult> DeleteBucket(string bucket, uint rwVal = RiakConstants.Defaults.RVal)
         {
-            // TODO: change this to do the whole op with a single connection and with streaming
-            var keys = ListKeys(bucket);
-            var objectIds = keys.Value.Select(key => new RiakObjectId(bucket, key)).ToList();
+            var results = UseConnection(conn =>
+                { 
+                    var keyResults = ListKeys(conn, bucket);
+                    if (keyResults.IsSuccess)
+                    {
+                        var objectIds = keyResults.Value.Select(key => new RiakObjectId(bucket, key)).ToList();
+                        return Delete(conn, objectIds, rwVal);
+                    }
+                    return RiakResult<IEnumerable<RiakResult>>.Error(keyResults.ResultCode, keyResults.ErrorMessage);
+                });
 
-            return Delete(objectIds, rwVal);
+            return results.Value;
+        }
+
+        private static RiakResult<IEnumerable<RiakResult>> Delete(IRiakConnection conn, IEnumerable<RiakObjectId> objectIds, uint rwVal)
+        {
+            var requests = objectIds.Select(id => new RpbDelReq {Bucket = id.Bucket.ToRiakString(), Key = id.Key.ToRiakString(), Rw = rwVal}).ToList();
+            var responses = requests.Select(conn.PbcWriteRead<RpbDelReq, RpbDelResp>).ToList();
+            return RiakResult<IEnumerable<RiakResult>>.Success(responses);
         }
 
         public RiakResult<RiakMapReduceResult> MapReduce(RiakMapReduceQuery query)
@@ -311,9 +330,13 @@ namespace CorrugatedIron
 
         public RiakResult<IEnumerable<string>> ListKeys(string bucket)
         {
-            var lkReq = new RpbListKeysReq {Bucket = bucket.ToRiakString()};
-            var result = UseConnection(conn => conn.PbcWriteRead<RpbListKeysReq, RpbListKeysResp>(lkReq, lkr => lkr.IsSuccess && !lkr.Value.Done));
+            return UseConnection(conn => ListKeys(conn, bucket));
+        }
 
+        private static RiakResult<IEnumerable<string>> ListKeys(IRiakConnection conn, string bucket)
+        {
+            var lkReq = new RpbListKeysReq {Bucket = bucket.ToRiakString()};
+            var result = conn.PbcWriteRead<RpbListKeysReq, RpbListKeysResp>(lkReq, lkr => lkr.IsSuccess && !lkr.Value.Done);
             if (result.IsSuccess)
             {
                 var keys = result.Value.Where(r => r.IsSuccess).SelectMany(r => r.Value.KeyNames).Distinct().ToList();

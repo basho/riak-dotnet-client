@@ -155,6 +155,11 @@ namespace CorrugatedIron.Models
             return new RiakObjectId(Bucket, Key);
         }
 
+        public void MarkClean()
+        {
+            _hashCode = CalculateHashCode();
+        }
+
         internal RiakObject(string bucket, string key, RpbContent content, byte[] vectorClock)
         {
             Bucket = bucket;
@@ -187,6 +192,7 @@ namespace CorrugatedIron.Models
         internal RpbPutReq ToMessage()
         {
             UpdateLastModified();
+
             var message = new RpbPutReq
             {
                 Bucket = Bucket.ToRiakString(),
@@ -224,10 +230,6 @@ namespace CorrugatedIron.Models
 
                 LastModified = (uint)(ms / 1000u);
                 LastModifiedUsec = (uint)((ms - LastModified * 1000u) * 100u);
-
-                // TODO: figure out if we should be doing this or not, or should we isntead
-                // be exposing a "mark as clean" function which does this instead.
-                //_hashCode = CalculateHashCode();
             }
         }
 

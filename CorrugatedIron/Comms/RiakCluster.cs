@@ -48,10 +48,10 @@ namespace CorrugatedIron.Comms
 
         public int RetryWaitTime { get; set; }
 
-        public RiakCluster(IRiakClusterConfiguration clusterConfiguration, IRiakNodeFactory nodeFactory, IRiakConnectionFactory connectionFactory)
+        public RiakCluster(IRiakClusterConfiguration clusterConfiguration, IRiakConnectionFactory connectionFactory)
         {
             _nodePollTime = clusterConfiguration.NodePollTime;
-            _nodes = clusterConfiguration.RiakNodes.Select(rn => nodeFactory.CreateNode(rn, connectionFactory)).ToList();
+            _nodes = clusterConfiguration.RiakNodes.Select(rn => new RiakNode(rn, connectionFactory)).Cast<IRiakNode>().ToList();
             _loadBalancer = new RoundRobinStrategy();
             _loadBalancer.Initialise(_nodes);
             _offlineNodes = new ConcurrentQueue<IRiakNode>();
