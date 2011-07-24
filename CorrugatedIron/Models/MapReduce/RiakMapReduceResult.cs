@@ -20,13 +20,14 @@ using CorrugatedIron.Messages;
 
 namespace CorrugatedIron.Models.MapReduce
 {
-    public class RiakMapReduceResult
+    public class RiakMapReduceResult : IRiakMapReduceResult
     {
-        public List<RiakMapReduceResultPhase> PhaseResults { get; private set; }
+        private readonly IEnumerable<RiakMapReduceResultPhase> _phaseResults;
+        public IEnumerable<RiakMapReduceResultPhase> PhaseResults { get { return _phaseResults; } }
 
         internal RiakMapReduceResult(IEnumerable<RiakResult<RpbMapRedResp>> response)
         {
-            PhaseResults = response.OrderBy(r => r.Value.Phase).Select(r => r.IsSuccess ? new RiakMapReduceResultPhase(r.Value) : new RiakMapReduceResultPhase()).ToList();
+            _phaseResults = response.OrderBy(r => r.Value.Phase).Select(r => r.IsSuccess ? new RiakMapReduceResultPhase(r.Value) : new RiakMapReduceResultPhase()).ToList();
         }
     }
 }

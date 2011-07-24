@@ -229,15 +229,15 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
 
             var mrRes = result.Value;
             mrRes.PhaseResults.ShouldNotBeNull();
-            mrRes.PhaseResults.Count.ShouldEqual(2);
+            mrRes.PhaseResults.Count().ShouldEqual(2);
 
-            mrRes.PhaseResults[0].Phase.ShouldEqual(0u);
-            mrRes.PhaseResults[1].Phase.ShouldEqual(1u);
+            mrRes.PhaseResults.ElementAt(0).Phase.ShouldEqual(0u);
+            mrRes.PhaseResults.ElementAt(1).Phase.ShouldEqual(1u);
 
-            mrRes.PhaseResults[0].Value.ShouldBeNull();
-            mrRes.PhaseResults[1].Value.ShouldNotBeNull();
+            mrRes.PhaseResults.ElementAt(0).Value.ShouldBeNull();
+            mrRes.PhaseResults.ElementAt(1).Value.ShouldNotBeNull();
 
-            var values = result.Value.PhaseResults[1].GetObject<int[]>();
+            var values = result.Value.PhaseResults.ElementAt(1).GetObject<int[]>();
             values[0].ShouldEqual(10);
         }
 
@@ -264,15 +264,15 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
 
                     var mrRes = result.Value;
                     mrRes.PhaseResults.ShouldNotBeNull();
-                    mrRes.PhaseResults.Count.ShouldEqual(2);
+                    mrRes.PhaseResults.Count().ShouldEqual(2);
 
-                    mrRes.PhaseResults[0].Phase.ShouldEqual(0u);
-                    mrRes.PhaseResults[1].Phase.ShouldEqual(1u);
+                    mrRes.PhaseResults.ElementAt(0).Phase.ShouldEqual(0u);
+                    mrRes.PhaseResults.ElementAt(1).Phase.ShouldEqual(1u);
 
-                    mrRes.PhaseResults[0].Value.ShouldBeNull();
-                    mrRes.PhaseResults[1].Value.ShouldNotBeNull();
+                    mrRes.PhaseResults.ElementAt(0).Value.ShouldBeNull();
+                    mrRes.PhaseResults.ElementAt(1).Value.ShouldNotBeNull();
 
-                    var values = result.Value.PhaseResults[1].GetObject<int[]>();
+                    var values = result.Value.PhaseResults.ElementAt(1).GetObject<int[]>();
                     values[0].ShouldEqual(10);
                 });
         }

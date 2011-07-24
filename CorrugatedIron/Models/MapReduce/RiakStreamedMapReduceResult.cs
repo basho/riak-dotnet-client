@@ -20,7 +20,7 @@ using CorrugatedIron.Messages;
 
 namespace CorrugatedIron.Models.MapReduce
 {
-    public class RiakStreamedMapReduceResult
+    public class RiakStreamedMapReduceResult : IRiakMapReduceResult
     {
         private readonly IEnumerable<RiakResult<RpbMapRedResp>> _responseReader;
 
