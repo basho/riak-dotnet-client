@@ -101,6 +101,7 @@
     <Compile Include="Models\MapReduce\Inputs\RiakPhaseInputs.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Models\MapReduce\IRiakMapReduceResult.cs" />
     <Compile Include="Models\MapReduce\Languages\IRiakPhaseLanguage.cs" />
     <Compile Include="Models\MapReduce\Languages\RiakPhaseLanguageErlang.cs" />
     <Compile Include="Models\MapReduce\Languages\RiakPhaseLanguageJavascript.cs" />
