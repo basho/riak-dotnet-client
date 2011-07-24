@@ -15,6 +15,7 @@
 // under the License.
 
 using System.Collections.Generic;
+using System.Linq;
 using CorrugatedIron.KeyFilters;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
@@ -84,7 +85,7 @@ namespace CorrugatedIron.Tests.Live
             var mrResult = Client.MapReduce(query);
             mrResult.IsSuccess.ShouldBeTrue();
 
-            var mrLinkString = mrResult.Value.PhaseResults[0].Value.FromRiakString();
+            var mrLinkString = mrResult.Value.PhaseResults.First().Value.FromRiakString();
             var mrLinks = RiakLink.ParseArrayFromJsonString(mrLinkString);
 
             mrLinks.Count.ShouldEqual(jLinks.Count);
@@ -108,7 +109,7 @@ namespace CorrugatedIron.Tests.Live
 
             var mrResult = result.Value;
             mrResult.PhaseResults.ShouldNotBeNull();
-            mrResult.PhaseResults.Count.ShouldEqual(2);
+            mrResult.PhaseResults.Count().ShouldEqual(2);
         }
 
         [Test]
