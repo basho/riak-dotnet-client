@@ -150,7 +150,6 @@
     <Compile Include="Comms\RiakConnectionFactory.cs" />
     <Compile Include="Comms\RiakCluster.cs" />
     <Compile Include="Comms\RiakNode.cs" />
-    <Compile Include="Comms\RiakNodeFactory.cs" />
     <Compile Include="Models\MapReduce\RiakMapReduceResult.cs" />
     <Compile Include="RiakResult.cs" />
     <Compile Include="Config\RiakClusterConfiguration.cs" />
