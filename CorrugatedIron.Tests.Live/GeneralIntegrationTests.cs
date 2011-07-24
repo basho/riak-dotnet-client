@@ -486,6 +486,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             var lm1 = o.LastModified;
             var lmu1 = o.LastModifiedUsec;
 
+            Thread.Sleep(100);
             o = Client.Put(o, new RiakPutOptions { ReturnBody = true}).Value;
 
             var lm2 = o.LastModified;
