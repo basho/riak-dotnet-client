@@ -51,18 +51,20 @@ Current Features
       user to make multiple calls to the client, resulting in multiple connection
       acquisitions behind the scenes, the user can use the Batch interface to make many
       calls on a single connection. This also reduces the overhead of setting the client
-      ID on each call as well.
+      ID on each call.
     * Because a batch operation reuses a single connection only a subset of the client
       API is available for batch actions. The functions that are excluded are the
       asynchronous functions.
-* Graceful degrade to HTTP/REST API when the request isn't supported via Protocol Buffers.
-* Works with .NET 4.0 on Windows, and Mono on Linux and OSX.
+* Graceful degrades to HTTP/REST API when the request isn't supported via Protocol Buffers.
+* Configurable via `web.config`, `app.config` or a custom configuration file.
 
-v0.1 Features (in development)
+**CorrugatedIron works with .NET 4.0 on Windows and Mono on Linux and OSX.**
+
+v0.2 Features (in development)
 ------------------------------
 
 * Connection idling when connections haven't been used for a while.
-* Connection self-healing and node management.
+* Improvements to connection self-healing and node management.
 
 Unplanned Features
 ------------------
@@ -78,12 +80,13 @@ Unplanned Features
 Future Features
 ---------------
 
-* LINQ expression parsing for map/reduce
-* Support for Riak Search and other extensions (Luwak?)
-* Suggestions from users
+* Suggestions from users.
+* Support for Riak Search and other extensions such as Luwak.
+* LINQ expression parsing for map/reduce.
 
 License
 -------
 
-Please see the LICENSE file for license information.
+CorrugatedIron is Open Source software released under the Apache 2.0 License.
+Please see the `LICENSE` file for full license details.
 
