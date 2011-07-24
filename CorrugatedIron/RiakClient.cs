@@ -193,6 +193,8 @@ namespace CorrugatedIron
                         c => new RiakObject(value.Bucket, value.Key, c, result.Value.VectorClock)).ToList();
             }
 
+            value.MarkClean();
+
             return RiakResult<RiakObject>.Success(finalResult);
         }
 
@@ -213,6 +215,16 @@ namespace CorrugatedIron
                     var responses = messages.Select(conn.PbcWriteRead<RpbPutReq, RpbPutResp>).ToList();
                     return RiakResult<IEnumerable<RiakResult<RpbPutResp>>>.Success(responses);
                 });
+
+            var resultsArray = results.Value.ToArray();
+
+            for (var i = 0; i < resultsArray.Length; i++)
+            {
+                if (resultsArray[i].IsSuccess)
+                {
+                    values.ElementAt(i).MarkClean();
+                }
+            }
 
             return results.Value.Zip(values, Tuple.Create).Select(t =>
                 {
