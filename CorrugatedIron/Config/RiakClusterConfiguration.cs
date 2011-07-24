@@ -35,6 +35,13 @@ namespace CorrugatedIron.Config
             return (IRiakClusterConfiguration)ConfigurationManager.GetSection(sectionName);
         }
 
+        public static IRiakClusterConfiguration LoadFromConfig(string sectionName, string fileName)
+        {
+            var map = new ConfigurationFileMap(fileName);
+            var config = ConfigurationManager.OpenMappedMachineConfiguration(map);
+            return (IRiakClusterConfiguration)config.GetSection(sectionName);
+        }
+
         [ConfigurationProperty("nodes", IsDefaultCollection = true, IsRequired = true)]
         [ConfigurationCollection(typeof(RiakNodeConfigurationCollection), AddItemName = "node")]
         public RiakNodeConfigurationCollection Nodes
