@@ -149,7 +149,7 @@
     <Compile Include="RiakClient.cs" />
     <Compile Include="Comms\RiakConnection.cs" />
     <Compile Include="Comms\RiakConnectionFactory.cs" />
-    <Compile Include="Comms\RiakCluster.cs" />
+    <Compile Include="RiakCluster.cs" />
     <Compile Include="Comms\RiakNode.cs" />
     <Compile Include="Models\MapReduce\RiakMapReduceResult.cs" />
     <Compile Include="RiakResult.cs" />
