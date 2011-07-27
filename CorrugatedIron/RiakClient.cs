@@ -520,10 +520,11 @@ namespace CorrugatedIron
         /// </remarks>
         private static byte[] GetClientId(string seed)
         {
-            byte[] byteSeed = new byte[16];    
+            byte[] byteSeed;
             
             if (String.IsNullOrEmpty(seed))
             {
+                byteSeed = new byte[16];    
                 var rng = new System.Security.Cryptography.RNGCryptoServiceProvider();
                 rng.GetBytes(byteSeed);
             }
