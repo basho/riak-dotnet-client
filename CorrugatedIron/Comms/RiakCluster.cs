@@ -61,9 +61,9 @@ namespace CorrugatedIron.Comms
             Task.Factory.StartNew(NodeMonitor);
         }
 
-        public IRiakClient CreateClient()
+        public IRiakClient CreateClient(string seed = null)
         {
-            return new RiakClient(this)
+            return new RiakClient(this, seed)
             {
                 RetryCount = _defaultRetryCount
             };
