@@ -47,10 +47,11 @@ namespace CorrugatedIron
 
         public IRiakAsyncClient Async { get; private set; }
 
-        internal RiakClient(IRiakCluster cluster)
+        internal RiakClient(IRiakCluster cluster, string seed = null)
         {
             _cluster = cluster;
-            ClientId = GetClientId();
+            
+            ClientId = GetClientId(seed);
             Async = new RiakAsyncClient(this);
         }
 
@@ -508,41 +509,37 @@ namespace CorrugatedIron
         {
             return _batchConnection != null ? op(_batchConnection, () => { }) : _cluster.UseDelayedConnection(_clientId, op, RetryCount);
         }
-
-        private static byte[] GetClientId()
+        
+        /// <summary>
+        /// Generate a valid ClientId based on a seed string.
+        /// </summary>
+        /// <remarks>
+        ///   <para>
+        ///     If a <paramref name="seed"/> is not supplied, a random number will be generated using System.Security.Cryptography.RNGCryptoService provider.
+        ///   </para>
+        /// </remarks>
+        private static byte[] GetClientId(string seed)
         {
+            byte[] byteSeed;
+            
+            if (String.IsNullOrEmpty(seed))
+            {
+                byteSeed = new byte[16];    
+                var rng = new System.Security.Cryptography.RNGCryptoServiceProvider();
+                rng.GetBytes(byteSeed);
+            }
+            else 
+            {
+                byteSeed = seed.ToRiakString();
+            }
 
             byte[] clientId;
-
-            var nicList = NetworkInterface.GetAllNetworkInterfaces().Where(IsValidNic)
-                .OrderBy(i => i.Id);
-
-            if (nicList.Count() > 0)
-            {
-                var nic = nicList.First();
-
-                clientId = nic.GetPhysicalAddress().GetAddressBytes();
-            }
-            else
-            {
-                var hostname = Environment.MachineName;
-
-                var sha = new System.Security.Cryptography.SHA1CryptoServiceProvider();
-                clientId = sha.ComputeHash(hostname.ToRiakString());
-            }
+            
+            var sha = new System.Security.Cryptography.SHA1CryptoServiceProvider();
+            clientId = sha.ComputeHash(byteSeed);
 
             Array.Resize(ref clientId, 4);
             return clientId;
-        }
-
-        private static bool IsValidNic(NetworkInterface nic)
-        {
-            return nic.OperationalStatus == OperationalStatus.Up
-                && !nic.NetworkInterfaceType.In(new[] { NetworkInterfaceType.Loopback, NetworkInterfaceType.Unknown, NetworkInterfaceType.Tunnel })
-                // eliminate virtual devices and MS supplied ones masquerading as physical devices
-                && nic.Id.IndexOf("Root") != 0
-                && nic.Description.IndexOf("Root") != 0
-                && !nic.Description.Contains("Microsoft");
         }
 
         private static string ToBucketUri(string bucket)
