@@ -423,7 +423,6 @@ namespace CorrugatedIron
 
         public RiakResult<IList<RiakObject>> WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks)
         {
-            // TODO: make this all happen on a single connection
             var query = new RiakMapReduceQuery()
                 .Inputs(new List<RiakBucketKeyInput> { new RiakBucketKeyInput(riakObject.Bucket, riakObject.Key) });
 
@@ -446,7 +445,7 @@ namespace CorrugatedIron
 
                 var objects = Get(oids);
 
-                // TODO
+                // FIXME
                 // we could be discarding results here. Not good?
                 // This really should be a multi-phase map/reduce
                 return RiakResult<IList<RiakObject>>.Success(objects.Where(r => r.IsSuccess).Select(r => r.Value).ToList());
