@@ -51,9 +51,9 @@ namespace CorrugatedIron.Models.MapReduce.Fluent
             return this;
         }
 
-        public RiakFluentLinkPhase Empty()
+        public RiakFluentLinkPhase AllLinks()
         {
-            _phase.Empty();
+            _phase.AllLinks();
             return this;
         }
     }
