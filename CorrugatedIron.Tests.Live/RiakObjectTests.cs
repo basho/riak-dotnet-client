@@ -80,7 +80,7 @@ namespace CorrugatedIron.Tests.Live
                         {
                             new RiakBucketKeyInput(TestBucket, Jeremiah )
                         })
-                .Link(l => l.Empty().Keep(true));
+                .Link(l => l.AllLinks().Keep(true));
 
             var mrResult = Client.MapReduce(query);
             mrResult.IsSuccess.ShouldBeTrue();
