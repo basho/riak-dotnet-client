@@ -2,13 +2,13 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
         <id>CorrugatedIron</id>
-	<version>0.1.0.0</version>
+	<version>0.1.1.0</version>
 	<authors>OJ Reeves, Jeremiah Peschka</authors>
 	<owners>OJ Reeves, Jeremiah Peschka</owners>
 	<description>
 CorrugatedIron - a .NET client for Riak.
 
-Riak is a distributed, fault tolerant, highly-available Key/Value store written by Basho Technologies. Riak is Open Source, written in Erlang and can be found at http://riak.basho.com/ - CorrugatedIron exposes the features of Riak through a developer-friendly API.
+Riak is a distributed, fault tolerant, highly-available Key/Value store written by Basho Technologies. Riak is Open Source, written in Erlang. CorrugatedIron exposes the features of Riak through a developer-friendly API.
 
 After installing this package, make sure that you modify either the app.config (for client apps) or web.config (for web apps) so that the details of the target Riak cluster are set correctly.
 	</description>
@@ -17,7 +17,7 @@ CorrugatedIron - a .NET client for Riak.
 	</summary>
 	<projectUrl>http://corrugatediron.org/</projectUrl>
 	<iconUrl>http://corrugatediron.org/nugeticon.png</iconUrl>
-	<licenseUrl>http://corrugatediron.org/LICENSE</licenseUrl>
+	<licenseUrl>http://corrugatediron.org/LICENSE.txt</licenseUrl>
 	<requireLicenseAcceptance>false</requireLicenseAcceptance>
 	<tags>Riak CorrugatedIron Corrugated Iron NoSQL Client Driver</tags>
 	<dependencies>
