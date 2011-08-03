@@ -168,7 +168,7 @@ namespace CorrugatedIron.Tests.Live
 
             var linkPeople = Client.WalkLinks(oj, linkPhases);
             linkPeople.IsSuccess.ShouldBeTrue();
-            linkPeople.Value.Count.ShouldEqual(5);
+            linkPeople.Value.Count.ShouldEqual(6);
         }
     }
 }

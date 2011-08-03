@@ -482,29 +482,29 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         public void LastModifiedShouldChangeAfterAPutRequest()
         {
             var o = new RiakObject(TestBucket, "1234", new { value = 1234 });
-
-            var lm1 = o.LastModified;
-            var lmu1 = o.LastModifiedUsec;
-
-            Thread.Sleep(100);
-            o = Client.Put(o, new RiakPutOptions { ReturnBody = true}).Value;
+            Client.Put(o);
 
             var lm2 = o.LastModified;
             var lmu2 = o.LastModifiedUsec;
 
-            Thread.Sleep(100);
+            Thread.Sleep(500);
             o.SetObject(new { value = 12345 });
-            o = Client.Put(o, new RiakPutOptions { ReturnBody = true }).Value;
+            Client.Put(o);
 
             var lm3 = o.LastModified;
             var lmu3 = o.LastModifiedUsec;
 
-            lm1.ShouldNotEqual(lm2);
-            lm1.ShouldNotEqual(lm3);
-            lmu1.ShouldNotEqual(lmu2);
-            lmu1.ShouldNotEqual(lmu3);
             lm2.ShouldNotEqual(lm3);
             lmu2.ShouldNotEqual(lmu3);
+
+            o.SetObject(new { value = 76543 });
+            o = Client.Put(o, new RiakPutOptions { ReturnBody = false }).Value;
+
+            var lm4 = o.LastModified;
+            var lmu4 = o.LastModifiedUsec;
+
+            lm2.ShouldNotEqual(lm4);
+            lmu2.ShouldNotEqual(lmu4);
         }
 
         [Test]
