@@ -35,7 +35,7 @@ namespace CorrugatedIron.Models.MapReduce.Phases
                 && string.IsNullOrWhiteSpace(riakLink.Key)
                 && string.IsNullOrWhiteSpace(riakLink.Tag))
             {
-                Empty();
+                AllLinks();
             }
             else
             {
@@ -50,7 +50,7 @@ namespace CorrugatedIron.Models.MapReduce.Phases
                 && string.IsNullOrWhiteSpace(riakLink.Key)
                 && string.IsNullOrWhiteSpace(riakLink.Tag))
             {
-                Empty();
+                AllLinks();
             }
             else
             {
@@ -78,7 +78,7 @@ namespace CorrugatedIron.Models.MapReduce.Phases
             return this;
         }
 
-        public RiakLinkPhase Empty()
+        public RiakLinkPhase AllLinks()
         {
             _bucket = default(string);
             _tag = default(string);

@@ -46,20 +46,19 @@ namespace CorrugatedIron.Models.MapReduce
             ContentType = RiakConstants.ContentTypes.ApplicationJson;
         }
 
-        // TODO: tidy this part of the interface up, it's way too verbose.
         public RiakMapReduceQuery Inputs(string bucket)
         {
-            _inputs = new RiakBucketInput(bucket);
+            _inputs = new RiakPhaseInputs(new RiakBucketInput(bucket));
             return this;
         }
 
-        public RiakMapReduceQuery Inputs(List<RiakBucketKeyInput> inputs)
+        public RiakMapReduceQuery Inputs(IEnumerable<RiakBucketKeyInput> inputs)
         {
             _inputs = new RiakPhaseInputs(inputs);
             return this;
         }
 
-        public RiakMapReduceQuery Inputs(List<RiakBucketKeyArgInput> inputs)
+        public RiakMapReduceQuery Inputs(IEnumerable<RiakBucketKeyArgInput> inputs)
         {
             _inputs = new RiakPhaseInputs(inputs);
             return this;

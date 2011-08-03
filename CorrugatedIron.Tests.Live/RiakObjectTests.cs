@@ -80,7 +80,7 @@ namespace CorrugatedIron.Tests.Live
                         {
                             new RiakBucketKeyInput(TestBucket, Jeremiah )
                         })
-                .Link(l => l.Empty().Keep(true));
+                .Link(l => l.AllLinks().Keep(true));
 
             var mrResult = Client.MapReduce(query);
             mrResult.IsSuccess.ShouldBeTrue();
@@ -168,7 +168,7 @@ namespace CorrugatedIron.Tests.Live
 
             var linkPeople = Client.WalkLinks(oj, linkPhases);
             linkPeople.IsSuccess.ShouldBeTrue();
-            linkPeople.Value.Count.ShouldEqual(5);
+            linkPeople.Value.Count.ShouldEqual(6);
         }
     }
 }
