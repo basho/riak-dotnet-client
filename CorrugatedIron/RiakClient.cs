@@ -18,7 +18,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Net.NetworkInformation;
 using CorrugatedIron.Comms;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
@@ -47,10 +46,11 @@ namespace CorrugatedIron
 
         public IRiakAsyncClient Async { get; private set; }
 
-        internal RiakClient(IRiakCluster cluster)
+        internal RiakClient(IRiakCluster cluster, string seed = null)
         {
             _cluster = cluster;
-            ClientId = GetClientId();
+            
+            ClientId = GetClientId(seed);
             Async = new RiakAsyncClient(this);
         }
 
@@ -66,10 +66,10 @@ namespace CorrugatedIron
             get { return _clientId; }
             set
             {
-                if (value == null || value.Length != RiakConstants.ClientIdLength)
+                if (value == null || value.Length < RiakConstants.MinClientIdLength)
                 {
                     throw new ArgumentException(
-                        "Client ID must be exactly {0} bytes long.".Fmt(RiakConstants.ClientIdLength), "value");
+                        "Client ID must be at least {0} bytes long.".Fmt(RiakConstants.MinClientIdLength), "value");
                 }
 
                 _clientId = value;
@@ -422,7 +422,6 @@ namespace CorrugatedIron
 
         public RiakResult<IList<RiakObject>> WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks)
         {
-            // TODO: make this all happen on a single connection
             var query = new RiakMapReduceQuery()
                 .Inputs(new List<RiakBucketKeyInput> { new RiakBucketKeyInput(riakObject.Bucket, riakObject.Key) });
 
@@ -445,7 +444,7 @@ namespace CorrugatedIron
 
                 var objects = Get(oids);
 
-                // TODO
+                // FIXME
                 // we could be discarding results here. Not good?
                 // This really should be a multi-phase map/reduce
                 return RiakResult<IList<RiakObject>>.Success(objects.Where(r => r.IsSuccess).Select(r => r.Value).ToList());
@@ -508,41 +507,37 @@ namespace CorrugatedIron
         {
             return _batchConnection != null ? op(_batchConnection, () => { }) : _cluster.UseDelayedConnection(_clientId, op, RetryCount);
         }
-
-        private static byte[] GetClientId()
+        
+        /// <summary>
+        /// Generate a valid ClientId based on a seed string.
+        /// </summary>
+        /// <remarks>
+        ///   <para>
+        ///     If a <paramref name="seed"/> is not supplied, a random number will be generated using System.Security.Cryptography.RNGCryptoService provider.
+        ///   </para>
+        /// </remarks>
+        private static byte[] GetClientId(string seed)
         {
+            byte[] byteSeed;
+            
+            if (String.IsNullOrEmpty(seed))
+            {
+                byteSeed = new byte[16];    
+                var rng = new System.Security.Cryptography.RNGCryptoServiceProvider();
+                rng.GetBytes(byteSeed);
+            }
+            else 
+            {
+                byteSeed = seed.ToRiakString();
+            }
 
             byte[] clientId;
-
-            var nicList = NetworkInterface.GetAllNetworkInterfaces().Where(IsValidNic)
-                .OrderBy(i => i.Id);
-
-            if (nicList.Count() > 0)
-            {
-                var nic = nicList.First();
-
-                clientId = nic.GetPhysicalAddress().GetAddressBytes();
-            }
-            else
-            {
-                var hostname = Environment.MachineName;
-
-                var sha = new System.Security.Cryptography.SHA1CryptoServiceProvider();
-                clientId = sha.ComputeHash(hostname.ToRiakString());
-            }
+            
+            var sha = new System.Security.Cryptography.SHA1CryptoServiceProvider();
+            clientId = sha.ComputeHash(byteSeed);
 
             Array.Resize(ref clientId, 4);
             return clientId;
-        }
-
-        private static bool IsValidNic(NetworkInterface nic)
-        {
-            return nic.OperationalStatus == OperationalStatus.Up
-                && !nic.NetworkInterfaceType.In(new[] { NetworkInterfaceType.Loopback, NetworkInterfaceType.Unknown, NetworkInterfaceType.Tunnel })
-                // eliminate virtual devices and MS supplied ones masquerading as physical devices
-                && nic.Id.IndexOf("Root") != 0
-                && nic.Description.IndexOf("Root") != 0
-                && !nic.Description.Contains("Microsoft");
         }
 
         private static string ToBucketUri(string bucket)

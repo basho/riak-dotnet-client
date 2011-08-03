@@ -50,7 +50,7 @@ namespace CorrugatedIron.Util
             public const string Utf8 = @"UTF-8";
         }
 
-        public const int ClientIdLength = 4;
+        public const int MinClientIdLength = 4;
 
         public static class Defaults
         {

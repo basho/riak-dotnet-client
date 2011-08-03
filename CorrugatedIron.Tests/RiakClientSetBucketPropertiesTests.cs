@@ -40,7 +40,7 @@ namespace CorrugatedIron.Tests.RiakClientSetBucketPropertiesTests
         {
         }
 
-        public IRiakClient CreateClient()
+        public IRiakClient CreateClient(string seed = null)
         {
             return new Mock<IRiakClient>().Object;
         }

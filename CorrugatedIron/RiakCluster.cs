@@ -29,8 +29,8 @@ namespace CorrugatedIron
 {
     public interface IRiakCluster : IDisposable
     {
-        IRiakClient CreateClient();
         int RetryWaitTime { get; set; }
+        IRiakClient CreateClient(string seed = null);
         RiakResult<TResult> UseConnection<TResult>(byte[] clientId, Func<IRiakConnection, RiakResult<TResult>> useFun, int retryAttempts);
         RiakResult UseConnection(byte[] clientId, Func<IRiakConnection, RiakResult> useFun, int retryAttempts);
         RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(byte[] clientId, Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun, int retryAttempts)
@@ -48,7 +48,7 @@ namespace CorrugatedIron
         private bool _disposing;
 
         public int RetryWaitTime { get; set; }
-
+  
         public RiakCluster(IRiakClusterConfiguration clusterConfiguration, IRiakConnectionFactory connectionFactory)
         {
             _nodePollTime = clusterConfiguration.NodePollTime;
@@ -61,20 +61,20 @@ namespace CorrugatedIron
 
             Task.Factory.StartNew(NodeMonitor);
         }
-
-        public static IRiakCluster FromConfig(string configSectionName)
+  
+        /// <summary>
+        /// Creates a new instance of <see cref="CorrugatedIron.RiakClient"/>.
+        /// </summary>
+        /// <returns>
+        /// A minty fresh client.
+        /// </returns>
+        /// <param name='seed'>
+        /// An optional seed to generate the Client Id for the <see cref="CorrugatedIron.RiakClient"/>. Having a unique Client Id is important for
+        /// generating good vclocks. For more information about the importance of vector clocks, refer to http://wiki.basho.com/Vector-Clocks.html
+        /// </param>
+        public IRiakClient CreateClient(string seed = null)
         {
-            return new RiakCluster(RiakClusterConfiguration.LoadFromConfig(configSectionName), new RiakConnectionFactory());
-        }
-
-        public static IRiakCluster FromConfig(string configSectionName, string configFileName)
-        {
-            return new RiakCluster(RiakClusterConfiguration.LoadFromConfig(configSectionName, configFileName), new RiakConnectionFactory());
-        }
-
-        public IRiakClient CreateClient()
-        {
-            return new RiakClient(this)
+            return new RiakClient(this, seed)
             {
                 RetryCount = _defaultRetryCount
             };
