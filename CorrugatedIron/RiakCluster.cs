@@ -61,6 +61,29 @@ namespace CorrugatedIron
 
             Task.Factory.StartNew(NodeMonitor);
         }
+
+        /// <summary>
+        /// Creates an instance of <see cref="CorrugatedIron.IRiakClient"/> populated from from the configuration section
+        /// specified by <paramref name="configSectionName"/>.
+        /// </summary>
+        /// <param name="configSectionName">The name of the configuration section to load the settings from.</param>
+        /// <returns>A fully configured <see cref="CorrugatedIron.IRiakCluster"/></returns>
+        public static IRiakCluster FromConfig(string configSectionName)
+        {
+            return new RiakCluster(RiakClusterConfiguration.LoadFromConfig(configSectionName), new RiakConnectionFactory());
+        }
+
+        /// <summary>
+        /// Creates an instance of <see cref="CorrugatedIron.IRiakClient"/> populated from from the configuration section
+        /// specified by <paramref name="configSectionName"/>.
+        /// </summary>
+        /// <param name="configSectionName">The name of the configuration section to load the settings from.</param>
+        /// <param name="configFileName">The full path and name of the config file to load the configuration from.</param>
+        /// <returns>A fully configured <see cref="CorrugatedIron.IRiakCluster"/></returns>
+        public static IRiakCluster FromConfig(string configSectionName, string configFileName)
+        {
+            return new RiakCluster(RiakClusterConfiguration.LoadFromConfig(configSectionName, configFileName), new RiakConnectionFactory());
+        }
   
         /// <summary>
         /// Creates a new instance of <see cref="CorrugatedIron.RiakClient"/>.
