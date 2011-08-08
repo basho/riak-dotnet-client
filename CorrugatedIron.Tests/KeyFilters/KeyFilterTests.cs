@@ -113,7 +113,7 @@ namespace CorrugatedIron.Tests.KeyFilters
         [Test]
         public void GreaterThanCorrectlyConvertsToJson()
         {
-            var gt = new GreatherThan<int>(50);
+            var gt = new GreaterThan<int>(50);
             gt.ToString().ShouldEqual(GreaterThanJson);
         }
         
