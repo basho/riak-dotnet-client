@@ -20,16 +20,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using CorrugatedIron.Comms;
 using CorrugatedIron.Comms.LoadBalancing;
 using CorrugatedIron.Config;
 using CorrugatedIron.Messages;
 
-namespace CorrugatedIron.Comms
+namespace CorrugatedIron
 {
     public interface IRiakCluster : IDisposable
     {
-        IRiakClient CreateClient();
         int RetryWaitTime { get; set; }
+        IRiakClient CreateClient(string seed = null);
         RiakResult<TResult> UseConnection<TResult>(byte[] clientId, Func<IRiakConnection, RiakResult<TResult>> useFun, int retryAttempts);
         RiakResult UseConnection(byte[] clientId, Func<IRiakConnection, RiakResult> useFun, int retryAttempts);
         RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(byte[] clientId, Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun, int retryAttempts)
@@ -59,6 +60,29 @@ namespace CorrugatedIron.Comms
             RetryWaitTime = clusterConfiguration.DefaultRetryWaitTime;
 
             Task.Factory.StartNew(NodeMonitor);
+        }
+
+        /// <summary>
+        /// Creates an instance of <see cref="CorrugatedIron.IRiakClient"/> populated from from the configuration section
+        /// specified by <paramref name="configSectionName"/>.
+        /// </summary>
+        /// <param name="configSectionName">The name of the configuration section to load the settings from.</param>
+        /// <returns>A fully configured <see cref="CorrugatedIron.IRiakCluster"/></returns>
+        public static IRiakCluster FromConfig(string configSectionName)
+        {
+            return new RiakCluster(RiakClusterConfiguration.LoadFromConfig(configSectionName), new RiakConnectionFactory());
+        }
+
+        /// <summary>
+        /// Creates an instance of <see cref="CorrugatedIron.IRiakClient"/> populated from from the configuration section
+        /// specified by <paramref name="configSectionName"/>.
+        /// </summary>
+        /// <param name="configSectionName">The name of the configuration section to load the settings from.</param>
+        /// <param name="configFileName">The full path and name of the config file to load the configuration from.</param>
+        /// <returns>A fully configured <see cref="CorrugatedIron.IRiakCluster"/></returns>
+        public static IRiakCluster FromConfig(string configSectionName, string configFileName)
+        {
+            return new RiakCluster(RiakClusterConfiguration.LoadFromConfig(configSectionName, configFileName), new RiakConnectionFactory());
         }
   
         /// <summary>
