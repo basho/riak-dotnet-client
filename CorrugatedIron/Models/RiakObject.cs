@@ -16,10 +16,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Xml;
+using System.Xml.Serialization;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
 using CorrugatedIron.Util;
+using Newtonsoft.Json;
 
 namespace CorrugatedIron.Models
 {
@@ -283,27 +287,76 @@ namespace CorrugatedIron.Models
             }
         }
 
-        public void SetObject<T>(T value)
+        // setting content type of SetObject changes content type
+        public void SetObject<T>(T value, string contentType = null)
             where T : class
         {
-            var json = value.Serialize();
-            Value = json.ToRiakString();
-            ContentType = RiakConstants.ContentTypes.ApplicationJson;
+            if (!String.IsNullOrEmpty(contentType))
+            {
+                ContentType = contentType;
+            }
+
+            // check content type
+            // save based on content type's deserialization method
+            
+            if (ContentType == RiakConstants.ContentTypes.ApplicationJson)
+            {
+                var json = value.Serialize();
+                Value = json.ToRiakString();
+                return;
+            }
+
+            if (ContentType == RiakConstants.ContentTypes.ProtocolBuffers)
+            {
+                var memoryStream = new MemoryStream();
+                ProtoBuf.Serializer.Serialize(memoryStream, value);
+                Value = memoryStream.ToArray();
+                return;
+            }
+
+            if (ContentType == RiakConstants.ContentTypes.Xml)
+            {
+                var memoryStream = new MemoryStream();
+                var serde = new XmlSerializer(typeof (T));
+                serde.Serialize(memoryStream, value);
+                Value = memoryStream.ToArray();
+                return;
+            }
+
+            throw new NotSupportedException(string.Format("Your current ContentType ({0}), is not supported.", ContentType));
         }
 
         public T GetObject<T>()
         {
-            if (ContentType != RiakConstants.ContentTypes.ApplicationJson)
+            if (ContentType == RiakConstants.ContentTypes.ApplicationJson)
             {
-                throw new InvalidOperationException("Unable to convert Riak Object value to type '{0}'. Content type required: '{1}'. Actual type: '{2}'".Fmt(typeof(T).Name, RiakConstants.ContentTypes.ApplicationJson, ContentType));
+                return JsonConvert.DeserializeObject<T>(Value.FromRiakString());
             }
 
-            return Value.As<T>();
+            if (ContentType == RiakConstants.ContentTypes.ProtocolBuffers)
+            {
+                var memoryStream = new MemoryStream();
+
+                memoryStream.Write(Value, 0, Value.Length);
+                return ProtoBuf.Serializer.Deserialize<T>(memoryStream);
+            }
+
+            if (ContentType == RiakConstants.ContentTypes.Xml)
+            {
+                var reader = XmlReader.Create(Value.FromRiakString());
+                var serde = new System.Xml.Serialization.XmlSerializer(typeof(T));
+
+                return (T)serde.Deserialize(reader);
+            }
+
+            throw new NotSupportedException(string.Format("Your current ContentType ({0}), is not supported.", ContentType));
         }
 
+        // TODO remove when we hit 0.3
+        [Obsolete("<Marked obsolete in v0.1.2; will be removed in v0.3")]
         public dynamic GetObject()
         {
-            return Value.As<dynamic>();
+            return GetObject<dynamic>();
         }
     }
 }

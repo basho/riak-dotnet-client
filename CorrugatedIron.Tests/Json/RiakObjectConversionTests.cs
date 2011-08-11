@@ -62,7 +62,7 @@ namespace CorrugatedIron.Tests.Json.RiakObjectConversionTests
         }
 
         [Test]
-        [ExpectedException(typeof(InvalidOperationException))]
+        [ExpectedException(typeof(NotSupportedException))]
         public void NonJsonObjectsCantBeDeserialisedFromJson()
         {
             var obj = new RiakObject("bucket", "key", "{\"Name\":{\"FirstName\":\"OJ\",\"Surname\":\"Reeves\"},\"PhoneNumbers\":[{\"Number\":\"12345678\",\"NumberType\":1}],\"DateOfBirth\":\"\\/Date(281664000000)\\/\",\"Email\":\"oj@buffered.io\"}", RiakConstants.ContentTypes.TextPlain);
