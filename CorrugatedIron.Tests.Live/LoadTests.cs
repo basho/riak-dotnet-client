@@ -81,7 +81,7 @@ namespace CorrugatedIron.Tests.Live.LoadTests
             {
                 if (r.IsSuccess)
                 {
-                    r.Value.PhaseResults[1].GetObject<int[]>()[0].ShouldEqual(10);
+                    r.Value.PhaseResults.ElementAt(1).GetObject<int[]>()[0].ShouldEqual(10);
                 }
                 else
                 {

@@ -40,7 +40,7 @@ namespace CorrugatedIron.Config
             set { this["name"] = value; }
         }
 
-        [ConfigurationProperty("hostAddress", DefaultValue = "127.0.0.1", IsRequired = false)]
+        [ConfigurationProperty("hostAddress", IsRequired = true)]
         public string HostAddress
         {
             get { return (string)this["hostAddress"]; }
