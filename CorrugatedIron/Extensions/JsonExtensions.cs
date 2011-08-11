@@ -21,16 +21,6 @@ namespace CorrugatedIron.Extensions
 {
     public static class JsonExtensions
     {
-        public static T As<T>(this string jsonString)
-        {
-            return JsonConvert.DeserializeObject<T>(jsonString);
-        }
-
-        public static T As<T>(this byte[] jsonBytes)
-        {
-            return JsonConvert.DeserializeObject<T>(jsonBytes.FromRiakString());
-        }
-
         public static string ToJson<T>(this T value)
         {
             return JsonConvert.SerializeObject(value);
