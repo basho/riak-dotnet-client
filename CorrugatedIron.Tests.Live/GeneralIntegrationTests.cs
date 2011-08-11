@@ -229,15 +229,15 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
 
             var mrRes = result.Value;
             mrRes.PhaseResults.ShouldNotBeNull();
-            mrRes.PhaseResults.Count.ShouldEqual(2);
+            mrRes.PhaseResults.Count().ShouldEqual(2);
 
-            mrRes.PhaseResults[0].Phase.ShouldEqual(0u);
-            mrRes.PhaseResults[1].Phase.ShouldEqual(1u);
+            mrRes.PhaseResults.ElementAt(0).Phase.ShouldEqual(0u);
+            mrRes.PhaseResults.ElementAt(1).Phase.ShouldEqual(1u);
 
-            mrRes.PhaseResults[0].Value.ShouldBeNull();
-            mrRes.PhaseResults[1].Value.ShouldNotBeNull();
+            mrRes.PhaseResults.ElementAt(0).Value.ShouldBeNull();
+            mrRes.PhaseResults.ElementAt(1).Value.ShouldNotBeNull();
 
-            var values = result.Value.PhaseResults[1].GetObject<int[]>();
+            var values = result.Value.PhaseResults.ElementAt(1).GetObject<int[]>();
             values[0].ShouldEqual(10);
         }
 
@@ -264,15 +264,15 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
 
                     var mrRes = result.Value;
                     mrRes.PhaseResults.ShouldNotBeNull();
-                    mrRes.PhaseResults.Count.ShouldEqual(2);
+                    mrRes.PhaseResults.Count().ShouldEqual(2);
 
-                    mrRes.PhaseResults[0].Phase.ShouldEqual(0u);
-                    mrRes.PhaseResults[1].Phase.ShouldEqual(1u);
+                    mrRes.PhaseResults.ElementAt(0).Phase.ShouldEqual(0u);
+                    mrRes.PhaseResults.ElementAt(1).Phase.ShouldEqual(1u);
 
-                    mrRes.PhaseResults[0].Value.ShouldBeNull();
-                    mrRes.PhaseResults[1].Value.ShouldNotBeNull();
+                    mrRes.PhaseResults.ElementAt(0).Value.ShouldBeNull();
+                    mrRes.PhaseResults.ElementAt(1).Value.ShouldNotBeNull();
 
-                    var values = result.Value.PhaseResults[1].GetObject<int[]>();
+                    var values = result.Value.PhaseResults.ElementAt(1).GetObject<int[]>();
                     values[0].ShouldEqual(10);
                 });
         }
@@ -482,29 +482,29 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         public void LastModifiedShouldChangeAfterAPutRequest()
         {
             var o = new RiakObject(TestBucket, "1234", new { value = 1234 });
-
-            var lm1 = o.LastModified;
-            var lmu1 = o.LastModifiedUsec;
-
-            Thread.Sleep(100);
-            o = Client.Put(o, new RiakPutOptions { ReturnBody = true}).Value;
+            Client.Put(o);
 
             var lm2 = o.LastModified;
             var lmu2 = o.LastModifiedUsec;
 
-            Thread.Sleep(100);
+            Thread.Sleep(500);
             o.SetObject(new { value = 12345 });
-            o = Client.Put(o, new RiakPutOptions { ReturnBody = true }).Value;
+            Client.Put(o);
 
             var lm3 = o.LastModified;
             var lmu3 = o.LastModifiedUsec;
 
-            lm1.ShouldNotEqual(lm2);
-            lm1.ShouldNotEqual(lm3);
-            lmu1.ShouldNotEqual(lmu2);
-            lmu1.ShouldNotEqual(lmu3);
             lm2.ShouldNotEqual(lm3);
             lmu2.ShouldNotEqual(lmu3);
+
+            o.SetObject(new { value = 76543 });
+            o = Client.Put(o, new RiakPutOptions { ReturnBody = false }).Value;
+
+            var lm4 = o.LastModified;
+            var lmu4 = o.LastModifiedUsec;
+
+            lm2.ShouldNotEqual(lm4);
+            lmu2.ShouldNotEqual(lmu4);
         }
 
         [Test]

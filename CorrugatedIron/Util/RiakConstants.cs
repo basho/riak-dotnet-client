@@ -30,6 +30,8 @@ namespace CorrugatedIron.Util
             public const string ImageGif = @"image/gif";
             public const string ImagePng = @"image/png";
             public const string ErlangBinary = @"application/x-erlang-binary";
+            public const string Xml = @"application/xml";
+            public const string ProtocolBuffers = @"application/x-protobuf";
         }
         
         public static class MapReduceLanguage
@@ -50,7 +52,7 @@ namespace CorrugatedIron.Util
             public const string Utf8 = @"UTF-8";
         }
 
-        public const int ClientIdLength = 4;
+        public const int MinClientIdLength = 4;
 
         public static class Defaults
         {
@@ -60,7 +62,7 @@ namespace CorrugatedIron.Util
             }
 
             public const uint RVal = 2;
-            public const string ContentType = ContentTypes.ApplicationOctetStream;
+            public const string ContentType = ContentTypes.ApplicationJson;
             public const string CharSet = CharSets.Utf8;
         }
         

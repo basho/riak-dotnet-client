@@ -15,6 +15,7 @@
 // under the License.
 
 using System.Collections.Generic;
+using System.Linq;
 using CorrugatedIron.KeyFilters;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
@@ -79,12 +80,12 @@ namespace CorrugatedIron.Tests.Live
                         {
                             new RiakBucketKeyInput(TestBucket, Jeremiah )
                         })
-                .Link(l => l.Empty().Keep(true));
+                .Link(l => l.AllLinks().Keep(true));
 
             var mrResult = Client.MapReduce(query);
             mrResult.IsSuccess.ShouldBeTrue();
 
-            var mrLinkString = mrResult.Value.PhaseResults[0].Value.FromRiakString();
+            var mrLinkString = mrResult.Value.PhaseResults.First().Value.FromRiakString();
             var mrLinks = RiakLink.ParseArrayFromJsonString(mrLinkString);
 
             mrLinks.Count.ShouldEqual(jLinks.Count);
@@ -108,7 +109,7 @@ namespace CorrugatedIron.Tests.Live
 
             var mrResult = result.Value;
             mrResult.PhaseResults.ShouldNotBeNull();
-            mrResult.PhaseResults.Count.ShouldEqual(2);
+            mrResult.PhaseResults.Count().ShouldEqual(2);
         }
 
         [Test]
@@ -167,7 +168,7 @@ namespace CorrugatedIron.Tests.Live
 
             var linkPeople = Client.WalkLinks(oj, linkPhases);
             linkPeople.IsSuccess.ShouldBeTrue();
-            linkPeople.Value.Count.ShouldEqual(5);
+            linkPeople.Value.Count.ShouldEqual(6);
         }
     }
 }

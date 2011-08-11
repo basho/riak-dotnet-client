@@ -15,14 +15,15 @@
 // under the License.
 
 using System.Collections.Generic;
+using CorrugatedIron.Extensions;
 using Newtonsoft.Json;
 
 namespace CorrugatedIron.Models.MapReduce.Inputs
 {
     public class RiakPhaseInputs
     {
-        private readonly List<RiakBucketKeyInput> _bucketKeyInputs;
-        private readonly List<RiakBucketKeyArgInput> _bucketKeyArgInputs;
+        private readonly IEnumerable<RiakBucketKeyInput> _bucketKeyInputs;
+        private readonly IEnumerable<RiakBucketKeyArgInput> _bucketKeyArgInputs;
         private readonly RiakBucketInput _bucketInput;
 
         public RiakPhaseInputs(RiakBucketInput bucketInput)
@@ -30,12 +31,12 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
             _bucketInput = bucketInput;
         }
 
-        public RiakPhaseInputs(List<RiakBucketKeyInput> bucketKeyInputs)
+        public RiakPhaseInputs(IEnumerable<RiakBucketKeyInput> bucketKeyInputs)
         {
             _bucketKeyInputs = bucketKeyInputs;
         }
 
-        public RiakPhaseInputs(List<RiakBucketKeyArgInput> bucketKeyArgInputs)
+        public RiakPhaseInputs(IEnumerable<RiakBucketKeyArgInput> bucketKeyArgInputs)
         {
             _bucketKeyArgInputs = bucketKeyArgInputs;
         }
@@ -69,21 +70,6 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
             writer.WriteEndArray();
 
             return writer;
-        }
-
-        public static implicit operator RiakPhaseInputs(RiakBucketInput input)
-        {
-            return new RiakPhaseInputs(input);
-        }
-
-        public static implicit operator RiakPhaseInputs(List<RiakBucketKeyInput> input)
-        {
-            return new RiakPhaseInputs(input);
-        }
-
-        public static implicit operator RiakPhaseInputs(List<RiakBucketKeyArgInput> input)
-        {
-            return new RiakPhaseInputs(input);
         }
     }
 }
