@@ -20,9 +20,9 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
 {
     public class RiakBucketKeyArgInput : RiakBucketKeyInput
     {
-        private readonly string _arg;
+        private readonly object _arg;
 
-        public RiakBucketKeyArgInput(string bucket, string key, string arg)
+        public RiakBucketKeyArgInput(string bucket, string key, object arg)
             : base(bucket, key)
         {
             _arg = arg;

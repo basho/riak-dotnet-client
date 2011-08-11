@@ -18,7 +18,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Net.NetworkInformation;
 using CorrugatedIron.Comms;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
@@ -67,10 +66,10 @@ namespace CorrugatedIron
             get { return _clientId; }
             set
             {
-                if (value == null || value.Length != RiakConstants.ClientIdLength)
+                if (value == null || value.Length < RiakConstants.MinClientIdLength)
                 {
                     throw new ArgumentException(
-                        "Client ID must be exactly {0} bytes long.".Fmt(RiakConstants.ClientIdLength), "value");
+                        "Client ID must be at least {0} bytes long.".Fmt(RiakConstants.MinClientIdLength), "value");
                 }
 
                 _clientId = value;
@@ -423,7 +422,6 @@ namespace CorrugatedIron
 
         public RiakResult<IList<RiakObject>> WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks)
         {
-            // TODO: make this all happen on a single connection
             var query = new RiakMapReduceQuery()
                 .Inputs(new List<RiakBucketKeyInput> { new RiakBucketKeyInput(riakObject.Bucket, riakObject.Key) });
 
@@ -446,7 +444,7 @@ namespace CorrugatedIron
 
                 var objects = Get(oids);
 
-                // TODO
+                // FIXME
                 // we could be discarding results here. Not good?
                 // This really should be a multi-phase map/reduce
                 return RiakResult<IList<RiakObject>>.Success(objects.Where(r => r.IsSuccess).Select(r => r.Value).ToList());
