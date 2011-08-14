@@ -29,6 +29,7 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
 
         public virtual JsonWriter WriteJson(JsonWriter writer)
         {
+            writer.WritePropertyName("bucket");
             writer.WriteValue(_bucket);
             return writer;
         }
