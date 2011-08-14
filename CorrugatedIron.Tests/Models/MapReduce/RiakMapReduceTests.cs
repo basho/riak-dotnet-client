@@ -15,7 +15,7 @@
 // under the License.
 
 using CorrugatedIron.Extensions;
-using CorrugatedIron.KeyFilters;
+using CorrugatedIron.Models.MapReduce.KeyFilters;
 using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Models.MapReduce.Inputs;
 using CorrugatedIron.Tests.Extensions;
@@ -76,7 +76,8 @@ namespace CorrugatedIron.Tests.Models.MapReduce
                     ContentType = MrContentType
                 }
                 .Inputs("animals")
-                .Filter(new Matches<string>("spider"))
+                //.Filter(new Matches<string>("spider"))
+                .Filter(f => f.Matches("spider"))
                 .MapJs(m => m.Source("function(o) { return [1]; }"))
                 .ReduceJs(r => r.Name("Riak.reduceSum").Keep(true));
 

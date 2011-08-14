@@ -16,7 +16,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using CorrugatedIron.KeyFilters;
+using CorrugatedIron.Models.MapReduce.KeyFilters;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Models.MapReduce.Inputs;
@@ -100,7 +100,8 @@ namespace CorrugatedIron.Tests.Live
         {
             var query = new RiakMapReduceQuery()
                 .Inputs(TestBucket)
-                .Filter(new Matches<string>(Jeremiah))
+                //.Filter(new Matches<string>(Jeremiah))
+                .Filter(f => f.Matches(Jeremiah))
                 .Link(l => l.Tag("friends").Bucket(TestBucket))
                 .ReduceErlang(r => r.ModFun("riak_kv_mapreduce", "reduce_set_union").Keep(true));
 

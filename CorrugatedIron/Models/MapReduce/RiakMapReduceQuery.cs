@@ -109,9 +109,13 @@ namespace CorrugatedIron.Models.MapReduce
             return this;
         }
 
-        public RiakMapReduceQuery Filter(IRiakKeyFilterToken filter)
+        public RiakMapReduceQuery Filter(Action<RiakFluentKeyFilter> setup)
         {
-            _filters.Add(filter);
+            var filters = new List<IRiakKeyFilterToken>();
+            var fluent = new RiakFluentKeyFilter(filters);
+            setup(fluent);
+            _filters.Add(filters[0]);
+
             return this;
         }
 

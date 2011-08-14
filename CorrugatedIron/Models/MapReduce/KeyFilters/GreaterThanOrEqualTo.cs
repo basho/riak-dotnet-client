@@ -19,9 +19,9 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
     /// <summary>
     /// Tests that the input is greater than or equal to the argument.
     /// </summary>
-    public class GreatherThanOrEqualTo<T> : RiakKeyFilterToken
+    public class GreaterThanOrEqualTo<T> : RiakKeyFilterToken
     {
-        public GreatherThanOrEqualTo(T arg)
+        public GreaterThanOrEqualTo(T arg)
             : base("greater_than_eq", arg)
         {
         }

@@ -83,6 +83,7 @@
     <Compile Include="Models\CommitHook\RiakJavascriptCommitHook.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Models\MapReduce\Fluent\RiakFluentKeyFilter.cs" />
     <Compile Include="Models\MapReduce\Fluent\RiakFluentLinkPhase.cs" />
     <Compile Include="Models\MapReduce\Fluent\RiakFluentActionPhaseErlang.cs" />
     <Compile Include="Models\MapReduce\Fluent\RiakFluentActionPhaseJavascript.cs" />
