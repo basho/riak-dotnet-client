@@ -19,9 +19,9 @@ namespace CorrugatedIron.KeyFilters
     /// <summary>
     /// Tests that the input is greater than the argument.
     /// </summary>
-    public class GreatherThan<T> : RiakKeyFilterToken
+    public class GreaterThan<T> : RiakKeyFilterToken
     {
-        public GreatherThan(T arg)
+        public GreaterThan(T arg)
             : base("greater_than", arg)
         {
         }
