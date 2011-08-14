@@ -14,15 +14,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CorrugatedIron.KeyFilters
+namespace CorrugatedIron.Models.MapReduce.KeyFilters
 {
     /// <summary>
-    /// Tests that the input begins with the argument (a string).
+    /// Tests that the input is greater than the argument.
     /// </summary>
-    public class StartsWith : RiakKeyFilterToken
+    public class GreaterThan<T> : RiakKeyFilterToken
     {
-        public StartsWith(string arg)
-            : base("starts_with", arg)
+        public GreaterThan(T arg)
+            : base("greater_than", arg)
         {
         }
     }

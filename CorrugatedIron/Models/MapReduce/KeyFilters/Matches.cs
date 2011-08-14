@@ -14,16 +14,19 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CorrugatedIron.KeyFilters
+namespace CorrugatedIron.Models.MapReduce.KeyFilters
 {
     /// <summary>
-    /// Tests that the input ends with the argument (a string).
+    /// Tests that the input matches the regular expression given in the argument.
     /// </summary>
-    public class EndsWith : RiakKeyFilterToken
+    public class Matches<T> : RiakKeyFilterToken
     {
-        public EndsWith(string arg)
-            : base("ends_with", arg)
+        public T Match { get; private set; }
+        
+        public Matches(T arg)
+            : base("matches", arg)
         {
+            Match = arg;
         }
     }
 }

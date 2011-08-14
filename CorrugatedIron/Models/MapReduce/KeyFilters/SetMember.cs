@@ -14,16 +14,27 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CorrugatedIron.KeyFilters
+using System.Collections.Generic;
+using Newtonsoft.Json;
+
+namespace CorrugatedIron.Models.MapReduce.KeyFilters
 {
     /// <summary>
-    /// Turns an integer (previously extracted with string_to_int), into a string.
+    /// Tests that the input is contained in the set given as the arguments.
     /// </summary>
-    public class IntToString : RiakKeyFilterToken
+    public class SetMember<T> : RiakKeyFilterToken
     {
-        public IntToString ()
-            : base("int_to_string")
+        public List<T> Set { get; private set; }
+
+        public SetMember(List<T> set)
+            : base("set_member", set.ToArray())
         {
+            Set = set;
+        }
+
+        protected override void WriteArguments(object[] arguments, JsonWriter writer)
+        {
+            Set.ForEach(v => writer.WriteValue(v));
         }
     }
 }

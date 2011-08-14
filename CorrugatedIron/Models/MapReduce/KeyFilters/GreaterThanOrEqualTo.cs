@@ -14,17 +14,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CorrugatedIron.KeyFilters
+namespace CorrugatedIron.Models.MapReduce.KeyFilters
 {
     /// <summary>
-    /// Changes all letters to lowercase.
+    /// Tests that the input is greater than or equal to the argument.
     /// </summary>
-    public class ToLower : RiakKeyFilterToken
+    public class GreatherThanOrEqualTo<T> : RiakKeyFilterToken
     {
-        public ToLower()
-            : base("to_lower")
+        public GreatherThanOrEqualTo(T arg)
+            : base("greater_than_eq", arg)
         {
         }
     }
 }
-

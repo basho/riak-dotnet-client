@@ -14,27 +14,19 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.Collections.Generic;
-using Newtonsoft.Json;
-
-namespace CorrugatedIron.KeyFilters
+namespace CorrugatedIron.Models.MapReduce.KeyFilters
 {
     /// <summary>
-    /// Tests that the input is contained in the set given as the arguments.
+    /// Joins two or more key-filter operations with a logical OR operation.
     /// </summary>
-    public class SetMember<T> : RiakKeyFilterToken
+    public class Or : RiakCompositeKeyFilterToken
     {
-        public List<T> Set { get; private set; }
-
-        public SetMember(List<T> set)
-            : base("set_member", set.ToArray())
+        public IRiakKeyFilterToken First { get { return (IRiakKeyFilterToken)Arguments[0]; } }
+        public IRiakKeyFilterToken Second { get { return (IRiakKeyFilterToken)Arguments[1]; } }
+        
+        public Or(IRiakKeyFilterToken first, IRiakKeyFilterToken second)
+            : base("or", first, second)
         {
-            Set = set;
-        }
-
-        protected override void WriteArguments(object[] arguments, JsonWriter writer)
-        {
-            Set.ForEach(v => writer.WriteValue(v));
         }
     }
 }

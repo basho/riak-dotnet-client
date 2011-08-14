@@ -1,4 +1,4 @@
-// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -14,31 +14,29 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Linq;
+using CorrugatedIron.Extensions;
 using Newtonsoft.Json;
 
-namespace CorrugatedIron.KeyFilters
+namespace CorrugatedIron.Models.MapReduce.KeyFilters
 {
-    /// <summary>
-    /// Tests that the input is equal to the argument.
-    /// </summary>
-    public class Equal<T> : RiakKeyFilterToken
+    public abstract class RiakCompositeKeyFilterToken : RiakKeyFilterToken
     {
-        public Equal(T arg)
-            : base("eq", arg)
+        protected RiakCompositeKeyFilterToken(string functionName, params object[] args)
+            : base(functionName, args)
         {
         }
 
         protected override void WriteArguments(object[] arguments, JsonWriter writer)
         {
-            var filter = arguments[0] as IRiakKeyFilterToken;
-            if (filter != null)
-            {
-                writer.WriteRawValue(filter.ToJsonString());
-            }
-            else
-            {
-                base.WriteArguments(arguments, writer);
-            }
+            arguments.Cast<IRiakKeyFilterToken>().ForEach(v =>WriteArgumentAsArray(v, writer) );
+        }
+
+        protected void WriteArgumentAsArray(IRiakKeyFilterToken argument, JsonWriter writer)
+        {
+            writer.WriteStartArray();
+            writer.WriteRawValue(argument.ToJsonString());
+            writer.WriteEndArray();
         }
     }
 }

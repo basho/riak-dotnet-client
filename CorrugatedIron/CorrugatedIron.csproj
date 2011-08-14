@@ -102,6 +102,32 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Models\MapReduce\IRiakMapReduceResult.cs" />
+    <Compile Include="Models\MapReduce\KeyFilters\And.cs" />
+    <Compile Include="Models\MapReduce\KeyFilters\Between.cs" />
+    <Compile Include="Models\MapReduce\KeyFilters\EndsWith.cs" />
+    <Compile Include="Models\MapReduce\KeyFilters\Equal.cs" />
+    <Compile Include="Models\MapReduce\KeyFilters\FloatToString.cs" />
+    <Compile Include="Models\MapReduce\KeyFilters\GreaterThan.cs" />
+    <Compile Include="Models\MapReduce\KeyFilters\GreaterThanOrEqualTo.cs" />
+    <Compile Include="Models\MapReduce\KeyFilters\IntToString.cs" />
+    <Compile Include="Models\MapReduce\KeyFilters\IRiakKeyFilterToken.cs" />
+    <Compile Include="Models\MapReduce\KeyFilters\LessThan.cs" />
+    <Compile Include="Models\MapReduce\KeyFilters\LessThanOrEqualTo.cs" />
+    <Compile Include="Models\MapReduce\KeyFilters\Matches.cs" />
+    <Compile Include="Models\MapReduce\KeyFilters\Not.cs" />
+    <Compile Include="Models\MapReduce\KeyFilters\NotEqual.cs" />
+    <Compile Include="Models\MapReduce\KeyFilters\Or.cs" />
+    <Compile Include="Models\MapReduce\KeyFilters\RiakCompositeKeyFilterToken.cs" />
+    <Compile Include="Models\MapReduce\KeyFilters\RiakKeyFilterToken.cs" />
+    <Compile Include="Models\MapReduce\KeyFilters\SetMember.cs" />
+    <Compile Include="Models\MapReduce\KeyFilters\SimilarTo.cs" />
+    <Compile Include="Models\MapReduce\KeyFilters\StartsWith.cs" />
+    <Compile Include="Models\MapReduce\KeyFilters\StringToFloat.cs" />
+    <Compile Include="Models\MapReduce\KeyFilters\StringToInt.cs" />
+    <Compile Include="Models\MapReduce\KeyFilters\Tokenize.cs" />
+    <Compile Include="Models\MapReduce\KeyFilters\ToLower.cs" />
+    <Compile Include="Models\MapReduce\KeyFilters\ToUpper.cs" />
+    <Compile Include="Models\MapReduce\KeyFilters\UrlDecode.cs" />
     <Compile Include="Models\MapReduce\Languages\IRiakPhaseLanguage.cs" />
     <Compile Include="Models\MapReduce\Languages\RiakPhaseLanguageErlang.cs" />
     <Compile Include="Models\MapReduce\Languages\RiakPhaseLanguageJavascript.cs" />
@@ -158,7 +184,6 @@
     <Compile Include="Config\RiakNodeConfigurationCollection.cs" />
     <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="Extensions\JsonExtensions.cs" />
-    <Compile Include="KeyFilters\RiakCompositeKeyFilterToken.cs" />
     <Compile Include="Util\RiakConstants.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Messages\MessageCode.cs" />
@@ -192,31 +217,6 @@
     <Compile Include="Messages\RpbSetClientIdReq.cs" />
     <Compile Include="Messages\RpbSetClientIdResp.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="KeyFilters\IRiakKeyFilterToken.cs" />
-    <Compile Include="KeyFilters\And.cs" />
-    <Compile Include="KeyFilters\Between.cs" />
-    <Compile Include="KeyFilters\EndsWith.cs" />
-    <Compile Include="KeyFilters\Equal.cs" />
-    <Compile Include="KeyFilters\FloatToString.cs" />
-    <Compile Include="KeyFilters\GreaterThan.cs" />
-    <Compile Include="KeyFilters\GreaterThanOrEqualTo.cs" />
-    <Compile Include="KeyFilters\IntToString.cs" />
-    <Compile Include="KeyFilters\LessThan.cs" />
-    <Compile Include="KeyFilters\LessThanOrEqualTo.cs" />
-    <Compile Include="KeyFilters\Matches.cs" />
-    <Compile Include="KeyFilters\Not.cs" />
-    <Compile Include="KeyFilters\NotEqual.cs" />
-    <Compile Include="KeyFilters\Or.cs" />
-    <Compile Include="KeyFilters\SetMember.cs" />
-    <Compile Include="KeyFilters\SimilarTo.cs" />
-    <Compile Include="KeyFilters\StartsWith.cs" />
-    <Compile Include="KeyFilters\StringToFloat.cs" />
-    <Compile Include="KeyFilters\StringToInt.cs" />
-    <Compile Include="KeyFilters\Tokenize.cs" />
-    <Compile Include="KeyFilters\ToLower.cs" />
-    <Compile Include="KeyFilters\ToUpper.cs" />
-    <Compile Include="KeyFilters\UrlDecode.cs" />
-    <Compile Include="KeyFilters\RiakKeyFilterToken.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Metadata\CorrugatedIron.snk">

@@ -14,16 +14,31 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CorrugatedIron.KeyFilters
+using Newtonsoft.Json;
+
+namespace CorrugatedIron.Models.MapReduce.KeyFilters
 {
     /// <summary>
-    /// Joins two or more key-filter operations with a logical AND operation.
+    /// Tests that the input is equal to the argument.
     /// </summary>
-    public class And : RiakCompositeKeyFilterToken
+    public class Equal<T> : RiakKeyFilterToken
     {
-        public And(IRiakKeyFilterToken first, IRiakKeyFilterToken second)
-            : base("and", first, second)
+        public Equal(T arg)
+            : base("eq", arg)
         {
+        }
+
+        protected override void WriteArguments(object[] arguments, JsonWriter writer)
+        {
+            var filter = arguments[0] as IRiakKeyFilterToken;
+            if (filter != null)
+            {
+                writer.WriteRawValue(filter.ToJsonString());
+            }
+            else
+            {
+                base.WriteArguments(arguments, writer);
+            }
         }
     }
 }

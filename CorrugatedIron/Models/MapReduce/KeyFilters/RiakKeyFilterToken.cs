@@ -19,7 +19,7 @@ using System.Text;
 using CorrugatedIron.Extensions;
 using Newtonsoft.Json;
 
-namespace CorrugatedIron.KeyFilters
+namespace CorrugatedIron.Models.MapReduce.KeyFilters
 {
     public abstract class RiakKeyFilterToken : IRiakKeyFilterToken
     {

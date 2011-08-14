@@ -14,16 +14,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CorrugatedIron.KeyFilters
+namespace CorrugatedIron.Models.MapReduce.KeyFilters
 {
     /// <summary>
-    /// Tests that input is within the Levenshtein distance of the first argument given by the second argument.
+    /// Changes all letters to lowercase.
     /// </summary>
-    public class SimilarTo<T> : RiakKeyFilterToken
+    public class ToLower : RiakKeyFilterToken
     {
-        public SimilarTo(T arg, int distance)
-            : base("similar_to", arg, distance)
+        public ToLower()
+            : base("to_lower")
         {
         }
     }
 }
+

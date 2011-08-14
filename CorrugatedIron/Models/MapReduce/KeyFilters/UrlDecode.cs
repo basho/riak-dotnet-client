@@ -14,16 +14,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CorrugatedIron.KeyFilters
+namespace CorrugatedIron.Models.MapReduce.KeyFilters
 {
     /// <summary>
-    /// Tests that the input is less than the argument.
+    /// URL-decodes the string.
     /// </summary>
-    public class LessThan<T> : RiakKeyFilterToken
+    public class UrlDecode : RiakKeyFilterToken
     {
-        public LessThan(T arg)
-            : base("less_than", arg)
+        public UrlDecode()
+            : base("urldecode")
         {
         }
     }
 }
+

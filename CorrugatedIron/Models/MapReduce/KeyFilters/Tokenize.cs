@@ -14,16 +14,22 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CorrugatedIron.KeyFilters
+namespace CorrugatedIron.Models.MapReduce.KeyFilters
 {
     /// <summary>
-    /// Turns a string into a floating point number.
+    /// Splits the input on the string given as the first argument and returns the nth
+    /// token specified by the second argument.
     /// </summary>
-    public class StringToFloat : RiakKeyFilterToken
+    public class Tokenize : RiakKeyFilterToken
     {
-        public StringToFloat()
-            : base("string_to_float")
+        public string Token { get; private set; }
+        public uint Position { get; private set; }
+        
+        public Tokenize(string token, uint position)
+            : base("tokenize", token, position)
         {
+            Token = token;
+            Position = position;
         }
     }
 }

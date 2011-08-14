@@ -14,17 +14,18 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CorrugatedIron.KeyFilters
+namespace CorrugatedIron.Models.MapReduce.KeyFilters
 {
     /// <summary>
-    /// Changes all letters to uppercase.
+    /// Tests that the input is between the first two arguments. 
+    /// If the third argument is given, it is whether to treat the range as inclusive. 
+    /// If the third argument is omitted, the range is treated as inclusive.
     /// </summary>
-    public class ToUpper : RiakKeyFilterToken
+    public class Between<T> : RiakKeyFilterToken
     {
-        public ToUpper()
-            : base("to_upper")
+        public Between(T first, T second, bool inclusive = true)
+            : base("between", first, second, inclusive)
         {
         }
     }
 }
-
