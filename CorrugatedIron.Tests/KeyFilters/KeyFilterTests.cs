@@ -16,7 +16,7 @@
 
 using System.Collections.Generic;
 using NUnit.Framework;
-using CorrugatedIron.KeyFilters;
+using CorrugatedIron.Models.MapReduce.KeyFilters;
 using CorrugatedIron.Tests.Extensions;
 
 namespace CorrugatedIron.Tests.KeyFilters
@@ -127,7 +127,7 @@ namespace CorrugatedIron.Tests.KeyFilters
         [Test]
         public void GreaterThanOrEqualCorrectlyConvertsToJson()
         {
-            var gte = new GreatherThanOrEqualTo<int>(2000);
+            var gte = new GreaterThanOrEqualTo<int>(2000);
             gte.ToString().ShouldEqual(GreaterThanOrEqualToJson);
         }
         
