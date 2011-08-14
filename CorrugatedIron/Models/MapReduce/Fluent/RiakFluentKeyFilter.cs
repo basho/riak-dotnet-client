@@ -24,91 +24,85 @@ namespace CorrugatedIron.Models.MapReduce.Fluent
     // TODO: Switch CorrugatedIron.Models.MapReduce.KeyFilters classes to internal
     public class RiakFluentKeyFilter
     {
-        private IRiakKeyFilterToken _filter;
+        private List<IRiakKeyFilterToken> _filters;
 
-        internal IRiakKeyFilterToken Filter
+        internal RiakFluentKeyFilter(List<IRiakKeyFilterToken> filters)
         {
-            get { return _filter; }
-            private set { _filter = value; }
+            _filters = filters;
         }
-                                    
-        internal RiakFluentKeyFilter(IRiakKeyFilterToken filter)
-        {
-            Filter = filter;
-        }
-
-        public RiakFluentKeyFilter() {}
 
         public RiakFluentKeyFilter And(Action<RiakFluentKeyFilter> left, Action<RiakFluentKeyFilter> right)
         {
-            var leftFluent = new RiakFluentKeyFilter();
-            left(leftFluent);
+            var leftFilters = new List<IRiakKeyFilterToken>();
+            var leftfluent = new RiakFluentKeyFilter(leftFilters);
+            left(leftfluent);
 
-            var rightFluent = new RiakFluentKeyFilter();
+            var rightFilters = new List<IRiakKeyFilterToken>();
+            var rightFluent = new RiakFluentKeyFilter(rightFilters);
             right(rightFluent);
 
-            Filter = new And(leftFluent.Filter, rightFluent.Filter);
+            _filters.Add(new And(leftFilters[0], rightFilters[0]));
 
             return this;
         }
 
         public RiakFluentKeyFilter Between<T>(T first, T second, bool inclusive)
         {
-            Filter = new Between<T>(first, second, inclusive);
+            _filters.Add(new Between<T>(first, second, inclusive));
             return this;
         }
 
         public RiakFluentKeyFilter EndsWith(string arg)
         {
-            Filter = new EndsWith(arg);
+            _filters.Add(new EndsWith(arg));
             return this;
         }
 
         public RiakFluentKeyFilter Equal<T>(T arg)
         {
-            Filter = new Equal<T>(arg);
+            _filters.Add(new Equal<T>(arg));
             return this;
         }
 
         public RiakFluentKeyFilter FloatToString()
         {
-            Filter = new FloatToString();
+            _filters.Add(new FloatToString());
             return this;
         }
 
         public RiakFluentKeyFilter GreaterThan<T>(T arg)
         {
-            Filter = new GreaterThan<T>(arg);
+            _filters.Add(new GreaterThan<T>(arg));
             return this;
         }
 
         public RiakFluentKeyFilter GreaterThanOrEqualTo<T>(T arg)
         {
-            Filter = new GreaterThanOrEqualTo<T>(arg);
+            _filters.Add(new GreaterThanOrEqualTo<T>(arg));
             return this;
         }
 
         public RiakFluentKeyFilter IntToString()
         {
-            Filter = new IntToString();
+            _filters.Add(new IntToString());
             return this;
         }
 
         public RiakFluentKeyFilter LessThan<T>(T arg)
         {
-            Filter = new LessThan<T>(arg);
+            _filters.Add(new LessThan<T>(arg));
             return this;
         }
 
         public RiakFluentKeyFilter LessThanOrEqualTo<T>(T arg)
         {
-            Filter = new LessThanOrEqualTo<T>(arg);
+            _filters.Add(new LessThanOrEqualTo<T>(arg));
             return this;
         }
 
         public RiakFluentKeyFilter Matches<T>(T arg)
         {
-            Filter = new Matches<T>(arg);
+            _filters.Add(new Matches<T>(arg));
             return this;
         }
 
@@ -117,83 +111,86 @@ namespace CorrugatedIron.Models.MapReduce.Fluent
         /// </summary>
         public RiakFluentKeyFilter Not(Action<RiakFluentKeyFilter> setup)
         {
-            var fluent = new RiakFluentKeyFilter();
+            var filters = new List<IRiakKeyFilterToken>();
+            var fluent = new RiakFluentKeyFilter(filters);
             setup(fluent);
-            Filter = new Not(fluent.Filter);
-            
+            _filters.Add(new Not(filters[0]));
+
             return this;
         }
 
         public RiakFluentKeyFilter NotEqual<T>(T arg)
         {
-            Filter = new NotEqual<T>(arg);
+            _filters.Add(new NotEqual<T>(arg));
             return this;
         }
 
         public RiakFluentKeyFilter Or(Action<RiakFluentKeyFilter> left, Action<RiakFluentKeyFilter> right)
         {
-            var leftFluent = new RiakFluentKeyFilter();
-            left(leftFluent);
+            var leftFilters = new List<IRiakKeyFilterToken>();
+            var leftfluent = new RiakFluentKeyFilter(leftFilters);
+            left(leftfluent);
 
-            var rightFluent = new RiakFluentKeyFilter();
+            var rightFilters = new List<IRiakKeyFilterToken>();
+            var rightFluent = new RiakFluentKeyFilter(rightFilters);
             right(rightFluent);
 
-            Filter = new Or(leftFluent.Filter, rightFluent.Filter);
+            _filters.Add(new Or(leftFilters[0], rightFilters[0]));
 
             return this;
         }
 
         public RiakFluentKeyFilter SetMember<T>(List<T> arg)
         {
-            Filter = new SetMember<T>(arg);
+            _filters.Add(new SetMember<T>(arg));
             return this;
         }
 
         public RiakFluentKeyFilter SimilarTo<T>(T arg, int distance)
         {
-            Filter = new SimilarTo<T>(arg, distance);
+            _filters.Add(new SimilarTo<T>(arg, distance));
             return this;
         }
 
         public RiakFluentKeyFilter StartsWith(string arg)
         {
-            Filter = new StartsWith(arg);
+            _filters.Add(new StartsWith(arg));
             return this;
         }
 
         public RiakFluentKeyFilter StringToFloat()
         {
-            Filter = new StringToFloat();
+            _filters.Add(new StringToFloat());
             return this;
         }
 
         public RiakFluentKeyFilter StringToInt()
         {
-            Filter = new StringToInt();
+            _filters.Add(new StringToInt());
             return this;
         }
 
         public RiakFluentKeyFilter Tokenize(string token, uint position)
         {
-            Filter = new Tokenize(token, position);
+            _filters.Add(new Tokenize(token, position));
             return this;
         }
 
         public RiakFluentKeyFilter ToLower()
         {
-            Filter = new ToLower();
+            _filters.Add(new ToLower());
             return this;
         }
 
         public RiakFluentKeyFilter ToUpper()
         {
-            Filter = new ToUpper();
+            _filters.Add(new ToUpper());
             return this;
         }
 
         public RiakFluentKeyFilter UrlDecode()
         {
-            Filter = new UrlDecode();
+            _filters.Add(new UrlDecode());
             return this;
         }
     }

@@ -41,7 +41,7 @@ namespace CorrugatedIron.Tests.Live
 
         public RiakMapReduceTests(string section = "riak1NodeConfiguration")
         {
-            ClusterConfig = RiakClusterConfiguration.LoadFromConfig("riak1NodeConfiguration");
+            ClusterConfig = RiakClusterConfiguration.LoadFromConfig(section);
         }
     }
 

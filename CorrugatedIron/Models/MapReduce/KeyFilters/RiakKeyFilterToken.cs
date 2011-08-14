@@ -52,7 +52,7 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
                 jw.WriteValue(FunctionName);
 
                 WriteArguments(Arguments, jw);
-                
+
                 jw.WriteEndArray();
             }
             

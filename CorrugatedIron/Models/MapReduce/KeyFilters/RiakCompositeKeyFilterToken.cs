@@ -34,9 +34,9 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
 
         protected void WriteArgumentAsArray(IRiakKeyFilterToken argument, JsonWriter writer)
         {
-            writer.WriteStartArray();
+            //writer.WriteStartArray();
             writer.WriteRawValue(argument.ToJsonString());
-            writer.WriteEndArray();
+            //writer.WriteEndArray();
         }
     }
 }
