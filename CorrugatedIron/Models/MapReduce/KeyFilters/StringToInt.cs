@@ -14,23 +14,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CorrugatedIron.KeyFilters
+namespace CorrugatedIron.Models.MapReduce.KeyFilters
 {
     /// <summary>
-    /// Splits the input on the string given as the first argument and returns the nth
-    /// token specified by the second argument.
+    /// Turns a string into an integer.
     /// </summary>
-    public class Tokenize : RiakKeyFilterToken
+    public class StringToInt : RiakKeyFilterToken
     {
-        public string Token { get; private set; }
-        public uint Position { get; private set; }
-        
-        public Tokenize(string token, uint position)
-            : base("tokenize", token, position)
+        public StringToInt()
+            : base("string_to_int")
         {
-            Token = token;
-            Position = position;
         }
     }
 }
-

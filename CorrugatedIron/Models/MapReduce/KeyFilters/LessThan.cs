@@ -14,15 +14,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CorrugatedIron.KeyFilters
+namespace CorrugatedIron.Models.MapReduce.KeyFilters
 {
     /// <summary>
-    /// Turns a string into an integer.
+    /// Tests that the input is less than the argument.
     /// </summary>
-    public class StringToInt : RiakKeyFilterToken
+    public class LessThan<T> : RiakKeyFilterToken
     {
-        public StringToInt()
-            : base("string_to_int")
+        public LessThan(T arg)
+            : base("less_than", arg)
         {
         }
     }

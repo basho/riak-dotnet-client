@@ -14,18 +14,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CorrugatedIron.KeyFilters
+namespace CorrugatedIron.Models.MapReduce.KeyFilters
 {
     /// <summary>
-    /// Tests that the input is between the first two arguments. 
-    /// If the third argument is given, it is whether to treat the range as inclusive. 
-    /// If the third argument is omitted, the range is treated as inclusive.
+    /// Turns a string into a floating point number.
     /// </summary>
-    public class Between<T> : RiakKeyFilterToken
+    public class StringToFloat : RiakKeyFilterToken
     {
-        public Between(T first, T second, bool inclusive = true)
-            : base("between", first, second, inclusive)
+        public StringToFloat()
+            : base("string_to_float")
         {
         }
     }
 }
+

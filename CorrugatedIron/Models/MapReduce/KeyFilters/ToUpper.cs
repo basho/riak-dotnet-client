@@ -14,15 +14,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CorrugatedIron.KeyFilters
+namespace CorrugatedIron.Models.MapReduce.KeyFilters
 {
     /// <summary>
-    /// URL-decodes the string.
+    /// Changes all letters to uppercase.
     /// </summary>
-    public class UrlDecode : RiakKeyFilterToken
+    public class ToUpper : RiakKeyFilterToken
     {
-        public UrlDecode()
-            : base("urldecode")
+        public ToUpper()
+            : base("to_upper")
         {
         }
     }

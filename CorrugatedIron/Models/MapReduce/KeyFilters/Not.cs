@@ -14,7 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CorrugatedIron.KeyFilters
+namespace CorrugatedIron.Models.MapReduce.KeyFilters
 {
     /// <summary>
     /// Negates the result of key-filter operations.

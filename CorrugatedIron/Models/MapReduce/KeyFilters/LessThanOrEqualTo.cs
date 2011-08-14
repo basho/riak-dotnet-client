@@ -14,15 +14,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CorrugatedIron.KeyFilters
+namespace CorrugatedIron.Models.MapReduce.KeyFilters
 {
     /// <summary>
-    /// Tests that the input is greater than the argument.
+    /// Tests that the input is less than or equal to the argument.
     /// </summary>
-    public class GreaterThan<T> : RiakKeyFilterToken
+    public class LessThanOrEqualTo<T> : RiakKeyFilterToken
     {
-        public GreaterThan(T arg)
-            : base("greater_than", arg)
+        public LessThanOrEqualTo(T arg)
+            : base("less_than_eq", arg)
         {
         }
     }

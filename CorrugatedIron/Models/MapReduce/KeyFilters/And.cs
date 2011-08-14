@@ -14,18 +14,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CorrugatedIron.KeyFilters
+namespace CorrugatedIron.Models.MapReduce.KeyFilters
 {
     /// <summary>
-    /// Joins two or more key-filter operations with a logical OR operation.
+    /// Joins two or more key-filter operations with a logical AND operation.
     /// </summary>
-    public class Or : RiakCompositeKeyFilterToken
+    public class And : RiakCompositeKeyFilterToken
     {
-        public IRiakKeyFilterToken First { get { return (IRiakKeyFilterToken)Arguments[0]; } }
-        public IRiakKeyFilterToken Second { get { return (IRiakKeyFilterToken)Arguments[1]; } }
-        
-        public Or(IRiakKeyFilterToken first, IRiakKeyFilterToken second)
-            : base("or", first, second)
+        public And(IRiakKeyFilterToken first, IRiakKeyFilterToken second)
+            : base("and", first, second)
         {
         }
     }

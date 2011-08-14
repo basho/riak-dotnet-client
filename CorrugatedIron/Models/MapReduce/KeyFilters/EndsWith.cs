@@ -14,15 +14,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CorrugatedIron.KeyFilters
+namespace CorrugatedIron.Models.MapReduce.KeyFilters
 {
     /// <summary>
-    /// Tests that the input is less than or equal to the argument.
+    /// Tests that the input ends with the argument (a string).
     /// </summary>
-    public class LessThanOrEqualTo<T> : RiakKeyFilterToken
+    public class EndsWith : RiakKeyFilterToken
     {
-        public LessThanOrEqualTo(T arg)
-            : base("less_than_eq", arg)
+        public EndsWith(string arg)
+            : base("ends_with", arg)
         {
         }
     }

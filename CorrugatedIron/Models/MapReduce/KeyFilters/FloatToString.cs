@@ -14,7 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CorrugatedIron.KeyFilters
+namespace CorrugatedIron.Models.MapReduce.KeyFilters
 {
     /// <summary>
     /// Turns a floating point number (previously extracted with string_to_float), into a string.

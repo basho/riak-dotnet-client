@@ -14,19 +14,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CorrugatedIron.KeyFilters
+namespace CorrugatedIron.Models.MapReduce.KeyFilters
 {
     /// <summary>
-    /// Tests that the input is not equal to the argument.
+    /// Tests that input is within the Levenshtein distance of the first argument given by the second argument.
     /// </summary>
-    public class NotEqual<T> : RiakKeyFilterToken
+    public class SimilarTo<T> : RiakKeyFilterToken
     {
-        public T Argument { get; private set; }
-        
-        public NotEqual(T arg)
-            : base("neq", arg)
+        public SimilarTo(T arg, int distance)
+            : base("similar_to", arg, distance)
         {
-            Argument = arg;
         }
     }
 }

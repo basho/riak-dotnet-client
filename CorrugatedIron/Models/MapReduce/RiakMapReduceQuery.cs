@@ -19,7 +19,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using CorrugatedIron.Extensions;
-using CorrugatedIron.KeyFilters;
+using CorrugatedIron.Models.MapReduce.KeyFilters;
 using CorrugatedIron.Messages;
 using CorrugatedIron.Models.MapReduce.Fluent;
 using CorrugatedIron.Models.MapReduce.Inputs;

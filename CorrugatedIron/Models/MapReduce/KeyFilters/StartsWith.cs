@@ -14,19 +14,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CorrugatedIron.KeyFilters
+namespace CorrugatedIron.Models.MapReduce.KeyFilters
 {
     /// <summary>
-    /// Tests that the input matches the regular expression given in the argument.
+    /// Tests that the input begins with the argument (a string).
     /// </summary>
-    public class Matches<T> : RiakKeyFilterToken
+    public class StartsWith : RiakKeyFilterToken
     {
-        public T Match { get; private set; }
-        
-        public Matches(T arg)
-            : base("matches", arg)
+        public StartsWith(string arg)
+            : base("starts_with", arg)
         {
-            Match = arg;
         }
     }
 }
