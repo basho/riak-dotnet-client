@@ -111,10 +111,9 @@ namespace CorrugatedIron.Models.MapReduce
 
         public RiakMapReduceQuery Filter(Action<RiakFluentKeyFilter> setup)
         {
-            var filters = new List<IRiakKeyFilterToken>();
-            var fluent = new RiakFluentKeyFilter(filters);
+            var fluent = new RiakFluentKeyFilter();
             setup(fluent);
-            _filters.Add(filters[0]);
+            _filters.Add(fluent.Filter);
 
             return this;
         }
@@ -131,15 +130,22 @@ namespace CorrugatedIron.Models.MapReduce
             {
                 writer.WriteStartObject();
 
-                writer.WritePropertyName("inputs");
-                _inputs.WriteJson(writer);
-
-                if (_filters.Count > 0)
+                if (_inputs != null)
                 {
-                    writer.WritePropertyName("key_filters");
-                    writer.WriteStartArray();
-                    _filters.ForEach(f => writer.WriteRawValue(f.ToJsonString()));
-                    writer.WriteEndArray();
+                    writer.WritePropertyName("inputs");
+                    
+                    writer.WriteStartObject();
+                    _inputs.WriteJson(writer);
+
+                    if (_filters.Count > 0)
+                    {
+                        writer.WritePropertyName("key_filters");
+                        writer.WriteStartArray();
+                        _filters.ForEach(f => writer.WriteRawValue(f.ToJsonString()));
+                        writer.WriteEndArray();
+                    }
+
+                    writer.WriteEndObject();
                 }
 
                 writer.WritePropertyName("query");

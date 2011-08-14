@@ -58,7 +58,7 @@ namespace CorrugatedIron.Tests.Live
         }
 
         [Test]
-        public void StartsWithFindsTheAppropriateKeys()
+        public void EqualsFindsOneKey()
         {
             for (int i = 0; i < 10; i++)
             {
@@ -66,6 +66,70 @@ namespace CorrugatedIron.Tests.Live
             }
 
             var mr = new RiakMapReduceQuery {ContentType = MrContentType};
+
+            mr.Inputs(bucket)
+                .Filter(f => f.Equal("time_8"))
+                .MapJs(m => m.Source("function (o) { return [1]; }"))
+                .ReduceJs(r => r.Name("Riak.reduceSum").Keep(true));
+
+            var result = Client.MapReduce(mr);
+            result.IsSuccess.ShouldBeTrue();
+
+            var mrResult = result.Value;
+            mrResult.PhaseResults.ShouldNotBeNull();
+            mrResult.PhaseResults.Count().ShouldEqual(2);
+
+            mrResult.PhaseResults.ElementAt(0).Phase.ShouldEqual(0u);
+            mrResult.PhaseResults.ElementAt(1).Phase.ShouldEqual(1u);
+
+            mrResult.PhaseResults.ElementAt(0).Value.ShouldBeNull();
+            mrResult.PhaseResults.ElementAt(1).Value.ShouldNotBeNull();
+
+            var values = result.Value.PhaseResults.ElementAt(1).GetObject<int[]>();
+            values[0].ShouldEqual(1);
+        }
+
+        [Test]
+        public void StartsWithFindsAllKeys()
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                Client.Put(new RiakObject(bucket, String.Format("time_{0}", i), emptyBody, RiakConstants.ContentTypes.ApplicationJson));
+            }
+
+            var mr = new RiakMapReduceQuery { ContentType = MrContentType };
+
+            mr.Inputs(bucket)
+                .Filter(f => f.StartsWith("time"))
+                .MapJs(m => m.Source("function (o) { return [1]; }"))
+                .ReduceJs(r => r.Name("Riak.reduceSum").Keep(true));
+
+            var result = Client.MapReduce(mr);
+            result.IsSuccess.ShouldBeTrue();
+
+            var mrResult = result.Value;
+            mrResult.PhaseResults.ShouldNotBeNull();
+            mrResult.PhaseResults.Count().ShouldEqual(2);
+
+            mrResult.PhaseResults.ElementAt(0).Phase.ShouldEqual(0u);
+            mrResult.PhaseResults.ElementAt(1).Phase.ShouldEqual(1u);
+
+            mrResult.PhaseResults.ElementAt(0).Value.ShouldBeNull();
+            mrResult.PhaseResults.ElementAt(1).Value.ShouldNotBeNull();
+
+            var values = result.Value.PhaseResults.ElementAt(1).GetObject<int[]>();
+            values[0].ShouldEqual(10);
+        }
+
+        [Test]
+        public void StartsWithAndBetweenReturnASubsetOfAllKeys()
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                Client.Put(new RiakObject(bucket, String.Format("time_{0}", i), emptyBody, RiakConstants.ContentTypes.ApplicationJson));
+            }
+
+            var mr = new RiakMapReduceQuery { ContentType = MrContentType };
 
             mr.Inputs(bucket)
                 .Filter(f => f.And(l => l.StartsWith("time"),
@@ -88,6 +152,7 @@ namespace CorrugatedIron.Tests.Live
             mrResult.PhaseResults.ElementAt(1).Value.ShouldNotBeNull();
 
             var values = result.Value.PhaseResults.ElementAt(1).GetObject<int[]>();
+            values[0].ShouldEqual(5);
         }
     }
 }
