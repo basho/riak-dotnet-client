@@ -148,7 +148,7 @@ namespace CorrugatedIron.Tests.KeyFilters
         [Test]
         public void MatchesCorrectlyConvertsToJson()
         {
-            var matches = new Matches<string>("solutions");
+            var matches = new Matches("solutions");
             matches.ToString().ShouldEqual(MatchesJson);
         }
         
@@ -214,7 +214,7 @@ namespace CorrugatedIron.Tests.KeyFilters
         [Test]
         public void NotCorrectlyConvertsToJson()
         {
-            var not = new Not(new Matches<string>("solution"));
+            var not = new Not(new Matches("solution"));
             not.ToString().ShouldEqual(NotJson);
         }
     }

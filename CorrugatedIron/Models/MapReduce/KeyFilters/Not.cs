@@ -14,18 +14,51 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
+using System.IO;
+using System.Text;
+using Newtonsoft.Json;
+
 namespace CorrugatedIron.Models.MapReduce.KeyFilters
 {
     /// <summary>
     /// Negates the result of key-filter operations.
     /// </summary>
-    public class Not : RiakCompositeKeyFilterToken
+    public class Not : IRiakKeyFilterToken
     {
-        public IRiakKeyFilterToken First { get { return (IRiakKeyFilterToken)Arguments[0]; } }
+        private readonly Tuple<string, IRiakKeyFilterToken> _kfDefinition;
+
+        public string FunctionName { get { return _kfDefinition.Item1; } }
+        public IRiakKeyFilterToken Argument { get { return _kfDefinition.Item2; } }
         
-        public Not(IRiakKeyFilterToken first)
-            : base("not", first)
+        public Not(IRiakKeyFilterToken arg)
         {
+            _kfDefinition = new Tuple<string, IRiakKeyFilterToken>("not", arg);
+        }
+
+        public override string ToString()
+        {
+            return ToJsonString();
+        }
+
+        public string ToJsonString()
+        {
+            var sb = new StringBuilder();
+
+            using (var sw = new StringWriter(sb))
+            using (JsonWriter jw = new JsonTextWriter(sw))
+            {
+                jw.WriteStartArray();
+
+                jw.WriteValue(FunctionName);
+                jw.WriteStartArray();
+                jw.WriteRawValue(Argument.ToString());
+                jw.WriteEndArray();
+
+                jw.WriteEndArray();
+            }
+
+            return sb.ToString();
         }
     }
 }

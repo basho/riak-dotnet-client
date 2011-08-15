@@ -14,19 +14,68 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
+using System.IO;
+using System.Text;
+using Newtonsoft.Json;
+
 namespace CorrugatedIron.Models.MapReduce.KeyFilters
 {
     /// <summary>
     /// Joins two or more key-filter operations with a logical OR operation.
     /// </summary>
-    public class Or : RiakCompositeKeyFilterToken
+    public class Or : IRiakKeyFilterToken
     {
-        public IRiakKeyFilterToken First { get { return (IRiakKeyFilterToken)Arguments[0]; } }
-        public IRiakKeyFilterToken Second { get { return (IRiakKeyFilterToken)Arguments[1]; } }
-        
-        public Or(IRiakKeyFilterToken first, IRiakKeyFilterToken second)
-            : base("or", first, second)
+        private Tuple<string, IRiakKeyFilterToken, IRiakKeyFilterToken> _kfDefinition;
+
+        public string FunctionName
         {
+            get { return _kfDefinition.Item1; }
+        }
+
+        public IRiakKeyFilterToken Left
+        {
+            get { return _kfDefinition.Item2; }
+        }
+
+        public IRiakKeyFilterToken Right
+        {
+            get { return _kfDefinition.Item3; }
+        }
+
+        public Or(IRiakKeyFilterToken left, IRiakKeyFilterToken right)
+        {
+            _kfDefinition = new Tuple<string, IRiakKeyFilterToken, IRiakKeyFilterToken>("or", left, right);
+        }
+
+        public override string ToString()
+        {
+            return ToJsonString();
+        }
+
+        public string ToJsonString()
+        {
+            var sb = new StringBuilder();
+
+            using (var sw = new StringWriter(sb))
+            using (JsonWriter jw = new JsonTextWriter(sw))
+            {
+                jw.WriteStartArray();
+
+                jw.WriteValue(FunctionName);
+
+                jw.WriteStartArray();
+                jw.WriteRawValue(Left.ToString());
+                jw.WriteEndArray();
+
+                jw.WriteStartArray();
+                jw.WriteRawValue(Right.ToString());
+                jw.WriteEndArray();
+
+                jw.WriteEndArray();
+            }
+
+            return sb.ToString();
         }
     }
 }

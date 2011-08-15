@@ -14,62 +14,40 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.Collections.Generic;
-using CorrugatedIron.Extensions;
-using Newtonsoft.Json;
+//using System.Collections.Generic;
+//using CorrugatedIron.Extensions;
+//using CorrugatedIron.Models.MapReduce.KeyFilters;
+//using Newtonsoft.Json;
 
-namespace CorrugatedIron.Models.MapReduce.Inputs
-{
-    public class RiakPhaseInputs
-    {
-        private readonly IEnumerable<RiakBucketKeyInput> _bucketKeyInputs;
-        private readonly IEnumerable<RiakBucketKeyArgInput> _bucketKeyArgInputs;
-        private readonly RiakBucketInput _bucketInput;
+//namespace CorrugatedIron.Models.MapReduce.Inputs
+//{
+//    public class RiakPhaseInputs
+//    {
+//        private readonly IRiakPhaseInput _input;
 
-        public RiakPhaseInputs(RiakBucketInput bucketInput)
-        {
-            _bucketInput = bucketInput;
-        }
+//        public List<IRiakKeyFilterToken> Filters { get; set; } 
 
-        public RiakPhaseInputs(IEnumerable<RiakBucketKeyInput> bucketKeyInputs)
-        {
-            _bucketKeyInputs = bucketKeyInputs;
-        }
+//        public RiakPhaseInputs(RiakBucketInput bucketInput)
+//        {
+//            _input = bucketInput;
+//            Filters = new List<IRiakKeyFilterToken>();
+//        }
 
-        public RiakPhaseInputs(IEnumerable<RiakBucketKeyArgInput> bucketKeyArgInputs)
-        {
-            _bucketKeyArgInputs = bucketKeyArgInputs;
-        }
+//        public RiakPhaseInputs(RiakBucketKeyInput bucketKeyInputs)
+//        {
+//            _input = bucketKeyInputs;
+//            Filters = new List<IRiakKeyFilterToken>();
+//        }
 
-        public JsonWriter WriteJson(JsonWriter writer)
-        {
-            if (_bucketInput != null)
-            {
-                return _bucketInput.WriteJson(writer);
-            }
+//        public RiakPhaseInputs(RiakBucketKeyKeyDataInput bucketKeyKeyDataInputs)
+//        {
+//            _input = bucketKeyKeyDataInputs;
+//            Filters = new List<IRiakKeyFilterToken>();
+//        }
 
-            writer.WriteStartArray();
-            if (_bucketKeyInputs != null)
-            {
-                _bucketKeyInputs.ForEach(i =>
-                    {
-                        writer.WriteStartArray();
-                        i.WriteJson(writer);
-                        writer.WriteEndArray();
-                    });
-            }
-            else
-            {
-                _bucketKeyArgInputs.ForEach(i =>
-                    {
-                        writer.WriteStartArray();
-                        i.WriteJson(writer);
-                        writer.WriteEndArray();
-                    });
-            }
-            writer.WriteEndArray();
-
-            return writer;
-        }
-    }
-}
+//        public JsonWriter WriteJson(JsonWriter writer)
+//        {
+//            return _input.WriteJson(writer);
+//        }
+//    }
+//}

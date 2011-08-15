@@ -14,16 +14,50 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
+using System.IO;
+using System.Text;
+using Newtonsoft.Json;
+
 namespace CorrugatedIron.Models.MapReduce.KeyFilters
 {
     /// <summary>
     /// Tests that the input is greater than the argument.
     /// </summary>
-    public class GreaterThan<T> : RiakKeyFilterToken
+    public class GreaterThan<T> : IRiakKeyFilterToken
     {
+        private readonly Tuple<string, T> _kfDefinition;
+
+        public string FunctionName { get { return _kfDefinition.Item1; } }
+
+        public T Argument { get { return _kfDefinition.Item2; } }
+
         public GreaterThan(T arg)
-            : base("greater_than", arg)
         {
+            _kfDefinition = new Tuple<string, T>("greater_than", arg);
+        }
+
+        public override string ToString()
+        {
+            return ToJsonString();
+        }
+
+        public string ToJsonString()
+        {
+            var sb = new StringBuilder();
+
+            using (var sw = new StringWriter(sb))
+            using (JsonWriter jw = new JsonTextWriter(sw))
+            {
+                jw.WriteStartArray();
+
+                jw.WriteValue(FunctionName);
+                jw.WriteValue(Argument);
+
+                jw.WriteEndArray();
+            }
+
+            return sb.ToString();
         }
     }
 }

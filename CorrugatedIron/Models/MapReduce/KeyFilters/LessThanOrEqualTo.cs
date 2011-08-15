@@ -14,16 +14,49 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
+using System.IO;
+using System.Text;
+using Newtonsoft.Json;
+
 namespace CorrugatedIron.Models.MapReduce.KeyFilters
 {
     /// <summary>
     /// Tests that the input is less than or equal to the argument.
     /// </summary>
-    public class LessThanOrEqualTo<T> : RiakKeyFilterToken
+    public class LessThanOrEqualTo<T> : IRiakKeyFilterToken
     {
+        private readonly Tuple<string, T> _kfDefinition;
+
+        public string FunctionName { get { return _kfDefinition.Item1; } }
+        public T Argument { get { return _kfDefinition.Item2; } }
+
         public LessThanOrEqualTo(T arg)
-            : base("less_than_eq", arg)
         {
+            _kfDefinition = new Tuple<string, T>("less_than_eq", arg);
+        }
+
+        public override string ToString()
+        {
+            return ToJsonString();
+        }
+
+        public string ToJsonString()
+        {
+            var sb = new StringBuilder();
+
+            using (var sw = new StringWriter(sb))
+            using (JsonWriter jw = new JsonTextWriter(sw))
+            {
+                jw.WriteStartArray();
+
+                jw.WriteValue(FunctionName);
+                jw.WriteValue(Argument);
+
+                jw.WriteEndArray();
+            }
+
+            return sb.ToString();
         }
     }
 }

@@ -27,9 +27,9 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
         {
         }
 
-        protected override void WriteArguments(object[] arguments, JsonWriter writer)
+        protected override void WriteArguments(JsonWriter writer)
         {
-            arguments.Cast<IRiakKeyFilterToken>().ForEach(v =>WriteArgumentAsArray(v, writer) );
+            Arguments.Cast<IRiakKeyFilterToken>().ForEach(v =>WriteArgumentAsArray(v, writer) );
         }
 
         protected void WriteArgumentAsArray(IRiakKeyFilterToken argument, JsonWriter writer)

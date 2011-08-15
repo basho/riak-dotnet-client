@@ -14,16 +14,39 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.IO;
+using System.Text;
+using Newtonsoft.Json;
+
 namespace CorrugatedIron.Models.MapReduce.KeyFilters
 {
     /// <summary>
     /// Changes all letters to uppercase.
     /// </summary>
-    public class ToUpper : RiakKeyFilterToken
+    public class ToUpper : IRiakKeyFilterToken
     {
-        public ToUpper()
-            : base("to_upper")
+        public string FunctionName { get { return "to_upper"; } }
+
+        public override string ToString()
         {
+            return ToJsonString();
+        }
+
+        public string ToJsonString()
+        {
+            var sb = new StringBuilder();
+
+            using (var sw = new StringWriter(sb))
+            using (JsonWriter jw = new JsonTextWriter(sw))
+            {
+                jw.WriteStartArray();
+
+                jw.WriteValue(FunctionName);
+
+                jw.WriteEndArray();
+            }
+
+            return sb.ToString();
         }
     }
 }

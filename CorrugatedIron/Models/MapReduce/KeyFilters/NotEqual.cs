@@ -14,19 +14,49 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
+using System.IO;
+using System.Text;
+using Newtonsoft.Json;
+
 namespace CorrugatedIron.Models.MapReduce.KeyFilters
 {
     /// <summary>
     /// Tests that the input is not equal to the argument.
     /// </summary>
-    public class NotEqual<T> : RiakKeyFilterToken
+    public class NotEqual<T> : IRiakKeyFilterToken
     {
-        public T Argument { get; private set; }
-        
+        private readonly Tuple<string, T> _kfDefinition;
+
+        public string FunctionName { get { return _kfDefinition.Item1; } }
+        public T Argument { get { return _kfDefinition.Item2; } }
+
         public NotEqual(T arg)
-            : base("neq", arg)
         {
-            Argument = arg;
+            _kfDefinition = new Tuple<string, T>("neq", arg);
+        }
+
+        public override string ToString()
+        {
+            return ToJsonString();
+        }
+
+        public string ToJsonString()
+        {
+            var sb = new StringBuilder();
+
+            using (var sw = new StringWriter(sb))
+            using (JsonWriter jw = new JsonTextWriter(sw))
+            {
+                jw.WriteStartArray();
+
+                jw.WriteValue(FunctionName);
+                jw.WriteValue(Argument);
+
+                jw.WriteEndArray();
+            }
+
+            return sb.ToString();
         }
     }
 }

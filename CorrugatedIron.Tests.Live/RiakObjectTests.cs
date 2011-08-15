@@ -75,11 +75,11 @@ namespace CorrugatedIron.Tests.Live
             var jeremiah = Client.Get(TestBucket, Jeremiah).Value;
             var jLinks = jeremiah.Links;
 
+            var input = new RiakBucketKeyInput();
+            input.AddBucketKey(TestBucket, Jeremiah);
+
             var query = new RiakMapReduceQuery()
-                .Inputs(new List<RiakBucketKeyInput>
-                        {
-                            new RiakBucketKeyInput(TestBucket, Jeremiah )
-                        })
+                .Inputs(input)
                 .Link(l => l.AllLinks().Keep(true));
 
             var mrResult = Client.MapReduce(query);

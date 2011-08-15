@@ -18,7 +18,6 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
 {
     public interface IRiakKeyFilterToken
     {
-        string FunctionName { get; set; }
         string ToJsonString();
     }
 }

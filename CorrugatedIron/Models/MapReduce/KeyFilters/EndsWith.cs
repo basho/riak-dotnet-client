@@ -14,16 +14,50 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
+using System.IO;
+using System.Text;
+using Newtonsoft.Json;
+
 namespace CorrugatedIron.Models.MapReduce.KeyFilters
 {
     /// <summary>
     /// Tests that the input ends with the argument (a string).
     /// </summary>
-    public class EndsWith : RiakKeyFilterToken
+    public class EndsWith : IRiakKeyFilterToken
     {
+        private Tuple<string, string> _kfDefinition;
+
+        public string FunctionName { get { return _kfDefinition.Item1; } }
+
+        public string Argument { get { return _kfDefinition.Item2; } }
+
         public EndsWith(string arg)
-            : base("ends_with", arg)
         {
+            _kfDefinition = new Tuple<string, string>("ends_with", arg);
+        }
+
+        public override string ToString()
+        {
+            return ToJsonString();
+        }
+
+        public string ToJsonString()
+        {
+            var sb = new StringBuilder();
+
+            using (var sw = new StringWriter(sb))
+            using (JsonWriter jw = new JsonTextWriter(sw))
+            {
+                jw.WriteStartArray();
+
+                jw.WriteValue(FunctionName);
+                jw.WriteValue(Argument);
+
+                jw.WriteEndArray();
+            }
+
+            return sb.ToString();
         }
     }
 }

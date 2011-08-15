@@ -33,34 +33,33 @@ namespace CorrugatedIron.Models.MapReduce
     public class RiakMapReduceQuery
     {
         private readonly List<RiakPhase> _phases;
-        private readonly List<IRiakKeyFilterToken> _filters;
+        
         private string _query;
-        private RiakPhaseInputs _inputs;
+        private RiakPhaseInput _inputs;
 
         public string ContentType { get; set; }
 
         public RiakMapReduceQuery()
         {
             _phases = new List<RiakPhase>();
-            _filters = new List<IRiakKeyFilterToken>();
             ContentType = RiakConstants.ContentTypes.ApplicationJson;
         }
 
         public RiakMapReduceQuery Inputs(string bucket)
         {
-            _inputs = new RiakPhaseInputs(new RiakBucketInput(bucket));
+            _inputs = new RiakBucketInput(bucket);
             return this;
         }
 
-        public RiakMapReduceQuery Inputs(IEnumerable<RiakBucketKeyInput> inputs)
+        public RiakMapReduceQuery Inputs(RiakBucketKeyInput riakBucketKeyInputs)
         {
-            _inputs = new RiakPhaseInputs(inputs);
+            _inputs = riakBucketKeyInputs;
             return this;
         }
 
-        public RiakMapReduceQuery Inputs(IEnumerable<RiakBucketKeyArgInput> inputs)
+        public RiakMapReduceQuery Inputs(RiakBucketKeyKeyDataInput riakBucketKeyKeyDataInputs)
         {
-            _inputs = new RiakPhaseInputs(inputs);
+            _inputs = riakBucketKeyKeyDataInputs;
             return this;
         }
 
@@ -114,7 +113,7 @@ namespace CorrugatedIron.Models.MapReduce
             var filters = new List<IRiakKeyFilterToken>();
             var fluent = new RiakFluentKeyFilter(filters);
             setup(fluent);
-            _filters.AddRange(filters);
+            _inputs.Filters.AddRange(filters);
 
             return this;
         }
@@ -137,15 +136,6 @@ namespace CorrugatedIron.Models.MapReduce
                     
                     writer.WriteStartObject();
                     _inputs.WriteJson(writer);
-
-                    if (_filters.Count > 0)
-                    {
-                        writer.WritePropertyName("key_filters");
-
-                        writer.WriteStartArray();
-                        _filters.ForEach(f => writer.WriteRawValue(f.ToJsonString()));
-                        writer.WriteEndArray();
-                    }
 
                     writer.WriteEndObject();
                 }

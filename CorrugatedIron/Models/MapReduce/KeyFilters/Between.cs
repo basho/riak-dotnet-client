@@ -14,6 +14,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
+using System.IO;
+using System.Text;
+using Newtonsoft.Json;
+
 namespace CorrugatedIron.Models.MapReduce.KeyFilters
 {
     /// <summary>
@@ -21,11 +26,48 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
     /// If the third argument is given, it is whether to treat the range as inclusive. 
     /// If the third argument is omitted, the range is treated as inclusive.
     /// </summary>
-    public class Between<T> : RiakKeyFilterToken
+    /// <remarks>It is assumed that left and right supply their own JSON conversion.</remarks>
+    public class Between<T> : IRiakKeyFilterToken
     {
-        public Between(T first, T second, bool inclusive = true)
-            : base("between", first, second, inclusive)
+        private Tuple<string, T, T, bool> _kfDefinition;
+
+        public string FunctionName { get { return _kfDefinition.Item1; } }
+
+        public T Left { get { return _kfDefinition.Item2; } }
+
+        public T Right { get { return _kfDefinition.Item3; } }
+
+        public bool Inclusive { get { return _kfDefinition.Item4; } }
+
+        public Between(T left, T right, bool inclusive = true)
+            
         {
+            _kfDefinition = new Tuple<string, T, T, bool>("between", left, right, inclusive);
+        }
+
+        public override string ToString()
+        {
+            return ToJsonString();
+        }
+
+        public string ToJsonString()
+        {
+            var sb = new StringBuilder();
+
+            using (var sw = new StringWriter(sb))
+            using (JsonWriter jw = new JsonTextWriter(sw))
+            {
+                jw.WriteStartArray();
+
+                jw.WriteValue(FunctionName);
+                jw.WriteValue(Left);
+                jw.WriteValue(Right);
+                jw.WriteValue(Inclusive);
+
+                jw.WriteEndArray();
+            }
+
+            return sb.ToString();
         }
     }
 }

@@ -14,19 +14,50 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
+using System.IO;
+using System.Text;
+using System.Text.RegularExpressions;
+using Newtonsoft.Json;
+
 namespace CorrugatedIron.Models.MapReduce.KeyFilters
 {
     /// <summary>
     /// Tests that the input matches the regular expression given in the argument.
     /// </summary>
-    public class Matches<T> : RiakKeyFilterToken
+    public class Matches : IRiakKeyFilterToken
     {
-        public T Match { get; private set; }
+        private readonly Tuple<string, string> _kfDefinition;
+
+        public string FunctionName { get { return _kfDefinition.Item1; } }
+        public string Argument { get { return _kfDefinition.Item2; } }
         
-        public Matches(T arg)
-            : base("matches", arg)
+        public Matches(string arg)
         {
-            Match = arg;
+            _kfDefinition = new Tuple<string, string>("matches", arg);
+        }
+
+        public override string ToString()
+        {
+            return ToJsonString();
+        }
+
+        public string ToJsonString()
+        {
+            var sb = new StringBuilder();
+
+            using (var sw = new StringWriter(sb))
+            using (JsonWriter jw = new JsonTextWriter(sw))
+            {
+                jw.WriteStartArray();
+
+                jw.WriteValue(FunctionName);
+                jw.WriteValue(Argument);
+
+                jw.WriteEndArray();
+            }
+
+            return sb.ToString();
         }
     }
 }
