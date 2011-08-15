@@ -14,22 +14,52 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
+using System.IO;
+using System.Text;
+using Newtonsoft.Json;
+
 namespace CorrugatedIron.Models.MapReduce.KeyFilters
 {
     /// <summary>
     /// Splits the input on the string given as the first argument and returns the nth
     /// token specified by the second argument.
     /// </summary>
-    public class Tokenize : RiakKeyFilterToken
+    public class Tokenize : IRiakKeyFilterToken
     {
-        public string Token { get; private set; }
-        public uint Position { get; private set; }
+        private readonly Tuple<string, string, uint> _kfDefinition;
+
+        public string FunctionName { get { return _kfDefinition.Item1; } }
+        public string Token { get { return _kfDefinition.Item2; } }
+        public uint Position { get { return _kfDefinition.Item3; } }
         
         public Tokenize(string token, uint position)
-            : base("tokenize", token, position)
         {
-            Token = token;
-            Position = position;
+            _kfDefinition = new Tuple<string, string, uint>("tokenize", token, position);
+        }
+
+        public override string ToString()
+        {
+            return ToJsonString();
+        }
+
+        public string ToJsonString()
+        {
+            var sb = new StringBuilder();
+
+            using (var sw = new StringWriter(sb))
+            using (JsonWriter jw = new JsonTextWriter(sw))
+            {
+                jw.WriteStartArray();
+
+                jw.WriteValue(FunctionName);
+                jw.WriteValue(Token);
+                jw.WriteValue(Position);
+
+                jw.WriteEndArray();
+            }
+
+            return sb.ToString();
         }
     }
 }

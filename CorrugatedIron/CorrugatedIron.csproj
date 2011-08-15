@@ -93,7 +93,7 @@
     <Compile Include="Models\MapReduce\Inputs\RiakBucketInput.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Models\MapReduce\Inputs\RiakBucketKeyArgInput.cs">
+    <Compile Include="Models\MapReduce\Inputs\RiakBucketKeyKeyDataInput.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Models\MapReduce\Inputs\RiakBucketKeyInput.cs">
@@ -106,7 +106,7 @@
     <Compile Include="Models\MapReduce\KeyFilters\And.cs" />
     <Compile Include="Models\MapReduce\KeyFilters\Between.cs" />
     <Compile Include="Models\MapReduce\KeyFilters\EndsWith.cs" />
-    <Compile Include="Models\MapReduce\KeyFilters\Equal.cs" />
+    <Compile Include="Models\MapReduce\KeyFilters\EqualTo.cs" />
     <Compile Include="Models\MapReduce\KeyFilters\FloatToString.cs" />
     <Compile Include="Models\MapReduce\KeyFilters\GreaterThan.cs" />
     <Compile Include="Models\MapReduce\KeyFilters\GreaterThanOrEqualTo.cs" />

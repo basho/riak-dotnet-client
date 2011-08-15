@@ -100,9 +100,9 @@ namespace CorrugatedIron.Models.MapReduce.Fluent
             return this;
         }
 
-        public RiakFluentKeyFilter Matches<T>(T arg)
+        public RiakFluentKeyFilter Matches(string arg)
         {
-            _filters.Add(new Matches<T>(arg));
+            _filters.Add(new Matches(arg));
             return this;
         }
 

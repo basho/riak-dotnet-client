@@ -14,23 +14,37 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Collections.Generic;
+using CorrugatedIron.Models.MapReduce.KeyFilters;
 using Newtonsoft.Json;
 
 namespace CorrugatedIron.Models.MapReduce.Inputs
 {
-    public class RiakBucketInput : IRiakPhaseInput
+    public class RiakBucketInput : RiakPhaseInput
     {
         private readonly string _bucket;
 
         public RiakBucketInput(string bucket)
         {
             _bucket = bucket;
+            Filters = new List<IRiakKeyFilterToken>();
         }
 
-        public virtual JsonWriter WriteJson(JsonWriter writer)
+        public override JsonWriter WriteJson(JsonWriter writer)
         {
             writer.WritePropertyName("bucket");
             writer.WriteValue(_bucket);
+
+            if (Filters.Count > 0)
+            {
+                writer.WritePropertyName("key_filters");
+                writer.WriteStartArray();
+
+                Filters.ForEach(f => writer.WriteRawValue(f.ToJsonString()));
+
+                writer.WriteEndArray();
+            }
+
             return writer;
         }
 

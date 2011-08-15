@@ -14,7 +14,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using Newtonsoft.Json;
 
 namespace CorrugatedIron.Models.MapReduce.KeyFilters
@@ -22,19 +25,41 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
     /// <summary>
     /// Tests that the input is contained in the set given as the arguments.
     /// </summary>
-    public class SetMember<T> : RiakKeyFilterToken
+    public class SetMember<T> : IRiakKeyFilterToken
     {
-        public List<T> Set { get; private set; }
+        private Tuple<string, List<T>> _kfDefinition;
+
+        public string FunctionName { get { return _kfDefinition.Item1; } }
+        public List<T> Argument { get { return Set; } }
+        public List<T> Set { get { return _kfDefinition.Item2; } } 
 
         public SetMember(List<T> set)
-            : base("set_member", set.ToArray())
         {
-            Set = set;
+            _kfDefinition = new Tuple<string, List<T>>("set_member", set);
         }
 
-        protected override void WriteArguments(object[] arguments, JsonWriter writer)
+        public override string ToString()
         {
-            Set.ForEach(v => writer.WriteValue(v));
+            return ToJsonString();
+        }
+
+        public string ToJsonString()
+        {
+            var sb = new StringBuilder();
+
+            using (var sw = new StringWriter(sb))
+            using (JsonWriter jw = new JsonTextWriter(sw))
+            {
+                jw.WriteStartArray();
+
+                jw.WriteValue(FunctionName);
+                
+                Set.ForEach(v => jw.WriteValue(v));
+
+                jw.WriteEndArray();
+            }
+
+            return sb.ToString();
         }
     }
 }

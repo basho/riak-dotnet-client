@@ -14,16 +14,51 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
+using System.IO;
+using System.Text;
+using Newtonsoft.Json;
+
 namespace CorrugatedIron.Models.MapReduce.KeyFilters
 {
     /// <summary>
     /// Tests that input is within the Levenshtein distance of the first argument given by the second argument.
     /// </summary>
-    public class SimilarTo<T> : RiakKeyFilterToken
+    public class SimilarTo<T> : IRiakKeyFilterToken
     {
+        private readonly Tuple<string, T, int> _kfDefintion;
+
+        public string FunctionName { get { return _kfDefintion.Item1; } }
+        public T Argument { get { return _kfDefintion.Item2; } }
+        public int Distance { get { return _kfDefintion.Item3; } }
+
         public SimilarTo(T arg, int distance)
-            : base("similar_to", arg, distance)
         {
+            _kfDefintion = new Tuple<string, T, int>("similar_to", arg, distance);
+        }
+
+        public override string ToString()
+        {
+            return ToJsonString();
+        }
+
+        public string ToJsonString()
+        {
+            var sb = new StringBuilder();
+
+            using (var sw = new StringWriter(sb))
+            using (JsonWriter jw = new JsonTextWriter(sw))
+            {
+                jw.WriteStartArray();
+
+                jw.WriteValue(FunctionName);
+                jw.WriteValue(Argument);
+                jw.WriteValue(Distance);
+
+                jw.WriteEndArray();
+            }
+
+            return sb.ToString();              
         }
     }
 }

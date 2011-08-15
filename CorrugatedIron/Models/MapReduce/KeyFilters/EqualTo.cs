@@ -22,19 +22,19 @@ using Newtonsoft.Json;
 namespace CorrugatedIron.Models.MapReduce.KeyFilters
 {
     /// <summary>
-    /// Tests that the input is less than the argument.
+    /// Tests that the input is equal to the argument.
     /// </summary>
-    public class LessThan<T> : IRiakKeyFilterToken
+    public class Equal<T> : IRiakKeyFilterToken
     {
-        private readonly Tuple<string, T> _kfDefinition;
+        private Tuple<string, T> _kfDefinition;
 
         public string FunctionName { get { return _kfDefinition.Item1; } }
 
         public T Argument { get { return _kfDefinition.Item2; } }
 
-        public LessThan(T arg)
+        public Equal(T arg)
         {
-            _kfDefinition = new Tuple<string, T>("less_than", arg);
+            _kfDefinition = new Tuple<string, T>("eq", arg);
         }
 
         public override string ToString()
