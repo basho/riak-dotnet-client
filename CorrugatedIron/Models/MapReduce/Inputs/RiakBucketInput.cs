@@ -32,23 +32,27 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
 
         public override JsonWriter WriteJson(JsonWriter writer)
         {
-            writer.WritePropertyName("inputs");
-            writer.WriteStartObject();
-
-            writer.WritePropertyName("bucket");
-            writer.WriteValue(_bucket);
-
             if (Filters.Count > 0)
             {
+                writer.WritePropertyName("inputs");
+                writer.WriteStartObject();
+
+                writer.WritePropertyName("bucket");
+                writer.WriteValue(_bucket);
+
                 writer.WritePropertyName("key_filters");
                 writer.WriteStartArray();
 
                 Filters.ForEach(f => writer.WriteRawValue(f.ToJsonString()));
 
                 writer.WriteEndArray();
+                writer.WriteEndObject();
             }
-
-            writer.WriteEndObject();
+            else
+            {
+                writer.WritePropertyName("inputs");
+                writer.WriteValue(_bucket);
+            }
 
             return writer;
         }

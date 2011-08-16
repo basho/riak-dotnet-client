@@ -34,7 +34,7 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
 
         public SimilarTo(T arg, int distance)
         {
-            _kfDefintion = new Tuple<string, T, int>("similar_to", arg, distance);
+            _kfDefintion = Tuple.Create("similar_to", arg, distance);
         }
 
         public override string ToString()

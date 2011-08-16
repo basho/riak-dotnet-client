@@ -34,7 +34,7 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
 
         public LessThan(T arg)
         {
-            _kfDefinition = new Tuple<string, T>("less_than", arg);
+            _kfDefinition = Tuple.Create("less_than", arg);
         }
 
         public override string ToString()

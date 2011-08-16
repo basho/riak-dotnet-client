@@ -33,7 +33,7 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
 
         public NotEqual(T arg)
         {
-            _kfDefinition = new Tuple<string, T>("neq", arg);
+            _kfDefinition = Tuple.Create("neq", arg);
         }
 
         public override string ToString()

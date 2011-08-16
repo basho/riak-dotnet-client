@@ -26,7 +26,7 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
     /// </summary>
     public class GreaterThanOrEqualTo<T> : IRiakKeyFilterToken
     {
-        public Tuple<string, T> _kfDefinition;
+        private readonly Tuple<string, T> _kfDefinition;
 
         public string FunctionName { get { return _kfDefinition.Item1; } }
 
@@ -34,7 +34,7 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
 
         public GreaterThanOrEqualTo(T arg)
         {
-            _kfDefinition = new Tuple<string, T>("greater_than_eq", arg);
+            _kfDefinition = Tuple.Create("greater_than_eq", arg);
         }
 
         public override string ToString()

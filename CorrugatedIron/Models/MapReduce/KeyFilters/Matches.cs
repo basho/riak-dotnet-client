@@ -34,7 +34,7 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
         
         public Matches(string arg)
         {
-            _kfDefinition = new Tuple<string, string>("matches", arg);
+            _kfDefinition = Tuple.Create("matches", arg);
         }
 
         public override string ToString()

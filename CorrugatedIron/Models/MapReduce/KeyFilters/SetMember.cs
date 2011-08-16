@@ -27,7 +27,7 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
     /// </summary>
     public class SetMember<T> : IRiakKeyFilterToken
     {
-        private Tuple<string, List<T>> _kfDefinition;
+        private readonly Tuple<string, List<T>> _kfDefinition;
 
         public string FunctionName { get { return _kfDefinition.Item1; } }
         public List<T> Argument { get { return Set; } }
@@ -35,7 +35,7 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
 
         public SetMember(List<T> set)
         {
-            _kfDefinition = new Tuple<string, List<T>>("set_member", set);
+            _kfDefinition = Tuple.Create("set_member", set);
         }
 
         public override string ToString()

@@ -33,7 +33,7 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
 
         public LessThanOrEqualTo(T arg)
         {
-            _kfDefinition = new Tuple<string, T>("less_than_eq", arg);
+            _kfDefinition = Tuple.Create("less_than_eq", arg);
         }
 
         public override string ToString()
