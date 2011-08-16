@@ -37,6 +37,7 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
 
         public override JsonWriter WriteJson(JsonWriter writer)
         {
+            writer.WritePropertyName("inputs");
             writer.WriteStartArray();
 
             BucketKeyKeyData.ForEach(bkkd =>

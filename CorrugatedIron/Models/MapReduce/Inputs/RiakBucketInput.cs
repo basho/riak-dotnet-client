@@ -32,6 +32,9 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
 
         public override JsonWriter WriteJson(JsonWriter writer)
         {
+            writer.WritePropertyName("inputs");
+            writer.WriteStartObject();
+
             writer.WritePropertyName("bucket");
             writer.WriteValue(_bucket);
 
@@ -44,6 +47,8 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
 
                 writer.WriteEndArray();
             }
+
+            writer.WriteEndObject();
 
             return writer;
         }

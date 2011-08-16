@@ -132,12 +132,7 @@ namespace CorrugatedIron.Models.MapReduce
 
                 if (_inputs != null)
                 {
-                    writer.WritePropertyName("inputs");
-                    
-                    writer.WriteStartObject();
                     _inputs.WriteJson(writer);
-
-                    writer.WriteEndObject();
                 }
 
                 writer.WritePropertyName("query");
