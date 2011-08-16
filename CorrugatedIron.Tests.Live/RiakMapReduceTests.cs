@@ -133,9 +133,10 @@ namespace CorrugatedIron.Tests.Live
 
             mr.Inputs(bucket)
                 .Filter(f => f.And(l => l.StartsWith("time"),
-                                   r => r.Tokenize("_", 1)
-                                            .Between(3, 7, true)))
-                .MapJs(m => m.Source("function (o) { return [1]; }"))
+                                   r => r.Tokenize("_", 2)
+                                       .Equal(6)))
+                                            //.Between(3, 7, true)))
+                .MapJs(m => m.Source("function (o) { return [1]; }").Keep(true))
                 .ReduceJs(r => r.Name("Riak.reduceSum").Keep(true));
 
             var result = Client.MapReduce(mr);

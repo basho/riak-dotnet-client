@@ -26,7 +26,7 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
     /// </summary>
     public class EndsWith : IRiakKeyFilterToken
     {
-        private Tuple<string, string> _kfDefinition;
+        private readonly Tuple<string, string> _kfDefinition;
 
         public string FunctionName { get { return _kfDefinition.Item1; } }
 
@@ -34,7 +34,7 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
 
         public EndsWith(string arg)
         {
-            _kfDefinition = new Tuple<string, string>("ends_with", arg);
+            _kfDefinition = Tuple.Create("ends_with", arg);
         }
 
         public override string ToString()

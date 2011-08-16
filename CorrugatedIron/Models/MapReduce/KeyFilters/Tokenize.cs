@@ -35,7 +35,7 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
         
         public Tokenize(string token, uint position)
         {
-            _kfDefinition = new Tuple<string, string, uint>("tokenize", token, position);
+            _kfDefinition = Tuple.Create("tokenize", token, position);
         }
 
         public override string ToString()

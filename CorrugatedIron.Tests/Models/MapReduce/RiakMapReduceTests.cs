@@ -28,10 +28,10 @@ namespace CorrugatedIron.Tests.Models.MapReduce
     public class RiakMapReduceTests
     {
         private const string MrJobText =
-            @"{""inputs"":{""bucket"":""animals""},""query"":[{""map"":{""language"":""javascript"",""source"":""function(v) { return [v]; }"",""keep"":true}}]}";
+            @"{""inputs"":""animals"",""query"":[{""map"":{""language"":""javascript"",""source"":""function(v) { return [v]; }"",""keep"":true}}]}";
 
         private const string ComplexMrJobText =
-            @"{""inputs"":{""bucket"":""animals""},""query"":[{""map"":{""language"":""javascript"",""source"":""function(o) { if (o.key.indexOf('spider') != -1) return [1]; return []; }"",""keep"":false}},{""reduce"":{""language"":""javascript"",""name"":""Riak.reduceSum"",""keep"":true}}]}";
+            @"{""inputs"":""animals"",""query"":[{""map"":{""language"":""javascript"",""source"":""function(o) { if (o.key.indexOf('spider') != -1) return [1]; return []; }"",""keep"":false}},{""reduce"":{""language"":""javascript"",""name"":""Riak.reduceSum"",""keep"":true}}]}";
 
         private const string ComplexMrJobWithFilterText =
             @"{""inputs"":{""bucket"":""animals"",""key_filters"":[[""matches"",""spider""]]},""query"":[{""map"":{""language"":""javascript"",""source"":""function(o) { return [1]; }"",""keep"":false}},{""reduce"":{""language"":""javascript"",""name"":""Riak.reduceSum"",""keep"":true}}]}";

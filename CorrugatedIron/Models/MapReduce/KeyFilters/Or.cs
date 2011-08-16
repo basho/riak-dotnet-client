@@ -15,6 +15,7 @@
 // under the License.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Newtonsoft.Json;
@@ -26,26 +27,26 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
     /// </summary>
     public class Or : IRiakKeyFilterToken
     {
-        private Tuple<string, IRiakKeyFilterToken, IRiakKeyFilterToken> _kfDefinition;
+        private readonly Tuple<string, List<IRiakKeyFilterToken>, List<IRiakKeyFilterToken>> _kfDefinition;
 
         public string FunctionName
         {
             get { return _kfDefinition.Item1; }
         }
 
-        public IRiakKeyFilterToken Left
+        public List<IRiakKeyFilterToken> Left
         {
             get { return _kfDefinition.Item2; }
         }
 
-        public IRiakKeyFilterToken Right
+        public List<IRiakKeyFilterToken> Right
         {
             get { return _kfDefinition.Item3; }
         }
 
-        public Or(IRiakKeyFilterToken left, IRiakKeyFilterToken right)
+        public Or(List<IRiakKeyFilterToken> left, List<IRiakKeyFilterToken> right)
         {
-            _kfDefinition = new Tuple<string, IRiakKeyFilterToken, IRiakKeyFilterToken>("or", left, right);
+            _kfDefinition = Tuple.Create("or", left, right);
         }
 
         public override string ToString()
@@ -65,11 +66,11 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
                 jw.WriteValue(FunctionName);
 
                 jw.WriteStartArray();
-                jw.WriteRawValue(Left.ToString());
+                Left.ForEach(l => jw.WriteRawValue(l.ToString()));
                 jw.WriteEndArray();
 
                 jw.WriteStartArray();
-                jw.WriteRawValue(Right.ToString());
+                Right.ForEach(r => jw.WriteRawValue(r.ToString()));
                 jw.WriteEndArray();
 
                 jw.WriteEndArray();

@@ -41,7 +41,7 @@ namespace CorrugatedIron.Models.MapReduce.Fluent
             var rightFluent = new RiakFluentKeyFilter(rightFilters);
             right(rightFluent);
 
-            _filters.Add(new And(leftFilters[0], rightFilters[0]));
+            _filters.Add(new And(leftFilters, rightFilters));
 
             return this;
         }
@@ -114,7 +114,7 @@ namespace CorrugatedIron.Models.MapReduce.Fluent
             var filters = new List<IRiakKeyFilterToken>();
             var fluent = new RiakFluentKeyFilter(filters);
             setup(fluent);
-            _filters.Add(new Not(filters[0]));
+            _filters.Add(new Not(filters));
 
             return this;
         }
@@ -135,7 +135,7 @@ namespace CorrugatedIron.Models.MapReduce.Fluent
             var rightFluent = new RiakFluentKeyFilter(rightFilters);
             right(rightFluent);
 
-            _filters.Add(new Or(leftFilters[0], rightFilters[0]));
+            _filters.Add(new Or(leftFilters, rightFilters));
 
             return this;
         }

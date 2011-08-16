@@ -26,14 +26,14 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
     /// </summary>
     public class StartsWith : IRiakKeyFilterToken
     {
-        public readonly Tuple<string, string> _kfDefinition;
+        private readonly Tuple<string, string> _kfDefinition;
 
         public string FunctionName { get { return _kfDefinition.Item1; } }
         public string Argument { get { return _kfDefinition.Item2; } }
 
         public StartsWith(string arg)
         {
-            _kfDefinition = new Tuple<string, string>("starts_with", arg);
+            _kfDefinition = Tuple.Create("starts_with", arg);
         }
 
         public override string ToString()

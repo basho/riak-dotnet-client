@@ -29,7 +29,7 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
     /// <remarks>It is assumed that left and right supply their own JSON conversion.</remarks>
     public class Between<T> : IRiakKeyFilterToken
     {
-        private Tuple<string, T, T, bool> _kfDefinition;
+        private readonly Tuple<string, T, T, bool> _kfDefinition;
 
         public string FunctionName { get { return _kfDefinition.Item1; } }
 
@@ -42,7 +42,7 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
         public Between(T left, T right, bool inclusive = true)
             
         {
-            _kfDefinition = new Tuple<string, T, T, bool>("between", left, right, inclusive);
+            _kfDefinition = Tuple.Create("between", left, right, inclusive);
         }
 
         public override string ToString()

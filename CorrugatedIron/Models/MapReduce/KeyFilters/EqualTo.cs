@@ -26,7 +26,7 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
     /// </summary>
     public class Equal<T> : IRiakKeyFilterToken
     {
-        private Tuple<string, T> _kfDefinition;
+        private readonly Tuple<string, T> _kfDefinition;
 
         public string FunctionName { get { return _kfDefinition.Item1; } }
 
@@ -34,7 +34,7 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
 
         public Equal(T arg)
         {
-            _kfDefinition = new Tuple<string, T>("eq", arg);
+            _kfDefinition = Tuple.Create("eq", arg);
         }
 
         public override string ToString()

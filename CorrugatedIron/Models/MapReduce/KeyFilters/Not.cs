@@ -15,6 +15,7 @@
 // under the License.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Newtonsoft.Json;
@@ -26,14 +27,14 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
     /// </summary>
     public class Not : IRiakKeyFilterToken
     {
-        private readonly Tuple<string, IRiakKeyFilterToken> _kfDefinition;
+        private readonly Tuple<string, List<IRiakKeyFilterToken>> _kfDefinition;
 
         public string FunctionName { get { return _kfDefinition.Item1; } }
-        public IRiakKeyFilterToken Argument { get { return _kfDefinition.Item2; } }
-        
-        public Not(IRiakKeyFilterToken arg)
+        public List<IRiakKeyFilterToken> Argument { get { return _kfDefinition.Item2; } }
+
+        public Not(List<IRiakKeyFilterToken> arg)
         {
-            _kfDefinition = new Tuple<string, IRiakKeyFilterToken>("not", arg);
+            _kfDefinition = Tuple.Create("not", arg);
         }
 
         public override string ToString()
@@ -52,9 +53,10 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
 
                 jw.WriteValue(FunctionName);
                 jw.WriteStartArray();
-                jw.WriteRawValue(Argument.ToString());
-                jw.WriteEndArray();
+                
+                Argument.ForEach(a => jw.WriteRawValue(a.ToString()));
 
+                jw.WriteEndArray();
                 jw.WriteEndArray();
             }
 
