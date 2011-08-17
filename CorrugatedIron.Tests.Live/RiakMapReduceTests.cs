@@ -57,6 +57,12 @@ namespace CorrugatedIron.Tests.Live
             Client = ClientGenerator();
         }
 
+        [TearDown]
+        public void TearDown()
+        {
+            Client.DeleteBucket(bucket);
+        }
+
         [Test]
         public void EqualsFindsOneKey()
         {
@@ -134,8 +140,8 @@ namespace CorrugatedIron.Tests.Live
             mr.Inputs(bucket)
                 .Filter(f => f.And(l => l.StartsWith("time"),
                                    r => r.Tokenize("_", 2)
-                                       .Equal(6)))
-                                            //.Between(3, 7, true)))
+                                            .StringToInt()
+                                            .Between(3, 7, true)))
                 .MapJs(m => m.Source("function (o) { return [1]; }").Keep(true))
                 .ReduceJs(r => r.Name("Riak.reduceSum").Keep(true));
 
@@ -144,15 +150,9 @@ namespace CorrugatedIron.Tests.Live
 
             var mrResult = result.Value;
             mrResult.PhaseResults.ShouldNotBeNull();
-            mrResult.PhaseResults.Count().ShouldEqual(2);
+            mrResult.PhaseResults.Count().ShouldEqual(3);
 
-            mrResult.PhaseResults.ElementAt(0).Phase.ShouldEqual(0u);
-            mrResult.PhaseResults.ElementAt(1).Phase.ShouldEqual(1u);
-
-            mrResult.PhaseResults.ElementAt(0).Value.ShouldBeNull();
-            mrResult.PhaseResults.ElementAt(1).Value.ShouldNotBeNull();
-
-            var values = result.Value.PhaseResults.ElementAt(1).GetObject<int[]>();
+            var values = result.Value.PhaseResults.ElementAt(2).GetObject<int[]>();
             values[0].ShouldEqual(5);
         }
     }
