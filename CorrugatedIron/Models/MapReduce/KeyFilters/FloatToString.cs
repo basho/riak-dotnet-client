@@ -14,16 +14,39 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CorrugatedIron.KeyFilters
+using System.IO;
+using System.Text;
+using Newtonsoft.Json;
+
+namespace CorrugatedIron.Models.MapReduce.KeyFilters
 {
     /// <summary>
     /// Turns a floating point number (previously extracted with string_to_float), into a string.
     /// </summary>
-    public class FloatToString : RiakKeyFilterToken
+    public class FloatToString : IRiakKeyFilterToken
     {
-        public FloatToString()
-            : base("float_to_string")
+        public string FunctionName { get { return "float_to_string"; } }
+
+        public override string ToString()
         {
+            return ToJsonString();
+        }
+
+        public string ToJsonString()
+        {
+            var sb = new StringBuilder();
+
+            using (var sw = new StringWriter(sb))
+            using (JsonWriter jw = new JsonTextWriter(sw))
+            {
+                jw.WriteStartArray();
+
+                jw.WriteValue(FunctionName);
+
+                jw.WriteEndArray();
+            }
+
+            return sb.ToString();
         }
     }
 }
