@@ -14,16 +14,39 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CorrugatedIron.KeyFilters
+using System.IO;
+using System.Text;
+using Newtonsoft.Json;
+
+namespace CorrugatedIron.Models.MapReduce.KeyFilters
 {
     /// <summary>
     /// Turns an integer (previously extracted with string_to_int), into a string.
     /// </summary>
-    public class IntToString : RiakKeyFilterToken
+    public class IntToString : IRiakKeyFilterToken
     {
-        public IntToString ()
-            : base("int_to_string")
+        public string FunctionName { get { return "int_to_string"; } }
+
+        public override string ToString()
         {
+            return ToJsonString();
+        }
+
+        public string ToJsonString()
+        {
+            var sb = new StringBuilder();
+
+            using (var sw = new StringWriter(sb))
+            using (JsonWriter jw = new JsonTextWriter(sw))
+            {
+                jw.WriteStartArray();
+
+                jw.WriteValue(FunctionName);
+
+                jw.WriteEndArray();
+            }
+
+            return sb.ToString();
         }
     }
 }

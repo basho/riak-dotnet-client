@@ -67,6 +67,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RiakClientTests.cs" />
     <Compile Include="RiakConfigurationTests.cs" />
+    <Compile Include="RiakMapReduceTests.cs" />
     <Compile Include="RiakObjectTests.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -14,25 +14,29 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Linq;
+using CorrugatedIron.Extensions;
 using Newtonsoft.Json;
 
-namespace CorrugatedIron.Models.MapReduce.Inputs
+namespace CorrugatedIron.Models.MapReduce.KeyFilters
 {
-    public class RiakBucketKeyArgInput : RiakBucketKeyInput
+    public abstract class RiakCompositeKeyFilterToken : RiakKeyFilterToken
     {
-        private readonly object _arg;
-
-        public RiakBucketKeyArgInput(string bucket, string key, object arg)
-            : base(bucket, key)
+        protected RiakCompositeKeyFilterToken(string functionName, params object[] args)
+            : base(functionName, args)
         {
-            _arg = arg;
         }
 
-        public override JsonWriter WriteJson(JsonWriter writer)
+        protected override void WriteArguments(JsonWriter writer)
         {
-            base.WriteJson(writer);
-            writer.WriteValue(_arg);
-            return writer;
+            Arguments.Cast<IRiakKeyFilterToken>().ForEach(v =>WriteArgumentAsArray(v, writer) );
+        }
+
+        protected void WriteArgumentAsArray(IRiakKeyFilterToken argument, JsonWriter writer)
+        {
+            //writer.WriteStartArray();
+            writer.WriteRawValue(argument.ToJsonString());
+            //writer.WriteEndArray();
         }
     }
 }
