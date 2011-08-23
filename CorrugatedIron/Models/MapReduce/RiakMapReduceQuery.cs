@@ -62,6 +62,13 @@ namespace CorrugatedIron.Models.MapReduce
             _inputs = riakBucketKeyKeyDataInputs;
             return this;
         }
+        
+        
+        public RiakMapReduceQuery Inputs(RiakModuleFunctionArgInput riakModFunArgsInput)
+        {
+            _inputs = riakModFunArgsInput;
+            return this;
+        }
 
         public RiakMapReduceQuery MapErlang(Action<RiakFluentActionPhaseErlang> setup)
         {
