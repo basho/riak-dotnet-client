@@ -36,7 +36,7 @@ namespace CorrugatedIron.Tests.Live
         protected Func<IRiakClient> ClientGenerator;
 
         protected const string MrContentType = RiakConstants.ContentTypes.ApplicationJson;
-        protected const string bucket = "fluent_key_bucket";
+        protected string bucket = "fluent_key_bucket";
         protected const string emptyBody = "{}";
 
         public RiakMapReduceTests(string section = "riak1NodeConfiguration")
