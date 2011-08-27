@@ -142,7 +142,7 @@ namespace CorrugatedIron.Tests.Live
                                    r => r.Tokenize("_", 2)
                                             .StringToInt()
                                             .Between(3, 7, true)))
-                .MapJs(m => m.Source("function (o) { return [1]; }").Keep(true))
+                .MapJs(m => m.Source("function (o) { return [1]; }").Keep(false))
                 .ReduceJs(r => r.Name("Riak.reduceSum").Keep(true));
 
             var result = Client.MapReduce(mr);
@@ -150,9 +150,9 @@ namespace CorrugatedIron.Tests.Live
 
             var mrResult = result.Value;
             mrResult.PhaseResults.ShouldNotBeNull();
-            mrResult.PhaseResults.Count().ShouldEqual(3);
+            mrResult.PhaseResults.Count().ShouldEqual(2);
 
-            var values = result.Value.PhaseResults.ElementAt(2).GetObject<int[]>();
+            var values = result.Value.PhaseResults.ElementAt(1).GetObject<int[]>();
             values[0].ShouldEqual(5);
         }
     }
