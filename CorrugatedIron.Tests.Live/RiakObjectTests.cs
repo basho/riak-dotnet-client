@@ -102,7 +102,7 @@ namespace CorrugatedIron.Tests.Live
                 .Inputs(TestBucket)
                 //.Filter(new Matches<string>(Jeremiah))
                 .Filter(f => f.Matches(Jeremiah))
-                .Link(l => l.Tag("friends").Bucket(TestBucket))
+                .Link(l => l.Tag("friends").Bucket(TestBucket).Keep(false))
                 .ReduceErlang(r => r.ModFun("riak_kv_mapreduce", "reduce_set_union").Keep(true));
 
             var result = Client.MapReduce(query);
