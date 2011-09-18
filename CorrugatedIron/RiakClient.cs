@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -296,10 +296,64 @@ namespace CorrugatedIron
 
             if (response.IsSuccess)
             {
-                return RiakResult<RiakMapReduceResult>.Success(new RiakMapReduceResult(response.Value));
+                var mrResponse = CondenseResponse(response.Value);
+                return RiakResult<RiakMapReduceResult>.Success(new RiakMapReduceResult(mrResponse));
             }
 
             return RiakResult<RiakMapReduceResult>.Error(response.ResultCode, response.ErrorMessage);
+        }
+        
+        private IEnumerable<RiakResult<RpbMapRedResp>> CondenseResponse(IEnumerable<RiakResult<RpbMapRedResp>> originalResponse) {
+            List<RiakResult<RpbMapRedResp>> resultList = new List<RiakResult<RpbMapRedResp>>(originalResponse);
+            
+            if (resultList.Count() == 1)
+            {
+                return resultList;
+            }
+            
+            var newResponse = new List<RiakResult<RpbMapRedResp>>();
+            RiakResult<RpbMapRedResp> previous = null;
+            
+            foreach (var current in resultList)
+            {
+                if (previous == null)
+                {
+                    newResponse.Add(RiakResult<RpbMapRedResp>.Success(current.Value));
+                    previous = current;
+                }
+                else if (previous.Value.Phase == current.Value.Phase)
+                {
+                    var mrResp = new RpbMapRedResp();
+                    
+                    mrResp.Done = current.Value.Done;
+                    
+                    if (current.Value.Response != null)
+                    {
+                        int newLength = previous.Value.Response.Length + current.Value.Response.Length;
+                        
+                        List<byte> newValue = new List<byte>(newLength);
+                        newValue.AddRange(previous.Value.Response);
+                        newValue.AddRange(current.Value.Response);
+                        
+                        int index = newResponse.IndexOf(previous);
+                        
+                        mrResp.Phase = current.Value.Phase;
+                        mrResp.Response = newValue.ToArray();
+                        
+                        newResponse.Remove(previous);
+                        newResponse.Insert(index, RiakResult<RpbMapRedResp>.Success(mrResp));
+                        
+                        previous = newResponse.ElementAt(index);
+                    }
+                }
+                else
+                {
+                    newResponse.Add(RiakResult<RpbMapRedResp>.Success(current.Value));
+                    previous = current;
+                } 
+            }
+            
+            return newResponse;
         }
 
         public RiakResult<RiakStreamedMapReduceResult> StreamMapReduce(RiakMapReduceQuery query)

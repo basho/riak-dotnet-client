@@ -51,7 +51,8 @@ namespace CorrugatedIron.Models
 
         public static IList<RiakLink> ParseArrayFromJsonString(string jsonString)
         {
-            // TODO test me
+            // HAX!
+            jsonString = jsonString.Replace("]][[", "],[");
             var rawLinks = JsonConvert.DeserializeObject<IList<IList<string>>>(jsonString);
 
             return rawLinks.Select(FromArray).ToList();
