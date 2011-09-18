@@ -48,5 +48,25 @@ namespace CorrugatedIron.Messages
         [ProtoMember(7, IsRequired = false, Name = "return_body", DataFormat = DataFormat.Default)]
         [DefaultValue(default(bool))]
         internal bool ReturnBody { get; set; }
+        
+        // optional uint32 pw = 8;
+        // optional bool if_not_modified = 9;
+        // optional bool if_none_match = 10;
+        // optional bool return_head = 11;
+        [ProtoMember(8, IsRequired = false, Name = "pw", DataFormat = DataFormat.TwosComplement)]
+        [DefaultValue(default(uint))]
+        internal uint Pw { get; set; }
+        
+        [ProtoMember(9, IsRequired = false, Name = "if_not_modified", DataFormat = DataFormat.Default)]
+        [DefaultValue(default(bool))]
+        internal bool IfNotModified { get; set; }
+        
+        [ProtoMember(10, IsRequired = false, Name = "if_none_match", DataFormat = DataFormat.Default)]
+        [DefaultValue(default(bool))]
+        internal bool IfNoneMatch { get; set; }
+        
+        [ProtoMember(11, IsRequired = false, Name = "return_head", DataFormat = DataFormat.Default)]
+        [DefaultValue(default(bool))]
+        internal bool ReturnHead { get; set; }
     }
 }
