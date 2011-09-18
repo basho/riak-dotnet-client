@@ -84,7 +84,7 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
         {
             // make sure we're all clear first
             var result = Client.GetBucketProperties(PropertiesTestBucket, true);
-            result.IsSuccess.ShouldBeTrue();
+             result.IsSuccess.ShouldBeTrue();
             var props = result.Value;
             props.ClearPostCommitHooks().ClearPreCommitHooks();
             Client.SetBucketProperties(PropertiesTestBucket, props).IsSuccess.ShouldBeTrue();

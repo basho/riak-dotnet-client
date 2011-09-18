@@ -71,7 +71,8 @@ namespace CorrugatedIron.Tests.Live
             };
             
             mr.Inputs(modFunArg)
-                .MapJs(m => m.Source(@"
+                .MapJs(m => //m.Name("Riak.mapValuesJson")
+                    m.Source(@"
 function(value, keydata, arg) 
 {
     return [value];
@@ -82,7 +83,8 @@ function(values, arg)
 {
     return values;
 }
-").Keep(true));
+").Keep(true))
+                    ;
             
             var result = Client.MapReduce(mr);
             result.IsSuccess.ShouldBeTrue();
