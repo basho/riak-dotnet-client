@@ -38,6 +38,7 @@ namespace CorrugatedIron.Models
         public byte[] VectorClock { get; private set; }
         public string VTag { get; private set; }
         public IDictionary<string, string> UserMetaData { get; set; }
+        public IDictionary<string, string> Indexes { get; set; }
         public uint LastModified { get; internal set; }
         public uint LastModifiedUsec { get; internal set; }
         public IList<RiakLink> Links { get; private set; }
@@ -92,6 +93,7 @@ namespace CorrugatedIron.Models
             ContentType = contentType;
             CharSet = charSet;
             UserMetaData = new Dictionary<string, string>();
+            Indexes = new Dictionary<string, string>();
             Links = new List<RiakLink>();
             Siblings = new List<RiakObject>();
         }
@@ -175,6 +177,7 @@ namespace CorrugatedIron.Models
             ContentEncoding = content.ContentEncoding.FromRiakString();
             ContentType = content.ContentType.FromRiakString();
             UserMetaData = content.UserMeta.ToDictionary(p => p.Key.FromRiakString(), p => p.Value.FromRiakString());
+//            Indexes = content.Indexes.ToDictionary(p => p.Key.FromRiakString(), p => p.Value.FromRiakString());
             Links = content.Links.Select(l => new RiakLink(l)).ToList();
             Siblings = new List<RiakObject>();
             LastModified = content.LastMod;
@@ -208,6 +211,7 @@ namespace CorrugatedIron.Models
                     Value = Value,
                     VTag = VTag.ToRiakString(),
                     UserMeta = UserMetaData.Select(kv => new RpbPair { Key = kv.Key.ToRiakString(), Value = kv.Value.ToRiakString() }).ToList(),
+//                    Indexes = Indexes.Select(kv => new RpbPair { Key = kv.Key.ToRiakString(), Value = kv.Value.ToRiakString() }).ToList(),
                     LastMod = LastModified,
                     LastModUSecs = LastModifiedUsec,
                     Links = Links.Select(l => l.ToMessage()).ToList()

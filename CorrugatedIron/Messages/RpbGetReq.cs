@@ -33,5 +33,29 @@ namespace CorrugatedIron.Messages
         [ProtoMember(3, IsRequired = false, Name = "r", DataFormat = DataFormat.TwosComplement)]
         [DefaultValue(default(uint))]
         internal uint R { get; set; }
+
+        [ProtoMember(4, IsRequired = false, Name = "pr", DataFormat = DataFormat.TwosComplement)]
+        [DefaultValue(default(uint))]
+        internal uint Pr { get; set; }
+        
+        [ProtoMember(5, IsRequired = false, Name = "basic_quorum", DataFormat = DataFormat.Default)]
+        [DefaultValue(default(bool))]
+        internal bool BasicQuorum { get; set; }
+        
+        [ProtoMember(6, IsRequired = false, Name = "notfound_ok", DataFormat = DataFormat.Default)]
+        [DefaultValue(default(bool))]
+        internal bool NotFoundOk { get; set; }
+        
+        [ProtoMember(7, IsRequired = false, Name = "if_modified", DataFormat = DataFormat.Default)]
+        [DefaultValue(null)]
+        internal byte[] IfModified { get; set; }
+        
+        [ProtoMember(8, IsRequired = false, Name = "head", DataFormat = DataFormat.Default)]
+        [DefaultValue(false)]
+        internal bool Head { get; set; }
+        
+        [ProtoMember(9, IsRequired = false, Name = "deletedvclock", DataFormat = DataFormat.Default)]
+        [DefaultValue(default(bool))]
+        internal bool DeletedVclock { get; set; }
     }
 }

@@ -247,26 +247,29 @@ namespace CorrugatedIron
                 });
         }
 
-        public RiakResult Delete(string bucket, string key, uint rwVal = RiakConstants.Defaults.RVal)
+        public RiakResult Delete(string bucket, string key, RiakDeleteOptions options = null)
         {
-            var request = new RpbDelReq {Bucket = bucket.ToRiakString(), Key = key.ToRiakString(), Rw = rwVal};
+            options = options ?? new RiakDeleteOptions();
+            
+            var request = new RpbDelReq {Bucket = bucket.ToRiakString(), Key = key.ToRiakString() };
+            options.Populate(request);
             var result = UseConnection(conn => conn.PbcWriteRead<RpbDelReq, RpbDelResp>(request));
 
             return result;
         }
 
-        public RiakResult Delete(RiakObjectId objectId, uint rwVal = RiakConstants.Defaults.RVal)
+        public RiakResult Delete(RiakObjectId objectId, RiakDeleteOptions options = null)
         {
-            return Delete(objectId.Bucket, objectId.Key, rwVal);
+            return Delete(objectId.Bucket, objectId.Key, options);
         }
 
-        public IEnumerable<RiakResult> Delete(IEnumerable<RiakObjectId> objectIds, uint rwVal = RiakConstants.Defaults.RVal)
+        public IEnumerable<RiakResult> Delete(IEnumerable<RiakObjectId> objectIds, RiakDeleteOptions options = null)
         {
-            var results = UseConnection(conn => Delete(conn, objectIds, rwVal));
+            var results = UseConnection(conn => Delete(conn, objectIds, options));
             return results.Value;
         }
 
-        public IEnumerable<RiakResult> DeleteBucket(string bucket, uint rwVal = RiakConstants.Defaults.RVal)
+        public IEnumerable<RiakResult> DeleteBucket(string bucket, uint rwVal)
         {
             var results = UseConnection(conn =>
                 { 
@@ -274,7 +277,7 @@ namespace CorrugatedIron
                     if (keyResults.IsSuccess)
                     {
                         var objectIds = keyResults.Value.Select(key => new RiakObjectId(bucket, key)).ToList();
-                        return Delete(conn, objectIds, rwVal);
+                        return Delete(conn, objectIds, new RiakDeleteOptions { Rw = rwVal});
                     }
                     return RiakResult<IEnumerable<RiakResult>>.Error(keyResults.ResultCode, keyResults.ErrorMessage);
                 });
@@ -282,9 +285,13 @@ namespace CorrugatedIron
             return results.Value;
         }
 
-        private static RiakResult<IEnumerable<RiakResult>> Delete(IRiakConnection conn, IEnumerable<RiakObjectId> objectIds, uint rwVal)
+        private static RiakResult<IEnumerable<RiakResult>> Delete(IRiakConnection conn, IEnumerable<RiakObjectId> objectIds, RiakDeleteOptions options = null)
         {
-            var requests = objectIds.Select(id => new RpbDelReq {Bucket = id.Bucket.ToRiakString(), Key = id.Key.ToRiakString(), Rw = rwVal}).ToList();
+            options = options ?? new RiakDeleteOptions();
+            var requests = objectIds.Select(id => new RpbDelReq {Bucket = id.Bucket.ToRiakString(), Key = id.Key.ToRiakString() }).ToList();
+            
+            requests.ForEach(r => options.Populate(r));
+            
             var responses = requests.Select(conn.PbcWriteRead<RpbDelReq, RpbDelResp>).ToList();
             return RiakResult<IEnumerable<RiakResult>>.Success(responses);
         }
