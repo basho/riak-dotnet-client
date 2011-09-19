@@ -49,10 +49,6 @@ namespace CorrugatedIron.Messages
         [DefaultValue(default(bool))]
         internal bool ReturnBody { get; set; }
         
-        // optional uint32 pw = 8;
-        // optional bool if_not_modified = 9;
-        // optional bool if_none_match = 10;
-        // optional bool return_head = 11;
         [ProtoMember(8, IsRequired = false, Name = "pw", DataFormat = DataFormat.TwosComplement)]
         [DefaultValue(default(uint))]
         internal uint Pw { get; set; }

@@ -216,6 +216,7 @@
     <Compile Include="Messages\RpbSetClientIdResp.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Models\MapReduce\Inputs\RiakModuleFunctionArgInput.cs" />
+    <Compile Include="Models\RiakDeleteOptions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Metadata\CorrugatedIron.snk">

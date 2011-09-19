@@ -34,9 +34,9 @@ namespace CorrugatedIron
         void Put(RiakObject value, Action<RiakResult<RiakObject>> callback, RiakPutOptions options = null);
         void Put(IEnumerable<RiakObject> values, Action<IEnumerable<RiakResult<RiakObject>>> callback, RiakPutOptions options = null);
 
-        void Delete(string bucket, string key, Action<RiakResult> callback, uint rwVal = RiakConstants.Defaults.RVal);
-        void Delete(RiakObjectId objectId, Action<RiakResult> callback, uint rwVal = RiakConstants.Defaults.RVal);
-        void Delete(IEnumerable<RiakObjectId> objectIds, Action<IEnumerable<RiakResult>> callback, uint rwVal = RiakConstants.Defaults.RVal);
+        void Delete(string bucket, string key, Action<RiakResult> callback, RiakDeleteOptions options = null);
+        void Delete(RiakObjectId objectId, Action<RiakResult> callback, RiakDeleteOptions options = null);
+        void Delete(IEnumerable<RiakObjectId> objectIds, Action<IEnumerable<RiakResult>> callback, RiakDeleteOptions options = null);
 
         void DeleteBucket(string bucket, Action<IEnumerable<RiakResult>> callback, uint rwVal = RiakConstants.Defaults.RVal);
 
@@ -100,19 +100,19 @@ namespace CorrugatedIron
             ExecAsync(() => callback(_client.Put(value, options)));
         }
 
-        public void Delete(string bucket, string key, Action<RiakResult> callback, uint rwVal = RiakConstants.Defaults.RVal)
+        public void Delete(string bucket, string key, Action<RiakResult> callback, RiakDeleteOptions options = null)
         {
-            ExecAsync(() => callback(_client.Delete(bucket, key, rwVal)));
+            ExecAsync(() => callback(_client.Delete(bucket, key, options)));
         }
 
-        public void Delete(RiakObjectId objectId, Action<RiakResult> callback, uint rwVal = RiakConstants.Defaults.RVal)
+        public void Delete(RiakObjectId objectId, Action<RiakResult> callback, RiakDeleteOptions options = null)
         {
-            ExecAsync(() => callback(_client.Delete(objectId.Bucket, objectId.Key, rwVal)));
+            ExecAsync(() => callback(_client.Delete(objectId.Bucket, objectId.Key, options)));
         }
 
-        public void Delete(IEnumerable<RiakObjectId> objectIds, Action<IEnumerable<RiakResult>> callback, uint rwVal = RiakConstants.Defaults.RVal)
+        public void Delete(IEnumerable<RiakObjectId> objectIds, Action<IEnumerable<RiakResult>> callback, RiakDeleteOptions options = null)
         {
-            ExecAsync(() => callback(_client.Delete(objectIds, rwVal)));
+            ExecAsync(() => callback(_client.Delete(objectIds, options)));
         }
 
         public void DeleteBucket(string bucket, Action<IEnumerable<RiakResult>> callback, uint rwVal = RiakConstants.Defaults.RVal)

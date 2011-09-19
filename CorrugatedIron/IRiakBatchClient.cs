@@ -33,9 +33,9 @@ namespace CorrugatedIron
         RiakResult<RiakObject> Put(RiakObject value, RiakPutOptions options = null);
         IEnumerable<RiakResult<RiakObject>> Put(IEnumerable<RiakObject> values, RiakPutOptions options = null);
 
-        RiakResult Delete(string bucket, string key, uint rwVal = RiakConstants.Defaults.RVal);
-        RiakResult Delete(RiakObjectId objectId, uint rwVal = RiakConstants.Defaults.RVal);
-        IEnumerable<RiakResult> Delete(IEnumerable<RiakObjectId> objectIds, uint rwVal = RiakConstants.Defaults.RVal);
+        RiakResult Delete(string bucket, string key, RiakDeleteOptions options = null);
+        RiakResult Delete(RiakObjectId objectId, RiakDeleteOptions options = null);
+        IEnumerable<RiakResult> Delete(IEnumerable<RiakObjectId> objectIds, RiakDeleteOptions options = null);
 
         IEnumerable<RiakResult> DeleteBucket(string bucket, uint rwVal = RiakConstants.Defaults.RVal);
 

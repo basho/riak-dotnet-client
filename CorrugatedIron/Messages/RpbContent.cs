@@ -65,5 +65,9 @@ namespace CorrugatedIron.Messages
         [ProtoMember(9, Name = "usermeta", DataFormat = DataFormat.Default)]
         [DefaultValue(null)]
         internal List<RpbPair> UserMeta { get; set; }
+        
+        [ProtoMember(10, Name = "indexes", DataFormat = DataFormat.Default)]
+        [DefaultValue(null)]
+        internal List<RpbPair> Indexes { get; set; }
     }
 }

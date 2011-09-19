@@ -36,5 +36,9 @@ namespace CorrugatedIron.Messages
         [ProtoMember(2, IsRequired = false, Name = "vclock", DataFormat = DataFormat.Default)]
         [DefaultValue(null)]
         internal byte[] VectorClock { get; set; }
+        
+        [ProtoMember(3, IsRequired = false, Name = "unchanged", DataFormat = DataFormat.Default)]
+        [DefaultValue(default(bool))]
+        internal bool Unchanged { get; set; }
     }
 }
