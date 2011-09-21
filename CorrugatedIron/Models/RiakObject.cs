@@ -177,7 +177,7 @@ namespace CorrugatedIron.Models
             ContentEncoding = content.ContentEncoding.FromRiakString();
             ContentType = content.ContentType.FromRiakString();
             UserMetaData = content.UserMeta.ToDictionary(p => p.Key.FromRiakString(), p => p.Value.FromRiakString());
-//            Indexes = content.Indexes.ToDictionary(p => p.Key.FromRiakString(), p => p.Value.FromRiakString());
+            Indexes = content.Indexes.ToDictionary(p => p.Key.FromRiakString(), p => p.Value.FromRiakString());
             Links = content.Links.Select(l => new RiakLink(l)).ToList();
             Siblings = new List<RiakObject>();
             LastModified = content.LastMod;
@@ -211,7 +211,7 @@ namespace CorrugatedIron.Models
                     Value = Value,
                     VTag = VTag.ToRiakString(),
                     UserMeta = UserMetaData.Select(kv => new RpbPair { Key = kv.Key.ToRiakString(), Value = kv.Value.ToRiakString() }).ToList(),
-//                    Indexes = Indexes.Select(kv => new RpbPair { Key = kv.Key.ToRiakString(), Value = kv.Value.ToRiakString() }).ToList(),
+                    Indexes = Indexes.Select(kv => new RpbPair { Key = kv.Key.ToRiakString(), Value = kv.Value.ToRiakString() }).ToList(),
                     LastMod = LastModified,
                     LastModUSecs = LastModifiedUsec,
                     Links = Links.Select(l => l.ToMessage()).ToList()
@@ -253,12 +253,14 @@ namespace CorrugatedIron.Models
                 && Equals(other.CharSet, CharSet)
                 && Equals(other.VectorClock, VectorClock)
                 && Equals(other.UserMetaData, UserMetaData)
+                && Equals(other.Indexes, Indexes)
                 && other.LastModified == LastModified
                 && other.LastModifiedUsec == LastModifiedUsec
                 && Equals(other.Links, Links)
                 && Equals(other._vtags, _vtags)
                 && other.Links.SequenceEqual(Links)
-                && other.UserMetaData.SequenceEqual(UserMetaData);
+                && other.UserMetaData.SequenceEqual(UserMetaData)
+                && other.Indexes.SequenceEqual(Indexes);
         }
 
         public override int GetHashCode()
@@ -283,6 +285,7 @@ namespace CorrugatedIron.Models
                 result = (result*397) ^ (CharSet != null ? CharSet.GetHashCode() : 0);
                 result = (result*397) ^ (VectorClock != null ? VectorClock.GetHashCode() : 0);
                 result = (result*397) ^ (UserMetaData != null ? UserMetaData.GetHashCode() : 0);
+                result = (result*397) ^ (Indexes != null ? Indexes.GetHashCode() : 0);
                 result = (result*397) ^ LastModified.GetHashCode();
                 result = (result*397) ^ LastModifiedUsec.GetHashCode();
                 result = (result*397) ^ (Links != null ? Links.GetHashCode() : 0);

@@ -29,6 +29,7 @@ namespace CorrugatedIron.Messages
         {
             Links = new List<RpbLink>();
             UserMeta = new List<RpbPair>();
+            Indexes = new List<RpbPair>();
         }
 
         [ProtoMember(1, IsRequired = true, Name = "value", DataFormat = DataFormat.Default)]
