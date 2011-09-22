@@ -147,12 +147,7 @@ namespace CorrugatedIron.Comms
 
         public T Read<T>() where T : new()
         {
-            var header = new byte[5];
-
-            if (PbcSocket.Receive(header, header.Length, 0) == 0)
-            {
-                throw new RiakException("Unable to read data from the source stream - Timed Out.");
-            }
+            var header = ReceiveAll(new byte[5]);
 
             var size = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(header, 0));
 
@@ -178,7 +173,23 @@ namespace CorrugatedIron.Comms
 #endif
             return DeserializeInstance<T>(size);
         }
-
+        
+        private byte[] ReceiveAll(byte[] resultBuffer) {
+            int totalBytesReceived = 0;
+            int lengthToReceive = resultBuffer.Length;
+            while (lengthToReceive > 0)
+            {
+                int bytesReceived = PbcSocket.Receive(resultBuffer, totalBytesReceived, lengthToReceive, 0);
+                if (bytesReceived == 0)
+                {
+                    throw new RiakException("Unable to read data from the source stream - Timed Out.");
+                }
+                totalBytesReceived += bytesReceived;
+                lengthToReceive -= bytesReceived;
+            }
+            return resultBuffer;
+        }
+        
         private T DeserializeInstance<T>(int size)
             where T : new()
         {
@@ -187,11 +198,7 @@ namespace CorrugatedIron.Comms
                 return new T();
             }
 
-            var resultBuffer = new byte[size - 1];
-            if (PbcSocket.Receive(resultBuffer, resultBuffer.Length, 0) == 0)
-            {
-                throw new RiakException("Unable to read data from the source stream - Timed Out.");
-            }
+            var resultBuffer = ReceiveAll(new byte[size - 1]);
 
             using (var memStream = new MemoryStream(resultBuffer))
             {
