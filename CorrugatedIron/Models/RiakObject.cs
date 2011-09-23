@@ -137,24 +137,24 @@ namespace CorrugatedIron.Models
             IntIndexes = new Dictionary<string, int>();
         }
         
-        public void AddBinIndex(string key, string indexedValue)
+        public void AddBinIndex(string index, string key)
         {
-            BinIndexes.Add(FormatBinKey(key), indexedValue);
+            BinIndexes.Add(FormatBinKey(index), key);
         }
         
-        public void AddIntIndex(string key, int indexedValue)
+        public void AddIntIndex(string index, int key)
         {
-            IntIndexes.Add(FormatIntKey(key), indexedValue);
+            IntIndexes.Add(FormatIntKey(index), key);
         }
         
-        public void RemoveBinIndex(string key)
+        public void RemoveBinIndex(string index)
         {
-            BinIndexes.Remove(FormatBinKey(key));
+            BinIndexes.Remove(FormatBinKey(index));
         }
   
-        public void RemoveIntIndex(string key)
+        public void RemoveIntIndex(string index)
         {
-            IntIndexes.Remove(FormatIntKey(key));
+            IntIndexes.Remove(FormatIntKey(index));
         }
         
         public void LinkTo(string bucket, string key, string tag)
