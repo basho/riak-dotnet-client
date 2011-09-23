@@ -38,11 +38,48 @@ namespace CorrugatedIron.Models
         public byte[] VectorClock { get; private set; }
         public string VTag { get; private set; }
         public IDictionary<string, string> UserMetaData { get; set; }
-        public IDictionary<string, string> Indexes { get; set; }
         public uint LastModified { get; internal set; }
         public uint LastModifiedUsec { get; internal set; }
         public IList<RiakLink> Links { get; private set; }
         public IList<RiakObject> Siblings { get; set; }
+        
+        public IDictionary<string, string> Indexes
+        {
+            get 
+            {
+                Dictionary<string, string> indexes = new Dictionary<string, string>();
+                
+                foreach (var key in _binIndexes.Keys)
+                {
+                    indexes.Add(key, _binIndexes[key]);
+                }
+                
+                foreach (var key in _intIndexes.Keys)
+                {
+                    indexes.Add(key, _intIndexes[key].ToString());
+                }
+                
+                return indexes;
+            }
+            
+            set 
+            {
+                foreach (var key in value.Keys)
+                {
+                    if (key.IndexOf("_int") > -1)
+                    {
+                        _intIndexes.Add(key, Convert.ToInt32(value[key]));
+                    }
+                    else 
+                    {
+                        _binIndexes.Add(key, value[key].ToString());
+                    }
+                }
+            }
+        }
+        
+        private IDictionary<string, string> _binIndexes;
+        private IDictionary<string, int> _intIndexes;
 
         private List<string> _vtags;
         private int _hashCode;
@@ -96,8 +133,31 @@ namespace CorrugatedIron.Models
             Indexes = new Dictionary<string, string>();
             Links = new List<RiakLink>();
             Siblings = new List<RiakObject>();
+            
+            _binIndexes = new Dictionary<string, string>();
+            _intIndexes = new Dictionary<string, int>();
         }
-
+        
+        public void AddBinIndex(string key, string indexedValue)
+        {
+            _binIndexes.Add(string.Format("{0}_bin", key), indexedValue);
+        }
+        
+        public void AddIntIndex(string key, int indexedValue)
+        {
+            _intIndexes.Add(string.Format("{0}_int", key), indexedValue);
+        }
+        
+        public void RemoveBinIndex(string key)
+        {
+            _binIndexes.Remove(key);
+        }
+  
+        public void RemoveIntIndex(string key)
+        {
+            _intIndexes.Remove(key);
+        }
+        
         public void LinkTo(string bucket, string key, string tag)
         {
             Links.Add(new RiakLink(bucket, key, tag));
@@ -285,7 +345,8 @@ namespace CorrugatedIron.Models
                 result = (result*397) ^ (CharSet != null ? CharSet.GetHashCode() : 0);
                 result = (result*397) ^ (VectorClock != null ? VectorClock.GetHashCode() : 0);
                 result = (result*397) ^ (UserMetaData != null ? UserMetaData.GetHashCode() : 0);
-                result = (result*397) ^ (Indexes != null ? Indexes.GetHashCode() : 0);
+                result = (result*397) ^ (_binIndexes != null ? _binIndexes.GetHashCode() : 0);
+                result = (result*397) ^ (_intIndexes != null ? _intIndexes.GetHashCode() : 0);
                 result = (result*397) ^ LastModified.GetHashCode();
                 result = (result*397) ^ LastModifiedUsec.GetHashCode();
                 result = (result*397) ^ (Links != null ? Links.GetHashCode() : 0);
