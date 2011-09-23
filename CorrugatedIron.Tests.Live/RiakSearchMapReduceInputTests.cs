@@ -71,7 +71,7 @@ namespace CorrugatedIron.Tests.Live
             };
             
             mr.Inputs(modFunArg)
-                .MapJs(m => //m.Name("Riak.mapValuesJson")
+                .MapJs(m => 
                     m.Source(@"
 function(value, keydata, arg) 
 {
