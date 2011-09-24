@@ -69,6 +69,12 @@ namespace CorrugatedIron.Models.MapReduce
             _inputs = riakModFunArgsInput;
             return this;
         }
+        
+        public RiakMapReduceQuery Inputs(RiakIndexInput riakIndexPhaseInput)
+        {
+            _inputs = riakIndexPhaseInput;
+            return this;
+        }
 
         public RiakMapReduceQuery MapErlang(Action<RiakFluentActionPhaseErlang> setup)
         {
@@ -114,6 +120,15 @@ namespace CorrugatedIron.Models.MapReduce
             _phases.Add(phase);
             return this;
         }
+        
+//        public RiakMapReduceQuery GetIndex(Action<RiakFluentIndexPhase> setup)
+//        {
+//            var phase = new RiakIndexPhase();
+//            var fluent = new RiakFluentIndexPhase(phase);
+//            setup(fluent);
+//            
+//            throw new NotImplementedException();
+//        }
 
         public RiakMapReduceQuery Filter(Action<RiakFluentKeyFilter> setup)
         {

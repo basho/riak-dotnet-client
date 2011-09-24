@@ -66,6 +66,11 @@ namespace CorrugatedIron.Models
             
             private set 
             {
+                if (BinIndexes == null)
+                    BinIndexes = new Dictionary<string, string>();
+                if (IntIndexes == null)
+                    IntIndexes = new Dictionary<string, int>();
+                
                 foreach (var key in value.Keys)
                 {
                     if (key.IndexOf("_int") > -1)
@@ -230,7 +235,7 @@ namespace CorrugatedIron.Models
             Bucket = bucket;
             Key = key;
             VectorClock = vectorClock;
-
+            
             Value = content.Value;
             VTag = content.VTag.FromRiakString();
             ContentEncoding = content.ContentEncoding.FromRiakString();
