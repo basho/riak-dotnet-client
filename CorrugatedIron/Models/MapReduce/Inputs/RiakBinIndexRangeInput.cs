@@ -13,16 +13,25 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-using System;using Newtonsoft.Json;
+
+using System;
+using Newtonsoft.Json;
+
 namespace CorrugatedIron.Models.MapReduce.Inputs
 {
-    public class RiakBinIndexEqualityInput : RiakIndexInput
-    {        public string Bucket { get; set; }        public string Index { get; set; }
-        public string Key { get; set; }
+    public class RiakBinIndexRangeInput : RiakIndexInput
+    {
+        public string Bucket { get; set; }
+        public string Index { get; set; }
+        public string Start { get; set; }
+        public string End { get; set; }
         
-        public RiakBinIndexEqualityInput (string bucket, string index, string key)
+        public RiakBinIndexRangeInput (string bucket, string index, string start, string end)
         {
-            Key = key;
+            Bucket = bucket;
+            Index = index;
+            Start = start;
+            End = end;
         }
         
         public override JsonWriter WriteJson(JsonWriter writer)
@@ -36,8 +45,12 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
             writer.WritePropertyName("index");
             writer.WriteValue(Index);
             
-            writer.WritePropertyName("key");
-            writer.WritePropertyName(Key);            
+            writer.WritePropertyName("start");
+            writer.WriteValue(Start);
+            
+            writer.WritePropertyName("end");
+            writer.WriteValue(End);
+            
             writer.WriteEndObject();
             
             return writer;

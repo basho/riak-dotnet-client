@@ -83,6 +83,20 @@ namespace CorrugatedIron.Tests.Live
             var result = Client.MapReduce(mr);
             result.IsSuccess.ShouldBeTrue();
         }
+        
+        [Test()]
+        public void RangeQueriesReturnMultipleKeys()
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                var o = new RiakObject(bucket, i.ToString(), "{ value: \"this is an object\" }");
+                o.AddIntIndex("age_int", 32);
+                
+                Client.Put(o);
+            }
+            
+            
+        }
     }
 }
 
