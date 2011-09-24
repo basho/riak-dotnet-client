@@ -218,7 +218,7 @@
     <Compile Include="Models\MapReduce\Inputs\RiakModuleFunctionArgInput.cs" />
     <Compile Include="Models\RiakDeleteOptions.cs" />
     <Compile Include="Models\MapReduce\Inputs\RiakIntIndexEqualityInput.cs" />
-    <Compile Include="Models\MapReduce\Inputs\RiakIndexEqualityInput.cs" />
+    <Compile Include="Models\MapReduce\Inputs\RiakBinIndexEqualityIndex" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Metadata\CorrugatedIron.snk">

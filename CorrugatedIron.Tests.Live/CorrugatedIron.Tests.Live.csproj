@@ -70,6 +70,7 @@
     <Compile Include="RiakMapReduceTests.cs" />
     <Compile Include="RiakObjectTests.cs" />
     <Compile Include="RiakSearchMapReduceInputTests.cs" />
+    <Compile Include="RiakIndexTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CorrugatedIron.Tests\CorrugatedIron.Tests.csproj">

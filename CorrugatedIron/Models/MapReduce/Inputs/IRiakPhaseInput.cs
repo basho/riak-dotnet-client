@@ -31,4 +31,8 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
         public List<IRiakKeyFilterToken> Filters { get; set; }
         public abstract JsonWriter WriteJson(JsonWriter writer);
     }
+    
+    public abstract class RiakIndexInput : RiakPhaseInput
+    {
+    }
 }

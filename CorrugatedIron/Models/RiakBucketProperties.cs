@@ -53,6 +53,7 @@ namespace CorrugatedIron.Models
         public uint? NVal { get; private set; }
         public bool? AllowMultiple { get; private set; }
         public string Backend { get; private set; }
+        public bool? Search { get; private set; }
         public List<IRiakPreCommitHook> PreCommitHooks { get; private set; }
         public List<IRiakPostCommitHook> PostCommitHooks { get; private set; }
 
@@ -124,6 +125,12 @@ namespace CorrugatedIron.Models
             Backend = backend;
             return this;
         }
+        
+        public RiakBucketProperties SetSearch(bool search)
+        {
+            Search = search;
+            return this;
+        }
 
         public RiakBucketProperties AddPreCommitHook(IRiakPreCommitHook commitHook)
         {
@@ -177,6 +184,7 @@ namespace CorrugatedIron.Models
             AllowMultiple = props.Value<bool?>("allow_mult");
             LastWriteWins = props.Value<bool?>("last_write_wins");
             Backend = props.Value<string>("backend");
+            Search = props.Value<bool?>("search");
 
             ReadQuorum(props, "r", v => RVal = v);
             ReadQuorum(props, "rw", v => RwVal = v);
@@ -237,7 +245,7 @@ namespace CorrugatedIron.Models
         internal RpbBucketProps ToMessage()
         {
             var message = new RpbBucketProps();
-            if(AllowMultiple.HasValue)
+            if (AllowMultiple.HasValue)
             {
                 message.AllowMultiple = AllowMultiple.Value;
             }
@@ -265,7 +273,8 @@ namespace CorrugatedIron.Models
                     .WriteEither("rw", RwVal)
                     .WriteEither("dw", DwVal)
                     .WriteEither("w", WVal)
-                    .WriteNonNullProperty("backend", Backend);
+                    .WriteNonNullProperty("backend", Backend)
+                    .WriteNullableProperty("search", Search);
 
                 if (PreCommitHooks != null)
                 {

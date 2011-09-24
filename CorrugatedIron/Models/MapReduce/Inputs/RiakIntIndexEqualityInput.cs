@@ -16,11 +16,12 @@
 using System;using Newtonsoft.Json;
 namespace CorrugatedIron.Models.MapReduce.Inputs
 {
-    public class RiakIntIndexEqualityInput : RiakPhaseInput
+    public class RiakIntIndexEqualityInput : RiakIndexInput
     {        public string Bucket { get; set; }        public string Index { get; set; }        public int Key { get; set; }        
         public RiakIntIndexEqualityInput (string bucket, string index, int key)
         {            Bucket = bucket;            Index = index;            Key = key;
-        }                public override JsonWriter WriteJson(JsonWriter writer)        {            writer.WritePropertyName("inputs");                        writer.WriteStartObject();            writer.WritePropertyName("bucket");            writer.WriteValue(Bucket);                        writer.WritePropertyName("index");            writer.WriteValue(Index);                        writer.WritePropertyName("key");            writer.WriteValue(Key.ToString());            writer.WriteEndObject();                        return writer;        }
+        }                public override JsonWriter WriteJson(JsonWriter writer)        {            writer.WritePropertyName("inputs");                        writer.WriteStartObject();            writer.WritePropertyName("bucket");            writer.WriteValue(Bucket);                        writer.WritePropertyName("index");            writer.WriteValue(Index);                        writer.WritePropertyName("key");
+            writer.WriteValue(Key);            writer.WriteEndObject();                        return writer;        }
     }
 }
 
