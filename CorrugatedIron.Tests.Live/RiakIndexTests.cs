@@ -15,6 +15,7 @@
 // under the License.
 
 using System.Linq;
+using System.Collections.Generic;
 using CorrugatedIron.Comms;
 using CorrugatedIron.Util;
 using CorrugatedIron.Models;
@@ -45,6 +46,12 @@ namespace CorrugatedIron.Tests.Live
             Client = ClientGenerator();
         }
         
+        [TearDown()]
+        public void TearDown()
+        {
+//            Client.DeleteBucket(bucket);
+        }
+        
         [Test()]
         public void IndexesAreSavedWithAnObject()
         {
@@ -64,7 +71,7 @@ namespace CorrugatedIron.Tests.Live
         }
         
         [Test()]
-        public void QueryingByIndexReturnsAListOfKeys()
+        public void QueryingByIntIndexReturnsAListOfKeys()
         {
             for (int i = 0; i < 10; i++)
             {
@@ -82,20 +89,38 @@ namespace CorrugatedIron.Tests.Live
             
             var result = Client.MapReduce(mr);
             result.IsSuccess.ShouldBeTrue();
+            
+            // TODO write tests verifying results
+            var resultString = result.Value.PhaseResults.ElementAt(0).Value.FromRiakString();
+            var keys = JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(resultString);
+            
+            keys.Count.ShouldEqual(10);
         }
         
         [Test()]
-        public void RangeQueriesReturnMultipleKeys()
+        public void IntRangeQueriesReturnMultipleKeys()
         {
             for (int i = 0; i < 10; i++)
             {
                 var o = new RiakObject(bucket, i.ToString(), "{ value: \"this is an object\" }");
-                o.AddIntIndex("age_int", 32);
+                o.AddIntIndex("age_int", 25 + i);
                 
                 Client.Put(o);
             }
             
+            var input = new RiakIntIndexRangeInput(bucket, "age_int", 27, 30);
             
+            var mr = new RiakMapReduceQuery()
+                .Inputs(input)
+                .ReduceErlang(r => r.ModFun("riak_kv_mapreduce", "reduce_identity").Keep(true));
+            
+            
+            mr.ContentType = RiakConstants.ContentTypes.ApplicationOctetStream;
+            
+            var result = Client.MapReduce(mr);
+            result.IsSuccess.ShouldBeTrue();
+            
+            // TODO write tests verifying results
         }
     }
 }
