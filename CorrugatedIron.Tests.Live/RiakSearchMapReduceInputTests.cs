@@ -94,10 +94,11 @@ function(values, arg)
             result.IsSuccess.ShouldBeTrue();
             
             var mrResult = result.Value;
-            mrResult.PhaseResults.Count().ShouldEqual(3);
+            mrResult.PhaseResults.Count().ShouldEqual(2);
             
-            mrResult.PhaseResults.ElementAt(0).Value.ShouldNotBeNull();
-            mrResult.PhaseResults.ElementAt(2).Value.ShouldNotBeNull();
+            mrResult.PhaseResults.ElementAt(0).Values.ShouldNotBeNull();
+            mrResult.PhaseResults.ElementAt(1).Values.ShouldNotBeNull();
+            // TODO Add data introspection to test - need to verify the results, after all.
         }
     }
 }

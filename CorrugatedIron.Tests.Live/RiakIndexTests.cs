@@ -49,7 +49,7 @@ namespace CorrugatedIron.Tests.Live
         [TearDown()]
         public void TearDown()
         {
-//            Client.DeleteBucket(bucket);
+            Client.DeleteBucket(bucket);
         }
         
         [Test()]
@@ -89,12 +89,18 @@ namespace CorrugatedIron.Tests.Live
             
             var result = Client.MapReduce(mr);
             result.IsSuccess.ShouldBeTrue();
+             
+            // TODO The difficulty in getting these keys out makes it clear that we need to provide additional Json automagic conversions.
+            var rawKeys = result.Value.PhaseResults.OrderBy(pr => pr.Phase).ElementAt(0).GetObjects();
+            List<RiakObjectId> keys = new List<RiakObjectId>();
+            foreach (var r in rawKeys)
+            {
+                keys.Add(new RiakObjectId(r[0][0].ToString(), r[0][1].ToString()));
+            }
+            
+            keys.Count().ShouldEqual(10);
             
             // TODO write tests verifying results
-            var resultString = result.Value.PhaseResults.ElementAt(0).Value.FromRiakString();
-            var keys = JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(resultString);
-            
-            keys.Count.ShouldEqual(10);
         }
         
         [Test()]
@@ -113,9 +119,6 @@ namespace CorrugatedIron.Tests.Live
             var mr = new RiakMapReduceQuery()
                 .Inputs(input)
                 .ReduceErlang(r => r.ModFun("riak_kv_mapreduce", "reduce_identity").Keep(true));
-            
-            
-            mr.ContentType = RiakConstants.ContentTypes.ApplicationOctetStream;
             
             var result = Client.MapReduce(mr);
             result.IsSuccess.ShouldBeTrue();
