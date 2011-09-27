@@ -48,15 +48,10 @@ namespace CorrugatedIron.Models.MapReduce
             
             return rVal;
         }
-
-        //public T GetObject<T>()
-        //{
-        //    return JsonConvert.DeserializeObject<T>(Value.FromRiakString());
-        //}
-
-        //public dynamic GetObject()
-        //{
-        //    return JsonConvert.DeserializeObject<dynamic>(Value.FromRiakString());
-        //}
+        
+        public IEnumerable<dynamic> GetObjects()
+        {
+            return GetObjects<dynamic>();
+        }
     }
 }
