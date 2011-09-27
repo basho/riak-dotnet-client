@@ -303,8 +303,8 @@ namespace CorrugatedIron
 
             if (response.IsSuccess)
             {
-                var mrResponse = CondenseResponse(response.Value);
-                return RiakResult<RiakMapReduceResult>.Success(new RiakMapReduceResult(mrResponse));
+                //var mrResponse = CondenseResponse(response.Value);
+                return RiakResult<RiakMapReduceResult>.Success(new RiakMapReduceResult(response.Value));
             }
 
             return RiakResult<RiakMapReduceResult>.Error(response.ResultCode, response.ErrorMessage);
@@ -502,7 +502,10 @@ namespace CorrugatedIron
             if (result.IsSuccess)
             {
                 var linkResults = result.Value.PhaseResults.GroupBy(r => r.Phase).Where(g => g.Key == riakLinks.Count - 1);
-                var linkResultStrings = linkResults.SelectMany(g => g.Select(r => r.Value.FromRiakString()));
+                var linkResultStrings = linkResults.SelectMany(lr => lr.ToList(), (lr, r) => new { lr, r })
+                                                   .SelectMany(@t => @t.r.Values, (@t, s) => s.FromRiakString());
+                
+                //var linkResultStrings = linkResults.SelectMany(g => g.Select(r => r.Values.Value.FromRiakString()));
                 var rawLinks = linkResultStrings.SelectMany(RiakLink.ParseArrayFromJsonString).Distinct();
                 var oids = rawLinks.Select(l => new RiakObjectId(l.Bucket, l.Key)).ToList();
 
