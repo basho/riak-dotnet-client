@@ -17,6 +17,8 @@
 using System.Collections.Generic;
 using CorrugatedIron.Messages;
 using System.Linq;
+using Newtonsoft.Json;
+using CorrugatedIron.Extensions;
 
 namespace CorrugatedIron.Models.MapReduce
 {
@@ -29,13 +31,22 @@ namespace CorrugatedIron.Models.MapReduce
         internal RiakMapReduceResultPhase(uint phase, IEnumerable<RpbMapRedResp> results)
         {
             Phase = phase;
-            Values = results.Select(r => r.Response).ToList(); 
+            Values = results.Select(r => r.Response).Where(b => b != null).ToList(); 
             Success = true;
         }
 
         internal RiakMapReduceResultPhase()
         {
             Success = false;
+        }
+        
+        public IEnumerable<T> GetObjects<T>()
+        {
+            
+            var rVal = from v in Values
+                       select JsonConvert.DeserializeObject<T>(v.FromRiakString());
+            
+            return rVal;
         }
 
         //public T GetObject<T>()
