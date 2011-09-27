@@ -9,6 +9,12 @@
         {
             
         }
+        
+        public RiakObjectId(string [] objectId)
+        {
+            Bucket = objectId[0];
+            Key = objectId[1];
+        }
 
         public RiakObjectId(string bucket, string key)
         {
