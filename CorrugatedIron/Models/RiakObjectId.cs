@@ -14,8 +14,13 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
+using Newtonsoft.Json;
+using CorrugatedIron.Extensions;
+
 namespace CorrugatedIron.Models
 {
+    [JsonConverter(typeof(RiakObjectIdConverter))]
     public class RiakObjectId
     {
         public string Bucket { get; set; }
@@ -31,7 +36,8 @@ namespace CorrugatedIron.Models
             Bucket = objectId[0];
             Key = objectId[1];
         }
-
+  
+        
         public RiakObjectId(string bucket, string key)
         {
             Bucket = bucket;
@@ -41,6 +47,47 @@ namespace CorrugatedIron.Models
         internal RiakLink ToRiakLink(string tag)
         {
             return new RiakLink(Bucket, Key, tag);
+        }
+    }
+    
+    public class RiakObjectIdConverter : JsonConverter
+    {
+        public override object ReadJson (JsonReader reader, Type objectType, Object existingValue, JsonSerializer serializer)
+        {
+            int pos = 0;
+            string[] objectIdParts = new string[2];
+            
+            while (reader.Read())
+            {
+                if (pos < 1)
+                {
+                    if (reader.TokenType == JsonToken.String)
+                    {
+                        objectIdParts[pos] = reader.Value.ToString();
+                        pos++;
+                    }
+                }
+                // read until the end of the JsonReader
+            }
+            
+            return new RiakObjectId(objectIdParts);
+        }
+        
+        public override void WriteJson (JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            throw new NotImplementedException ();
+        }
+        
+        public override bool CanWrite {
+            get {
+                return base.CanWrite;
+            }
+        }
+        
+        public override bool CanRead { get { return true; } }
+        public override bool CanConvert (Type objectType) 
+        {
+            return true;
         }
     }
 }
