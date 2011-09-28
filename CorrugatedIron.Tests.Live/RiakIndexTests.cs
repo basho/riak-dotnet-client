@@ -89,14 +89,8 @@ namespace CorrugatedIron.Tests.Live
             
             var result = Client.MapReduce(mr);
             result.IsSuccess.ShouldBeTrue();
-             
-            // TODO The difficulty in getting these keys out makes it clear that we need to provide additional Json automagic conversions.
-            var rawKeys = result.Value.PhaseResults.OrderBy(pr => pr.Phase).ElementAt(0).GetObjects();
-            List<RiakObjectId> keys = new List<RiakObjectId>();
-            foreach (var r in rawKeys)
-            {
-                keys.Add(new RiakObjectId(r[0][0].ToString(), r[0][1].ToString()));
-            }
+            
+            var keys = result.Value.PhaseResults.OrderBy(pr => pr.Phase).ElementAt(0).GetObjects<RiakObjectId>();
             
             keys.Count().ShouldEqual(10);
             
