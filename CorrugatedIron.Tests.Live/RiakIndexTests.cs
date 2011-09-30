@@ -85,7 +85,8 @@ namespace CorrugatedIron.Tests.Live
             
             var mr = new RiakMapReduceQuery();
             mr.Inputs(input)
-                .ReduceErlang(r => r.ModFun("riak_kv_mapreduce", "reduce_identity").Keep(true));
+            //    .ReduceErlang(r => r.ModFun("riak_kv_mapreduce", "reduce_identity").Keep(true));
+            .ReduceJs(r => r.Name("mapValuesJson").Keep(true));
             
             var result = Client.MapReduce(mr);
             result.IsSuccess.ShouldBeTrue();
@@ -94,7 +95,60 @@ namespace CorrugatedIron.Tests.Live
             
             keys.Count().ShouldEqual(10);
             
-            // TODO write tests verifying results
+            foreach (var key in keys)
+            {
+                key.Bucket.ShouldNotBeNullOrEmpty();
+                key.Key.ShouldNotBeNullOrEmpty();
+            }
+        }
+        
+        [Test()]
+        public void RiakObjectIdCanBeCreatedFromJsonArrayOrObject()
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                var o = new RiakObject(bucket, i.ToString(), "{ value: \"this is an object\" }");
+                o.AddIntIndex("age_int", 32);
+                
+                Client.Put(o);
+            }
+            
+            var input = new RiakIntIndexEqualityInput(bucket, "age_int", 32);
+            
+            var mr = new RiakMapReduceQuery();
+            mr.Inputs(input)
+            //    .ReduceErlang(r => r.ModFun("riak_kv_mapreduce", "reduce_identity").Keep(true));
+                .ReduceJs(r => r.Name("mapValuesJson").Keep(true));
+            
+            var result = Client.MapReduce(mr);
+            result.IsSuccess.ShouldBeTrue();
+            var keysOne = result.Value.PhaseResults.OrderBy(pr => pr.Phase).ElementAt(0).GetObjects<RiakObjectId>();
+            
+            mr = new RiakMapReduceQuery();
+            mr.Inputs(input)
+                .ReduceErlang(r => r.ModFun("riak_kv_mapreduce", "reduce_identity").Keep(true));
+            
+            result = Client.MapReduce(mr);
+            result.IsSuccess.ShouldBeTrue();
+            var keysTwo = result.Value.PhaseResults.OrderBy(pr => pr.Phase).ElementAt(0).GetObjects<RiakObjectId>();
+            
+            keysOne.Count().ShouldEqual(keysTwo.Count());
+            
+            foreach (var key in keysOne)
+            {
+                key.Key.ShouldNotBeNullOrEmpty();
+                key.Bucket.ShouldNotBeNullOrEmpty();
+                
+                keysTwo.Contains(key).ShouldBeTrue();
+            }
+            
+            foreach (var key in keysTwo)
+            {
+                key.Key.ShouldNotBeNullOrEmpty();
+                key.Bucket.ShouldNotBeNullOrEmpty();
+                
+                keysOne.Contains(key).ShouldBeTrue();
+            }
         }
         
         [Test()]

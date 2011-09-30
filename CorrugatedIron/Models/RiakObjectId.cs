@@ -48,6 +48,33 @@ namespace CorrugatedIron.Models
         {
             return new RiakLink(Bucket, Key, tag);
         }
+        
+        public override bool Equals (object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (obj.GetType() != typeof(RiakObjectId)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            
+            return Equals ((RiakObjectId)obj);
+        }
+        
+        public bool Equals(RiakObjectId other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return Equals(other.Bucket, Bucket) && Equals(other.Key, Key);
+        }
+        
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int result = (Bucket != null ? Bucket.GetHashCode() : 0);
+                result = (result * 397) ^ (Key != null ? Key.GetHashCode() : 0);
+                
+                return result;
+            }
+        }
     }
     
     public class RiakObjectIdConverter : JsonConverter
@@ -59,15 +86,14 @@ namespace CorrugatedIron.Models
             
             while (reader.Read())
             {
-                if (pos < 1)
+                if (pos < 2)
                 {
-                    if (reader.TokenType == JsonToken.String)
+                    if (reader.TokenType == JsonToken.String || reader.TokenType == JsonToken.PropertyName)
                     {
                         objectIdParts[pos] = reader.Value.ToString();
                         pos++;
                     }
                 }
-                // read until the end of the JsonReader
             }
             
             return new RiakObjectId(objectIdParts);
