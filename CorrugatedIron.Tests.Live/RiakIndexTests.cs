@@ -85,8 +85,7 @@ namespace CorrugatedIron.Tests.Live
             
             var mr = new RiakMapReduceQuery();
             mr.Inputs(input)
-            //    .ReduceErlang(r => r.ModFun("riak_kv_mapreduce", "reduce_identity").Keep(true));
-            .ReduceJs(r => r.Name("mapValuesJson").Keep(true));
+                .ReduceJs(r => r.Name("mapValuesJson").Keep(true));
             
             var result = Client.MapReduce(mr);
             result.IsSuccess.ShouldBeTrue();
@@ -117,7 +116,6 @@ namespace CorrugatedIron.Tests.Live
             
             var mr = new RiakMapReduceQuery();
             mr.Inputs(input)
-            //    .ReduceErlang(r => r.ModFun("riak_kv_mapreduce", "reduce_identity").Keep(true));
                 .ReduceJs(r => r.Name("mapValuesJson").Keep(true));
             
             var result = Client.MapReduce(mr);
