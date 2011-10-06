@@ -26,6 +26,7 @@ namespace CorrugatedIron.Config
         int NodePollTime { get; }
         int DefaultRetryWaitTime { get; }
         int DefaultRetryCount { get; }
+        bool VnodeVclocks { get; }
     }
 
     public class RiakClusterConfiguration : ConfigurationSection, IRiakClusterConfiguration
@@ -74,6 +75,13 @@ namespace CorrugatedIron.Config
         {
             get { return (int)this["defaultRetryCount"]; }
             set { this["defaultRetryCount"] = value; }
+        }
+        
+        [ConfigurationProperty("vnodeVclocks", DefaultValue = true, IsRequired = false)]
+        public bool VnodeVclocks
+        {
+            get { return (bool)this["vnodeVclocks"]; }
+            set { this["vnodeVclocks"] = value; }
         }
     }
 }
