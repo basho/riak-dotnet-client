@@ -45,6 +45,8 @@ namespace CorrugatedIron.Models
                     && RwVal == null
                     && DwVal == null
                     && WVal == null
+                    && PrVal == null
+                    && PwVal == null
                     && string.IsNullOrEmpty(Backend);
             }
         }
@@ -56,11 +58,27 @@ namespace CorrugatedIron.Models
         public bool? Search { get; private set; }
         public List<IRiakPreCommitHook> PreCommitHooks { get; private set; }
         public List<IRiakPostCommitHook> PostCommitHooks { get; private set; }
+        public bool? NotFoundOk { get; private set; }
+        public bool? BasicQuorum { get; private set; }
 
         public Either<uint, string> RVal { get; private set; }
         public Either<uint, string> RwVal { get; private set; }
         public Either<uint, string> DwVal { get; private set; }
         public Either<uint, string> WVal { get; private set; }
+        public Either<uint, string> PrVal { get; private set; }
+        public Either<uint, string> PwVal { get; private set; }
+        
+        public RiakBucketProperties SetBasicQuorum(bool value)
+        {
+            BasicQuorum = value;
+            return this;
+        }
+        
+        public RiakBucketProperties SetNotFoundOk(bool value)
+        {
+            NotFoundOk = value;
+            return this;
+        }
 
         public RiakBucketProperties SetAllowMultiple(bool value)
         {
@@ -118,6 +136,26 @@ namespace CorrugatedIron.Models
         public RiakBucketProperties SetWVal(string value)
         {
             return WriteQuorum(value, v => WVal = v);
+        }
+        
+        public RiakBucketProperties SetPrVal(string value)
+        {
+            return WriteQuorum(value, v => PrVal = v);
+        }
+        
+        public RiakBucketProperties SetPrVal(int value)
+        {
+            return WriteQuorum(value, v => PrVal = v);
+        }
+        
+        public RiakBucketProperties SetPwVal(string value)
+        {
+            return WriteQuorum(value, var => PwVal = var);
+        }
+        
+        public RiakBucketProperties SetPwVal(int value)
+        {
+            return WriteQuorum(value, var => PwVal = var);
         }
 
         public RiakBucketProperties SetBackend(string backend)
@@ -185,6 +223,8 @@ namespace CorrugatedIron.Models
             LastWriteWins = props.Value<bool?>("last_write_wins");
             Backend = props.Value<string>("backend");
             Search = props.Value<bool?>("search");
+            NotFoundOk = props.Value<bool?>("notfound_ok");
+            BasicQuorum = props.Value<bool?>("basic_quorum");
 
             ReadQuorum(props, "r", v => RVal = v);
             ReadQuorum(props, "rw", v => RwVal = v);
