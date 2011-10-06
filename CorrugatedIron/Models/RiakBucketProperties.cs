@@ -60,12 +60,38 @@ namespace CorrugatedIron.Models
         public List<IRiakPostCommitHook> PostCommitHooks { get; private set; }
         public bool? NotFoundOk { get; private set; }
         public bool? BasicQuorum { get; private set; }
-
+  
+        /// <summary>
+        /// The number of replicas that must return before a read is considered a succes.
+        /// </summary>
+        /// <value>
+        /// The R value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.
+        /// </value>
         public Either<uint, string> RVal { get; private set; }
+        /// <summary>
+        /// The number of replicas that must return before a delete is considered a success.
+        /// </summary>
+        /// <value>The RW Value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.</value>
         public Either<uint, string> RwVal { get; private set; }
+        /// <summary>
+        /// The number of replicas that must commit to durable storage and respond before a write is considered a success. 
+        /// </summary>
+        /// <value>The DW value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.</value>
         public Either<uint, string> DwVal { get; private set; }
+        /// <summary>
+        /// The number of replicas that must respond before a write is considered a success.
+        /// </summary>
+        /// <value>The W value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.</value>
         public Either<uint, string> WVal { get; private set; }
+        /// <summary>
+        /// The number of primary replicas that must respond before a read is considered a success.
+        /// </summary>
+        /// <value>The PR value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.</value>
         public Either<uint, string> PrVal { get; private set; }
+        /// <summary>
+        /// The number of primary replicas that must respond before a write is considered a success.
+        /// </summary>
+        /// <value>The PW value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.</value>
         public Either<uint, string> PwVal { get; private set; }
         
         public RiakBucketProperties SetBasicQuorum(bool value)
@@ -143,7 +169,7 @@ namespace CorrugatedIron.Models
             return WriteQuorum(value, v => PrVal = v);
         }
         
-        public RiakBucketProperties SetPrVal(int value)
+        public RiakBucketProperties SetPrVal(uint value)
         {
             return WriteQuorum(value, v => PrVal = v);
         }
@@ -153,7 +179,7 @@ namespace CorrugatedIron.Models
             return WriteQuorum(value, var => PwVal = var);
         }
         
-        public RiakBucketProperties SetPwVal(int value)
+        public RiakBucketProperties SetPwVal(uint value)
         {
             return WriteQuorum(value, var => PwVal = var);
         }
@@ -230,6 +256,8 @@ namespace CorrugatedIron.Models
             ReadQuorum(props, "rw", v => RwVal = v);
             ReadQuorum(props, "dw", v => DwVal = v);
             ReadQuorum(props, "w", v => WVal = v);
+            ReadQuorum(props, "pr", v => PrVal = v);
+            ReadQuorum(props, "pw", v => PwVal = v);
 
             var preCommitHooks = props.Value<JArray>("precommit");
             if (preCommitHooks.Count > 0)
@@ -313,8 +341,12 @@ namespace CorrugatedIron.Models
                     .WriteEither("rw", RwVal)
                     .WriteEither("dw", DwVal)
                     .WriteEither("w", WVal)
+                    .WriteEither("pr", PrVal)
+                    .WriteEither("pw", PwVal)
                     .WriteNonNullProperty("backend", Backend)
-                    .WriteNullableProperty("search", Search);
+                    .WriteNullableProperty("search", Search)
+                    .WriteNullableProperty("notfound_ok", NotFoundOk)
+                    .WriteNullableProperty("basic_quorum", BasicQuorum);
 
                 if (PreCommitHooks != null)
                 {
