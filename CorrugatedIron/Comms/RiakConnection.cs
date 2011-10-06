@@ -63,6 +63,7 @@ namespace CorrugatedIron.Comms
         private readonly string _restRootUrl;
         private readonly RiakPbcSocket _socket;
         private string _restClientId;
+        private readonly bool _vnodeVclocks;
 
         public bool IsIdle
         {
@@ -78,6 +79,7 @@ namespace CorrugatedIron.Comms
         {
             _restRootUrl = @"{0}://{1}:{2}".Fmt(nodeConfiguration.RestScheme, nodeConfiguration.HostAddress, nodeConfiguration.RestPort);
             _socket = new RiakPbcSocket(nodeConfiguration.HostAddress, nodeConfiguration.PbcPort, nodeConfiguration.NetworkReadTimeout, nodeConfiguration.NetworkWriteTimeout);
+            _vnodeVclocks = nodeConfiguration.VnodeVclocks;
         }
 
         public static byte[] ToClientId(int id)
@@ -87,7 +89,9 @@ namespace CorrugatedIron.Comms
 
         public void SetClientId(byte[] clientId)
         {
-            PbcWriteRead<RpbSetClientIdReq, RpbSetClientIdResp>(new RpbSetClientIdReq { ClientId = clientId });
+            if (_vnodeVclocks == true) return;
+
+            PbcWriteRead<RpbSetClientIdReq, RpbSetClientIdResp>(new RpbSetClientIdReq {ClientId = clientId});
             _restClientId = Convert.ToBase64String(clientId);
         }
 

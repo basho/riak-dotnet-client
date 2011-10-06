@@ -123,7 +123,7 @@ namespace CorrugatedIron
 
             if (node != null)
             {
-                var result = node.UseConnection(clientId, useFun);
+                var result = node.UseConnection(useFun, clientId);
                 if (!result.IsSuccess)
                 {
                     if (result.ResultCode == ResultCode.NoConnections)
@@ -157,7 +157,7 @@ namespace CorrugatedIron
 
             if (node != null)
             {
-                var result = node.UseDelayedConnection(clientId, useFun);
+                var result = node.UseDelayedConnection(useFun, clientId);
                 if (!result.IsSuccess)
                 {
                     if (result.ResultCode == ResultCode.NoConnections)
@@ -198,7 +198,7 @@ namespace CorrugatedIron
                 IRiakNode node = null;
                 while (_offlineNodes.TryDequeue(out node) && !_disposing)
                 {
-                    var result = node.UseConnection(_pollClientId, c => c.PbcWriteRead<RpbPingReq, RpbPingResp>(new RpbPingReq()));
+                    var result = node.UseConnection(c => c.PbcWriteRead<RpbPingReq, RpbPingResp>(new RpbPingReq()), _pollClientId);
                     if (result.IsSuccess)
                     {
                         _loadBalancer.AddNode(node);
