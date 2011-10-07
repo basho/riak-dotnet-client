@@ -14,12 +14,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Collections.Generic;
+using CorrugatedIron.Models.MapReduce.KeyFilters;
 using Newtonsoft.Json;
 
 namespace CorrugatedIron.Models.MapReduce.Inputs
 {
     public interface IRiakPhaseInput
     {
+        
         JsonWriter WriteJson(JsonWriter writer);
+    }
+
+    public abstract class RiakPhaseInput : IRiakPhaseInput
+    {
+        public List<IRiakKeyFilterToken> Filters { get; set; }
+        public abstract JsonWriter WriteJson(JsonWriter writer);
+    }
+    
+    public abstract class RiakIndexInput : RiakPhaseInput
+    {
     }
 }

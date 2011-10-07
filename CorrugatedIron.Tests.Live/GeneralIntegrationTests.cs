@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using CorrugatedIron.Extensions;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Tests.Extensions;
@@ -234,10 +235,15 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             mrRes.PhaseResults.ElementAt(0).Phase.ShouldEqual(0u);
             mrRes.PhaseResults.ElementAt(1).Phase.ShouldEqual(1u);
 
-            mrRes.PhaseResults.ElementAt(0).Value.ShouldBeNull();
-            mrRes.PhaseResults.ElementAt(1).Value.ShouldNotBeNull();
-
-            var values = result.Value.PhaseResults.ElementAt(1).GetObject<int[]>();
+            //mrRes.PhaseResults.ElementAt(0).Values.ShouldBeNull();
+            foreach(var v in mrRes.PhaseResults.ElementAt(0).Values)
+            {
+                v.ShouldBeNull();
+            }
+            mrRes.PhaseResults.ElementAt(1).Values.ShouldNotBeNull();
+   
+            var values = result.Value.PhaseResults.ElementAt(1).GetObjects<int[]>().First();
+            //var values = Newtonsoft.Json.JsonConvert.DeserializeObject<int[]>(result.Value.PhaseResults.ElementAt(1).Values.First().FromRiakString());
             values[0].ShouldEqual(10);
         }
 
@@ -269,10 +275,14 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
                     mrRes.PhaseResults.ElementAt(0).Phase.ShouldEqual(0u);
                     mrRes.PhaseResults.ElementAt(1).Phase.ShouldEqual(1u);
 
-                    mrRes.PhaseResults.ElementAt(0).Value.ShouldBeNull();
-                    mrRes.PhaseResults.ElementAt(1).Value.ShouldNotBeNull();
-
-                    var values = result.Value.PhaseResults.ElementAt(1).GetObject<int[]>();
+                    //mrRes.PhaseResults.ElementAt(0).Values.ShouldBeNull();
+                    foreach(var v in mrRes.PhaseResults.ElementAt(0).Values)
+                    {
+                        v.ShouldBeNull();
+                    }
+                    mrRes.PhaseResults.ElementAt(1).Values.ShouldNotBeNull();
+    
+                    var values = result.Value.PhaseResults.ElementAt(1).GetObjects<int[]>().First();
                     values[0].ShouldEqual(10);
                 });
         }

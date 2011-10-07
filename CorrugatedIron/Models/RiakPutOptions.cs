@@ -23,6 +23,10 @@ namespace CorrugatedIron.Models
         public uint? W { get; set; }
         public uint? Dw { get; set; }
         public bool ReturnBody { get; set; }
+        public uint? Pw { get; set; }
+        public bool IfNotModified { get; set; }
+        public bool IfNoneMatch { get; set; }
+        public bool ReturnHead { get; set; }
 
         public RiakPutOptions()
         {
@@ -40,6 +44,14 @@ namespace CorrugatedIron.Models
             {
                 request.Dw = Dw.Value;
             }
+            if (Pw.HasValue)
+            {
+                request.Pw = Pw.Value;
+            }
+            
+            request.IfNotModified = IfNotModified;
+            request.IfNoneMatch = IfNoneMatch;
+            request.ReturnHead = ReturnHead;
         }
     }
 }
