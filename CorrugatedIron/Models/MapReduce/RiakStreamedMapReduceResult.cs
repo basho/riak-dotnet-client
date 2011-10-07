@@ -33,7 +33,7 @@ namespace CorrugatedIron.Models.MapReduce
         {
             get
             {
-                return _responseReader.Select(item => item.IsSuccess ? new RiakMapReduceResultPhase(item.Value) : new RiakMapReduceResultPhase());
+                return _responseReader.Select(item => item.IsSuccess ? new RiakMapReduceResultPhase(item.Value.Phase, new List<RpbMapRedResp> {item.Value}) : new RiakMapReduceResultPhase());
             }
         }
     }

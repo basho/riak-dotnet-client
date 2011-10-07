@@ -19,7 +19,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using CorrugatedIron.Extensions;
-using CorrugatedIron.KeyFilters;
+using CorrugatedIron.Models.MapReduce.KeyFilters;
 using CorrugatedIron.Messages;
 using CorrugatedIron.Models.MapReduce.Fluent;
 using CorrugatedIron.Models.MapReduce.Inputs;
@@ -33,34 +33,46 @@ namespace CorrugatedIron.Models.MapReduce
     public class RiakMapReduceQuery
     {
         private readonly List<RiakPhase> _phases;
-        private readonly List<IRiakKeyFilterToken> _filters;
+        
         private string _query;
-        private RiakPhaseInputs _inputs;
+        private RiakPhaseInput _inputs;
 
         public string ContentType { get; set; }
 
         public RiakMapReduceQuery()
         {
             _phases = new List<RiakPhase>();
-            _filters = new List<IRiakKeyFilterToken>();
             ContentType = RiakConstants.ContentTypes.ApplicationJson;
         }
 
         public RiakMapReduceQuery Inputs(string bucket)
         {
-            _inputs = new RiakPhaseInputs(new RiakBucketInput(bucket));
+            _inputs = new RiakBucketInput(bucket);
             return this;
         }
 
-        public RiakMapReduceQuery Inputs(IEnumerable<RiakBucketKeyInput> inputs)
+        public RiakMapReduceQuery Inputs(RiakBucketKeyInput riakBucketKeyInputs)
         {
-            _inputs = new RiakPhaseInputs(inputs);
+            _inputs = riakBucketKeyInputs;
             return this;
         }
 
-        public RiakMapReduceQuery Inputs(IEnumerable<RiakBucketKeyArgInput> inputs)
+        public RiakMapReduceQuery Inputs(RiakBucketKeyKeyDataInput riakBucketKeyKeyDataInputs)
         {
-            _inputs = new RiakPhaseInputs(inputs);
+            _inputs = riakBucketKeyKeyDataInputs;
+            return this;
+        }
+        
+        
+        public RiakMapReduceQuery Inputs(RiakModuleFunctionArgInput riakModFunArgsInput)
+        {
+            _inputs = riakModFunArgsInput;
+            return this;
+        }
+        
+        public RiakMapReduceQuery Inputs(RiakIndexInput riakIndexPhaseInput)
+        {
+            _inputs = riakIndexPhaseInput;
             return this;
         }
 
@@ -108,10 +120,23 @@ namespace CorrugatedIron.Models.MapReduce
             _phases.Add(phase);
             return this;
         }
+        
+//        public RiakMapReduceQuery GetIndex(Action<RiakFluentIndexPhase> setup)
+//        {
+//            var phase = new RiakIndexPhase();
+//            var fluent = new RiakFluentIndexPhase(phase);
+//            setup(fluent);
+//            
+//            throw new NotImplementedException();
+//        }
 
-        public RiakMapReduceQuery Filter(IRiakKeyFilterToken filter)
+        public RiakMapReduceQuery Filter(Action<RiakFluentKeyFilter> setup)
         {
-            _filters.Add(filter);
+            var filters = new List<IRiakKeyFilterToken>();
+            var fluent = new RiakFluentKeyFilter(filters);
+            setup(fluent);
+            _inputs.Filters.AddRange(filters);
+
             return this;
         }
 
@@ -127,18 +152,13 @@ namespace CorrugatedIron.Models.MapReduce
             {
                 writer.WriteStartObject();
 
-                writer.WritePropertyName("inputs");
-                _inputs.WriteJson(writer);
-
-                if (_filters.Count > 0)
+                if (_inputs != null)
                 {
-                    writer.WritePropertyName("key_filters");
-                    writer.WriteStartArray();
-                    _filters.ForEach(f => writer.WriteRawValue(f.ToJsonString()));
-                    writer.WriteEndArray();
+                    _inputs.WriteJson(writer);
                 }
 
                 writer.WritePropertyName("query");
+
                 writer.WriteStartArray();
                 _phases.ForEach(p => writer.WriteRawValue(p.ToJsonString()));
                 writer.WriteEndArray();

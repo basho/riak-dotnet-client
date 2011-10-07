@@ -22,9 +22,9 @@ namespace CorrugatedIron.Comms
 {
     public interface IRiakNode : IDisposable
     {
-        RiakResult UseConnection(byte[] clientId, Func<IRiakConnection, RiakResult> useFun);
-        RiakResult<TResult> UseConnection<TResult>(byte[] clientId, Func<IRiakConnection, RiakResult<TResult>> useFun);
-        RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(byte[] clientId, Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun)
+        RiakResult UseConnection(Func<IRiakConnection, RiakResult> useFun, byte[] clientId);
+        RiakResult<TResult> UseConnection<TResult>(Func<IRiakConnection, RiakResult<TResult>> useFun, byte[] clientId);
+        RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun, byte[] clientId)
             where TResult : RiakResult;
     }
 
@@ -38,17 +38,17 @@ namespace CorrugatedIron.Comms
             _connections = new RiakConnectionPool(nodeConfiguration, connectionFactory);
         }
 
-        public RiakResult UseConnection(byte[] clientId, Func<IRiakConnection, RiakResult> useFun)
+        public RiakResult UseConnection(Func<IRiakConnection, RiakResult> useFun, byte[] clientId = default(byte[]))
         {
-            return UseConnection(clientId, useFun, RiakResult.Error);
+            return UseConnection(useFun, RiakResult.Error, clientId);
         }
 
-        public RiakResult<TResult> UseConnection<TResult>(byte[] clientId, Func<IRiakConnection, RiakResult<TResult>> useFun)
+        public RiakResult<TResult> UseConnection<TResult>(Func<IRiakConnection, RiakResult<TResult>> useFun,byte[] clientId = default(byte[]))
         {
-            return UseConnection(clientId, useFun, RiakResult<TResult>.Error);
+            return UseConnection(useFun, RiakResult<TResult>.Error, clientId);
         }
 
-        private TRiakResult UseConnection<TRiakResult>(byte[] clientId, Func<IRiakConnection, TRiakResult> useFun, Func<ResultCode, string, TRiakResult> onError)
+        private TRiakResult UseConnection<TRiakResult>(Func<IRiakConnection, TRiakResult> useFun, Func<ResultCode, string, TRiakResult> onError, byte[] clientId = default(byte[]))
             where TRiakResult : RiakResult
         {
             if (_disposing) return onError(ResultCode.ShuttingDown, "Connection is shutting down");
@@ -67,7 +67,7 @@ namespace CorrugatedIron.Comms
             return onError(ResultCode.NoConnections, "Unable to acquire connection");
         }
 
-        public RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(byte[] clientId, Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun)
+        public RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun, byte[] clientId = default(byte[]))
             where TResult : RiakResult
         {
             if (_disposing) return RiakResult<IEnumerable<TResult>>.Error(ResultCode.ShuttingDown, "Connection is shutting down");

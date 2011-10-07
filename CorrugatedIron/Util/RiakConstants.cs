@@ -53,6 +53,15 @@ namespace CorrugatedIron.Util
         }
 
         public const int MinClientIdLength = 4;
+        
+        public static class QuorumOptions
+        {
+            private const uint UINT_MAX = uint.MaxValue;
+            public const uint One = UINT_MAX - 1;
+            public const uint Quorum = UINT_MAX - 2;
+            public const uint All = UINT_MAX - 3;
+            public const uint Default = UINT_MAX - 4;
+        }
 
         public static class Defaults
         {
