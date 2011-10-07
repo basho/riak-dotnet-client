@@ -52,5 +52,17 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
 
             return writer;
         }
+        
+        public static RiakBucketKeyInput FromRiakObjectIds(IEnumerable<RiakObjectId> riakObjectIds)
+        {
+            var rbki = new RiakBucketKeyInput();
+            
+            foreach(var objectid in riakObjectIds)
+            {
+                rbki.AddBucketKey(objectid.Bucket, objectid.Key);
+            }
+            
+            return rbki;
+        }
     }
 }
