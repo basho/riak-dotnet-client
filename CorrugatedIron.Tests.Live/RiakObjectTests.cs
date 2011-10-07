@@ -25,6 +25,8 @@ using CorrugatedIron.Extensions;
 using CorrugatedIron.Tests.Live.LiveRiakConnectionTests;
 using NUnit.Framework;
 
+using Newtonsoft.Json;
+
 namespace CorrugatedIron.Tests.Live
 {
     [TestFixture]
@@ -84,11 +86,19 @@ namespace CorrugatedIron.Tests.Live
 
             var mrResult = Client.MapReduce(query);
             mrResult.IsSuccess.ShouldBeTrue();
+            
+            // TODO Is *this* chunk of code acceptable?
+            // This should probably be taken care of in the RiakClient.WalkLinks
+            var listOfLinks = mrResult.Value.PhaseResults.OrderBy(pr => pr.Phase)
+                                  .ElementAt(0).Values
+                                  .Select(v => RiakLink.ParseArrayFromJsonString(v.FromRiakString()));
+            
+            var mrLinks = from link in listOfLinks
+                          from item in link
+                          select item;
 
-            var mrLinkString = mrResult.Value.PhaseResults.First().Value.FromRiakString();
-            var mrLinks = RiakLink.ParseArrayFromJsonString(mrLinkString);
 
-            mrLinks.Count.ShouldEqual(jLinks.Count);
+            mrLinks.Count().ShouldEqual(jLinks.Count);
             foreach (var link in jLinks)
             {
                 mrLinks.ShouldContain(link);

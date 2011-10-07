@@ -29,6 +29,7 @@ namespace CorrugatedIron.Messages
         {
             Links = new List<RpbLink>();
             UserMeta = new List<RpbPair>();
+            Indexes = new List<RpbPair>();
         }
 
         [ProtoMember(1, IsRequired = true, Name = "value", DataFormat = DataFormat.Default)]
@@ -65,5 +66,9 @@ namespace CorrugatedIron.Messages
         [ProtoMember(9, Name = "usermeta", DataFormat = DataFormat.Default)]
         [DefaultValue(null)]
         internal List<RpbPair> UserMeta { get; set; }
+        
+        [ProtoMember(10, Name = "indexes", DataFormat = DataFormat.Default)]
+        [DefaultValue(null)]
+        internal List<RpbPair> Indexes { get; set; }
     }
 }

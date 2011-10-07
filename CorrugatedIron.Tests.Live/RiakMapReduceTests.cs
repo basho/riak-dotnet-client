@@ -24,6 +24,7 @@ using CorrugatedIron.Tests.Extensions;
 using CorrugatedIron.Util;
 using CorrugatedIron.Extensions;
 using NUnit.Framework;
+using Newtonsoft.Json;
 
 namespace CorrugatedIron.Tests.Live
 {
@@ -88,10 +89,11 @@ namespace CorrugatedIron.Tests.Live
             mrResult.PhaseResults.ElementAt(0).Phase.ShouldEqual(0u);
             mrResult.PhaseResults.ElementAt(1).Phase.ShouldEqual(1u);
 
-            mrResult.PhaseResults.ElementAt(0).Value.ShouldBeNull();
-            mrResult.PhaseResults.ElementAt(1).Value.ShouldNotBeNull();
-
-            var values = result.Value.PhaseResults.ElementAt(1).GetObject<int[]>();
+            mrResult.PhaseResults.ElementAt(0).Values.Count().ShouldEqual(0);
+            mrResult.PhaseResults.ElementAt(1).Values.Count().ShouldNotEqual(0);
+            
+            
+            var values = JsonConvert.DeserializeObject<int[]>(mrResult.PhaseResults.ElementAt(1).Values.First().FromRiakString());
             values[0].ShouldEqual(1);
         }
 
@@ -120,10 +122,11 @@ namespace CorrugatedIron.Tests.Live
             mrResult.PhaseResults.ElementAt(0).Phase.ShouldEqual(0u);
             mrResult.PhaseResults.ElementAt(1).Phase.ShouldEqual(1u);
 
-            mrResult.PhaseResults.ElementAt(0).Value.ShouldBeNull();
-            mrResult.PhaseResults.ElementAt(1).Value.ShouldNotBeNull();
-
-            var values = result.Value.PhaseResults.ElementAt(1).GetObject<int[]>();
+            mrResult.PhaseResults.ElementAt(0).Values.Count().ShouldEqual(0);
+            mrResult.PhaseResults.ElementAt(1).Values.Count().ShouldNotEqual(0);
+   
+            
+            var values = result.Value.PhaseResults.ElementAt(1).GetObjects<int[]>().First();
             values[0].ShouldEqual(10);
         }
 
@@ -152,7 +155,7 @@ namespace CorrugatedIron.Tests.Live
             mrResult.PhaseResults.ShouldNotBeNull();
             mrResult.PhaseResults.Count().ShouldEqual(2);
 
-            var values = result.Value.PhaseResults.ElementAt(1).GetObject<int[]>();
+            var values = result.Value.PhaseResults.ElementAt(1).GetObjects<int[]>().First();
             values[0].ShouldEqual(5);
         }
     }
