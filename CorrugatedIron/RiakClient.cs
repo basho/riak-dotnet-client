@@ -635,6 +635,26 @@ namespace CorrugatedIron
                 return result;
             }
         }
+        
+        /// <summary>
+        /// Get the results of an index query prepared for use in a <see cref="CorrugatedIron.Models.MapReduce.MapReduceQuery"/>
+        /// </summary>
+        /// <returns>
+        /// A <see cref="RiakBucketKeyInput"/> of the index query results
+        /// </returns>
+        /// <param name='indexQuery'>
+        /// Index query.
+        /// </param>
+        public RiakBucketKeyInput GetIndex(RiakIndexInput indexQuery)
+        {
+            var query = new RiakMapReduceQuery()
+                .Inputs(indexQuery).ReduceErlang(r => r.ModFun("riak_kv_mapreduce", "reduce_identity").Keep(true));
+            var result = MapReduce(query);
+            
+            var keys = result.Value.PhaseResults.OrderBy(pr => pr.Phase).ElementAt(0).GetObjects<RiakObjectId>();
+            
+            return RiakBucketKeyInput.FromRiakObjectIds(keys);
+        }
   
         /// <summary>
         /// Retrieve arbitrarily deep list of links for a <see cref="CorrugatedIron.RiakObject"/>
