@@ -15,7 +15,7 @@
 // under the License.
 
 using CorrugatedIron.Extensions;
-using CorrugatedIron.KeyFilters;
+using CorrugatedIron.Models.MapReduce.KeyFilters;
 using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Models.MapReduce.Inputs;
 using CorrugatedIron.Tests.Extensions;
@@ -34,7 +34,7 @@ namespace CorrugatedIron.Tests.Models.MapReduce
             @"{""inputs"":""animals"",""query"":[{""map"":{""language"":""javascript"",""source"":""function(o) { if (o.key.indexOf('spider') != -1) return [1]; return []; }"",""keep"":false}},{""reduce"":{""language"":""javascript"",""name"":""Riak.reduceSum"",""keep"":true}}]}";
 
         private const string ComplexMrJobWithFilterText =
-            @"{""inputs"":""animals"",""key_filters"":[[""matches"",""spider""]],""query"":[{""map"":{""language"":""javascript"",""source"":""function(o) { return [1]; }"",""keep"":false}},{""reduce"":{""language"":""javascript"",""name"":""Riak.reduceSum"",""keep"":true}}]}";
+            @"{""inputs"":{""bucket"":""animals"",""key_filters"":[[""matches"",""spider""]]},""query"":[{""map"":{""language"":""javascript"",""source"":""function(o) { return [1]; }"",""keep"":false}},{""reduce"":{""language"":""javascript"",""name"":""Riak.reduceSum"",""keep"":true}}]}";
 
         private const string MrContentType = RiakConstants.ContentTypes.ApplicationJson;
 
@@ -76,7 +76,8 @@ namespace CorrugatedIron.Tests.Models.MapReduce
                     ContentType = MrContentType
                 }
                 .Inputs("animals")
-                .Filter(new Matches<string>("spider"))
+                //.Filter(new Matches<string>("spider"))
+                .Filter(f => f.Matches("spider"))
                 .MapJs(m => m.Source("function(o) { return [1]; }"))
                 .ReduceJs(r => r.Name("Riak.reduceSum").Keep(true));
 
