@@ -47,6 +47,10 @@ namespace CorrugatedIron.Tests.Live
             Cluster = new RiakCluster(ClusterConfig, new RiakConnectionFactory());
             ClientGenerator = () => new RiakClient(Cluster);
             Client = ClientGenerator();
+            
+            var props = Client.GetBucketProperties(bucket, true).Value;
+            props.SetSearch(true);
+            Client.SetBucketProperties(bucket, props);
         }
         
         [TearDown]
@@ -71,7 +75,7 @@ namespace CorrugatedIron.Tests.Live
             };
             
             mr.Inputs(modFunArg)
-                .MapJs(m => //m.Name("Riak.mapValuesJson")
+                .MapJs(m => 
                     m.Source(@"
 function(value, keydata, arg) 
 {
@@ -90,10 +94,11 @@ function(values, arg)
             result.IsSuccess.ShouldBeTrue();
             
             var mrResult = result.Value;
-            mrResult.PhaseResults.Count().ShouldEqual(3);
+            mrResult.PhaseResults.Count().ShouldEqual(2);
             
-            mrResult.PhaseResults.ElementAt(0).Value.ShouldNotBeNull();
-            mrResult.PhaseResults.ElementAt(2).Value.ShouldNotBeNull();
+            mrResult.PhaseResults.ElementAt(0).Values.ShouldNotBeNull();
+            mrResult.PhaseResults.ElementAt(1).Values.ShouldNotBeNull();
+            // TODO Add data introspection to test - need to verify the results, after all.
         }
     }
 }
