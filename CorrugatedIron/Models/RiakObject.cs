@@ -42,6 +42,48 @@ namespace CorrugatedIron.Models
         public uint LastModifiedUsec { get; internal set; }
         public IList<RiakLink> Links { get; private set; }
         public IList<RiakObject> Siblings { get; set; }
+        public IDictionary<string, string> BinIndexes { get; set; }
+        public IDictionary<string, int> IntIndexes { get; set; }
+        
+        public IDictionary<string, string> Indexes
+        {
+            get 
+            {
+                Dictionary<string, string> indexes = new Dictionary<string, string>();
+                
+                foreach (var key in BinIndexes.Keys)
+                {
+                    indexes.Add(key, BinIndexes[key]);
+                }
+                
+                foreach (var key in IntIndexes.Keys)
+                {
+                    indexes.Add(key, IntIndexes[key].ToString());
+                }
+                
+                return indexes;
+            }
+            
+            private set 
+            {
+                if (BinIndexes == null)
+                    BinIndexes = new Dictionary<string, string>();
+                if (IntIndexes == null)
+                    IntIndexes = new Dictionary<string, int>();
+                
+                foreach (var key in value.Keys)
+                {
+                    if (key.IndexOf("_int") > -1)
+                    {
+                        IntIndexes.Add(key, Convert.ToInt32(value[key]));
+                    }
+                    else 
+                    {
+                        BinIndexes.Add(key, value[key].ToString());
+                    }
+                }
+            }
+        }
 
         private List<string> _vtags;
         private int _hashCode;
@@ -92,10 +134,34 @@ namespace CorrugatedIron.Models
             ContentType = contentType;
             CharSet = charSet;
             UserMetaData = new Dictionary<string, string>();
+            Indexes = new Dictionary<string, string>();
             Links = new List<RiakLink>();
             Siblings = new List<RiakObject>();
+            
+            BinIndexes = new Dictionary<string, string>();
+            IntIndexes = new Dictionary<string, int>();
         }
-
+        
+        public void AddBinIndex(string index, string key)
+        {
+            BinIndexes.Add(FormatBinKey(index), key);
+        }
+        
+        public void AddIntIndex(string index, int key)
+        {
+            IntIndexes.Add(FormatIntKey(index), key);
+        }
+        
+        public void RemoveBinIndex(string index)
+        {
+            BinIndexes.Remove(FormatBinKey(index));
+        }
+  
+        public void RemoveIntIndex(string index)
+        {
+            IntIndexes.Remove(FormatIntKey(index));
+        }
+        
         public void LinkTo(string bucket, string key, string tag)
         {
             Links.Add(new RiakLink(bucket, key, tag));
@@ -169,12 +235,13 @@ namespace CorrugatedIron.Models
             Bucket = bucket;
             Key = key;
             VectorClock = vectorClock;
-
+            
             Value = content.Value;
             VTag = content.VTag.FromRiakString();
             ContentEncoding = content.ContentEncoding.FromRiakString();
             ContentType = content.ContentType.FromRiakString();
             UserMetaData = content.UserMeta.ToDictionary(p => p.Key.FromRiakString(), p => p.Value.FromRiakString());
+            Indexes = content.Indexes.ToDictionary(p => p.Key.FromRiakString(), p => p.Value.FromRiakString());
             Links = content.Links.Select(l => new RiakLink(l)).ToList();
             Siblings = new List<RiakObject>();
             LastModified = content.LastMod;
@@ -208,6 +275,7 @@ namespace CorrugatedIron.Models
                     Value = Value,
                     VTag = VTag.ToRiakString(),
                     UserMeta = UserMetaData.Select(kv => new RpbPair { Key = kv.Key.ToRiakString(), Value = kv.Value.ToRiakString() }).ToList(),
+                    Indexes = Indexes.Select(kv => new RpbPair { Key = kv.Key.ToRiakString(), Value = kv.Value.ToRiakString() }).ToList(),
                     LastMod = LastModified,
                     LastModUSecs = LastModifiedUsec,
                     Links = Links.Select(l => l.ToMessage()).ToList()
@@ -249,12 +317,14 @@ namespace CorrugatedIron.Models
                 && Equals(other.CharSet, CharSet)
                 && Equals(other.VectorClock, VectorClock)
                 && Equals(other.UserMetaData, UserMetaData)
+                && Equals(other.Indexes, Indexes)
                 && other.LastModified == LastModified
                 && other.LastModifiedUsec == LastModifiedUsec
                 && Equals(other.Links, Links)
                 && Equals(other._vtags, _vtags)
                 && other.Links.SequenceEqual(Links)
-                && other.UserMetaData.SequenceEqual(UserMetaData);
+                && other.UserMetaData.SequenceEqual(UserMetaData)
+                && other.Indexes.SequenceEqual(Indexes);
         }
 
         public override int GetHashCode()
@@ -279,6 +349,8 @@ namespace CorrugatedIron.Models
                 result = (result*397) ^ (CharSet != null ? CharSet.GetHashCode() : 0);
                 result = (result*397) ^ (VectorClock != null ? VectorClock.GetHashCode() : 0);
                 result = (result*397) ^ (UserMetaData != null ? UserMetaData.GetHashCode() : 0);
+                result = (result*397) ^ (BinIndexes != null ? BinIndexes.GetHashCode() : 0);
+                result = (result*397) ^ (IntIndexes != null ? IntIndexes.GetHashCode() : 0);
                 result = (result*397) ^ LastModified.GetHashCode();
                 result = (result*397) ^ LastModifiedUsec.GetHashCode();
                 result = (result*397) ^ (Links != null ? Links.GetHashCode() : 0);
@@ -357,6 +429,26 @@ namespace CorrugatedIron.Models
         public dynamic GetObject()
         {
             return GetObject<dynamic>();
+        }
+        
+        private string FormatBinKey(string key)
+        {
+            if (key.IndexOf("_bin") < 0)
+            {
+                key = "{0}_bin".Fmt(key);
+            }
+            
+            return key;
+        }
+        
+        private string FormatIntKey(string key)
+        {
+            if (key.IndexOf("_int") < 0)
+            {
+                key = "{0}_int".Fmt(key);
+            }
+            
+            return key;
         }
     }
 }
