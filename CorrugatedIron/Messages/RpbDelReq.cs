@@ -33,5 +33,38 @@ namespace CorrugatedIron.Messages
         [ProtoMember(3, IsRequired = false, Name = "rw", DataFormat = DataFormat.TwosComplement)]
         [DefaultValue(default(uint))]
         internal uint Rw { get; set; }
+
+        
+        /*     optional bytes vclock = 4;
+                optional uint32 r = 5;
+                optional uint32 w = 6;
+                optional uint32 pr = 7;
+                optional uint32 pw = 8;
+                optional uint32 dw = 9;
+        */
+        
+        [ProtoMember(4, IsRequired = false, Name = "vclock", DataFormat = DataFormat.Default)]
+        [DefaultValue(null)]
+        internal byte[] Vclock { get; set; }
+        
+        [ProtoMember(5, IsRequired = false, Name = "r", DataFormat = DataFormat.TwosComplement)]
+        [DefaultValue(default(uint))]
+        internal uint R { get; set; }
+        
+        [ProtoMember(6, IsRequired = false, Name = "w", DataFormat = DataFormat.TwosComplement)]
+        [DefaultValue(default(uint))]
+        internal uint W { get; set; }
+        
+        [ProtoMember(7, IsRequired = false, Name = "pr", DataFormat = DataFormat.TwosComplement)]
+        [DefaultValue(default(uint))]
+        internal uint Pr { get; set; }
+        
+        [ProtoMember(8, IsRequired = false, Name = "pw", DataFormat = DataFormat.TwosComplement)]
+        [DefaultValue(default(uint))]
+        internal uint Pw { get; set; }
+        
+        [ProtoMember(9, IsRequired = false, Name = "dw", DataFormat = DataFormat.TwosComplement)]
+        [DefaultValue(default(uint))]
+        internal uint Dw { get; set; }
     }
 }

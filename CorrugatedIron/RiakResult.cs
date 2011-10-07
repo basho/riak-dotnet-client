@@ -86,5 +86,31 @@ namespace CorrugatedIron
                 ErrorMessage = message
             };
         }
+        
+        public override int GetHashCode ()
+        {
+            unchecked
+            {
+                int result = (Value != null ? Value.GetHashCode() : 0);
+                result = (result*397) ^ IsSuccess.GetHashCode();
+                result = (result*397) ^ ResultCode.GetHashCode();
+                return result;
+            }
+        }
+        
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != typeof(RiakResult<TResult>)) return false;
+            return Equals((RiakResult<TResult>)obj);
+        }
+
+        public bool Equals(RiakResult<TResult> other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return Equals(other.Value, Value) && Equals(other.IsSuccess, IsSuccess) && Equals(other.ResultCode, ResultCode);
+        }
     }
 }

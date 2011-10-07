@@ -25,6 +25,7 @@ using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Models.MapReduce.Inputs;
 using CorrugatedIron.Tests.Extensions;
 using CorrugatedIron.Tests.Live.LiveRiakConnectionTests;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 
@@ -64,8 +65,11 @@ namespace CorrugatedIron.Tests.Live.LoadTests
                 result.IsSuccess.ShouldBeTrue();
             }
 
+            var input = new RiakBucketKeyInput();
+            keys.ForEach(k => input.AddBucketKey(MapReduceBucket, k));
+
             var query = new RiakMapReduceQuery()
-                .Inputs(keys.Select(k => new RiakBucketKeyInput(MapReduceBucket, k)).ToList())
+                .Inputs(input)
                 .MapJs(m => m.Source(@"function(o){return[1];}"))
                 .ReduceJs(r => r.Name(@"Riak.reduceSum").Keep(true));
             query.Compile();
@@ -81,7 +85,9 @@ namespace CorrugatedIron.Tests.Live.LoadTests
             {
                 if (r.IsSuccess)
                 {
-                    r.Value.PhaseResults.ElementAt(1).GetObject<int[]>()[0].ShouldEqual(10);
+                    var resultValue = JsonConvert.DeserializeObject<int[]>(r.Value.PhaseResults.ElementAt(1).Values.First().FromRiakString())[0];
+                    resultValue.ShouldEqual(10);
+                    //r.Value.PhaseResults.ElementAt(1).GetObject<int[]>()[0].ShouldEqual(10);
                 }
                 else
                 {
@@ -118,8 +124,11 @@ namespace CorrugatedIron.Tests.Live.LoadTests
                 result.IsSuccess.ShouldBeTrue();
             }
 
+            var input = new RiakBucketKeyInput();
+            keys.ForEach(k => input.AddBucketKey(MapReduceBucket, k));
+
             var query = new RiakMapReduceQuery()
-                .Inputs(keys.Select(k => new RiakBucketKeyInput(MapReduceBucket, k)).ToList())
+                .Inputs(input)
                 .MapJs(m => m.Source(@"function(o){return[1];}"))
                 .ReduceJs(r => r.Name(@"Riak.reduceSum").Keep(true));
             query.Compile();
@@ -136,7 +145,10 @@ namespace CorrugatedIron.Tests.Live.LoadTests
                 if (result.Count > 0)
                 {
                     var lastResult = result.OrderByDescending(r => r.Phase).First();
-                    lastResult.GetObject<int[]>()[0].ShouldEqual(10);
+                    var resultValue = JsonConvert.DeserializeObject<int[]>(lastResult.Values.First().FromRiakString());
+                    //var resultValue = JsonConvert.DeserializeObject<int[]>(r.Value.PhaseResults.ElementAt(1).Values.First().FromRiakString())[0];
+                    resultValue[0].ShouldEqual(10);
+                    //lastResult.GetObject<int[]>()[0].ShouldEqual(10);
                 }
                 else
                 {
