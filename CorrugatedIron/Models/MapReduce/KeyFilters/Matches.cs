@@ -17,7 +17,6 @@
 using System;
 using System.IO;
 using System.Text;
-using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 
 namespace CorrugatedIron.Models.MapReduce.KeyFilters
@@ -29,9 +28,16 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
     {
         private readonly Tuple<string, string> _kfDefinition;
 
-        public string FunctionName { get { return _kfDefinition.Item1; } }
-        public string Argument { get { return _kfDefinition.Item2; } }
-        
+        public string FunctionName
+        {
+            get { return _kfDefinition.Item1; }
+        }
+
+        public string Argument
+        {
+            get { return _kfDefinition.Item2; }
+        }
+
         public Matches(string arg)
         {
             _kfDefinition = Tuple.Create("matches", arg);
@@ -46,8 +52,8 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
         {
             var sb = new StringBuilder();
 
-            using (var sw = new StringWriter(sb))
-            using (JsonWriter jw = new JsonTextWriter(sw))
+            using(var sw = new StringWriter(sb))
+            using(JsonWriter jw = new JsonTextWriter(sw))
             {
                 jw.WriteStartArray();
 

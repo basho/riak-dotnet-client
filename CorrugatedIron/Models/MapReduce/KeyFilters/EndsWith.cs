@@ -28,36 +28,48 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
     {
         private readonly Tuple<string, string> _kfDefinition;
 
-        public string FunctionName { get { return _kfDefinition.Item1; } }
-
-        public string Argument { get { return _kfDefinition.Item2; } }
-
         public EndsWith(string arg)
         {
             _kfDefinition = Tuple.Create("ends_with", arg);
         }
 
-        public override string ToString()
+        public string FunctionName
         {
-            return ToJsonString();
+            get { return _kfDefinition.Item1; }
         }
+
+        public string Argument
+        {
+            get { return _kfDefinition.Item2; }
+        }
+
+        #region IRiakKeyFilterToken Members
 
         public string ToJsonString()
         {
             var sb = new StringBuilder();
 
-            using (var sw = new StringWriter(sb))
-            using (JsonWriter jw = new JsonTextWriter(sw))
+            using(var sw = new StringWriter(sb))
             {
-                jw.WriteStartArray();
+                using(JsonWriter jw = new JsonTextWriter(sw))
+                {
+                    jw.WriteStartArray();
 
-                jw.WriteValue(FunctionName);
-                jw.WriteValue(Argument);
+                    jw.WriteValue(FunctionName);
+                    jw.WriteValue(Argument);
 
-                jw.WriteEndArray();
+                    jw.WriteEndArray();
+                }
             }
 
             return sb.ToString();
+        }
+
+        #endregion
+
+        public override string ToString()
+        {
+            return ToJsonString();
         }
     }
 }

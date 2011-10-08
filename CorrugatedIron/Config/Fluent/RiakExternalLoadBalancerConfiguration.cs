@@ -25,11 +25,20 @@ namespace CorrugatedIron.Config.Fluent
         private int _defaultRetryWaitTime = 200;
         private int _defaultRetryCount = 3;
 
-        public int NodePollTime { get { return _nodePollTime; } } 
+        public int NodePollTime
+        {
+            get { return _nodePollTime; }
+        }
 
-        public int DefaultRetryWaitTime { get { return _defaultRetryWaitTime; } }
+        public int DefaultRetryWaitTime
+        {
+            get { return _defaultRetryWaitTime; }
+        }
 
-        public int DefaultRetryCount { get { return _defaultRetryCount; } }
+        public int DefaultRetryCount
+        {
+            get { return _defaultRetryCount; }
+        }
 
         public IRiakNodeConfiguration Target
         {

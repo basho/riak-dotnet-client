@@ -33,15 +33,16 @@ namespace CorrugatedIron.Util
             public const string Xml = @"application/xml";
             public const string ProtocolBuffers = @"application/x-protobuf";
         }
-        
+
         public static class MapReduceLanguage
         {
             public const string JavaScript = "javascript";
             public const string Json = JavaScript;
             public const string Erlang = "erlang";
         }
-        
-        public static class MapReducePhaseType {
+
+        public static class MapReducePhaseType
+        {
             public const string Map = @"map";
             public const string Reduce = @"reduce";
             public const string Link = @"link";
@@ -53,14 +54,14 @@ namespace CorrugatedIron.Util
         }
 
         public const int MinClientIdLength = 4;
-        
+
         public static class QuorumOptions
         {
-            private const uint UINT_MAX = uint.MaxValue;
-            public const uint One = UINT_MAX - 1;
-            public const uint Quorum = UINT_MAX - 2;
-            public const uint All = UINT_MAX - 3;
-            public const uint Default = UINT_MAX - 4;
+            private const uint UintMax = uint.MaxValue;
+            public const uint One = UintMax - 1;
+            public const uint Quorum = UintMax - 2;
+            public const uint All = UintMax - 3;
+            public const uint Default = UintMax - 4;
         }
 
         public static class Defaults
@@ -74,7 +75,7 @@ namespace CorrugatedIron.Util
             public const string ContentType = ContentTypes.ApplicationJson;
             public const string CharSet = CharSets.Utf8;
         }
-        
+
         public static class KeyFilterTransforms
         {
             public const string IntToString = @"int_to_string";

@@ -29,10 +29,21 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
     {
         private readonly Tuple<string, string, uint> _kfDefinition;
 
-        public string FunctionName { get { return _kfDefinition.Item1; } }
-        public string Token { get { return _kfDefinition.Item2; } }
-        public uint Position { get { return _kfDefinition.Item3; } }
-        
+        public string FunctionName
+        {
+            get { return _kfDefinition.Item1; }
+        }
+
+        public string Token
+        {
+            get { return _kfDefinition.Item2; }
+        }
+
+        public uint Position
+        {
+            get { return _kfDefinition.Item3; }
+        }
+
         public Tokenize(string token, uint position)
         {
             _kfDefinition = Tuple.Create("tokenize", token, position);
@@ -47,8 +58,8 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
         {
             var sb = new StringBuilder();
 
-            using (var sw = new StringWriter(sb))
-            using (JsonWriter jw = new JsonTextWriter(sw))
+            using(var sw = new StringWriter(sb))
+            using(JsonWriter jw = new JsonTextWriter(sw))
             {
                 jw.WriteStartArray();
 
@@ -63,4 +74,3 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
         }
     }
 }
-

@@ -173,6 +173,7 @@
     <Compile Include="Models\RiakObject.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Converters\RiakObjectIdConverter.cs" />
     <Compile Include="Models\RiakPutOptions.cs">
       <SubType>Code</SubType>
     </Compile>

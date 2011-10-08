@@ -29,9 +29,20 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
     {
         private readonly Tuple<string, List<T>> _kfDefinition;
 
-        public string FunctionName { get { return _kfDefinition.Item1; } }
-        public List<T> Argument { get { return Set; } }
-        public List<T> Set { get { return _kfDefinition.Item2; } } 
+        public string FunctionName
+        {
+            get { return _kfDefinition.Item1; }
+        }
+
+        public List<T> Argument
+        {
+            get { return Set; }
+        }
+
+        public List<T> Set
+        {
+            get { return _kfDefinition.Item2; }
+        }
 
         public SetMember(List<T> set)
         {
@@ -47,13 +58,13 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
         {
             var sb = new StringBuilder();
 
-            using (var sw = new StringWriter(sb))
-            using (JsonWriter jw = new JsonTextWriter(sw))
+            using(var sw = new StringWriter(sb))
+            using(JsonWriter jw = new JsonTextWriter(sw))
             {
                 jw.WriteStartArray();
 
                 jw.WriteValue(FunctionName);
-                
+
                 Set.ForEach(v => jw.WriteValue(v));
 
                 jw.WriteEndArray();

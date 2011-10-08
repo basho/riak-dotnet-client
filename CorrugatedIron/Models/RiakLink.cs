@@ -74,9 +74,9 @@ namespace CorrugatedIron.Models
         {
             var message = new RpbLink
             {
-                Bucket = Bucket.ToRiakString(),
-                Key = Key.ToRiakString(),
-                Tag = Tag.ToRiakString()
+            Bucket = Bucket.ToRiakString(),
+            Key = Key.ToRiakString(),
+            Tag = Tag.ToRiakString()
             };
 
             return message;
@@ -84,16 +84,31 @@ namespace CorrugatedIron.Models
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != typeof(RiakLink)) return false;
+            if(ReferenceEquals(null, obj))
+            {
+                return false;
+            }
+            if(ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+            if(obj.GetType() != typeof(RiakLink))
+            {
+                return false;
+            }
             return Equals((RiakLink)obj);
         }
 
         public bool Equals(RiakLink other)
         {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
+            if(ReferenceEquals(null, other))
+            {
+                return false;
+            }
+            if(ReferenceEquals(this, other))
+            {
+                return true;
+            }
             return Equals(other.Bucket, Bucket) && Equals(other.Key, Key) && Equals(other.Tag, Tag);
         }
 
@@ -102,8 +117,8 @@ namespace CorrugatedIron.Models
             unchecked
             {
                 int result = (Bucket != null ? Bucket.GetHashCode() : 0);
-                result = (result*397) ^ (Key != null ? Key.GetHashCode() : 0);
-                result = (result*397) ^ (Tag != null ? Tag.GetHashCode() : 0);
+                result = (result * 397) ^ (Key != null ? Key.GetHashCode() : 0);
+                result = (result * 397) ^ (Tag != null ? Tag.GetHashCode() : 0);
                 return result;
             }
         }

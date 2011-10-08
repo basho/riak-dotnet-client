@@ -14,7 +14,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
 using Newtonsoft.Json;
 
 namespace CorrugatedIron.Models.MapReduce.Inputs
@@ -25,36 +24,35 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
         public string Index { get; set; }
         public int Start { get; set; }
         public int End { get; set; }
-        
-        public RiakIntIndexRangeInput (string bucket, string index, int start, int end)
+
+        public RiakIntIndexRangeInput(string bucket, string index, int start, int end)
         {
             Bucket = bucket;
             Index = index;
             Start = start;
             End = end;
         }
-        
+
         public override JsonWriter WriteJson(JsonWriter writer)
         {
             writer.WritePropertyName("inputs");
-            
+
             writer.WriteStartObject();
             writer.WritePropertyName("bucket");
             writer.WriteValue(Bucket);
-            
+
             writer.WritePropertyName("index");
             writer.WriteValue(Index);
-            
+
             writer.WritePropertyName("start");
             writer.WriteValue(Start);
-            
+
             writer.WritePropertyName("end");
             writer.WriteValue(End);
-            
+
             writer.WriteEndObject();
-            
+
             return writer;
         }
     }
 }
-
