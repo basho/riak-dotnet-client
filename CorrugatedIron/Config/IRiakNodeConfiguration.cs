@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -14,20 +14,19 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.Configuration;
-
 namespace CorrugatedIron.Config
 {
-    public class RiakNodeConfigurationCollection : ConfigurationElementCollection
+    public interface IRiakNodeConfiguration
     {
-        protected override ConfigurationElement CreateNewElement()
-        {
-            return new RiakNodeConfiguration();
-        }
-
-        protected override object GetElementKey(ConfigurationElement element)
-        {
-            return ((RiakNodeConfiguration)element).Name;
-        }
+        string Name { get; }
+        string HostAddress { get; }
+        int PbcPort { get; }
+        string RestScheme { get; }
+        int RestPort { get; }
+        int PoolSize { get; }
+        //int IdleTimeout { get; }
+        int NetworkReadTimeout { get; }
+        int NetworkWriteTimeout { get; }
+        bool VnodeVclocks { get; }
     }
 }

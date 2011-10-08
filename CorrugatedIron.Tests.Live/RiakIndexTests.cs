@@ -35,7 +35,7 @@ namespace CorrugatedIron.Tests.Live
         
         public WhenUsingIndexes () : base()
         {
-            bucket = "riak_index_tests";
+            Bucket = "riak_index_tests";
         }
         
         [SetUp()]
@@ -49,13 +49,13 @@ namespace CorrugatedIron.Tests.Live
         [TearDown()]
         public void TearDown()
         {
-            Client.DeleteBucket(bucket);
+            Client.DeleteBucket(Bucket);
         }
         
         [Test()]
         public void IndexesAreSavedWithAnObject()
         {
-            var o = new RiakObject(bucket, "the_object", "{ value: \"this is an object\" }");
+            var o = new RiakObject(Bucket, "the_object", "{ value: \"this is an object\" }");
             o.AddBinIndex("tacos", "are great!");
             o.AddIntIndex("age", 12);
             
@@ -75,13 +75,13 @@ namespace CorrugatedIron.Tests.Live
         {
             for (int i = 0; i < 10; i++)
             {
-                var o = new RiakObject(bucket, i.ToString(), "{ value: \"this is an object\" }");
+                var o = new RiakObject(Bucket, i.ToString(), "{ value: \"this is an object\" }");
                 o.AddIntIndex("age_int", 32);
                 
                 Client.Put(o);
             }
             
-            var input = new RiakIntIndexEqualityInput(bucket, "age_int", 32);
+            var input = new RiakIntIndexEqualityInput(Bucket, "age_int", 32);
             
             var mr = new RiakMapReduceQuery();
             mr.Inputs(input)
@@ -106,13 +106,13 @@ namespace CorrugatedIron.Tests.Live
         {
             for (int i = 0; i < 10; i++)
             {
-                var o = new RiakObject(bucket, i.ToString(), "{ value: \"this is an object\" }");
+                var o = new RiakObject(Bucket, i.ToString(), "{ value: \"this is an object\" }");
                 o.AddIntIndex("age_int", 32);
                 
                 Client.Put(o);
             }
             
-            var input = new RiakIntIndexEqualityInput(bucket, "age_int", 32);
+            var input = new RiakIntIndexEqualityInput(Bucket, "age_int", 32);
             
             var mr = new RiakMapReduceQuery();
             mr.Inputs(input)
@@ -154,13 +154,13 @@ namespace CorrugatedIron.Tests.Live
         {
             for (int i = 0; i < 10; i++)
             {
-                var o = new RiakObject(bucket, i.ToString(), "{ value: \"this is an object\" }");
+                var o = new RiakObject(Bucket, i.ToString(), "{ value: \"this is an object\" }");
                 o.AddIntIndex("age_int", 25 + i);
                 
                 Client.Put(o);
             }
             
-            var input = new RiakIntIndexRangeInput(bucket, "age_int", 27, 30);
+            var input = new RiakIntIndexRangeInput(Bucket, "age_int", 27, 30);
             
             var mr = new RiakMapReduceQuery()
                 .Inputs(input)

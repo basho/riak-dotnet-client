@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -14,20 +14,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.Configuration;
+using System.Collections.Generic;
 
 namespace CorrugatedIron.Config
 {
-    public class RiakNodeConfigurationCollection : ConfigurationElementCollection
+    public interface IRiakClusterConfiguration
     {
-        protected override ConfigurationElement CreateNewElement()
-        {
-            return new RiakNodeConfiguration();
-        }
-
-        protected override object GetElementKey(ConfigurationElement element)
-        {
-            return ((RiakNodeConfiguration)element).Name;
-        }
+        IList<IRiakNodeConfiguration> RiakNodes { get; }
+        int NodePollTime { get; }
+        int DefaultRetryWaitTime { get; }
+        int DefaultRetryCount { get; }
     }
 }

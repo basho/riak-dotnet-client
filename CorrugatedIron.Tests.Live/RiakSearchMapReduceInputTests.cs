@@ -38,7 +38,7 @@ namespace CorrugatedIron.Tests.Live
 
         public RiakSearchMapReduceInputTests () : base()
         {
-            bucket = "riak_search_bucket";
+            Bucket = "riak_search_bucket";
         }
         
         [SetUp]
@@ -48,22 +48,22 @@ namespace CorrugatedIron.Tests.Live
             ClientGenerator = () => new RiakClient(Cluster);
             Client = ClientGenerator();
             
-            var props = Client.GetBucketProperties(bucket, true).Value;
+            var props = Client.GetBucketProperties(Bucket, true).Value;
             props.SetSearch(true);
-            Client.SetBucketProperties(bucket, props);
+            Client.SetBucketProperties(Bucket, props);
         }
         
         [TearDown]
         public void TearDown()
         {
-            Client.DeleteBucket(bucket);
+            Client.DeleteBucket(Bucket);
         }
         
         [Test]
         public void SearchingByNameReturnsTheObjectId()
         {
-            Client.Put(new RiakObject(bucket, _riakSearchKey, _riakSearchDoc, RiakConstants.ContentTypes.ApplicationJson));
-            Client.Put(new RiakObject(bucket, _riakSearchKey2, _riakSearchDoc2, RiakConstants.ContentTypes.ApplicationJson));
+            Client.Put(new RiakObject(Bucket, _riakSearchKey, _riakSearchDoc, RiakConstants.ContentTypes.ApplicationJson));
+            Client.Put(new RiakObject(Bucket, _riakSearchKey2, _riakSearchDoc2, RiakConstants.ContentTypes.ApplicationJson));
             
             var mr = new RiakMapReduceQuery();
             
@@ -71,7 +71,7 @@ namespace CorrugatedIron.Tests.Live
                                 {
                 Module = "riak_search",
                 Function = "mapred_search",
-                Arg = new[] {bucket, "name:Al*"}
+                Arg = new[] {Bucket, "name:Al*"}
             };
             
             mr.Inputs(modFunArg)

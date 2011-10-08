@@ -103,7 +103,7 @@ namespace CorrugatedIron.Tests.Live.LoadTests
 
         private List<RiakResult<RiakMapReduceResult>> DoMapRed(RiakMapReduceQuery query)
         {
-            var client = ClientGenerator();
+            var client = Cluster.CreateClient();
 
             var results = ActionCount.Times(() => client.MapReduce(query));
             return results.ToList();
@@ -160,7 +160,7 @@ namespace CorrugatedIron.Tests.Live.LoadTests
 
         private List<RiakMapReduceResultPhase> DoStreamingMapRed(RiakMapReduceQuery query)
         {
-            var client = ClientGenerator();
+            var client = Cluster.CreateClient();
 
             var results = ActionCount.Times(() =>
                 {

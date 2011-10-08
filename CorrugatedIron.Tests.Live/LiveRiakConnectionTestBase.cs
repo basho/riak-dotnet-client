@@ -40,10 +40,9 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
         protected const string MultiBodyTwo = @"{""dishes"": 11}";
         protected const string PropertiesTestBucket = @"propertiestestbucket";
 
-        protected IRiakCluster Cluster;
+        protected IRiakEndPoint Cluster;
         protected IRiakClient Client;
         protected IRiakClusterConfiguration ClusterConfig;
-        protected Func<IRiakClient> ClientGenerator;
 
         static LiveRiakConnectionTestBase()
         {
@@ -53,21 +52,17 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
 
         public LiveRiakConnectionTestBase(string section = "riak1NodeConfiguration")
         {
-            ClusterConfig = RiakClusterConfiguration.LoadFromConfig(section);
+            // TODO: do something smarter with this
+            // switch between cluster and load balancer configuration "easily" by changing the following
+            // two lines around
+            //Cluster = RiakExternalLoadBalancer.FromConfig("riakHaproxyConfiguration");
+            Cluster = RiakCluster.FromConfig(section);
         }
 
         [SetUp]
         public void SetUp()
         {
-            Cluster = new RiakCluster(ClusterConfig, new RiakConnectionFactory());
-            ClientGenerator = () => new RiakClient(Cluster);
-            Client = ClientGenerator();
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            Cluster.Dispose();
+            Client = Cluster.CreateClient();
         }
     }
 }

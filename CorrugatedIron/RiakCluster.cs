@@ -27,17 +27,7 @@ using CorrugatedIron.Messages;
 
 namespace CorrugatedIron
 {
-    public interface IRiakCluster : IDisposable
-    {
-        int RetryWaitTime { get; set; }
-        IRiakClient CreateClient(string seed = null);
-        RiakResult<TResult> UseConnection<TResult>(byte[] clientId, Func<IRiakConnection, RiakResult<TResult>> useFun, int retryAttempts);
-        RiakResult UseConnection(byte[] clientId, Func<IRiakConnection, RiakResult> useFun, int retryAttempts);
-        RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(byte[] clientId, Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun, int retryAttempts)
-            where TResult : RiakResult;
-    }
-
-    public class RiakCluster : IRiakCluster
+    public class RiakCluster : RiakEndPoint
     {
         private readonly byte[] _pollClientId = new byte[] { 1, 1, 1, 1 };
         private readonly RoundRobinStrategy _loadBalancer;
@@ -47,8 +37,11 @@ namespace CorrugatedIron
         private readonly int _defaultRetryCount;
         private bool _disposing;
 
-        public int RetryWaitTime { get; set; }
-  
+        protected override int DefaultRetryCount
+        {
+            get { return _defaultRetryCount; }
+        }
+
         public RiakCluster(IRiakClusterConfiguration clusterConfiguration, IRiakConnectionFactory connectionFactory)
         {
             _nodePollTime = clusterConfiguration.NodePollTime;
@@ -67,8 +60,8 @@ namespace CorrugatedIron
         /// specified by <paramref name="configSectionName"/>.
         /// </summary>
         /// <param name="configSectionName">The name of the configuration section to load the settings from.</param>
-        /// <returns>A fully configured <see cref="CorrugatedIron.IRiakCluster"/></returns>
-        public static IRiakCluster FromConfig(string configSectionName)
+        /// <returns>A fully configured <see cref="IRiakEndPoint"/></returns>
+        public static IRiakEndPoint FromConfig(string configSectionName)
         {
             return new RiakCluster(RiakClusterConfiguration.LoadFromConfig(configSectionName), new RiakConnectionFactory());
         }
@@ -79,42 +72,13 @@ namespace CorrugatedIron
         /// </summary>
         /// <param name="configSectionName">The name of the configuration section to load the settings from.</param>
         /// <param name="configFileName">The full path and name of the config file to load the configuration from.</param>
-        /// <returns>A fully configured <see cref="CorrugatedIron.IRiakCluster"/></returns>
-        public static IRiakCluster FromConfig(string configSectionName, string configFileName)
+        /// <returns>A fully configured <see cref="IRiakEndPoint"/></returns>
+        public static IRiakEndPoint FromConfig(string configSectionName, string configFileName)
         {
             return new RiakCluster(RiakClusterConfiguration.LoadFromConfig(configSectionName, configFileName), new RiakConnectionFactory());
         }
-  
-        /// <summary>
-        /// Creates a new instance of <see cref="CorrugatedIron.RiakClient"/>.
-        /// </summary>
-        /// <returns>
-        /// A minty fresh client.
-        /// </returns>
-        /// <param name='seed'>
-        /// An optional seed to generate the Client Id for the <see cref="CorrugatedIron.RiakClient"/>. Having a unique Client Id is important for
-        /// generating good vclocks. For more information about the importance of vector clocks, refer to http://wiki.basho.com/Vector-Clocks.html
-        /// </param>
-        public IRiakClient CreateClient(string seed = null)
-        {
-            return new RiakClient(this, seed)
-            {
-                RetryCount = _defaultRetryCount
-            };
-        }
 
-        public RiakResult UseConnection(byte[] clientId, Func<IRiakConnection, RiakResult> useFun, int retryAttempts)
-        {
-            return UseConnection(clientId, useFun, RiakResult.Error, retryAttempts);
-        }
-
-        public RiakResult<TResult> UseConnection<TResult>(byte[] clientId, Func<IRiakConnection, RiakResult<TResult>> useFun, int retryAttempts)
-        {
-            return UseConnection(clientId, useFun, RiakResult<TResult>.Error, retryAttempts);
-        }
-
-        private TRiakResult UseConnection<TRiakResult>(byte[] clientId, Func<IRiakConnection, TRiakResult> useFun, Func<ResultCode, string, TRiakResult> onError, int retryAttempts)
-            where TRiakResult : RiakResult
+        protected override TRiakResult UseConnection<TRiakResult>(byte[] clientId, Func<IRiakConnection, TRiakResult> useFun, Func<ResultCode, string, TRiakResult> onError, int retryAttempts)
         {
             if(retryAttempts < 0) return onError(ResultCode.NoRetries, "Unable to access a connection on the cluster.");
             if (_disposing) return onError(ResultCode.ShuttingDown, "System currently shutting down");
@@ -123,7 +87,7 @@ namespace CorrugatedIron
 
             if (node != null)
             {
-                var result = node.UseConnection(useFun, clientId);
+                var result = node.UseConnection(clientId, useFun);
                 if (!result.IsSuccess)
                 {
                     if (result.ResultCode == ResultCode.NoConnections)
@@ -147,8 +111,7 @@ namespace CorrugatedIron
             return onError(ResultCode.ClusterOffline, "Unable to access functioning Riak node");
         }
 
-        public RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(byte[] clientId, Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun, int retryAttempts)
-            where TResult : RiakResult
+        public override RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(byte[] clientId, Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun, int retryAttempts)
         {
             if(retryAttempts < 0) return RiakResult<IEnumerable<TResult>>.Error(ResultCode.NoRetries, "Unable to access a connection on the cluster.");
             if (_disposing) return RiakResult<IEnumerable<TResult>>.Error(ResultCode.ShuttingDown, "System currently shutting down");
@@ -157,7 +120,7 @@ namespace CorrugatedIron
 
             if (node != null)
             {
-                var result = node.UseDelayedConnection(useFun, clientId);
+                var result = node.UseDelayedConnection(clientId, useFun);
                 if (!result.IsSuccess)
                 {
                     if (result.ResultCode == ResultCode.NoConnections)
@@ -198,7 +161,7 @@ namespace CorrugatedIron
                 IRiakNode node = null;
                 while (_offlineNodes.TryDequeue(out node) && !_disposing)
                 {
-                    var result = node.UseConnection(c => c.PbcWriteRead<RpbPingReq, RpbPingResp>(new RpbPingReq()), _pollClientId);
+                    var result = node.UseConnection(_pollClientId, c => c.PbcWriteRead<RpbPingReq, RpbPingResp>(new RpbPingReq()));
                     if (result.IsSuccess)
                     {
                         _loadBalancer.AddNode(node);
@@ -221,7 +184,7 @@ namespace CorrugatedIron
             }
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
             _disposing = true;
 
