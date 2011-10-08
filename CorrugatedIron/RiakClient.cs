@@ -38,7 +38,7 @@ namespace CorrugatedIron
 
     public class RiakClient : IRiakClient
     {
-        private readonly IRiakCluster _cluster;
+        private readonly IRiakEndPoint _endPoint;
         private byte[] _clientId;
         private readonly IRiakConnection _batchConnection;
 
@@ -46,9 +46,9 @@ namespace CorrugatedIron
 
         public IRiakAsyncClient Async { get; private set; }
 
-        internal RiakClient(IRiakCluster cluster, string seed = null)
+        internal RiakClient(IRiakEndPoint endPoint, string seed = null)
         {
-            _cluster = cluster;
+            _endPoint = endPoint;
             
             ClientId = GetClientId(seed);
             Async = new RiakAsyncClient(this);
@@ -734,7 +734,7 @@ namespace CorrugatedIron
                     }
                 };
 
-            var result = _cluster.UseDelayedConnection(_clientId, batchFun, RetryCount);
+            var result = _endPoint.UseDelayedConnection(_clientId, batchFun, RetryCount);
 
             if (!result.IsSuccess && result.ResultCode == ResultCode.BatchException)
             {
@@ -744,12 +744,12 @@ namespace CorrugatedIron
 
         private RiakResult<TResult> UseConnection<TResult>(Func<IRiakConnection, RiakResult<TResult>> op)
         {
-            return _batchConnection != null ? op(_batchConnection) : _cluster.UseConnection(_clientId, op, RetryCount);
+            return _batchConnection != null ? op(_batchConnection) : _endPoint.UseConnection(_clientId, op, RetryCount);
         }
 
         private RiakResult<IEnumerable<RiakResult<TResult>>> UseDelayedConnection<TResult>(Func<IRiakConnection, Action, RiakResult<IEnumerable<RiakResult<TResult>>>> op)
         {
-            return _batchConnection != null ? op(_batchConnection, () => { }) : _cluster.UseDelayedConnection(_clientId, op, RetryCount);
+            return _batchConnection != null ? op(_batchConnection, () => { }) : _endPoint.UseDelayedConnection(_clientId, op, RetryCount);
         }
         
         /// <summary>

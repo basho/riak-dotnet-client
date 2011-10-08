@@ -18,20 +18,6 @@ using System.Configuration;
 
 namespace CorrugatedIron.Config
 {
-    public interface IRiakNodeConfiguration
-    {
-        string Name { get; }
-        string HostAddress { get; }
-        int PbcPort { get; }
-        string RestScheme { get; }
-        int RestPort { get; }
-        int PoolSize { get; }
-        //int IdleTimeout { get; }
-        int NetworkReadTimeout { get; }
-        int NetworkWriteTimeout { get; }
-        bool VnodeVclocks { get; }
-    }
-
     public class RiakNodeConfiguration : ConfigurationElement, IRiakNodeConfiguration
     {
         [ConfigurationProperty("name", IsRequired = true)]

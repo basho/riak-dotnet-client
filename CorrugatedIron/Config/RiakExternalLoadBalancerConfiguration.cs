@@ -14,37 +14,34 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
 
 namespace CorrugatedIron.Config
 {
-    public class RiakClusterConfiguration : ConfigurationSection, IRiakClusterConfiguration
+    public class RiakExternalLoadBalancerConfiguration : ConfigurationSection, IRiakExternalLoadBalancerConfiguration
     {
-        public static IRiakClusterConfiguration LoadFromConfig(string sectionName)
+        public static IRiakExternalLoadBalancerConfiguration LoadFromConfig(string sectionName)
         {
-            return (IRiakClusterConfiguration)ConfigurationManager.GetSection(sectionName);
+            return (IRiakExternalLoadBalancerConfiguration)ConfigurationManager.GetSection(sectionName);
         }
 
-        public static IRiakClusterConfiguration LoadFromConfig(string sectionName, string fileName)
+        public static IRiakExternalLoadBalancerConfiguration LoadFromConfig(string sectionName, string fileName)
         {
             var map = new ConfigurationFileMap(fileName);
             var config = ConfigurationManager.OpenMappedMachineConfiguration(map);
-            return (IRiakClusterConfiguration)config.GetSection(sectionName);
+            return (IRiakExternalLoadBalancerConfiguration)config.GetSection(sectionName);
         }
 
-        [ConfigurationProperty("nodes", IsDefaultCollection = true, IsRequired = true)]
-        [ConfigurationCollection(typeof(RiakNodeConfigurationCollection), AddItemName = "node")]
-        public RiakNodeConfigurationCollection Nodes
+        public IRiakNodeConfiguration Target
         {
-            get { return (RiakNodeConfigurationCollection)this["nodes"]; }
-            set { this["nodes"] = value; }
+            get { return TargetNode; }
         }
 
-        IList<IRiakNodeConfiguration> IRiakClusterConfiguration.RiakNodes
+        [ConfigurationProperty("target", IsRequired = true)]
+        public RiakNodeConfiguration TargetNode
         {
-            get { return Nodes.Cast<IRiakNodeConfiguration>().ToList(); }
+            get { return (RiakNodeConfiguration)this["target"]; }
+            set { this["target"] = value; }
         }
 
         [ConfigurationProperty("nodePollTime", DefaultValue = 5000, IsRequired = false)]
