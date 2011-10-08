@@ -34,7 +34,6 @@ namespace CorrugatedIron.Tests.Live
         protected IRiakEndPoint Cluster;
         protected IRiakClient Client;
         protected IRiakClusterConfiguration ClusterConfig;
-        protected Func<IRiakClient> ClientGenerator;
 
         protected const string MrContentType = RiakConstants.ContentTypes.ApplicationJson;
         protected string Bucket = "fluent_key_bucket";
@@ -54,8 +53,7 @@ namespace CorrugatedIron.Tests.Live
         public void SetUp()
         {
             Cluster = new RiakCluster(ClusterConfig, new RiakConnectionFactory());
-            ClientGenerator = () => new RiakClient(Cluster);
-            Client = ClientGenerator();
+            Client = Cluster.CreateClient();
         }
 
         [TearDown]

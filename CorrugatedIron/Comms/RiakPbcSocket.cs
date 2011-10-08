@@ -40,12 +40,12 @@ namespace CorrugatedIron.Comms
         {
             get
             {
-                if (_pbcSocket == null)
+                if(_pbcSocket == null)
                 {
                     var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                     socket.Connect(_server, _port);
 
-                    if (!socket.Connected)
+                    if(!socket.Connected)
                     {
                         throw new RiakException("Unable to connect to remote server: {0}:{1}".Fmt(_server, _port));
                     }
@@ -97,7 +97,7 @@ namespace CorrugatedIron.Comms
 
             TypeToMessageCodeMap = new Dictionary<Type, MessageCode>();
 
-            foreach (var item in MessageCodeToTypeMap)
+            foreach(var item in MessageCodeToTypeMap)
             {
                 TypeToMessageCodeMap.Add(item.Value, item.Key);
             }
@@ -119,7 +119,7 @@ namespace CorrugatedIron.Comms
             byte[] messageBody;
             long messageLength = 0;
 
-            using (var memStream = new MemoryStream())
+            using(var memStream = new MemoryStream())
             {
                 // add a buffer to the start of the array to put the size and message code
                 memStream.Position += headerSize;
@@ -129,7 +129,7 @@ namespace CorrugatedIron.Comms
             }
 
             // check to make sure something was written, otherwise we'll have to create a new array
-            if (messageLength == headerSize)
+            if(messageLength == headerSize)
             {
                 messageBody = new byte[headerSize];
             }
@@ -152,13 +152,13 @@ namespace CorrugatedIron.Comms
             var size = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(header, 0));
 
             var messageCode = (MessageCode)header[sizeof(int)];
-            if (messageCode == MessageCode.ErrorResp)
+            if(messageCode == MessageCode.ErrorResp)
             {
                 var error = DeserializeInstance<RpbErrorResp>(size);
                 throw new RiakException(error.ErrorCode, error.ErrorMessage.FromRiakString());
             }
 
-            if (!MessageCodeToTypeMap.ContainsKey(messageCode))
+            if(!MessageCodeToTypeMap.ContainsKey(messageCode))
             {
                 throw new RiakInvalidDataException((byte)messageCode);
             }
@@ -166,21 +166,22 @@ namespace CorrugatedIron.Comms
             // This message code validation is here to make sure that the caller
             // is getting exactly what they expect. This "could" be removed from
             // production code, but it's a good thing to have in here for dev.
-            if (MessageCodeToTypeMap[messageCode] != typeof(T))
+            if(MessageCodeToTypeMap[messageCode] != typeof(T))
             {
                 throw new InvalidOperationException(string.Format("Attempt to decode message to type '{0}' when received type '{1}'.", typeof(T).Name, MessageCodeToTypeMap[messageCode].Name));
             }
 #endif
             return DeserializeInstance<T>(size);
         }
-        
-        private byte[] ReceiveAll(byte[] resultBuffer) {
+
+        private byte[] ReceiveAll(byte[] resultBuffer)
+        {
             int totalBytesReceived = 0;
             int lengthToReceive = resultBuffer.Length;
-            while (lengthToReceive > 0)
+            while(lengthToReceive > 0)
             {
                 int bytesReceived = PbcSocket.Receive(resultBuffer, totalBytesReceived, lengthToReceive, 0);
-                if (bytesReceived == 0)
+                if(bytesReceived == 0)
                 {
                     throw new RiakException("Unable to read data from the source stream - Timed Out.");
                 }
@@ -189,18 +190,18 @@ namespace CorrugatedIron.Comms
             }
             return resultBuffer;
         }
-        
+
         private T DeserializeInstance<T>(int size)
             where T : new()
         {
-            if (size <= 1)
+            if(size <= 1)
             {
                 return new T();
             }
 
             var resultBuffer = ReceiveAll(new byte[size - 1]);
 
-            using (var memStream = new MemoryStream(resultBuffer))
+            using(var memStream = new MemoryStream(resultBuffer))
             {
                 return Serializer.Deserialize<T>(memStream);
             }
@@ -208,7 +209,7 @@ namespace CorrugatedIron.Comms
 
         public void Disconnect()
         {
-            if (_pbcSocket != null)
+            if(_pbcSocket != null)
             {
                 _pbcSocket.Disconnect(false);
                 _pbcSocket.Dispose();

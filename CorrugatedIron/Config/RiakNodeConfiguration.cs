@@ -87,7 +87,7 @@ namespace CorrugatedIron.Config
         [ConfigurationProperty("vnodeVclocks", DefaultValue = true, IsRequired = false)]
         public bool VnodeVclocks
         {
-            get { return (bool) this["vnodeVclocks"]; }
+            get { return (bool)this["vnodeVclocks"]; }
             set { this["vnodeVclocks"] = value; }
         }
     }

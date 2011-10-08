@@ -30,10 +30,7 @@ namespace CorrugatedIron.Exceptions
 
         public override string Message
         {
-            get
-            {
-                return "Unexpected message code returned from Riak: {0}".Fmt(MessageCode);
-            }
+            get { return "Unexpected message code returned from Riak: {0}".Fmt(MessageCode); }
         }
     }
 }

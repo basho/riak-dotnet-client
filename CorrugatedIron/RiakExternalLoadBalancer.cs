@@ -51,15 +51,21 @@ namespace CorrugatedIron
 
         protected override TRiakResult UseConnection<TRiakResult>(byte[] clientId, Func<IRiakConnection, TRiakResult> useFun, Func<ResultCode, string, TRiakResult> onError, int retryAttempts)
         {
-            if(retryAttempts < 0) return onError(ResultCode.NoRetries, "Unable to access a connection on the cluster.");
-            if (_disposing) return onError(ResultCode.ShuttingDown, "System currently shutting down");
+            if(retryAttempts < 0)
+            {
+                return onError(ResultCode.NoRetries, "Unable to access a connection on the cluster.");
+            }
+            if(_disposing)
+            {
+                return onError(ResultCode.ShuttingDown, "System currently shutting down");
+            }
 
             var node = _node;
 
-            if (node != null)
+            if(node != null)
             {
                 var result = node.UseConnection(clientId, useFun);
-                if (!result.IsSuccess)
+                if(!result.IsSuccess)
                 {
                     Thread.Sleep(RetryWaitTime);
                     return UseConnection(clientId, useFun, onError, retryAttempts - 1);
@@ -71,15 +77,21 @@ namespace CorrugatedIron
 
         public override RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(byte[] clientId, Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun, int retryAttempts)
         {
-            if(retryAttempts < 0) return RiakResult<IEnumerable<TResult>>.Error(ResultCode.NoRetries, "Unable to access a connection on the cluster.");
-            if (_disposing) return RiakResult<IEnumerable<TResult>>.Error(ResultCode.ShuttingDown, "System currently shutting down");
+            if(retryAttempts < 0)
+            {
+                return RiakResult<IEnumerable<TResult>>.Error(ResultCode.NoRetries, "Unable to access a connection on the cluster.");
+            }
+            if(_disposing)
+            {
+                return RiakResult<IEnumerable<TResult>>.Error(ResultCode.ShuttingDown, "System currently shutting down");
+            }
 
             var node = _node;
 
-            if (node != null)
+            if(node != null)
             {
                 var result = node.UseDelayedConnection(clientId, useFun);
-                if (!result.IsSuccess)
+                if(!result.IsSuccess)
                 {
                     Thread.Sleep(RetryWaitTime);
                     return UseDelayedConnection(clientId, useFun, retryAttempts - 1);

@@ -24,7 +24,7 @@ namespace CorrugatedIron.Models.MapReduce.Fluent
     // TODO: Switch CorrugatedIron.Models.MapReduce.KeyFilters classes to internal
     public class RiakFluentKeyFilter
     {
-        private List<IRiakKeyFilterToken> _filters;
+        private readonly List<IRiakKeyFilterToken> _filters;
 
         internal RiakFluentKeyFilter(List<IRiakKeyFilterToken> filters)
         {

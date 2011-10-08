@@ -14,9 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.Collections.Generic;
 using CorrugatedIron.Extensions;
-using CorrugatedIron.Models.MapReduce.KeyFilters;
 using Newtonsoft.Json;
 
 namespace CorrugatedIron.Models.MapReduce.Inputs
@@ -26,11 +24,11 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
         public string Module { get; set; }
         public string Function { get; set; }
         public string[] Arg { get; set; }
-        
+
         public RiakModuleFunctionArgInput()
         {
         }
-        
+
         public RiakModuleFunctionArgInput(string module, string function, string[] arg)
         {
             Module = module;
@@ -50,11 +48,11 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
             writer.WriteValue(Function);
 
             writer.WritePropertyName("arg");
-            
+
             writer.WriteStartArray();
-            Arg.ForEach(a => writer.WriteValue(a));
+            Arg.ForEach(writer.WriteValue);
             writer.WriteEndArray();
-            
+
             writer.WriteEndObject();
 
             return writer;

@@ -31,7 +31,7 @@ namespace CorrugatedIron.Models.MapReduce
         internal RiakMapReduceResultPhase(uint phase, IEnumerable<RpbMapRedResp> results)
         {
             Phase = phase;
-            Values = results.Select(r => r.Response).Where(b => b != null).ToList(); 
+            Values = results.Select(r => r.Response).Where(b => b != null).ToList();
             Success = true;
         }
 
@@ -39,16 +39,13 @@ namespace CorrugatedIron.Models.MapReduce
         {
             Success = false;
         }
-        
+
         public IEnumerable<T> GetObjects<T>()
         {
-            
-            var rVal = from v in Values
-                       select JsonConvert.DeserializeObject<T>(v.FromRiakString());
-            
+            var rVal = Values.Select(v => JsonConvert.DeserializeObject<T>(v.FromRiakString()));
             return rVal;
         }
-        
+
         public IEnumerable<dynamic> GetObjects()
         {
             return GetObjects<dynamic>();

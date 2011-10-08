@@ -15,44 +15,37 @@
 // under the License.
 
 using System.Linq;
-using System.Collections.Generic;
 using CorrugatedIron.Comms;
-using CorrugatedIron.Util;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Models.MapReduce.Inputs;
 using CorrugatedIron.Tests.Extensions;
-using CorrugatedIron.Extensions;
 using NUnit.Framework;
-using Newtonsoft.Json;
 
 namespace CorrugatedIron.Tests.Live
 {
-    [TestFixture()]
+    [TestFixture]
     public class WhenUsingIndexes : RiakMapReduceTests
     {
-        private const string _ageIndexName = "age";
-        
-        public WhenUsingIndexes () : base()
+        public WhenUsingIndexes ()
         {
             Bucket = "riak_index_tests";
         }
         
-        [SetUp()]
+        [SetUp]
         public void SetUp()
         {
             Cluster = new RiakCluster(ClusterConfig, new RiakConnectionFactory());
-            ClientGenerator = () => new RiakClient(Cluster);
-            Client = ClientGenerator();
+            Client = Cluster.CreateClient();
         }
         
-        [TearDown()]
+        [TearDown]
         public void TearDown()
         {
             Client.DeleteBucket(Bucket);
         }
         
-        [Test()]
+        [Test]
         public void IndexesAreSavedWithAnObject()
         {
             var o = new RiakObject(Bucket, "the_object", "{ value: \"this is an object\" }");
@@ -70,7 +63,7 @@ namespace CorrugatedIron.Tests.Live
             ro.IntIndexes.Count.ShouldEqual(1);
         }
         
-        [Test()]
+        [Test]
         public void QueryingByIntIndexReturnsAListOfKeys()
         {
             for (int i = 0; i < 10; i++)
@@ -101,7 +94,7 @@ namespace CorrugatedIron.Tests.Live
             }
         }
         
-        [Test()]
+        [Test]
         public void RiakObjectIdCanBeCreatedFromJsonArrayOrObject()
         {
             for (int i = 0; i < 10; i++)
@@ -114,16 +107,16 @@ namespace CorrugatedIron.Tests.Live
             
             var input = new RiakIntIndexEqualityInput(Bucket, "age_int", 32);
             
-            var mr = new RiakMapReduceQuery();
-            mr.Inputs(input)
+            var mr = new RiakMapReduceQuery()
+                .Inputs(input)
                 .ReduceJs(r => r.Name("mapValuesJson").Keep(true));
             
             var result = Client.MapReduce(mr);
             result.IsSuccess.ShouldBeTrue();
             var keysOne = result.Value.PhaseResults.OrderBy(pr => pr.Phase).ElementAt(0).GetObjects<RiakObjectId>();
             
-            mr = new RiakMapReduceQuery();
-            mr.Inputs(input)
+            mr = new RiakMapReduceQuery()
+                .Inputs(input)
                 .ReduceErlang(r => r.ModFun("riak_kv_mapreduce", "reduce_identity").Keep(true));
             
             result = Client.MapReduce(mr);
@@ -149,10 +142,10 @@ namespace CorrugatedIron.Tests.Live
             }
         }
         
-        [Test()]
+        [Test]
         public void IntRangeQueriesReturnMultipleKeys()
         {
-            for (int i = 0; i < 10; i++)
+            for (var i = 0; i < 10; i++)
             {
                 var o = new RiakObject(Bucket, i.ToString(), "{ value: \"this is an object\" }");
                 o.AddIntIndex("age_int", 25 + i);

@@ -17,18 +17,25 @@
 using System;
 using System.IO;
 using System.Text;
-using CorrugatedIron.Extensions;
 using Newtonsoft.Json;
 
 namespace CorrugatedIron.Models.MapReduce.KeyFilters
 {
     public abstract class RiakKeyFilterToken : IRiakKeyFilterToken
     {
-        private Tuple<string, object, object> _kfDefinition;
-        public string FunctionName { get { return _kfDefinition.Item1; } }
-        public object[] Arguments { get { return new[]{ _kfDefinition.Item2, _kfDefinition.Item3 }; } }
+        private readonly Tuple<string, object, object> _kfDefinition;
 
-        protected RiakKeyFilterToken() 
+        public string FunctionName
+        {
+            get { return _kfDefinition.Item1; }
+        }
+
+        public object[] Arguments
+        {
+            get { return new[] { _kfDefinition.Item2, _kfDefinition.Item3 }; }
+        }
+
+        protected RiakKeyFilterToken()
         {
         }
 
@@ -36,18 +43,18 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
         {
             _kfDefinition = new Tuple<string, object, object>(functionName, args[0], args[1]);
         }
-        
+
         public override string ToString()
         {
             return ToJsonString();
         }
-        
+
         public string ToJsonString()
         {
             var sb = new StringBuilder();
-            
+
             using(var sw = new StringWriter(sb))
-            using (JsonWriter jw = new JsonTextWriter(sw))
+            using(JsonWriter jw = new JsonTextWriter(sw))
             {
                 jw.WriteStartArray();
                 jw.WriteValue(FunctionName);
@@ -56,7 +63,7 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
 
                 jw.WriteEndArray();
             }
-            
+
             return sb.ToString();
         }
 

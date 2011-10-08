@@ -26,38 +26,46 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
     /// </summary>
     public class Equal<T> : IRiakKeyFilterToken
     {
-        private Tuple<string, T> _kfDefinition;
-
-        public string FunctionName { get { return _kfDefinition.Item1; } }
-
-        public T Argument { get { return _kfDefinition.Item2; } }
+        private readonly Tuple<string, T> _kfDefinition;
 
         public Equal(T arg)
         {
             _kfDefinition = new Tuple<string, T>("eq", arg);
         }
 
-        public override string ToString()
+        public string FunctionName
         {
-            return ToJsonString();
+            get { return _kfDefinition.Item1; }
+        }
+
+        public T Argument
+        {
+            get { return _kfDefinition.Item2; }
         }
 
         public string ToJsonString()
         {
             var sb = new StringBuilder();
 
-            using (var sw = new StringWriter(sb))
-            using (JsonWriter jw = new JsonTextWriter(sw))
+            using(var sw = new StringWriter(sb))
             {
-                jw.WriteStartArray();
+                using(JsonWriter jw = new JsonTextWriter(sw))
+                {
+                    jw.WriteStartArray();
 
-                jw.WriteValue(FunctionName);
-                jw.WriteValue(Argument);
+                    jw.WriteValue(FunctionName);
+                    jw.WriteValue(Argument);
 
-                jw.WriteEndArray();
+                    jw.WriteEndArray();
+                }
             }
 
             return sb.ToString();
+        }
+
+        public override string ToString()
+        {
+            return ToJsonString();
         }
     }
 }

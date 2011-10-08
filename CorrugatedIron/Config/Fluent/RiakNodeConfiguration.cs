@@ -31,23 +31,50 @@ namespace CorrugatedIron.Config.Fluent
         private int _networkWriteTimeout = 2000;
         private bool _vnodeVclocks = true;
 
-        public string Name { get { return _name; } }
+        public string Name
+        {
+            get { return _name; }
+        }
 
-        public string HostAddress { get { return _hostAddress; } }
+        public string HostAddress
+        {
+            get { return _hostAddress; }
+        }
 
-        public int PbcPort { get { return _pbcPort; } }
+        public int PbcPort
+        {
+            get { return _pbcPort; }
+        }
 
-        public string RestScheme { get { return _restScheme; } }
+        public string RestScheme
+        {
+            get { return _restScheme; }
+        }
 
-        public int RestPort { get { return _restPort; } }
+        public int RestPort
+        {
+            get { return _restPort; }
+        }
 
-        public int PoolSize { get { return _poolSize; } }
+        public int PoolSize
+        {
+            get { return _poolSize; }
+        }
 
-        public int NetworkReadTimeout { get { return _networkReadTimeout; } }
+        public int NetworkReadTimeout
+        {
+            get { return _networkReadTimeout; }
+        }
 
-        public int NetworkWriteTimeout { get { return _networkWriteTimeout; } }
+        public int NetworkWriteTimeout
+        {
+            get { return _networkWriteTimeout; }
+        }
 
-        public bool VnodeVclocks { get { return _vnodeVclocks; } }
+        public bool VnodeVclocks
+        {
+            get { return _vnodeVclocks; }
+        }
 
         public RiakNodeConfiguration SetName(string name)
         {
@@ -71,7 +98,7 @@ namespace CorrugatedIron.Config.Fluent
         {
             _restScheme = restScheme.ToLower();
 
-            if (_restScheme != "http" && _restScheme != "https")
+            if(_restScheme != "http" && _restScheme != "https")
             {
                 throw new NotSupportedException("Riak's REST interface doesn't support the scheme '{0}'. Please specify 'http' or 'https'.".Fmt(restScheme));
             }

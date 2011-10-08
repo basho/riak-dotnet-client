@@ -31,13 +31,13 @@ namespace CorrugatedIron.Models.CommitHook
         public string ToJsonString()
         {
             var sb = new StringBuilder();
-            
+
             using(var sw = new StringWriter(sb))
-            using (JsonWriter writer = new JsonTextWriter(sw))
+            using(JsonWriter writer = new JsonTextWriter(sw))
             {
                 WriteJson(writer);
             }
-            
+
             return sb.ToString();
         }
 

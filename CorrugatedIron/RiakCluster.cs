@@ -90,20 +90,27 @@ namespace CorrugatedIron
                 var result = node.UseConnection(clientId, useFun);
                 if (!result.IsSuccess)
                 {
+                    TRiakResult nextResult = null;
                     if (result.ResultCode == ResultCode.NoConnections)
                     {
                         Thread.Sleep(RetryWaitTime);
-                        return UseConnection(clientId, useFun, onError, retryAttempts - 1);
+                        nextResult = UseConnection(clientId, useFun, onError, retryAttempts - 1);
                     }
-
-                    if (result.ResultCode == ResultCode.CommunicationError)
+                    else if (result.ResultCode == ResultCode.CommunicationError)
                     {
                         DeactivateNode(node);
                         Thread.Sleep(RetryWaitTime);
-                        return UseConnection(clientId, useFun, onError, retryAttempts - 1);
+                        nextResult = UseConnection(clientId, useFun, onError, retryAttempts - 1);
                     }
 
-                    // use the onError function so that we know the return value is the right type
+                    // if the next result is successful then return that
+                    if (nextResult != null && nextResult.IsSuccess)
+                    {
+                        return nextResult;
+                    }
+
+                    // otherwise we'll return the result that we had at this call to make sure that
+                    // the correct/initial error is shown
                     return onError(result.ResultCode, result.ErrorMessage);
                 }
                 return (TRiakResult)result;

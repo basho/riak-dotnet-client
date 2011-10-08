@@ -33,7 +33,7 @@ namespace CorrugatedIron.Models.MapReduce
     public class RiakMapReduceQuery
     {
         private readonly List<RiakPhase> _phases;
-        
+
         private string _query;
         private RiakPhaseInput _inputs;
 
@@ -62,14 +62,14 @@ namespace CorrugatedIron.Models.MapReduce
             _inputs = riakBucketKeyKeyDataInputs;
             return this;
         }
-        
-        
+
+
         public RiakMapReduceQuery Inputs(RiakModuleFunctionArgInput riakModFunArgsInput)
         {
             _inputs = riakModFunArgsInput;
             return this;
         }
-        
+
         public RiakMapReduceQuery Inputs(RiakIndexInput riakIndexPhaseInput)
         {
             _inputs = riakIndexPhaseInput;
@@ -120,15 +120,15 @@ namespace CorrugatedIron.Models.MapReduce
             _phases.Add(phase);
             return this;
         }
-        
-//        public RiakMapReduceQuery GetIndex(Action<RiakFluentIndexPhase> setup)
-//        {
-//            var phase = new RiakIndexPhase();
-//            var fluent = new RiakFluentIndexPhase(phase);
-//            setup(fluent);
-//            
-//            throw new NotImplementedException();
-//        }
+
+        //        public RiakMapReduceQuery GetIndex(Action<RiakFluentIndexPhase> setup)
+        //        {
+        //            var phase = new RiakIndexPhase();
+        //            var fluent = new RiakFluentIndexPhase(phase);
+        //            setup(fluent);
+        //            
+        //            throw new NotImplementedException();
+        //        }
 
         public RiakMapReduceQuery Filter(Action<RiakFluentKeyFilter> setup)
         {
@@ -143,16 +143,19 @@ namespace CorrugatedIron.Models.MapReduce
         public void Compile()
         {
             System.Diagnostics.Debug.Assert(_inputs != null);
-            if (!string.IsNullOrWhiteSpace(_query)) return;
+            if(!string.IsNullOrWhiteSpace(_query))
+            {
+                return;
+            }
 
             var sb = new StringBuilder();
 
-            using (var sw = new StringWriter(sb))
+            using(var sw = new StringWriter(sb))
             using(JsonWriter writer = new JsonTextWriter(sw))
             {
                 writer.WriteStartObject();
 
-                if (_inputs != null)
+                if(_inputs != null)
                 {
                     _inputs.WriteJson(writer);
                 }
@@ -173,10 +176,10 @@ namespace CorrugatedIron.Models.MapReduce
         {
             Compile();
             var message = new RpbMapRedReq
-                              {
-                                  Request = _query.ToRiakString(),
-                                  ContentType = ContentType.ToRiakString()
-                              };
+            {
+                Request = _query.ToRiakString(),
+                ContentType = ContentType.ToRiakString()
+            };
 
             return message;
         }

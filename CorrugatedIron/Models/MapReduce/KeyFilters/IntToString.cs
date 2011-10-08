@@ -25,7 +25,10 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
     /// </summary>
     public class IntToString : IRiakKeyFilterToken
     {
-        public string FunctionName { get { return "int_to_string"; } }
+        public string FunctionName
+        {
+            get { return "int_to_string"; }
+        }
 
         public override string ToString()
         {
@@ -36,8 +39,8 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
         {
             var sb = new StringBuilder();
 
-            using (var sw = new StringWriter(sb))
-            using (JsonWriter jw = new JsonTextWriter(sw))
+            using(var sw = new StringWriter(sb))
+            using(JsonWriter jw = new JsonTextWriter(sw))
             {
                 jw.WriteStartArray();
 
