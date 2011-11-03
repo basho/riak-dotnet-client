@@ -43,6 +43,7 @@ namespace CorrugatedIron.Comms
                 if(_pbcSocket == null)
                 {
                     var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                    socket.NoDelay = true;
                     socket.Connect(_server, _port);
 
                     if(!socket.Connected)
