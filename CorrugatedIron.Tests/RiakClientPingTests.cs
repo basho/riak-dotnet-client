@@ -48,7 +48,7 @@ namespace CorrugatedIron.Tests.RiakClientPingTests
         public void CorrectResultIsReturned()
         {
             Response.IsSuccess.ShouldBeFalse();
-            Response.ResultCode.ShouldEqual(ResultCode.ClusterOffline);
+            Response.ResultCode.ShouldEqual(ResultCode.CommunicationError);
         }
     }
 
