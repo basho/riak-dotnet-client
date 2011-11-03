@@ -16,7 +16,6 @@
 
 using System;
 using System.Collections.Generic;
-using CorrugatedIron.Extensions;
 using Newtonsoft.Json;
 
 namespace CorrugatedIron.Models.MapReduce.Inputs
@@ -40,13 +39,13 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
             writer.WritePropertyName("inputs");
             writer.WriteStartArray();
 
-            BucketKeyList.ForEach(bk => 
-                                      {
-                                          writer.WriteStartArray();
-                                          writer.WriteValue(bk.Item1);
-                                          writer.WriteValue(bk.Item2);
-                                          writer.WriteEndArray();
-                                      });
+            BucketKeyList.ForEach(bk =>
+            {
+                writer.WriteStartArray();
+                writer.WriteValue(bk.Item1);
+                writer.WriteValue(bk.Item2);
+                writer.WriteEndArray();
+            });
 
             writer.WriteEndArray();
 

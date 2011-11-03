@@ -22,7 +22,6 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
 {
     public interface IRiakPhaseInput
     {
-        
         JsonWriter WriteJson(JsonWriter writer);
     }
 
@@ -31,7 +30,8 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
         public List<IRiakKeyFilterToken> Filters { get; set; }
         public abstract JsonWriter WriteJson(JsonWriter writer);
     }
-    
+
+    // TODO: Confirm with JP that this isn't violating LSP.
     public abstract class RiakIndexInput : RiakPhaseInput
     {
     }

@@ -44,40 +44,39 @@ namespace CorrugatedIron.Models
         public IList<RiakObject> Siblings { get; set; }
         public IDictionary<string, string> BinIndexes { get; set; }
         public IDictionary<string, int> IntIndexes { get; set; }
-        
+
         public IDictionary<string, string> Indexes
         {
-            get 
+            get
             {
-                Dictionary<string, string> indexes = new Dictionary<string, string>();
-                
-                foreach (var key in BinIndexes.Keys)
-                {
-                    indexes.Add(key, BinIndexes[key]);
-                }
-                
-                foreach (var key in IntIndexes.Keys)
+                var indexes = BinIndexes.Keys.ToDictionary(key => key, key => BinIndexes[key]);
+
+                foreach(var key in IntIndexes.Keys)
                 {
                     indexes.Add(key, IntIndexes[key].ToString());
                 }
-                
+
                 return indexes;
             }
-            
-            private set 
+
+            private set
             {
-                if (BinIndexes == null)
-                    BinIndexes = new Dictionary<string, string>();
-                if (IntIndexes == null)
-                    IntIndexes = new Dictionary<string, int>();
-                
-                foreach (var key in value.Keys)
+                if(BinIndexes == null)
                 {
-                    if (key.IndexOf("_int") > -1)
+                    BinIndexes = new Dictionary<string, string>();
+                }
+                if(IntIndexes == null)
+                {
+                    IntIndexes = new Dictionary<string, int>();
+                }
+
+                foreach(var key in value.Keys)
+                {
+                    if(key.IndexOf("_int") > -1)
                     {
                         IntIndexes.Add(key, Convert.ToInt32(value[key]));
                     }
-                    else 
+                    else
                     {
                         BinIndexes.Add(key, value[key].ToString());
                     }
@@ -95,10 +94,7 @@ namespace CorrugatedIron.Models
 
         public List<string> VTags
         {
-            get
-            {
-                return _vtags ?? (_vtags = Siblings.Count == 0 ? new List<string> {VTag} : Siblings.Select(s => s.VTag).ToList());
-            }
+            get { return _vtags ?? (_vtags = Siblings.Count == 0 ? new List<string> { VTag } : Siblings.Select(s => s.VTag).ToList()); }
         }
 
         public RiakObject(string bucket, string key)
@@ -137,31 +133,31 @@ namespace CorrugatedIron.Models
             Indexes = new Dictionary<string, string>();
             Links = new List<RiakLink>();
             Siblings = new List<RiakObject>();
-            
+
             BinIndexes = new Dictionary<string, string>();
             IntIndexes = new Dictionary<string, int>();
         }
-        
+
         public void AddBinIndex(string index, string key)
         {
             BinIndexes.Add(FormatBinKey(index), key);
         }
-        
+
         public void AddIntIndex(string index, int key)
         {
             IntIndexes.Add(FormatIntKey(index), key);
         }
-        
+
         public void RemoveBinIndex(string index)
         {
             BinIndexes.Remove(FormatBinKey(index));
         }
-  
+
         public void RemoveIntIndex(string index)
         {
             IntIndexes.Remove(FormatIntKey(index));
         }
-        
+
         public void LinkTo(string bucket, string key, string tag)
         {
             Links.Add(new RiakLink(bucket, key, tag));
@@ -207,10 +203,7 @@ namespace CorrugatedIron.Models
 
         public void RemoveLinks(RiakObjectId riakObjectId)
         {
-            var linksToRemove = from link in Links
-                                where link.Bucket == riakObjectId.Bucket
-                                      && link.Key == riakObjectId.Key
-                                select link;
+            var linksToRemove = Links.Where(l => l.Bucket == riakObjectId.Bucket && l.Key == riakObjectId.Key);
 
             linksToRemove.ForEach(l => Links.Remove(l));
         }
@@ -235,7 +228,7 @@ namespace CorrugatedIron.Models
             Bucket = bucket;
             Key = key;
             VectorClock = vectorClock;
-            
+
             Value = content.Value;
             VTag = content.VTag.FromRiakString();
             ContentEncoding = content.ContentEncoding.FromRiakString();
@@ -253,7 +246,7 @@ namespace CorrugatedIron.Models
         internal RiakObject(string bucket, string key, ICollection<RpbContent> contents, byte[] vectorClock)
             : this(bucket, key, contents.First(), vectorClock)
         {
-            if (contents.Count > 1)
+            if(contents.Count > 1)
             {
                 Siblings = contents.Select(c => new RiakObject(bucket, key, c, vectorClock)).ToList();
                 _hashCode = CalculateHashCode();
@@ -287,15 +280,24 @@ namespace CorrugatedIron.Models
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != typeof (RiakObject)) return false;
-            return Equals((RiakObject) obj);
+            if(ReferenceEquals(null, obj))
+            {
+                return false;
+            }
+            if(ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+            if(obj.GetType() != typeof(RiakObject))
+            {
+                return false;
+            }
+            return Equals((RiakObject)obj);
         }
 
         private void UpdateLastModified()
         {
-            if (HasChanged)
+            if(HasChanged)
             {
                 var t = DateTime.UtcNow - new DateTime(1970, 1, 1);
                 var ms = (ulong)Math.Round(t.TotalMilliseconds);
@@ -307,8 +309,16 @@ namespace CorrugatedIron.Models
 
         public bool Equals(RiakObject other)
         {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
+            if(ReferenceEquals(null, other))
+            {
+                return false;
+            }
+
+            if(ReferenceEquals(this, other))
+            {
+                return true;
+            }
+
             return Equals(other.Bucket, Bucket)
                 && Equals(other.Key, Key)
                 && Equals(other.Value, Value)
@@ -342,19 +352,19 @@ namespace CorrugatedIron.Models
             unchecked
             {
                 var result = (Bucket != null ? Bucket.GetHashCode() : 0);
-                result = (result*397) ^ (Key != null ? Key.GetHashCode() : 0);
-                result = (result*397) ^ (Value != null ? Value.GetHashCode() : 0);
-                result = (result*397) ^ (ContentType != null ? ContentType.GetHashCode() : 0);
-                result = (result*397) ^ (ContentEncoding != null ? ContentEncoding.GetHashCode() : 0);
-                result = (result*397) ^ (CharSet != null ? CharSet.GetHashCode() : 0);
-                result = (result*397) ^ (VectorClock != null ? VectorClock.GetHashCode() : 0);
-                result = (result*397) ^ (UserMetaData != null ? UserMetaData.GetHashCode() : 0);
-                result = (result*397) ^ (BinIndexes != null ? BinIndexes.GetHashCode() : 0);
-                result = (result*397) ^ (IntIndexes != null ? IntIndexes.GetHashCode() : 0);
-                result = (result*397) ^ LastModified.GetHashCode();
-                result = (result*397) ^ LastModifiedUsec.GetHashCode();
-                result = (result*397) ^ (Links != null ? Links.GetHashCode() : 0);
-                result = (result*397) ^ (_vtags != null ? _vtags.GetHashCode() : 0);
+                result = (result * 397) ^ (Key != null ? Key.GetHashCode() : 0);
+                result = (result * 397) ^ (Value != null ? Value.GetHashCode() : 0);
+                result = (result * 397) ^ (ContentType != null ? ContentType.GetHashCode() : 0);
+                result = (result * 397) ^ (ContentEncoding != null ? ContentEncoding.GetHashCode() : 0);
+                result = (result * 397) ^ (CharSet != null ? CharSet.GetHashCode() : 0);
+                result = (result * 397) ^ (VectorClock != null ? VectorClock.GetHashCode() : 0);
+                result = (result * 397) ^ (UserMetaData != null ? UserMetaData.GetHashCode() : 0);
+                result = (result * 397) ^ (BinIndexes != null ? BinIndexes.GetHashCode() : 0);
+                result = (result * 397) ^ (IntIndexes != null ? IntIndexes.GetHashCode() : 0);
+                result = (result * 397) ^ LastModified.GetHashCode();
+                result = (result * 397) ^ LastModifiedUsec.GetHashCode();
+                result = (result * 397) ^ (Links != null ? Links.GetHashCode() : 0);
+                result = (result * 397) ^ (_vtags != null ? _vtags.GetHashCode() : 0);
                 return result;
             }
         }
@@ -363,22 +373,22 @@ namespace CorrugatedIron.Models
         public void SetObject<T>(T value, string contentType = null)
             where T : class
         {
-            if (!String.IsNullOrEmpty(contentType))
+            if(!String.IsNullOrEmpty(contentType))
             {
                 ContentType = contentType;
             }
 
             // check content type
             // save based on content type's deserialization method
-            
-            if (ContentType == RiakConstants.ContentTypes.ApplicationJson)
+
+            if(ContentType == RiakConstants.ContentTypes.ApplicationJson)
             {
                 var json = value.Serialize();
                 Value = json.ToRiakString();
                 return;
             }
 
-            if (ContentType == RiakConstants.ContentTypes.ProtocolBuffers)
+            if(ContentType == RiakConstants.ContentTypes.ProtocolBuffers)
             {
                 var memoryStream = new MemoryStream();
                 ProtoBuf.Serializer.Serialize(memoryStream, value);
@@ -386,10 +396,10 @@ namespace CorrugatedIron.Models
                 return;
             }
 
-            if (ContentType == RiakConstants.ContentTypes.Xml)
+            if(ContentType == RiakConstants.ContentTypes.Xml)
             {
                 var memoryStream = new MemoryStream();
-                var serde = new XmlSerializer(typeof (T));
+                var serde = new XmlSerializer(typeof(T));
                 serde.Serialize(memoryStream, value);
                 Value = memoryStream.ToArray();
                 return;
@@ -400,12 +410,12 @@ namespace CorrugatedIron.Models
 
         public T GetObject<T>()
         {
-            if (ContentType == RiakConstants.ContentTypes.ApplicationJson)
+            if(ContentType == RiakConstants.ContentTypes.ApplicationJson)
             {
                 return JsonConvert.DeserializeObject<T>(Value.FromRiakString());
             }
 
-            if (ContentType == RiakConstants.ContentTypes.ProtocolBuffers)
+            if(ContentType == RiakConstants.ContentTypes.ProtocolBuffers)
             {
                 var memoryStream = new MemoryStream();
 
@@ -413,10 +423,10 @@ namespace CorrugatedIron.Models
                 return ProtoBuf.Serializer.Deserialize<T>(memoryStream);
             }
 
-            if (ContentType == RiakConstants.ContentTypes.Xml)
+            if(ContentType == RiakConstants.ContentTypes.Xml)
             {
                 var reader = XmlReader.Create(Value.FromRiakString());
-                var serde = new System.Xml.Serialization.XmlSerializer(typeof(T));
+                var serde = new XmlSerializer(typeof(T));
 
                 return (T)serde.Deserialize(reader);
             }
@@ -430,24 +440,24 @@ namespace CorrugatedIron.Models
         {
             return GetObject<dynamic>();
         }
-        
+
         private string FormatBinKey(string key)
         {
-            if (key.IndexOf("_bin") < 0)
+            if(key.IndexOf("_bin") < 0)
             {
                 key = "{0}_bin".Fmt(key);
             }
-            
+
             return key;
         }
-        
+
         private string FormatIntKey(string key)
         {
-            if (key.IndexOf("_int") < 0)
+            if(key.IndexOf("_int") < 0)
             {
                 key = "{0}_int".Fmt(key);
             }
-            
+
             return key;
         }
     }

@@ -32,7 +32,7 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
 
         public override JsonWriter WriteJson(JsonWriter writer)
         {
-            if (Filters.Count > 0)
+            if(Filters.Count > 0)
             {
                 writer.WritePropertyName("inputs");
                 writer.WriteStartObject();

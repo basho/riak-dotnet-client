@@ -31,16 +31,27 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
     {
         private readonly Tuple<string, T, T, bool> _kfDefinition;
 
-        public string FunctionName { get { return _kfDefinition.Item1; } }
+        public string FunctionName
+        {
+            get { return _kfDefinition.Item1; }
+        }
 
-        public T Left { get { return _kfDefinition.Item2; } }
+        public T Left
+        {
+            get { return _kfDefinition.Item2; }
+        }
 
-        public T Right { get { return _kfDefinition.Item3; } }
+        public T Right
+        {
+            get { return _kfDefinition.Item3; }
+        }
 
-        public bool Inclusive { get { return _kfDefinition.Item4; } }
+        public bool Inclusive
+        {
+            get { return _kfDefinition.Item4; }
+        }
 
         public Between(T left, T right, bool inclusive = true)
-            
         {
             _kfDefinition = Tuple.Create("between", left, right, inclusive);
         }
@@ -54,8 +65,8 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
         {
             var sb = new StringBuilder();
 
-            using (var sw = new StringWriter(sb))
-            using (JsonWriter jw = new JsonTextWriter(sw))
+            using(var sw = new StringWriter(sb))
+            using(JsonWriter jw = new JsonTextWriter(sw))
             {
                 jw.WriteStartArray();
 

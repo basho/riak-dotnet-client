@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -61,6 +61,13 @@
     <Compile Include="Comms\LoadBalancing\ILoadBalancingStrategy.cs" />
     <Compile Include="Comms\LoadBalancing\RoundRobinStrategy.cs" />
     <Compile Include="Comms\RiakPbcSocket.cs" />
+    <Compile Include="Config\Fluent\RiakClusterConfiguration.cs" />
+    <Compile Include="Config\Fluent\RiakExternalLoadBalancerConfiguration.cs" />
+    <Compile Include="Config\Fluent\RiakNodeConfiguration.cs" />
+    <Compile Include="Config\IRiakClusterConfiguration.cs" />
+    <Compile Include="Config\IRiakExternalLoadBalancerConfiguration.cs" />
+    <Compile Include="Config\IRiakNodeConfiguration.cs" />
+    <Compile Include="Config\RiakExternalLoadBalancerConfiguration.cs" />
     <Compile Include="Containers\ConcurrentEnumerable.cs" />
     <Compile Include="Containers\ConcurrentEnumerator.cs" />
     <Compile Include="Containers\Either.cs" />
@@ -68,6 +75,7 @@
     <Compile Include="Exceptions\RiakInvalidDataException.cs" />
     <Compile Include="Exceptions\RiakException.cs" />
     <Compile Include="IRiakBatchClient.cs" />
+    <Compile Include="IRiakEndPoint.cs" />
     <Compile Include="Models\CommitHook\IRiakPostCommitHook.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -165,6 +173,7 @@
     <Compile Include="Models\RiakObject.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Converters\RiakObjectIdConverter.cs" />
     <Compile Include="Models\RiakPutOptions.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -176,6 +185,8 @@
     <Compile Include="RiakCluster.cs" />
     <Compile Include="Comms\RiakNode.cs" />
     <Compile Include="Models\MapReduce\RiakMapReduceResult.cs" />
+    <Compile Include="RiakEndPoint.cs" />
+    <Compile Include="RiakExternalLoadBalancer.cs" />
     <Compile Include="RiakResult.cs" />
     <Compile Include="Config\RiakClusterConfiguration.cs" />
     <Compile Include="Config\RiakNodeConfiguration.cs" />

@@ -14,9 +14,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
+using CorrugatedIron.Converters;
 using Newtonsoft.Json;
-using CorrugatedIron.Extensions;
 
 namespace CorrugatedIron.Models
 {
@@ -28,16 +27,15 @@ namespace CorrugatedIron.Models
 
         public RiakObjectId()
         {
-            
         }
-        
-        public RiakObjectId(string [] objectId)
+
+        public RiakObjectId(string[] objectId)
         {
             Bucket = objectId[0];
             Key = objectId[1];
         }
-  
-        
+
+
         public RiakObjectId(string bucket, string key)
         {
             Bucket = bucket;
@@ -48,72 +46,47 @@ namespace CorrugatedIron.Models
         {
             return new RiakLink(Bucket, Key, tag);
         }
-        
-        public override bool Equals (object obj)
+
+        public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
-            if (obj.GetType() != typeof(RiakObjectId)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            
-            return Equals ((RiakObjectId)obj);
+            if(ReferenceEquals(null, obj))
+            {
+                return false;
+            }
+            if(obj.GetType() != typeof(RiakObjectId))
+            {
+                return false;
+            }
+            if(ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+
+            return Equals((RiakObjectId)obj);
         }
-        
+
         public bool Equals(RiakObjectId other)
         {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
+            if(ReferenceEquals(null, other))
+            {
+                return false;
+            }
+            if(ReferenceEquals(this, other))
+            {
+                return true;
+            }
             return Equals(other.Bucket, Bucket) && Equals(other.Key, Key);
         }
-        
+
         public override int GetHashCode()
         {
             unchecked
             {
                 int result = (Bucket != null ? Bucket.GetHashCode() : 0);
                 result = (result * 397) ^ (Key != null ? Key.GetHashCode() : 0);
-                
+
                 return result;
             }
-        }
-    }
-    
-    public class RiakObjectIdConverter : JsonConverter
-    {
-        public override object ReadJson (JsonReader reader, Type objectType, Object existingValue, JsonSerializer serializer)
-        {
-            int pos = 0;
-            string[] objectIdParts = new string[2];
-            
-            while (reader.Read())
-            {
-                if (pos < 2)
-                {
-                    if (reader.TokenType == JsonToken.String || reader.TokenType == JsonToken.PropertyName)
-                    {
-                        objectIdParts[pos] = reader.Value.ToString();
-                        pos++;
-                    }
-                }
-            }
-            
-            return new RiakObjectId(objectIdParts);
-        }
-        
-        public override void WriteJson (JsonWriter writer, object value, JsonSerializer serializer)
-        {
-            throw new NotImplementedException ();
-        }
-        
-        public override bool CanWrite {
-            get {
-                return base.CanWrite;
-            }
-        }
-        
-        public override bool CanRead { get { return true; } }
-        public override bool CanConvert (Type objectType) 
-        {
-            return true;
         }
     }
 }

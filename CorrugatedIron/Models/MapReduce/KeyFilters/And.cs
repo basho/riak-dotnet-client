@@ -58,17 +58,17 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
         {
             var sb = new StringBuilder();
 
-            using (var sw = new StringWriter(sb))
-            using (JsonWriter jw = new JsonTextWriter(sw))
+            using(var sw = new StringWriter(sb))
+            using(JsonWriter jw = new JsonTextWriter(sw))
             {
                 jw.WriteStartArray();
 
                 jw.WriteValue(FunctionName);
-                
+
                 jw.WriteStartArray();
                 Left.ForEach(l => jw.WriteRawValue(l.ToString()));
                 jw.WriteEndArray();
-                
+
                 jw.WriteStartArray();
                 Right.ForEach(r => jw.WriteRawValue(r.ToString()));
                 jw.WriteEndArray();

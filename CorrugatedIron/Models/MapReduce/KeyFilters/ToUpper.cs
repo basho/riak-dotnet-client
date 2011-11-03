@@ -25,7 +25,10 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
     /// </summary>
     public class ToUpper : IRiakKeyFilterToken
     {
-        public string FunctionName { get { return "to_upper"; } }
+        public string FunctionName
+        {
+            get { return "to_upper"; }
+        }
 
         public override string ToString()
         {
@@ -36,8 +39,8 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
         {
             var sb = new StringBuilder();
 
-            using (var sw = new StringWriter(sb))
-            using (JsonWriter jw = new JsonTextWriter(sw))
+            using(var sw = new StringWriter(sb))
+            using(JsonWriter jw = new JsonTextWriter(sw))
             {
                 jw.WriteStartArray();
 
@@ -50,4 +53,3 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
         }
     }
 }
-

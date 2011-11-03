@@ -27,7 +27,7 @@ using NUnit.Framework;
 
 namespace CorrugatedIron.Tests.RiakClientSetBucketPropertiesTests
 {
-    public class MockCluster : IRiakCluster
+    public class MockCluster : IRiakEndPoint
     {
         public Mock<IRiakConnection> ConnectionMock = new Mock<IRiakConnection>();
 
@@ -119,3 +119,4 @@ namespace CorrugatedIron.Tests.RiakClientSetBucketPropertiesTests
         }
     }
 }
+

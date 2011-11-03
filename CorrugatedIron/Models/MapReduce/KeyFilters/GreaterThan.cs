@@ -28,9 +28,15 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
     {
         private readonly Tuple<string, T> _kfDefinition;
 
-        public string FunctionName { get { return _kfDefinition.Item1; } }
+        public string FunctionName
+        {
+            get { return _kfDefinition.Item1; }
+        }
 
-        public T Argument { get { return _kfDefinition.Item2; } }
+        public T Argument
+        {
+            get { return _kfDefinition.Item2; }
+        }
 
         public GreaterThan(T arg)
         {
@@ -46,8 +52,8 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
         {
             var sb = new StringBuilder();
 
-            using (var sw = new StringWriter(sb))
-            using (JsonWriter jw = new JsonTextWriter(sw))
+            using(var sw = new StringWriter(sb))
+            using(JsonWriter jw = new JsonTextWriter(sw))
             {
                 jw.WriteStartArray();
 

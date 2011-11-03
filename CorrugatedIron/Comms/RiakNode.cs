@@ -22,9 +22,11 @@ namespace CorrugatedIron.Comms
 {
     public interface IRiakNode : IDisposable
     {
-        RiakResult UseConnection(Func<IRiakConnection, RiakResult> useFun, byte[] clientId);
-        RiakResult<TResult> UseConnection<TResult>(Func<IRiakConnection, RiakResult<TResult>> useFun, byte[] clientId);
-        RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun, byte[] clientId)
+        RiakResult UseConnection(byte[] clientId, Func<IRiakConnection, RiakResult> useFun);
+        RiakResult<TResult> UseConnection<TResult>(byte[] clientId, Func<IRiakConnection, RiakResult<TResult>> useFun);
+
+        RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(byte[] clientId,
+            Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun)
             where TResult : RiakResult;
     }
 
@@ -38,48 +40,48 @@ namespace CorrugatedIron.Comms
             _connections = new RiakConnectionPool(nodeConfiguration, connectionFactory);
         }
 
-        public RiakResult UseConnection(Func<IRiakConnection, RiakResult> useFun, byte[] clientId = default(byte[]))
+        public RiakResult UseConnection(byte[] clientId, Func<IRiakConnection, RiakResult> useFun)
         {
-            return UseConnection(useFun, RiakResult.Error, clientId);
+            return UseConnection(clientId, useFun, RiakResult.Error);
         }
 
-        public RiakResult<TResult> UseConnection<TResult>(Func<IRiakConnection, RiakResult<TResult>> useFun,byte[] clientId = default(byte[]))
+        public RiakResult<TResult> UseConnection<TResult>(byte[] clientId, Func<IRiakConnection, RiakResult<TResult>> useFun)
         {
-            return UseConnection(useFun, RiakResult<TResult>.Error, clientId);
+            return UseConnection(clientId, useFun, RiakResult<TResult>.Error);
         }
 
-        private TRiakResult UseConnection<TRiakResult>(Func<IRiakConnection, TRiakResult> useFun, Func<ResultCode, string, TRiakResult> onError, byte[] clientId = default(byte[]))
+        private TRiakResult UseConnection<TRiakResult>(byte[] clientId, Func<IRiakConnection, TRiakResult> useFun, Func<ResultCode, string, TRiakResult> onError)
             where TRiakResult : RiakResult
         {
-            if (_disposing) return onError(ResultCode.ShuttingDown, "Connection is shutting down");
+            if(_disposing) return onError(ResultCode.ShuttingDown, "Connection is shutting down");
 
             Func<IRiakConnection, TRiakResult> wrapper = conn =>
-                {
-                    conn.SetClientId(clientId);
-                    return useFun(conn);
-                };
+            {
+                conn.SetClientId(clientId);
+                return useFun(conn);
+            };
 
             var response = _connections.Consume(wrapper);
-            if (response.Item1)
+            if(response.Item1)
             {
                 return response.Item2;
             }
             return onError(ResultCode.NoConnections, "Unable to acquire connection");
         }
 
-        public RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun, byte[] clientId = default(byte[]))
+        public RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(byte[] clientId, Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun)
             where TResult : RiakResult
         {
-            if (_disposing) return RiakResult<IEnumerable<TResult>>.Error(ResultCode.ShuttingDown, "Connection is shutting down");
+            if(_disposing) return RiakResult<IEnumerable<TResult>>.Error(ResultCode.ShuttingDown, "Connection is shutting down");
 
             Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> wrapper = (conn, onFinish) =>
-                {
-                    conn.SetClientId(clientId);
-                    return useFun(conn, onFinish);
-                };
+            {
+                conn.SetClientId(clientId);
+                return useFun(conn, onFinish);
+            };
 
             var response = _connections.DelayedConsume(wrapper);
-            if (response.Item1)
+            if(response.Item1)
             {
                 return response.Item2;
             }
