@@ -31,14 +31,13 @@ namespace CorrugatedIron.Tests.Live
 
     public class RiakMapReduceTests
     {
-        protected IRiakCluster Cluster;
+        protected IRiakEndPoint Cluster;
         protected IRiakClient Client;
         protected IRiakClusterConfiguration ClusterConfig;
-        protected Func<IRiakClient> ClientGenerator;
 
         protected const string MrContentType = RiakConstants.ContentTypes.ApplicationJson;
-        protected string bucket = "fluent_key_bucket";
-        protected const string emptyBody = "{}";
+        protected string Bucket = "fluent_key_bucket";
+        protected const string EmptyBody = "{}";
 
         public RiakMapReduceTests(string section = "riak1NodeConfiguration")
         {
@@ -54,14 +53,13 @@ namespace CorrugatedIron.Tests.Live
         public void SetUp()
         {
             Cluster = new RiakCluster(ClusterConfig, new RiakConnectionFactory());
-            ClientGenerator = () => new RiakClient(Cluster);
-            Client = ClientGenerator();
+            Client = Cluster.CreateClient();
         }
 
         [TearDown]
         public void TearDown()
         {
-            Client.DeleteBucket(bucket);
+            Client.DeleteBucket(Bucket);
         }
 
         [Test]
@@ -69,12 +67,12 @@ namespace CorrugatedIron.Tests.Live
         {
             for (int i = 0; i < 10; i++)
             {
-                Client.Put(new RiakObject(bucket, String.Format("time_{0}", i), emptyBody, RiakConstants.ContentTypes.ApplicationJson));
+                Client.Put(new RiakObject(Bucket, String.Format("time_{0}", i), EmptyBody, RiakConstants.ContentTypes.ApplicationJson));
             }
 
             var mr = new RiakMapReduceQuery {ContentType = MrContentType};
 
-            mr.Inputs(bucket)
+            mr.Inputs(Bucket)
                 .Filter(f => f.Equal("time_8"))
                 .MapJs(m => m.Source("function (o) { return [1]; }"))
                 .ReduceJs(r => r.Name("Riak.reduceSum").Keep(true));
@@ -102,12 +100,12 @@ namespace CorrugatedIron.Tests.Live
         {
             for (int i = 0; i < 10; i++)
             {
-                Client.Put(new RiakObject(bucket, String.Format("time_{0}", i), emptyBody, RiakConstants.ContentTypes.ApplicationJson));
+                Client.Put(new RiakObject(Bucket, String.Format("time_{0}", i), EmptyBody, RiakConstants.ContentTypes.ApplicationJson));
             }
 
             var mr = new RiakMapReduceQuery { ContentType = MrContentType };
 
-            mr.Inputs(bucket)
+            mr.Inputs(Bucket)
                 .Filter(f => f.StartsWith("time"))
                 .MapJs(m => m.Source("function (o) { return [1]; }"))
                 .ReduceJs(r => r.Name("Riak.reduceSum").Keep(true));
@@ -135,12 +133,12 @@ namespace CorrugatedIron.Tests.Live
         {
             for (int i = 0; i < 10; i++)
             {
-                Client.Put(new RiakObject(bucket, String.Format("time_{0}", i), emptyBody, RiakConstants.ContentTypes.ApplicationJson));
+                Client.Put(new RiakObject(Bucket, String.Format("time_{0}", i), EmptyBody, RiakConstants.ContentTypes.ApplicationJson));
             }
 
             var mr = new RiakMapReduceQuery { ContentType = MrContentType };
 
-            mr.Inputs(bucket)
+            mr.Inputs(Bucket)
                 .Filter(f => f.And(l => l.StartsWith("time"),
                                    r => r.Tokenize("_", 2)
                                             .StringToInt()

@@ -41,13 +41,13 @@ namespace CorrugatedIron.Models
             get
             {
                 return !LastWriteWins.HasValue
-                    && RVal == null
-                    && RwVal == null
-                    && DwVal == null
-                    && WVal == null
-                    && PrVal == null
-                    && PwVal == null
-                    && string.IsNullOrEmpty(Backend);
+                && RVal == null
+                && RwVal == null
+                && DwVal == null
+                && WVal == null
+                && PrVal == null
+                && PwVal == null
+                && string.IsNullOrEmpty(Backend);
             }
         }
 
@@ -60,7 +60,7 @@ namespace CorrugatedIron.Models
         public List<IRiakPostCommitHook> PostCommitHooks { get; private set; }
         public bool? NotFoundOk { get; private set; }
         public bool? BasicQuorum { get; private set; }
-  
+
         /// <summary>
         /// The number of replicas that must return before a read is considered a succes.
         /// </summary>
@@ -68,38 +68,43 @@ namespace CorrugatedIron.Models
         /// The R value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.
         /// </value>
         public Either<uint, string> RVal { get; private set; }
+
         /// <summary>
         /// The number of replicas that must return before a delete is considered a success.
         /// </summary>
         /// <value>The RW Value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.</value>
         public Either<uint, string> RwVal { get; private set; }
+
         /// <summary>
         /// The number of replicas that must commit to durable storage and respond before a write is considered a success. 
         /// </summary>
         /// <value>The DW value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.</value>
         public Either<uint, string> DwVal { get; private set; }
+
         /// <summary>
         /// The number of replicas that must respond before a write is considered a success.
         /// </summary>
         /// <value>The W value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.</value>
         public Either<uint, string> WVal { get; private set; }
+
         /// <summary>
         /// The number of primary replicas that must respond before a read is considered a success.
         /// </summary>
         /// <value>The PR value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.</value>
         public Either<uint, string> PrVal { get; private set; }
+
         /// <summary>
         /// The number of primary replicas that must respond before a write is considered a success.
         /// </summary>
         /// <value>The PW value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.</value>
         public Either<uint, string> PwVal { get; private set; }
-        
+
         public RiakBucketProperties SetBasicQuorum(bool value)
         {
             BasicQuorum = value;
             return this;
         }
-        
+
         public RiakBucketProperties SetNotFoundOk(bool value)
         {
             NotFoundOk = value;
@@ -163,22 +168,22 @@ namespace CorrugatedIron.Models
         {
             return WriteQuorum(value, v => WVal = v);
         }
-        
+
         public RiakBucketProperties SetPrVal(string value)
         {
             return WriteQuorum(value, v => PrVal = v);
         }
-        
+
         public RiakBucketProperties SetPrVal(uint value)
         {
             return WriteQuorum(value, v => PrVal = v);
         }
-        
+
         public RiakBucketProperties SetPwVal(string value)
         {
             return WriteQuorum(value, var => PwVal = var);
         }
-        
+
         public RiakBucketProperties SetPwVal(uint value)
         {
             return WriteQuorum(value, var => PwVal = var);
@@ -189,7 +194,7 @@ namespace CorrugatedIron.Models
             Backend = backend;
             return this;
         }
-        
+
         public RiakBucketProperties SetSearch(bool search)
         {
             Search = search;
@@ -260,13 +265,13 @@ namespace CorrugatedIron.Models
             ReadQuorum(props, "pw", v => PwVal = v);
 
             var preCommitHooks = props.Value<JArray>("precommit");
-            if (preCommitHooks.Count > 0)
+            if(preCommitHooks.Count > 0)
             {
                 PreCommitHooks = preCommitHooks.Cast<JObject>().Select(LoadPreCommitHook).ToList();
             }
 
             var postCommitHooks = props.Value<JArray>("postcommit");
-            if (postCommitHooks.Count > 0)
+            if(postCommitHooks.Count > 0)
             {
                 PostCommitHooks = postCommitHooks.Cast<JObject>().Select(LoadPostCommitHook).ToList();
             }
@@ -275,7 +280,7 @@ namespace CorrugatedIron.Models
         private static IRiakPreCommitHook LoadPreCommitHook(JObject hook)
         {
             JToken token;
-            if (hook.TryGetValue("name", out token))
+            if(hook.TryGetValue("name", out token))
             {
                 // must be a javascript hook
                 return new RiakJavascriptCommitHook(token.Value<string>());
@@ -293,7 +298,7 @@ namespace CorrugatedIron.Models
 
         private static void ReadQuorum(JObject props, string key, Action<Either<uint, string>> setter)
         {
-            if (props[key].Type == JTokenType.String)
+            if(props[key].Type == JTokenType.String)
             {
                 setter(new Either<uint, string>(props.Value<string>(key)));
             }
@@ -304,7 +309,7 @@ namespace CorrugatedIron.Models
         }
 
         internal RiakBucketProperties(RpbBucketProps bucketProps)
-            : this()
+        : this()
         {
             AllowMultiple = bucketProps.AllowMultiple;
             NVal = bucketProps.NVal;
@@ -313,11 +318,11 @@ namespace CorrugatedIron.Models
         internal RpbBucketProps ToMessage()
         {
             var message = new RpbBucketProps();
-            if (AllowMultiple.HasValue)
+            if(AllowMultiple.HasValue)
             {
                 message.AllowMultiple = AllowMultiple.Value;
             }
-            if (NVal.HasValue)
+            if(NVal.HasValue)
             {
                 message.NVal = NVal.Value;
             }
@@ -327,28 +332,28 @@ namespace CorrugatedIron.Models
         internal string ToJsonString()
         {
             var sb = new StringBuilder();
-            
+
             using(var sw = new StringWriter(sb))
-            using (JsonWriter jw = new JsonTextWriter(sw))
+            using(JsonWriter jw = new JsonTextWriter(sw))
             {
                 jw.WriteStartObject();
                 jw.WritePropertyName("props");
                 jw.WriteStartObject();
                 jw.WriteNullableProperty("n_val", NVal)
-                    .WriteNullableProperty("allow_mult", AllowMultiple)
-                    .WriteNullableProperty("last_write_wins", LastWriteWins)
-                    .WriteEither("r", RVal)
-                    .WriteEither("rw", RwVal)
-                    .WriteEither("dw", DwVal)
-                    .WriteEither("w", WVal)
-                    .WriteEither("pr", PrVal)
-                    .WriteEither("pw", PwVal)
-                    .WriteNonNullProperty("backend", Backend)
-                    .WriteNullableProperty("search", Search)
-                    .WriteNullableProperty("notfound_ok", NotFoundOk)
-                    .WriteNullableProperty("basic_quorum", BasicQuorum);
+                .WriteNullableProperty("allow_mult", AllowMultiple)
+                .WriteNullableProperty("last_write_wins", LastWriteWins)
+                .WriteEither("r", RVal)
+                .WriteEither("rw", RwVal)
+                .WriteEither("dw", DwVal)
+                .WriteEither("w", WVal)
+                .WriteEither("pr", PrVal)
+                .WriteEither("pw", PwVal)
+                .WriteNonNullProperty("backend", Backend)
+                .WriteNullableProperty("search", Search)
+                .WriteNullableProperty("notfound_ok", NotFoundOk)
+                .WriteNullableProperty("basic_quorum", BasicQuorum);
 
-                if (PreCommitHooks != null)
+                if(PreCommitHooks != null)
                 {
                     jw.WritePropertyName("precommit");
                     jw.WriteStartArray();
@@ -356,7 +361,7 @@ namespace CorrugatedIron.Models
                     jw.WriteEndArray();
                 }
 
-                if (PostCommitHooks != null)
+                if(PostCommitHooks != null)
                 {
                     jw.WritePropertyName("postcommit");
                     jw.WriteStartArray();
@@ -367,7 +372,7 @@ namespace CorrugatedIron.Models
                 jw.WriteEndObject();
                 jw.WriteEndObject();
             }
-            
+
             return sb.ToString();
         }
     }

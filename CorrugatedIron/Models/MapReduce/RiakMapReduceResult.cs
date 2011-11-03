@@ -23,17 +23,23 @@ namespace CorrugatedIron.Models.MapReduce
     public class RiakMapReduceResult : IRiakMapReduceResult
     {
         private readonly IEnumerable<RiakMapReduceResultPhase> _phaseResults;
-        public IEnumerable<RiakMapReduceResultPhase> PhaseResults { get { return _phaseResults; } }
+
+        public IEnumerable<RiakMapReduceResultPhase> PhaseResults
+        {
+            get { return _phaseResults; }
+        }
 
         internal RiakMapReduceResult(IEnumerable<RiakResult<RpbMapRedResp>> response)
         {
             var phases = from r in response
                          group r by r.Value.Phase
                          into g
-                         select new {Phase = g.Key, 
-                                     Success = g.FirstOrDefault().IsSuccess, 
-                                     PhaseResults = (from rr in g.ToList()
-                                                     select rr.Value)};
+                         select new
+                         {
+                             Phase = g.Key,
+                             Success = g.First().IsSuccess,
+                             PhaseResults = g.Select(rr => rr.Value)
+                         };
 
             _phaseResults = phases.OrderBy(p => p.Phase).Select(p => p.Success ? new RiakMapReduceResultPhase(p.Phase, p.PhaseResults) : new RiakMapReduceResultPhase()).ToList();
         }

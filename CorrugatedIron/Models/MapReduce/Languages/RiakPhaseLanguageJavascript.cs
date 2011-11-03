@@ -45,13 +45,13 @@ namespace CorrugatedIron.Models.MapReduce.Languages
 
         public void WriteJson(JsonWriter writer)
         {
-            if (!string.IsNullOrWhiteSpace(_name))
+            if(!string.IsNullOrWhiteSpace(_name))
             {
                 System.Diagnostics.Debug.Assert(string.IsNullOrWhiteSpace(_bucket), "Bucket should be empty if Name specified");
                 System.Diagnostics.Debug.Assert(string.IsNullOrWhiteSpace(_key), "Key should be empty if Name specified");
                 System.Diagnostics.Debug.Assert(string.IsNullOrWhiteSpace(_source), "Source should be empty if Name specified");
             }
-            else if (!string.IsNullOrWhiteSpace(_source))
+            else if(!string.IsNullOrWhiteSpace(_source))
             {
                 System.Diagnostics.Debug.Assert(string.IsNullOrWhiteSpace(_bucket), "Bucket should be empty if Name specified");
                 System.Diagnostics.Debug.Assert(string.IsNullOrWhiteSpace(_key), "Key should be empty if Name specified");

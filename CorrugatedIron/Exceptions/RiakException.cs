@@ -25,7 +25,11 @@ namespace CorrugatedIron.Exceptions
     {
         private readonly string _errorMessage;
         public uint ErrorCode { get; private set; }
-        public string ErrorMessage { get { return _errorMessage; } }
+
+        public string ErrorMessage
+        {
+            get { return _errorMessage; }
+        }
 
         public RiakException(uint errorCode, string errorMessage)
         {
@@ -40,10 +44,7 @@ namespace CorrugatedIron.Exceptions
 
         public override string Message
         {
-            get
-            {
-                return _errorMessage;
-            }
+            get { return _errorMessage; }
         }
 
         public override IDictionary Data

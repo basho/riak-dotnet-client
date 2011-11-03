@@ -18,7 +18,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using CorrugatedIron.Extensions;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Tests.Extensions;
@@ -434,6 +433,11 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
 
                     batch.DeleteBucket(bucket);
 
+                    // This might fail if you check straight away
+                    // because deleting takes time behind the scenes.
+                    // So wait in case (yup, you can shoot me if you like!)
+                    Thread.Sleep(4000);
+
                     keyList = batch.ListKeys(bucket);
                     keyList.Value.Count().ShouldEqual(0);
                     batch.ListBuckets().Value.Contains(bucket).ShouldBeFalse();
@@ -457,6 +461,11 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             keyList.Value.Count().ShouldEqual(10);
 
             Client.DeleteBucket(bucket);
+
+            // This might fail if you check straight away
+            // because deleting takes time behind the scenes.
+            // So wait in case (yup, you can shoot me if you like!)
+            Thread.Sleep(4000);
 
             keyList = Client.ListKeys(bucket);
             keyList.Value.Count().ShouldEqual(0);
@@ -483,6 +492,11 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             Client.Async.DeleteBucket(bucket, asyncTester.HandleResult);
             var result = asyncTester.Result;
             
+            // This might fail if you check straight away
+            // because deleting takes time behind the scenes.
+            // So wait in case (yup, you can shoot me if you like!)
+            Thread.Sleep(4000);
+
             keyList = Client.ListKeys(bucket);
             keyList.Value.Count().ShouldEqual(0);
             Client.ListBuckets().Value.Contains(bucket).ShouldBeFalse();
@@ -507,6 +521,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             lm2.ShouldNotEqual(lm3);
             lmu2.ShouldNotEqual(lmu3);
 
+            Thread.Sleep(500);
             o.SetObject(new { value = 76543 });
             o = Client.Put(o, new RiakPutOptions { ReturnBody = false }).Value;
 

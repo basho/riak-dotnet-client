@@ -33,7 +33,7 @@ namespace CorrugatedIron.Comms
             _allResources = new List<IRiakConnection>();
             _resources = new ConcurrentStack<IRiakConnection>();
 
-            for (var i = 0; i < poolSize; ++i)
+            for(var i = 0; i < poolSize; ++i)
             {
                 var conn = connFactory.CreateConnection(nodeConfig);
                 _allResources.Add(conn);
@@ -43,24 +43,24 @@ namespace CorrugatedIron.Comms
 
         public Tuple<bool, TResult> Consume<TResult>(Func<IRiakConnection, TResult> consumer)
         {
-            if (_disposing) return Tuple.Create(false, default(TResult));
+            if(_disposing) return Tuple.Create(false, default(TResult));
 
             IRiakConnection instance = null;
             try
             {
-                if (_resources.TryPop(out instance))
+                if(_resources.TryPop(out instance))
                 {
                     var result = consumer(instance);
                     return Tuple.Create(true, result);
                 }
             }
-            catch (Exception)
+            catch(Exception)
             {
                 return Tuple.Create(false, default(TResult));
             }
             finally
             {
-                if (instance != null)
+                if(instance != null)
                 {
                     _resources.Push(instance);
                 }
@@ -71,26 +71,27 @@ namespace CorrugatedIron.Comms
 
         public Tuple<bool, TResult> DelayedConsume<TResult>(Func<IRiakConnection, Action, TResult> consumer)
         {
-            if (_disposing) return Tuple.Create(false, default(TResult));
+            if(_disposing) return Tuple.Create(false, default(TResult));
 
             IRiakConnection instance = null;
             try
             {
-                if (_resources.TryPop(out instance))
+                if(_resources.TryPop(out instance))
                 {
                     Action cleanup = () =>
-                        {
-                            var i = instance;
-                            instance = null;
-                            _resources.Push(i);
-                        };
+                    {
+                        var i = instance;
+                        instance = null;
+                        _resources.Push(i);
+                    };
+
                     var result = consumer(instance, cleanup);
                     return Tuple.Create(true, result);
                 }
             }
-            catch (Exception)
+            catch(Exception)
             {
-                if (instance != null)
+                if(instance != null)
                 {
                     _resources.Push(instance);
                 }
@@ -102,7 +103,7 @@ namespace CorrugatedIron.Comms
 
         public void Dispose()
         {
-            if (_disposing) return;
+            if(_disposing) return;
 
             _disposing = true;
 

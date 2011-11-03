@@ -28,9 +28,5 @@ namespace CorrugatedIron.Models.Rest
         public HttpStatusCode StatusCode { get; set; }
         public Dictionary<string, string> Headers { get; set; }
         public string ErrorMessage { get; set; }
-
-        public RiakRestResponse()
-        {
-        }
     }
 }

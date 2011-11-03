@@ -39,7 +39,7 @@ namespace CorrugatedIron.Comms.LoadBalancing
         public IRiakNode SelectNode()
         {
             IRiakNode node = null;
-            if (_roundRobin.TryMoveNext(out node))
+            if(_roundRobin.TryMoveNext(out node))
             {
                 return node;
             }
@@ -48,9 +48,9 @@ namespace CorrugatedIron.Comms.LoadBalancing
 
         public void RemoveNode(IRiakNode node)
         {
-            lock (_nodesLock)
+            lock(_nodesLock)
             {
-                if (_nodes.Contains(node))
+                if(_nodes.Contains(node))
                 {
                     _nodes.Remove(node);
                     var list = _nodes.ToList();
@@ -61,9 +61,9 @@ namespace CorrugatedIron.Comms.LoadBalancing
 
         public void AddNode(IRiakNode node)
         {
-            lock (_nodesLock)
+            lock(_nodesLock)
             {
-                if (!_nodes.Contains(node))
+                if(!_nodes.Contains(node))
                 {
                     _nodes.Add(node);
                     var list = _nodes.ToList();
@@ -74,13 +74,13 @@ namespace CorrugatedIron.Comms.LoadBalancing
 
         private IEnumerable<IRiakNode> RoundRobin()
         {
-            while (true)
+            while(true)
             {
                 var list = _generator().ToList();
-                if (list.Count > 0)
+                if(list.Count > 0)
                 {
                     var nodes = list.GetEnumerator();
-                    while (nodes.MoveNext() && nodes.Current != null)
+                    while(nodes.MoveNext() && nodes.Current != null)
                     {
                         yield return nodes.Current;
                     }

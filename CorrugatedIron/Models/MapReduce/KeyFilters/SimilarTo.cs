@@ -28,9 +28,20 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
     {
         private readonly Tuple<string, T, int> _kfDefintion;
 
-        public string FunctionName { get { return _kfDefintion.Item1; } }
-        public T Argument { get { return _kfDefintion.Item2; } }
-        public int Distance { get { return _kfDefintion.Item3; } }
+        public string FunctionName
+        {
+            get { return _kfDefintion.Item1; }
+        }
+
+        public T Argument
+        {
+            get { return _kfDefintion.Item2; }
+        }
+
+        public int Distance
+        {
+            get { return _kfDefintion.Item3; }
+        }
 
         public SimilarTo(T arg, int distance)
         {
@@ -46,8 +57,8 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
         {
             var sb = new StringBuilder();
 
-            using (var sw = new StringWriter(sb))
-            using (JsonWriter jw = new JsonTextWriter(sw))
+            using(var sw = new StringWriter(sb))
+            using(JsonWriter jw = new JsonTextWriter(sw))
             {
                 jw.WriteStartArray();
 
@@ -58,7 +69,7 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
                 jw.WriteEndArray();
             }
 
-            return sb.ToString();              
+            return sb.ToString();
         }
     }
 }

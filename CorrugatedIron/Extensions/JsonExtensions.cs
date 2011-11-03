@@ -41,7 +41,7 @@ namespace CorrugatedIron.Extensions
         public static JsonWriter WriteNonNullProperty<T>(this JsonWriter writer, string name, T value)
             where T : class
         {
-            if (value != null)
+            if(value != null)
             {
                 writer.WriteProperty(name, value);
             }
@@ -50,9 +50,9 @@ namespace CorrugatedIron.Extensions
 
         public static JsonWriter WriteEither<TLeft, TRight>(this JsonWriter writer, string name, Either<TLeft, TRight> either)
         {
-            if (either != null)
+            if(either != null)
             {
-                if (either.IsLeft)
+                if(either.IsLeft)
                 {
                     writer.WriteProperty(name, either.Left);
                 }
@@ -67,7 +67,7 @@ namespace CorrugatedIron.Extensions
         public static JsonWriter WriteNullableProperty<T>(this JsonWriter writer, string name, T? value)
             where T : struct
         {
-            if (value.HasValue)
+            if(value.HasValue)
             {
                 writer.WriteProperty(name, value.Value);
             }
@@ -76,7 +76,7 @@ namespace CorrugatedIron.Extensions
 
         public static JsonWriter WriteSpecifiedProperty(this JsonWriter writer, string name, string value)
         {
-            if (!string.IsNullOrWhiteSpace(value))
+            if(!string.IsNullOrWhiteSpace(value))
             {
                 writer.WriteProperty(name, value);
             }
