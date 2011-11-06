@@ -21,7 +21,7 @@ using Newtonsoft.Json;
 
 namespace CorrugatedIron.Models.MapReduce.KeyFilters
 {
-    public abstract class RiakKeyFilterToken : IRiakKeyFilterToken
+    internal abstract class RiakKeyFilterToken : IRiakKeyFilterToken
     {
         private readonly Tuple<string, object, object> _kfDefinition;
 

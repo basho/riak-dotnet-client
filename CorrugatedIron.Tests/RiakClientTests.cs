@@ -10,8 +10,6 @@ namespace CorrugatedIron.Tests.RiakClientTests
     [TestFixture]
     internal class RiakClientTests
     {
-        #region Setup/Teardown
-
         [SetUp]
         protected void SetUp()
         {
@@ -28,8 +26,6 @@ namespace CorrugatedIron.Tests.RiakClientTests
             Cluster = new RiakCluster(ClusterConfigMock.Object, ConnFactoryMock.Object);
             Client = new RiakClient(Cluster);
         }
-
-        #endregion
 
         protected Mock<IRiakConnection> ConnMock;
         protected Mock<IRiakNodeConfiguration> NodeConfigMock;

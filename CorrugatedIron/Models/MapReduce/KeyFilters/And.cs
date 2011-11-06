@@ -25,7 +25,7 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
     /// <summary>
     /// Joins two or more key-filter operations with a logical AND operation.
     /// </summary>
-    public class And : IRiakKeyFilterToken
+    internal class And : IRiakKeyFilterToken
     {
         private readonly Tuple<string, List<IRiakKeyFilterToken>, List<IRiakKeyFilterToken>> _kfDefinition;
 

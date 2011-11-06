@@ -322,52 +322,36 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         [Test]
         public void WritesWithAllowMultProducesMultiple()
         {
-            // delete first if something does exist
-            Client.Delete(MultiBucket, MultiKey);
-
-            // Do this via the REST interface - will be substantially slower than PBC
-            var props = new RiakBucketProperties().SetAllowMultiple(true).SetLastWriteWins(false);
-            props.CanUsePbc.ShouldBeFalse();
-            Client.SetBucketProperties(MultiBucket, props).IsSuccess.ShouldBeTrue();
-
-            var doc = new RiakObject(MultiBucket, MultiKey, MultiBodyOne, RiakConstants.ContentTypes.ApplicationJson);
-            var writeResult1 = Client.Put(doc);
-            writeResult1.IsSuccess.ShouldBeTrue();
-
-            doc = new RiakObject(MultiBucket, MultiKey, MultiBodyTwo, RiakConstants.ContentTypes.ApplicationJson);
-            var writeResult2 = Client.Put(doc);
-            writeResult2.IsSuccess.ShouldBeTrue();
-            writeResult2.Value.Siblings.Count.ShouldEqual(2);
-
-            var result = Client.Get(MultiBucket, MultiKey);
-            result.Value.Siblings.Count.ShouldEqual(2);
+            DoAllowMultProducesMultipleTest(Client);
         }
 
         [Test]
         public void WritesWithAllowMultProducesMultipleInBatch()
         {
-            Client.Batch(batch =>
-                {
-                    // delete first if something does exist
-                    batch.Delete(MultiBucket, MultiKey);
+            Client.Batch(DoAllowMultProducesMultipleTest);
+        }
 
-                    // Do this via the REST interface - will be substantially slower than PBC
-                    var props = new RiakBucketProperties().SetAllowMultiple(true).SetLastWriteWins(false);
-                    props.CanUsePbc.ShouldBeFalse();
-                    batch.SetBucketProperties(MultiBucket, props).IsSuccess.ShouldBeTrue();
+        private static void DoAllowMultProducesMultipleTest(IRiakBatchClient client)
+        {
+            // delete first if something does exist
+            client.Delete(MultiBucket, MultiKey);
 
-                    var doc = new RiakObject(MultiBucket, MultiKey, MultiBodyOne, RiakConstants.ContentTypes.ApplicationJson);
-                    var writeResult1 = batch.Put(doc);
-                    writeResult1.IsSuccess.ShouldBeTrue();
+            // Do this via the REST interface - will be substantially slower than PBC
+            var props = new RiakBucketProperties().SetAllowMultiple(true).SetLastWriteWins(false);
+            props.CanUsePbc.ShouldBeFalse();
+            client.SetBucketProperties(MultiBucket, props).IsSuccess.ShouldBeTrue();
 
-                    doc = new RiakObject(MultiBucket, MultiKey, MultiBodyTwo, RiakConstants.ContentTypes.ApplicationJson);
-                    var writeResult2 = batch.Put(doc);
-                    writeResult2.IsSuccess.ShouldBeTrue();
-                    writeResult2.Value.Siblings.Count.ShouldEqual(2);
+            var doc = new RiakObject(MultiBucket, MultiKey, MultiBodyOne, RiakConstants.ContentTypes.ApplicationJson);
+            var writeResult1 = client.Put(doc);
+            writeResult1.IsSuccess.ShouldBeTrue();
 
-                    var result = batch.Get(MultiBucket, MultiKey);
-                    result.Value.Siblings.Count.ShouldEqual(2);
-                });
+            doc = new RiakObject(MultiBucket, MultiKey, MultiBodyTwo, RiakConstants.ContentTypes.ApplicationJson);
+            var writeResult2 = client.Put(doc);
+            writeResult2.IsSuccess.ShouldBeTrue();
+            writeResult2.Value.Siblings.Count.ShouldEqual(2);
+
+            var result = client.Get(MultiBucket, MultiKey);
+            result.Value.Siblings.Count.ShouldEqual(2);
         }
 
         [Test]

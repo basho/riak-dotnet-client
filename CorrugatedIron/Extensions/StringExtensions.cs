@@ -15,6 +15,7 @@
 // under the License.
 
 using System.Web;
+using CorrugatedIron.Util;
 
 namespace CorrugatedIron.Extensions
 {
@@ -40,6 +41,26 @@ namespace CorrugatedIron.Extensions
         public static string UrlEncoded(this string value)
         {
             return HttpUtility.UrlEncode(value);
+        }
+
+        public static bool IsIntegerKey(this string value)
+        {
+            return value.EndsWith(RiakConstants.IndexSuffix.Integer);
+        }
+
+        public static bool IsBinaryKey(this string value)
+        {
+            return value.EndsWith(RiakConstants.IndexSuffix.Binary);
+        }
+
+        public static string ToIntegerKey(this string value)
+        {
+            return value.IsIntegerKey() ? value : value + RiakConstants.IndexSuffix.Integer;
+        }
+
+        public static string ToBinaryKey(this string value)
+        {
+            return value.IsBinaryKey() ? value : value + RiakConstants.IndexSuffix.Binary;
         }
     }
 }
