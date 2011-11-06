@@ -23,7 +23,7 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
     /// <summary>
     /// Turns an integer (previously extracted with string_to_int), into a string.
     /// </summary>
-    public class IntToString : IRiakKeyFilterToken
+    internal class IntToString : IRiakKeyFilterToken
     {
         public string FunctionName
         {

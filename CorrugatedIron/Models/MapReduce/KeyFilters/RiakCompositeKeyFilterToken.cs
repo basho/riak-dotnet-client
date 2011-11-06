@@ -20,7 +20,7 @@ using Newtonsoft.Json;
 
 namespace CorrugatedIron.Models.MapReduce.KeyFilters
 {
-    public abstract class RiakCompositeKeyFilterToken : RiakKeyFilterToken
+    internal abstract class RiakCompositeKeyFilterToken : RiakKeyFilterToken
     {
         protected RiakCompositeKeyFilterToken(string functionName, params object[] args)
             : base(functionName, args)

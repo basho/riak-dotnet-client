@@ -24,7 +24,7 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
     /// <summary>
     /// Tests that the input is greater than the argument.
     /// </summary>
-    public class GreaterThan<T> : IRiakKeyFilterToken
+    internal class GreaterThan<T> : IRiakKeyFilterToken
     {
         private readonly Tuple<string, T> _kfDefinition;
 
