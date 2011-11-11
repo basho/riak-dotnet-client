@@ -404,6 +404,14 @@ namespace CorrugatedIron.Models
                 Value = memoryStream.ToArray();
                 return;
             }
+            
+            new XmlSe
+            
+            if(ContentType.StartsWith("text"))
+            {
+                Value = value.ToString().ToRiakString();
+                return;
+            }
 
             throw new NotSupportedException(string.Format("Your current ContentType ({0}), is not supported.", ContentType));
         }
