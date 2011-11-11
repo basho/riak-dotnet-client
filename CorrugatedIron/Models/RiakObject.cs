@@ -405,8 +405,6 @@ namespace CorrugatedIron.Models
                 return;
             }
             
-            new XmlSe
-            
             if(ContentType.StartsWith("text"))
             {
                 Value = value.ToString().ToRiakString();
