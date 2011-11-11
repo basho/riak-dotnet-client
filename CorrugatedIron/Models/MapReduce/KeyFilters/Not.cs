@@ -25,7 +25,7 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
     /// <summary>
     /// Negates the result of key-filter operations.
     /// </summary>
-    public class Not : IRiakKeyFilterToken
+    internal class Not : IRiakKeyFilterToken
     {
         private readonly Tuple<string, List<IRiakKeyFilterToken>> _kfDefinition;
 

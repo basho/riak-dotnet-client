@@ -24,7 +24,7 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
     /// <summary>
     /// Tests that the input ends with the argument (a string).
     /// </summary>
-    public class EndsWith : IRiakKeyFilterToken
+    internal class EndsWith : IRiakKeyFilterToken
     {
         private readonly Tuple<string, string> _kfDefinition;
 
@@ -42,8 +42,6 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
         {
             get { return _kfDefinition.Item2; }
         }
-
-        #region IRiakKeyFilterToken Members
 
         public string ToJsonString()
         {
@@ -64,8 +62,6 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
 
             return sb.ToString();
         }
-
-        #endregion
 
         public override string ToString()
         {

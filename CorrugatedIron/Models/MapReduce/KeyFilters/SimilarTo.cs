@@ -24,7 +24,7 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
     /// <summary>
     /// Tests that input is within the Levenshtein distance of the first argument given by the second argument.
     /// </summary>
-    public class SimilarTo<T> : IRiakKeyFilterToken
+    internal class SimilarTo<T> : IRiakKeyFilterToken
     {
         private readonly Tuple<string, T, int> _kfDefintion;
 

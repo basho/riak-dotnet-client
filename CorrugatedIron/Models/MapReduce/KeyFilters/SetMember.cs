@@ -25,7 +25,7 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
     /// <summary>
     /// Tests that the input is contained in the set given as the arguments.
     /// </summary>
-    public class SetMember<T> : IRiakKeyFilterToken
+    internal class SetMember<T> : IRiakKeyFilterToken
     {
         private readonly Tuple<string, List<T>> _kfDefinition;
 

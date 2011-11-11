@@ -23,7 +23,7 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
     /// <summary>
     /// URL-decodes the string.
     /// </summary>
-    public class UrlDecode : IRiakKeyFilterToken
+    internal class UrlDecode : IRiakKeyFilterToken
     {
         public string FunctionName
         {

@@ -29,6 +29,9 @@ namespace CorrugatedIron.Models
 {
     public class RiakObject
     {
+        private List<string> _vtags;
+        private int _hashCode;
+
         public string Bucket { get; private set; }
         public string Key { get; private set; }
         public byte[] Value { get; set; }
@@ -70,22 +73,19 @@ namespace CorrugatedIron.Models
                     IntIndexes = new Dictionary<string, int>();
                 }
 
-                foreach(var key in value.Keys)
+                foreach(var item in value)
                 {
-                    if(key.IndexOf("_int") > -1)
+                    if(item.Key.IndexOf(RiakConstants.IndexSuffix.Integer) > -1)
                     {
-                        IntIndexes.Add(key, Convert.ToInt32(value[key]));
+                        IntIndexes.Add(item.Key, Convert.ToInt32(item.Value));
                     }
                     else
                     {
-                        BinIndexes.Add(key, value[key].ToString());
+                        BinIndexes.Add(item.Key, item.Value);
                     }
                 }
             }
         }
-
-        private List<string> _vtags;
-        private int _hashCode;
 
         public bool HasChanged
         {
@@ -140,22 +140,22 @@ namespace CorrugatedIron.Models
 
         public void AddBinIndex(string index, string key)
         {
-            BinIndexes.Add(FormatBinKey(index), key);
+            BinIndexes.Add(index.ToBinaryKey(), key);
         }
 
         public void AddIntIndex(string index, int key)
         {
-            IntIndexes.Add(FormatIntKey(index), key);
+            IntIndexes.Add(index.ToIntegerKey(), key);
         }
 
         public void RemoveBinIndex(string index)
         {
-            BinIndexes.Remove(FormatBinKey(index));
+            IntIndexes.Remove(index.ToBinaryKey());
         }
 
         public void RemoveIntIndex(string index)
         {
-            IntIndexes.Remove(FormatIntKey(index));
+            IntIndexes.Remove(index.ToIntegerKey());
         }
 
         public void LinkTo(string bucket, string key, string tag)
@@ -373,7 +373,7 @@ namespace CorrugatedIron.Models
         public void SetObject<T>(T value, string contentType = null)
             where T : class
         {
-            if(!String.IsNullOrEmpty(contentType))
+            if(!string.IsNullOrEmpty(contentType))
             {
                 ContentType = contentType;
             }
@@ -402,6 +402,12 @@ namespace CorrugatedIron.Models
                 var serde = new XmlSerializer(typeof(T));
                 serde.Serialize(memoryStream, value);
                 Value = memoryStream.ToArray();
+                return;
+            }
+            
+            if(ContentType.StartsWith("text"))
+            {
+                Value = value.ToString().ToRiakString();
                 return;
             }
 
@@ -439,26 +445,6 @@ namespace CorrugatedIron.Models
         public dynamic GetObject()
         {
             return GetObject<dynamic>();
-        }
-
-        private string FormatBinKey(string key)
-        {
-            if(key.IndexOf("_bin") < 0)
-            {
-                key = "{0}_bin".Fmt(key);
-            }
-
-            return key;
-        }
-
-        private string FormatIntKey(string key)
-        {
-            if(key.IndexOf("_int") < 0)
-            {
-                key = "{0}_int".Fmt(key);
-            }
-
-            return key;
         }
     }
 }

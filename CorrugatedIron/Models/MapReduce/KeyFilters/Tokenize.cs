@@ -25,7 +25,7 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
     /// Splits the input on the string given as the first argument and returns the nth
     /// token specified by the second argument.
     /// </summary>
-    public class Tokenize : IRiakKeyFilterToken
+    internal class Tokenize : IRiakKeyFilterToken
     {
         private readonly Tuple<string, string, uint> _kfDefinition;
 

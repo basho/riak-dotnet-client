@@ -24,7 +24,7 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
     /// <summary>
     /// Tests that the input is not equal to the argument.
     /// </summary>
-    public class NotEqual<T> : IRiakKeyFilterToken
+    internal class NotEqual<T> : IRiakKeyFilterToken
     {
         private readonly Tuple<string, T> _kfDefinition;
 

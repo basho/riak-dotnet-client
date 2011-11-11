@@ -789,7 +789,7 @@ namespace CorrugatedIron
         {
             byte[] byteSeed;
 
-            if(String.IsNullOrEmpty(seed))
+            if(string.IsNullOrEmpty(seed))
             {
                 byteSeed = new byte[16];
                 var rng = new System.Security.Cryptography.RNGCryptoServiceProvider();

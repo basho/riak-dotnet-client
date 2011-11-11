@@ -23,7 +23,7 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
     /// <summary>
     /// Changes all letters to uppercase.
     /// </summary>
-    public class ToUpper : IRiakKeyFilterToken
+    internal class ToUpper : IRiakKeyFilterToken
     {
         public string FunctionName
         {

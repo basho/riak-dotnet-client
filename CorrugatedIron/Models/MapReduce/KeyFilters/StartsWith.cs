@@ -24,7 +24,7 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
     /// <summary>
     /// Tests that the input begins with the argument (a string).
     /// </summary>
-    public class StartsWith : IRiakKeyFilterToken
+    internal class StartsWith : IRiakKeyFilterToken
     {
         private readonly Tuple<string, string> _kfDefinition;
 
