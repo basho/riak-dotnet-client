@@ -24,7 +24,7 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
     /// <summary>
     /// Tests that the input matches the regular expression given in the argument.
     /// </summary>
-    public class Matches : IRiakKeyFilterToken
+    internal class Matches : IRiakKeyFilterToken
     {
         private readonly Tuple<string, string> _kfDefinition;
 

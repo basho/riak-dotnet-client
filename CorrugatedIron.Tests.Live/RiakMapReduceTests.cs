@@ -14,7 +14,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
 using System.Linq;
 using CorrugatedIron.Comms;
 using CorrugatedIron.Config;
@@ -67,7 +66,7 @@ namespace CorrugatedIron.Tests.Live
         {
             for (int i = 0; i < 10; i++)
             {
-                Client.Put(new RiakObject(Bucket, String.Format("time_{0}", i), EmptyBody, RiakConstants.ContentTypes.ApplicationJson));
+                Client.Put(new RiakObject(Bucket, string.Format("time_{0}", i), EmptyBody, RiakConstants.ContentTypes.ApplicationJson));
             }
 
             var mr = new RiakMapReduceQuery {ContentType = MrContentType};
@@ -100,7 +99,7 @@ namespace CorrugatedIron.Tests.Live
         {
             for (int i = 0; i < 10; i++)
             {
-                Client.Put(new RiakObject(Bucket, String.Format("time_{0}", i), EmptyBody, RiakConstants.ContentTypes.ApplicationJson));
+                Client.Put(new RiakObject(Bucket, string.Format("time_{0}", i), EmptyBody, RiakConstants.ContentTypes.ApplicationJson));
             }
 
             var mr = new RiakMapReduceQuery { ContentType = MrContentType };
@@ -131,9 +130,9 @@ namespace CorrugatedIron.Tests.Live
         [Test]
         public void StartsWithAndBetweenReturnASubsetOfAllKeys()
         {
-            for (int i = 0; i < 10; i++)
+            for (var i = 0; i < 10; i++)
             {
-                Client.Put(new RiakObject(Bucket, String.Format("time_{0}", i), EmptyBody, RiakConstants.ContentTypes.ApplicationJson));
+                Client.Put(new RiakObject(Bucket, string.Format("time_{0}", i), EmptyBody, RiakConstants.ContentTypes.ApplicationJson));
             }
 
             var mr = new RiakMapReduceQuery { ContentType = MrContentType };

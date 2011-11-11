@@ -23,7 +23,7 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
     /// <summary>
     /// Turns a floating point number (previously extracted with string_to_float), into a string.
     /// </summary>
-    public class FloatToString : IRiakKeyFilterToken
+    internal class FloatToString : IRiakKeyFilterToken
     {
         public string FunctionName
         {

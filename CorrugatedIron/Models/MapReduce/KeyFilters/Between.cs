@@ -27,7 +27,7 @@ namespace CorrugatedIron.Models.MapReduce.KeyFilters
     /// If the third argument is omitted, the range is treated as inclusive.
     /// </summary>
     /// <remarks>It is assumed that left and right supply their own JSON conversion.</remarks>
-    public class Between<T> : IRiakKeyFilterToken
+    internal class Between<T> : IRiakKeyFilterToken
     {
         private readonly Tuple<string, T, T, bool> _kfDefinition;
 

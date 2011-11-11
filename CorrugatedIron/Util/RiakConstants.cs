@@ -34,6 +34,12 @@ namespace CorrugatedIron.Util
             public const string ProtocolBuffers = @"application/x-protobuf";
         }
 
+        public static class IndexSuffix
+        {
+            public const string Integer = @"_int";
+            public const string Binary = @"_bin";
+        }
+
         public static class MapReduceLanguage
         {
             public const string JavaScript = "javascript";
