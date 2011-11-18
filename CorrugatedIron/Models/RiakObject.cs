@@ -218,11 +218,6 @@ namespace CorrugatedIron.Models
             return new RiakObjectId(Bucket, Key);
         }
 
-        public void MarkClean()
-        {
-            _hashCode = CalculateHashCode();
-        }
-
         internal RiakObject(string bucket, string key, RpbContent content, byte[] vectorClock)
         {
             Bucket = bucket;
