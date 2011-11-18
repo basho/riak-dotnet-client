@@ -490,14 +490,14 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         public void LastModifiedShouldChangeAfterAPutRequest()
         {
             var o = new RiakObject(TestBucket, "1234", new { value = 1234 });
-            Client.Put(o);
+            o = Client.Put(o).Value;
 
             var lm2 = o.LastModified;
             var lmu2 = o.LastModifiedUsec;
 
             Thread.Sleep(500);
             o.SetObject(new { value = 12345 });
-            Client.Put(o);
+            o = Client.Put(o).Value;
 
             var lm3 = o.LastModified;
             var lmu3 = o.LastModifiedUsec;
