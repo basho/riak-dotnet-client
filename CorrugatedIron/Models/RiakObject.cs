@@ -218,11 +218,6 @@ namespace CorrugatedIron.Models
             return new RiakObjectId(Bucket, Key);
         }
 
-        public void MarkClean()
-        {
-            _hashCode = CalculateHashCode();
-        }
-
         internal RiakObject(string bucket, string key, RpbContent content, byte[] vectorClock)
         {
             Bucket = bucket;
@@ -255,8 +250,6 @@ namespace CorrugatedIron.Models
 
         internal RpbPutReq ToMessage()
         {
-            UpdateLastModified();
-
             var message = new RpbPutReq
             {
                 Bucket = Bucket.ToRiakString(),
@@ -269,8 +262,6 @@ namespace CorrugatedIron.Models
                     VTag = VTag.ToRiakString(),
                     UserMeta = UserMetaData.Select(kv => new RpbPair { Key = kv.Key.ToRiakString(), Value = kv.Value.ToRiakString() }).ToList(),
                     Indexes = Indexes.Select(kv => new RpbPair { Key = kv.Key.ToRiakString(), Value = kv.Value.ToRiakString() }).ToList(),
-                    LastMod = LastModified,
-                    LastModUSecs = LastModifiedUsec,
                     Links = Links.Select(l => l.ToMessage()).ToList()
                 }
             };
@@ -293,18 +284,6 @@ namespace CorrugatedIron.Models
                 return false;
             }
             return Equals((RiakObject)obj);
-        }
-
-        private void UpdateLastModified()
-        {
-            if(HasChanged)
-            {
-                var t = DateTime.UtcNow - new DateTime(1970, 1, 1);
-                var ms = (ulong)Math.Round(t.TotalMilliseconds);
-
-                LastModified = (uint)(ms / 1000u);
-                LastModifiedUsec = (uint)((ms - LastModified * 1000u) * 100u);
-            }
         }
 
         public bool Equals(RiakObject other)
