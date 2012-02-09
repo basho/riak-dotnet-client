@@ -22,7 +22,9 @@ namespace CorrugatedIron.Models.RiakSearch
     public class RiakSearchTerm
     {
         public string Field { get; set; }
-        public string Term { get; set; }
+        
+        // TODO: Create an interface that can be implemented as either PhraseSearchTerm or RangeSearchTerm
+        public IRiakSearchQueryTerm Term { get; set; }
         public int? Proximity { get; set; }
         public int? Boost { get; set; }
         public bool Prohibited { get; set; }
@@ -58,7 +60,7 @@ namespace CorrugatedIron.Models.RiakSearch
             string replacement = @"\$1";
             
             var regex = new Regex(pattern);
-            return regex.Replace(Term, replacement);
+            return regex.Replace(Term.ToRiakSearchTermString(), replacement);
         }
     }
 }
