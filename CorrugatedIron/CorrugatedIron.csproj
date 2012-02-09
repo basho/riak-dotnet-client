@@ -234,6 +234,9 @@
     <Compile Include="Models\RiakSearch\IRiakSearchQueryTerm.cs" />
     <Compile Include="Models\RiakSearch\RiakPhraseSearchTerm.cs" />
     <Compile Include="Models\RiakSearch\RiakRangeSearchTerm.cs" />
+    <Compile Include="Models\RiakSearch\RiakSearchQuery.cs" />
+    <Compile Include="Models\RiakSearch\IRiakSearchTerm.cs" />
+    <Compile Include="Models\RiakSearch\And.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Metadata\CorrugatedIron.snk">

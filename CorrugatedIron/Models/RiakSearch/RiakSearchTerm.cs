@@ -16,10 +16,11 @@
 using System;
 using System.Text;
 using System.Text.RegularExpressions;
+using CorrugatedIrons.Models.RiakSearch;
 
 namespace CorrugatedIron.Models.RiakSearch
 {
-    public class RiakSearchTerm
+    public class RiakSearchTerm : IRiakSearchTerm
     {
         public string Field { get; set; }
         public IRiakSearchQueryTerm Term { get; set; }
