@@ -15,6 +15,7 @@
 // under the License.
 
 using System;
+using System.Collections.Generic;
 
 namespace CorrugatedIron.Models.RiakSearch
 {

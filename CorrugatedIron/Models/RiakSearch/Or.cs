@@ -33,7 +33,7 @@ namespace CorrugatedIron.Models.RiakSearch
         public IRiakSearchTerm Right { get { return _booleanDefition.Item3; } }
         
         
-        string ToRiakSearchString()
+        public string ToRiakSearchString()
         {
             return String.Format("({0} {1} {2})", Left.ToRiakSearchString(), Right.ToRiakSearchString());
         }
