@@ -16,7 +16,7 @@
 using System;
 using System.Text;
 using System.Text.RegularExpressions;
-using CorrugatedIrons.Models.RiakSearch;
+using CorrugatedIron.Models.RiakSearch;
 
 namespace CorrugatedIron.Models.RiakSearch
 {
@@ -28,7 +28,12 @@ namespace CorrugatedIron.Models.RiakSearch
         public int? Boost { get; set; }
         public bool Prohibited { get; set; }
         
-        public override string ToString ()
+        public override string ToString()
+        {
+            return ToRiakSearchString();
+        }
+        
+        public string ToRiakSearchString ()
         {
             var sb = new StringBuilder();
             
