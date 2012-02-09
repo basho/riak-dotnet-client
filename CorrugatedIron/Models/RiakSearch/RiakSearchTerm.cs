@@ -22,8 +22,6 @@ namespace CorrugatedIron.Models.RiakSearch
     public class RiakSearchTerm
     {
         public string Field { get; set; }
-        
-        // TODO: Create an interface that can be implemented as either PhraseSearchTerm or RangeSearchTerm
         public IRiakSearchQueryTerm Term { get; set; }
         public int? Proximity { get; set; }
         public int? Boost { get; set; }
