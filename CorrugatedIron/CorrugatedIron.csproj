@@ -231,6 +231,9 @@
     <Compile Include="Models\MapReduce\Inputs\RiakBinIndexEqualityInput.cs" />
     <Compile Include="Models\MapReduce\Inputs\RiakBinIndexRangeInput.cs" />
     <Compile Include="Models\RiakSearch\RiakSearchTerm.cs" />
+    <Compile Include="Models\RiakSearch\IRiakSearchQueryTerm.cs" />
+    <Compile Include="Models\RiakSearch\RiakPhraseSearchTerm.cs" />
+    <Compile Include="Models\RiakSearch\RiakRangeSearchTerm.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Metadata\CorrugatedIron.snk">
