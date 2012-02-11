@@ -15,27 +15,12 @@
 // under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace CorrugatedIron.Models.RiakSearch
+namespace CorrugatedIron.Models.Solr
 {
-    public class RiakSearchQuery
+    public interface ISolrQueryPart
     {
-        public List<IRiakSearchTerm> Terms { get; set; }
-        
-        private readonly string _bucket;
-        
-        public RiakSearchQuery (string bucket)
-        {
-            _bucket = bucket;
-           Terms = new List<IRiakSearchTerm>();
-        }
-        
-        public override string ToString()
-        {
-            throw new NotImplementedException();
-        }
+        string ToSolrQueryString();
     }
 }
 

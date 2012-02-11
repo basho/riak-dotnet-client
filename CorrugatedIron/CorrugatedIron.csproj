@@ -238,6 +238,10 @@
     <Compile Include="Models\RiakSearch\IRiakSearchTerm.cs" />
     <Compile Include="Models\RiakSearch\And.cs" />
     <Compile Include="Models\RiakSearch\Or.cs" />
+    <Compile Include="Models\RiakSearch\Group.cs" />
+    <Compile Include="Models\Solr\SolrQuery.cs" />
+    <Compile Include="Models\Solr\ISolrQueryPart.cs" />
+    <Compile Include="Models\Solr\SolrToken.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Metadata\CorrugatedIron.snk">
@@ -254,5 +258,6 @@
   -->
   <ItemGroup>
     <Folder Include="Models\RiakSearch\" />
+    <Folder Include="Models\Solr\" />
   </ItemGroup>
 </Project>

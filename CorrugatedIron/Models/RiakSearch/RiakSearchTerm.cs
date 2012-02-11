@@ -27,12 +27,7 @@ namespace CorrugatedIron.Models.RiakSearch
         public int? Proximity { get; set; }
         public int? Boost { get; set; }
         public bool Prohibited { get; set; }
-        
-        public override string ToString()
-        {
-            return ToRiakSearchString();
-        }
-        
+              
         public string ToRiakSearchString ()
         {
             var sb = new StringBuilder();
@@ -46,7 +41,7 @@ namespace CorrugatedIron.Models.RiakSearch
                 sb.Append(":");
             }
             
-            sb.Append(EscapeTerm());
+            sb.Append(Term.ToString());
             
             if (Proximity.HasValue) {
                 sb.Append(string.Format("~{0}", Proximity.Value));
@@ -59,8 +54,8 @@ namespace CorrugatedIron.Models.RiakSearch
             return sb.ToString();
         }
         
-        private string EscapeTerm() {
-            string pattern = @"[+-/[](): ]";
+        public override string ToString() {
+            string pattern = @"[+-/\[\]\(\): ]";
             string replacement = @"\$1";
             
             var regex = new Regex(pattern);
