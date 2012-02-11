@@ -26,7 +26,7 @@ namespace CorrugatedIron.Tests.Models
     public class SolrTests
     {
         [Test]
-        public void SolrTermCorrectlyEscapesSpecialCharacters() 
+        public void SolrTermCorrectlyEscapesOneSpecialCharacter() 
         {
             var token = new SolrToken();
             token.Term = "2+2";
@@ -35,6 +35,18 @@ namespace CorrugatedIron.Tests.Models
             
             escapedString.Contains(@"\").ShouldBeTrue();
             escapedString.Equals(@"2\+2").ShouldBeTrue();
+        }
+        
+        [Test]
+        public void SolrTermCorrectlyEscapesMultipleSpecialCharacters()
+        {
+            var token = new SolrToken();
+            token.Term = "2+2-2";
+            
+            string escapedString = token.ToString();
+            
+            escapedString.Contains(@"\").ShouldBeTrue();
+            escapedString.Equals(@"2\+2\-2").ShouldBeTrue();
         }
     }
 }
