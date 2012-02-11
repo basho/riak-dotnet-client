@@ -29,7 +29,9 @@ namespace CorrugatedIron.Tests.Models
         public void SolrTermCorrectlyEscapesOneSpecialCharacter() 
         {
             var token = new SolrToken();
-            token.Term = "2+2";
+            var spt = new SolrPhraseToken();
+            spt.Term = "2+2";
+            token.Term = spt;
             
             string escapedString = token.ToString();
             
@@ -41,7 +43,9 @@ namespace CorrugatedIron.Tests.Models
         public void SolrTermCorrectlyEscapesMultipleSpecialCharacters()
         {
             var token = new SolrToken();
-            token.Term = "2+2-2";
+            var spt = new SolrPhraseToken();
+            spt.Term = "2+2-2";
+            token.Term = spt;
             
             string escapedString = token.ToString();
             
@@ -54,7 +58,9 @@ namespace CorrugatedIron.Tests.Models
         {
             var token = new SolrToken();
             token.Field = "eyes";
-            token.Term = "blue";
+            var spt = new SolrPhraseToken();
+            spt.Term = "blue";
+            token.Term = spt;
             
             string result = token.ToString();
             
@@ -68,7 +74,11 @@ namespace CorrugatedIron.Tests.Models
         {
             var token = new SolrToken();
             token.Field = "artist";
-            token.Term = "The Rolling Stones";
+            
+            var spt = new SolrPhraseToken();
+            spt.Term = "The Rolling Stones";
+            
+            token.Term = spt;
             
             string result = token.ToString();
             
@@ -79,8 +89,12 @@ namespace CorrugatedIron.Tests.Models
         public void RequiredTermsShouldBePrefixedWithAPlusSign()
         {
             var token = new SolrToken();
-            token.Term = "riak";
             token.Required = true;
+            
+            var spt = new SolrPhraseToken();
+            spt.Term = "riak";
+            
+            token.Term = spt;
             
             string result = token.ToString();
             
@@ -89,11 +103,15 @@ namespace CorrugatedIron.Tests.Models
         }
         
         [Test]
-        public void BoostedTermsContainACaret()
+        public void BoostedTermsShouldContainACaret()
         {
             var token = new SolrToken();
-            token.Term = "Erlang";
             token.Boost = 10;
+            
+            var spt = new SolrPhraseToken();
+            spt.Term = "Erlang";
+            
+            token.Term = spt;
             
             string result = token.ToString();
             
@@ -102,17 +120,56 @@ namespace CorrugatedIron.Tests.Models
         }
     
         [Test]
-        public void BoostedPhrasesContainACaretOutsideOfQuotedString()
+        public void BoostedPhrasesShouldContainACaretOutsideOfQuotedString()
         {
             var token = new SolrToken();
             token.Field = "artist";
-            token.Term = "The Rolling Stones";
             token.Boost = 10;
+            
+            var spt = new SolrPhraseToken();
+            spt.Term = "The Rolling Stones";
+            
+            token.Term = spt;
             
             string result = token.ToString();
             
             result.Contains("^").ShouldBeTrue();
-            result.Equals(@"artist:""The Rolling Stones""^10").ShouldBeTrue();
+            result.ShouldEqual(@"artist:""The Rolling Stones""^10");
+        }
+    }
+    
+    [TestFixture()]
+    public class SolrRangeTokenTests
+    {
+        [Test]
+        public void InclusiveTermShouldBeFormattedCorrecly()
+        {
+            var token = new SolrToken();
+            var srt = new SolrRangeToken();
+            srt.From = "20020101";
+            srt.To = "20030101";
+            srt.Inclusive = true;
+            
+            token.Field = "mod_date";
+            token.Term = srt;
+            
+            token.Term.ToSolrTerm().ShouldEqual("[20020101 TO 20030101]");
+        }
+        
+        [Test]
+        public void ExclusiveTermShouldBeFormattedCorrecly()
+        {
+            var token = new SolrToken();
+            
+            var srt = new SolrRangeToken();
+            srt.From = "Aida";
+            srt.To = "Carmen";
+            srt.Inclusive = false;
+            
+            token.Field = "title";
+            token.Term = srt;
+            
+            token.Term.ToSolrTerm().ShouldEqual("{Aida TO Carmen}");
         }
     }
 }

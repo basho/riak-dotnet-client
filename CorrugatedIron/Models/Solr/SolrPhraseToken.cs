@@ -16,27 +16,17 @@
 
 using System;
 using CorrugatedIron.Extensions;
+using CorrugatedIron.Models.Solr;
 
 namespace CorrugatedIron.Models.Solr
 {
-    public class SolrRangeToken : ISolrTerm
+    public class SolrPhraseToken : ISolrTerm
     {
-        public string From { get; set; }
-        public string To { get; set; }
-        public bool Inclusive { get; set; }
-        
-        private string Open = "[";
-        private string Close = "]";
-        
+        public string Term { get; set; }
         
         public string ToSolrTerm()
         {
-            if (!Inclusive) {
-                Open = "{";
-                Close = "}";
-            }
-            
-            return String.Format("{0}{1} TO {2}{3}", Open, From.ToSolrTerm(), To.ToSolrTerm(), Close);
+            return Term.ToSolrTerm();
         }
     }
 }
