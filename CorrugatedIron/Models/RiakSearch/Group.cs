@@ -13,33 +13,42 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
 using System;
-using CorrugatedIron.Models.RiakSearch;
+using System.Collections.Generic;
+using System.Text;
 
 namespace CorrugatedIron.Models.RiakSearch
 {
-    public class And : IRiakSearchTerm
+    public class Group : IRiakSearchTerm
     {
-        private readonly Tuple<string, IRiakSearchTerm, IRiakSearchTerm> _booleanDefition;
-        
-        public And (IRiakSearchTerm left, IRiakSearchTerm right)
+        private List<IRiakSearchTerm> _groupItems;
+            
+        public Group ()
         {
-            _booleanDefition = Tuple.Create("AND", left, right);
+            _groupItems = new List<IRiakSearchTerm>();
         }
         
-        public string Name { get { return _booleanDefition.Item1; } }
-        public IRiakSearchTerm Left { get { return _booleanDefition.Item2; } } 
-        public IRiakSearchTerm Right { get { return _booleanDefition.Item3; } }
+        public Group(List<IRiakSearchTerm> groupItems)
+        {
+            _groupItems = groupItems;
+        }
         
         public override string ToString()
         {
             return ToRiakSearchString();
         }
-        
+
         public string ToRiakSearchString()
         {
-            return String.Format("{0} {1} {2}", Left.ToString(), Name, Right.ToString());
+            var sb = new StringBuilder();
+            
+            sb.Append("(");
+            
+            _groupItems.ForEach(gi => sb.Append(gi.ToString()));
+            
+            sb.Append(")");
+            
+            return sb.ToString();
         }
     }
 }

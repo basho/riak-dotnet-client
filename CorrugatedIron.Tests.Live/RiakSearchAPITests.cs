@@ -29,9 +29,35 @@ namespace CorrugatedIron.Tests.Live
     [TestFixture()]
     public class RiakSearchAPITests
     {
+        // N.B. You need to install the search hooks on the riak_search_bucket first via `bin/search-cmd install riak_search_bucket`
+        private const string RiakSearchKey = "a.hacker";
+        private const string RiakSearchKey2 = "a.public";
+        private const string RiakSearchDoc = "{\"name\":\"Alyssa P. Hacker\", \"bio\":\"I'm an engineer, making awesome things.\", \"favorites\":{\"book\":\"The Moon is a Harsh Mistress\",\"album\":\"Magical Mystery Tour\", }}";
+        private const string RiakSearchDoc2 = "{\"name\":\"Alan Q. Public\", \"bio\":\"I'm an exciting mathematician\", \"favorites\":{\"book\":\"Prelude to Mathematics\",\"album\":\"The Fame Monster\"}}";
+
         public RiakSearchAPITests ()
         {
+            Bucket = "riak_search_bucket";
         }
+        
+        [SetUp]
+        public void SetUp() 
+        {
+            Cluster = new RiakCluster(ClusterConfig, new RiakConnectionFactory());
+            Client = Cluster.CreateClient();
+            
+            var props = Client.GetBucketProperties(Bucket, true).Value;
+            props.SetSearch(true);
+            Client.SetBucketProperties(Bucket, props);
+        }
+        
+        [TearDown]
+        public void TearDown()
+        {
+            Client.DeleteBucket(Bucket);
+        }
+        
+        
     }
 }
 
