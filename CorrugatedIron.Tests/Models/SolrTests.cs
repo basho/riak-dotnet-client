@@ -23,7 +23,7 @@ using NUnit.Framework;
 namespace CorrugatedIron.Tests.Models
 {
     [TestFixture()]
-    public class SolrTests
+    public class BasicSolrTokenTests
     {
         [Test]
         public void SolrTermCorrectlyEscapesOneSpecialCharacter() 
@@ -47,6 +47,72 @@ namespace CorrugatedIron.Tests.Models
             
             escapedString.Contains(@"\").ShouldBeTrue();
             escapedString.Equals(@"2\+2\-2").ShouldBeTrue();
+        }
+        
+        [Test]
+        public void SolrTermIncludesFieldName()
+        {
+            var token = new SolrToken();
+            token.Field = "eyes";
+            token.Term = "blue";
+            
+            string result = token.ToString();
+            
+            result.Contains("eyes").ShouldBeTrue();
+            result.Contains("blue").ShouldBeTrue();
+            result.Equals("eyes:blue").ShouldBeTrue();
+        }
+        
+        [Test]
+        public void SolrTermWithSpacesShouldBeQuoted()
+        {
+            var token = new SolrToken();
+            token.Field = "artist";
+            token.Term = "The Rolling Stones";
+            
+            string result = token.ToString();
+            
+            result.Equals(@"artist:""The Rolling Stones""").ShouldBeTrue();
+        }
+        
+        [Test]
+        public void RequiredTermsShouldBePrefixedWithAPlusSign()
+        {
+            var token = new SolrToken();
+            token.Term = "riak";
+            token.Required = true;
+            
+            string result = token.ToString();
+            
+            result.Contains("+").ShouldBeTrue();
+            result.Equals("+riak").ShouldBeTrue();
+        }
+        
+        [Test]
+        public void BoostedTermsContainACaret()
+        {
+            var token = new SolrToken();
+            token.Term = "Erlang";
+            token.Boost = 10;
+            
+            string result = token.ToString();
+            
+            result.Contains("^").ShouldBeTrue();
+            result.Equals("Erlang^10").ShouldBeTrue();
+        }
+    
+        [Test]
+        public void BoostedPhrasesContainACaretOutsideOfQuotedString()
+        {
+            var token = new SolrToken();
+            token.Field = "artist";
+            token.Term = "The Rolling Stones";
+            token.Boost = 10;
+            
+            string result = token.ToString();
+            
+            result.Contains("^").ShouldBeTrue();
+            result.Equals(@"artist:""The Rolling Stones""^10").ShouldBeTrue();
         }
     }
 }
