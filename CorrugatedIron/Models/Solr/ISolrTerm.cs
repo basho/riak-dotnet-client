@@ -13,31 +13,13 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
 using System;
-using CorrugatedIron.Extensions;
 
 namespace CorrugatedIron.Models.Solr
 {
-    public class SolrRangeToken : ISolrTerm
+    public interface ISolrTerm
     {
-        public string From { get; set; }
-        public string To { get; set; }
-        public bool Inclusive { get; set; }
-        
-        private string Open = "[";
-        private string Close = "]";
-        
-        
-        public string ToSolrTerm()
-        {
-            if (!Inclusive) {
-                Open = "{";
-                Close = "}";
-            }
-            
-            return String.Format("{0}{1} TO {2}{3}", Open, From.ToSolrTerm(), To.ToSolrTerm(), Close);
-        }
+        string ToSolrTerm();
     }
 }
 

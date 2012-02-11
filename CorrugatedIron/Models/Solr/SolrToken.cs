@@ -17,13 +17,15 @@
 using System;
 using System.Text;
 using System.Text.RegularExpressions;
+using CorrugatedIron.Extensions;
+using CorrugatedIron.Models.Solr;
 
 namespace CorrugatedIron.Models.Solr
 {
     public class SolrToken : ISolrQueryPart
     {
         public string Field { get; set; }
-        public string Term { get; set; }
+        public ISolrTerm Term { get; set; }
         public int? Proximity { get; set; } 
         public decimal? Boost { get; set; }
         public bool Required { get; set; }
@@ -56,7 +58,7 @@ namespace CorrugatedIron.Models.Solr
                 sb.Append("-");
             }
             
-            sb.Append(EscapeTerm(Term));
+            sb.Append(Term.ToSolrTerm());
             
             if (Proximity.HasValue) {
                 sb.Append(String.Format("~{0}", Proximity));
@@ -67,23 +69,6 @@ namespace CorrugatedIron.Models.Solr
             }
             
             return sb.ToString();
-        }
-        
-        protected string EscapeTerm(string term) {
-            // + - && || ! ( ) { } [ ] ^ " ~ * ? : \
-            string pattern = @"[\+\-!\(\)\{\}\[\]^\""~\*\?\:\\]{1}";
-            
-            string replacement = @"\$&";
-            
-            var regex = new Regex(pattern);
-            var result = regex.Replace(Term, replacement);
-            
-            // If we have a phrase, then we want to put double quotes around the Term
-            if (Term.IndexOf(" ") > -1) {
-                result = String.Format("\"{0}\"", result);
-            }
-            
-            return result;
         }
     }
 }
