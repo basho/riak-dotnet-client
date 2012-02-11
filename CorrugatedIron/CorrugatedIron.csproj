@@ -242,6 +242,7 @@
     <Compile Include="Models\Solr\SolrQuery.cs" />
     <Compile Include="Models\Solr\ISolrQueryPart.cs" />
     <Compile Include="Models\Solr\SolrToken.cs" />
+    <Compile Include="Models\Solr\SolrRangeToken.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Metadata\CorrugatedIron.snk">

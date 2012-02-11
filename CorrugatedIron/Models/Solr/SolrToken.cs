@@ -56,8 +56,6 @@ namespace CorrugatedIron.Models.Solr
                 sb.Append("-");
             }
             
-            
-            
             sb.Append(EscapeTerm(Term));
             
             if (Proximity.HasValue) {
@@ -71,7 +69,7 @@ namespace CorrugatedIron.Models.Solr
             return sb.ToString();
         }
         
-        private string EscapeTerm(string term) {
+        protected string EscapeTerm(string term) {
             // + - && || ! ( ) { } [ ] ^ " ~ * ? : \
             string pattern = @"[\+\-!\(\)\{\}\[\]^\""~\*\?\:\\]{1}";
             
