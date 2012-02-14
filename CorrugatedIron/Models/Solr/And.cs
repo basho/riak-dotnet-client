@@ -15,29 +15,30 @@
 // under the License.
 
 using System;
-using CorrugatedIron.Extensions;
 
 namespace CorrugatedIron.Models.Solr
 {
-    public class SolrPhraseToken : ISolrQueryPart, ISolrTerm
+    public class And : ISolrQueryPart
     {
-        public string Term { get; set; }
+        private readonly Tuple<string, ISolrQueryPart, ISolrQueryPart> _booleanDefition;
         
-        public SolrPhraseToken() {}
-        
-        public SolrPhraseToken(string term)
+        public And (ISolrQueryPart left, ISolrQueryPart right)
         {
-            Term = term;
+            _booleanDefition = Tuple.Create("AND", left, right);
         }
         
-        public override string ToString()
+        public string Name { get { return _booleanDefition.Item1; } }
+        public ISolrQueryPart Left { get { return _booleanDefition.Item2; } } 
+        public ISolrQueryPart Right { get { return _booleanDefition.Item3; } }
+        
+        public override string ToString() 
         {
             return ToSolrTerm();
-        }
+        }   
         
         public string ToSolrTerm()
         {
-            return Term.ToSolrTerm();
+            return String.Format("{0} {1} {2}", Left.ToString(), Name, Right.ToString());
         }
     }
 }

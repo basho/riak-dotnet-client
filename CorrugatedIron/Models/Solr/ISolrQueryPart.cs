@@ -20,7 +20,7 @@ namespace CorrugatedIron.Models.Solr
 {
     public interface ISolrQueryPart
     {
-        string ToSolrQueryString();
+        string ToSolrTerm();
     }
 }
 

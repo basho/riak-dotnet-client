@@ -154,6 +154,7 @@ namespace CorrugatedIron.Tests.Models
             token.Term = srt;
             
             token.Term.ToSolrTerm().ShouldEqual("[20020101 TO 20030101]");
+            token.ToString().ShouldEqual("mod_date:[20020101 TO 20030101]");
         }
         
         [Test]
@@ -170,6 +171,65 @@ namespace CorrugatedIron.Tests.Models
             token.Term = srt;
             
             token.Term.ToSolrTerm().ShouldEqual("{Aida TO Carmen}");
+            token.ToString().ShouldEqual("title:{Aida TO Carmen}");
+        }
+    }
+    
+    [TestFixture()]
+    public class BooleanSolrTokenTests
+    {
+        [Test]
+        public void AndTokensAreFormattedCorrectly()
+        {
+            var first = new SolrToken();
+            first.Term = new SolrPhraseToken("coffee");
+            
+            var second = new SolrToken();
+            second.Term = new SolrPhraseToken("tea");
+            
+            var and = new And(first, second);
+            
+            string result = and.ToString();
+            
+            result.Contains("AND").ShouldBeTrue();
+            result.ShouldEqual("coffee AND tea");
+        }
+        
+        [Test]
+        public void OrTokensAreFormattedCorrectly()
+        {
+            var first = new SolrToken();
+            first.Term = new SolrPhraseToken("coffee");
+            
+            var second = new SolrToken();
+            second.Term = new SolrPhraseToken("tea");
+            
+            var or = new Or(first, second);
+            
+            string result = or.ToString();
+            
+            result.Contains("OR").ShouldBeTrue();
+            result.ShouldEqual("coffee OR tea");
+        }
+        
+        [Test]
+        public void GroupTokensAreFormattedCorrectly()
+        {
+            var first = new SolrToken();
+            first.Term = new SolrPhraseToken("coffee");
+            
+            var second = new SolrToken();
+            second.Term = new SolrPhraseToken("tea");
+            
+            var or = new Or(first, second);
+            
+            var g = new Group();
+            g.AddItem(or);
+            
+            string result = g.ToString();
+            
+            result.Contains("OR").ShouldBeTrue();
+            result.ShouldEqual("(coffee OR tea)");
         }
     }
 }

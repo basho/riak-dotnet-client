@@ -19,7 +19,7 @@ using CorrugatedIron.Extensions;
 
 namespace CorrugatedIron.Models.Solr
 {
-    public class SolrRangeToken : ISolrTerm
+    public class SolrRangeToken : ISolrQueryPart, ISolrTerm
     {
         public string From { get; set; }
         public string To { get; set; }

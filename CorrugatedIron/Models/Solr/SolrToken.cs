@@ -18,7 +18,6 @@ using System;
 using System.Text;
 using System.Text.RegularExpressions;
 using CorrugatedIron.Extensions;
-using CorrugatedIron.Models.Solr;
 
 namespace CorrugatedIron.Models.Solr
 {
@@ -27,6 +26,7 @@ namespace CorrugatedIron.Models.Solr
         public string Field { get; set; }
         public ISolrTerm Term { get; set; }
         public int? Proximity { get; set; } 
+        // TODO: Boost must be positive
         public decimal? Boost { get; set; }
         public bool Required { get; set; }
         public bool Prohibit { get; set; }
@@ -38,10 +38,10 @@ namespace CorrugatedIron.Models.Solr
         }
         
         public override string ToString() {
-            return ToSolrQueryString();
+            return ToSolrTerm();
         }
 
-        public string ToSolrQueryString()
+        public string ToSolrTerm()
         {
             var sb = new StringBuilder();
             
