@@ -31,7 +31,8 @@ namespace CorrugatedIron.Models.Solr
         
         public string ToSolrTerm()
         {
-            if (!Inclusive) {
+            if (!Inclusive) 
+            {
                 Open = "{";
                 Close = "}";
             }
