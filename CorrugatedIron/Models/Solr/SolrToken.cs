@@ -45,17 +45,17 @@ namespace CorrugatedIron.Models.Solr
         {
             var sb = new StringBuilder();
             
-            if (!String.IsNullOrEmpty(Field)) {
-                sb.Append(Field);
-                sb.Append(":");
-            }
-            
             if (Required) {
                 sb.Append("+");
             }
             
             if (Prohibit) {
                 sb.Append("-");
+            }
+            
+            if (!String.IsNullOrEmpty(Field)) {
+                sb.Append(Field);
+                sb.Append(":");
             }
             
             sb.Append(Term.ToSolrTerm());
