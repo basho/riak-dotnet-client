@@ -230,15 +230,6 @@
     <Compile Include="Models\MapReduce\Inputs\RiakIntIndexRangeInput.cs" />
     <Compile Include="Models\MapReduce\Inputs\RiakBinIndexEqualityInput.cs" />
     <Compile Include="Models\MapReduce\Inputs\RiakBinIndexRangeInput.cs" />
-    <Compile Include="Models\RiakSearch\RiakSearchTerm.cs" />
-    <Compile Include="Models\RiakSearch\IRiakSearchQueryTerm.cs" />
-    <Compile Include="Models\RiakSearch\RiakPhraseSearchTerm.cs" />
-    <Compile Include="Models\RiakSearch\RiakRangeSearchTerm.cs" />
-    <Compile Include="Models\RiakSearch\RiakSearchQuery.cs" />
-    <Compile Include="Models\RiakSearch\IRiakSearchTerm.cs" />
-    <Compile Include="Models\RiakSearch\And.cs" />
-    <Compile Include="Models\RiakSearch\Or.cs" />
-    <Compile Include="Models\RiakSearch\Group.cs" />
     <Compile Include="Models\Solr\SolrQuery.cs" />
     <Compile Include="Models\Solr\ISolrQueryPart.cs" />
     <Compile Include="Models\Solr\SolrToken.cs" />
@@ -263,7 +254,6 @@
   </Target>
   -->
   <ItemGroup>
-    <Folder Include="Models\RiakSearch\" />
     <Folder Include="Models\Solr\" />
   </ItemGroup>
 </Project>
