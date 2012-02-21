@@ -31,6 +31,7 @@ namespace CorrugatedIron.Models.Solr
         /// </summary>
         public string Query { get; set; }
         public string Fieldname { get; set; }
+        public ISolrQueryPart Token { get; set; }
         // TODO restrict operation to "and" or "or"
         public string Operation { get; set; }
         public int? StartOffset { get; set; }
