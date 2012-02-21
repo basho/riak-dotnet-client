@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -10,7 +10,6 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CorrugatedIron</RootNamespace>
     <AssemblyName>CorrugatedIron</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -48,11 +47,10 @@
     <Reference Include="protobuf-net, Version=1.0.0.280, Culture=neutral, PublicKeyToken=257b51d87d2e4d67">
       <HintPath>..\lib\protobuf-net.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=4.0.2.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="System.Configuration" />
+    <Reference Include="Newtonsoft.Json">
       <HintPath>..\lib\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="System.Configuration" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\Metadata\VersionInfo.cs">
@@ -232,6 +230,15 @@
     <Compile Include="Models\MapReduce\Inputs\RiakIntIndexRangeInput.cs" />
     <Compile Include="Models\MapReduce\Inputs\RiakBinIndexEqualityInput.cs" />
     <Compile Include="Models\MapReduce\Inputs\RiakBinIndexRangeInput.cs" />
+    <Compile Include="Models\Solr\SolrQuery.cs" />
+    <Compile Include="Models\Solr\ISolrQueryPart.cs" />
+    <Compile Include="Models\Solr\SolrToken.cs" />
+    <Compile Include="Models\Solr\SolrRangeToken.cs" />
+    <Compile Include="Models\Solr\ISolrTerm.cs" />
+    <Compile Include="Models\Solr\SolrPhraseToken.cs" />
+    <Compile Include="Models\Solr\And.cs" />
+    <Compile Include="Models\Solr\Or.cs" />
+    <Compile Include="Models\Solr\Group.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Metadata\CorrugatedIron.snk">
@@ -246,4 +253,7 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <ItemGroup>
+    <Folder Include="Models\Solr\" />
+  </ItemGroup>
 </Project>
