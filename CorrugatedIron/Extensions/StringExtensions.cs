@@ -15,6 +15,7 @@
 // under the License.
 
 using System.Web;
+using System.Text.RegularExpressions;
 using CorrugatedIron.Util;
 
 namespace CorrugatedIron.Extensions
@@ -61,6 +62,23 @@ namespace CorrugatedIron.Extensions
         public static string ToBinaryKey(this string value)
         {
             return value.IsBinaryKey() ? value : value + RiakConstants.IndexSuffix.Binary;
+        }
+        
+        public static string ToSolrTerm(this string value) {
+            // + - && || ! ( ) { } [ ] ^ " ~ * ? : \
+            string pattern = @"[\+\-!\(\)\{\}\[\]^\""~\*\?\:\\]{1}";
+            
+            string replacement = @"\$&";
+            
+            var regex = new Regex(pattern);
+            var result = regex.Replace(value, replacement);
+            
+            // If we have a phrase, then we want to put double quotes around the Term
+            if (value.IndexOf(" ") > -1) {
+                result = string.Format("\"{0}\"", result);
+            }
+            
+            return result;
         }
     }
 }
