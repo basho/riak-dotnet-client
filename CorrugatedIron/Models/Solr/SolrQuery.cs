@@ -58,35 +58,43 @@ namespace CorrugatedIron.Models.Solr
             
             var searchTerms = new List<string>();
             
-            if (!String.IsNullOrEmpty(Query)) {
+            if (!String.IsNullOrEmpty(Query)) 
+            {
                 searchTerms.Add(string.Format("q={0}", Query));
             }
             
-            if (!String.IsNullOrEmpty(Fieldname)) {
+            if (!String.IsNullOrEmpty(Fieldname)) 
+            {
                 searchTerms.Add(string.Format("df={0}", Fieldname));
             }
             
-            if (!String.IsNullOrEmpty(Operation)) {
+            if (!String.IsNullOrEmpty(Operation)) 
+            {
                 searchTerms.Add(string.Format("q.op={0}", Operation));
             }
             
-            if (StartOffset.HasValue) {
+            if (StartOffset.HasValue) 
+            {
                 searchTerms.Add(string.Format("start={0}", StartOffset.Value));
             }
             
-            if (Rows.HasValue) {
+            if (Rows.HasValue) 
+            {
                 searchTerms.Add(string.Format("rows={0}", Rows.Value));
             }
             
-            if (!String.IsNullOrEmpty(SortField)) {
+            if (!String.IsNullOrEmpty(SortField)) 
+            {
                 searchTerms.Add(string.Format("sort={0}", SortField));
             }
             
-            if (!String.IsNullOrEmpty(OutputFormat)) {
+            if (!String.IsNullOrEmpty(OutputFormat)) 
+            {
                 searchTerms.Add(string.Format("wt={0}", OutputFormat));
             }
             
-            if (!String.IsNullOrEmpty(FilterQuery)) {
+            if (!String.IsNullOrEmpty(FilterQuery)) 
+            {
                 searchTerms.Add(string.Format("filter={0}", FilterQuery));
             }
             
