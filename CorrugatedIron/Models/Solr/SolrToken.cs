@@ -37,7 +37,8 @@ namespace CorrugatedIron.Models.Solr
             Prohibit = false;
         }
         
-        public override string ToString() {
+        public override string ToString() 
+        {
             return ToSolrTerm();
         }
 
@@ -45,26 +46,31 @@ namespace CorrugatedIron.Models.Solr
         {
             var sb = new StringBuilder();
             
-            if (Required) {
+            if (Required) 
+            {
                 sb.Append("+");
             }
             
-            if (Prohibit) {
+            if (Prohibit) 
+            {
                 sb.Append("-");
             }
             
-            if (!String.IsNullOrEmpty(Field)) {
+            if (!String.IsNullOrEmpty(Field)) 
+            {
                 sb.Append(Field);
                 sb.Append(":");
             }
             
             sb.Append(Term.ToSolrTerm());
             
-            if (Proximity.HasValue) {
+            if (Proximity.HasValue) 
+            {
                 sb.Append(String.Format("~{0}", Proximity));
             }
             
-            if (Boost.HasValue) {
+            if (Boost.HasValue) 
+            {
                 sb.Append(String.Format("^{0}", Boost));
             }
             
