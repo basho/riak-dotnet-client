@@ -14,23 +14,20 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Extensions;
-using CorrugatedIron.Models.Solr;
+using CorrugatedIron.Models.RiakSearch;
 using CorrugatedIron.Tests.Extensions;
-using CorrugatedIron.Util;
 using NUnit.Framework;
 
 namespace CorrugatedIron.Tests.Models
 {
-    [TestFixture()]
+    [TestFixture]
     public class BasicSolrTokenTests
     {
         [Test]
         public void SolrTermCorrectlyEscapesOneSpecialCharacter() 
         {
-            var token = new SolrToken();
-            var spt = new SolrPhraseToken();
-            spt.Term = "2+2";
+            var token = new RiakSearchToken();
+            var spt = new RiakSearchPhraseToken {Term = "2+2"};
             token.Term = spt;
             
             string escapedString = token.ToString();
@@ -42,9 +39,8 @@ namespace CorrugatedIron.Tests.Models
         [Test]
         public void SolrTermCorrectlyEscapesMultipleSpecialCharacters()
         {
-            var token = new SolrToken();
-            var spt = new SolrPhraseToken();
-            spt.Term = "2+2-2";
+            var token = new RiakSearchToken();
+            var spt = new RiakSearchPhraseToken {Term = "2+2-2"};
             token.Term = spt;
             
             string escapedString = token.ToString();
@@ -56,10 +52,8 @@ namespace CorrugatedIron.Tests.Models
         [Test]
         public void SolrTermIncludesFieldName()
         {
-            var token = new SolrToken();
-            token.Field = "eyes";
-            var spt = new SolrPhraseToken();
-            spt.Term = "blue";
+            var token = new RiakSearchToken {Field = "eyes"};
+            var spt = new RiakSearchPhraseToken {Term = "blue"};
             token.Term = spt;
             
             string result = token.ToString();
@@ -72,12 +66,10 @@ namespace CorrugatedIron.Tests.Models
         [Test]
         public void SolrTermWithSpacesShouldBeQuoted()
         {
-            var token = new SolrToken();
-            token.Field = "artist";
-            
-            var spt = new SolrPhraseToken();
-            spt.Term = "The Rolling Stones";
-            
+            var token = new RiakSearchToken {Field = "artist"};
+
+            var spt = new RiakSearchPhraseToken {Term = "The Rolling Stones"};
+
             token.Term = spt;
             
             string result = token.ToString();
@@ -88,12 +80,10 @@ namespace CorrugatedIron.Tests.Models
         [Test]
         public void RequiredTermsShouldBePrefixedWithAPlusSign()
         {
-            var token = new SolrToken();
-            token.Required = true;
-            
-            var spt = new SolrPhraseToken();
-            spt.Term = "riak";
-            
+            var token = new RiakSearchToken {Required = true};
+
+            var spt = new RiakSearchPhraseToken {Term = "riak"};
+
             token.Term = spt;
             
             string result = token.ToString();
@@ -105,12 +95,9 @@ namespace CorrugatedIron.Tests.Models
         [Test]
         public void BoostedTermsShouldContainACaret()
         {
-            var token = new SolrToken();
-            token.Boost = 10;
-            
-            var spt = new SolrPhraseToken();
-            spt.Term = "Erlang";
-            
+            var token = new RiakSearchToken {Boost = 10};
+            var spt = new RiakSearchPhraseToken {Term = "Erlang"};
+
             token.Term = spt;
             
             string result = token.ToString();
@@ -122,13 +109,9 @@ namespace CorrugatedIron.Tests.Models
         [Test]
         public void BoostedPhrasesShouldContainACaretOutsideOfQuotedString()
         {
-            var token = new SolrToken();
-            token.Field = "artist";
-            token.Boost = 10;
-            
-            var spt = new SolrPhraseToken();
-            spt.Term = "The Rolling Stones";
-            
+            var token = new RiakSearchToken {Field = "artist", Boost = 10};
+            var spt = new RiakSearchPhraseToken {Term = "The Rolling Stones"};
+
             token.Term = spt;
             
             string result = token.ToString();
@@ -138,58 +121,46 @@ namespace CorrugatedIron.Tests.Models
         }
     }
     
-    [TestFixture()]
+    [TestFixture]
     public class SolrRangeTokenTests
     {
         [Test]
         public void InclusiveTermShouldBeFormattedCorrecly()
         {
-            var token = new SolrToken();
-            var srt = new SolrRangeToken();
-            srt.From = "20020101";
-            srt.To = "20030101";
-            srt.Inclusive = true;
-            
+            var token = new RiakSearchToken();
+            var srt = new RiakSearchRangeToken {From = "20020101", To = "20030101", Inclusive = true};
+
             token.Field = "mod_date";
             token.Term = srt;
             
-            token.Term.ToSolrTerm().ShouldEqual("[20020101 TO 20030101]");
+            token.Term.ToSearchTerm().ShouldEqual("[20020101 TO 20030101]");
             token.ToString().ShouldEqual("mod_date:[20020101 TO 20030101]");
         }
         
         [Test]
         public void ExclusiveTermShouldBeFormattedCorrecly()
         {
-            var token = new SolrToken();
-            
-            var srt = new SolrRangeToken();
-            srt.From = "Aida";
-            srt.To = "Carmen";
-            srt.Inclusive = false;
-            
-            token.Field = "title";
+            var token = new RiakSearchToken {Field = "title"};
+            var srt = new RiakSearchRangeToken {From = "Aida", To = "Carmen", Inclusive = false};
+
             token.Term = srt;
             
-            token.Term.ToSolrTerm().ShouldEqual("{Aida TO Carmen}");
+            token.Term.ToSearchTerm().ShouldEqual("{Aida TO Carmen}");
             token.ToString().ShouldEqual("title:{Aida TO Carmen}");
         }
     }
     
-    [TestFixture()]
+    [TestFixture]
     public class BooleanSolrTokenTests
     {
         [Test]
         public void AndTokensAreFormattedCorrectly()
         {
-            var first = new SolrToken();
-            first.Term = new SolrPhraseToken("coffee");
-            
-            var second = new SolrToken();
-            second.Term = new SolrPhraseToken("tea");
-            
+            var first = new RiakSearchToken {Term = new RiakSearchPhraseToken("coffee")};
+            var second = new RiakSearchToken {Term = new RiakSearchPhraseToken("tea")};
             var and = new And(first, second);
             
-            string result = and.ToString();
+            var result = and.ToString();
             
             result.Contains("AND").ShouldBeTrue();
             result.ShouldEqual("coffee AND tea");
@@ -198,15 +169,11 @@ namespace CorrugatedIron.Tests.Models
         [Test]
         public void OrTokensAreFormattedCorrectly()
         {
-            var first = new SolrToken();
-            first.Term = new SolrPhraseToken("coffee");
-            
-            var second = new SolrToken();
-            second.Term = new SolrPhraseToken("tea");
-            
+            var first = new RiakSearchToken {Term = new RiakSearchPhraseToken("coffee")};
+            var second = new RiakSearchToken {Term = new RiakSearchPhraseToken("tea")};
             var or = new Or(first, second);
             
-            string result = or.ToString();
+            var result = or.ToString();
             
             result.Contains("OR").ShouldBeTrue();
             result.ShouldEqual("coffee OR tea");
@@ -215,12 +182,8 @@ namespace CorrugatedIron.Tests.Models
         [Test]
         public void GroupTokensAreFormattedCorrectly()
         {
-            var first = new SolrToken();
-            first.Term = new SolrPhraseToken("coffee");
-            
-            var second = new SolrToken();
-            second.Term = new SolrPhraseToken("tea");
-            
+            var first = new RiakSearchToken {Term = new RiakSearchPhraseToken("coffee")};
+            var second = new RiakSearchToken {Term = new RiakSearchPhraseToken("tea")};
             var or = new Or(first, second);
             
             var g = new Group();
