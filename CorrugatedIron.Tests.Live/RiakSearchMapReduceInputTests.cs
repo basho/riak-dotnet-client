@@ -20,6 +20,7 @@ using CorrugatedIron.Util;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Models.MapReduce.Inputs;
+using CorrugatedIron.Models.RiakSearch;
 using CorrugatedIron.Tests.Extensions;
 using NUnit.Framework;
 
@@ -84,6 +85,37 @@ namespace CorrugatedIron.Tests.Live
             mrResult.PhaseResults.ElementAt(0).Values.ShouldNotBeNull();
             mrResult.PhaseResults.ElementAt(1).Values.ShouldNotBeNull();
             // TODO Add data introspection to test - need to verify the results, after all.
+        }
+
+        [Test]
+        public void SearchingByNameUsingRiakSearchObjectReturnsTheObjectid()
+        {
+            Client.Put(new RiakObject(Bucket, RiakSearchKey, RiakSearchDoc, RiakConstants.ContentTypes.ApplicationJson));
+            Client.Put(new RiakObject(Bucket, RiakSearchKey2, RiakSearchDoc2, RiakConstants.ContentTypes.ApplicationJson));
+
+            var mr = new RiakMapReduceQuery();
+
+            var rspt = new RiakSearchPhraseToken {Field = "name", Term = "Al*"};
+
+            var mfa = new RiakModuleFunctionArgInput
+                          {
+                              Module = "riak_search",
+                              Function = "mapred_search",
+                              Arg = new[] {Bucket, rspt.ToString()}
+                          };
+
+            mr.Inputs(mfa)
+                .MapJs(m => m.Source(@"function(value, keydata, arg) { return [value]; }").Keep(true))
+                .ReduceJs(r => r.Source(@"function(values, arg) { return values; }").Keep(true));
+
+            var result = Client.MapReduce(mr);
+            result.IsSuccess.ShouldBeTrue();
+
+            var mrResult = result.Value;
+            mrResult.PhaseResults.Count().ShouldEqual(2);
+
+            mrResult.PhaseResults.ElementAt(0).Values.ShouldNotBeNull();
+            mrResult.PhaseResults.ElementAt(1).Values.ShouldNotBeNull();
         }
     }
 }

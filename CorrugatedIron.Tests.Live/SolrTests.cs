@@ -16,17 +16,18 @@
 
 using System.Linq;
 using CorrugatedIron.Comms;
+using CorrugatedIron.Models.RiakSearch;
+using CorrugatedIron.Models.RiakSearch.Solr;
 using CorrugatedIron.Util;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Models.MapReduce.Inputs;
-using CorrugatedIron.Models.Solr;
 using CorrugatedIron.Tests.Extensions;
 using NUnit.Framework;
 
 namespace CorrugatedIron.Tests.Live
 {
-    [TestFixture()]
+    [TestFixture]
     public class SolrTests : RiakMapReduceTests
     {
         // N.B. You need to install the search hooks on the riak_search_bucket first via `bin/search-cmd install riak_search_bucket`
@@ -64,14 +65,10 @@ namespace CorrugatedIron.Tests.Live
             Client.Put(new RiakObject(Bucket, RiakSearchKey2, RiakSearchDoc2, RiakConstants.ContentTypes.ApplicationJson));
             
             var mr = new RiakMapReduceQuery();
-            
-            var token = new SolrPhraseToken();
-            token.Term = "Al*";
-            
-            var solr = new SolrQuery();
-            solr.Fieldname = "name";
-            solr.Query = token.ToSolrTerm();
-            
+
+            var token = new RiakSearchPhraseToken {Term = "Al*"};
+            var solr = new SolrQuery { Fieldname = "name", QueryPart = token };
+
             var modFunArg = new RiakModuleFunctionArgInput
                                 {
                                     Module = "riak_search",
