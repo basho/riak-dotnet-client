@@ -64,15 +64,24 @@ namespace CorrugatedIron.Extensions
             return value.IsBinaryKey() ? value : value + RiakConstants.IndexSuffix.Binary;
         }
         
-        public static string ToSolrTerm(this string value) {
+        public static string ToRiakSearchTerm(this string value) 
+        {
             // + - && || ! ( ) { } [ ] ^ " ~ * ? : \
-            string pattern = @"[\+\-!\(\)\{\}\[\]^\""~\*\?\:\\]{1}";
+            const string pattern = @"[\+\-!\(\)\{\}\[\]^\""~\*\?\:\\]{1}";
             
-            string replacement = @"\$&";
+            const string replacement = @"\$&";
             
             var regex = new Regex(pattern);
             var result = regex.Replace(value, replacement);
-            
+
+            // if this is a range query, we can skip the double quotes
+            var valueLength = value.Length;
+            if ((value[0] == '[' && value[valueLength - 1] == ']')
+                || (value[0] == '{' && value[valueLength - 1] == '}'))
+            {
+                return result;
+            }
+
             // If we have a phrase, then we want to put double quotes around the Term
             if (value.IndexOf(" ") > -1) {
                 result = string.Format("\"{0}\"", result);

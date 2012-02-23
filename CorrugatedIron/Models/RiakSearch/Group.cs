@@ -14,22 +14,21 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
 using System.Text;
 using System.Collections.Generic;
 
-namespace CorrugatedIron.Models.Solr
+namespace CorrugatedIron.Models.RiakSearch
 {
-    public class Group : ISolrQueryPart
+    public class Group : IRiakSearchQueryPart
     {
-        List<ISolrQueryPart> _parts;
+        List<IRiakSearchQueryPart> _parts;
         
         public Group ()
         {
-            _parts = new List<ISolrQueryPart>();
+            _parts = new List<IRiakSearchQueryPart>();
         }
         
-        public Group AddItem(ISolrQueryPart item)
+        public Group AddItem(IRiakSearchQueryPart item)
         {
             _parts.Add(item);
             return this;
@@ -37,10 +36,10 @@ namespace CorrugatedIron.Models.Solr
         
         public override string ToString()
         {
-            return ToSolrTerm();
+            return ToSearchTerm();
         }
 
-        public string ToSolrTerm()
+        public string ToSearchTerm()
         {
             var sb = new StringBuilder();
             
