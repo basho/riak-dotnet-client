@@ -71,19 +71,16 @@ namespace CorrugatedIron.Tests.Live
                 Function = "mapred_search",
                 Arg = new[] {Bucket, "name:Al*"}
             };
-            
-            mr.Inputs(modFunArg)
-                .MapJs(m => m.Source(@"function(value, keydata, arg) { return [value]; }").Keep(true))
-                .ReduceJs(r => r.Source(@"function(values, arg) { return values; }").Keep(true));
+
+            mr.Inputs(modFunArg);
             
             var result = Client.MapReduce(mr);
             result.IsSuccess.ShouldBeTrue();
             
             var mrResult = result.Value;
-            mrResult.PhaseResults.Count().ShouldEqual(2);
+            mrResult.PhaseResults.Count().ShouldEqual(1);
             
             mrResult.PhaseResults.ElementAt(0).Values.ShouldNotBeNull();
-            mrResult.PhaseResults.ElementAt(1).Values.ShouldNotBeNull();
             // TODO Add data introspection to test - need to verify the results, after all.
         }
 
@@ -104,18 +101,15 @@ namespace CorrugatedIron.Tests.Live
                               Arg = new[] {Bucket, rspt.ToString()}
                           };
 
-            mr.Inputs(mfa)
-                .MapJs(m => m.Source(@"function(value, keydata, arg) { return [value]; }").Keep(true))
-                .ReduceJs(r => r.Source(@"function(values, arg) { return values; }").Keep(true));
+            mr.Inputs(mfa);
 
             var result = Client.MapReduce(mr);
             result.IsSuccess.ShouldBeTrue();
 
             var mrResult = result.Value;
-            mrResult.PhaseResults.Count().ShouldEqual(2);
+            mrResult.PhaseResults.Count().ShouldEqual(1);
 
             mrResult.PhaseResults.ElementAt(0).Values.ShouldNotBeNull();
-            mrResult.PhaseResults.ElementAt(1).Values.ShouldNotBeNull();
         }
     }
 }
