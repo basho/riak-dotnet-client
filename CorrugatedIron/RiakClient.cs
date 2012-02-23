@@ -369,17 +369,46 @@ namespace CorrugatedIron
         /// </remarks>
         public IEnumerable<RiakResult> DeleteBucket(string bucket, uint rwVal)
         {
-            var results = UseConnection(conn =>
-            {
-                var keyResults = ListKeys(conn, bucket);
-                if(keyResults.IsSuccess)
-                {
-                    var objectIds = keyResults.Value.Select(key => new RiakObjectId(bucket, key)).ToList();
-                    return Delete(conn, objectIds, new RiakDeleteOptions { Rw = rwVal });
-                }
-                return RiakResult<IEnumerable<RiakResult>>.Error(keyResults.ResultCode, keyResults.ErrorMessage);
-            });
+            return DeleteBucket(bucket, new RiakDeleteOptions {Rw = rwVal});
+        }
 
+        /// <summary>
+        /// Deletes the contents of the specified <paramref name="bucket"/>.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="System.Collections.Generic.IEnumerable&lt;T&gt;"/> of <see cref="CorrugatedIron.RiakResult"/> listing the success of all deletes
+        /// </returns>
+        /// <param name='bucket'>
+        /// The bucket to be deleted.
+        /// </param>
+        /// <param name='deleteOptions'>
+        /// Options for Riak delete operation <see cref="CorrugatedIron.Models.RiakDeleteOptions"/>
+        /// </param>
+        /// <remarks>
+        /// <para>
+        /// A delete bucket operation actually deletes all keys in the bucket individually. 
+        /// A <see cref="CorrugatedIron.RiakClient.ListKeys"/> operation is performed to retrieve a list of keys
+        /// The keys retrieved from the <see cref="CorrugatedIron.RiakClient.ListKeys"/> are then deleted through
+        /// <see cref="CorrugatedIron.RiakClient.Delete"/>. 
+        /// </para>
+        /// <para>
+        /// Because of the <see cref="CorrugatedIron.RiakClient.ListKeys"/> operation, this may be a time consuming operation on
+        /// production systems and may cause memory problems for the client. This should be used either in testing or on small buckets with 
+        /// known amounts of data.
+        /// </para>
+        /// </remarks>
+        public IEnumerable<RiakResult> DeleteBucket(string bucket, RiakDeleteOptions deleteOptions)
+        {
+            var results = UseConnection(conn =>
+                                            {
+                                                var keyResults = ListKeys(conn, bucket);
+                                                if (keyResults.IsSuccess)
+                                                {
+                                                    var objectIds = keyResults.Value.Select(key => new RiakObjectId(bucket, key)).ToList();
+                                                    return Delete(conn, objectIds, deleteOptions);
+                                                }
+                                                return RiakResult<IEnumerable<RiakResult>>.Error(keyResults.ResultCode, keyResults.ErrorMessage);
+                                            });
             return results.Value;
         }
 
