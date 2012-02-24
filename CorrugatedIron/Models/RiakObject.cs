@@ -27,6 +27,10 @@ using Newtonsoft.Json;
 
 namespace CorrugatedIron.Models
 {
+    public delegate string SerializeObjectToString<in T>(T theObject);
+
+    public delegate byte[] SerializeObjectToByteArray<in T>(T theObject);
+
     public class RiakObject
     {
         private List<string> _vtags;
@@ -346,6 +350,41 @@ namespace CorrugatedIron.Models
                 result = (result * 397) ^ (_vtags != null ? _vtags.GetHashCode() : 0);
                 return result;
             }
+        }
+
+        public void SetObject<T>(T value, string contentType, SerializeObjectToString<T> serializeObject)
+            where T : class 
+        {
+            if (string.IsNullOrEmpty(contentType))
+            {
+                throw new ArgumentException("contentType must be a valid MIME type");
+            }
+
+            if (serializeObject == null)
+            {
+                throw new ArgumentException("serializeObject cannot be null");
+            }
+            
+            ContentType = contentType;
+
+            Value = serializeObject(value).ToRiakString();
+        }
+
+        public void SetObject<T>(T value, string contentType, SerializeObjectToByteArray<T> serializeObject)
+        {
+            if (string.IsNullOrEmpty(contentType))
+            {
+                throw new ArgumentException("contentType must be a valid MIME type");
+            }
+
+            if (serializeObject == null)
+            {
+                throw new ArgumentException("serializeObject cannot be null");
+            }
+
+            ContentType = contentType;
+
+            Value = serializeObject(value);
         }
 
         // setting content type of SetObject changes content type
