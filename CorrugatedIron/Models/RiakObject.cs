@@ -31,6 +31,8 @@ namespace CorrugatedIron.Models
 
     public delegate byte[] SerializeObjectToByteArray<in T>(T theObject);
 
+    public delegate T DeserializeObject<out T>(byte[] theObject, string contentType);
+
     public class RiakObject
     {
         private List<string> _vtags;
@@ -430,6 +432,16 @@ namespace CorrugatedIron.Models
             }
 
             throw new NotSupportedException(string.Format("Your current ContentType ({0}), is not supported.", ContentType));
+        }
+
+        public T GetObject<T>(DeserializeObject<T> deserializeObject)
+        {
+            if (deserializeObject == null)
+            {
+                throw new ArgumentException("deserializeObject must not be null");
+            }
+
+            return deserializeObject(Value, ContentType);
         }
 
         public T GetObject<T>()
