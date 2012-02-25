@@ -22,6 +22,7 @@ using CorrugatedIron.Models;
 using CorrugatedIron.Tests.Extensions;
 using CorrugatedIron.Util;
 using NUnit.Framework;
+using Newtonsoft.Json;
 
 namespace CorrugatedIron.Tests.Json.RiakObjectConversionTests
 {
@@ -70,8 +71,7 @@ namespace CorrugatedIron.Tests.Json.RiakObjectConversionTests
         }
 
         [Test]
-        [Ignore("Only run this if you're interested in some perf stats for Json conversio" +
-            "n")]
+        [Ignore("Only run this if you're interested in some perf stats for Json conversion")]
         public void JsonConversionTimerTest()
         {
             var testPerson = new Person
@@ -115,6 +115,42 @@ namespace CorrugatedIron.Tests.Json.RiakObjectConversionTests
             sw.Stop();
             Console.WriteLine("De" +
                 "serialisation took a total of {0} - {1} per iteration", sw.Elapsed, new TimeSpan(sw.ElapsedTicks / iterations));
+        }
+
+        [Test]
+        public void CustomSerializerWillSerializeJson()
+        {
+            var testPerson = new Person
+            {
+                DateOfBirth = new DateTime(1978, 12, 5, 0, 0, 0, DateTimeKind.Utc),
+                Email = "oj@buffered.io",
+                Name = new Name
+                {
+                    FirstName = "OJ",
+                    Surname = "Reeves"
+                },
+                PhoneNumbers = new List<PhoneNumber>
+                {
+                    new PhoneNumber
+                    {
+                        Number = "12345678",
+                        NumberType = PhoneNumberType.Home
+                    }
+                }
+            };
+
+            var sots = new SerializeObjectToString<Person>(JsonConvert.SerializeObject);
+
+            var obj = new RiakObject("bucket", "key");
+            obj.SetObject(testPerson, RiakConstants.ContentTypes.ApplicationJson, sots);
+            obj.Value.ShouldNotBeNull();
+            obj.ContentType.ShouldEqual(RiakConstants.ContentTypes.ApplicationJson);
+
+            var json = obj.Value.FromRiakString();
+            json.ShouldEqual("{\"Name\":{\"FirstName\":\"OJ\",\"Surname\":\"Reeves\"},\"PhoneNumbers\":[{\"Number\":\"12345678\",\"NumberType\":1}],\"DateOfBirth\":\"\\/Date(281664000000)\\/\",\"Email\":\"oj@buffered.io\"}");
+
+            var deserialisedPerson = obj.GetObject<Person>();
+            deserialisedPerson.ShouldEqual(testPerson);
         }
     }
 }
