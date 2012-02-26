@@ -27,6 +27,12 @@ using Newtonsoft.Json;
 
 namespace CorrugatedIron.Models
 {
+    public delegate string SerializeObjectToString<in T>(T theObject);
+
+    public delegate byte[] SerializeObjectToByteArray<in T>(T theObject);
+
+    public delegate T DeserializeObject<out T>(byte[] theObject, string contentType);
+
     public class RiakObject
     {
         private List<string> _vtags;
@@ -348,6 +354,41 @@ namespace CorrugatedIron.Models
             }
         }
 
+        public void SetObject<T>(T value, string contentType, SerializeObjectToString<T> serializeObject)
+            where T : class 
+        {
+            if (string.IsNullOrEmpty(contentType))
+            {
+                throw new ArgumentException("contentType must be a valid MIME type");
+            }
+
+            if (serializeObject == null)
+            {
+                throw new ArgumentException("serializeObject cannot be null");
+            }
+            
+            ContentType = contentType;
+
+            Value = serializeObject(value).ToRiakString();
+        }
+
+        public void SetObject<T>(T value, string contentType, SerializeObjectToByteArray<T> serializeObject)
+        {
+            if (string.IsNullOrEmpty(contentType))
+            {
+                throw new ArgumentException("contentType must be a valid MIME type");
+            }
+
+            if (serializeObject == null)
+            {
+                throw new ArgumentException("serializeObject cannot be null");
+            }
+
+            ContentType = contentType;
+
+            Value = serializeObject(value);
+        }
+
         // setting content type of SetObject changes content type
         public void SetObject<T>(T value, string contentType = null)
             where T : class
@@ -391,6 +432,16 @@ namespace CorrugatedIron.Models
             }
 
             throw new NotSupportedException(string.Format("Your current ContentType ({0}), is not supported.", ContentType));
+        }
+
+        public T GetObject<T>(DeserializeObject<T> deserializeObject)
+        {
+            if (deserializeObject == null)
+            {
+                throw new ArgumentException("deserializeObject must not be null");
+            }
+
+            return deserializeObject(Value, ContentType);
         }
 
         public T GetObject<T>()
