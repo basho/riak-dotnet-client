@@ -24,6 +24,7 @@ using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
 using CorrugatedIron.Util;
 using Newtonsoft.Json;
+using ProtoBuf;
 
 namespace CorrugatedIron.Models
 {
@@ -36,7 +37,7 @@ namespace CorrugatedIron.Models
     public class RiakObject
     {
         private List<string> _vtags;
-        private int _hashCode;
+        private readonly int _hashCode;
 
         public string Bucket { get; private set; }
         public string Key { get; private set; }
@@ -403,32 +404,33 @@ namespace CorrugatedIron.Models
 
             if(ContentType == RiakConstants.ContentTypes.ApplicationJson)
             {
-                var sots = new SeralizeObjectToString(Serialize);
-                SetObject(value, contentType, sots);
+                var sots = new SerializeObjectToString<T>(theObject => theObject.Serialize());
+                SetObject(value, ContentType, sots);
                 return;
             }
 
             if(ContentType == RiakConstants.ContentTypes.ProtocolBuffers)
             {
-                var soba = new SerializeObjectToByteArray(theObject =>  
+                var soba = new SerializeObjectToByteArray<T>(theObject =>  
                 {
                     var ms = new MemoryStream();
-                    Protobuf.Serializer.Serialize(ms, value);
+                    Serializer.Serialize(ms, value);
                     return ms.ToArray();
                 });
-                SetObject(value, contentType, soba);
+                SetObject(value, ContentType, soba);
                 return;
             }
 
             if(ContentType == RiakConstants.ContentTypes.Xml)
             {
-                var soba = new SerializeObjectToByteArray(theObject =>
+                var soba = new SerializeObjectToByteArray<T>(theObject =>
                 {
                     var ms = new MemoryStream();
                     var serde = new XmlSerializer(typeof(T));
-                    return serde.Serialize(ms, value);
+                    serde.Serialize(ms, value);
+                    return ms.ToArray();
                 });
-                SetObject(value, contentType, soba);
+                SetObject(value, ContentType, soba);
                 return;
             }
             
@@ -463,7 +465,7 @@ namespace CorrugatedIron.Models
                 var memoryStream = new MemoryStream();
 
                 memoryStream.Write(Value, 0, Value.Length);
-                return ProtoBuf.Serializer.Deserialize<T>(memoryStream);
+                return Serializer.Deserialize<T>(memoryStream);
             }
 
             if(ContentType == RiakConstants.ContentTypes.Xml)
