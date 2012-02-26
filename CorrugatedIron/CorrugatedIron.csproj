@@ -179,6 +179,8 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Models\RiakSearch\BaseSearchQuery.cs" />
+    <Compile Include="Models\RiakSearch\IRiakSearchQueryPart.cs" />
+    <Compile Include="Models\RiakSearch\RiakSearchBinaryLogicTerm.cs" />
     <Compile Include="Models\RiakSearch\RiakSearchQuery.cs" />
     <Compile Include="Models\RiakServerInfo.cs" />
     <Compile Include="RiakAsyncClient.cs" />
@@ -238,7 +240,7 @@
     <Compile Include="Models\RiakSearch\Solr\SolrQuery.cs" />
     <Compile Include="Models\RiakSearch\RiakSearchToken.cs" />
     <Compile Include="Models\RiakSearch\RiakSearchRangeToken.cs" />
-    <Compile Include="Models\RiakSearch\IRiakSearchTerm.cs" />
+    <Compile Include="Models\RiakSearch\RiakSearchTerm.cs" />
     <Compile Include="Models\RiakSearch\RiakSearchPhraseToken.cs" />
     <Compile Include="Models\RiakSearch\And.cs" />
     <Compile Include="Models\RiakSearch\Or.cs" />

@@ -19,36 +19,24 @@ using System.Text;
 
 namespace CorrugatedIron.Models.RiakSearch
 {
-    public interface IRiakSearchQueryPart
-    {
-        string ToSearchTerm();
-    }
-
-    public class RiakSearchToken : IRiakSearchQueryPart
+    public class RiakSearchToken : RiakSearchQueryPart
     {
         public string Field { get; set; }
-        public IRiakSearchTerm Term { get; set; }
+        public RiakSearchTerm Term { get; set; }
         public int? Proximity { get; set; } 
         // TODO: Boost must be positive
         public decimal? Boost { get; set; }
         public bool Required { get; set; }
         public bool Prohibit { get; set; }
         
-        public RiakSearchToken ()
+        public RiakSearchToken()
         {
             Required = false;
             Prohibit = false;
         }
         
-        public override string ToString() 
+        public override void ToSearchTerm(StringBuilder sb)
         {
-            return ToSearchTerm();
-        }
-
-        public string ToSearchTerm()
-        {
-            var sb = new StringBuilder();
-            
             if (Required) 
             {
                 sb.Append("+");
@@ -59,25 +47,23 @@ namespace CorrugatedIron.Models.RiakSearch
                 sb.Append("-");
             }
             
-            if (!String.IsNullOrEmpty(Field)) 
+            if (!string.IsNullOrWhiteSpace(Field)) 
             {
                 sb.Append(Field);
                 sb.Append(":");
             }
-            
-            sb.Append(Term.ToSearchTerm());
+
+            Term.ToSearchTerm(sb);
             
             if (Proximity.HasValue) 
             {
-                sb.Append(String.Format("~{0}", Proximity));
+                sb.AppendFormat("~{0}", Proximity);
             }
             
             if (Boost.HasValue) 
             {
-                sb.Append(String.Format("^{0}", Boost));
+                sb.AppendFormat("^{0}", Boost);
             }
-            
-            return sb.ToString();
         }
     }
 }
