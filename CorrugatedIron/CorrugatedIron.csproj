@@ -10,7 +10,6 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CorrugatedIron</RootNamespace>
     <AssemblyName>CorrugatedIron</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -37,9 +36,13 @@
     <AssemblyOriginatorKeyFile>..\Metadata\CorrugatedIron.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="protobuf-net, Version=1.0.0.280, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
-      <HintPath>..\lib\protobuf-net.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=4.0.8.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.4.0.8\lib\net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="protobuf-net, Version=2.0.0.480, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\protobuf-net.2.0.0.480\lib\net40\protobuf-net.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -49,10 +52,6 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="Newtonsoft.Json, Version=4.0.2.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="System.Configuration" />
   </ItemGroup>
   <ItemGroup>
@@ -108,6 +107,7 @@
     <Compile Include="Models\MapReduce\Inputs\RiakBucketKeyInput.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Models\MapReduce\Inputs\RiakBucketSearchInput.cs" />
     <Compile Include="Models\MapReduce\IRiakMapReduceResult.cs" />
     <Compile Include="Models\MapReduce\KeyFilters\And.cs" />
     <Compile Include="Models\MapReduce\KeyFilters\Between.cs" />
@@ -178,6 +178,8 @@
     <Compile Include="Models\RiakPutOptions.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Models\RiakSearch\BaseSearchQuery.cs" />
+    <Compile Include="Models\RiakSearch\RiakSearchQuery.cs" />
     <Compile Include="Models\RiakServerInfo.cs" />
     <Compile Include="RiakAsyncClient.cs" />
     <Compile Include="RiakClient.cs" />
@@ -233,11 +235,20 @@
     <Compile Include="Models\MapReduce\Inputs\RiakIntIndexRangeInput.cs" />
     <Compile Include="Models\MapReduce\Inputs\RiakBinIndexEqualityInput.cs" />
     <Compile Include="Models\MapReduce\Inputs\RiakBinIndexRangeInput.cs" />
+    <Compile Include="Models\RiakSearch\Solr\SolrQuery.cs" />
+    <Compile Include="Models\RiakSearch\RiakSearchToken.cs" />
+    <Compile Include="Models\RiakSearch\RiakSearchRangeToken.cs" />
+    <Compile Include="Models\RiakSearch\IRiakSearchTerm.cs" />
+    <Compile Include="Models\RiakSearch\RiakSearchPhraseToken.cs" />
+    <Compile Include="Models\RiakSearch\And.cs" />
+    <Compile Include="Models\RiakSearch\Or.cs" />
+    <Compile Include="Models\RiakSearch\Group.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Metadata\CorrugatedIron.snk">
       <Link>CorrugatedIron.snk</Link>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -247,4 +258,5 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <ItemGroup />
 </Project>
