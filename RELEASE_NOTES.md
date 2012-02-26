@@ -16,6 +16,10 @@ This closes [Issue 32: DeleteBucket() overload which takes a RiakDeleteOptions i
 
 The Either<TLeft, TRight> Construct existed to allow users to pass in either an integer or string for quorum commands. Riak only allows a uint to be passed in. Rather than resort to string parsing, we've removed the Either<TLeft, TRight> construct and replaced it with good, old-fashioned constants. Please see `RiakConstants.QuorumOptions`.
 
+### Removed dynamic GetObject method
+
+Removed deprecated method `public dynamic GetObject()`. 
+
 ### Custom Serializers
 
 This closes [Issue 16: Implement GetObject<T> and SetObject<T> with custom SerDe](https://github.com/DistributedNonsense/CorrugatedIron/issues/16) and [Issue 34: option to use ServiceStack json serializer](https://github.com/DistributedNonsense/CorrugatedIron/issues/34).
@@ -63,6 +67,8 @@ An example of how to use these delegates can be found in either the `CorrugatedI
 		var deserialisedPerson = obj.GetObject<Person>();
 		deserialisedPerson.ShouldEqual(testPerson);
 	}
+
+The legacy `GetObject<T>()` method remains for backwards compatability. This mechanism is provided largely as a convenience method - base class library XML serialization and Newtonsoft.JSON are used for convenience. Developers looking for high performance read/write throughput should use the custom SerDe mechanisms provided in the new `GetObject<T>` and `SetObject<T>`.
 
 ### Updated Library Support for NuGet
 
