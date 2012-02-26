@@ -403,25 +403,32 @@ namespace CorrugatedIron.Models
 
             if(ContentType == RiakConstants.ContentTypes.ApplicationJson)
             {
-                var json = value.Serialize();
-                Value = json.ToRiakString();
+                var sots = new SeralizeObjectToString(Serialize);
+                SetObject(value, contentType, sots);
                 return;
             }
 
             if(ContentType == RiakConstants.ContentTypes.ProtocolBuffers)
             {
-                var memoryStream = new MemoryStream();
-                ProtoBuf.Serializer.Serialize(memoryStream, value);
-                Value = memoryStream.ToArray();
+                var soba = new SerializeObjectToByteArray(theObject =>  
+                {
+                    var ms = new MemoryStream();
+                    Protobuf.Serializer.Serialize(ms, value);
+                    return ms.ToArray();
+                });
+                SetObject(value, contentType, soba);
                 return;
             }
 
             if(ContentType == RiakConstants.ContentTypes.Xml)
             {
-                var memoryStream = new MemoryStream();
-                var serde = new XmlSerializer(typeof(T));
-                serde.Serialize(memoryStream, value);
-                Value = memoryStream.ToArray();
+                var soba = new SerializeObjectToByteArray(theObject =>
+                {
+                    var ms = new MemoryStream();
+                    var serde = new XmlSerializer(typeof(T));
+                    return serde.Serialize(ms, value);
+                });
+                SetObject(value, contentType, soba);
                 return;
             }
             
