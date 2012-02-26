@@ -1,4 +1,4 @@
-// Copyright (c) 2010 - OJ Reeves & Jeremiah Peschka
+﻿// Copyright (c) 2010 - OJ Reeves & Jeremiah Peschka
 // 
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -14,21 +14,34 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
 using System.Text;
-using CorrugatedIron.Extensions;
 
 namespace CorrugatedIron.Models.RiakSearch
 {
-    public class RiakSearchRangeToken : RiakSearchQueryPart
+    public abstract class RiakSearchBinaryLogicTerm : RiakSearchQueryPart
     {
-        public string From { get; set; }
-        public string To { get; set; }
-        public bool Inclusive { get; set; }
+        private string _operand;
+        private RiakSearchQueryPart _left;
+        private RiakSearchQueryPart _right;
         
+        protected RiakSearchBinaryLogicTerm(string operand, RiakSearchQueryPart left, RiakSearchQueryPart right)
+        {
+            _operand = operand;
+            _left = left;
+            _right = right;
+        }
+
+        public override string ToString() 
+        {
+            return ToSearchTerm();
+        }   
+
         public override void ToSearchTerm(StringBuilder sb)
         {
-            sb.AppendFormat(Inclusive ? "[{0} TO {1}]" : "{{{0} TO {1}}}", From.ToRiakSearchTerm(), To.ToRiakSearchTerm());
+            _left.ToSearchTerm(sb);
+            sb.AppendFormat(" {0} ", _operand);
+            _right.ToSearchTerm(sb);
         }
     }
 }
-

@@ -21,7 +21,7 @@ using Moq;
 
 namespace CorrugatedIron.Tests.RiakClientTests
 {
-    public abstract class RiakClientTestBase<TRequest, TResult>
+    internal abstract class RiakClientTestBase<TRequest, TResult>
         where TResult : new()
     {
         protected RiakResult<TResult> Result;

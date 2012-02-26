@@ -92,7 +92,8 @@ namespace CorrugatedIron.Tests.Live
 
             var mr = new RiakMapReduceQuery();
 
-            var rspt = new RiakSearchPhraseToken {Field = "name", Term = "Al*"};
+            //var rspt = new RiakSearchPhraseToken {Field = "name", Term = "Al*"};
+            var rspt = new RiakSearchPhraseToken("Al*");
 
             var mfa = new RiakModuleFunctionArgInput
                           {
@@ -113,4 +114,3 @@ namespace CorrugatedIron.Tests.Live
         }
     }
 }
-
