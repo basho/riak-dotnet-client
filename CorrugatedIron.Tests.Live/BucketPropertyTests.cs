@@ -59,10 +59,10 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
             result.Value.AllowMultiple.HasValue.ShouldBeTrue();
             result.Value.NVal.HasValue.ShouldBeTrue();
             result.Value.LastWriteWins.HasValue.ShouldBeFalse();
-            result.Value.RVal.ShouldBeNull();
-            result.Value.RwVal.ShouldBeNull();
-            result.Value.DwVal.ShouldBeNull();
-            result.Value.WVal.ShouldBeNull();
+            result.Value.RVal.HasValue.ShouldBeFalse();
+            result.Value.RwVal.HasValue.ShouldBeFalse();
+            result.Value.DwVal.HasValue.ShouldBeFalse();
+            result.Value.WVal.HasValue.ShouldBeFalse();
         }
 
         [Test]
@@ -73,10 +73,10 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
             result.Value.AllowMultiple.HasValue.ShouldBeTrue();
             result.Value.NVal.HasValue.ShouldBeTrue();
             result.Value.LastWriteWins.HasValue.ShouldBeTrue();
-            result.Value.RVal.ShouldNotBeNull();
-            result.Value.RwVal.ShouldNotBeNull();
-            result.Value.DwVal.ShouldNotBeNull();
-            result.Value.WVal.ShouldNotBeNull();
+            result.Value.RVal.HasValue.ShouldBeTrue();
+            result.Value.RwVal.HasValue.ShouldBeTrue();
+            result.Value.DwVal.HasValue.ShouldBeTrue();
+            result.Value.WVal.HasValue.ShouldBeTrue();
         }
 
         [Test]

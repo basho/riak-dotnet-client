@@ -19,7 +19,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using CorrugatedIron.Containers;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
 using CorrugatedIron.Models.CommitHook;
@@ -67,37 +66,37 @@ namespace CorrugatedIron.Models
         /// <value>
         /// The R value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.
         /// </value>
-        public Either<uint, string> RVal { get; private set; }
+        public uint? RVal { get; private set; }
 
         /// <summary>
         /// The number of replicas that must return before a delete is considered a success.
         /// </summary>
         /// <value>The RW Value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.</value>
-        public Either<uint, string> RwVal { get; private set; }
+        public uint? RwVal { get; private set; }
 
         /// <summary>
         /// The number of replicas that must commit to durable storage and respond before a write is considered a success. 
         /// </summary>
         /// <value>The DW value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.</value>
-        public Either<uint, string> DwVal { get; private set; }
+        public uint? DwVal { get; private set; }
 
         /// <summary>
         /// The number of replicas that must respond before a write is considered a success.
         /// </summary>
         /// <value>The W value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.</value>
-        public Either<uint, string> WVal { get; private set; }
+        public uint? WVal { get; private set; }
 
         /// <summary>
         /// The number of primary replicas that must respond before a read is considered a success.
         /// </summary>
         /// <value>The PR value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.</value>
-        public Either<uint, string> PrVal { get; private set; }
+        public uint? PrVal { get; private set; }
 
         /// <summary>
         /// The number of primary replicas that must respond before a write is considered a success.
         /// </summary>
         /// <value>The PW value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.</value>
-        public Either<uint, string> PwVal { get; private set; }
+        public uint? PwVal { get; private set; }
 
         public RiakBucketProperties SetBasicQuorum(bool value)
         {
@@ -134,17 +133,7 @@ namespace CorrugatedIron.Models
             return WriteQuorum(value, v => RVal = v);
         }
 
-        public RiakBucketProperties SetRVal(string value)
-        {
-            return WriteQuorum(value, v => RVal = v);
-        }
-
         public RiakBucketProperties SetRwVal(uint value)
-        {
-            return WriteQuorum(value, v => RwVal = v);
-        }
-
-        public RiakBucketProperties SetRwVal(string value)
         {
             return WriteQuorum(value, v => RwVal = v);
         }
@@ -154,34 +143,14 @@ namespace CorrugatedIron.Models
             return WriteQuorum(value, v => DwVal = v);
         }
 
-        public RiakBucketProperties SetDwVal(string value)
-        {
-            return WriteQuorum(value, v => DwVal = v);
-        }
-
         public RiakBucketProperties SetWVal(uint value)
         {
             return WriteQuorum(value, v => WVal = v);
         }
 
-        public RiakBucketProperties SetWVal(string value)
-        {
-            return WriteQuorum(value, v => WVal = v);
-        }
-
-        public RiakBucketProperties SetPrVal(string value)
-        {
-            return WriteQuorum(value, v => PrVal = v);
-        }
-
         public RiakBucketProperties SetPrVal(uint value)
         {
             return WriteQuorum(value, v => PrVal = v);
-        }
-
-        public RiakBucketProperties SetPwVal(string value)
-        {
-            return WriteQuorum(value, var => PwVal = var);
         }
 
         public RiakBucketProperties SetPwVal(uint value)
@@ -225,17 +194,9 @@ namespace CorrugatedIron.Models
             return this;
         }
 
-        private RiakBucketProperties WriteQuorum(uint value, Action<Either<uint, string>> setter)
+        private RiakBucketProperties WriteQuorum(uint value, Action<uint?> setter)
         {
-            System.Diagnostics.Debug.Assert(value >= 1);
-            setter(new Either<uint, string>(value));
-            return this;
-        }
-
-        private RiakBucketProperties WriteQuorum(string value, Action<Either<uint, string>> setter)
-        {
-            System.Diagnostics.Debug.Assert(new HashSet<string> { "all", "quorum", "one" }.Contains(value), "Incorrect quorum value");
-            setter(new Either<uint, string>(value));
+            setter(value);
             return this;
         }
 
@@ -296,16 +257,9 @@ namespace CorrugatedIron.Models
             return new RiakErlangCommitHook(hook.Value<string>("mod"), hook.Value<string>("fun"));
         }
 
-        private static void ReadQuorum(JObject props, string key, Action<Either<uint, string>> setter)
+        private static void ReadQuorum(JObject props, string key, Action<uint?> setter)
         {
-            if(props[key].Type == JTokenType.String)
-            {
-                setter(new Either<uint, string>(props.Value<string>(key)));
-            }
-            else
-            {
-                setter(new Either<uint, string>(props.Value<uint>(key)));
-            }
+            setter(props.Value<uint>(key));
         }
 
         internal RiakBucketProperties(RpbBucketProps bucketProps)
@@ -342,12 +296,12 @@ namespace CorrugatedIron.Models
                 jw.WriteNullableProperty("n_val", NVal)
                 .WriteNullableProperty("allow_mult", AllowMultiple)
                 .WriteNullableProperty("last_write_wins", LastWriteWins)
-                .WriteEither("r", RVal)
-                .WriteEither("rw", RwVal)
-                .WriteEither("dw", DwVal)
-                .WriteEither("w", WVal)
-                .WriteEither("pr", PrVal)
-                .WriteEither("pw", PwVal)
+                .WriteNullableProperty("r", RVal)
+                .WriteNullableProperty("rw", RwVal)
+                .WriteNullableProperty("dw", DwVal)
+                .WriteNullableProperty("w", WVal)
+                .WriteNullableProperty("pr", PrVal)
+                .WriteNullableProperty("pw", PwVal)
                 .WriteNonNullProperty("backend", Backend)
                 .WriteNullableProperty("search", Search)
                 .WriteNullableProperty("notfound_ok", NotFoundOk)

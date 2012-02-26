@@ -48,22 +48,6 @@ namespace CorrugatedIron.Extensions
             return writer;
         }
 
-        public static JsonWriter WriteEither<TLeft, TRight>(this JsonWriter writer, string name, Either<TLeft, TRight> either)
-        {
-            if(either != null)
-            {
-                if(either.IsLeft)
-                {
-                    writer.WriteProperty(name, either.Left);
-                }
-                else
-                {
-                    writer.WriteProperty(name, either.Right);
-                }
-            }
-            return writer;
-        }
-
         public static JsonWriter WriteNullableProperty<T>(this JsonWriter writer, string name, T? value)
             where T : struct
         {
