@@ -34,6 +34,8 @@ namespace CorrugatedIron.Models
 
     public delegate T DeserializeObject<out T>(byte[] theObject, string contentType);
 
+    public delegate T ResolveConflict<T>(List<T> conflictedObjects);
+
     public class RiakObject
     {
         private List<string> _vtags;
@@ -401,7 +403,6 @@ namespace CorrugatedIron.Models
 
             // check content type
             // save based on content type's deserialization method
-
             if(ContentType == RiakConstants.ContentTypes.ApplicationJson)
             {
                 var sots = new SerializeObjectToString<T>(theObject => theObject.Serialize());
@@ -443,11 +444,18 @@ namespace CorrugatedIron.Models
             throw new NotSupportedException(string.Format("Your current ContentType ({0}), is not supported.", ContentType));
         }
 
-        public T GetObject<T>(DeserializeObject<T> deserializeObject)
+        public T GetObject<T>(DeserializeObject<T> deserializeObject, ResolveConflict<T> resolveConflict = null)
         {
             if (deserializeObject == null)
             {
                 throw new ArgumentException("deserializeObject must not be null");
+            }
+
+            if (Siblings.Count > 1 && resolveConflict != null)
+            {
+                var conflictedObjects = Siblings.Select(s => deserializeObject(s.Value, ContentType)).ToList();
+
+                return resolveConflict(conflictedObjects);
             }
 
             return deserializeObject(Value, ContentType);
@@ -457,33 +465,34 @@ namespace CorrugatedIron.Models
         {
             if(ContentType == RiakConstants.ContentTypes.ApplicationJson)
             {
-                return JsonConvert.DeserializeObject<T>(Value.FromRiakString());
+                var deserializeObject = new DeserializeObject<T>((value, contentType) => JsonConvert.DeserializeObject<T>(Value.FromRiakString()));
+                return GetObject(deserializeObject, null);
             }
 
             if(ContentType == RiakConstants.ContentTypes.ProtocolBuffers)
             {
-                var memoryStream = new MemoryStream();
-
-                memoryStream.Write(Value, 0, Value.Length);
-                return Serializer.Deserialize<T>(memoryStream);
+                var deserializeObject = new DeserializeObject<T>((value, contentType) =>
+                                                                     {
+                                                                         var ms = new MemoryStream();
+                                                                         ms.Write(value, 0, Value.Length);
+                                                                         return Serializer.Deserialize<T>(ms);
+                                                                     });
+                return GetObject(deserializeObject, null);
             }
 
             if(ContentType == RiakConstants.ContentTypes.Xml)
             {
-                var reader = XmlReader.Create(Value.FromRiakString());
-                var serde = new XmlSerializer(typeof(T));
-
-                return (T)serde.Deserialize(reader);
+                var deserializeObject = new DeserializeObject<T>((value, contenType) =>
+                                                                     {
+                                                                         var r = XmlReader.Create(Value.FromRiakString());
+                                                                         var serde = new XmlSerializer(typeof (T));
+                                                                         return (T) serde.Deserialize(r);
+                                                                     }
+                    );
+                return GetObject<T>(deserializeObject, null);
             }
 
             throw new NotSupportedException(string.Format("Your current ContentType ({0}), is not supported.", ContentType));
-        }
-
-        // TODO remove when we hit 0.3
-        [Obsolete("<Marked obsolete in v0.1.2; will be removed in v0.3")]
-        public dynamic GetObject()
-        {
-            return GetObject<dynamic>();
         }
     }
 }
