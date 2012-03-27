@@ -34,6 +34,7 @@ namespace CorrugatedIron
     {
         void Batch(Action<IRiakBatchClient> batchAction);
 
+        byte[] ClientId { get; }
         IRiakAsyncClient Async { get; }
     }
 
