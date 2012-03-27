@@ -19,40 +19,31 @@ using System.Collections.Generic;
 
 namespace CorrugatedIron.Models.RiakSearch
 {
-    public class Group : IRiakSearchQueryPart
+    public class Group : RiakSearchQueryPart
     {
-        List<IRiakSearchQueryPart> _parts;
+        private List<RiakSearchQueryPart> _parts;
         
-        public Group ()
+        public Group()
         {
-            _parts = new List<IRiakSearchQueryPart>();
+            _parts = new List<RiakSearchQueryPart>();
         }
         
-        public Group AddItem(IRiakSearchQueryPart item)
+        public Group AddItem(RiakSearchQueryPart item)
         {
             _parts.Add(item);
             return this;
         }
         
-        public override string ToString()
+        public override void ToSearchTerm(StringBuilder sb)
         {
-            return ToSearchTerm();
-        }
-
-        public string ToSearchTerm()
-        {
-            var sb = new StringBuilder();
-            
             sb.Append("(");
             
             foreach (var part in _parts)
             {
-                sb.Append(part.ToString());
+                part.ToSearchTerm(sb);
             }
             
             sb.Append(")");
-            
-            return sb.ToString();
         }
     }
 }

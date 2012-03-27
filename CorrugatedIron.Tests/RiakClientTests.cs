@@ -24,7 +24,7 @@ namespace CorrugatedIron.Tests.RiakClientTests
                                                                      {NodeConfigMock.Object});
 
             Cluster = new RiakCluster(ClusterConfigMock.Object, ConnFactoryMock.Object);
-            Client = new RiakClient(Cluster);
+            Client = Cluster.CreateClient();
         }
 
         protected Mock<IRiakConnection> ConnMock;
@@ -32,7 +32,7 @@ namespace CorrugatedIron.Tests.RiakClientTests
         protected Mock<IRiakClusterConfiguration> ClusterConfigMock;
         protected Mock<IRiakConnectionFactory> ConnFactoryMock;
         protected RiakCluster Cluster;
-        protected RiakClient Client;
+        protected IRiakClient Client;
 
         [Test]
         public void ClientIdIsNotNull()

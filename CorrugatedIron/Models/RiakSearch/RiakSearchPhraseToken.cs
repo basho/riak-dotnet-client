@@ -14,30 +14,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Text;
 using CorrugatedIron.Extensions;
 
 namespace CorrugatedIron.Models.RiakSearch
 {
-    public class RiakSearchPhraseToken : IRiakSearchQueryPart, IRiakSearchTerm
+    public class RiakSearchPhraseToken : RiakSearchQueryPart
     {
+        // what is this 'Field' property for?
         public string Field { get; set; }
         public string Term { get; set; }
-        
-        public RiakSearchPhraseToken() {}
         
         public RiakSearchPhraseToken(string term)
         {
             Term = term;
         }
         
-        public override string ToString()
+        public override void ToSearchTerm(StringBuilder sb)
         {
-            return ToSearchTerm();
-        }
-        
-        public string ToSearchTerm()
-        {
-            return Term.ToRiakSearchTerm();
+            sb.Append(Term.ToRiakSearchTerm());
         }
     }
 }

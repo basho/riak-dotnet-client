@@ -26,9 +26,9 @@ namespace CorrugatedIron.Models.RiakSearch
         /// <summary>
         /// The query to be run. This obeys the usual SOLR query syntax. See http://lucene.apache.org/solr/tutorial.html#Querying+Data
         /// </summary>
-        public string Query { get { return QueryPart.ToString(); }  }
+        public string Query { get { return QueryPart.ToSearchTerm(); } }
 
-        public IRiakSearchQueryPart QueryPart;
+        public RiakSearchQueryPart QueryPart;
 
         public abstract string ToQueryString();
     }
