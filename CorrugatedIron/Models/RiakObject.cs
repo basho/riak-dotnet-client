@@ -40,11 +40,11 @@ namespace CorrugatedIron.Models
     {
         private List<string> _vtags;
         private readonly int _hashCode;
+        private string _contentType;
 
         public string Bucket { get; private set; }
         public string Key { get; private set; }
         public byte[] Value { get; set; }
-        public string ContentType { get; set; }
         public string ContentEncoding { get; set; }
         public string CharSet { get; set; }
         public byte[] VectorClock { get; private set; }
@@ -56,6 +56,26 @@ namespace CorrugatedIron.Models
         public IList<RiakObject> Siblings { get; set; }
         public IDictionary<string, string> BinIndexes { get; set; }
         public IDictionary<string, int> IntIndexes { get; set; }
+        
+        public string ContentType 
+        { 
+            get
+            {
+                return _contentType;
+            }
+            
+            set
+            {
+                if (value.Contains("/"))
+                {
+                    _contentType = value;
+                }
+                else
+                {
+                    throw new FormatException("Valid content types must contain a string. Refer to http://en.wikipedia.org/wiki/MIME#Content-Type for formatting information");
+                }
+            }
+        }
 
         public IDictionary<string, string> Indexes
         {
