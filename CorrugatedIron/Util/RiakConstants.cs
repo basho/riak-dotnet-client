@@ -77,7 +77,7 @@ namespace CorrugatedIron.Util
                 public const int Timeout = 30000;
             }
 
-            public const uint RVal = 2;
+            public const uint RVal = QuorumOptions.Default;
             public const string ContentType = ContentTypes.ApplicationJson;
             public const string CharSet = CharSets.Utf8;
         }
