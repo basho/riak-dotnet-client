@@ -1,0 +1,12 @@
+<?xml version="1.0" standalone="yes"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" InitialTargets="Compile">
+  <PropertyGroup>
+    <SourcePath>..</SourcePath>
+    <SolutionPath>..\CorrugatedIron.sln</SolutionPath>
+  </PropertyGroup>
+
+  <Target Name="Compile">
+    <MSBuild Projects="$(SolutionPath)" Properties="Configuration=Release" Targets="Clean;Rebuild" >
+    </MSBuild>
+  </Target>
+</Project>

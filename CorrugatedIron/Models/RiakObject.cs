@@ -40,7 +40,6 @@ namespace CorrugatedIron.Models
     {
         private List<string> _vtags;
         private readonly int _hashCode;
-        private string _contentType;
 
         public string Bucket { get; private set; }
         public string Key { get; private set; }
@@ -234,16 +233,16 @@ namespace CorrugatedIron.Models
             Key = key;
             VectorClock = vectorClock;
 
-            Value = content.Value;
-            VTag = content.VTag.FromRiakString();
-            ContentEncoding = content.ContentEncoding.FromRiakString();
-            ContentType = content.ContentType.FromRiakString();
-            UserMetaData = content.UserMeta.ToDictionary(p => p.Key.FromRiakString(), p => p.Value.FromRiakString());
-            Indexes = content.Indexes.ToDictionary(p => p.Key.FromRiakString(), p => p.Value.FromRiakString());
-            Links = content.Links.Select(l => new RiakLink(l)).ToList();
+            Value = content.value;
+            VTag = content.vtag.FromRiakString();
+            ContentEncoding = content.content_encoding.FromRiakString();
+            ContentType = content.content_type.FromRiakString();
+            UserMetaData = content.usermeta.ToDictionary(p => p.key.FromRiakString(), p => p.value.FromRiakString());
+            Indexes = content.indexes.ToDictionary(p => p.key.FromRiakString(), p => p.value.FromRiakString());
+            Links = content.links.Select(l => new RiakLink(l)).ToList();
             Siblings = new List<RiakObject>();
-            LastModified = content.LastMod;
-            LastModifiedUsec = content.LastModUSecs;
+            LastModified = content.last_mod;
+            LastModifiedUsec = content.last_mod_usecs;
 
             _hashCode = CalculateHashCode();
         }
@@ -262,20 +261,21 @@ namespace CorrugatedIron.Models
         {
             var message = new RpbPutReq
             {
-                Bucket = Bucket.ToRiakString(),
-                Key = Key.ToRiakString(),
-                VectorClock = VectorClock,
-                Content = new RpbContent
+                bucket = Bucket.ToRiakString(),
+                key = Key.ToRiakString(),
+                vclock = VectorClock,
+                content = new RpbContent
                 {
-                    ContentType = ContentType.ToRiakString(),
-                    Value = Value,
-                    VTag = VTag.ToRiakString(),
-                    UserMeta = UserMetaData.Select(kv => new RpbPair { Key = kv.Key.ToRiakString(), Value = kv.Value.ToRiakString() }).ToList(),
-                    Indexes = Indexes.Select(kv => new RpbPair { Key = kv.Key.ToRiakString(), Value = kv.Value.ToRiakString() }).ToList(),
-                    Links = Links.Select(l => l.ToMessage()).ToList()
+                    content_type = ContentType.ToRiakString(),
+                    value = Value,
+                    vtag = VTag.ToRiakString()
                 }
             };
 
+            message.content.usermeta.AddRange(UserMetaData.Select(kv => new RpbPair { key = kv.Key.ToRiakString(), value = kv.Value.ToRiakString() }));
+            message.content.indexes.AddRange(Indexes.Select(kv => new RpbPair { key = kv.Key.ToRiakString(), value = kv.Value.ToRiakString() }));
+            message.content.links.AddRange(Links.Select(l => l.ToMessage()));
+            
             return message;
         }
 
