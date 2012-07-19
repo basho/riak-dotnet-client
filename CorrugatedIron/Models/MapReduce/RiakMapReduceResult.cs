@@ -32,7 +32,7 @@ namespace CorrugatedIron.Models.MapReduce
         internal RiakMapReduceResult(IEnumerable<RiakResult<RpbMapRedResp>> response)
         {
             var phases = from r in response
-                         group r by r.Value.Phase
+                         group r by r.Value.phase
                          into g
                          select new
                          {

@@ -41,31 +41,6 @@ namespace CorrugatedIron.Tests.RiakAsyncClientTests
     }
 
     [TestFixture]
-    internal class WhenPingingServerAsync : RiakAsyncClientTestBase<RiakResult>
-    {
-        [SetUp]
-        public void SetUp()
-        {
-            ClientMock.Setup(m => m.Ping()).Returns(RiakResult.Success());
-            AsyncClient.Ping(Tester.HandleResult);
-            Result = Tester.Result;
-        }
-
-        [Test]
-        public void AsyncClientInvokesCorrectClientFunction()
-        {
-            ClientMock.Verify(m => m.Ping(), Times.Once());
-        }
-
-        [Test]
-        public void AsyncClientReturnsCorrectResult()
-        {
-            Result.ShouldNotBeNull();
-            Result.IsSuccess.ShouldBeTrue();
-        }
-    }
-
-    [TestFixture]
     internal class WhenCallingGetWithObjectIdAsync : RiakAsyncClientTestBase<RiakResult<RiakObject>>
     {
         [SetUp]
