@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <Target Name="Compile">
-    <MSBuild Projects="$(SolutionPath)" Properties="Configuration=Release" Targets="Clean;Rebuild" >
-    </MSBuild>
+    <MSBuild Projects="$(SolutionPath)" Properties="Configuration=Debug" Targets="Clean;Rebuild"/>
+    <MSBuild Projects="$(SolutionPath)" Properties="Configuration=Release" Targets="Clean;Rebuild"/>
   </Target>
 </Project>

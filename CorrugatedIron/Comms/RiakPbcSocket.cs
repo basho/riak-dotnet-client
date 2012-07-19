@@ -116,17 +116,17 @@ namespace CorrugatedIron.Comms
 
             var messageBody = new byte[headerSize];
 
-            var size = BitConverter.GetBytes(IPAddress.HostToNetworkOrder(0));
+            var size = BitConverter.GetBytes(IPAddress.HostToNetworkOrder(1));
             Array.Copy(size, messageBody, sizeSize);
             messageBody[sizeSize] = (byte)messageCode;
 
-            if(PbcSocket.Send(messageBody, (int)headerSize, SocketFlags.None) == 0)
+            if(PbcSocket.Send(messageBody, headerSize, SocketFlags.None) == 0)
             {
                 throw new RiakException("Failed to send data to server - Timed Out: {0}:{1}".Fmt(_server, _port));
             }
         }
 
-        public void Write<T>(T message)
+        public void Write<T>(T message) where T : class
         {
             const int sizeSize = sizeof(int);
             const int codeSize = sizeof(byte);
