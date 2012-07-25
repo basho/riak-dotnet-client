@@ -147,12 +147,12 @@ namespace CorrugatedIron.Models
             IntIndexes = new Dictionary<string, int>();
         }
 
-        public void AddBinIndex(string index, string key)
+        public void AddIndex(string index, string key)
         {
             BinIndexes.Add(index.ToBinaryKey(), key);
         }
 
-        public void AddIntIndex(string index, int key)
+        public void AddIndex(string index, int key)
         {
             IntIndexes.Add(index.ToIntegerKey(), key);
         }

@@ -56,5 +56,10 @@ namespace CorrugatedIron
         RiakResult<IList<RiakObject>> WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks);
 
         RiakResult<RiakServerInfo> GetServerInfo();
+
+        RiakResult<IList<string>> IndexGet(string bucket, string indexName, int value);
+        RiakResult<IList<string>> IndexGet(string bucket, string indexName, string value);
+        RiakResult<IList<string>> IndexGet(string bucket, string indexName, int minValue, int maxValue);
+        RiakResult<IList<string>> IndexGet(string bucket, string indexName, string minValue, string maxValue);
     }
 }

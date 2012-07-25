@@ -49,8 +49,8 @@ namespace CorrugatedIron.Tests.Live
         public void IndexesAreSavedWithAnObject()
         {
             var o = new RiakObject(Bucket, "the_object", "{ value: \"this is an object\" }");
-            o.AddBinIndex("tacos", "are great!");
-            o.AddIntIndex("age", 12);
+            o.AddIndex("tacos", "are great!");
+            o.AddIndex("age", 12);
             
             Client.Put(o);
             
@@ -62,6 +62,52 @@ namespace CorrugatedIron.Tests.Live
             ro.BinIndexes.Count.ShouldEqual(1);
             ro.IntIndexes.Count.ShouldEqual(1);
         }
+
+        [Test]
+        public void IntIndexGetReturnsListOfKeys()
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                var o = new RiakObject(Bucket, i.ToString(), "{ value: \"this is an object\" }");
+                o.AddIndex("age_int", 32);
+                
+                Client.Put(o);
+            }
+
+            var result = Client.IndexGet(Bucket, "age", 32);
+            result.IsSuccess.ShouldBeTrue();
+            result.Value.Count.ShouldEqual(10);
+
+            foreach (var v in result.Value)
+            {
+                var key = int.Parse(v);
+                key.ShouldBeLessThan(10);
+                key.ShouldBeGreaterThan(-1);
+            }
+        }
+        
+        [Test]
+        public void BinIndexGetReturnsListOfKeys()
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                var o = new RiakObject(Bucket, i.ToString(), "{ value: \"this is an object\" }");
+                o.AddIndex("age", "32");
+                
+                Client.Put(o);
+            }
+
+            var result = Client.IndexGet(Bucket, "age", "32");
+            result.IsSuccess.ShouldBeTrue();
+            result.Value.Count.ShouldEqual(10);
+
+            foreach (var v in result.Value)
+            {
+                var key = int.Parse(v);
+                key.ShouldBeLessThan(10);
+                key.ShouldBeGreaterThan(-1);
+            }
+        }
         
         [Test]
         public void QueryingByIntIndexReturnsAListOfKeys()
@@ -69,7 +115,7 @@ namespace CorrugatedIron.Tests.Live
             for (int i = 0; i < 10; i++)
             {
                 var o = new RiakObject(Bucket, i.ToString(), "{ value: \"this is an object\" }");
-                o.AddIntIndex("age_int", 32);
+                o.AddIndex("age_int", 32);
                 
                 Client.Put(o);
             }
@@ -100,7 +146,7 @@ namespace CorrugatedIron.Tests.Live
             for (int i = 0; i < 10; i++)
             {
                 var o = new RiakObject(Bucket, i.ToString(), "{ value: \"this is an object\" }");
-                o.AddIntIndex("age_int", 32);
+                o.AddIndex("age_int", 32);
                 
                 Client.Put(o);
             }
@@ -148,7 +194,7 @@ namespace CorrugatedIron.Tests.Live
             for (var i = 0; i < 10; i++)
             {
                 var o = new RiakObject(Bucket, i.ToString(), "{ value: \"this is an object\" }");
-                o.AddIntIndex("age_int", 25 + i);
+                o.AddIndex("age_int", 25 + i);
                 
                 Client.Put(o);
             }

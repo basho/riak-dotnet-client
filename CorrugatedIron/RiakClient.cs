@@ -744,6 +744,67 @@ namespace CorrugatedIron
             return RiakResult<RiakServerInfo>.Error(result.ResultCode, result.ErrorMessage);
         }
 
+        public RiakResult<IList<string>> IndexGet(string bucket, string indexName, string minValue, string maxValue)
+        {
+            return IndexGetRange(bucket, indexName, minValue, maxValue, RiakConstants.IndexSuffix.Binary);
+        }
+
+        public RiakResult<IList<string>> IndexGet(string bucket, string indexName, int minValue, int maxValue)
+        {
+            return IndexGetRange(bucket, indexName, minValue.ToString(), maxValue.ToString(), RiakConstants.IndexSuffix.Integer);
+        }
+
+        private RiakResult<IList<string>> IndexGetRange(string bucket, string indexName, string minValue, string maxValue, string indexSuffix)
+        {
+            var message = new RpbIndexReq
+            {
+                bucket = bucket.ToRiakString(),
+                index = (indexName + indexSuffix).ToRiakString(),
+                qtype = RpbIndexReq.IndexQueryType.range,
+                range_min = minValue.ToRiakString(),
+                range_max = maxValue.ToRiakString()
+            };
+
+            var result = UseConnection(conn => conn.PbcWriteRead<RpbIndexReq, RpbIndexResp>(message));
+
+            if (result.IsSuccess)
+            {
+                return RiakResult<IList<string>>.Success(result.Value.keys.Select(k => k.FromRiakString()).ToList());
+            }
+
+            return RiakResult<IList<string>>.Error(result.ResultCode, result.ErrorMessage);
+        }
+
+        public RiakResult<IList<string>> IndexGet(string bucket, string indexName, string value)
+        {
+            return IndexGetEquals(bucket, indexName, value, RiakConstants.IndexSuffix.Binary);
+        }
+
+        public RiakResult<IList<string>> IndexGet(string bucket, string indexName, int value)
+        {
+            return IndexGetEquals(bucket, indexName, value.ToString(), RiakConstants.IndexSuffix.Integer);
+        }
+
+        private RiakResult<IList<string>> IndexGetEquals(string bucket, string indexName, string value, string indexSuffix)
+        {
+            var message = new RpbIndexReq
+            {
+                bucket = bucket.ToRiakString(),
+                index = (indexName + indexSuffix).ToRiakString(),
+                key = value.ToRiakString(),
+                qtype = RpbIndexReq.IndexQueryType.eq
+            };
+
+            var result = UseConnection(conn => conn.PbcWriteRead<RpbIndexReq, RpbIndexResp>(message));
+
+            if (result.IsSuccess)
+            {
+                return RiakResult<IList<string>>.Success(result.Value.keys.Select(k => k.FromRiakString()).ToList());
+            }
+
+            return RiakResult<IList<string>>.Error(result.ResultCode, result.ErrorMessage);
+        }
+
         /// <summary>
         /// Used to create a batched set of actions to be sent to a Riak cluster. This guarantees some level of serialized activity.
         /// </summary>

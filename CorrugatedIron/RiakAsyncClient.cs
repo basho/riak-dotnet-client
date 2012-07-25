@@ -58,6 +58,11 @@ namespace CorrugatedIron
 
         void GetServerInfo(Action<RiakResult<RiakServerInfo>> callback);
 
+        void IndexGet(string bucket, string indexName, int value, Action<RiakResult<IList<string>>> callback);
+        void IndexGet(string bucket, string indexName, string value, Action<RiakResult<IList<string>>> callback);
+        void IndexGet(string bucket, string indexName, int minValue, int maxValue, Action<RiakResult<IList<string>>> callback);
+        void IndexGet(string bucket, string indexName, string minValue, string maxValue, Action<RiakResult<IList<string>>> callback);
+
         void Batch(Action<IRiakBatchClient> batchAction);
     }
 
@@ -163,6 +168,26 @@ namespace CorrugatedIron
         public void GetServerInfo(Action<RiakResult<RiakServerInfo>> callback)
         {
             ExecAsync(() => callback(_client.GetServerInfo()));
+        }
+
+        public void IndexGet(string bucket, string indexName, int value, Action<RiakResult<IList<string>>> callback)
+        {
+            ExecAsync(() => callback(_client.IndexGet(bucket, indexName, value)));
+        }
+
+        public void IndexGet(string bucket, string indexName, string value, Action<RiakResult<IList<string>>> callback)
+        {
+            ExecAsync(() => callback(_client.IndexGet(bucket, indexName, value)));
+        }
+
+        public void IndexGet(string bucket, string indexName, int minValue, int maxValue, Action<RiakResult<IList<string>>> callback)
+        {
+            ExecAsync(() => callback(_client.IndexGet(bucket, indexName, minValue, maxValue)));
+        }
+
+        public void IndexGet(string bucket, string indexName, string minValue, string maxValue, Action<RiakResult<IList<string>>> callback)
+        {
+            ExecAsync(() => callback(_client.IndexGet(bucket, indexName, minValue, maxValue)));
         }
 
         public void Batch(Action<IRiakBatchClient> batchAction)
