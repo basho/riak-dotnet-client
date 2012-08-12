@@ -15,6 +15,7 @@
 // under the License.
 
 using System.Web;
+using System.Text.RegularExpressions;
 using CorrugatedIron.Util;
 
 namespace CorrugatedIron.Extensions
@@ -22,6 +23,11 @@ namespace CorrugatedIron.Extensions
     public static class StringExtensions
     {
         private static readonly System.Text.Encoding RiakEncoding = System.Text.Encoding.UTF8;
+
+        // + - && || ! ( ) { } [ ] ^ " ~ * ? : \
+        private const string SearchTermPattern = @"[\+\-!\(\)\{\}\[\]^\""~\*\?\:\\]{1}";
+        private const string SearchTermReplacement = @"\$&";
+        private static readonly Regex SearchTermRegex = new Regex(SearchTermPattern, RegexOptions.Compiled);
 
         public static byte[] ToRiakString(this string value)
         {
@@ -61,6 +67,27 @@ namespace CorrugatedIron.Extensions
         public static string ToBinaryKey(this string value)
         {
             return value.IsBinaryKey() ? value : value + RiakConstants.IndexSuffix.Binary;
+        }
+        
+        public static string ToRiakSearchTerm(this string value) 
+        {
+            var result = SearchTermRegex.Replace(value, SearchTermReplacement);
+
+            // if this is a range query, we can skip the double quotes
+            var valueLength = value.Length;
+            if ((value[0] == '[' && value[valueLength - 1] == ']')
+                || (value[0] == '{' && value[valueLength - 1] == '}'))
+            {
+                return result;
+            }
+
+            // If we have a phrase, then we want to put double quotes around the Term
+            if (value.IndexOf(" ") > -1)
+            {
+                result = string.Format("\"{0}\"", result);
+            }
+            
+            return result;
         }
     }
 }

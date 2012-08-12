@@ -59,10 +59,10 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
             result.Value.AllowMultiple.HasValue.ShouldBeTrue();
             result.Value.NVal.HasValue.ShouldBeTrue();
             result.Value.LastWriteWins.HasValue.ShouldBeFalse();
-            result.Value.RVal.ShouldBeNull();
-            result.Value.RwVal.ShouldBeNull();
-            result.Value.DwVal.ShouldBeNull();
-            result.Value.WVal.ShouldBeNull();
+            result.Value.RVal.ShouldNotBeNull();
+            result.Value.RwVal.ShouldNotBeNull();
+            result.Value.DwVal.ShouldNotBeNull();
+            result.Value.WVal.ShouldNotBeNull();
         }
 
         [Test]
