@@ -348,10 +348,10 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             doc = new RiakObject(MultiBucket, MultiKey, MultiBodyTwo, RiakConstants.ContentTypes.ApplicationJson);
             var writeResult2 = client.Put(doc);
             writeResult2.IsSuccess.ShouldBeTrue();
-            writeResult2.Value.Siblings.Count.ShouldEqual(2);
+            writeResult2.Value.Siblings.Count.ShouldBeGreaterThan(2);
 
             var result = client.Get(MultiBucket, MultiKey);
-            result.Value.Siblings.Count.ShouldEqual(2);
+            result.Value.Siblings.Count.ShouldBeGreaterThan(2);
         }
 
         [Test]

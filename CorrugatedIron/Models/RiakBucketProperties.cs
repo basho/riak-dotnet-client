@@ -129,19 +129,14 @@ namespace CorrugatedIron.Models
             return this;
         }
 
-        public RiakBucketProperties SetRVal(uint value)
-        {
-            return WriteQuorum(value, v => RVal = v);
-        }
-
         public RiakBucketProperties SetRVal(string value)
         {
             return WriteQuorum(value, v => RVal = v);
         }
 
-        public RiakBucketProperties SetRwVal(uint value)
+        public RiakBucketProperties SetRVal(uint value)
         {
-            return WriteQuorum(value, v => RwVal = v);
+            return WriteQuorum(value, v => RVal = v);
         }
 
         public RiakBucketProperties SetRwVal(string value)
@@ -149,9 +144,9 @@ namespace CorrugatedIron.Models
             return WriteQuorum(value, v => RwVal = v);
         }
 
-        public RiakBucketProperties SetDwVal(uint value)
+        public RiakBucketProperties SetRwVal(uint value)
         {
-            return WriteQuorum(value, v => DwVal = v);
+            return WriteQuorum(value, v => RwVal = v);
         }
 
         public RiakBucketProperties SetDwVal(string value)
@@ -159,12 +154,17 @@ namespace CorrugatedIron.Models
             return WriteQuorum(value, v => DwVal = v);
         }
 
-        public RiakBucketProperties SetWVal(uint value)
+        public RiakBucketProperties SetDwVal(uint value)
+        {
+            return WriteQuorum(value, v => DwVal = v);
+        }
+
+        public RiakBucketProperties SetWVal(string value)
         {
             return WriteQuorum(value, v => WVal = v);
         }
 
-        public RiakBucketProperties SetWVal(string value)
+        public RiakBucketProperties SetWVal(uint value)
         {
             return WriteQuorum(value, v => WVal = v);
         }
@@ -225,16 +225,18 @@ namespace CorrugatedIron.Models
             return this;
         }
 
-        private RiakBucketProperties WriteQuorum(uint value, Action<Either<uint, string>> setter)
+        private RiakBucketProperties WriteQuorum(string value, Action<Either<uint, string>> setter)
         {
-            System.Diagnostics.Debug.Assert(value >= 1);
+            System.Diagnostics.Debug.Assert(new HashSet<string> { "all", "quorum", "one" }.Contains(value), "Incorrect quorum value");
+
             setter(new Either<uint, string>(value));
             return this;
         }
 
-        private RiakBucketProperties WriteQuorum(string value, Action<Either<uint, string>> setter)
+        private RiakBucketProperties WriteQuorum(uint value, Action<Either<uint, string>> setter)
         {
-            System.Diagnostics.Debug.Assert(new HashSet<string> { "all", "quorum", "one" }.Contains(value), "Incorrect quorum value");
+            System.Diagnostics.Debug.Assert(value >= 1);
+
             setter(new Either<uint, string>(value));
             return this;
         }

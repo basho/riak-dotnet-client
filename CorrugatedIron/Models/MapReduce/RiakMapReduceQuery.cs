@@ -51,6 +51,12 @@ namespace CorrugatedIron.Models.MapReduce
             return this;
         }
 
+        public RiakMapReduceQuery Inputs(RiakBucketSearchInput riakBucketSearchInput)
+        {
+            _inputs = riakBucketSearchInput;
+            return this;
+        }
+
         public RiakMapReduceQuery Inputs(RiakBucketKeyInput riakBucketKeyInputs)
         {
             _inputs = riakBucketKeyInputs;

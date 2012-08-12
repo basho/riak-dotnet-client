@@ -33,15 +33,6 @@ namespace CorrugatedIron.Messages
         [ProtoMember(3, IsRequired = false, Name = "rw", DataFormat = DataFormat.TwosComplement)]
         [DefaultValue(default(uint))]
         internal uint Rw { get; set; }
-
-        
-        /*     optional bytes vclock = 4;
-                optional uint32 r = 5;
-                optional uint32 w = 6;
-                optional uint32 pr = 7;
-                optional uint32 pw = 8;
-                optional uint32 dw = 9;
-        */
         
         [ProtoMember(4, IsRequired = false, Name = "vclock", DataFormat = DataFormat.Default)]
         [DefaultValue(null)]
