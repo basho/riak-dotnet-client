@@ -71,6 +71,7 @@
     <Compile Include="RiakConfigurationTests.cs" />
     <Compile Include="RiakMapReduceTests.cs" />
     <Compile Include="RiakObjectTests.cs" />
+    <Compile Include="RiakPbSearchTests.cs" />
     <Compile Include="RiakSearchMapReduceInputTests.cs" />
     <Compile Include="RiakIndexTests.cs" />
   </ItemGroup>

@@ -201,6 +201,8 @@
     <Compile Include="Models\RiakSearch\IRiakSearchQueryPart.cs" />
     <Compile Include="Models\RiakSearch\RiakSearchBinaryLogicTerm.cs" />
     <Compile Include="Models\RiakSearch\RiakSearchQuery.cs" />
+    <Compile Include="Models\RiakSearch\RiakSearchRequest.cs" />
+    <Compile Include="Models\RiakSearch\RiakSearchResult.cs" />
     <Compile Include="Models\RiakServerInfo.cs" />
     <Compile Include="RiakAsyncClient.cs" />
     <Compile Include="RiakClient.cs" />

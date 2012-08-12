@@ -23,6 +23,8 @@ using CorrugatedIron.Tests.Extensions;
 using CorrugatedIron.Tests.Live.LiveRiakConnectionTests;
 using CorrugatedIron.Util;
 using NUnit.Framework;
+using System.Linq;
+using System.Text;
 
 namespace CorrugatedIron.Tests.Live
 {
@@ -30,19 +32,28 @@ namespace CorrugatedIron.Tests.Live
     public class RiakClientTests : LiveRiakConnectionTestBase
     {
         [Test]
+        public void WritingLargeObjectIsSuccessful()
+        {
+            var text = Enumerable.Range(0, 2000000).Aggregate(new StringBuilder(), (sb, i) => sb.Append(i.ToString())).ToString();
+            var riakObject = new RiakObject(TestBucket, "large", text, RiakConstants.ContentTypes.TextPlain);
+            var result = Client.Put(riakObject);
+            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
+        }
+
+        [Test]
         public void DeleteIsSuccessful()
         {
             var riakObject = new RiakObject(TestBucket, TestKey, TestJson, RiakConstants.ContentTypes.ApplicationJson);
             var riakObjectId = riakObject.ToRiakObjectId();
 
             var putResult = Client.Put(riakObject);
-            putResult.IsSuccess.ShouldBeTrue();
+            putResult.IsSuccess.ShouldBeTrue(putResult.ErrorMessage);
 
             var delResult = Client.Delete(riakObjectId);
-            delResult.IsSuccess.ShouldBeTrue();
+            delResult.IsSuccess.ShouldBeTrue(delResult.ErrorMessage);
 
             var getResult = Client.Get(riakObjectId);
-            getResult.IsSuccess.ShouldBeFalse();
+            getResult.IsSuccess.ShouldBeFalse(getResult.ErrorMessage);
             getResult.ResultCode.ShouldEqual(ResultCode.NotFound);
             getResult.Value.ShouldBeNull();
         }

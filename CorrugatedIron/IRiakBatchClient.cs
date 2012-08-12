@@ -18,6 +18,8 @@ using System.Collections.Generic;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Util;
+using CorrugatedIron.Models.RiakSearch;
+using System;
 
 namespace CorrugatedIron
 {
@@ -61,5 +63,7 @@ namespace CorrugatedIron
         RiakResult<IList<string>> IndexGet(string bucket, string indexName, string value);
         RiakResult<IList<string>> IndexGet(string bucket, string indexName, int minValue, int maxValue);
         RiakResult<IList<string>> IndexGet(string bucket, string indexName, string minValue, string maxValue);
+
+        //RiakResult<RiakSearchResult> Search(Action<RiakSearchRequest> prepareRequest)
     }
 }
