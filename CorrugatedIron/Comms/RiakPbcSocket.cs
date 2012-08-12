@@ -117,7 +117,7 @@ namespace CorrugatedIron.Comms
             const int sizeSize = sizeof(int);
             const int codeSize = sizeof(byte);
             const int headerSize = sizeSize + codeSize;
-            const int sendBufferSize = 1024 * 16;
+            const int sendBufferSize = 1024 * 4;
             byte[] messageBody;
             long messageLength = 0;
 
@@ -141,12 +141,12 @@ namespace CorrugatedIron.Comms
             Array.Copy(size, messageBody, sizeSize);
             messageBody[sizeSize] = (byte)messageCode;
 
-            int bytesToSend = (int)messageLength;
-            int position = 0;
+            var bytesToSend = (int)messageLength;
+            var position = 0;
 
             while (bytesToSend > 0)
             {
-                int sent = PbcSocket.Send(messageBody, position, bytesToSend <= sendBufferSize ? bytesToSend : sendBufferSize, SocketFlags.None);
+                var sent = PbcSocket.Send(messageBody, position, Math.Min(bytesToSend, sendBufferSize), SocketFlags.None);
                 if (sent == 0)
                 {
                     throw new RiakException("Failed to send data to server - Timed Out: {0}:{1}".Fmt(_server, _port));
