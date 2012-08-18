@@ -26,7 +26,7 @@ using NUnit.Framework;
 
 namespace CorrugatedIron.Tests.Live
 {
-    [TestFixture()]
+    [TestFixture]
     public class RiakSearchMapReduceInputTests : RiakMapReduceTests
     {
         // N.B. You need to install the search hooks on the riak_search_bucket first via `bin/search-cmd install riak_search_bucket`
@@ -64,18 +64,18 @@ namespace CorrugatedIron.Tests.Live
             Client.Put(new RiakObject(Bucket, RiakSearchKey2, RiakSearchDoc2, RiakConstants.ContentTypes.ApplicationJson));
             
             var mr = new RiakMapReduceQuery();
-            
+
             var modFunArg = new RiakModuleFunctionArgInput
-                                {
+            {
                 Module = "riak_search",
                 Function = "mapred_search",
-                Arg = new[] {Bucket, "name:Al*"}
+                Arg = new[] { Bucket, "name:Al*" }
             };
 
             mr.Inputs(modFunArg);
             
             var result = Client.MapReduce(mr);
-            result.IsSuccess.ShouldBeTrue();
+            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
             
             var mrResult = result.Value;
             mrResult.PhaseResults.Count().ShouldEqual(1);
@@ -105,7 +105,7 @@ namespace CorrugatedIron.Tests.Live
             mr.Inputs(mfa);
 
             var result = Client.MapReduce(mr);
-            result.IsSuccess.ShouldBeTrue();
+            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
 
             var mrResult = result.Value;
             mrResult.PhaseResults.Count().ShouldEqual(1);

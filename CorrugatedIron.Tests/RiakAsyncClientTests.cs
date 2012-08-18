@@ -46,7 +46,7 @@ namespace CorrugatedIron.Tests.RiakAsyncClientTests
         [SetUp]
         public void SetUp()
         {
-            ClientMock.Setup(m => m.Get(It.IsAny<string>(), It.IsAny<string>(), 2)).Returns(RiakResult<RiakObject>.Success(new RiakObject("foo", "bar", "baz")));
+            ClientMock.Setup(m => m.Get(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<uint>())).Returns(RiakResult<RiakObject>.Success(new RiakObject("foo", "bar", "baz")));
             AsyncClient.Get(new RiakObjectId("foo", "bar"), Tester.HandleResult);
             Result = Tester.Result;
         }
@@ -54,14 +54,14 @@ namespace CorrugatedIron.Tests.RiakAsyncClientTests
         [Test]
         public void AsyncClientInvokesCorrectClientFunction()
         {
-            ClientMock.Verify(m => m.Get(It.IsAny<string>(), It.IsAny<string>(), 2), Times.Once());
+            ClientMock.Verify(m => m.Get(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<uint>()), Times.Once());
         }
 
         [Test]
         public void AsyncClientReturnsCorrectResult()
         {
             Result.ShouldNotBeNull();
-            Result.IsSuccess.ShouldBeTrue();
+            Result.IsSuccess.ShouldBeTrue(Result.ErrorMessage);
             Result.Value.ShouldNotBeNull();
             Result.Value.Bucket.ShouldEqual("foo");
             Result.Value.Key.ShouldEqual("bar");
@@ -75,7 +75,7 @@ namespace CorrugatedIron.Tests.RiakAsyncClientTests
         [SetUp]
         public void SetUp()
         {
-            ClientMock.Setup(m => m.Get(It.IsAny<string>(), It.IsAny<string>(), 2)).Returns(RiakResult<RiakObject>.Success(new RiakObject("foo", "bar", "baz")));
+            ClientMock.Setup(m => m.Get(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<uint>())).Returns(RiakResult<RiakObject>.Success(new RiakObject("foo", "bar", "baz")));
             AsyncClient.Get("foo", "bar", Tester.HandleResult);
             Result = Tester.Result;
         }
@@ -83,14 +83,14 @@ namespace CorrugatedIron.Tests.RiakAsyncClientTests
         [Test]
         public void AsyncClientInvokesCorrectClientFunction()
         {
-            ClientMock.Verify(m => m.Get(It.IsAny<string>(), It.IsAny<string>(), 2), Times.Once());
+            ClientMock.Verify(m => m.Get(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<uint>()), Times.Once());
         }
 
         [Test]
         public void AsyncClientReturnsCorrectResult()
         {
             Result.ShouldNotBeNull();
-            Result.IsSuccess.ShouldBeTrue();
+            Result.IsSuccess.ShouldBeTrue(Result.ErrorMessage);
             Result.Value.ShouldNotBeNull();
             Result.Value.Bucket.ShouldEqual("foo");
             Result.Value.Key.ShouldEqual("bar");

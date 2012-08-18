@@ -56,7 +56,7 @@ namespace CorrugatedIron.Tests.Live
             
             var result = Client.Get(o.ToRiakObjectId());
             
-            result.IsSuccess.ShouldBeTrue();
+            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
             var ro = result.Value;
             
             ro.BinIndexes.Count.ShouldEqual(1);
@@ -75,7 +75,7 @@ namespace CorrugatedIron.Tests.Live
             }
 
             var result = Client.IndexGet(Bucket, "age", 32);
-            result.IsSuccess.ShouldBeTrue();
+            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
             result.Value.Count.ShouldEqual(10);
 
             foreach (var v in result.Value)
@@ -98,7 +98,7 @@ namespace CorrugatedIron.Tests.Live
             }
 
             var result = Client.IndexGet(Bucket, "age", "32");
-            result.IsSuccess.ShouldBeTrue();
+            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
             result.Value.Count.ShouldEqual(10);
 
             foreach (var v in result.Value)
@@ -114,7 +114,7 @@ namespace CorrugatedIron.Tests.Live
         {
             for (int i = 0; i < 10; i++)
             {
-                var o = new RiakObject(Bucket, i.ToString(), "{ value: \"this is an object\" }");
+                var o = new RiakObject(Bucket, i.ToString(), "{\"value\":\"this is an object\"}");
                 o.AddIndex("age_int", 32);
                 
                 Client.Put(o);
@@ -124,10 +124,10 @@ namespace CorrugatedIron.Tests.Live
             
             var mr = new RiakMapReduceQuery();
             mr.Inputs(input)
-                .ReduceJs(r => r.Name("mapValuesJson").Keep(true));
+                .MapJs(m => m.Name("Riak.mapValuesJson").Keep(true));
             
             var result = Client.MapReduce(mr);
-            result.IsSuccess.ShouldBeTrue();
+            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
             
             var keys = result.Value.PhaseResults.OrderBy(pr => pr.Phase).ElementAt(0).GetObjects<RiakObjectId>();
             
@@ -137,54 +137,6 @@ namespace CorrugatedIron.Tests.Live
             {
                 key.Bucket.ShouldNotBeNullOrEmpty();
                 key.Key.ShouldNotBeNullOrEmpty();
-            }
-        }
-        
-        [Test]
-        public void RiakObjectIdCanBeCreatedFromJsonArrayOrObject()
-        {
-            for (int i = 0; i < 10; i++)
-            {
-                var o = new RiakObject(Bucket, i.ToString(), "{ value: \"this is an object\" }");
-                o.AddIndex("age_int", 32);
-                
-                Client.Put(o);
-            }
-            
-            var input = new RiakIntIndexEqualityInput(Bucket, "age_int", 32);
-            
-            var mr = new RiakMapReduceQuery()
-                .Inputs(input)
-                .ReduceJs(r => r.Name("mapValuesJson").Keep(true));
-            
-            var result = Client.MapReduce(mr);
-            result.IsSuccess.ShouldBeTrue();
-            var keysOne = result.Value.PhaseResults.OrderBy(pr => pr.Phase).ElementAt(0).GetObjects<RiakObjectId>();
-            
-            mr = new RiakMapReduceQuery()
-                .Inputs(input)
-                .ReduceErlang(r => r.ModFun("riak_kv_mapreduce", "reduce_identity").Keep(true));
-            
-            result = Client.MapReduce(mr);
-            result.IsSuccess.ShouldBeTrue();
-            var keysTwo = result.Value.PhaseResults.OrderBy(pr => pr.Phase).ElementAt(0).GetObjects<RiakObjectId>();
-            
-            keysOne.Count().ShouldEqual(keysTwo.Count());
-            
-            foreach (var key in keysOne)
-            {
-                key.Key.ShouldNotBeNullOrEmpty();
-                key.Bucket.ShouldNotBeNullOrEmpty();
-                
-                keysTwo.Contains(key).ShouldBeTrue();
-            }
-            
-            foreach (var key in keysTwo)
-            {
-                key.Key.ShouldNotBeNullOrEmpty();
-                key.Bucket.ShouldNotBeNullOrEmpty();
-                
-                keysOne.Contains(key).ShouldBeTrue();
             }
         }
         
@@ -206,7 +158,7 @@ namespace CorrugatedIron.Tests.Live
                 .ReduceErlang(r => r.ModFun("riak_kv_mapreduce", "reduce_identity").Keep(true));
             
             var result = Client.MapReduce(mr);
-            result.IsSuccess.ShouldBeTrue();
+            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
             
             // TODO write tests verifying results
         }
