@@ -39,6 +39,8 @@ namespace CorrugatedIron.Models.MapReduce
 
         public string ContentType { get; set; }
 
+        public int? Timeout { get; set; }
+
         public RiakMapReduceQuery()
         {
             _phases = new List<RiakPhase>();
@@ -171,6 +173,10 @@ namespace CorrugatedIron.Models.MapReduce
                 writer.WriteStartArray();
                 _phases.ForEach(p => writer.WriteRawValue(p.ToJsonString()));
                 writer.WriteEndArray();
+
+                // only serialize the timeout property if the value is set.
+                if (Timeout.HasValue)
+                    writer.WriteProperty<int>("timeout", Timeout.Value);
 
                 writer.WriteEndObject();
             }
