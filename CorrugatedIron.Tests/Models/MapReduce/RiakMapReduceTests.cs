@@ -30,6 +30,9 @@ namespace CorrugatedIron.Tests.Models.MapReduce
         private const string MrJobText =
             @"{""inputs"":""animals"",""query"":[{""map"":{""language"":""javascript"",""source"":""function(v) { return [v]; }"",""keep"":true}}]}";
 
+        private const string MrJobWithTimeoutText =
+            @"{""inputs"":""animals"",""query"":[{""map"":{""language"":""javascript"",""source"":""function(v) { return [v]; }"",""keep"":true}}],""timeout"":100200}";
+
         private const string ComplexMrJobText =
             @"{""inputs"":""animals"",""query"":[{""map"":{""language"":""javascript"",""source"":""function(o) { if (o.key.indexOf('spider') != -1) return [1]; return []; }"",""keep"":false}},{""reduce"":{""language"":""javascript"",""name"":""Riak.reduceSum"",""keep"":true}}]}";
 
@@ -51,6 +54,22 @@ namespace CorrugatedIron.Tests.Models.MapReduce
             var request = query.ToMessage();
             request.ContentType.ShouldEqual(MrContentType.ToRiakString());
             request.Request.ShouldEqual(MrJobText.ToRiakString());
+        }
+
+        [Test]
+        public void BuildingSimpleMapReduceJobsWithTimeoutProducesTheCorrectCommand()
+        {
+            var query = new RiakMapReduceQuery
+            {
+                ContentType = MrContentType,
+                Timeout = 100200
+            }
+                .Inputs("animals")
+                .MapJs(m => m.Source("function(v) { return [v]; }").Keep(true));
+
+            var request = query.ToMessage();
+            request.ContentType.ShouldEqual(MrContentType.ToRiakString());
+            request.Request.ShouldEqual(MrJobWithTimeoutText.ToRiakString());
         }
 
         [Test]
