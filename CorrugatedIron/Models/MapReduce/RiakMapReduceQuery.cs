@@ -19,10 +19,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using CorrugatedIron.Extensions;
-using CorrugatedIron.Models.MapReduce.KeyFilters;
 using CorrugatedIron.Messages;
 using CorrugatedIron.Models.MapReduce.Fluent;
 using CorrugatedIron.Models.MapReduce.Inputs;
+using CorrugatedIron.Models.MapReduce.KeyFilters;
 using CorrugatedIron.Models.MapReduce.Languages;
 using CorrugatedIron.Models.MapReduce.Phases;
 using CorrugatedIron.Util;
@@ -129,15 +129,6 @@ namespace CorrugatedIron.Models.MapReduce
             return this;
         }
 
-        //        public RiakMapReduceQuery GetIndex(Action<RiakFluentIndexPhase> setup)
-        //        {
-        //            var phase = new RiakIndexPhase();
-        //            var fluent = new RiakFluentIndexPhase(phase);
-        //            setup(fluent);
-        //            
-        //            throw new NotImplementedException();
-        //        }
-
         public RiakMapReduceQuery Filter(Action<RiakFluentKeyFilter> setup)
         {
             var filters = new List<IRiakKeyFilterToken>();
@@ -174,9 +165,10 @@ namespace CorrugatedIron.Models.MapReduce
                 _phases.ForEach(p => writer.WriteRawValue(p.ToJsonString()));
                 writer.WriteEndArray();
 
-                // only serialize the timeout property if the value is set.
                 if (Timeout.HasValue)
+                {
                     writer.WriteProperty<int>("timeout", Timeout.Value);
+                }
 
                 writer.WriteEndObject();
             }

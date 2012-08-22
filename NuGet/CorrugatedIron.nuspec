@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
         <id>CorrugatedIron</id>
-	<version>0.2.2.0</version>
+	<version>0.2.3.0</version>
 	<authors>OJ Reeves, Jeremiah Peschka</authors>
 	<owners>OJ Reeves, Jeremiah Peschka</owners>
 	<description>
@@ -21,7 +21,7 @@ CorrugatedIron - a .NET client for Riak.
 	<requireLicenseAcceptance>false</requireLicenseAcceptance>
 	<tags>Riak CorrugatedIron Corrugated Iron NoSQL Client Driver</tags>
 	<dependencies>
-            <dependency id="Newtonsoft.Json" version="4.0.8" />
+            <dependency id="Newtonsoft.Json" version="4.5.7" />
             <dependency id="protobuf-net" version="2.0.0.480" />
 	</dependencies>
 	<frameworkAssemblies>
