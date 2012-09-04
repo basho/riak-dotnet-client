@@ -27,4 +27,3 @@ test-results/*
 *.dotCover
 *.nupkg
 test-results
-packages/*
