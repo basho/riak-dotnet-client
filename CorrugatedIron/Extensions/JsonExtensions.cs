@@ -14,6 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Collections.Generic;
 using CorrugatedIron.Containers;
 using Newtonsoft.Json;
 
@@ -34,7 +35,16 @@ namespace CorrugatedIron.Extensions
         public static JsonWriter WriteProperty<T>(this JsonWriter writer, string name, T value)
         {
             writer.WritePropertyName(name);
-            writer.WriteValue(value);
+            if (value is Dictionary<string, object>)
+            {
+                var valueJson = JsonConvert.SerializeObject(value);
+                writer.WriteRawValue(valueJson);
+            }
+            else
+            {
+                writer.WriteValue(value);
+            }
+
             return writer;
         }
 

@@ -46,6 +46,12 @@ namespace CorrugatedIron.Models.MapReduce
             return rVal;
         }
 
+        public IEnumerable<T> GetSingleObjects<T>()
+        {
+            var rVal = Values.Select(v => JsonConvert.DeserializeObject<T>(v.FromRiakStringTrim()));
+            return rVal;
+        }
+
         public IEnumerable<dynamic> GetObjects()
         {
             return GetObjects<dynamic>();

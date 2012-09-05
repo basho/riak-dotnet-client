@@ -40,7 +40,6 @@ namespace CorrugatedIron.Models
     {
         private List<string> _vtags;
         private readonly int _hashCode;
-        private string _contentType;
 
         public string Bucket { get; private set; }
         public string Key { get; private set; }
@@ -95,6 +94,12 @@ namespace CorrugatedIron.Models
                     }
                 }
             }
+        }
+
+        public DateTime GetLastModified()
+        {
+            var epochTime = ToEpoch(LastModified, LastModifiedUsec);
+            return new DateTime(epochTime, DateTimeKind.Utc);
         }
 
         public bool HasChanged
@@ -260,6 +265,7 @@ namespace CorrugatedIron.Models
 
         internal RpbPutReq ToMessage()
         {
+            UpdateLastModified();
             var message = new RpbPutReq
             {
                 Bucket = Bucket.ToRiakString(),
@@ -279,6 +285,19 @@ namespace CorrugatedIron.Models
             return message;
         }
 
+        private void UpdateLastModified()
+        {
+            if (HasChanged)
+            {
+                var t = DateTime.UtcNow - new DateTime(1970, 1, 1);
+                var ms = (ulong)Math.Round(t.TotalMilliseconds);
+
+                LastModified = (uint)(ms / 1000u);
+                LastModifiedUsec = (uint)((ms - LastModified * 1000u) * 100u);
+            }
+        }
+
+
         public override bool Equals(object obj)
         {
             if(ReferenceEquals(null, obj))
@@ -294,6 +313,14 @@ namespace CorrugatedIron.Models
                 return false;
             }
             return Equals((RiakObject)obj);
+        }
+
+        private long ToEpoch(uint lastModified, uint lastModifiedUsec)
+        {
+            var epochTime = new DateTime(1970, 1, 1).Ticks;
+            epochTime += lastModified * 10000000L;
+            epochTime += lastModifiedUsec / 100L;
+            return epochTime;
         }
 
         public bool Equals(RiakObject other)
