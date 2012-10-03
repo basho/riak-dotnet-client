@@ -56,7 +56,7 @@ namespace CorrugatedIron.Tests.Json.RiakObjectConversionTests
             obj.ContentType.ShouldEqual(RiakConstants.ContentTypes.ApplicationJson);
 
             var json = obj.Value.FromRiakString();
-            json.ShouldEqual("{\"Name\":{\"FirstName\":\"OJ\",\"Surname\":\"Reeves\"},\"PhoneNumbers\":[{\"Number\":\"12345678\",\"NumberType\":1}],\"DateOfBirth\":\"\\/Date(281664000000)\\/\",\"Email\":\"oj@buffered.io\"}");
+            json.ShouldEqual("{\"Name\":{\"FirstName\":\"OJ\",\"Surname\":\"Reeves\"},\"PhoneNumbers\":[{\"Number\":\"12345678\",\"NumberType\":1}],\"DateOfBirth\":\"1978-12-05T00:00:00Z\",\"Email\":\"oj@buffered.io\"}");
 
             var deserialisedPerson = obj.GetObject<Person>();
             deserialisedPerson.ShouldEqual(testPerson);
@@ -66,7 +66,7 @@ namespace CorrugatedIron.Tests.Json.RiakObjectConversionTests
         [ExpectedException(typeof(NotSupportedException))]
         public void NonJsonObjectsCantBeDeserialisedFromJson()
         {
-            var obj = new RiakObject("bucket", "key", "{\"Name\":{\"FirstName\":\"OJ\",\"Surname\":\"Reeves\"},\"PhoneNumbers\":[{\"Number\":\"12345678\",\"NumberType\":1}],\"DateOfBirth\":\"\\/Date(281664000000)\\/\",\"Email\":\"oj@buffered.io\"}", RiakConstants.ContentTypes.TextPlain);
+            var obj = new RiakObject("bucket", "key", "{\"Name\":{\"FirstName\":\"OJ\",\"Surname\":\"Reeves\"},\"PhoneNumbers\":[{\"Number\":\"12345678\",\"NumberType\":1}],\"DateOfBirth\":\"1978-12-05T00:00:00Z\",\"Email\":\"oj@buffered.io\"}", RiakConstants.ContentTypes.TextPlain);
             obj.GetObject<Person>();
         }
 
@@ -147,7 +147,7 @@ namespace CorrugatedIron.Tests.Json.RiakObjectConversionTests
             obj.ContentType.ShouldEqual(RiakConstants.ContentTypes.ApplicationJson);
 
             var json = obj.Value.FromRiakString();
-            json.ShouldEqual("{\"Name\":{\"FirstName\":\"OJ\",\"Surname\":\"Reeves\"},\"PhoneNumbers\":[{\"Number\":\"12345678\",\"NumberType\":1}],\"DateOfBirth\":\"\\/Date(281664000000)\\/\",\"Email\":\"oj@buffered.io\"}");
+            json.ShouldEqual("{\"Name\":{\"FirstName\":\"OJ\",\"Surname\":\"Reeves\"},\"PhoneNumbers\":[{\"Number\":\"12345678\",\"NumberType\":1}],\"DateOfBirth\":\"1978-12-05T00:00:00Z\",\"Email\":\"oj@buffered.io\"}");
 
             var deserialisedPerson = obj.GetObject<Person>();
             deserialisedPerson.ShouldEqual(testPerson);
