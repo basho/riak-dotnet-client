@@ -525,6 +525,9 @@ function Configure-BuildEnvironment {
         '4.0' {
             $versions = @('v4.0.30319')
         }
+		'4.5' {
+            $versions = @('v4.0.30319')
+        }
         default {
             throw ($msgs.error_unknown_framework -f $versionPart, $framework)
         }

@@ -30,6 +30,7 @@ CorrugatedIron - a .NET client for Riak.
     </metadata>
 	<files>
 		<file src="bin\4.0\CorrugatedIron.dll" target="lib/net40" />
+		<file src="bin\4.5\CorrugatedIron.dll" target="lib/net45" />
 		<file src="transforms\app.config.transform" target="content\app.config.transform" />
 		<file src="transforms\web.config.transform" target="content\web.config.transform" />
   </files>
