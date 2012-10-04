@@ -26,7 +26,7 @@ properties {
   # BUILD_NUMBER is defined during CI builds. Make sure that this value
   # is changed if the CI system in use does not set this variable.
   # Make sure Semver versioning is used for the build number.
-  $build.version = if($env:BUILD_NUMBER) { $env:BUILD_NUMBER } else { "2.5.0.0" }
+  $build.version = if($env:BUILD_NUMBER) { $env:BUILD_NUMBER } else { "0.2.3.5" }
   
   $tools = @{}
   $tools.dir = "$($base.dir)\tools"
