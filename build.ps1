@@ -20,7 +20,7 @@ $buildPath = (Resolve-Path $scriptPath\build)
 $psakeModule = @(Get-ChildItem $scriptPath\* -recurse -include psake.ps1)[0].FullName
 . $psakeModule $buildFile $taskList '4.0' $docs $parameters $properties
 . $psakeModule $buildFile $taskList '4.5' $docs $parameters $properties
-#. $psakeModule $buildFile Package $framework $docs $parameters $properties
+. $psakeModule $buildFile Package $framework $docs $parameters $properties
 
 if($env:BUILD_NUMBER) {
   [Environment]::Exit($lastexitcode)
