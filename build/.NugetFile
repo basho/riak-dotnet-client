@@ -1,0 +1,3 @@
+install_to '.'
+chew 'psake' '4.1.0'
+chew 'NUnit.Runners' '2.6.0.12051'

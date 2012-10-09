@@ -1,6 +1,8 @@
 ﻿using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Security;
 
+[assembly: AllowPartiallyTrustedCallers]
 [assembly: AssemblyTitle("CorrugatedIron")]
 [assembly: AssemblyDescription(".NET Client for the Riak KV store")]
 [assembly: InternalsVisibleTo("CorrugatedIron.Tests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100cbce6729c1b4ff49bcf42aa707e4700d2598ee88419832228f79c898e8b816fdeabbf388ccab0482107968bb440602f4820ffc11a144b8fd612db37c1e74f438ae46b05a3ba1618b5643f849803b9088c2242e8aa3b83b5efc2dc680db8558cdbed862a8e6399b25dd6ba468bd113af3b227eb7caf70f0f152093f82cdf708d0")]

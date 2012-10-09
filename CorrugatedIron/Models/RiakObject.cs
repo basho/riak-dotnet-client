@@ -40,7 +40,6 @@ namespace CorrugatedIron.Models
     {
         private List<string> _vtags;
         private readonly int _hashCode;
-        private string _contentType;
 
         public string Bucket { get; private set; }
         public string Key { get; private set; }
@@ -97,6 +96,12 @@ namespace CorrugatedIron.Models
             }
         }
 
+        public DateTime GetLastModified()
+        {
+            var epochTime = ToEpoch(LastModified, LastModifiedUsec);
+            return new DateTime(epochTime, DateTimeKind.Utc);
+        }
+
         public bool HasChanged
         {
             get { return _hashCode != CalculateHashCode(); }
@@ -128,17 +133,23 @@ namespace CorrugatedIron.Models
         }
 
         public RiakObject(string bucket, string key, string value, string contentType, string charSet)
-            : this(bucket, key, value.ToRiakString(), contentType, charSet)
+            : this(bucket, key, value.ToRiakString(), contentType, charSet, null)
         {
         }
 
-        public RiakObject(string bucket, string key, byte[] value, string contentType, string charSet)
+        public RiakObject(string bucket, string key, string value, string contentType, string charSet, byte[] vectorClock)
+            : this(bucket, key, value.ToRiakString(), contentType, charSet, vectorClock)
+        {
+        }
+
+        public RiakObject(string bucket, string key, byte[] value, string contentType, string charSet, byte[] vectorClock)
         {
             Bucket = bucket;
             Key = key;
             Value = value;
             ContentType = contentType;
             CharSet = charSet;
+            VectorClock = vectorClock;
             UserMetaData = new Dictionary<string, string>();
             Indexes = new Dictionary<string, string>();
             Links = new List<RiakLink>();
@@ -146,6 +157,36 @@ namespace CorrugatedIron.Models
 
             BinIndexes = new Dictionary<string, string>();
             IntIndexes = new Dictionary<string, int>();
+        }
+
+        internal RiakObject(string bucket, string key, RpbContent content, byte[] vectorClock)
+        {
+            Bucket = bucket;
+            Key = key;
+            VectorClock = vectorClock;
+
+            Value = content.Value;
+            VTag = content.VTag.FromRiakString();
+            ContentEncoding = content.ContentEncoding.FromRiakString();
+            ContentType = content.ContentType.FromRiakString();
+            UserMetaData = content.UserMeta.ToDictionary(p => p.Key.FromRiakString(), p => p.Value.FromRiakString());
+            Indexes = content.Indexes.ToDictionary(p => p.Key.FromRiakString(), p => p.Value.FromRiakString());
+            Links = content.Links.Select(l => new RiakLink(l)).ToList();
+            Siblings = new List<RiakObject>();
+            LastModified = content.LastMod;
+            LastModifiedUsec = content.LastModUSecs;
+
+            _hashCode = CalculateHashCode();
+        }
+
+        internal RiakObject(string bucket, string key, ICollection<RpbContent> contents, byte[] vectorClock)
+            : this(bucket, key, contents.First(), vectorClock)
+        {
+            if (contents.Count > 1)
+            {
+                Siblings = contents.Select(c => new RiakObject(bucket, key, c, vectorClock)).ToList();
+                _hashCode = CalculateHashCode();
+            }
         }
 
         public void AddBinIndex(string index, string key)
@@ -228,38 +269,11 @@ namespace CorrugatedIron.Models
             return new RiakObjectId(Bucket, Key);
         }
 
-        internal RiakObject(string bucket, string key, RpbContent content, byte[] vectorClock)
-        {
-            Bucket = bucket;
-            Key = key;
-            VectorClock = vectorClock;
 
-            Value = content.Value;
-            VTag = content.VTag.FromRiakString();
-            ContentEncoding = content.ContentEncoding.FromRiakString();
-            ContentType = content.ContentType.FromRiakString();
-            UserMetaData = content.UserMeta.ToDictionary(p => p.Key.FromRiakString(), p => p.Value.FromRiakString());
-            Indexes = content.Indexes.ToDictionary(p => p.Key.FromRiakString(), p => p.Value.FromRiakString());
-            Links = content.Links.Select(l => new RiakLink(l)).ToList();
-            Siblings = new List<RiakObject>();
-            LastModified = content.LastMod;
-            LastModifiedUsec = content.LastModUSecs;
-
-            _hashCode = CalculateHashCode();
-        }
-
-        internal RiakObject(string bucket, string key, ICollection<RpbContent> contents, byte[] vectorClock)
-            : this(bucket, key, contents.First(), vectorClock)
-        {
-            if(contents.Count > 1)
-            {
-                Siblings = contents.Select(c => new RiakObject(bucket, key, c, vectorClock)).ToList();
-                _hashCode = CalculateHashCode();
-            }
-        }
 
         internal RpbPutReq ToMessage()
         {
+            UpdateLastModified();
             var message = new RpbPutReq
             {
                 Bucket = Bucket.ToRiakString(),
@@ -279,6 +293,19 @@ namespace CorrugatedIron.Models
             return message;
         }
 
+        private void UpdateLastModified()
+        {
+            if (HasChanged)
+            {
+                var t = DateTime.UtcNow - new DateTime(1970, 1, 1);
+                var ms = (ulong)Math.Round(t.TotalMilliseconds);
+
+                LastModified = (uint)(ms / 1000u);
+                LastModifiedUsec = (uint)((ms - LastModified * 1000u) * 100u);
+            }
+        }
+
+
         public override bool Equals(object obj)
         {
             if(ReferenceEquals(null, obj))
@@ -294,6 +321,14 @@ namespace CorrugatedIron.Models
                 return false;
             }
             return Equals((RiakObject)obj);
+        }
+
+        private long ToEpoch(uint lastModified, uint lastModifiedUsec)
+        {
+            var epochTime = new DateTime(1970, 1, 1).Ticks;
+            epochTime += lastModified * 10000000L;
+            epochTime += lastModifiedUsec / 100L;
+            return epochTime;
         }
 
         public bool Equals(RiakObject other)

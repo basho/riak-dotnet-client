@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>CorrugatedIron.Plus</id>
+	<version>0.2.3.5</version>
+	<authors>OJ Reeves, Jeremiah Peschka</authors>
+	<owners>OJ Reeves, Jeremiah Peschka</owners>
+	<description>
+CorrugatedIron - a .NET client for Riak.
+
+Riak is a distributed, fault tolerant, highly-available Key/Value store written by Basho Technologies. Riak is Open Source, written in Erlang. CorrugatedIron exposes the features of Riak through a developer-friendly API.
+
+After installing this package, make sure that you modify either the app.config (for client apps) or web.config (for web apps) so that the details of the target Riak cluster are set correctly.
+	</description>
+	<summary>
+CorrugatedIron - a .NET client for Riak.
+	</summary>
+	<projectUrl>http://corrugatediron.org/</projectUrl>
+	<iconUrl>http://corrugatediron.org/nugeticon.png</iconUrl>
+	<licenseUrl>http://corrugatediron.org/LICENSE.txt</licenseUrl>
+	<requireLicenseAcceptance>false</requireLicenseAcceptance>
+	<tags>Riak CorrugatedIron Corrugated Iron NoSQL Client Driver</tags>
+	<dependencies>
+            <dependency id="Newtonsoft.Json" version="4.5.9" />
+            <dependency id="protobuf-net" version="2.0.0.480" />
+	</dependencies>
+	<frameworkAssemblies>
+            <frameworkAssembly assemblyName="System.configuration" />
+	</frameworkAssemblies>
+    </metadata>
+	<files>
+		<file src="bin\4.0\CorrugatedIron.dll" target="lib/net40" />
+		<file src="bin\4.5\CorrugatedIron.dll" target="lib/net45" />
+		<file src="transforms\app.config.transform" target="content\app.config.transform" />
+		<file src="transforms\web.config.transform" target="content\web.config.transform" />
+  </files>
+</package>
