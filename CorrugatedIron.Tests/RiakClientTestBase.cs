@@ -21,7 +21,7 @@ using Moq;
 
 namespace CorrugatedIron.Tests.RiakClientTests
 {
-    public abstract class RiakClientTestBase<TRequest, TResult>
+    internal abstract class RiakClientTestBase<TRequest, TResult>
         where TResult : new()
     {
         protected RiakResult<TResult> Result;
@@ -30,7 +30,7 @@ namespace CorrugatedIron.Tests.RiakClientTests
         protected Mock<IRiakClusterConfiguration> ClusterConfigMock;
         protected Mock<IRiakConnectionFactory> ConnFactoryMock;
         protected RiakCluster Cluster;
-        protected RiakClient Client;
+        protected IRiakClient Client;
 
         protected void SetUpInternal()
         {
@@ -47,7 +47,7 @@ namespace CorrugatedIron.Tests.RiakClientTests
             ClusterConfigMock.SetupGet(m => m.DefaultRetryWaitTime).Returns(100);
 
             Cluster = new RiakCluster(ClusterConfigMock.Object, ConnFactoryMock.Object);
-            Client = (RiakClient)Cluster.CreateClient();
+            Client = Cluster.CreateClient();
         }
     }
 }

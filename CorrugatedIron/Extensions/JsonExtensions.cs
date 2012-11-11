@@ -50,9 +50,9 @@ namespace CorrugatedIron.Extensions
 
         public static JsonWriter WriteEither<TLeft, TRight>(this JsonWriter writer, string name, Either<TLeft, TRight> either)
         {
-            if(either != null)
+            if (either != null)
             {
-                if(either.IsLeft)
+                if (either.IsLeft)
                 {
                     writer.WriteProperty(name, either.Left);
                 }

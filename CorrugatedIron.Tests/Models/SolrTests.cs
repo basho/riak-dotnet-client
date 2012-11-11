@@ -27,7 +27,7 @@ namespace CorrugatedIron.Tests.Models
         public void SolrTermCorrectlyEscapesOneSpecialCharacter() 
         {
             var token = new RiakSearchToken();
-            var spt = new RiakSearchPhraseToken {Term = "2+2"};
+            var spt = new RiakSearchPhraseToken("2+2");
             token.Term = spt;
             
             string escapedString = token.ToString();
@@ -40,7 +40,7 @@ namespace CorrugatedIron.Tests.Models
         public void SolrTermCorrectlyEscapesMultipleSpecialCharacters()
         {
             var token = new RiakSearchToken();
-            var spt = new RiakSearchPhraseToken {Term = "2+2-2"};
+            var spt = new RiakSearchPhraseToken("2+2-2");
             token.Term = spt;
             
             string escapedString = token.ToString();
@@ -53,7 +53,7 @@ namespace CorrugatedIron.Tests.Models
         public void SolrTermIncludesFieldName()
         {
             var token = new RiakSearchToken {Field = "eyes"};
-            var spt = new RiakSearchPhraseToken {Term = "blue"};
+            var spt = new RiakSearchPhraseToken("blue");
             token.Term = spt;
             
             string result = token.ToString();
@@ -68,7 +68,7 @@ namespace CorrugatedIron.Tests.Models
         {
             var token = new RiakSearchToken {Field = "artist"};
 
-            var spt = new RiakSearchPhraseToken {Term = "The Rolling Stones"};
+            var spt = new RiakSearchPhraseToken("The Rolling Stones");
 
             token.Term = spt;
             
@@ -82,7 +82,7 @@ namespace CorrugatedIron.Tests.Models
         {
             var token = new RiakSearchToken {Required = true};
 
-            var spt = new RiakSearchPhraseToken {Term = "riak"};
+            var spt = new RiakSearchPhraseToken("riak");
 
             token.Term = spt;
             
@@ -96,7 +96,7 @@ namespace CorrugatedIron.Tests.Models
         public void BoostedTermsShouldContainACaret()
         {
             var token = new RiakSearchToken {Boost = 10};
-            var spt = new RiakSearchPhraseToken {Term = "Erlang"};
+            var spt = new RiakSearchPhraseToken("Erlang");
 
             token.Term = spt;
             
@@ -110,7 +110,7 @@ namespace CorrugatedIron.Tests.Models
         public void BoostedPhrasesShouldContainACaretOutsideOfQuotedString()
         {
             var token = new RiakSearchToken {Field = "artist", Boost = 10};
-            var spt = new RiakSearchPhraseToken {Term = "The Rolling Stones"};
+            var spt = new RiakSearchPhraseToken("The Rolling Stones");
 
             token.Term = spt;
             

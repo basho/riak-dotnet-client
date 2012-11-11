@@ -30,7 +30,7 @@ namespace CorrugatedIron.Messages
             Content = new List<RpbContent>();
         }
 
-        [ProtoMember(1, Name = "content", DataFormat = DataFormat.Default)]
+        [ProtoMember(1, Name = "contents", DataFormat = DataFormat.Default)]
         internal List<RpbContent> Content { get; private set; }
 
         [ProtoMember(2, IsRequired = false, Name = "vclock", DataFormat = DataFormat.Default)]
