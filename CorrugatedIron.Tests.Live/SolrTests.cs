@@ -66,7 +66,7 @@ namespace CorrugatedIron.Tests.Live
             
             var mr = new RiakMapReduceQuery();
 
-            var token = new RiakSearchPhraseToken {Term = "Al*"};
+            var token = new RiakSearchPhraseToken("Al*");
             var solr = new SolrQuery { Fieldname = "name", QueryPart = token };
 
             var modFunArg = new RiakModuleFunctionArgInput

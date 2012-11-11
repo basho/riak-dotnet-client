@@ -37,7 +37,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.4.0.8\lib\net40\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.4.5.7\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -68,7 +68,6 @@
     <Compile Include="RiakObjectTests.cs" />
     <Compile Include="RiakSearchMapReduceInputTests.cs" />
     <Compile Include="RiakIndexTests.cs" />
-    <Compile Include="SolrTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CorrugatedIron.Tests\CorrugatedIron.Tests.csproj">

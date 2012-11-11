@@ -14,17 +14,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
+using System.Text;
 
 namespace CorrugatedIron.Models.RiakSearch
 {
-    public class And : RiakSearchBinaryLogicTerm
+    public abstract class RiakSearchTerm
     {
-        public And(RiakSearchQueryPart left, RiakSearchQueryPart right)
-            : base("AND", left, right)
+        public string ToSearchTerm()
         {
+            var sb = new StringBuilder();
+            ToSearchTerm(sb);
+            return sb.ToString();
         }
+
+        public override string ToString()
+        {
+            return ToSearchTerm();
+        }
+
+        public abstract void ToSearchTerm(StringBuilder sb);
     }
 }
-
 

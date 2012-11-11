@@ -70,14 +70,14 @@ namespace CorrugatedIron.Config
         //    set { this["idleTimeout"] = value; }
         //}
 
-        [ConfigurationProperty("networkReadTimeout", DefaultValue = 2000, IsRequired = false)]
+        [ConfigurationProperty("networkReadTimeout", DefaultValue = 4000, IsRequired = false)]
         public int NetworkReadTimeout
         {
             get { return (int)this["networkReadTimeout"]; }
             set { this["networkReadTimeout"] = value; }
         }
 
-        [ConfigurationProperty("networkWriteTimeout", DefaultValue = 2000, IsRequired = false)]
+        [ConfigurationProperty("networkWriteTimeout", DefaultValue = 4000, IsRequired = false)]
         public int NetworkWriteTimeout
         {
             get { return (int)this["networkWriteTimeout"]; }

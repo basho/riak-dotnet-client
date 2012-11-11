@@ -18,27 +18,11 @@ using System;
 
 namespace CorrugatedIron.Models.RiakSearch
 {
-    public class Or : IRiakSearchQueryPart
+    public class Or : RiakSearchBinaryLogicTerm
     {
-        private readonly Tuple<string, IRiakSearchQueryPart, IRiakSearchQueryPart> _booleanDefition;
-        
-        public Or (IRiakSearchQueryPart left, IRiakSearchQueryPart right)
+        public Or(RiakSearchQueryPart left, RiakSearchQueryPart right)
+            : base("OR", left, right)
         {
-            _booleanDefition = Tuple.Create("OR", left, right);
-        }
-        
-        public string Name { get { return _booleanDefition.Item1; } }
-        public IRiakSearchQueryPart Left { get { return _booleanDefition.Item2; } } 
-        public IRiakSearchQueryPart Right { get { return _booleanDefition.Item3; } }
-        
-        public override string ToString() 
-        {
-            return ToSearchTerm();
-        }   
-        
-        public string ToSearchTerm()
-        {
-            return String.Format("{0} {1} {2}", Left.ToString(), Name, Right.ToString());
         }
     }
 }
