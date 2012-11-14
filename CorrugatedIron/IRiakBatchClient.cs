@@ -17,9 +17,8 @@
 using System.Collections.Generic;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
+using CorrugatedIron.Models.Search;
 using CorrugatedIron.Util;
-using CorrugatedIron.Models.RiakSearch;
-using System;
 
 namespace CorrugatedIron
 {
