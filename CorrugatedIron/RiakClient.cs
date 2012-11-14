@@ -27,6 +27,7 @@ using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Models.MapReduce.Inputs;
 using CorrugatedIron.Models.Rest;
 using CorrugatedIron.Util;
+using CorrugatedIron.Models.Search;
 
 namespace CorrugatedIron
 {

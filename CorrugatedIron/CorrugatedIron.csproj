@@ -204,6 +204,14 @@
     <Compile Include="Models\RiakSearch\RiakSearchRequest.cs" />
     <Compile Include="Models\RiakSearch\RiakSearchResult.cs" />
     <Compile Include="Models\RiakServerInfo.cs" />
+    <Compile Include="Models\Search\BinaryTerm.cs" />
+    <Compile Include="Models\Search\GroupTerm.cs" />
+    <Compile Include="Models\Search\RangeTerm.cs" />
+    <Compile Include="Models\Search\RiakFluentSearch.cs" />
+    <Compile Include="Models\Search\RiakSearchRequest.cs" />
+    <Compile Include="Models\Search\RiakSearchResult.cs" />
+    <Compile Include="Models\Search\Term.cs" />
+    <Compile Include="Models\Search\UnaryTerm.cs" />
     <Compile Include="RiakAsyncClient.cs" />
     <Compile Include="RiakClient.cs" />
     <Compile Include="Comms\RiakConnection.cs" />

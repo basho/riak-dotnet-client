@@ -34,7 +34,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         public void ServerInfoIsSuccessfullyExtracted()
         {
             var result = Client.GetServerInfo();
-            result.IsSuccess.ShouldBeTrue();
+            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
         }
 
         [Test]
@@ -42,7 +42,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         {
             var asyncTester = new AsyncMethodTester<RiakResult<RiakServerInfo>>();
             Client.Async.GetServerInfo(asyncTester.HandleResult);
-            asyncTester.Result.IsSuccess.ShouldBeTrue();
+            asyncTester.Result.IsSuccess.ShouldBeTrue(asyncTester.Result.ErrorMessage);
         }
 
         [Test]
