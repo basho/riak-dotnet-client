@@ -47,17 +47,17 @@ namespace CorrugatedIron.Tests.RiakClientSetBucketPropertiesTests
 
         public int RetryWaitTime { get; set; }
 
-        public RiakResult<TResult> UseConnection<TResult>(byte[] clientId, Func<IRiakConnection, RiakResult<TResult>> useFun, int retryAttempts)
+        public RiakResult<TResult> UseConnection<TResult>(Func<IRiakConnection, RiakResult<TResult>> useFun, int retryAttempts)
         {
             return useFun(ConnectionMock.Object);
         }
 
-        public RiakResult UseConnection(byte[] clientId, Func<IRiakConnection, RiakResult> useFun, int retryAttempts)
+        public RiakResult UseConnection(Func<IRiakConnection, RiakResult> useFun, int retryAttempts)
         {
             return useFun(ConnectionMock.Object);
         }
 
-        public RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(byte[] clientId, Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun, int retryAttempts)
+        public RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun, int retryAttempts)
             where TResult : RiakResult
         {
             throw new NotImplementedException();
@@ -74,7 +74,7 @@ namespace CorrugatedIron.Tests.RiakClientSetBucketPropertiesTests
         {
             Cluster = new MockCluster();
             ClientId = System.Text.Encoding.Default.GetBytes("fadjskl").Take(4).ToArray();
-            Client = new RiakClient(Cluster) {ClientId = ClientId};
+            Client = new RiakClient(Cluster);
         }
     }
 
