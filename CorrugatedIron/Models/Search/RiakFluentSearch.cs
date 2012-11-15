@@ -14,6 +14,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
+
 namespace CorrugatedIron.Models.Search
 {
     public class RiakFluentSearch
@@ -41,6 +43,13 @@ namespace CorrugatedIron.Models.Search
         public Term Search(string value)
         {
             _term = new UnaryTerm(this, value);
+            return _term;
+        }
+
+        public Term Group(string value, Func<Term, Term> groupSetup)
+        {
+            var groupedTerm = groupSetup(new UnaryTerm(this, value));
+            _term = new GroupTerm(this, groupedTerm);
             return _term;
         }
 

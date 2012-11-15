@@ -25,7 +25,7 @@ namespace CorrugatedIron.Tests.RiakClientTests
         where TRequest : class
         where TResult : class, new()
     {
-        protected RiakResult<TResult> Result;
+        protected RiakResult<TResult> Result = null;
         protected Mock<IRiakConnection> ConnMock;
         protected Mock<IRiakNodeConfiguration> NodeConfigMock;
         protected Mock<IRiakClusterConfiguration> ClusterConfigMock;

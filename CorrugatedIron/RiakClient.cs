@@ -440,6 +440,19 @@ namespace CorrugatedIron
             return RiakResult<RiakMapReduceResult>.Error(response.ResultCode, response.ErrorMessage);
         }
 
+        public RiakResult<RiakSearchResult> Search(RiakSearchRequest search)
+        {
+            var request = search.ToMessage();
+            var response = UseConnection(conn => conn.PbcWriteRead<RpbSearchQueryReq, RpbSearchQueryResp>(request));
+
+            if (response.IsSuccess)
+            {
+                return RiakResult<RiakSearchResult>.Success(new RiakSearchResult(response.Value));
+            }
+
+            return RiakResult<RiakSearchResult>.Error(response.ResultCode, response.ErrorMessage);
+        }
+
         private IEnumerable<RiakResult<RpbMapRedResp>> CondenseResponse(IEnumerable<RiakResult<RpbMapRedResp>> originalResponse)
         {
             var resultList = new List<RiakResult<RpbMapRedResp>>(originalResponse);

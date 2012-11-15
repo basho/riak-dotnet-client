@@ -3,7 +3,4 @@
   <Target Name="Prepare">
     <Exec Command="..\.nuget\NuGet.exe pack CorrugatedIron.nuspec" />
   </Target>
-  <Target Name="Publish" DependsOnTargets="Prepare">
-    <Exec Command="..\.nuget\NuGet.exe pack CorrugatedIron.nuspec" />
-  </Target>
 </Project>
