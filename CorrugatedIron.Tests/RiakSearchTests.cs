@@ -143,6 +143,17 @@ namespace CorrugatedIron.Tests
         }
 
         [Test]
+        public void InitialGroupedTermsSerializeCorrectly()
+        {
+            var s = new RiakFluentSearch()
+                .Group("foo", t => t.Or("bar").And("baz", x => x.And("schmoopy")))
+                .Or("bar", t => t.And("slop"))
+                .Build();
+            var q = s.ToString();
+            Assert.AreEqual("(foo OR bar AND (baz AND schmoopy)) OR (bar AND slop)", q);
+        }
+
+        [Test]
         public void GroupedTermsSerializeCorrectly()
         {
             var s = new RiakFluentSearch()

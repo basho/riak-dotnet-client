@@ -40,6 +40,8 @@ namespace CorrugatedIron
 
         IEnumerable<RiakResult> DeleteBucket(string bucket, uint rwVal = RiakConstants.Defaults.RVal);
 
+        RiakResult<RiakSearchResult> Search(RiakSearchRequest search);
+
         RiakResult<RiakMapReduceResult> MapReduce(RiakMapReduceQuery query);
 
         RiakResult<RiakStreamedMapReduceResult> StreamMapReduce(RiakMapReduceQuery query);

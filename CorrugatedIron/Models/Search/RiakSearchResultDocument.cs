@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -14,9 +14,19 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CorrugatedIron.Models.RiakSearch
+using System.Collections.ObjectModel;
+using System.Linq;
+using CorrugatedIron.Messages;
+
+namespace CorrugatedIron.Models.Search
 {
-    public class RiakSearchResult
+    public class RiakSearchResultDocument
     {
+        public ReadOnlyCollection<RiakSearchResultField> Fields { get; private set; }
+
+        internal RiakSearchResultDocument(RpbSearchDoc doc)
+        {
+            Fields = new ReadOnlyCollection<RiakSearchResultField>(doc.fields.Select(f => new RiakSearchResultField(f)).ToList());
+        }
     }
 }

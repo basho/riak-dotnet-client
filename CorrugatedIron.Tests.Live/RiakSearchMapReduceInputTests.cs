@@ -20,7 +20,6 @@ using CorrugatedIron.Util;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Models.MapReduce.Inputs;
-using CorrugatedIron.Models.RiakSearch;
 using CorrugatedIron.Tests.Extensions;
 using NUnit.Framework;
 
@@ -64,13 +63,11 @@ namespace CorrugatedIron.Tests.Live
             Client.Put(new RiakObject(Bucket, RiakSearchKey2, RiakSearchDoc2, RiakConstants.ContentTypes.ApplicationJson));
 
             var mr = new RiakMapReduceQuery()
-                .Inputs(new RiakModuleFunctionArgInput("riak_search", "mapred_search",
-                    new[] { Bucket, "name:A1" }));
-                //.Inputs(new RiakBucketSearchInput
-                //    {
-                //        Bucket = Bucket,
-                //        Query = "name:A1"
-                //    });
+                .Inputs(new RiakBucketSearchInput
+                    {
+                        Bucket = Bucket,
+                        Query = "name:A1*"
+                    });
 
             var result = Client.MapReduce(mr);
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
@@ -80,30 +77,6 @@ namespace CorrugatedIron.Tests.Live
             
             mrResult.PhaseResults.ElementAt(0).Values.ShouldNotBeNull();
             // TODO Add data introspection to test - need to verify the results, after all.
-        }
-
-        [Test]
-        public void SearchingByNameUsingRiakSearchObjectReturnsTheObjectid()
-        {
-            Client.Put(new RiakObject(Bucket, RiakSearchKey, RiakSearchDoc, RiakConstants.ContentTypes.ApplicationJson));
-            Client.Put(new RiakObject(Bucket, RiakSearchKey2, RiakSearchDoc2, RiakConstants.ContentTypes.ApplicationJson));
-
-            var rspt = new RiakSearchPhraseToken("Al*");
-
-            var mr = new RiakMapReduceQuery()
-                .Inputs(new RiakBucketSearchInput
-                    {
-                        Bucket = Bucket,
-                        Query = rspt.ToSearchTerm()
-                    });
-
-            var result = Client.MapReduce(mr);
-            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
-
-            var mrResult = result.Value;
-            mrResult.PhaseResults.Count().ShouldEqual(1);
-
-            mrResult.PhaseResults.ElementAt(0).Values.ShouldNotBeNull();
         }
     }
 }

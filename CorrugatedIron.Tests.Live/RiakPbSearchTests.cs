@@ -14,7 +14,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using CorrugatedIron.Models;
+using CorrugatedIron.Models.Search;
+using CorrugatedIron.Tests.Extensions;
 using CorrugatedIron.Tests.Live.LiveRiakConnectionTests;
+using CorrugatedIron.Util;
 using NUnit.Framework;
 
 namespace CorrugatedIron.Tests.Live
@@ -22,10 +26,61 @@ namespace CorrugatedIron.Tests.Live
     [TestFixture]
     public class WhenQueryingRiakSearchViaPbc : LiveRiakConnectionTestBase
     {
-        [Test]
-        public void SearchingBucketWithoutSearchEnabledReturnsError()
+        private const string Bucket = "riak_search_bucket";
+        private const string RiakSearchKey = "a.hacker";
+        private const string RiakSearchKey2 = "a.public";
+        private const string RiakSearchDoc = "{\"name\":\"Alyssa P. Hacker\", \"bio\":\"I'm an engineer, making awesome things.\", \"favorites\":{\"book\":\"The Moon is a Harsh Mistress\",\"album\":\"Magical Mystery Tour\", }}";
+        private const string RiakSearchDoc2 = "{\"name\":\"Alan Q. Public\", \"bio\":\"I'm an exciting awesome mathematician\", \"favorites\":{\"book\":\"Prelude to Mathematics\",\"album\":\"The Fame Monster\"}}";
+
+        [SetUp]
+        public new void SetUp() 
         {
-            //Client.Search("search_not_enabled_bucket", );
+            base.SetUp();
+            
+            var props = Client.GetBucketProperties(Bucket, true).Value;
+            props.SetSearch(true);
+            Client.SetBucketProperties(Bucket, props);
+        }
+
+        [Test]
+        public void SearchingWithSimpleFluentQueryWorksCorrectly()
+        {
+            Client.Put(new RiakObject(Bucket, RiakSearchKey, RiakSearchDoc, RiakConstants.ContentTypes.ApplicationJson));
+
+            var req = new RiakSearchRequest
+            {
+                Query = new RiakFluentSearch("riak_search_bucket", "name")
+            };
+
+            req.Query.Search("Alyssa");
+
+            var result = Client.Search(req);
+            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
+            result.Value.NumFound.ShouldEqual(1u);
+            result.Value.Documents.Count.ShouldEqual(1);
+            result.Value.Documents[0].Fields.Count.ShouldEqual(5);
+        }
+
+        [Test]
+        public void SearchingWithMoreComplexFluentQueryWorksCorrectly()
+        {
+            Client.Put(new RiakObject(Bucket, RiakSearchKey, RiakSearchDoc, RiakConstants.ContentTypes.ApplicationJson));
+            Client.Put(new RiakObject(Bucket, RiakSearchKey2, RiakSearchDoc2, RiakConstants.ContentTypes.ApplicationJson));
+
+            var req = new RiakSearchRequest
+            {
+                Query = new RiakFluentSearch("riak_search_bucket", "bio")
+            };
+
+            req.Query.Search("awesome")
+                .And("an")
+                .And("mathematician").Not();
+
+            var result = Client.Search(req);
+            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
+            result.Value.NumFound.ShouldEqual(1u);
+            result.Value.Documents.Count.ShouldEqual(1);
+            result.Value.Documents[0].Fields.Count.ShouldEqual(5);
         }
     }
 }

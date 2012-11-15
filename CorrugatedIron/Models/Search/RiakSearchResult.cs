@@ -14,9 +14,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Collections.ObjectModel;
+using System.Linq;
+using CorrugatedIron.Messages;
+
 namespace CorrugatedIron.Models.Search
 {
     public class RiakSearchResult
     {
+        public float MaxScore { get; private set; }
+        public uint NumFound { get; private set; }
+        public ReadOnlyCollection<RiakSearchResultDocument> Documents { get; private set; }
+
+        internal RiakSearchResult(RpbSearchQueryResp response)
+        {
+            MaxScore = response.max_score;
+            NumFound = response.num_found;
+
+            var docs = response.docs.Select(d => new RiakSearchResultDocument(d));
+            Documents = new ReadOnlyCollection<RiakSearchResultDocument>(docs.ToList());
+        }
     }
 }
