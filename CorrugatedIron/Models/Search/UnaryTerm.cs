@@ -20,15 +20,15 @@ namespace CorrugatedIron.Models.Search
     {
         private readonly string _value;
 
-        public UnaryTerm(RiakFluentSearch search, string value)
-            : base(search)
+        public UnaryTerm(RiakFluentSearch search, string field, string value)
+            : base(search, field)
         {
             _value = value;
         }
 
         public override string ToString()
         {
-            return Prefix() + Encode(_value) + Suffix();
+            return Prefix() + Field() + Encode(_value) + Suffix();
         }
     }
 }

@@ -20,8 +20,8 @@ namespace CorrugatedIron.Models.Search
     {
         private readonly Term _term;
 
-        public GroupTerm(RiakFluentSearch search, Term term)
-            : base(search)
+        public GroupTerm(RiakFluentSearch search, string field, Term term)
+            : base(search, field)
         {
             _term = term;
         }

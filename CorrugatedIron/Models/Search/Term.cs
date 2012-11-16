@@ -23,6 +23,8 @@ namespace CorrugatedIron.Models.Search
     {
         private static readonly Regex EncodeRegex = new Regex(@"(["" \\'\(\)\[\]\\:\+\-\/\?])");
 
+        private readonly string _field;
+
         private double? _boost;
         private double? _proximity;
         private bool _not;
@@ -31,9 +33,10 @@ namespace CorrugatedIron.Models.Search
 
         internal Term Owner { get; set; }
 
-        protected Term(RiakFluentSearch search)
+        protected Term(RiakFluentSearch search, string field)
         {
             Search = search;
+            _field = field;
         }
 
         public RiakFluentSearch Build()
@@ -64,6 +67,11 @@ namespace CorrugatedIron.Models.Search
             return _not ? "NOT " : string.Empty;
         }
 
+        internal string Field()
+        {
+            return string.IsNullOrWhiteSpace(_field) ? string.Empty : _field + ":";
+        }
+
         public Term Not()
         {
             _not = true;
@@ -72,38 +80,68 @@ namespace CorrugatedIron.Models.Search
 
         public BinaryTerm Or(string value)
         {
-            return new BinaryTerm(Search, BinaryTerm.Op.Or, this, value);
+            return Or(_field, value);
+        }
+
+        public BinaryTerm Or(string field, string value)
+        {
+            return new BinaryTerm(Search, field, BinaryTerm.Op.Or, this, value);
         }
 
         public BinaryTerm OrRange(string from, string to, bool inclusive = false)
         {
-            var range = new RangeTerm(Search, from, to, inclusive);
-            return new BinaryTerm(Search, BinaryTerm.Op.Or, this, range);
+            return OrRange(_field, from, to, inclusive);
+        }
+
+        public BinaryTerm OrRange(string field, string from, string to, bool inclusive = false)
+        {
+            var range = new RangeTerm(Search, field, from, to, inclusive);
+            return new BinaryTerm(Search, field, BinaryTerm.Op.Or, this, range);
         }
 
         public BinaryTerm Or(string value, Func<Term, Term> groupSetup)
         {
-            var groupedTerm = groupSetup(new UnaryTerm(Search, value));
-            var groupTerm = new GroupTerm(Search, groupedTerm);
-            return new BinaryTerm(Search, BinaryTerm.Op.Or, this, groupTerm);
+            return Or(_field, value, groupSetup);
+        }
+
+        public BinaryTerm Or(string field, string value, Func<Term, Term> groupSetup)
+        {
+            var groupedTerm = groupSetup(new UnaryTerm(Search, field, value));
+            var groupTerm = new GroupTerm(Search, field, groupedTerm);
+            return new BinaryTerm(Search, _field, BinaryTerm.Op.Or, this, groupTerm);
         }
 
         public BinaryTerm And(string value)
         {
-            return new BinaryTerm(Search, BinaryTerm.Op.And, this, value);
+            return And(_field, value);
+        }
+
+        public BinaryTerm And(string field, string value)
+        {
+            return new BinaryTerm(Search, field, BinaryTerm.Op.And, this, value);
         }
 
         public BinaryTerm AndRange(string from, string to, bool inclusive = false)
         {
-            var range = new RangeTerm(Search, from, to, inclusive);
-            return new BinaryTerm(Search, BinaryTerm.Op.And, this, range);
+            return AndRange(_field, from, to, inclusive);
+        }
+
+        public BinaryTerm AndRange(string field, string from, string to, bool inclusive = false)
+        {
+            var range = new RangeTerm(Search, field, from, to, inclusive);
+            return new BinaryTerm(Search, field, BinaryTerm.Op.And, this, range);
         }
 
         public BinaryTerm And(string value, Func<Term, Term> groupSetup)
         {
-            var groupedTerm = groupSetup(new UnaryTerm(Search, value));
-            var groupTerm = new GroupTerm(Search, groupedTerm);
-            return new BinaryTerm(Search, BinaryTerm.Op.And, this, groupTerm);
+            return And(_field, value, groupSetup);
+        }
+
+        public BinaryTerm And(string field, string value, Func<Term, Term> groupSetup)
+        {
+            var groupedTerm = groupSetup(new UnaryTerm(Search, field, value));
+            var groupTerm = new GroupTerm(Search, field, groupedTerm);
+            return new BinaryTerm(Search, field, BinaryTerm.Op.And, this, groupTerm);
         }
 
         protected static string Encode(string value)
