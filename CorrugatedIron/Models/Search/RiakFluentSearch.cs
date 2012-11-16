@@ -20,42 +20,34 @@ namespace CorrugatedIron.Models.Search
 {
     public class RiakFluentSearch
     {
-        private readonly string _index;
-        private readonly string _field;
+        private readonly string _bucket;
+        private string _field;
         private Term _term;
+        private bool _grouped;
 
-        public RiakFluentSearch()
-            : this(null, null)
+        public RiakFluentSearch(string bucket, string field)
         {
-        }
-
-        public RiakFluentSearch(string field)
-            : this(null, field)
-        {
-        }
-
-        public RiakFluentSearch(string index, string field)
-        {
-            _index = index;
+            _bucket = bucket;
             _field = field;
         }
 
         public Term Search(string value)
         {
-            _term = new UnaryTerm(this, value);
+            _term = new UnaryTerm(this, _field, value);
             return _term;
         }
 
         public Term Group(string value, Func<Term, Term> groupSetup)
         {
-            var groupedTerm = groupSetup(new UnaryTerm(this, value));
-            _term = new GroupTerm(this, groupedTerm);
+            var groupedTerm = groupSetup(new UnaryTerm(this, _field, value));
+            _grouped = true;
+            _term = new GroupTerm(this, _field, groupedTerm);
             return _term;
         }
 
         public Term Search(string from, string to, bool inclusive = false)
         {
-            _term = new RangeTerm(this, from, to, inclusive);
+            _term = new RangeTerm(this, _field, from, to, inclusive);
             return _term;
         }
 
@@ -67,9 +59,7 @@ namespace CorrugatedIron.Models.Search
                 term = term.Owner;
             }
 
-            return (string.IsNullOrWhiteSpace(_index) ? "" : _index + ".")
-                + (string.IsNullOrWhiteSpace(_field) ? "" : _field + ":")
-                + term;
+            return _bucket + "." + (_grouped ? _field + ":" : string.Empty) + term;
         }
     }
 }

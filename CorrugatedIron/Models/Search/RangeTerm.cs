@@ -22,8 +22,8 @@ namespace CorrugatedIron.Models.Search
         private readonly string _to;
         private readonly bool _inclusive;
 
-        public RangeTerm(RiakFluentSearch search, string from, string to, bool inclusive)
-            : base(search)
+        public RangeTerm(RiakFluentSearch search, string field, string from, string to, bool inclusive)
+            : base(search, field)
         {
             _from = from;
             _to = to;
@@ -33,7 +33,7 @@ namespace CorrugatedIron.Models.Search
         public override string ToString()
         {
             var brackets = _inclusive ? new [] { "[", "]" } : new [] { "{", "}" };
-            return Prefix() + brackets[0] + _from + " TO " + _to + brackets[1];
+            return Prefix() + Field() + brackets[0] + _from + " TO " + _to + brackets[1];
         }
     }
 }
