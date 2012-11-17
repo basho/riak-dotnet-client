@@ -14,7 +14,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using CorrugatedIron.Extensions;
@@ -29,14 +28,12 @@ namespace CorrugatedIron.Tests.RiakAsyncClientTests
     {
         protected Mock<IRiakClient> ClientMock;
         protected RiakAsyncClient AsyncClient;
-        protected AsyncMethodTester<TResult> Tester;
         protected TResult Result;
 
         protected RiakAsyncClientTestBase()
         {
             ClientMock = new Mock<IRiakClient>();
             AsyncClient = new RiakAsyncClient(ClientMock.Object);
-            Tester = new AsyncMethodTester<TResult>();
         }
     }
 
@@ -47,8 +44,7 @@ namespace CorrugatedIron.Tests.RiakAsyncClientTests
         public void SetUp()
         {
             ClientMock.Setup(m => m.Ping()).Returns(RiakResult.Success());
-            AsyncClient.Ping(Tester.HandleResult);
-            Result = Tester.Result;
+            Result = AsyncClient.Ping().Result;
         }
 
         [Test]
@@ -72,8 +68,7 @@ namespace CorrugatedIron.Tests.RiakAsyncClientTests
         public void SetUp()
         {
             ClientMock.Setup(m => m.Get(It.IsAny<string>(), It.IsAny<string>(), 2)).Returns(RiakResult<RiakObject>.Success(new RiakObject("foo", "bar", "baz")));
-            AsyncClient.Get(new RiakObjectId("foo", "bar"), Tester.HandleResult);
-            Result = Tester.Result;
+            Result = AsyncClient.Get(new RiakObjectId("foo", "bar")).Result;
         }
 
         [Test]
@@ -101,8 +96,7 @@ namespace CorrugatedIron.Tests.RiakAsyncClientTests
         public void SetUp()
         {
             ClientMock.Setup(m => m.Get(It.IsAny<string>(), It.IsAny<string>(), 2)).Returns(RiakResult<RiakObject>.Success(new RiakObject("foo", "bar", "baz")));
-            AsyncClient.Get("foo", "bar", Tester.HandleResult);
-            Result = Tester.Result;
+            Result = AsyncClient.Get("foo", "bar").Result;
         }
 
         [Test]
@@ -130,8 +124,7 @@ namespace CorrugatedIron.Tests.RiakAsyncClientTests
         public void SetUp()
         {
             ClientMock.Setup(m => m.Get(It.IsAny<IEnumerable<RiakObjectId>>(), 2)).Returns(new List<RiakResult<RiakObject>>());
-            AsyncClient.Get(new List<RiakObjectId>(), Tester.HandleResult, 2);
-            Result = Tester.Result;
+            Result = AsyncClient.Get(new List<RiakObjectId>(), 2).Result;
         }
 
         [Test]

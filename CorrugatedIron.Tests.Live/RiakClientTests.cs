@@ -47,10 +47,10 @@ namespace CorrugatedIron.Tests.Live
             var riakObjectId = riakObject.ToRiakObjectId();
 
             var putResult = Client.Put(riakObject);
-            putResult.IsSuccess.ShouldBeTrue();
+            putResult.IsSuccess.ShouldBeTrue(putResult.ErrorMessage);
 
             var delResult = Client.Delete(riakObjectId);
-            delResult.IsSuccess.ShouldBeTrue();
+            delResult.IsSuccess.ShouldBeTrue(delResult.ErrorMessage);
 
             var getResult = Client.Get(riakObjectId);
             getResult.IsSuccess.ShouldBeFalse();
@@ -67,10 +67,10 @@ namespace CorrugatedIron.Tests.Live
                     var riakObjectId = riakObject.ToRiakObjectId();
 
                     var putResult = batch.Put(riakObject);
-                    putResult.IsSuccess.ShouldBeTrue();
+                    putResult.IsSuccess.ShouldBeTrue(putResult.ErrorMessage);
 
                     var delResult = batch.Delete(riakObjectId);
-                    delResult.IsSuccess.ShouldBeTrue();
+                    delResult.IsSuccess.ShouldBeTrue(delResult.ErrorMessage);
 
                     var getResult = batch.Get(riakObjectId);
                     getResult.IsSuccess.ShouldBeFalse();
@@ -86,19 +86,11 @@ namespace CorrugatedIron.Tests.Live
             var riakObjectId = riakObject.ToRiakObjectId();
 
             var putResult = Client.Put(riakObject);
-            putResult.IsSuccess.ShouldBeTrue();
+            putResult.IsSuccess.ShouldBeTrue(putResult.ErrorMessage);
 
-            RiakResult theResult = null;
-            var resetEvent = new AutoResetEvent(false);
+            var result = Client.Async.Delete(riakObjectId).Result;
 
-            Client.Async.Delete(riakObjectId, result =>
-                                            {
-                                                theResult = result;
-                                                resetEvent.Set();
-                                            });
-            resetEvent.WaitOne();
-
-            theResult.IsSuccess.ShouldBeTrue();
+            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
 
             var getResult = Client.Get(riakObjectId);
             getResult.IsSuccess.ShouldBeFalse();
@@ -118,22 +110,13 @@ namespace CorrugatedIron.Tests.Live
             var oneObjectId = one.ToRiakObjectId();
             var twoObjectId = two.ToRiakObjectId();
 
-            IEnumerable<RiakResult> theResults = null;
-
             var list = new List<RiakObjectId> { oneObjectId, twoObjectId };
 
-            var resetEvent = new AutoResetEvent(false);
+            var results = Client.Async.Delete(list).Result;
 
-            Client.Async.Delete(list, results =>
-                                    {
-                                        theResults = results;
-                                        resetEvent.Set();
-                                    });
-            resetEvent.WaitOne();
-
-            foreach (var riakResult in theResults)
+            foreach (var riakResult in results)
             {
-                riakResult.IsSuccess.ShouldBeTrue();
+                riakResult.IsSuccess.ShouldBeTrue(riakResult.ErrorMessage);
             }
 
             var oneResult = Client.Get(oneObjectId);
@@ -159,22 +142,13 @@ namespace CorrugatedIron.Tests.Live
             var oneObjectId = one.ToRiakObjectId();
             var twoObjectId = two.ToRiakObjectId();
 
-            IEnumerable<RiakResult<RiakObject>> theResults = null;
-
             var list = new List<RiakObjectId> {oneObjectId, twoObjectId};
 
-            var resetEvent = new AutoResetEvent(false);
+            var results = Client.Async.Get(list).Result;
 
-            Client.Async.Get(list, results =>
-                                 {
-                                     theResults = results;
-                                     resetEvent.Set();
-                                 });
-            resetEvent.WaitOne();
-
-            foreach (var result in theResults)
+            foreach (var result in results)
             {
-                result.IsSuccess.ShouldBeTrue();
+                result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
                 result.Value.ShouldNotBeNull();
             }
         }
@@ -187,21 +161,13 @@ namespace CorrugatedIron.Tests.Live
 
             Client.Put(riakObject);
 
-            RiakResult<RiakObject> theResult = null;
-            var resetEvent = new AutoResetEvent(false);
+            var result = Client.Async.Get(riakObjectId).Result;
 
-            Client.Async.Get(riakObjectId, result =>
-                                         {
-                                             theResult = result;
-                                             resetEvent.Set();
-                                         });
-            resetEvent.WaitOne();
-
-            theResult.IsSuccess.ShouldBeTrue();
-            theResult.Value.ShouldNotBeNull();
-            theResult.Value.Bucket.ShouldEqual(TestBucket);
-            theResult.Value.Key.ShouldEqual(TestKey);
-            theResult.Value.Value.FromRiakString().ShouldEqual(TestJson);
+            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
+            result.Value.ShouldNotBeNull();
+            result.Value.Bucket.ShouldEqual(TestBucket);
+            result.Value.Key.ShouldEqual(TestKey);
+            result.Value.Value.FromRiakString().ShouldEqual(TestJson);
         }
 
         [Test]
@@ -209,19 +175,10 @@ namespace CorrugatedIron.Tests.Live
         {
             var riakObject = new RiakObject(TestBucket, TestKey, TestJson, RiakConstants.ContentTypes.ApplicationJson);
 
-            RiakResult<RiakObject> theResult = null;
-
-            var resetEvent = new AutoResetEvent(false);
-
-            Client.Async.Put(riakObject, result =>
-                                       {
-                                           theResult = result;
-                                           resetEvent.Set();
-                                       });
-            resetEvent.WaitOne();
+            var result = Client.Async.Put(riakObject).Result;
             
-            theResult.IsSuccess.ShouldBeTrue();
-            theResult.Value.ShouldNotBeNull();
+            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
+            result.Value.ShouldNotBeNull();
         }
 
         [Test]
@@ -230,19 +187,11 @@ namespace CorrugatedIron.Tests.Live
             var one = new RiakObject(TestBucket, "one", TestJson, RiakConstants.ContentTypes.ApplicationJson);
             var two = new RiakObject(TestBucket, "two", TestJson, RiakConstants.ContentTypes.ApplicationJson);
 
-            IEnumerable<RiakResult<RiakObject>> theResults = null;
-            var resetEvent = new AutoResetEvent(false);
+            var results = Client.Async.Put(new List<RiakObject> {one, two}).Result;
 
-            Client.Async.Put(new List<RiakObject> {one, two}, result =>
-                                                            {
-                                                                theResults = result;
-                                                                resetEvent.Set();
-                                                            });
-            resetEvent.WaitOne();
-
-            foreach (var riakResult in theResults)
+            foreach (var riakResult in results)
             {
-                riakResult.IsSuccess.ShouldBeTrue();
+                riakResult.IsSuccess.ShouldBeTrue(riakResult.ErrorMessage);
                 riakResult.Value.ShouldNotBeNull();
             }
         }
