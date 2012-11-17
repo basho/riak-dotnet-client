@@ -40,7 +40,6 @@ namespace CorrugatedIron.Models
     {
         private List<string> _vtags;
         private readonly int _hashCode;
-        private string _contentType;
 
         public string Bucket { get; private set; }
         public string Key { get; private set; }
@@ -285,14 +284,17 @@ namespace CorrugatedIron.Models
             {
                 return false;
             }
+
             if(ReferenceEquals(this, obj))
             {
                 return true;
             }
+
             if(obj.GetType() != typeof(RiakObject))
             {
                 return false;
             }
+
             return Equals((RiakObject)obj);
         }
 
@@ -467,7 +469,7 @@ namespace CorrugatedIron.Models
             if(ContentType == RiakConstants.ContentTypes.ApplicationJson)
             {
                 var deserializeObject = new DeserializeObject<T>((value, contentType) => JsonConvert.DeserializeObject<T>(Value.FromRiakString()));
-                return GetObject(deserializeObject, null);
+                return GetObject(deserializeObject);
             }
 
             if(ContentType == RiakConstants.ContentTypes.ProtocolBuffers)
@@ -478,7 +480,7 @@ namespace CorrugatedIron.Models
                                                                          ms.Write(value, 0, Value.Length);
                                                                          return Serializer.Deserialize<T>(ms);
                                                                      });
-                return GetObject(deserializeObject, null);
+                return GetObject(deserializeObject);
             }
 
             if(ContentType == RiakConstants.ContentTypes.Xml)
@@ -490,7 +492,7 @@ namespace CorrugatedIron.Models
                                                                          return (T) serde.Deserialize(r);
                                                                      }
                     );
-                return GetObject<T>(deserializeObject, null);
+                return GetObject(deserializeObject);
             }
 
             throw new NotSupportedException(string.Format("Your current ContentType ({0}), is not supported.", ContentType));
