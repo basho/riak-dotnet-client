@@ -108,7 +108,7 @@ namespace CorrugatedIron.Models.Search
         {
             var groupedTerm = groupSetup(new UnaryTerm(Search, field, value));
             var groupTerm = new GroupTerm(Search, field, groupedTerm);
-            return new BinaryTerm(Search, _field, BinaryTerm.Op.Or, this, groupTerm);
+            return new BinaryTerm(Search, field, BinaryTerm.Op.Or, this, groupTerm);
         }
 
         public BinaryTerm And(string value)

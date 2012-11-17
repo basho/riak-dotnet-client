@@ -186,14 +186,14 @@ namespace CorrugatedIron.Tests
                 .Search("foo")
                 .Or("bar").Not()
                 .AndRange("10", "20", true)
-                .Or("otherkey", "baz", t => t.And("schmoopy for president+")
+                .Or("otherkey", "baz", t => t.And("hash", "schmoopy for president+")
                     .Boost(6)
                     .And("bash", "dooby", x => x.Or("dash", "fooby").Not())
                     .Or("smelly"))
-                .And("baz", t => t.Or("quux").OrRange("la", "da")).Not().Proximity(10)
+                .And("baz", t => t.Or("zoom", "quux").OrRange("la", "da")).Not().Proximity(10)
                 .Build();
             var q = s.ToString();
-            Assert.AreEqual(@"bucket.key:foo OR NOT key:bar AND key:[10 TO 20] OR (otherkey:baz AND otherkey:schmoopy\ for\ president\+^6 AND (bash:dooby OR NOT dash:fooby) OR key:smelly) AND NOT (key:baz OR key:quux OR key:{la TO da})~10", q);
+            Assert.AreEqual(@"bucket.key:foo OR NOT key:bar AND key:[10 TO 20] OR (otherkey:baz AND hash:schmoopy\ for\ president\+^6 AND (bash:dooby OR NOT dash:fooby) OR bash:smelly) AND NOT (otherkey:baz OR zoom:quux OR zoom:{la TO da})~10", q);
         }
 
     }

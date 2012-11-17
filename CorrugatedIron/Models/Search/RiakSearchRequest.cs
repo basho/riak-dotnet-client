@@ -21,8 +21,6 @@ namespace CorrugatedIron.Models.Search
 {
     public class RiakSearchRequest
     {
-        public string Index { get; set; }
-
         public RiakFluentSearch Query { get; set; }
 
         public uint Rows { get; set; }
@@ -37,7 +35,7 @@ namespace CorrugatedIron.Models.Search
         {
             return new RpbSearchQueryReq
             {
-                index = Index.ToRiakString(),
+                index = Query.Bucket.ToRiakString(),
                 q = Query.ToString().ToRiakString(),
                 rows = Rows,
                 start = Start,

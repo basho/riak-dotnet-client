@@ -59,6 +59,7 @@ namespace CorrugatedIron.Tests.Live
             result.Value.NumFound.ShouldEqual(1u);
             result.Value.Documents.Count.ShouldEqual(1);
             result.Value.Documents[0].Fields.Count.ShouldEqual(5);
+            result.Value.Documents[0].Id.Value.ShouldEqual("a.hacker");
         }
 
         [Test]
@@ -74,13 +75,14 @@ namespace CorrugatedIron.Tests.Live
 
             req.Query.Search("awesome")
                 .And("an")
-                .And("mathematician").Not();
+                .And("mathematician", t => t.Or("favorites_ablum", "Fame"));
 
             var result = Client.Search(req);
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
             result.Value.NumFound.ShouldEqual(1u);
             result.Value.Documents.Count.ShouldEqual(1);
             result.Value.Documents[0].Fields.Count.ShouldEqual(5);
+            result.Value.Documents[0].Id.Value.ShouldEqual("a.public");
         }
     }
 }
