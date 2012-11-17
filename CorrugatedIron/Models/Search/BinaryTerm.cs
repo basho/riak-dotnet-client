@@ -23,9 +23,14 @@ namespace CorrugatedIron.Models.Search
         private readonly Term _left;
         private readonly Term _right;
         private readonly Op _op;
-        private readonly string _value;
+        private readonly Token _value;
 
         internal BinaryTerm(RiakFluentSearch search, string field, Op op, Term left, string value)
+            : this(search, field, op, left, Token.Is(value))
+        {
+        }
+
+        internal BinaryTerm(RiakFluentSearch search, string field, Op op, Term left, Token value)
             : this(search, field, op, left)
         {
             _value = value;
@@ -49,7 +54,7 @@ namespace CorrugatedIron.Models.Search
         {
             return _left + " " + _op.ToString().ToUpper() + " "
                 + Prefix()
-                + (_right != null ? _right.ToString() : Field() + Encode(_value)) + Suffix();
+                + (_right != null ? _right.ToString() : Field() + _value) + Suffix();
         }
     }
 }

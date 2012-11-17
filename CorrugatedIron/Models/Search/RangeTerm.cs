@@ -18,11 +18,11 @@ namespace CorrugatedIron.Models.Search
 {
     public class RangeTerm : Term
     {
-        private readonly string _from;
-        private readonly string _to;
+        private readonly Token _from;
+        private readonly Token _to;
         private readonly bool _inclusive;
 
-        public RangeTerm(RiakFluentSearch search, string field, string from, string to, bool inclusive)
+        public RangeTerm(RiakFluentSearch search, string field, Token from, Token to, bool inclusive)
             : base(search, field)
         {
             _from = from;

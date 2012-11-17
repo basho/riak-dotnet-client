@@ -18,9 +18,14 @@ namespace CorrugatedIron.Models.Search
 {
     public class UnaryTerm : Term
     {
-        private readonly string _value;
+        private readonly Token _value;
 
         public UnaryTerm(RiakFluentSearch search, string field, string value)
+            : this(search, field, Token.Is(value))
+        {
+        }
+
+        public UnaryTerm(RiakFluentSearch search, string field, Token value)
             : base(search, field)
         {
             _value = value;
@@ -28,7 +33,7 @@ namespace CorrugatedIron.Models.Search
 
         public override string ToString()
         {
-            return Prefix() + Field() + Encode(_value) + Suffix();
+            return Prefix() + Field() + _value + Suffix();
         }
     }
 }

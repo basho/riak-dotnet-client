@@ -63,6 +63,25 @@ namespace CorrugatedIron.Tests.Live
         }
 
         [Test]
+        public void SearchingWithWildcardFluentQueryWorksCorrectly()
+        {
+            Client.Put(new RiakObject(Bucket, RiakSearchKey, RiakSearchDoc, RiakConstants.ContentTypes.ApplicationJson));
+            Client.Put(new RiakObject(Bucket, RiakSearchKey2, RiakSearchDoc2, RiakConstants.ContentTypes.ApplicationJson));
+
+            var req = new RiakSearchRequest
+            {
+                Query = new RiakFluentSearch("riak_search_bucket", "name")
+            };
+
+            req.Query.Search(Token.StartsWith("Al"));
+
+            var result = Client.Search(req);
+            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
+            result.Value.NumFound.ShouldEqual(2u);
+            result.Value.Documents.Count.ShouldEqual(2);
+        }
+
+        [Test]
         public void SearchingWithMoreComplexFluentQueryWorksCorrectly()
         {
             Client.Put(new RiakObject(Bucket, RiakSearchKey, RiakSearchDoc, RiakConstants.ContentTypes.ApplicationJson));

@@ -31,18 +31,18 @@ namespace CorrugatedIron.Tests
 
             var query = search.ToString();
 
-            var expected = @"bucket.key:This\ is\\\ a\ \""Test\""\ to\ make\ \'sure\'\ it\ \(the\ text\)\ is\ \[characterised\]\ correctly\ \(master\:slave\)\ \+\ includes\ \-\ this\ url\:\ http\:\/\/foo.com\/bar\?baz=quux";
+            var expected = @"key:This\ is\\\ a\ \""Test\""\ to\ make\ \'sure\'\ it\ \(the\ text\)\ is\ \[characterised\]\ correctly\ \(master\:slave\)\ \+\ includes\ \-\ this\ url\:\ http\:\/\/foo.com\/bar\?baz=quux";
             Assert.AreEqual(expected, query);
         }
 
         [Test]
         public void SimpleIndexFieldUnaryTermSerializesCorrectly()
         {
-            var s = new RiakFluentSearch("index", "field")
+            var s = new RiakFluentSearch("bucket", "field")
                 .Search("foo")
                 .Build();
             var q = s.ToString();
-            Assert.AreEqual("index.field:foo", q);
+            Assert.AreEqual("field:foo", q);
         }
 
         [Test]
@@ -53,7 +53,7 @@ namespace CorrugatedIron.Tests
                 .Boost(5)
                 .Build();
             var q = s.ToString();
-            Assert.AreEqual("bucket.key:foo^5", q);
+            Assert.AreEqual("key:foo^5", q);
         }
 
         [Test]
@@ -64,7 +64,7 @@ namespace CorrugatedIron.Tests
                 .And("bar")
                 .Build();
             var q = s.ToString();
-            Assert.AreEqual("bucket.key:foo AND key:bar", q);
+            Assert.AreEqual("key:foo AND key:bar", q);
         }
 
         [Test]
@@ -74,7 +74,7 @@ namespace CorrugatedIron.Tests
                 .Search("10", "20")
                 .Build();
             var q = s.ToString();
-            Assert.AreEqual("bucket.key:{10 TO 20}", q);
+            Assert.AreEqual("key:{10 TO 20}", q);
         }
 
         [Test]
@@ -84,7 +84,7 @@ namespace CorrugatedIron.Tests
                 .Search("10", "20", true)
                 .Build();
             var q = s.ToString();
-            Assert.AreEqual("bucket.key:[10 TO 20]", q);
+            Assert.AreEqual("key:[10 TO 20]", q);
         }
 
         [Test]
@@ -95,7 +95,7 @@ namespace CorrugatedIron.Tests
                 .Or("bar")
                 .Build();
             var q = s.ToString();
-            Assert.AreEqual("bucket.key:foo OR key:bar", q);
+            Assert.AreEqual("key:foo OR key:bar", q);
         }
 
         [Test]
@@ -107,7 +107,7 @@ namespace CorrugatedIron.Tests
                 .And("baz")
                 .Build();
             var q = s.ToString();
-            Assert.AreEqual("bucket.key:foo OR key:bar AND key:baz", q);
+            Assert.AreEqual("key:foo OR key:bar AND key:baz", q);
         }
 
         [Test]
@@ -119,7 +119,7 @@ namespace CorrugatedIron.Tests
                 .And("baz").Boost(5)
                 .Build();
             var q = s.ToString();
-            Assert.AreEqual("bucket.key:foo OR key:bar^3 AND key:baz^5", q);
+            Assert.AreEqual("key:foo OR key:bar^3 AND key:baz^5", q);
         }
 
         [Test]
@@ -130,7 +130,7 @@ namespace CorrugatedIron.Tests
                 .Or("bar", t => t.And("slop"))
                 .Build();
             var q = s.ToString();
-            Assert.AreEqual("bucket.key:(key:foo OR key:bar AND (key:baz AND key:schmoopy)) OR (key:bar AND key:slop)", q);
+            Assert.AreEqual("key:(key:foo OR key:bar AND (key:baz AND key:schmoopy)) OR (key:bar AND key:slop)", q);
         }
 
         [Test]
@@ -145,7 +145,7 @@ namespace CorrugatedIron.Tests
                     .And("dooby", x => x.Or("fooby")))
                 .Build();
             var q = s.ToString();
-            Assert.AreEqual("bucket.key:foo OR key:bar AND (key:baz OR key:quux) OR (key:baz AND key:schmoopy^6 AND (key:dooby OR key:fooby))", q);
+            Assert.AreEqual("key:foo OR key:bar AND (key:baz OR key:quux) OR (key:baz AND key:schmoopy^6 AND (key:dooby OR key:fooby))", q);
         }
 
         [Test]
@@ -160,7 +160,7 @@ namespace CorrugatedIron.Tests
                     .And("dooby", x => x.Or("fooby").Not()))
                 .Build();
             var q = s.ToString();
-            Assert.AreEqual("bucket.key:foo OR NOT key:bar AND NOT (key:baz OR key:quux) OR (key:baz AND key:schmoopy^6 AND (key:dooby OR NOT key:fooby))", q);
+            Assert.AreEqual("key:foo OR NOT key:bar AND NOT (key:baz OR key:quux) OR (key:baz AND key:schmoopy^6 AND (key:dooby OR NOT key:fooby))", q);
         }
 
         [Test]
@@ -173,10 +173,10 @@ namespace CorrugatedIron.Tests
                 .And("baz", t => t.Or("quux").OrRange("la", "da")).Not().Proximity(10)
                 .Or("baz", t => t.And("schmoopy for president+")
                     .Boost(6)
-                    .And("dooby", x => x.Or("fooby").Not()))
+                    .And(Token.StartsWith("dooby"), x => x.Or("fooby").Not()))
                 .Build();
             var q = s.ToString();
-            Assert.AreEqual(@"bucket.key:foo OR NOT key:bar AND key:[10 TO 20] AND NOT (key:baz OR key:quux OR key:{la TO da})~10 OR (key:baz AND key:schmoopy\ for\ president\+^6 AND (key:dooby OR NOT key:fooby))", q);
+            Assert.AreEqual(@"key:foo OR NOT key:bar AND key:[10 TO 20] AND NOT (key:baz OR key:quux OR key:{la TO da})~10 OR (key:baz AND key:schmoopy\ for\ president\+^6 AND (key:dooby* OR NOT key:fooby))", q);
         }
 
         [Test]
@@ -186,14 +186,14 @@ namespace CorrugatedIron.Tests
                 .Search("foo")
                 .Or("bar").Not()
                 .AndRange("10", "20", true)
-                .Or("otherkey", "baz", t => t.And("hash", "schmoopy for president+")
+                .Or("otherkey", "baz", t => t.And("hash", Token.StartsWith("schmoopy for president+"))
                     .Boost(6)
                     .And("bash", "dooby", x => x.Or("dash", "fooby").Not())
                     .Or("smelly"))
                 .And("baz", t => t.Or("zoom", "quux").OrRange("la", "da")).Not().Proximity(10)
                 .Build();
             var q = s.ToString();
-            Assert.AreEqual(@"bucket.key:foo OR NOT key:bar AND key:[10 TO 20] OR (otherkey:baz AND hash:schmoopy\ for\ president\+^6 AND (bash:dooby OR NOT dash:fooby) OR bash:smelly) AND NOT (otherkey:baz OR zoom:quux OR zoom:{la TO da})~10", q);
+            Assert.AreEqual(@"key:foo OR NOT key:bar AND key:[10 TO 20] OR (otherkey:baz AND hash:schmoopy\ for\ president\+*^6 AND (bash:dooby OR NOT dash:fooby) OR bash:smelly) AND NOT (otherkey:baz OR zoom:quux OR zoom:{la TO da})~10", q);
         }
 
     }

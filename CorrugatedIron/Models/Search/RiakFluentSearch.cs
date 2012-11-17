@@ -15,9 +15,44 @@
 // under the License.
 
 using System;
+using System.Text.RegularExpressions;
 
 namespace CorrugatedIron.Models.Search
 {
+    public class Token
+    {
+        private static readonly Regex EncodeRegex = new Regex(@"(["" \\'\(\)\[\]\\:\+\-\/\?])");
+
+        private readonly string _value;
+        private readonly string _suffix;
+
+        internal Token(string value)
+            : this(value, null)
+        {
+        }
+
+        internal Token(string value, string suffix)
+        {
+            _value = value;
+            _suffix = suffix;
+        }
+
+        public static Token Is(string value)
+        {
+            return new Token(value);
+        }
+
+        public static Token StartsWith(string value)
+        {
+            return new Token(value, "*");
+        }
+
+        public override string ToString()
+        {
+            return _value != null ? EncodeRegex.Replace(_value, m => "\\" + m.Value) + _suffix : string.Empty;
+        }
+    }
+
     public class RiakFluentSearch
     {
         private readonly string _bucket;
@@ -38,11 +73,21 @@ namespace CorrugatedIron.Models.Search
 
         public Term Search(string value)
         {
+            return Search(Token.Is(value));
+        }
+
+        public Term Search(Token value)
+        {
             _term = new UnaryTerm(this, _field, value);
             return _term;
         }
 
         public Term Group(string value, Func<Term, Term> groupSetup)
+        {
+            return Group(Token.Is(value), groupSetup);
+        }
+
+        public Term Group(Token value, Func<Term, Term> groupSetup)
         {
             var groupedTerm = groupSetup(new UnaryTerm(this, _field, value));
             _grouped = true;
@@ -51,6 +96,24 @@ namespace CorrugatedIron.Models.Search
         }
 
         public Term Search(string from, string to, bool inclusive = false)
+        {
+            _term = new RangeTerm(this, _field, Token.Is(from), Token.Is(to), inclusive);
+            return _term;
+        }
+
+        public Term Search(string from, Token to, bool inclusive = false)
+        {
+            _term = new RangeTerm(this, _field, Token.Is(from), to, inclusive);
+            return _term;
+        }
+
+        public Term Search(Token from, string to, bool inclusive = false)
+        {
+            _term = new RangeTerm(this, _field, from, Token.Is(to), inclusive);
+            return _term;
+        }
+
+        public Term Search(Token from, Token to, bool inclusive = false)
         {
             _term = new RangeTerm(this, _field, from, to, inclusive);
             return _term;
