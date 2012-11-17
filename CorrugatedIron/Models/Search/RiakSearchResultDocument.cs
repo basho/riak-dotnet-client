@@ -14,6 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using CorrugatedIron.Messages;
@@ -22,11 +23,23 @@ namespace CorrugatedIron.Models.Search
 {
     public class RiakSearchResultDocument
     {
-        public ReadOnlyCollection<RiakSearchResultField> Fields { get; private set; }
+        public RiakSearchResultField Id { get; private set; }
+        public List<RiakSearchResultField> Fields { get; private set; }
 
         internal RiakSearchResultDocument(RpbSearchDoc doc)
         {
-            Fields = new ReadOnlyCollection<RiakSearchResultField>(doc.fields.Select(f => new RiakSearchResultField(f)).ToList());
+            Fields = new List<RiakSearchResultField>();
+
+            foreach (var f in doc.fields)
+            {
+                var field = new RiakSearchResultField(f);
+                Fields.Add(field);
+
+                if (field.Key == "id")
+                {
+                    Id = field;
+                }
+            }
         }
     }
 }

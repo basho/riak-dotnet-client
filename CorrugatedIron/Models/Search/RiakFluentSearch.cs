@@ -21,12 +21,17 @@ namespace CorrugatedIron.Models.Search
     public class RiakFluentSearch
     {
         private readonly string _bucket;
-        private string _field;
+        private readonly string _field;
         private Term _term;
         private bool _grouped;
 
+        public string Bucket { get { return _bucket; } }
+
         public RiakFluentSearch(string bucket, string field)
         {
+            if (string.IsNullOrWhiteSpace(bucket)) throw new ArgumentNullException("bucket");
+            if (string.IsNullOrWhiteSpace(field)) throw new ArgumentNullException("field");
+
             _bucket = bucket;
             _field = field;
         }
@@ -59,7 +64,7 @@ namespace CorrugatedIron.Models.Search
                 term = term.Owner;
             }
 
-            return _bucket + "." + (_grouped ? _field + ":" : string.Empty) + term;
+            return (_grouped ? _field + ":" : string.Empty) + term;
         }
     }
 }
