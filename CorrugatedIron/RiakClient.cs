@@ -14,20 +14,19 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
 using CorrugatedIron.Comms;
-using CorrugatedIron.Config;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Models.MapReduce.Inputs;
 using CorrugatedIron.Models.Rest;
-using CorrugatedIron.Util;
 using CorrugatedIron.Models.Search;
+using CorrugatedIron.Util;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 
 namespace CorrugatedIron
 {
@@ -40,6 +39,8 @@ namespace CorrugatedIron
 
     public class RiakClient : IRiakClient
     {
+        private const string ListKeysWarning = "*** [CI] -> ListKeys is an expensive operation and should not be used in Production scenarios. ***";
+
         private readonly IRiakEndPoint _endPoint;
         private readonly IRiakConnection _batchConnection;
 
@@ -528,6 +529,10 @@ namespace CorrugatedIron
         /// a list of keys. This operation, while cheaper in Riak 1.0 than in earlier versions of Riak, should be avoided.</remarks>
         public RiakResult<IEnumerable<string>> ListKeys(string bucket)
         {
+            System.Diagnostics.Debug.Write(ListKeysWarning);
+            System.Diagnostics.Trace.TraceWarning(ListKeysWarning);
+            Console.WriteLine(ListKeysWarning);
+
             return UseConnection(conn => ListKeys(conn, bucket));
         }
 
@@ -546,6 +551,10 @@ namespace CorrugatedIron
 
         public RiakResult<IEnumerable<string>> StreamListKeys(string bucket)
         {
+            System.Diagnostics.Debug.Write(ListKeysWarning);
+            System.Diagnostics.Trace.TraceWarning(ListKeysWarning);
+            Console.WriteLine(ListKeysWarning);
+
             var lkReq = new RpbListKeysReq { bucket = bucket.ToRiakString() };
             var result = UseDelayedConnection((conn, onFinish) =>
                 conn.PbcWriteStreamRead<RpbListKeysReq, RpbListKeysResp>(lkReq, lkr => lkr.IsSuccess && !lkr.Value.done, onFinish));
