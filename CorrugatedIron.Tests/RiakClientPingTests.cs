@@ -78,9 +78,6 @@ namespace CorrugatedIron.Tests.RiakClientPingTests
     [TestFixture]
     internal class WhenCallingPingAsynchronously : RiakClientTestBase<RpbPingReq, RpbPingResp>
     {
-        private readonly ManualResetEvent _indicator = new ManualResetEvent(false);
-        private volatile bool _done = false;
-
         [SetUp]
         public void SetUp()
         {
@@ -91,15 +88,8 @@ namespace CorrugatedIron.Tests.RiakClientPingTests
         [Test]
         public void CallbackIsInvokedCorrectly()
         {
-            Client.Async.Ping(Callback);
-            _indicator.WaitOne();
-            _done.ShouldBeTrue();
-        }
-
-        public void Callback(RiakResult result)
-        {
-            _done = result.IsSuccess;
-            _indicator.Set();
+            var result = Client.Async.Ping().Result;
+            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
         }
     }
 }

@@ -40,9 +40,8 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         [Test]
         public void ServerInfoIsSuccessfullyExtractedAsynchronously()
         {
-            var asyncTester = new AsyncMethodTester<RiakResult<RiakServerInfo>>();
-            Client.Async.GetServerInfo(asyncTester.HandleResult);
-            asyncTester.Result.IsSuccess.ShouldBeTrue();
+            var result = Client.Async.GetServerInfo().Result;
+            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
         }
 
         [Test]
@@ -135,7 +134,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         [Test]
         public void BulkInsertFetchDeleteWorksAsExpected()
         {
-            var keys = new[] { 1, 2, 3, 4, 5 }.Select(i => TestKey + i);
+            var keys = new[] { 1, 2, 3, 4, 5 }.Select(i => TestKey + i).ToList();
             var docs = keys.Select(k => new RiakObject(TestBucket, k, TestJson, RiakConstants.ContentTypes.ApplicationJson)).ToList();
 
             var writeResult = Client.Put(docs);
@@ -143,7 +142,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             writeResult.All(r => r.IsSuccess).ShouldBeTrue();
 
             var objectIds = keys.Select(k => new RiakObjectId(TestBucket, k)).ToList();
-            var loadedDocs = Client.Get(objectIds);
+            var loadedDocs = Client.Get(objectIds).ToList();
             loadedDocs.All(d => d.IsSuccess).ShouldBeTrue();
             loadedDocs.All(d => d.Value != null).ShouldBeTrue();
 
@@ -154,7 +153,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         [Test]
         public void BulkInsertFetchDeleteWorksAsExpectedInBatch()
         {
-            var keys = new[] { 1, 2, 3, 4, 5 }.Select(i => TestKey + i);
+            var keys = new[] { 1, 2, 3, 4, 5 }.Select(i => TestKey + i).ToList();
             var docs = keys.Select(k => new RiakObject(TestBucket, k, TestJson, RiakConstants.ContentTypes.ApplicationJson)).ToList();
 
             Client.Batch(batch =>
@@ -472,9 +471,8 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             var keyList = Client.ListKeys(bucket);
             keyList.Value.Count().ShouldEqual(10);
 
-            var asyncTester = new AsyncMethodTester<IEnumerable<RiakResult>>();
-            Client.Async.DeleteBucket(bucket, asyncTester.HandleResult);
-            var result = asyncTester.Result;
+            var result = Client.Async.DeleteBucket(bucket).Result.ToList();
+            result.ForEach(x => x.IsSuccess.ShouldBeTrue(x.ErrorMessage));
             
             // This might fail if you check straight away
             // because deleting takes time behind the scenes.
@@ -561,18 +559,11 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
                 Client.Put(doc).IsSuccess.ShouldBeTrue();
             }
 
-            RiakResult<IEnumerable<string>> theResult = null;
-            var resetEvnt = new AutoResetEvent(false);
-            Client.Async.ListKeys(bucket, result =>
-                                            {
-                                                theResult = result;
-                                                resetEvnt.Set();
-                                            });
+            var result = Client.Async.ListKeys(bucket).Result;
 
-            resetEvnt.WaitOne();
-            theResult.IsSuccess.ShouldBeTrue();
-            theResult.Value.ShouldNotBeNull();
-            theResult.Value.ToList().Count.ShouldEqual(10);
+            result.IsSuccess.ShouldBeTrue();
+            result.Value.ShouldNotBeNull();
+            result.Value.Count().ShouldEqual(10);
         }
     }
 }

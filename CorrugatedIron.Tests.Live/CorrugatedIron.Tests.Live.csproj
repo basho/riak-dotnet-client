@@ -55,7 +55,6 @@
     <Compile Include="..\Metadata\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
-    <Compile Include="AsyncMethodTester.cs" />
     <Compile Include="BucketPropertyTests.cs" />
     <Compile Include="GeneralIntegrationTests.cs" />
     <Compile Include="IdleTests.cs" />
