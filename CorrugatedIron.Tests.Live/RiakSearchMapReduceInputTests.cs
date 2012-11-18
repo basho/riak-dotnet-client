@@ -20,13 +20,12 @@ using CorrugatedIron.Util;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Models.MapReduce.Inputs;
-using CorrugatedIron.Models.RiakSearch;
 using CorrugatedIron.Tests.Extensions;
 using NUnit.Framework;
 
 namespace CorrugatedIron.Tests.Live
 {
-    [TestFixture()]
+    [TestFixture]
     public class RiakSearchMapReduceInputTests : RiakMapReduceTests
     {
         // N.B. You need to install the search hooks on the riak_search_bucket first via `bin/search-cmd install riak_search_bucket`
@@ -62,55 +61,22 @@ namespace CorrugatedIron.Tests.Live
         {
             Client.Put(new RiakObject(Bucket, RiakSearchKey, RiakSearchDoc, RiakConstants.ContentTypes.ApplicationJson));
             Client.Put(new RiakObject(Bucket, RiakSearchKey2, RiakSearchDoc2, RiakConstants.ContentTypes.ApplicationJson));
-            
-            var mr = new RiakMapReduceQuery();
-            
-            var modFunArg = new RiakModuleFunctionArgInput
-                                {
-                Module = "riak_search",
-                Function = "mapred_search",
-                Arg = new[] {Bucket, "name:Al*"}
-            };
 
-            mr.Inputs(modFunArg);
-            
+            var mr = new RiakMapReduceQuery()
+                .Inputs(new RiakBucketSearchInput
+                    {
+                        Bucket = Bucket,
+                        Query = "name:A1*"
+                    });
+
             var result = Client.MapReduce(mr);
-            result.IsSuccess.ShouldBeTrue();
+            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
             
             var mrResult = result.Value;
             mrResult.PhaseResults.Count().ShouldEqual(1);
             
             mrResult.PhaseResults.ElementAt(0).Values.ShouldNotBeNull();
             // TODO Add data introspection to test - need to verify the results, after all.
-        }
-
-        [Test]
-        public void SearchingByNameUsingRiakSearchObjectReturnsTheObjectid()
-        {
-            Client.Put(new RiakObject(Bucket, RiakSearchKey, RiakSearchDoc, RiakConstants.ContentTypes.ApplicationJson));
-            Client.Put(new RiakObject(Bucket, RiakSearchKey2, RiakSearchDoc2, RiakConstants.ContentTypes.ApplicationJson));
-
-            var mr = new RiakMapReduceQuery();
-
-            //var rspt = new RiakSearchPhraseToken {Field = "name", Term = "Al*"};
-            var rspt = new RiakSearchPhraseToken("Al*");
-
-            var mfa = new RiakModuleFunctionArgInput
-                          {
-                              Module = "riak_search",
-                              Function = "mapred_search",
-                              Arg = new[] {Bucket, rspt.ToString()}
-                          };
-
-            mr.Inputs(mfa);
-
-            var result = Client.MapReduce(mr);
-            result.IsSuccess.ShouldBeTrue();
-
-            var mrResult = result.Value;
-            mrResult.PhaseResults.Count().ShouldEqual(1);
-
-            mrResult.PhaseResults.ElementAt(0).Values.ShouldNotBeNull();
         }
     }
 }

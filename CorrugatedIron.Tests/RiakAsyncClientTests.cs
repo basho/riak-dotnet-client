@@ -81,7 +81,7 @@ namespace CorrugatedIron.Tests.RiakAsyncClientTests
         public void AsyncClientReturnsCorrectResult()
         {
             Result.ShouldNotBeNull();
-            Result.IsSuccess.ShouldBeTrue();
+            Result.IsSuccess.ShouldBeTrue(Result.ErrorMessage);
             Result.Value.ShouldNotBeNull();
             Result.Value.Bucket.ShouldEqual("foo");
             Result.Value.Key.ShouldEqual("bar");
@@ -109,7 +109,7 @@ namespace CorrugatedIron.Tests.RiakAsyncClientTests
         public void AsyncClientReturnsCorrectResult()
         {
             Result.ShouldNotBeNull();
-            Result.IsSuccess.ShouldBeTrue();
+            Result.IsSuccess.ShouldBeTrue(Result.ErrorMessage);
             Result.Value.ShouldNotBeNull();
             Result.Value.Bucket.ShouldEqual("foo");
             Result.Value.Key.ShouldEqual("bar");

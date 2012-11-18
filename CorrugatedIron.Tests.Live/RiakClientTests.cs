@@ -14,17 +14,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Models;
 using CorrugatedIron.Tests.Extensions;
 using CorrugatedIron.Tests.Live.LiveRiakConnectionTests;
 using CorrugatedIron.Util;
 using NUnit.Framework;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace CorrugatedIron.Tests.Live
 {
@@ -53,7 +51,7 @@ namespace CorrugatedIron.Tests.Live
             delResult.IsSuccess.ShouldBeTrue(delResult.ErrorMessage);
 
             var getResult = Client.Get(riakObjectId);
-            getResult.IsSuccess.ShouldBeFalse();
+            getResult.IsSuccess.ShouldBeFalse(getResult.ErrorMessage);
             getResult.ResultCode.ShouldEqual(ResultCode.NotFound);
             getResult.Value.ShouldBeNull();
         }

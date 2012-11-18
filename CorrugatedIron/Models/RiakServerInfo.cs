@@ -26,8 +26,8 @@ namespace CorrugatedIron.Models
 
         internal RiakServerInfo(RpbGetServerInfoResp resp)
         {
-            Node = resp.Node.FromRiakString();
-            Version = resp.ServerVersion.FromRiakString();
+            Node = resp.node.FromRiakString();
+            Version = resp.server_version.FromRiakString();
         }
     }
 }

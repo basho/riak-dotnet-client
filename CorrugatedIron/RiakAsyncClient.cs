@@ -49,6 +49,11 @@ namespace CorrugatedIron
         Task<RiakResult<RiakBucketProperties>> GetBucketProperties(string bucket, bool extended = false);
         Task<RiakResult> SetBucketProperties(string bucket, RiakBucketProperties properties);
 
+        Task<RiakResult<IList<string>>> IndexGet(string bucket, string indexName, int value);
+        Task<RiakResult<IList<string>>> IndexGet(string bucket, string indexName, string value);
+        Task<RiakResult<IList<string>>> IndexGet(string bucket, string indexName, int minValue, int maxValue);
+        Task<RiakResult<IList<string>>> IndexGet(string bucket, string indexName, string minValue, string maxValue);
+
         Task<RiakResult<IList<RiakObject>>> WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks);
 
         Task<RiakResult<RiakServerInfo>> GetServerInfo();
@@ -205,6 +210,26 @@ namespace CorrugatedIron
         public Task<RiakResult> SetBucketProperties(string bucket, RiakBucketProperties properties)
         {
             return Task.Factory.StartNew(() => _client.SetBucketProperties(bucket, properties));
+        }
+
+        public Task<RiakResult<IList<string>>> IndexGet(string bucket, string indexName, int value)
+        {
+            return Task.Factory.StartNew(() => _client.IndexGet(bucket, indexName, value));
+        }
+
+        public Task<RiakResult<IList<string>>> IndexGet(string bucket, string indexName, string value)
+        {
+            return Task.Factory.StartNew(() => _client.IndexGet(bucket, indexName, value));
+        }
+
+        public Task<RiakResult<IList<string>>> IndexGet(string bucket, string indexName, int minValue, int maxValue)
+        {
+            return Task.Factory.StartNew(() => _client.IndexGet(bucket, indexName, minValue, maxValue));
+        }
+
+        public Task<RiakResult<IList<string>>> IndexGet(string bucket, string indexName, string minValue, string maxValue)
+        {
+            return Task.Factory.StartNew(() => _client.IndexGet(bucket, indexName, minValue, maxValue));
         }
 
         public Task<RiakResult<IList<RiakObject>>> WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks)

@@ -49,18 +49,64 @@ namespace CorrugatedIron.Tests.Live
         public void IndexesAreSavedWithAnObject()
         {
             var o = new RiakObject(Bucket, "the_object", "{ value: \"this is an object\" }");
-            o.AddBinIndex("tacos", "are great!");
-            o.AddIntIndex("age", 12);
+            o.AddIndex("tacos", "are great!");
+            o.AddIndex("age", 12);
             
             Client.Put(o);
             
             var result = Client.Get(o.ToRiakObjectId());
             
-            result.IsSuccess.ShouldBeTrue();
+            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
             var ro = result.Value;
             
             ro.BinIndexes.Count.ShouldEqual(1);
             ro.IntIndexes.Count.ShouldEqual(1);
+        }
+
+        [Test]
+        public void IntIndexGetReturnsListOfKeys()
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                var o = new RiakObject(Bucket, i.ToString(), "{ value: \"this is an object\" }");
+                o.AddIndex("age_int", 32);
+                
+                Client.Put(o);
+            }
+
+            var result = Client.IndexGet(Bucket, "age", 32);
+            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
+            result.Value.Count.ShouldEqual(10);
+
+            foreach (var v in result.Value)
+            {
+                var key = int.Parse(v);
+                key.ShouldBeLessThan(10);
+                key.ShouldBeGreaterThan(-1);
+            }
+        }
+        
+        [Test]
+        public void BinIndexGetReturnsListOfKeys()
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                var o = new RiakObject(Bucket, i.ToString(), "{ value: \"this is an object\" }");
+                o.AddIndex("age", "32");
+                
+                Client.Put(o);
+            }
+
+            var result = Client.IndexGet(Bucket, "age", "32");
+            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
+            result.Value.Count.ShouldEqual(10);
+
+            foreach (var v in result.Value)
+            {
+                var key = int.Parse(v);
+                key.ShouldBeLessThan(10);
+                key.ShouldBeGreaterThan(-1);
+            }
         }
         
         [Test]
@@ -68,8 +114,8 @@ namespace CorrugatedIron.Tests.Live
         {
             for (int i = 0; i < 10; i++)
             {
-                var o = new RiakObject(Bucket, i.ToString(), "{ value: \"this is an object\" }");
-                o.AddIntIndex("age_int", 32);
+                var o = new RiakObject(Bucket, i.ToString(), "{\"value\":\"this is an object\"}");
+                o.AddIndex("age_int", 32);
                 
                 Client.Put(o);
             }
@@ -78,10 +124,10 @@ namespace CorrugatedIron.Tests.Live
             
             var mr = new RiakMapReduceQuery();
             mr.Inputs(input)
-                .ReduceJs(r => r.Name("mapValuesJson").Keep(true));
+                .MapJs(m => m.Name("Riak.mapValuesJson").Keep(true));
             
             var result = Client.MapReduce(mr);
-            result.IsSuccess.ShouldBeTrue();
+            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
             
             var keys = result.Value.PhaseResults.OrderBy(pr => pr.Phase).ElementAt(0).GetObjects<RiakObjectId>();
             
@@ -95,60 +141,12 @@ namespace CorrugatedIron.Tests.Live
         }
         
         [Test]
-        public void RiakObjectIdCanBeCreatedFromJsonArrayOrObject()
-        {
-            for (int i = 0; i < 10; i++)
-            {
-                var o = new RiakObject(Bucket, i.ToString(), "{ value: \"this is an object\" }");
-                o.AddIntIndex("age_int", 32);
-                
-                Client.Put(o);
-            }
-            
-            var input = new RiakIntIndexEqualityInput(Bucket, "age_int", 32);
-            
-            var mr = new RiakMapReduceQuery()
-                .Inputs(input)
-                .ReduceJs(r => r.Name("mapValuesJson").Keep(true));
-            
-            var result = Client.MapReduce(mr);
-            result.IsSuccess.ShouldBeTrue();
-            var keysOne = result.Value.PhaseResults.OrderBy(pr => pr.Phase).ElementAt(0).GetObjects<RiakObjectId>();
-            
-            mr = new RiakMapReduceQuery()
-                .Inputs(input)
-                .ReduceErlang(r => r.ModFun("riak_kv_mapreduce", "reduce_identity").Keep(true));
-            
-            result = Client.MapReduce(mr);
-            result.IsSuccess.ShouldBeTrue();
-            var keysTwo = result.Value.PhaseResults.OrderBy(pr => pr.Phase).ElementAt(0).GetObjects<RiakObjectId>();
-            
-            keysOne.Count().ShouldEqual(keysTwo.Count());
-            
-            foreach (var key in keysOne)
-            {
-                key.Key.ShouldNotBeNullOrEmpty();
-                key.Bucket.ShouldNotBeNullOrEmpty();
-                
-                keysTwo.Contains(key).ShouldBeTrue();
-            }
-            
-            foreach (var key in keysTwo)
-            {
-                key.Key.ShouldNotBeNullOrEmpty();
-                key.Bucket.ShouldNotBeNullOrEmpty();
-                
-                keysOne.Contains(key).ShouldBeTrue();
-            }
-        }
-        
-        [Test]
         public void IntRangeQueriesReturnMultipleKeys()
         {
             for (var i = 0; i < 10; i++)
             {
                 var o = new RiakObject(Bucket, i.ToString(), "{ value: \"this is an object\" }");
-                o.AddIntIndex("age_int", 25 + i);
+                o.AddIndex("age_int", 25 + i);
                 
                 Client.Put(o);
             }
@@ -160,7 +158,7 @@ namespace CorrugatedIron.Tests.Live
                 .ReduceErlang(r => r.ModFun("riak_kv_mapreduce", "reduce_identity").Keep(true));
             
             var result = Client.MapReduce(mr);
-            result.IsSuccess.ShouldBeTrue();
+            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
             
             // TODO write tests verifying results
         }

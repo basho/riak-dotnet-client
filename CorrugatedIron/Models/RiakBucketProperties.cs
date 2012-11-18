@@ -313,8 +313,8 @@ namespace CorrugatedIron.Models
         internal RiakBucketProperties(RpbBucketProps bucketProps)
         : this()
         {
-            AllowMultiple = bucketProps.AllowMultiple;
-            NVal = bucketProps.NVal;
+            AllowMultiple = bucketProps.allow_mult;
+            NVal = bucketProps.n_val;
         }
 
         internal RpbBucketProps ToMessage()
@@ -322,11 +322,11 @@ namespace CorrugatedIron.Models
             var message = new RpbBucketProps();
             if(AllowMultiple.HasValue)
             {
-                message.AllowMultiple = AllowMultiple.Value;
+                message.allow_mult = AllowMultiple.Value;
             }
             if(NVal.HasValue)
             {
-                message.NVal = NVal.Value;
+                message.n_val = NVal.Value;
             }
             return message;
         }

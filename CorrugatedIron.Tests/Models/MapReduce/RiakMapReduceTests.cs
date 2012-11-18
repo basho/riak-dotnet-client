@@ -52,8 +52,8 @@ namespace CorrugatedIron.Tests.Models.MapReduce
                 .MapJs(m => m.Source("function(v) { return [v]; }").Keep(true));
 
             var request = query.ToMessage();
-            request.ContentType.ShouldEqual(MrContentType.ToRiakString());
-            request.Request.ShouldEqual(MrJobText.ToRiakString());
+            request.content_type.ShouldEqual(MrContentType.ToRiakString());
+            request.request.ShouldEqual(MrJobText.ToRiakString());
         }
 
         [Test]
@@ -68,8 +68,8 @@ namespace CorrugatedIron.Tests.Models.MapReduce
                 .MapJs(m => m.Source("function(v) { return [v]; }").Keep(true));
 
             var request = query.ToMessage();
-            request.ContentType.ShouldEqual(MrContentType.ToRiakString());
-            request.Request.ShouldEqual(MrJobWithTimeoutText.ToRiakString());
+            request.content_type.ShouldEqual(MrContentType.ToRiakString());
+            request.request.ShouldEqual(MrJobWithTimeoutText.ToRiakString());
         }
 
         [Test]
@@ -84,7 +84,7 @@ namespace CorrugatedIron.Tests.Models.MapReduce
                 .ReduceJs(r => r.Name("Riak.reduceSum").Keep(true));
 
             var request = query.ToMessage();
-            request.Request.ShouldEqual(ComplexMrJobText.ToRiakString());
+            request.request.ShouldEqual(ComplexMrJobText.ToRiakString());
         }
 
         [Test]
@@ -101,7 +101,7 @@ namespace CorrugatedIron.Tests.Models.MapReduce
                 .ReduceJs(r => r.Name("Riak.reduceSum").Keep(true));
 
             var request = query.ToMessage();
-            request.Request.ShouldEqual(ComplexMrJobWithFilterText.ToRiakString());
+            request.request.ShouldEqual(ComplexMrJobWithFilterText.ToRiakString());
         }
     }
 }
