@@ -15,44 +15,9 @@
 // under the License.
 
 using System;
-using System.Text.RegularExpressions;
 
 namespace CorrugatedIron.Models.Search
 {
-    public class Token
-    {
-        private static readonly Regex EncodeRegex = new Regex(@"(["" \\'\(\)\[\]\\:\+\-\/\?])");
-
-        private readonly string _value;
-        private readonly string _suffix;
-
-        internal Token(string value)
-            : this(value, null)
-        {
-        }
-
-        internal Token(string value, string suffix)
-        {
-            _value = value;
-            _suffix = suffix;
-        }
-
-        public static Token Is(string value)
-        {
-            return new Token(value);
-        }
-
-        public static Token StartsWith(string value)
-        {
-            return new Token(value, "*");
-        }
-
-        public override string ToString()
-        {
-            return _value != null ? EncodeRegex.Replace(_value, m => "\\" + m.Value) + _suffix : string.Empty;
-        }
-    }
-
     public class RiakFluentSearch
     {
         private readonly string _bucket;
