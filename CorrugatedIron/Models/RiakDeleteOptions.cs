@@ -90,37 +90,37 @@ namespace CorrugatedIron.Models
         {
             if(Rw.HasValue)
             {
-                request.Rw = Rw.Value;
+                request.rw = Rw.Value;
             }
 
             if(Vclock != null)
             {
-                request.Vclock = Vclock;
+                request.vclock = Vclock;
             }
 
             if(R.HasValue)
             {
-                request.R = R.Value;
+                request.r = R.Value;
             }
 
             if(W.HasValue)
             {
-                request.W = W.Value;
+                request.w = W.Value;
             }
 
             if(Pr.HasValue)
             {
-                request.Pr = Pr.Value;
+                request.pr = Pr.Value;
             }
 
             if(Pw.HasValue)
             {
-                request.Pw = Pw.Value;
+                request.pw = Pw.Value;
             }
 
             if(Dw.HasValue)
             {
-                request.Dw = Dw.Value;
+                request.dw = Dw.Value;
             }
         }
     }

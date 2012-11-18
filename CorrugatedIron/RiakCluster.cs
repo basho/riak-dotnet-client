@@ -167,7 +167,8 @@ namespace CorrugatedIron
                 IRiakNode node = null;
                 while (_offlineNodes.TryDequeue(out node) && !_disposing)
                 {
-                    var result = node.UseConnection(c => c.PbcWriteRead<RpbPingReq, RpbPingResp>(new RpbPingReq()));
+                    var result = node.UseConnection(c => c.PbcWriteRead(MessageCode.PingReq, MessageCode.PingResp));
+
                     if (result.IsSuccess)
                     {
                         _loadBalancer.AddNode(node);

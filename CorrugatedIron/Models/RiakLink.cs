@@ -65,18 +65,18 @@ namespace CorrugatedIron.Models
 
         internal RiakLink(RpbLink link)
         {
-            Bucket = link.Bucket.FromRiakString();
-            Key = link.Key.FromRiakString();
-            Tag = link.Tag.FromRiakString();
+            Bucket = link.bucket.FromRiakString();
+            Key = link.key.FromRiakString();
+            Tag = link.tag.FromRiakString();
         }
 
         internal RpbLink ToMessage()
         {
             var message = new RpbLink
             {
-            Bucket = Bucket.ToRiakString(),
-            Key = Key.ToRiakString(),
-            Tag = Tag.ToRiakString()
+                bucket = Bucket.ToRiakString(),
+                key = Key.ToRiakString(),
+                tag = Tag.ToRiakString()
             };
 
             return message;

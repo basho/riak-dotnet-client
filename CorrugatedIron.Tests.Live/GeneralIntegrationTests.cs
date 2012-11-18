@@ -34,7 +34,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         public void ServerInfoIsSuccessfullyExtracted()
         {
             var result = Client.GetServerInfo();
-            result.IsSuccess.ShouldBeTrue();
+            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
         }
 
         [Test]
@@ -48,14 +48,14 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         public void PingRequstResultsInPingResponse()
         {
             var result = Client.Ping();
-            result.IsSuccess.ShouldBeTrue();
+            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
         }
 
         [Test]
         public void ReadingMissingValueDoesntBreak()
         {
             var readResult = Client.Get("nobucket", "novalue");
-            readResult.IsSuccess.ShouldBeFalse();
+            readResult.IsSuccess.ShouldBeFalse(readResult.ErrorMessage);
             readResult.ResultCode.ShouldEqual(ResultCode.NotFound);
         }
 

@@ -111,8 +111,8 @@ namespace CorrugatedIron.Tests.RiakClientSetBucketPropertiesTests
         [SetUp]
         public void SetUp()
         {
-            var result = RiakResult<RpbSetBucketResp>.Success(new RpbSetBucketResp());
-            Cluster.ConnectionMock.Setup(m => m.PbcWriteRead<RpbSetBucketReq, RpbSetBucketResp>(It.IsAny<RpbSetBucketReq>())).Returns(result);
+            var result = RiakResult.Success();
+            Cluster.ConnectionMock.Setup(m => m.PbcWriteRead(It.IsAny<RpbSetBucketReq>(), MessageCode.SetBucketResp)).Returns(result);
 
             Response = Client.SetBucketProperties("foo", new RiakBucketProperties().SetAllowMultiple(true));
         }
@@ -120,7 +120,7 @@ namespace CorrugatedIron.Tests.RiakClientSetBucketPropertiesTests
         [Test]
         public void PbcInterfaceIsInvokedWithAppropriateValues()
         {
-            Cluster.ConnectionMock.Verify(m => m.PbcWriteRead<RpbSetBucketReq, RpbSetBucketResp>(It.Is<RpbSetBucketReq>(r => r.Props.AllowMultiple)), Times.Once());
+            Cluster.ConnectionMock.Verify(m => m.PbcWriteRead(It.Is<RpbSetBucketReq>(r => r.props.allow_mult), MessageCode.SetBucketResp), Times.Once());
         }
     }
 }

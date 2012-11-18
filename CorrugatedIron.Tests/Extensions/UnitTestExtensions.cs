@@ -22,6 +22,7 @@ using NUnit.Framework;
 
 namespace CorrugatedIron.Tests.Extensions
 {
+    [System.Diagnostics.DebuggerNonUserCode]
     public static class UnitTestExtensions
     {
         public static void ShouldEqual<T>(this T actual, T expected)

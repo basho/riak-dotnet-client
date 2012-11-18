@@ -31,7 +31,7 @@ namespace CorrugatedIron.Models.MapReduce
         internal RiakMapReduceResultPhase(uint phase, IEnumerable<RpbMapRedResp> results)
         {
             Phase = phase;
-            Values = results.Select(r => r.Response).Where(b => b != null).ToList();
+            Values = results.Select(r => r.response).Where(b => b != null).ToList();
             Success = true;
         }
 

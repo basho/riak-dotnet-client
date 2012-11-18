@@ -28,10 +28,10 @@ namespace CorrugatedIron.Tests.Models
         public void RiakIndexNameManglingIsHandledAutomatically()
         {
             var riakObject = new RiakObject(Bucket, Key, "value");
-            riakObject.AddBinIndex("name", "jeremiah");
-            riakObject.AddBinIndex("state_bin", "oregon");
-            riakObject.AddIntIndex("age", 32);
-            riakObject.AddIntIndex("cats_int", 2);
+            riakObject.AddIndex("name", "jeremiah");
+            riakObject.AddIndex("state_bin", "oregon");
+            riakObject.AddIndex("age", 32);
+            riakObject.AddIndex("cats_int", 2);
             
             riakObject.Indexes.Keys.Contains("name").ShouldBeFalse();
             riakObject.Indexes.Keys.Contains("age").ShouldBeFalse();

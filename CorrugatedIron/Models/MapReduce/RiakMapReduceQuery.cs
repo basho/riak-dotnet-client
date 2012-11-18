@@ -181,8 +181,8 @@ namespace CorrugatedIron.Models.MapReduce
             Compile();
             var message = new RpbMapRedReq
             {
-                Request = _query.ToRiakString(),
-                ContentType = ContentType.ToRiakString()
+                request = _query.ToRiakString(),
+                content_type = ContentType.ToRiakString()
             };
 
             return message;
