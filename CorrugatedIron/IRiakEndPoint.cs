@@ -7,7 +7,12 @@ namespace CorrugatedIron
     public interface IRiakEndPoint : IDisposable
     {
         int RetryWaitTime { get; set; }
-        IRiakClient CreateClient(string seed = null);
+
+        IRiakClient CreateClient();
+
+        [Obsolete("Clients no longer need a seed value, use CreateClient() instead")]
+        IRiakClient CreateClient(string seed);
+
         RiakResult<TResult> UseConnection<TResult>(Func<IRiakConnection, RiakResult<TResult>> useFun, int retryAttempts);
         RiakResult UseConnection(Func<IRiakConnection, RiakResult> useFun, int retryAttempts);
 
