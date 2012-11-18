@@ -27,20 +27,20 @@ namespace CorrugatedIron
             };
         }
 
-        public RiakResult UseConnection(byte[] clientId, Func<IRiakConnection, RiakResult> useFun, int retryAttempts)
+        public RiakResult UseConnection(Func<IRiakConnection, RiakResult> useFun, int retryAttempts)
         {
-            return UseConnection(clientId, useFun, RiakResult.Error, retryAttempts);
+            return UseConnection(useFun, RiakResult.Error, retryAttempts);
         }
 
-        public RiakResult<TResult> UseConnection<TResult>(byte[] clientId, Func<IRiakConnection, RiakResult<TResult>> useFun, int retryAttempts)
+        public RiakResult<TResult> UseConnection<TResult>(Func<IRiakConnection, RiakResult<TResult>> useFun, int retryAttempts)
         {
-            return UseConnection(clientId, useFun, RiakResult<TResult>.Error, retryAttempts);
+            return UseConnection(useFun, RiakResult<TResult>.Error, retryAttempts);
         }
 
-        protected abstract TRiakResult UseConnection<TRiakResult>(byte[] clientId, Func<IRiakConnection, TRiakResult> useFun, Func<ResultCode, string, TRiakResult> onError, int retryAttempts)
+        protected abstract TRiakResult UseConnection<TRiakResult>(Func<IRiakConnection, TRiakResult> useFun, Func<ResultCode, string, TRiakResult> onError, int retryAttempts)
             where TRiakResult : RiakResult;
 
-        public abstract RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(byte[] clientId, Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun, int retryAttempts)
+        public abstract RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun, int retryAttempts)
             where TResult : RiakResult;
 
         public abstract void Dispose();

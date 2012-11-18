@@ -34,60 +34,35 @@ namespace CorrugatedIron
     {
         void Batch(Action<IRiakBatchClient> batchAction);
 
-        byte[] ClientId { get; }
         IRiakAsyncClient Async { get; }
     }
 
     public class RiakClient : IRiakClient
     {
         private readonly IRiakEndPoint _endPoint;
-        private byte[] _clientId;
         private readonly IRiakConnection _batchConnection;
 
         public int RetryCount { get; set; }
 
         public IRiakAsyncClient Async { get; private set; }
 
-        internal RiakClient(IRiakEndPoint endPoint, string seed = null)
+        internal RiakClient(IRiakEndPoint endPoint)
         {
             _endPoint = endPoint;
-
-            ClientId = GetClientId(seed);
             Async = new RiakAsyncClient(this);
         }
 
-        private RiakClient(IRiakConnection batchConnection, byte[] clientId)
+        [Obsolete("This method should no longer be used, use RiakClient(IRiakEndPoint) instead")]
+        internal RiakClient(IRiakEndPoint endPoint, string seed = null) : this(endPoint) { }
+
+        private RiakClient(IRiakConnection batchConnection)
         {
             _batchConnection = batchConnection;
-            ClientId = clientId;
             Async = new RiakAsyncClient(this);
         }
 
-        /// <summary>
-        /// Gets or sets the client identifier.
-        /// </summary>
-        /// <value>
-        /// The client identifier.
-        /// </value>
-        /// <exception cref='ArgumentException'>
-        /// Is thrown when a ClientId is less than 4 bytes.
-        /// </exception>
-        /// <remarks>
-        /// ClientId is not used by default in Riak 1.0 and newer. This behavior can be changed by setting vnode_vclocks to false on both the server and the client. See <see cref="IRiakNodeConfiguration.VnodeVclocks"/>.
-        /// </remarks>
-        public byte[] ClientId
-        {
-            get { return _clientId; }
-            set
-            {
-                if(value == null || value.Length < RiakConstants.MinClientIdLength)
-                {
-                    throw new ArgumentException("Client ID must be at least {0} bytes long.".Fmt(RiakConstants.MinClientIdLength), "value");
-                }
-
-                _clientId = value;
-            }
-        }
+        [Obsolete("This method should no longer be used, use RiakClient(IRiakConnection) instead")]
+        private RiakClient(IRiakConnection batchConnection, byte[] clientId) : this(batchConnection) { }
 
         /// <summary>
         /// Ping this instance of Riak
@@ -760,7 +735,7 @@ namespace CorrugatedIron
             {
                 try
                 {
-                    batchAction(new RiakClient(conn, _clientId));
+                    batchAction(new RiakClient(conn));
                     return RiakResult<IEnumerable<RiakResult<object>>>.Success(null);
                 }
                 catch(Exception ex)
@@ -773,7 +748,7 @@ namespace CorrugatedIron
                 }
             };
 
-            var result = _endPoint.UseDelayedConnection(_clientId, batchFun, RetryCount);
+            var result = _endPoint.UseDelayedConnection(batchFun, RetryCount);
 
             if(!result.IsSuccess && result.ResultCode == ResultCode.BatchException)
             {
@@ -783,7 +758,7 @@ namespace CorrugatedIron
 
         private RiakResult<TResult> UseConnection<TResult>(Func<IRiakConnection, RiakResult<TResult>> op)
         {
-            return _batchConnection != null ? op(_batchConnection) : _endPoint.UseConnection(_clientId, op, RetryCount);
+            return _batchConnection != null ? op(_batchConnection) : _endPoint.UseConnection(op, RetryCount);
         }
 
         private RiakResult<IEnumerable<RiakResult<TResult>>> UseDelayedConnection<TResult>(
@@ -791,38 +766,7 @@ namespace CorrugatedIron
         {
             return _batchConnection != null
                 ? op(_batchConnection, () => { })
-                : _endPoint.UseDelayedConnection(_clientId, op, RetryCount);
-        }
-
-        /// <summary>
-        /// Generate a valid ClientId based on a seed string.
-        /// </summary>
-        /// <remarks>
-        ///   <para>This is only required to reproduce Riak 0.14.2 and earlier behavior. The ClientId will only be used when vnode_vclocks is set to false.</para>
-        ///   <para>
-        ///     If a <paramref name="seed"/> is not supplied, a random number will be generated using System.Security.Cryptography.RNGCryptoService provider.
-        ///   </para>
-        /// </remarks>
-        private static byte[] GetClientId(string seed)
-        {
-            byte[] byteSeed;
-
-            if(string.IsNullOrEmpty(seed))
-            {
-                byteSeed = new byte[16];
-                var rng = new System.Security.Cryptography.RNGCryptoServiceProvider();
-                rng.GetBytes(byteSeed);
-            }
-            else
-            {
-                byteSeed = seed.ToRiakString();
-            }
-
-            var sha = new System.Security.Cryptography.SHA1CryptoServiceProvider();
-            var clientId = sha.ComputeHash(byteSeed);
-
-            Array.Resize(ref clientId, 4);
-            return clientId;
+                : _endPoint.UseDelayedConnection(op, RetryCount);
         }
 
         private static string ToBucketUri(string bucket)
