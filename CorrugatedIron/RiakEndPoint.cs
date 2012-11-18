@@ -10,7 +10,7 @@ namespace CorrugatedIron
         protected abstract int DefaultRetryCount { get; }
 
         /// <summary>
-        /// Creates a new instance of <see cref="CorrugatedIron.RiakClient"/>.
+        /// [Obsolete] Creates a new instance of <see cref="CorrugatedIron.RiakClient"/>.
         /// </summary>
         /// <returns>
         /// A minty fresh client.
@@ -19,12 +19,21 @@ namespace CorrugatedIron
         /// An optional seed to generate the Client Id for the <see cref="CorrugatedIron.RiakClient"/>. Having a unique Client Id is important for
         /// generating good vclocks. For more information about the importance of vector clocks, refer to http://wiki.basho.com/Vector-Clocks.html
         /// </param>
-        public IRiakClient CreateClient(string seed = null)
+        [Obsolete("Clients no longer need a seed value, use CreateClient() instead")]
+        public IRiakClient CreateClient(string seed)
         {
-            return new RiakClient(this, seed)
-            {
-                RetryCount = DefaultRetryCount
-            };
+            return new RiakClient(this, seed) { RetryCount = DefaultRetryCount };
+        }
+
+        /// <summary>
+        /// Creates a new instance of <see cref="CorrugatedIron.RiakClient"/>.
+        /// </summary>
+        /// <returns>
+        /// A minty fresh client.
+        /// </returns>
+        public IRiakClient CreateClient()
+        {
+            return new RiakClient(this) { RetryCount = DefaultRetryCount };
         }
 
         public RiakResult UseConnection(Func<IRiakConnection, RiakResult> useFun, int retryAttempts)
