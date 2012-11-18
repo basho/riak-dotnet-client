@@ -67,14 +67,14 @@ namespace CorrugatedIron.Tests.RiakAsyncClientTests
         [SetUp]
         public void SetUp()
         {
-            ClientMock.Setup(m => m.Get(It.IsAny<string>(), It.IsAny<string>(), 2)).Returns(RiakResult<RiakObject>.Success(new RiakObject("foo", "bar", "baz")));
+            ClientMock.Setup(m => m.Get(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<uint>())).Returns(RiakResult<RiakObject>.Success(new RiakObject("foo", "bar", "baz")));
             Result = AsyncClient.Get(new RiakObjectId("foo", "bar")).Result;
         }
 
         [Test]
         public void AsyncClientInvokesCorrectClientFunction()
         {
-            ClientMock.Verify(m => m.Get(It.IsAny<string>(), It.IsAny<string>(), 2), Times.Once());
+            ClientMock.Verify(m => m.Get(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<uint>()), Times.Once());
         }
 
         [Test]
@@ -95,14 +95,14 @@ namespace CorrugatedIron.Tests.RiakAsyncClientTests
         [SetUp]
         public void SetUp()
         {
-            ClientMock.Setup(m => m.Get(It.IsAny<string>(), It.IsAny<string>(), 2)).Returns(RiakResult<RiakObject>.Success(new RiakObject("foo", "bar", "baz")));
+            ClientMock.Setup(m => m.Get(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<uint>())).Returns(RiakResult<RiakObject>.Success(new RiakObject("foo", "bar", "baz")));
             Result = AsyncClient.Get("foo", "bar").Result;
         }
 
         [Test]
         public void AsyncClientInvokesCorrectClientFunction()
         {
-            ClientMock.Verify(m => m.Get(It.IsAny<string>(), It.IsAny<string>(), 2), Times.Once());
+            ClientMock.Verify(m => m.Get(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<uint>()), Times.Once());
         }
 
         [Test]
