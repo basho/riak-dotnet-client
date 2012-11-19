@@ -1,8 +1,8 @@
 <?xml version="1.0" standalone="yes"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <SourcePath>..</SourcePath>
-    <SolutionPath>..\CorrugatedIron.sln</SolutionPath>
+    <SourcePath>.</SourcePath>
+    <SolutionPath>.\CorrugatedIron.sln</SolutionPath>
   </PropertyGroup>
 
   <Target Name="Release" DependsOnTargets="CompileRelease;NugetRelease" />
