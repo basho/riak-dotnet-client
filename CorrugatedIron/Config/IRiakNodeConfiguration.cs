@@ -27,6 +27,5 @@ namespace CorrugatedIron.Config
         //int IdleTimeout { get; }
         int NetworkReadTimeout { get; }
         int NetworkWriteTimeout { get; }
-        bool VnodeVclocks { get; }
     }
 }
