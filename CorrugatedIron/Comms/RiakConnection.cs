@@ -89,7 +89,6 @@ namespace CorrugatedIron.Comms
     {
         private readonly string _restRootUrl;
         private readonly RiakPbcSocket _socket;
-        private readonly bool _vnodeVclocks;
 
         public bool IsIdle
         {
@@ -106,7 +105,6 @@ namespace CorrugatedIron.Comms
             _restRootUrl = @"{0}://{1}:{2}".Fmt(nodeConfiguration.RestScheme, nodeConfiguration.HostAddress, nodeConfiguration.RestPort);
             _socket = new RiakPbcSocket(nodeConfiguration.HostAddress, nodeConfiguration.PbcPort, nodeConfiguration.NetworkReadTimeout,
                 nodeConfiguration.NetworkWriteTimeout);
-            _vnodeVclocks = nodeConfiguration.VnodeVclocks;
         }
 
         public RiakResult<TResult> PbcRead<TResult>()
