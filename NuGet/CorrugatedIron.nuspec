@@ -12,8 +12,7 @@
 
       After installing this package, make sure that you modify either the app.config (for client apps) or web.config (for web apps) so that the details of the target Riak cluster are set correctly.
 
-      As of version 1.0.0 CorrugaedIron requires Riak version 1.2.1 or higher. Use CorrugatedIron version 0.2.3 if you
-      aim to continue using Riak versions prior to 1.2.
+      As of version 1.0.0 CorrugaedIron requires Riak version 1.2.1 or higher. Use CorrugatedIron version 0.2.3 if you aim to continue using Riak versions prior to 1.2.
     </description>
     <summary>
       CorrugatedIron - the .NET client for Riak.
