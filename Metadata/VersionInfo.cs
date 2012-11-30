@@ -15,6 +15,6 @@
 // where we're really happy with the stability and features of the client we'll
 // move to the Major version number.
 // We'll use the revision number for hot fix release and probably leave the build
-// number alone. It's left here because Windows binaries use 4 numbers.
-[assembly: AssemblyVersion("0.3.0.0")] 
-[assembly: AssemblyFileVersion("0.3.0.0")]
+// number there for when we do rc releases.
+[assembly: AssemblyVersion("1.0.0.1")] 
+[assembly: AssemblyFileVersion("1.0.0.1")]

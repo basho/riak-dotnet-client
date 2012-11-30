@@ -10,7 +10,7 @@
 
   <Target Name="NugetRelease">
     <Message Text="Creating Release Nuget package" />
-    <Exec Command="&quot;$(SourcePath)\.nuget\Nuget.exe&quot; pack $(SourcePath)\Nuget\CorrugatedIron.nuspec" />
+    <Exec Command="&quot;$(SourcePath)\.nuget\Nuget.exe&quot; pack $(SourcePath)\Nuget\CorrugatedIron.nuspec -Symbols" />
   </Target>
 
   <Target Name="CompileRelease">

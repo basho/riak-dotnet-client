@@ -9,21 +9,27 @@
         <nodes>
             <node name="dev1"
                   hostAddress="riak-test"
-                  pbcPort="8081"
+                  pbcPort="10017"
                   restScheme="http"
-                  restPort="8091"
+                  restPort="10018"
                   poolSize="20" />
             <node name="dev2"
                   hostAddress="riak-test"
-                  pbcPort="8082"
+                  pbcPort="10027"
                   restScheme="http"
-                  restPort="8092"
+                  restPort="10028"
                   poolSize="20" />
             <node name="dev3"
                   hostAddress="riak-test"
-                  pbcPort="8083"
+                  pbcPort="10037"
                   restScheme="http"
-                  restPort="8093"
+                  restPort="10038"
+                  poolSize="20" />
+            <node name="dev4"
+                  hostAddress="riak-test"
+                  pbcPort="10047"
+                  restScheme="http"
+                  restPort="10048"
                   poolSize="20" />
         </nodes>
     </riakConfig>
