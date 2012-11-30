@@ -14,10 +14,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using CorrugatedIron.Extensions;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using CorrugatedIron.Extensions;
 
 namespace CorrugatedIron.Exceptions
 {

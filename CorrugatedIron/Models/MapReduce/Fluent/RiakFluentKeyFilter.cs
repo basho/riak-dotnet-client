@@ -14,9 +14,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using CorrugatedIron.Models.MapReduce.KeyFilters;
 using System;
 using System.Collections.Generic;
-using CorrugatedIron.Models.MapReduce.KeyFilters;
 
 namespace CorrugatedIron.Models.MapReduce.Fluent
 {

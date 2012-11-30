@@ -14,14 +14,14 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.Linq;
 using CorrugatedIron.Comms;
-using CorrugatedIron.Util;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Models.MapReduce.Inputs;
 using CorrugatedIron.Tests.Extensions;
+using CorrugatedIron.Util;
 using NUnit.Framework;
+using System.Linq;
 
 namespace CorrugatedIron.Tests.Live
 {

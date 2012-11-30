@@ -14,15 +14,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Models;
 using CorrugatedIron.Tests.Extensions;
 using CorrugatedIron.Util;
-using NUnit.Framework;
 using Newtonsoft.Json;
+using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace CorrugatedIron.Tests.Json.RiakObjectConversionTests
 {

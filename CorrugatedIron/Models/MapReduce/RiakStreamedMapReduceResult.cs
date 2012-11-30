@@ -14,9 +14,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using CorrugatedIron.Messages;
 using System.Collections.Generic;
 using System.Linq;
-using CorrugatedIron.Messages;
 
 namespace CorrugatedIron.Models.MapReduce
 {

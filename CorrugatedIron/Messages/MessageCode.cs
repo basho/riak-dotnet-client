@@ -21,10 +21,10 @@ namespace CorrugatedIron.Messages
         ErrorResp = 0,
         PingReq = 1,
         PingResp = 2,
-        GetClientIdReq = 3,
-        GetClientIdResp = 4,
-        SetClientIdReq = 5,
-        SetClientIdResp = 6,
+        GetClientIdReq = 3,     // Not used any more
+        GetClientIdResp = 4,    // Not used any more
+        SetClientIdReq = 5,     // Not used any more
+        SetClientIdResp = 6,    // Not used any more
         GetServerInfoReq = 7,
         GetServerInfoResp = 8,
         GetReq = 9,

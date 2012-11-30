@@ -14,8 +14,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using NUnit.Framework;
 using CorrugatedIron.Models.Search;
+using NUnit.Framework;
 
 namespace CorrugatedIron.Tests
 {

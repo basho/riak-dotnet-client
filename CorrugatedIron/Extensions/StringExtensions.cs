@@ -14,10 +14,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using CorrugatedIron.Util;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
-using CorrugatedIron.Util;
 
 namespace CorrugatedIron.Extensions
 {

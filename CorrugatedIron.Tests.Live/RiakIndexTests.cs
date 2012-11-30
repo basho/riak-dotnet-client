@@ -1,12 +1,12 @@
-// Copyright (c) 2010 - OJ Reeves & Jeremiah Peschka
-// 
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+//
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
 // except in compliance with the License.  You may obtain
 // a copy of the License at
-// 
-//    http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
 // Unless required by applicable law or agreed to in writing,
 // software distributed under the License is distributed on an
 // "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -14,13 +14,13 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.Linq;
 using CorrugatedIron.Comms;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Models.MapReduce.Inputs;
 using CorrugatedIron.Tests.Extensions;
 using NUnit.Framework;
+using System.Linq;
 
 namespace CorrugatedIron.Tests.Live
 {

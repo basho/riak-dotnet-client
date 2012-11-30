@@ -14,11 +14,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using CorrugatedIron.Comms;
+using CorrugatedIron.Config;
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using CorrugatedIron.Comms;
-using CorrugatedIron.Config;
 
 namespace CorrugatedIron
 {

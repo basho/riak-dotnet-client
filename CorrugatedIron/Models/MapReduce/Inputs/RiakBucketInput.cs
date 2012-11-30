@@ -14,9 +14,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.Collections.Generic;
 using CorrugatedIron.Models.MapReduce.KeyFilters;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace CorrugatedIron.Models.MapReduce.Inputs
 {

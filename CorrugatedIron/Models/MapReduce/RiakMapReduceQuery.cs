@@ -14,10 +14,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
 using CorrugatedIron.Models.MapReduce.Fluent;
@@ -27,6 +23,10 @@ using CorrugatedIron.Models.MapReduce.Languages;
 using CorrugatedIron.Models.MapReduce.Phases;
 using CorrugatedIron.Util;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
 
 namespace CorrugatedIron.Models.MapReduce
 {
