@@ -529,15 +529,15 @@ namespace CorrugatedIron
         /// a list of keys. This operation, while cheaper in Riak 1.0 than in earlier versions of Riak, should be avoided.</remarks>
         public RiakResult<IEnumerable<string>> ListKeys(string bucket)
         {
-            System.Diagnostics.Debug.Write(ListKeysWarning);
-            System.Diagnostics.Trace.TraceWarning(ListKeysWarning);
-            Console.WriteLine(ListKeysWarning);
-
             return UseConnection(conn => ListKeys(conn, bucket));
         }
 
         private static RiakResult<IEnumerable<string>> ListKeys(IRiakConnection conn, string bucket)
         {
+            System.Diagnostics.Debug.Write(ListKeysWarning);
+            System.Diagnostics.Trace.TraceWarning(ListKeysWarning);
+            Console.WriteLine(ListKeysWarning);
+
             var lkReq = new RpbListKeysReq { bucket = bucket.ToRiakString() };
             var result = conn.PbcWriteRead<RpbListKeysReq, RpbListKeysResp>(lkReq,
                 lkr => lkr.IsSuccess && !lkr.Value.done);
