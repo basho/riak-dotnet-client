@@ -378,15 +378,16 @@ namespace CorrugatedIron
         public IEnumerable<RiakResult> DeleteBucket(string bucket, RiakDeleteOptions deleteOptions)
         {
             var results = UseConnection(conn =>
-                                            {
-                                                var keyResults = ListKeys(conn, bucket);
-                                                if (keyResults.IsSuccess)
-                                                {
-                                                    var objectIds = keyResults.Value.Select(key => new RiakObjectId(bucket, key)).ToList();
-                                                    return Delete(conn, objectIds, deleteOptions);
-                                                }
-                                                return RiakResult<IEnumerable<RiakResult>>.Error(keyResults.ResultCode, keyResults.ErrorMessage);
-                                            });
+                {
+                    var keyResults = ListKeys(conn, bucket);
+                    if (keyResults.IsSuccess)
+                    {
+                        var objectIds = keyResults.Value.Select(key => new RiakObjectId(bucket, key)).ToList();
+                        return Delete(conn, objectIds, deleteOptions);
+                    }
+                    return RiakResult<IEnumerable<RiakResult>>.Error(keyResults.ResultCode, keyResults.ErrorMessage);
+                });
+
             return results.Value;
         }
 

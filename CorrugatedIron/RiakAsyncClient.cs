@@ -14,12 +14,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Util;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace CorrugatedIron
 {

@@ -15,9 +15,7 @@
 // under the License.
 
 using CorrugatedIron.Extensions;
-using CorrugatedIron.Models.MapReduce.KeyFilters;
 using CorrugatedIron.Models.MapReduce;
-using CorrugatedIron.Models.MapReduce.Inputs;
 using CorrugatedIron.Tests.Extensions;
 using CorrugatedIron.Util;
 using NUnit.Framework;

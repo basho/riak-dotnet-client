@@ -14,15 +14,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using CorrugatedIron.Exceptions;
+using CorrugatedIron.Extensions;
+using CorrugatedIron.Messages;
+using ProtoBuf;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using CorrugatedIron.Exceptions;
-using CorrugatedIron.Extensions;
-using CorrugatedIron.Messages;
-using ProtoBuf;
 
 namespace CorrugatedIron.Comms
 {

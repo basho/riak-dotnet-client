@@ -14,13 +14,13 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.Collections.Generic;
-using System.Linq;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Models;
 using CorrugatedIron.Tests.Extensions;
 using Moq;
 using NUnit.Framework;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CorrugatedIron.Tests.RiakAsyncClientTests
 {

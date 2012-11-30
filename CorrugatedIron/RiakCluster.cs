@@ -14,16 +14,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using CorrugatedIron.Comms;
+using CorrugatedIron.Comms.LoadBalancing;
+using CorrugatedIron.Config;
+using CorrugatedIron.Messages;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using CorrugatedIron.Comms;
-using CorrugatedIron.Comms.LoadBalancing;
-using CorrugatedIron.Config;
-using CorrugatedIron.Messages;
 
 namespace CorrugatedIron
 {

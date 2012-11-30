@@ -15,7 +15,6 @@
 // under the License.
 
 using System;
-using System.Text.RegularExpressions;
 
 namespace CorrugatedIron.Models.Search
 {

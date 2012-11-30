@@ -14,11 +14,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.Collections.Generic;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Models.Search;
 using CorrugatedIron.Util;
+using System.Collections.Generic;
 
 namespace CorrugatedIron
 {

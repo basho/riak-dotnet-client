@@ -14,9 +14,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
-using System.Linq;
-using System.Threading;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.CommitHook;
@@ -24,6 +21,9 @@ using CorrugatedIron.Tests.Extensions;
 using CorrugatedIron.Tests.Live.LiveRiakConnectionTests;
 using CorrugatedIron.Util;
 using NUnit.Framework;
+using System;
+using System.Linq;
+using System.Threading;
 
 namespace CorrugatedIron.Tests.Live.BucketPropertyTests
 {

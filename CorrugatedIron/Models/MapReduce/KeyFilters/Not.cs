@@ -14,11 +14,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using Newtonsoft.Json;
 
 namespace CorrugatedIron.Models.MapReduce.KeyFilters
 {

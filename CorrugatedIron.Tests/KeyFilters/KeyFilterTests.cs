@@ -14,10 +14,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.Collections.Generic;
-using NUnit.Framework;
 using CorrugatedIron.Models.MapReduce.KeyFilters;
 using CorrugatedIron.Tests.Extensions;
+using NUnit.Framework;
+using System.Collections.Generic;
 
 namespace CorrugatedIron.Tests.KeyFilters
 {

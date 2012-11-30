@@ -14,9 +14,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using CorrugatedIron.Comms;
 using CorrugatedIron.Messages;
 using CorrugatedIron.Models;
@@ -24,6 +21,9 @@ using CorrugatedIron.Models.Rest;
 using CorrugatedIron.Util;
 using Moq;
 using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CorrugatedIron.Tests.RiakClientSetBucketPropertiesTests
 {

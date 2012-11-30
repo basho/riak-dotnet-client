@@ -14,6 +14,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using CorrugatedIron.Config;
+using CorrugatedIron.Extensions;
+using CorrugatedIron.Messages;
+using CorrugatedIron.Models.Rest;
+using CorrugatedIron.Util;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -22,11 +27,6 @@ using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using CorrugatedIron.Config;
-using CorrugatedIron.Extensions;
-using CorrugatedIron.Messages;
-using CorrugatedIron.Models.Rest;
-using CorrugatedIron.Util;
 
 namespace CorrugatedIron.Comms
 {

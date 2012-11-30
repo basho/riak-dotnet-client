@@ -14,11 +14,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.Collections.Generic;
-using System.Linq;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CorrugatedIron.Models
 {

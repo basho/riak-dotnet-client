@@ -14,10 +14,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.IO;
 using CorrugatedIron.Config;
 using CorrugatedIron.Tests.Extensions;
 using NUnit.Framework;
+using System.IO;
 
 namespace CorrugatedIron.Tests.Live.RiakConfigurationTests
 {
