@@ -69,6 +69,10 @@ namespace CorrugatedIron
         /// <summary>
         /// Ping this instance of Riak
         /// </summary>
+        /// <description>Ping can be used to ensure that there is an operational Riak node
+        /// present at the other end of the client. It's important to note that this will ping
+        /// any Riak node in the cluster and a specific node cannot be specified by the user.
+        /// Do not use this method to determine individual node health.</description>
         /// <returns>Returns true if the Riak instance has returned a 'pong' response. 
         /// Returns false if Riak is unavailable or returns a 'pang' response. </returns>
         public RiakResult Ping()
@@ -92,7 +96,7 @@ namespace CorrugatedIron
         /// </param>
         /// <remarks>If a node does not respond, that does not necessarily mean that the 
         /// <paramref name="bucket"/>/<paramref name="key"/> combination is not available. It simply means
-        /// that less than <paramref name="rVal" /> nodes successfully responded to the read request. Unfortunatley, 
+        /// that fewer than <paramref name="rVal" /> nodes responded to the read request. Unfortunatley, 
         /// the Riak API does not allow us to distinguish between a 404 resulting from less than <paramref name="rVal"/>
         /// nodes successfully responding and a <paramref name="bucket"/>/<paramref name="key"/> combination
         /// not being found in Riak.
@@ -126,11 +130,11 @@ namespace CorrugatedIron
         /// <param name='rVal'>
         /// The number of nodes required to successfully respond to the read before the read is considered a success.
         /// </param>
-        /// <remarks>If a node does not respond, that does not necessarily mean that the object referred to by
-        /// <paramref name="objectId"/> is not available. It simply means
-        /// that less than <paramref name="rVal" /> nodes successfully responded to the read request. Unfortunately, 
+        /// <remarks>If a node does not respond, that does not necessarily mean that the 
+        /// <paramref name="bucket"/>/<paramref name="key"/> combination is not available. It simply means
+        /// that fewer than <paramref name="rVal" /> nodes responded to the read request. Unfortunatley, 
         /// the Riak API does not allow us to distinguish between a 404 resulting from less than <paramref name="rVal"/>
-        /// nodes successfully responding and a object identified by <paramref name="objectId"/>
+        /// nodes successfully responding and a <paramref name="bucket"/>/<paramref name="key"/> combination
         /// not being found in Riak.
         /// </remarks>
         public RiakResult<RiakObject> Get(RiakObjectId objectId, uint rVal = RiakConstants.Defaults.RVal)
@@ -147,6 +151,12 @@ namespace CorrugatedIron
         /// <param name='rVal'>
         /// The number of nodes required to successfully respond to the read before the read is considered a success.
         /// </param>
+        /// <returns>An <see cref="System.Collections.Generic.IEnumerable<T>"/> of <see cref="CorrugatedIron.Models.RiakResult<T>"/>
+        /// is returned. You should verify the success or failure of each result separately.</returns>
+        /// <remarks>Riak does not support multi get behavior. CorrugatedIron's multi get functionality wraps multiple
+        /// get requests and returns results as an IEnumerable<RiakResult<RiakObject>>. Callers should be aware that
+        /// this may result in partial success - all results should be evaluated individually in the calling application.
+        /// In addition, applications should plan for multiple failures or multiple cases of siblings being present.</remarks>
         public IEnumerable<RiakResult<RiakObject>> Get(IEnumerable<RiakObjectId> bucketKeyPairs,
             uint rVal = RiakConstants.Defaults.RVal)
         {
@@ -221,14 +231,20 @@ namespace CorrugatedIron
         }
 
         /// <summary>
-        /// Persist an <see href="System.Collections.Generic.IEnumerable&lt;T&gt;"/> of <see cref="CorrugatedIron.Models.RiakObjectId"/> to Riak.
+        /// Persist an <see href="System.Collections.Generic.IEnumerable<T>"/> of <see cref="CorrugatedIron.Models.RiakObjectId"/> to Riak.
         /// </summary>
         /// <param name='values'>
-        /// The <see href="System.Collections.Generic.IEnumerable&lt;T&gt;"/> of <see cref="CorrugatedIron.Models.RiakObjectId"/> to save.
+        /// The <see href="System.Collections.Generic.IEnumerable<T>"/> of <see cref="CorrugatedIron.Models.RiakObjectId"/> to save.
         /// </param>
         /// <param name='options'>
         /// Put options.
         /// </param>
+        /// <returns>An <see cref="System.Collections.Generic.IEnumerable<T>"/> of <see cref="CorrugatedIron.Models.RiakResult<T>"/>
+        /// is returned. You should verify the success or failure of each result separately.</returns>
+        /// <remarks>Riak does not support multi put behavior. CorrugatedIron's multi put functionality wraps multiple
+        /// put requests and returns results as an IEnumerable<RiakResult<RiakObject>>. Callers should be aware that
+        /// this may result in partial success - all results should be evaluated individually in the calling application.
+        /// In addition, applications should plan for multiple failures or multiple cases of siblings being present.</remarks>
         public IEnumerable<RiakResult<RiakObject>> Put(IEnumerable<RiakObject> values, RiakPutOptions options = null)
         {
             options = options ?? new RiakPutOptions();
@@ -333,16 +349,16 @@ namespace CorrugatedIron
         /// The number of nodes that must respond successfully to a delete request.
         /// </param>
         /// <remarks>
+        /// /// <para>
+        /// Because of the <see cref="CorrugatedIron.RiakClient.ListKeys"/> operation, this may be a time consuming operation on
+        /// production systems and may cause memory problems for the client. This should be used either in testing or on small buckets with 
+        /// known amounts of data.
+        /// </para>
         /// <para>
         /// A delete bucket operation actually deletes all keys in the bucket individually. 
         /// A <see cref="CorrugatedIron.RiakClient.ListKeys"/> operation is performed to retrieve a list of keys
         /// The keys retrieved from the <see cref="CorrugatedIron.RiakClient.ListKeys"/> are then deleted through
         /// <see cref="CorrugatedIron.RiakClient.Delete"/>. 
-        /// </para>
-        /// <para>
-        /// Because of the <see cref="CorrugatedIron.RiakClient.ListKeys"/> operation, this may be a time consuming operation on
-        /// production systems and may cause memory problems for the client. This should be used either in testing or on small buckets with 
-        /// known amounts of data.
         /// </para>
         /// </remarks>
         public IEnumerable<RiakResult> DeleteBucket(string bucket, uint rwVal)
