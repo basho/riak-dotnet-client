@@ -60,8 +60,8 @@ Current Features
 
 **CorrugatedIron works with .NET 4.0 on Windows and Mono on Linux and OSX.**
 
-v0.2 Features (in development)
-------------------------------
+Planned Features (in development)
+---------------------------------
 
 * Connection idling when connections haven't been used for a while.
 * Improvements to connection self-healing and node management.
@@ -81,7 +81,7 @@ Future Features
 ---------------
 
 * Suggestions from users.
-* Support for Riak Search and other extensions such as Luwak.
+* Support for Riak Search.
 * LINQ expression parsing for map/reduce.
 
 License
