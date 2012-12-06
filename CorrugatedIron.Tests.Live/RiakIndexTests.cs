@@ -66,10 +66,10 @@ namespace CorrugatedIron.Tests.Live
         [Test]
         public void IntIndexGetReturnsListOfKeys()
         {
-            for (int i = 0; i < 10; i++)
+            for (var i = 0; i < 10; i++)
             {
                 var o = new RiakObject(Bucket, i.ToString(), "{ value: \"this is an object\" }");
-                o.AddIndex("age_int", 32);
+                o.AddIndex("age", 32);
                 
                 Client.Put(o);
             }
@@ -89,7 +89,7 @@ namespace CorrugatedIron.Tests.Live
         [Test]
         public void BinIndexGetReturnsListOfKeys()
         {
-            for (int i = 0; i < 10; i++)
+            for (var i = 0; i < 10; i++)
             {
                 var o = new RiakObject(Bucket, i.ToString(), "{ value: \"this is an object\" }");
                 o.AddIndex("age", "32");
@@ -112,24 +112,21 @@ namespace CorrugatedIron.Tests.Live
         [Test]
         public void QueryingByIntIndexReturnsAListOfKeys()
         {
-            for (int i = 0; i < 10; i++)
+            for (var i = 0; i < 10; i++)
             {
                 var o = new RiakObject(Bucket, i.ToString(), "{\"value\":\"this is an object\"}");
-                o.AddIndex("age_int", 32);
+                o.AddIndex("age", 32);
                 
                 Client.Put(o);
             }
             
-            var input = new RiakIntIndexEqualityInput(Bucket, "age_int", 32);
-            
-            var mr = new RiakMapReduceQuery();
-            mr.Inputs(input)
-                .MapJs(m => m.Name("Riak.mapValuesJson").Keep(true));
+            var mr = new RiakMapReduceQuery()
+                .Inputs(RiakIndex.Match(Bucket, "age", 32));
             
             var result = Client.MapReduce(mr);
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
-            
-            var keys = result.Value.PhaseResults.OrderBy(pr => pr.Phase).ElementAt(0).GetObjects<RiakObjectId>();
+
+            var keys = result.Value.PhaseResults.SelectMany(x => x.GetObjects<RiakObjectId>()).ToList();
             
             keys.Count().ShouldEqual(10);
             
@@ -146,15 +143,13 @@ namespace CorrugatedIron.Tests.Live
             for (var i = 0; i < 10; i++)
             {
                 var o = new RiakObject(Bucket, i.ToString(), "{ value: \"this is an object\" }");
-                o.AddIndex("age_int", 25 + i);
+                o.AddIndex("age", 25 + i);
                 
                 Client.Put(o);
             }
             
-            var input = new RiakIntIndexRangeInput(Bucket, "age_int", 27, 30);
-            
             var mr = new RiakMapReduceQuery()
-                .Inputs(input)
+                .Inputs(RiakIndex.Range(Bucket, "age", 27, 30))
                 .ReduceErlang(r => r.ModFun("riak_kv_mapreduce", "reduce_identity").Keep(true));
             
             var result = Client.MapReduce(mr);

@@ -126,6 +126,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Models\MapReduce\Inputs\RiakBucketSearchInput.cs" />
+    <Compile Include="Models\MapReduce\Inputs\RiakIndex.cs" />
     <Compile Include="Models\MapReduce\IRiakMapReduceResult.cs" />
     <Compile Include="Models\MapReduce\KeyFilters\And.cs" />
     <Compile Include="Models\MapReduce\KeyFilters\Between.cs" />

@@ -113,8 +113,7 @@ namespace CorrugatedIron.Tests.Json.RiakObjectConversionTests
                 var result = obj.GetObject<Person>();
             }
             sw.Stop();
-            Console.WriteLine("De" +
-                "serialisation took a total of {0} - {1} per iteration", sw.Elapsed, new TimeSpan(sw.ElapsedTicks / iterations));
+            Console.WriteLine("Deserialisation took a total of {0} - {1} per iteration", sw.Elapsed, new TimeSpan(sw.ElapsedTicks / iterations));
         }
 
         [Test]

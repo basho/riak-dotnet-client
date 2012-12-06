@@ -14,6 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using CorrugatedIron.Extensions;
 using Newtonsoft.Json;
 
 namespace CorrugatedIron.Models.MapReduce.Inputs
@@ -28,7 +29,7 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
         public RiakIntIndexRangeInput(string bucket, string index, int start, int end)
         {
             Bucket = bucket;
-            Index = index;
+            Index = index.ToIntegerKey();
             Start = start;
             End = end;
         }

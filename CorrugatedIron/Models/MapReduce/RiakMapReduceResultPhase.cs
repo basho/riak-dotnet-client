@@ -40,9 +40,9 @@ namespace CorrugatedIron.Models.MapReduce
             Success = false;
         }
 
-        public IEnumerable<T> GetObjects<T>()
+        public IList<T> GetObjects<T>()
         {
-            var rVal = Values.Select(v => JsonConvert.DeserializeObject<T>(v.FromRiakString()));
+            var rVal = Values.Select(v => JsonConvert.DeserializeObject<T>(v.FromRiakString())).ToList();
             return rVal;
         }
 
