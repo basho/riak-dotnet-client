@@ -84,6 +84,21 @@ namespace CorrugatedIron.Models.Search
             return _term;
         }
 
+        public Term Between(string from, string to)
+        {
+            return Between(Token.Is(from), Token.Is(to));
+        }
+
+        public Term Between(Token from, string to)
+        {
+            return Between(from, Token.Is(to));
+        }
+
+        public Term Between(string from, Token to)
+        {
+            return Between(Token.Is(from), to);
+        }
+
         public Term Between(Token from, Token to)
         {
             _term = new RangeTerm(this, _field, from, to, true);
