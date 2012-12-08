@@ -361,6 +361,17 @@ namespace CorrugatedIron.Models
             }
         }
 
+        public void SetObject<T>(T value, SerializeObjectToString<T> serializeObject)
+            where T : class
+        {
+            if (serializeObject == null)
+            {
+                throw new ArgumentException("serializeObject cannot be null");
+            }
+
+            Value = serializeObject(value).ToRiakString();
+        }
+
         public void SetObject<T>(T value, string contentType, SerializeObjectToString<T> serializeObject)
             where T : class 
         {
@@ -369,14 +380,19 @@ namespace CorrugatedIron.Models
                 throw new ArgumentException("contentType must be a valid MIME type");
             }
 
+            ContentType = contentType;
+
+            SetObject(value, serializeObject);
+        }
+
+        public void SetObject<T>(T value, SerializeObjectToByteArray<T> serializeObject)
+        {
             if (serializeObject == null)
             {
                 throw new ArgumentException("serializeObject cannot be null");
             }
-            
-            ContentType = contentType;
 
-            Value = serializeObject(value).ToRiakString();
+            Value = serializeObject(value);
         }
 
         public void SetObject<T>(T value, string contentType, SerializeObjectToByteArray<T> serializeObject)
@@ -386,14 +402,9 @@ namespace CorrugatedIron.Models
                 throw new ArgumentException("contentType must be a valid MIME type");
             }
 
-            if (serializeObject == null)
-            {
-                throw new ArgumentException("serializeObject cannot be null");
-            }
-
             ContentType = contentType;
 
-            Value = serializeObject(value);
+            SetObject(value, serializeObject);
         }
 
         // setting content type of SetObject changes content type

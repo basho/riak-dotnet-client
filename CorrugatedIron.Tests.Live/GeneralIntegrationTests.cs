@@ -555,7 +555,8 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             {
                 var doc = new RiakObject(bucket, i.ToString(), new { value = i });
 
-                Client.Put(doc).IsSuccess.ShouldBeTrue();
+                var r = Client.Put(doc);
+                r.IsSuccess.ShouldBeTrue();
             }
 
             var result = Client.Async.ListKeys(bucket).Result;
