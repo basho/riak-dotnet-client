@@ -91,6 +91,49 @@ namespace CorrugatedIron
         /// <param name='key'>
         /// The key.
         /// </param>
+        /// <param name='options'>The <see cref="CorrugatedIron.Models.RiakGetOptions" /> responsible for 
+        /// configuring the semantics of this single get request. These options will override any previously 
+        /// defined bucket configuration properties.</param>
+        /// <remarks>If a node does not respond, that does not necessarily mean that the 
+        /// <paramref name="bucket"/>/<paramref name="key"/> combination is not available. It simply means
+        /// that fewer than R/PR nodes responded to the read request. See <see cref="CorrugatedIron.Models.RiakGetOptions" />
+        /// for information on how different options change Riak's default behavior.
+        /// </remarks>
+        public RiakResult<RiakObject> Get(string bucket, string key, RiakGetOptions options = null)
+        {
+            var request = new RpbGetReq { bucket = bucket.ToRiakString(), key = key.ToRiakString() };
+
+            options = options ?? new RiakGetOptions();
+            options.Populate(request);
+
+            var result = UseConnection(conn => conn.PbcWriteRead<RpbGetReq, RpbGetResp>(request));
+            
+            if(!result.IsSuccess)
+            {
+                return RiakResult<RiakObject>.Error(result.ResultCode, result.ErrorMessage);
+            }
+            
+            if(result.Value.vclock == null)
+            {
+                return RiakResult<RiakObject>.Error(ResultCode.NotFound);
+            }
+            
+            var o = new RiakObject(bucket, key, result.Value.content, result.Value.vclock);
+            
+            return RiakResult<RiakObject>.Success(o);
+        }
+
+        /// <summary>
+        /// Get the specified <paramref name="key"/> from the <paramref name="bucket"/>.
+        /// Optionally can be read from <paramref name="rVal"/> instances. By default, the server's
+        /// r-value will be used, but can be overridden by <paramref name="rVal"/>.
+        /// </summary>
+        /// <param name='bucket'>
+        /// The name of the bucket containing the <paramref name="key"/>
+        /// </param>
+        /// <param name='key'>
+        /// The key.
+        /// </param>
         /// <param name='rVal'>
         /// The number of nodes required to successfully respond to the read before the read is considered a success.
         /// </param>
@@ -101,24 +144,11 @@ namespace CorrugatedIron
         /// nodes successfully responding and a <paramref name="bucket"/>/<paramref name="key"/> combination
         /// not being found in Riak.
         /// </remarks>
+        [Obsolete("Use Get(string, string, RiakGetOptions) instead")]
         public RiakResult<RiakObject> Get(string bucket, string key, uint rVal = RiakConstants.Defaults.RVal)
         {
-            var request = new RpbGetReq { bucket = bucket.ToRiakString(), key = key.ToRiakString(), r = rVal };
-            var result = UseConnection(conn => conn.PbcWriteRead<RpbGetReq, RpbGetResp>(request));
-
-            if(!result.IsSuccess)
-            {
-                return RiakResult<RiakObject>.Error(result.ResultCode, result.ErrorMessage);
-            }
-
-            if(result.Value.vclock == null)
-            {
-                return RiakResult<RiakObject>.Error(ResultCode.NotFound);
-            }
-
-            var o = new RiakObject(bucket, key, result.Value.content, result.Value.vclock);
-
-            return RiakResult<RiakObject>.Success(o);
+            var options = new RiakGetOptions { R = rVal };
+            return Get(bucket, key, options);
         }
 
         /// <summary>
@@ -137,9 +167,64 @@ namespace CorrugatedIron
         /// nodes successfully responding and a <paramref name="bucket"/>/<paramref name="key"/> combination
         /// not being found in Riak.
         /// </remarks>
+        [Obsolete("Use Get(string, string, RiakGetOptions) instead")]
         public RiakResult<RiakObject> Get(RiakObjectId objectId, uint rVal = RiakConstants.Defaults.RVal)
         {
             return Get(objectId.Bucket, objectId.Key, rVal);
+        }
+
+        /// <summary>
+        /// Retrieve multiple objects from Riak.
+        /// </summary>
+        /// <param name='bucketKeyPairs'>
+        /// An <see href="System.Collections.Generic.IEnumerable&lt;T&gt;"/> of <see cref="CorrugatedIron.Models.RiakObjectId"/> to be retrieved
+        /// </param>
+        /// <param name='options'>The <see cref="CorrugatedIron.Models.RiakGetOptions" /> responsible for 
+        /// configuring the semantics of this single get request. These options will override any previously 
+        /// defined bucket configuration properties.</param>
+        /// <returns>An <see cref="System.Collections.Generic.IEnumerable<T>"/> of <see cref="CorrugatedIron.Models.RiakResult<T>"/>
+        /// is returned. You should verify the success or failure of each result separately.</returns>
+        /// <remarks>Riak does not support multi get behavior. CorrugatedIron's multi get functionality wraps multiple
+        /// get requests and returns results as an IEnumerable<RiakResult<RiakObject>>. Callers should be aware that
+        /// this may result in partial success - all results should be evaluated individually in the calling application.
+        /// In addition, applications should plan for multiple failures or multiple cases of siblings being present.</remarks>
+        public IEnumerable<RiakResult<RiakObject>> Get(IEnumerable<RiakObjectId> bucketKeyPairs,
+                                                       RiakGetOptions options = null)
+        {
+            bucketKeyPairs = bucketKeyPairs.ToList();
+
+            options = options ?? new RiakGetOptions();
+            var requests = bucketKeyPairs.Select(bk => new RpbGetReq { bucket = bk.Bucket.ToRiakString(), key = bk.Key.ToRiakString() }).ToList();
+            requests.ForEach(r => options.Populate(r));
+
+            var results = UseConnection(conn =>
+                                        {
+                var responses = requests.Select(conn.PbcWriteRead<RpbGetReq, RpbGetResp>).ToList();
+                return RiakResult<IEnumerable<RiakResult<RpbGetResp>>>.Success(responses);
+            });
+            
+            return results.Value.Zip(bucketKeyPairs, Tuple.Create).Select(result =>
+                                                                          {
+                if(!result.Item1.IsSuccess)
+                {
+                    return RiakResult<RiakObject>.Error(result.Item1.ResultCode, result.Item1.ErrorMessage);
+                }
+                
+                if(result.Item1.Value.vclock == null)
+                {
+                    return RiakResult<RiakObject>.Error(ResultCode.NotFound);
+                }
+                
+                var o = new RiakObject(result.Item2.Bucket, result.Item2.Key, result.Item1.Value.content.First(), result.Item1.Value.vclock);
+                
+                if(result.Item1.Value.content.Count > 1)
+                {
+                    o.Siblings = result.Item1.Value.content.Select(c =>
+                                                                   new RiakObject(result.Item2.Bucket, result.Item2.Key, c, result.Item1.Value.vclock)).ToList();
+                }
+                
+                return RiakResult<RiakObject>.Success(o);
+            });
         }
 
         /// <summary>
@@ -157,40 +242,13 @@ namespace CorrugatedIron
         /// get requests and returns results as an IEnumerable<RiakResult<RiakObject>>. Callers should be aware that
         /// this may result in partial success - all results should be evaluated individually in the calling application.
         /// In addition, applications should plan for multiple failures or multiple cases of siblings being present.</remarks>
+        [Obsolete("Use Get(IEnumerable<RiakObjectId>, RiakGetOptions) instead.")]
         public IEnumerable<RiakResult<RiakObject>> Get(IEnumerable<RiakObjectId> bucketKeyPairs,
             uint rVal = RiakConstants.Defaults.RVal)
         {
-            bucketKeyPairs = bucketKeyPairs.ToList();
+            var options = new RiakGetOptions { R = rVal };
 
-            var requests = bucketKeyPairs.Select(bk => new RpbGetReq { bucket = bk.Bucket.ToRiakString(), key = bk.Key.ToRiakString(), r = rVal }).ToList();
-            var results = UseConnection(conn =>
-            {
-                var responses = requests.Select(conn.PbcWriteRead<RpbGetReq, RpbGetResp>).ToList();
-                return RiakResult<IEnumerable<RiakResult<RpbGetResp>>>.Success(responses);
-            });
-
-            return results.Value.Zip(bucketKeyPairs, Tuple.Create).Select(result =>
-            {
-                if(!result.Item1.IsSuccess)
-                {
-                    return RiakResult<RiakObject>.Error(result.Item1.ResultCode, result.Item1.ErrorMessage);
-                }
-
-                if(result.Item1.Value.vclock == null)
-                {
-                    return RiakResult<RiakObject>.Error(ResultCode.NotFound);
-                }
-
-                var o = new RiakObject(result.Item2.Bucket, result.Item2.Key, result.Item1.Value.content.First(), result.Item1.Value.vclock);
-
-                if(result.Item1.Value.content.Count > 1)
-                {
-                    o.Siblings = result.Item1.Value.content.Select(c =>
-                        new RiakObject(result.Item2.Bucket, result.Item2.Key, c, result.Item1.Value.vclock)).ToList();
-                }
-
-                return RiakResult<RiakObject>.Success(o);
-            });
+            return Get(bucketKeyPairs, options);
         }
 
 
@@ -730,7 +788,7 @@ namespace CorrugatedIron
                 var rawLinks = linkResultStrings.SelectMany(RiakLink.ParseArrayFromJsonString).Distinct();
                 var oids = rawLinks.Select(l => new RiakObjectId(l.Bucket, l.Key)).ToList();
 
-                var objects = Get(oids);
+                var objects = Get(oids, new RiakGetOptions());
 
                 // FIXME
                 // we could be discarding results here. Not good?
