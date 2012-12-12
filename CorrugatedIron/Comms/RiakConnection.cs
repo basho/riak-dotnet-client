@@ -15,6 +15,7 @@
 // under the License.
 
 using CorrugatedIron.Config;
+using CorrugatedIron.Exceptions;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
 using CorrugatedIron.Models.Rest;
@@ -115,10 +116,18 @@ namespace CorrugatedIron.Comms
                 var result = _socket.Read<TResult>();
                 return RiakResult<TResult>.Success(result);
             }
-            catch(Exception ex)
+            catch (RiakException ex)
+            {
+                if (ex.NodeOffline)
+                {
+                    Disconnect();
+                }
+                return RiakResult<TResult>.Error(ResultCode.CommunicationError, ex.Message, ex.NodeOffline);
+            }
+            catch (Exception ex)
             {
                 Disconnect();
-                return RiakResult<TResult>.Error(ResultCode.CommunicationError, ex.Message);
+                return RiakResult<TResult>.Error(ResultCode.CommunicationError, ex.Message, true);
             }
         }
 
@@ -129,10 +138,18 @@ namespace CorrugatedIron.Comms
                 _socket.Read(expectedMessageCode);
                 return RiakResult.Success();
             }
+            catch (RiakException ex)
+            {
+                if (ex.NodeOffline)
+                {
+                    Disconnect();
+                }
+                return RiakResult.Error(ResultCode.CommunicationError, ex.Message, ex.NodeOffline);
+            }
             catch(Exception ex)
             {
                 Disconnect();
-                return RiakResult.Error(ResultCode.CommunicationError, ex.Message);
+                return RiakResult.Error(ResultCode.CommunicationError, ex.Message, true);
             }
         }
 
@@ -151,10 +168,18 @@ namespace CorrugatedIron.Comms
 
                 return RiakResult<IEnumerable<RiakResult<TResult>>>.Success(results);
             }
+            catch (RiakException ex)
+            {
+                if (ex.NodeOffline)
+                {
+                    Disconnect();
+                }
+                return RiakResult<IEnumerable<RiakResult<TResult>>>.Error(ResultCode.CommunicationError, ex.Message, ex.NodeOffline);
+            }
             catch(Exception ex)
             {
                 Disconnect();
-                return RiakResult<IEnumerable<RiakResult<TResult>>>.Error(ResultCode.CommunicationError, ex.Message);
+                return RiakResult<IEnumerable<RiakResult<TResult>>>.Error(ResultCode.CommunicationError, ex.Message, true);
             }
         }
 
@@ -166,10 +191,18 @@ namespace CorrugatedIron.Comms
                 _socket.Write(request);
                 return RiakResult.Success();
             }
+            catch (RiakException ex)
+            {
+                if (ex.NodeOffline)
+                {
+                    Disconnect();
+                }
+                return RiakResult.Error(ResultCode.CommunicationError, ex.Message, ex.NodeOffline);
+            }
             catch(Exception ex)
             {
                 Disconnect();
-                return RiakResult.Error(ResultCode.CommunicationError, ex.Message);
+                return RiakResult.Error(ResultCode.CommunicationError, ex.Message, true);
             }
         }
 
@@ -180,10 +213,18 @@ namespace CorrugatedIron.Comms
                 _socket.Write(messageCode);
                 return RiakResult.Success();
             }
+            catch (RiakException ex)
+            {
+                if (ex.NodeOffline)
+                {
+                    Disconnect();
+                }
+                return RiakResult.Error(ResultCode.CommunicationError, ex.Message, ex.NodeOffline);
+            }
             catch(Exception ex)
             {
                 Disconnect();
-                return RiakResult.Error(ResultCode.CommunicationError, ex.Message);
+                return RiakResult.Error(ResultCode.CommunicationError, ex.Message, true);
             }
         }
 
@@ -196,7 +237,7 @@ namespace CorrugatedIron.Comms
             {
                 return PbcRead<TResult>();
             }
-            return RiakResult<TResult>.Error(writeResult.ResultCode, writeResult.ErrorMessage);
+            return RiakResult<TResult>.Error(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline);
         }
 
         public RiakResult PbcWriteRead<TRequest>(TRequest request, MessageCode expectedMessageCode)
@@ -207,7 +248,7 @@ namespace CorrugatedIron.Comms
             {
                 return PbcRead(expectedMessageCode);
             }
-            return RiakResult.Error(writeResult.ResultCode, writeResult.ErrorMessage);
+            return RiakResult.Error(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline);
         }
 
         public RiakResult<TResult> PbcWriteRead<TResult>(MessageCode messageCode)
@@ -218,7 +259,7 @@ namespace CorrugatedIron.Comms
             {
                 return PbcRead<TResult>();
             }
-            return RiakResult<TResult>.Error(writeResult.ResultCode, writeResult.ErrorMessage);
+            return RiakResult<TResult>.Error(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline);
         }
 
         public RiakResult PbcWriteRead(MessageCode messageCode, MessageCode expectedMessageCode)
@@ -228,7 +269,7 @@ namespace CorrugatedIron.Comms
             {
                 return PbcRead(expectedMessageCode);
             }
-            return RiakResult.Error(writeResult.ResultCode, writeResult.ErrorMessage);
+            return RiakResult.Error(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline);
         }
 
         public RiakResult<IEnumerable<RiakResult<TResult>>> PbcWriteRead<TRequest, TResult>(TRequest request,
@@ -241,7 +282,7 @@ namespace CorrugatedIron.Comms
             {
                 return PbcRepeatRead(repeatRead);
             }
-            return RiakResult<IEnumerable<RiakResult<TResult>>>.Error(writeResult.ResultCode, writeResult.ErrorMessage);
+            return RiakResult<IEnumerable<RiakResult<TResult>>>.Error(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline);
         }
 
         public RiakResult<IEnumerable<RiakResult<TResult>>> PbcWriteRead<TResult>(MessageCode messageCode,
@@ -253,7 +294,7 @@ namespace CorrugatedIron.Comms
             {
                 return PbcRepeatRead(repeatRead);
             }
-            return RiakResult<IEnumerable<RiakResult<TResult>>>.Error(writeResult.ResultCode, writeResult.ErrorMessage);
+            return RiakResult<IEnumerable<RiakResult<TResult>>>.Error(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline);
         }
 
         public RiakResult<IEnumerable<RiakResult<TResult>>> PbcStreamRead<TResult>(Func<RiakResult<TResult>, bool> repeatRead, Action onFinish)
@@ -310,7 +351,7 @@ namespace CorrugatedIron.Comms
                 return PbcStreamReadIterator(repeatRead, onFinish);
             }
             onFinish();
-            return new[] { RiakResult<TResult>.Error(writeResult.ResultCode, writeResult.ErrorMessage) };
+            return new[] { RiakResult<TResult>.Error(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline) };
         }
 
         private IEnumerable<RiakResult<TResult>> PbcWriteStreamReadIterator<TResult>(MessageCode messageCode,
@@ -323,7 +364,7 @@ namespace CorrugatedIron.Comms
                 return PbcStreamReadIterator(repeatRead, onFinish);
             }
             onFinish();
-            return new[] { RiakResult<TResult>.Error(writeResult.ResultCode, writeResult.ErrorMessage) };
+            return new[] { RiakResult<TResult>.Error(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline) };
         }
 
         public RiakResult<RiakRestResponse> RestRequest(RiakRestRequest request)
@@ -399,9 +440,13 @@ namespace CorrugatedIron.Comms
 
                 return RiakResult<RiakRestResponse>.Success(result);
             }
+            catch(RiakException ex)
+            {
+                return RiakResult<RiakRestResponse>.Error(ResultCode.CommunicationError, ex.Message, ex.NodeOffline);
+            }
             catch(Exception ex)
             {
-                return RiakResult<RiakRestResponse>.Error(ResultCode.CommunicationError, ex.Message);
+                return RiakResult<RiakRestResponse>.Error(ResultCode.CommunicationError, ex.Message, true);
             }
         }
 

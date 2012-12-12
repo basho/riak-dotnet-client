@@ -82,8 +82,8 @@ namespace CorrugatedIron
 
         /// <summary>
         /// Get the specified <paramref name="key"/> from the <paramref name="bucket"/>.
-        /// Optionally can be read from <paramref name="rVal"/> instances. By default, the server's
-        /// r-value will be used, but can be overridden by <paramref name="rVal"/>.
+        /// Optionally can be read from rVal instances. By default, the server's
+        /// r-value will be used, but can be overridden by rVal.
         /// </summary>
         /// <param name='bucket'>
         /// The name of the bucket containing the <paramref name="key"/>
@@ -110,12 +110,12 @@ namespace CorrugatedIron
             
             if(!result.IsSuccess)
             {
-                return RiakResult<RiakObject>.Error(result.ResultCode, result.ErrorMessage);
+                return RiakResult<RiakObject>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
             }
             
             if(result.Value.vclock == null)
             {
-                return RiakResult<RiakObject>.Error(ResultCode.NotFound);
+                return RiakResult<RiakObject>.Error(ResultCode.NotFound, "Unable to find value in Riak", false);
             }
             
             var o = new RiakObject(bucket, key, result.Value.content, result.Value.vclock);
@@ -207,12 +207,12 @@ namespace CorrugatedIron
                                                                           {
                 if(!result.Item1.IsSuccess)
                 {
-                    return RiakResult<RiakObject>.Error(result.Item1.ResultCode, result.Item1.ErrorMessage);
+                    return RiakResult<RiakObject>.Error(result.Item1.ResultCode, result.Item1.ErrorMessage, result.Item1.NodeOffline);
                 }
                 
                 if(result.Item1.Value.vclock == null)
                 {
-                    return RiakResult<RiakObject>.Error(ResultCode.NotFound);
+                    return RiakResult<RiakObject>.Error(ResultCode.NotFound, "Unable to find value in Riak", false);
                 }
                 
                 var o = new RiakObject(result.Item2.Bucket, result.Item2.Key, result.Item1.Value.content.First(), result.Item1.Value.vclock);
@@ -272,7 +272,7 @@ namespace CorrugatedIron
 
             if(!result.IsSuccess)
             {
-                return RiakResult<RiakObject>.Error(result.ResultCode, result.ErrorMessage);
+                return RiakResult<RiakObject>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
             }
 
             var finalResult = options.ReturnBody
@@ -338,7 +338,7 @@ namespace CorrugatedIron
                     return RiakResult<RiakObject>.Success(finalResult);
                 }
 
-                return RiakResult<RiakObject>.Error(t.Item1.ResultCode, t.Item1.ErrorMessage);
+                return RiakResult<RiakObject>.Error(t.Item1.ResultCode, t.Item1.ErrorMessage, t.Item1.NodeOffline);
             });
         }
 
@@ -459,7 +459,7 @@ namespace CorrugatedIron
                         var objectIds = keyResults.Value.Select(key => new RiakObjectId(bucket, key)).ToList();
                         return Delete(conn, objectIds, deleteOptions);
                     }
-                    return RiakResult<IEnumerable<RiakResult>>.Error(keyResults.ResultCode, keyResults.ErrorMessage);
+                    return RiakResult<IEnumerable<RiakResult>>.Error(keyResults.ResultCode, keyResults.ErrorMessage, keyResults.NodeOffline);
                 });
 
             return results.Value;
@@ -488,7 +488,7 @@ namespace CorrugatedIron
                 return RiakResult<RiakMapReduceResult>.Success(new RiakMapReduceResult(response.Value));
             }
 
-            return RiakResult<RiakMapReduceResult>.Error(response.ResultCode, response.ErrorMessage);
+            return RiakResult<RiakMapReduceResult>.Error(response.ResultCode, response.ErrorMessage, response.NodeOffline);
         }
 
         public RiakResult<RiakSearchResult> Search(RiakSearchRequest search)
@@ -501,7 +501,7 @@ namespace CorrugatedIron
                 return RiakResult<RiakSearchResult>.Success(new RiakSearchResult(response.Value));
             }
 
-            return RiakResult<RiakSearchResult>.Error(response.ResultCode, response.ErrorMessage);
+            return RiakResult<RiakSearchResult>.Error(response.ResultCode, response.ErrorMessage, response.NodeOffline);
         }
 
         private IEnumerable<RiakResult<RpbMapRedResp>> CondenseResponse(IEnumerable<RiakResult<RpbMapRedResp>> originalResponse)
@@ -567,7 +567,7 @@ namespace CorrugatedIron
             {
                 return RiakResult<RiakStreamedMapReduceResult>.Success(new RiakStreamedMapReduceResult(response.Value));
             }
-            return RiakResult<RiakStreamedMapReduceResult>.Error(response.ResultCode, response.ErrorMessage);
+            return RiakResult<RiakStreamedMapReduceResult>.Error(response.ResultCode, response.ErrorMessage, response.NodeOffline);
         }
 
         /// <summary>
@@ -588,7 +588,7 @@ namespace CorrugatedIron
                 var buckets = result.Value.buckets.Select(b => b.FromRiakString());
                 return RiakResult<IEnumerable<string>>.Success(buckets.ToList());
             }
-            return RiakResult<IEnumerable<string>>.Error(result.ResultCode, result.ErrorMessage);
+            return RiakResult<IEnumerable<string>>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
 
         /// <summary>
@@ -621,7 +621,7 @@ namespace CorrugatedIron
                 var keys = result.Value.Where(r => r.IsSuccess).SelectMany(r => r.Value.keys).Select(k => k.FromRiakString()).Distinct().ToList();
                 return RiakResult<IEnumerable<string>>.Success(keys);
             }
-            return RiakResult<IEnumerable<string>>.Error(result.ResultCode, result.ErrorMessage);
+            return RiakResult<IEnumerable<string>>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
 
         public RiakResult<IEnumerable<string>> StreamListKeys(string bucket)
@@ -639,7 +639,7 @@ namespace CorrugatedIron
                 var keys = result.Value.Where(r => r.IsSuccess).SelectMany(r => r.Value.keys).Select(k => k.FromRiakString());
                 return RiakResult<IEnumerable<string>>.Success(keys);
             }
-            return RiakResult<IEnumerable<string>>.Error(result.ResultCode, result.ErrorMessage);
+            return RiakResult<IEnumerable<string>>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
 
         /// <summary>
@@ -672,9 +672,9 @@ namespace CorrugatedIron
                         return RiakResult<RiakBucketProperties>.Success(response);
                     }
                     return RiakResult<RiakBucketProperties>.Error(ResultCode.InvalidResponse,
-                        "Unexpected Status Code: {0} ({1})".Fmt(result.Value.StatusCode, (int)result.Value.StatusCode));
+                        "Unexpected Status Code: {0} ({1})".Fmt(result.Value.StatusCode, (int)result.Value.StatusCode), false);
                 }
-                return RiakResult<RiakBucketProperties>.Error(result.ResultCode, result.ErrorMessage);
+                return RiakResult<RiakBucketProperties>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
             }
             else
             {
@@ -686,7 +686,7 @@ namespace CorrugatedIron
                     var props = new RiakBucketProperties(result.Value.props);
                     return RiakResult<RiakBucketProperties>.Success(props);
                 }
-                return RiakResult<RiakBucketProperties>.Error(result.ResultCode, result.ErrorMessage);
+                return RiakResult<RiakBucketProperties>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
             }
         }
 
@@ -721,7 +721,7 @@ namespace CorrugatedIron
                 var result = UseConnection(conn => conn.RestRequest(request));
                 if(result.IsSuccess && result.Value.StatusCode != HttpStatusCode.NoContent)
                 {
-                    return RiakResult.Error(ResultCode.InvalidResponse, "Unexpected Status Code: {0} ({1})".Fmt(result.Value.StatusCode, (int)result.Value.StatusCode));
+                    return RiakResult.Error(ResultCode.InvalidResponse, "Unexpected Status Code: {0} ({1})".Fmt(result.Value.StatusCode, (int)result.Value.StatusCode), result.NodeOffline);
                 }
                 return result;
             }
@@ -795,7 +795,7 @@ namespace CorrugatedIron
                 // This really should be a multi-phase map/reduce
                 return RiakResult<IList<RiakObject>>.Success(objects.Where(r => r.IsSuccess).Select(r => r.Value).ToList());
             }
-            return RiakResult<IList<RiakObject>>.Error(result.ResultCode, result.ErrorMessage);
+            return RiakResult<IList<RiakObject>>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
 
         /// <summary>
@@ -814,7 +814,7 @@ namespace CorrugatedIron
             {
                 return RiakResult<RiakServerInfo>.Success(new RiakServerInfo(result.Value));
             }
-            return RiakResult<RiakServerInfo>.Error(result.ResultCode, result.ErrorMessage);
+            return RiakResult<RiakServerInfo>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
 
         public RiakResult<IList<string>> IndexGet(string bucket, string indexName, string minValue, string maxValue)
@@ -845,7 +845,7 @@ namespace CorrugatedIron
                 return RiakResult<IList<string>>.Success(result.Value.keys.Select(k => k.FromRiakString()).ToList());
             }
 
-            return RiakResult<IList<string>>.Error(result.ResultCode, result.ErrorMessage);
+            return RiakResult<IList<string>>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
 
         public RiakResult<IList<string>> IndexGet(string bucket, string indexName, string value)
@@ -875,7 +875,7 @@ namespace CorrugatedIron
                 return RiakResult<IList<string>>.Success(result.Value.keys.Select(k => k.FromRiakString()).ToList());
             }
 
-            return RiakResult<IList<string>>.Error(result.ResultCode, result.ErrorMessage);
+            return RiakResult<IList<string>>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
 
         /// <summary>
@@ -898,7 +898,7 @@ namespace CorrugatedIron
                 }
                 catch(Exception ex)
                 {
-                    return RiakResult<IEnumerable<RiakResult<object>>>.Error(ResultCode.BatchException, "{0}\n{1}".Fmt(ex.Message, ex.StackTrace));
+                    return RiakResult<IEnumerable<RiakResult<object>>>.Error(ResultCode.BatchException, "{0}\n{1}".Fmt(ex.Message, ex.StackTrace), true);
                 }
                 finally
                 {

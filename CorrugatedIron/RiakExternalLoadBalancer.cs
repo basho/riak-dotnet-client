@@ -49,15 +49,15 @@ namespace CorrugatedIron
             get { return _lbConfiguration.DefaultRetryCount; }
         }
 
-        protected override TRiakResult UseConnection<TRiakResult>(Func<IRiakConnection, TRiakResult> useFun, Func<ResultCode, string, TRiakResult> onError, int retryAttempts)
+        protected override TRiakResult UseConnection<TRiakResult>(Func<IRiakConnection, TRiakResult> useFun, Func<ResultCode, string, bool, TRiakResult> onError, int retryAttempts)
         {
             if(retryAttempts < 0)
             {
-                return onError(ResultCode.NoRetries, "Unable to access a connection on the cluster.");
+                return onError(ResultCode.NoRetries, "Unable to access a connection on the cluster.", true);
             }
             if(_disposing)
             {
-                return onError(ResultCode.ShuttingDown, "System currently shutting down");
+                return onError(ResultCode.ShuttingDown, "System currently shutting down", true);
             }
 
             var node = _node;
@@ -72,18 +72,18 @@ namespace CorrugatedIron
                 }
                 return (TRiakResult)result;
             }
-            return onError(ResultCode.ClusterOffline, "Unable to access functioning Riak node");
+            return onError(ResultCode.ClusterOffline, "Unable to access functioning Riak node", true);
         }
 
         public override RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun, int retryAttempts)
         {
             if(retryAttempts < 0)
             {
-                return RiakResult<IEnumerable<TResult>>.Error(ResultCode.NoRetries, "Unable to access a connection on the cluster.");
+                return RiakResult<IEnumerable<TResult>>.Error(ResultCode.NoRetries, "Unable to access a connection on the cluster.", true);
             }
             if(_disposing)
             {
-                return RiakResult<IEnumerable<TResult>>.Error(ResultCode.ShuttingDown, "System currently shutting down");
+                return RiakResult<IEnumerable<TResult>>.Error(ResultCode.ShuttingDown, "System currently shutting down", true);
             }
 
             var node = _node;
@@ -98,7 +98,7 @@ namespace CorrugatedIron
                 }
                 return result;
             }
-            return RiakResult<IEnumerable<TResult>>.Error(ResultCode.ClusterOffline, "Unable to access functioning Riak node");
+            return RiakResult<IEnumerable<TResult>>.Error(ResultCode.ClusterOffline, "Unable to access functioning Riak node", true);
         }
 
         public override void Dispose()
