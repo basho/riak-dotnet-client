@@ -23,7 +23,6 @@ namespace CorrugatedIron.Models.Search
         private readonly string _field;
 
         private double? _boost;
-        private double? _proximity;
         private bool _not;
 
         protected RiakFluentSearch Search;
@@ -47,16 +46,9 @@ namespace CorrugatedIron.Models.Search
             return this;
         }
 
-        public Term Proximity(double proximity)
-        {
-            _proximity = proximity;
-            return this;
-        }
-
         internal string Suffix()
         {
-            return (_boost.HasValue ? "^" + _boost.Value : string.Empty) +
-                (_proximity.HasValue ?  "~" + _proximity.Value : string.Empty);
+            return _boost.HasValue ? "^" + _boost.Value : string.Empty;
         }
 
         internal string Prefix()
@@ -239,6 +231,28 @@ namespace CorrugatedIron.Models.Search
             var groupedTerm = groupSetup(new UnaryTerm(Search, field, value));
             var groupTerm = new GroupTerm(Search, field, groupedTerm);
             return new BinaryTerm(Search, field, BinaryTerm.Op.And, this, groupTerm);
+        }
+
+        public Term AndProximity(double proximity, params string[] words)
+        {
+            return AndProximity(_field, proximity, words);
+        }
+
+        public Term AndProximity(string field, double proximity, params string[] words)
+        {
+            var prox = new ProximityTerm(Search, field, proximity, words);
+            return new BinaryTerm(Search, field, BinaryTerm.Op.And, this, prox);
+        }
+
+        public Term OrProximity(double proximity, params string[] words)
+        {
+            return OrProximity(_field, proximity, words);
+        }
+
+        public Term OrProximity(string field, double proximity, params string[] words)
+        {
+            var prox = new ProximityTerm(Search, field, proximity, words);
+            return new BinaryTerm(Search, field, BinaryTerm.Op.Or, this, prox);
         }
     }
 }

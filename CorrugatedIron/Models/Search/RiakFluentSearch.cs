@@ -81,6 +81,18 @@ namespace CorrugatedIron.Models.Search
             return _term;
         }
 
+        public ProximityTerm Proximity(int proximity, params string[] words)
+        {
+            return Proximity(_field, proximity, words);
+        }
+
+        public ProximityTerm Proximity(string field, int proximity, params string[] words)
+        {
+            var term = new ProximityTerm(this, field, proximity, words);
+            _term = term;
+            return term;
+        }
+
         public override string ToString()
         {
             var term = _term;
