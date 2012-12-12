@@ -14,11 +14,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 using CorrugatedIron.Containers;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
@@ -27,6 +22,11 @@ using CorrugatedIron.Models.Rest;
 using CorrugatedIron.Util;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
 
 namespace CorrugatedIron.Models
 {
@@ -313,8 +313,8 @@ namespace CorrugatedIron.Models
         internal RiakBucketProperties(RpbBucketProps bucketProps)
         : this()
         {
-            AllowMultiple = bucketProps.AllowMultiple;
-            NVal = bucketProps.NVal;
+            AllowMultiple = bucketProps.allow_mult;
+            NVal = bucketProps.n_val;
         }
 
         internal RpbBucketProps ToMessage()
@@ -322,11 +322,11 @@ namespace CorrugatedIron.Models
             var message = new RpbBucketProps();
             if(AllowMultiple.HasValue)
             {
-                message.AllowMultiple = AllowMultiple.Value;
+                message.allow_mult = AllowMultiple.Value;
             }
             if(NVal.HasValue)
             {
-                message.NVal = NVal.Value;
+                message.n_val = NVal.Value;
             }
             return message;
         }

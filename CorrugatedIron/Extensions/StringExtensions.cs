@@ -14,15 +14,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.Web;
-using System.Text.RegularExpressions;
 using CorrugatedIron.Util;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Web;
 
 namespace CorrugatedIron.Extensions
 {
     public static class StringExtensions
     {
-        private static readonly System.Text.Encoding RiakEncoding = System.Text.Encoding.UTF8;
+        private static readonly System.Text.Encoding RiakEncoding = new UTF8Encoding(false);
 
         // + - && || ! ( ) { } [ ] ^ " ~ * ? : \
         private const string SearchTermPattern = @"[\+\-!\(\)\{\}\[\]^\""~\*\?\:\\]{1}";

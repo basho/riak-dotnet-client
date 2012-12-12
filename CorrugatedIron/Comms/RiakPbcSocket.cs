@@ -14,15 +14,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using CorrugatedIron.Exceptions;
+using CorrugatedIron.Extensions;
+using CorrugatedIron.Messages;
+using ProtoBuf;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using CorrugatedIron.Exceptions;
-using CorrugatedIron.Extensions;
-using CorrugatedIron.Messages;
-using ProtoBuf;
 
 namespace CorrugatedIron.Comms
 {
@@ -70,30 +70,26 @@ namespace CorrugatedIron.Comms
             MessageCodeToTypeMap = new Dictionary<MessageCode, Type>
             {
                 { MessageCode.ErrorResp, typeof(RpbErrorResp) },
-                { MessageCode.PingReq, typeof(RpbPingReq) },
-                { MessageCode.PingResp, typeof(RpbPingResp) },
-                { MessageCode.GetClientIdReq, typeof(RpbGetClientIdReq) },
                 { MessageCode.GetClientIdResp, typeof(RpbGetClientIdResp) },
                 { MessageCode.SetClientIdReq, typeof(RpbSetClientIdReq) },
-                { MessageCode.SetClientIdResp, typeof(RpbSetClientIdResp) },
-                { MessageCode.GetServerInfoReq, typeof(RpbGetServerInfoReq) },
                 { MessageCode.GetServerInfoResp, typeof(RpbGetServerInfoResp) },
                 { MessageCode.GetReq, typeof(RpbGetReq) },
                 { MessageCode.GetResp, typeof(RpbGetResp) },
                 { MessageCode.PutReq, typeof(RpbPutReq) },
                 { MessageCode.PutResp, typeof(RpbPutResp) },
                 { MessageCode.DelReq, typeof(RpbDelReq) },
-                { MessageCode.DelResp, typeof(RpbDelResp) },
-                { MessageCode.ListBucketsReq, typeof(RpbListBucketsReq) },
                 { MessageCode.ListBucketsResp, typeof(RpbListBucketsResp) },
                 { MessageCode.ListKeysReq, typeof(RpbListKeysReq) },
                 { MessageCode.ListKeysResp, typeof(RpbListKeysResp) },
                 { MessageCode.GetBucketReq, typeof(RpbGetBucketReq) },
                 { MessageCode.GetBucketResp, typeof(RpbGetBucketResp) },
                 { MessageCode.SetBucketReq, typeof(RpbSetBucketReq) },
-                { MessageCode.SetBucketResp, typeof(RpbSetBucketResp) },
                 { MessageCode.MapRedReq, typeof(RpbMapRedReq) },
-                { MessageCode.MapRedResp, typeof(RpbMapRedResp) }
+                { MessageCode.MapRedResp, typeof(RpbMapRedResp) },
+                { MessageCode.IndexReq, typeof(RpbIndexReq) },
+                { MessageCode.IndexResp, typeof(RpbIndexResp) },
+                { MessageCode.SearchQueryReq, typeof(RpbSearchQueryReq) },
+                { MessageCode.SearchQueryResp, typeof(RpbSearchQueryResp) }
             };
 
             TypeToMessageCodeMap = new Dictionary<Type, MessageCode>();
@@ -112,7 +108,25 @@ namespace CorrugatedIron.Comms
             _sendTimeout = sendTimeout;
         }
 
-        public void Write<T>(T message)
+        public void Write(MessageCode messageCode)
+        {
+            const int sizeSize = sizeof(int);
+            const int codeSize = sizeof(byte);
+            const int headerSize = sizeSize + codeSize;
+
+            var messageBody = new byte[headerSize];
+
+            var size = BitConverter.GetBytes(IPAddress.HostToNetworkOrder(1));
+            Array.Copy(size, messageBody, sizeSize);
+            messageBody[sizeSize] = (byte)messageCode;
+
+            if(PbcSocket.Send(messageBody, headerSize, SocketFlags.None) == 0)
+            {
+                throw new RiakException("Failed to send data to server - Timed Out: {0}:{1}".Fmt(_server, _port));
+            }
+        }
+
+        public void Write<T>(T message) where T : class
         {
             const int sizeSize = sizeof(int);
             const int codeSize = sizeof(byte);
@@ -156,6 +170,26 @@ namespace CorrugatedIron.Comms
             }
         }
 
+        public MessageCode Read(MessageCode expectedCode)
+        {
+            var header = ReceiveAll(new byte[5]);
+            var size = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(header, 0));
+            var messageCode = (MessageCode)header[sizeof(int)];
+
+            if(messageCode == MessageCode.ErrorResp)
+            {
+                var error = DeserializeInstance<RpbErrorResp>(size);
+                throw new RiakException(error.errcode, error.errmsg.FromRiakString());
+            }
+
+            if (expectedCode != messageCode)
+            {
+                throw new RiakException("Expected return code {0} received {1}".Fmt(expectedCode, messageCode));
+            }
+
+            return messageCode;
+        }
+
         public T Read<T>() where T : new()
         {
             var header = ReceiveAll(new byte[5]);
@@ -166,7 +200,7 @@ namespace CorrugatedIron.Comms
             if(messageCode == MessageCode.ErrorResp)
             {
                 var error = DeserializeInstance<RpbErrorResp>(size);
-                throw new RiakException(error.ErrorCode, error.ErrorMessage.FromRiakString());
+                throw new RiakException(error.errcode, error.errmsg.FromRiakString());
             }
 
             if(!MessageCodeToTypeMap.ContainsKey(messageCode))
@@ -187,6 +221,7 @@ namespace CorrugatedIron.Comms
 
         private byte[] ReceiveAll(byte[] resultBuffer)
         {
+            PbcSocket.ReceiveTimeout = 0;
             int totalBytesReceived = 0;
             int lengthToReceive = resultBuffer.Length;
             while(lengthToReceive > 0)

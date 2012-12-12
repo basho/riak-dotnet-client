@@ -14,9 +14,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using CorrugatedIron.Comms;
 using CorrugatedIron.Messages;
 using CorrugatedIron.Models;
@@ -24,6 +21,9 @@ using CorrugatedIron.Models.Rest;
 using CorrugatedIron.Util;
 using Moq;
 using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CorrugatedIron.Tests.RiakClientSetBucketPropertiesTests
 {
@@ -40,24 +40,29 @@ namespace CorrugatedIron.Tests.RiakClientSetBucketPropertiesTests
         {
         }
 
-        public IRiakClient CreateClient(string seed = null)
+        public IRiakClient CreateClient()
+        {
+            return new Mock<IRiakClient>().Object;
+        }
+
+        public IRiakClient CreateClient(string seed)
         {
             return new Mock<IRiakClient>().Object;
         }
 
         public int RetryWaitTime { get; set; }
 
-        public RiakResult<TResult> UseConnection<TResult>(byte[] clientId, Func<IRiakConnection, RiakResult<TResult>> useFun, int retryAttempts)
+        public RiakResult<TResult> UseConnection<TResult>(Func<IRiakConnection, RiakResult<TResult>> useFun, int retryAttempts)
         {
             return useFun(ConnectionMock.Object);
         }
 
-        public RiakResult UseConnection(byte[] clientId, Func<IRiakConnection, RiakResult> useFun, int retryAttempts)
+        public RiakResult UseConnection(Func<IRiakConnection, RiakResult> useFun, int retryAttempts)
         {
             return useFun(ConnectionMock.Object);
         }
 
-        public RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(byte[] clientId, Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun, int retryAttempts)
+        public RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun, int retryAttempts)
             where TResult : RiakResult
         {
             throw new NotImplementedException();
@@ -74,7 +79,7 @@ namespace CorrugatedIron.Tests.RiakClientSetBucketPropertiesTests
         {
             Cluster = new MockCluster();
             ClientId = System.Text.Encoding.Default.GetBytes("fadjskl").Take(4).ToArray();
-            Client = new RiakClient(Cluster) {ClientId = ClientId};
+            Client = new RiakClient(Cluster);
         }
     }
 
@@ -106,8 +111,8 @@ namespace CorrugatedIron.Tests.RiakClientSetBucketPropertiesTests
         [SetUp]
         public void SetUp()
         {
-            var result = RiakResult<RpbSetBucketResp>.Success(new RpbSetBucketResp());
-            Cluster.ConnectionMock.Setup(m => m.PbcWriteRead<RpbSetBucketReq, RpbSetBucketResp>(It.IsAny<RpbSetBucketReq>())).Returns(result);
+            var result = RiakResult.Success();
+            Cluster.ConnectionMock.Setup(m => m.PbcWriteRead(It.IsAny<RpbSetBucketReq>(), MessageCode.SetBucketResp)).Returns(result);
 
             Response = Client.SetBucketProperties("foo", new RiakBucketProperties().SetAllowMultiple(true));
         }
@@ -115,7 +120,7 @@ namespace CorrugatedIron.Tests.RiakClientSetBucketPropertiesTests
         [Test]
         public void PbcInterfaceIsInvokedWithAppropriateValues()
         {
-            Cluster.ConnectionMock.Verify(m => m.PbcWriteRead<RpbSetBucketReq, RpbSetBucketResp>(It.Is<RpbSetBucketReq>(r => r.Props.AllowMultiple)), Times.Once());
+            Cluster.ConnectionMock.Verify(m => m.PbcWriteRead(It.Is<RpbSetBucketReq>(r => r.props.allow_mult), MessageCode.SetBucketResp), Times.Once());
         }
     }
 }

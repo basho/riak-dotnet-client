@@ -59,7 +59,7 @@ namespace CorrugatedIron.Util
             public const string Utf8 = @"UTF-8";
         }
 
-        public const int MinClientIdLength = 4;
+        //public const int MinClientIdLength = 4;
 
         public static class QuorumOptions
         {
@@ -121,7 +121,7 @@ namespace CorrugatedIron.Util
             {
                 public const string DisableCacheKey = @"Pragma";
                 public const string DisableCacheValue = @"no-cache";
-                public const string ClientId = @"X-Riak-ClientId";
+                //public const string ClientId = @"X-Riak-ClientId";
             }
 
             public static class HttpMethod

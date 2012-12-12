@@ -1,0 +1,25 @@
+<?xml version="1.0" standalone="yes"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <SourcePath>.</SourcePath>
+    <SolutionPath>.\CorrugatedIron.sln</SolutionPath>
+  </PropertyGroup>
+
+  <Target Name="Release" DependsOnTargets="CompileRelease;NugetRelease" />
+  <Target Name="Debug" DependsOnTargets="CompileDebug" />
+
+  <Target Name="NugetRelease">
+    <Message Text="Creating Release Nuget package" />
+    <Exec Command="&quot;$(SourcePath)\.nuget\Nuget.exe&quot; pack $(SourcePath)\Nuget\CorrugatedIron.nuspec -Symbols" />
+  </Target>
+
+  <Target Name="CompileRelease">
+    <Message Text="Building Release version" />
+    <MSBuild Projects="$(SolutionPath)" Properties="Configuration=Release" Targets="Clean;Rebuild"/>
+  </Target>
+
+  <Target Name="CompileDebug">
+    <Message Text="Building Debug version" />
+    <MSBuild Projects="$(SolutionPath)" Properties="Configuration=Debug" Targets="Clean;Rebuild"/>
+  </Target>
+</Project>

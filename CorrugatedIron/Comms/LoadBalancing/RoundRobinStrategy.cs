@@ -14,10 +14,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using CorrugatedIron.Containers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using CorrugatedIron.Containers;
 
 namespace CorrugatedIron.Comms.LoadBalancing
 {

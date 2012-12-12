@@ -27,4 +27,7 @@ test-results/*
 *.dotCover
 *.nupkg
 test-results
-packages/*
+
+*.ncrunchproject
+*.ncrunchsolution
+_NCrunch_*

@@ -14,19 +14,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
-using System.Collections.Generic;
-using CorrugatedIron.Comms;
 using CorrugatedIron.Config;
 using CorrugatedIron.Extensions;
 using NUnit.Framework;
+using System.Collections.Generic;
 
 namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
 {
     public class LiveRiakConnectionTestBase
     {
         protected const int TestClientId = 42;
-        protected readonly static byte[] ClientId;
         protected const string TestHost = "riak-test";
         protected const int TestPbcPort = 8081;
         protected const int TestHttpPort = 8091;
@@ -46,7 +43,6 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
 
         static LiveRiakConnectionTestBase()
         {
-            ClientId = RiakConnection.ToClientId(TestClientId);
             TestJson = new { @string = "value", @int = 100, @float = 2.34, array = new[] { 1, 2, 3 }, dict = new Dictionary<string, string> { { "foo", "bar" } } }.ToJson();
         }
 
