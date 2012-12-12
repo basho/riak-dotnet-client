@@ -71,7 +71,7 @@ namespace CorrugatedIron.Tests
         public void SimpleRangeTermSerializesCorrectly()
         {
             var s = new RiakFluentSearch("bucket", "key")
-                .Search("10", "20")
+                .Between("10", "20", false)
                 .Build();
             var q = s.ToString();
             Assert.AreEqual("key:{10 TO 20}", q);
@@ -81,7 +81,7 @@ namespace CorrugatedIron.Tests
         public void SimpleInclusiveRangeTermSerializesCorrectly()
         {
             var s = new RiakFluentSearch("bucket", "key")
-                .Search("10", "20", true)
+                .Between("10", "20")
                 .Build();
             var q = s.ToString();
             Assert.AreEqual("key:[10 TO 20]", q);
@@ -169,8 +169,8 @@ namespace CorrugatedIron.Tests
             var s = new RiakFluentSearch("bucket", "key")
                 .Search("foo")
                 .Or("bar").Not()
-                .AndRange("10", "20", true)
-                .And("baz", t => t.Or("quux").OrRange("la", "da")).Not().Proximity(10)
+                .AndBetween("10", "20", true)
+                .And("baz", t => t.Or("quux").OrBetween("la", "da")).Not().Proximity(10)
                 .Or("baz", t => t.And("schmoopy for president+")
                     .Boost(6)
                     .And(Token.StartsWith("dooby"), x => x.Or("fooby").Not()))
@@ -185,12 +185,12 @@ namespace CorrugatedIron.Tests
             var s = new RiakFluentSearch("bucket", "key")
                 .Search("foo")
                 .Or("bar").Not()
-                .AndRange("10", "20", true)
+                .AndBetween("10", "20", true)
                 .Or("otherkey", "baz", t => t.And("hash", Token.StartsWith("schmoopy for president+"))
                     .Boost(6)
                     .And("bash", "dooby", x => x.Or("dash", "fooby").Not())
                     .Or("smelly"))
-                .And("baz", t => t.Or("zoom", "quux").OrRange("la", "da")).Not().Proximity(10)
+                .And("baz", t => t.Or("zoom", "quux").OrBetween("la", "da")).Not().Proximity(10)
                 .Build();
             var q = s.ToString();
             Assert.AreEqual(@"key:foo OR NOT key:bar AND key:[10 TO 20] OR (otherkey:baz AND hash:schmoopy\ for\ president\+*^6 AND (bash:dooby OR NOT dash:fooby) OR bash:smelly) AND NOT (otherkey:baz OR zoom:quux OR zoom:{la TO da})~10", q);
