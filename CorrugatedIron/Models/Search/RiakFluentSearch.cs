@@ -60,48 +60,24 @@ namespace CorrugatedIron.Models.Search
             return _term;
         }
 
-        public Term Search(string from, string to, bool inclusive = false)
+        public Term Between(string from, string to, bool inclusive = true)
         {
-            _term = new RangeTerm(this, _field, Token.Is(from), Token.Is(to), inclusive);
-            return _term;
+            return Between(Token.Is(from), Token.Is(to), inclusive);
         }
 
-        public Term Search(string from, Token to, bool inclusive = false)
+        public Term Between(Token from, string to, bool inclusive = true)
         {
-            _term = new RangeTerm(this, _field, Token.Is(from), to, inclusive);
-            return _term;
+            return Between(from, Token.Is(to), inclusive);
         }
 
-        public Term Search(Token from, string to, bool inclusive = false)
+        public Term Between(string from, Token to, bool inclusive = true)
         {
-            _term = new RangeTerm(this, _field, from, Token.Is(to), inclusive);
-            return _term;
+            return Between(Token.Is(from), to, inclusive);
         }
 
-        public Term Search(Token from, Token to, bool inclusive = false)
+        public Term Between(Token from, Token to, bool inclusive = true)
         {
             _term = new RangeTerm(this, _field, from, to, inclusive);
-            return _term;
-        }
-
-        public Term Between(string from, string to)
-        {
-            return Between(Token.Is(from), Token.Is(to));
-        }
-
-        public Term Between(Token from, string to)
-        {
-            return Between(from, Token.Is(to));
-        }
-
-        public Term Between(string from, Token to)
-        {
-            return Between(Token.Is(from), to);
-        }
-
-        public Term Between(Token from, Token to)
-        {
-            _term = new RangeTerm(this, _field, from, to, true);
             return _term;
         }
 
