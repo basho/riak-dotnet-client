@@ -14,17 +14,18 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.Collections.Generic;
 using CorrugatedIron.Comms;
 using CorrugatedIron.Config;
 using Moq;
+using System.Collections.Generic;
 
 namespace CorrugatedIron.Tests.RiakClientTests
 {
     internal abstract class RiakClientTestBase<TRequest, TResult>
-        where TResult : new()
+        where TRequest : class
+        where TResult : class, new()
     {
-        protected RiakResult<TResult> Result;
+        protected RiakResult<TResult> Result = null;
         protected Mock<IRiakConnection> ConnMock;
         protected Mock<IRiakNodeConfiguration> NodeConfigMock;
         protected Mock<IRiakClusterConfiguration> ClusterConfigMock;

@@ -14,11 +14,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using CorrugatedIron.Comms;
+using CorrugatedIron.Config;
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using CorrugatedIron.Comms;
-using CorrugatedIron.Config;
 
 namespace CorrugatedIron
 {
@@ -49,7 +49,7 @@ namespace CorrugatedIron
             get { return _lbConfiguration.DefaultRetryCount; }
         }
 
-        protected override TRiakResult UseConnection<TRiakResult>(byte[] clientId, Func<IRiakConnection, TRiakResult> useFun, Func<ResultCode, string, TRiakResult> onError, int retryAttempts)
+        protected override TRiakResult UseConnection<TRiakResult>(Func<IRiakConnection, TRiakResult> useFun, Func<ResultCode, string, TRiakResult> onError, int retryAttempts)
         {
             if(retryAttempts < 0)
             {
@@ -64,18 +64,18 @@ namespace CorrugatedIron
 
             if(node != null)
             {
-                var result = node.UseConnection(clientId, useFun);
+                var result = node.UseConnection(useFun);
                 if(!result.IsSuccess)
                 {
                     Thread.Sleep(RetryWaitTime);
-                    return UseConnection(clientId, useFun, onError, retryAttempts - 1);
+                    return UseConnection(useFun, onError, retryAttempts - 1);
                 }
                 return (TRiakResult)result;
             }
             return onError(ResultCode.ClusterOffline, "Unable to access functioning Riak node");
         }
 
-        public override RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(byte[] clientId, Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun, int retryAttempts)
+        public override RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun, int retryAttempts)
         {
             if(retryAttempts < 0)
             {
@@ -90,11 +90,11 @@ namespace CorrugatedIron
 
             if(node != null)
             {
-                var result = node.UseDelayedConnection(clientId, useFun);
+                var result = node.UseDelayedConnection(useFun);
                 if(!result.IsSuccess)
                 {
                     Thread.Sleep(RetryWaitTime);
-                    return UseDelayedConnection(clientId, useFun, retryAttempts - 1);
+                    return UseDelayedConnection(useFun, retryAttempts - 1);
                 }
                 return result;
             }

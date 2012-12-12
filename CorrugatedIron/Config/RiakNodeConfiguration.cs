@@ -83,12 +83,5 @@ namespace CorrugatedIron.Config
             get { return (int)this["networkWriteTimeout"]; }
             set { this["networkWriteTimeout"] = value; }
         }
-
-        [ConfigurationProperty("vnodeVclocks", DefaultValue = true, IsRequired = false)]
-        public bool VnodeVclocks
-        {
-            get { return (bool)this["vnodeVclocks"]; }
-            set { this["vnodeVclocks"] = value; }
-        }
     }
 }

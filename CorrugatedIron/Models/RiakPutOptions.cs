@@ -35,23 +35,23 @@ namespace CorrugatedIron.Models
 
         internal void Populate(RpbPutReq request)
         {
-            request.ReturnBody = ReturnBody;
             if(W.HasValue)
             {
-                request.W = W.Value;
+                request.w = W.Value;
             }
             if(Dw.HasValue)
             {
-                request.Dw = Dw.Value;
+                request.dw = Dw.Value;
             }
             if(Pw.HasValue)
             {
-                request.Pw = Pw.Value;
+                request.pw = Pw.Value;
             }
 
-            request.IfNotModified = IfNotModified;
-            request.IfNoneMatch = IfNoneMatch;
-            request.ReturnHead = ReturnHead;
+            request.if_not_modified = IfNotModified;
+            request.if_none_match = IfNoneMatch;
+            request.return_head = ReturnHead;
+            request.return_body = ReturnBody;
         }
     }
 }
