@@ -34,12 +34,13 @@ namespace CorrugatedIron
         public bool IsSuccess { get; protected set; }
         public string ErrorMessage { get; protected set; }
         public ResultCode ResultCode { get; protected set; }
+        internal bool NodeOffline { get; set; }
 
         protected RiakResult()
         {
         }
 
-        public static RiakResult Success()
+        internal static RiakResult Success()
         {
             return new RiakResult
             {
@@ -48,13 +49,14 @@ namespace CorrugatedIron
             };
         }
 
-        public static RiakResult Error(ResultCode code, string message = null)
+        internal static RiakResult Error(ResultCode code, string message, bool nodeOffline)
         {
             return new RiakResult
             {
                 IsSuccess = false,
                 ResultCode = code,
-                ErrorMessage = message
+                ErrorMessage = message,
+                NodeOffline = nodeOffline
             };
         }
     }
@@ -67,7 +69,7 @@ namespace CorrugatedIron
         {
         }
 
-        public static RiakResult<TResult> Success(TResult value)
+        internal static RiakResult<TResult> Success(TResult value)
         {
             return new RiakResult<TResult>
             {
@@ -77,13 +79,14 @@ namespace CorrugatedIron
             };
         }
 
-        public new static RiakResult<TResult> Error(ResultCode code, string message = null)
+        internal new static RiakResult<TResult> Error(ResultCode code, string message, bool nodeOffline)
         {
             return new RiakResult<TResult>
             {
                 IsSuccess = false,
                 ResultCode = code,
-                ErrorMessage = message
+                ErrorMessage = message,
+                NodeOffline = nodeOffline
             };
         }
 
@@ -94,6 +97,7 @@ namespace CorrugatedIron
                 var result = (Value != null ? Value.GetHashCode() : 0);
                 result = (result * 397) ^ IsSuccess.GetHashCode();
                 result = (result * 397) ^ ResultCode.GetHashCode();
+                result = (result * 397) ^ NodeOffline.GetHashCode();
                 return result;
             }
         }
@@ -125,7 +129,10 @@ namespace CorrugatedIron
             {
                 return true;
             }
-            return Equals(other.Value, Value) && Equals(other.IsSuccess, IsSuccess) && Equals(other.ResultCode, ResultCode);
+            return Equals(other.Value, Value)
+                && Equals(other.IsSuccess, IsSuccess)
+                && Equals(other.ResultCode, ResultCode)
+                && Equals(other.NodeOffline, NodeOffline);
         }
     }
 }

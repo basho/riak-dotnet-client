@@ -179,7 +179,7 @@ namespace CorrugatedIron.Comms
             if(messageCode == MessageCode.ErrorResp)
             {
                 var error = DeserializeInstance<RpbErrorResp>(size);
-                throw new RiakException(error.errcode, error.errmsg.FromRiakString());
+                throw new RiakException(error.errcode, error.errmsg.FromRiakString(), false);
             }
 
             if (expectedCode != messageCode)
