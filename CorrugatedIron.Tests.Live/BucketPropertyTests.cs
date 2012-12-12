@@ -14,9 +14,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
-using System.Linq;
-using System.Threading;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.CommitHook;
@@ -24,6 +21,9 @@ using CorrugatedIron.Tests.Extensions;
 using CorrugatedIron.Tests.Live.LiveRiakConnectionTests;
 using CorrugatedIron.Util;
 using NUnit.Framework;
+using System;
+using System.Linq;
+using System.Threading;
 
 namespace CorrugatedIron.Tests.Live.BucketPropertyTests
 {
@@ -47,7 +47,7 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
             Client.Put(pairs);
 
             var results = Client.ListKeys(bucket);
-            results.IsSuccess.ShouldBeTrue();
+            results.IsSuccess.ShouldBeTrue(results.ErrorMessage);
             results.Value.Count().ShouldEqual(10);
         }
 
@@ -55,21 +55,21 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
         public void GettingWithoutExtendedFlagDoesNotReturnExtraProperties()
         {
             var result = Client.GetBucketProperties(PropertiesTestBucket);
-            result.IsSuccess.ShouldBeTrue();
+            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
             result.Value.AllowMultiple.HasValue.ShouldBeTrue();
             result.Value.NVal.HasValue.ShouldBeTrue();
             result.Value.LastWriteWins.HasValue.ShouldBeFalse();
-            result.Value.RVal.ShouldNotBeNull();
-            result.Value.RwVal.ShouldNotBeNull();
-            result.Value.DwVal.ShouldNotBeNull();
-            result.Value.WVal.ShouldNotBeNull();
+            result.Value.RVal.ShouldBeNull();
+            result.Value.RwVal.ShouldBeNull();
+            result.Value.DwVal.ShouldBeNull();
+            result.Value.WVal.ShouldBeNull();
         }
 
         [Test]
         public void GettingWithExtendedFlagReturnsExtraProperties()
         {
             var result = Client.GetBucketProperties(PropertiesTestBucket, true);
-            result.IsSuccess.ShouldBeTrue();
+            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
             result.Value.AllowMultiple.HasValue.ShouldBeTrue();
             result.Value.NVal.HasValue.ShouldBeTrue();
             result.Value.LastWriteWins.HasValue.ShouldBeTrue();
@@ -84,14 +84,14 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
         {
             // make sure we're all clear first
             var result = Client.GetBucketProperties(PropertiesTestBucket, true);
-             result.IsSuccess.ShouldBeTrue();
+             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
             var props = result.Value;
             props.ClearPostCommitHooks().ClearPreCommitHooks();
             Client.SetBucketProperties(PropertiesTestBucket, props).IsSuccess.ShouldBeTrue();
 
             // when we load, the commit hook lists should be null
             result = Client.GetBucketProperties(PropertiesTestBucket, true);
-            result.IsSuccess.ShouldBeTrue();
+            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
             props = result.Value;
             props.PreCommitHooks.ShouldBeNull();
             props.PostCommitHooks.ShouldBeNull();
@@ -100,11 +100,13 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
             props.AddPreCommitHook(new RiakJavascriptCommitHook("Foo.doBar"))
                 .AddPreCommitHook(new RiakErlangCommitHook("my_mod", "do_fun"))
                 .AddPostCommitHook(new RiakErlangCommitHook("my_other_mod", "do_more"));
-            Client.SetBucketProperties(PropertiesTestBucket, props).IsSuccess.ShouldBeTrue();
+
+            var propResult = Client.SetBucketProperties(PropertiesTestBucket, props);
+            propResult.IsSuccess.ShouldBeTrue(propResult.ErrorMessage);
 
             // load them out again and make sure they got loaded up
             result = Client.GetBucketProperties(PropertiesTestBucket, true);
-            result.IsSuccess.ShouldBeTrue();
+            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
             props = result.Value;
 
             props.PreCommitHooks.ShouldNotBeNull();
@@ -120,14 +122,15 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
                 {
                     // make sure we're all clear first
                     var result = batch.GetBucketProperties(PropertiesTestBucket, true);
-                    result.IsSuccess.ShouldBeTrue();
+                    result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
                     var props = result.Value;
                     props.ClearPostCommitHooks().ClearPreCommitHooks();
-                    batch.SetBucketProperties(PropertiesTestBucket, props).IsSuccess.ShouldBeTrue();
+                    var propResult = batch.SetBucketProperties(PropertiesTestBucket, props);
+                    propResult.IsSuccess.ShouldBeTrue(propResult.ErrorMessage);
 
                     // when we load, the commit hook lists should be null
                     result = batch.GetBucketProperties(PropertiesTestBucket, true);
-                    result.IsSuccess.ShouldBeTrue();
+                    result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
                     props = result.Value;
                     props.PreCommitHooks.ShouldBeNull();
                     props.PostCommitHooks.ShouldBeNull();
@@ -136,11 +139,12 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
                     props.AddPreCommitHook(new RiakJavascriptCommitHook("Foo.doBar"))
                         .AddPreCommitHook(new RiakErlangCommitHook("my_mod", "do_fun"))
                         .AddPostCommitHook(new RiakErlangCommitHook("my_other_mod", "do_more"));
-                    batch.SetBucketProperties(PropertiesTestBucket, props).IsSuccess.ShouldBeTrue();
+                    propResult = batch.SetBucketProperties(PropertiesTestBucket, props);
+                    propResult.IsSuccess.ShouldBeTrue(propResult.ErrorMessage);
 
                     // load them out again and make sure they got loaded up
                     result = batch.GetBucketProperties(PropertiesTestBucket, true);
-                    result.IsSuccess.ShouldBeTrue();
+                    result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
                     props = result.Value;
 
                     props.PreCommitHooks.ShouldNotBeNull();
@@ -161,14 +165,15 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
                     {
                         // make sure we're all clear first
                         var result = batch.GetBucketProperties(PropertiesTestBucket, true);
-                        result.IsSuccess.ShouldBeTrue();
+                        result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
                         var props = result.Value;
                         props.ClearPostCommitHooks().ClearPreCommitHooks();
-                        batch.SetBucketProperties(PropertiesTestBucket, props).IsSuccess.ShouldBeTrue();
+                        var propResult = batch.SetBucketProperties(PropertiesTestBucket, props);
+                        propResult.IsSuccess.ShouldBeTrue(propResult.ErrorMessage);
 
                         // when we load, the commit hook lists should be null
                         result = batch.GetBucketProperties(PropertiesTestBucket, true);
-                        result.IsSuccess.ShouldBeTrue();
+                        result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
                         props = result.Value;
                         props.PreCommitHooks.ShouldBeNull();
                         props.PostCommitHooks.ShouldBeNull();
@@ -177,11 +182,12 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
                         props.AddPreCommitHook(new RiakJavascriptCommitHook("Foo.doBar"))
                             .AddPreCommitHook(new RiakErlangCommitHook("my_mod", "do_fun"))
                             .AddPostCommitHook(new RiakErlangCommitHook("my_other_mod", "do_more"));
-                        batch.SetBucketProperties(PropertiesTestBucket, props).IsSuccess.ShouldBeTrue();
+                        propResult = batch.SetBucketProperties(PropertiesTestBucket, props);
+                        propResult.IsSuccess.ShouldBeTrue(propResult.ErrorMessage);
 
                         // load them out again and make sure they got loaded up
                         result = batch.GetBucketProperties(PropertiesTestBucket, true);
-                        result.IsSuccess.ShouldBeTrue();
+                        result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
                         props = result.Value;
 
                         props.PreCommitHooks.ShouldNotBeNull();

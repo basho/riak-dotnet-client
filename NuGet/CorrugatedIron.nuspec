@@ -1,31 +1,57 @@
 <?xml version="1.0"?>
+<!--
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+//
+// This file is provided to you under the Apache License,
+// Version 2.0 (the "License"); you may not use this file
+// except in compliance with the License.  You may obtain
+// a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+-->
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
-    <metadata>
-        <id>CorrugatedIron</id>
-	<version>0.2.3.0</version>
-	<authors>OJ Reeves, Jeremiah Peschka</authors>
-	<owners>OJ Reeves, Jeremiah Peschka</owners>
-	<description>
-CorrugatedIron - a .NET client for Riak.
+  <metadata>
+    <id>CorrugatedIron</id>
+    <version>1.0.1</version>
+    <authors>OJ Reeves, Jeremiah Peschka</authors>
+    <owners>OJ Reeves, Jeremiah Peschka</owners>
+    <description>
+      CorrugatedIron - the .NET client for Riak.
 
-Riak is a distributed, fault tolerant, highly-available Key/Value store written by Basho Technologies. Riak is Open Source, written in Erlang. CorrugatedIron exposes the features of Riak through a developer-friendly API.
+      Riak is a distributed, fault tolerant, highly-available Key/Value store written by Basho Technologies. Riak is Open Source, written in Erlang. CorrugatedIron exposes the features of Riak through a developer-friendly API.
 
-After installing this package, make sure that you modify either the app.config (for client apps) or web.config (for web apps) so that the details of the target Riak cluster are set correctly.
-	</description>
-	<summary>
-CorrugatedIron - a .NET client for Riak.
-	</summary>
-	<projectUrl>http://corrugatediron.org/</projectUrl>
-	<iconUrl>http://corrugatediron.org/nugeticon.png</iconUrl>
-	<licenseUrl>http://corrugatediron.org/LICENSE.txt</licenseUrl>
-	<requireLicenseAcceptance>false</requireLicenseAcceptance>
-	<tags>Riak CorrugatedIron Corrugated Iron NoSQL Client Driver</tags>
-	<dependencies>
-            <dependency id="Newtonsoft.Json" version="4.5.7" />
-            <dependency id="protobuf-net" version="2.0.0.480" />
-	</dependencies>
-	<frameworkAssemblies>
-            <frameworkAssembly assemblyName="System.configuration" />
-	</frameworkAssemblies>
-    </metadata>
+      After installing this package, make sure that you modify either the app.config (for client apps) or web.config (for web apps) so that the details of the target Riak cluster are set correctly.
+
+      As of version 1.0.0 CorrugaedIron requires Riak version 1.2.1 or higher. Use CorrugatedIron version 0.2.3 if you aim to continue using Riak versions prior to 1.2.
+    </description>
+    <summary>
+      CorrugatedIron - the .NET client for Riak.
+    </summary>
+    <projectUrl>http://corrugatediron.org/</projectUrl>
+    <iconUrl>http://corrugatediron.org/nugeticon.png</iconUrl>
+    <licenseUrl>http://corrugatediron.org/LICENSE.txt</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <tags>Riak CorrugatedIron Corrugated Iron NoSQL Client Driver</tags>
+    <dependencies>
+      <dependency id="Newtonsoft.Json" version="4.5.10" />
+      <dependency id="protobuf-net" version="2.0.0.602" />
+    </dependencies>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="System.configuration" />
+    </frameworkAssemblies>
+  </metadata>
+  <files>
+    <file src="Content\App.config.transform" target="Content" />
+    <file src="Content\web.config.transform" target="Content" />
+    <file src="..\CorrugatedIron\bin\Release\CorrugatedIron.dll" target="lib\net40" />
+    <file src="..\CorrugatedIron\bin\Release\CorrugatedIron.pdb" target="lib\net40" />
+    <file src="..\CorrugatedIron\**\*.cs" target="src" />
+  </files>
 </package>

@@ -14,10 +14,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.IO;
-using System.Text;
 using CorrugatedIron.Extensions;
 using Newtonsoft.Json;
+using System.IO;
+using System.Text;
 
 namespace CorrugatedIron.Models.MapReduce.Phases
 {

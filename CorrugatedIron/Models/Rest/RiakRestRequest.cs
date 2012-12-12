@@ -14,8 +14,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.Collections.Generic;
 using CorrugatedIron.Util;
+using System.Collections.Generic;
 
 namespace CorrugatedIron.Models.Rest
 {

@@ -14,11 +14,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.Collections.Generic;
-using CorrugatedIron.Messages;
-using System.Linq;
-using Newtonsoft.Json;
 using CorrugatedIron.Extensions;
+using CorrugatedIron.Messages;
+using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CorrugatedIron.Models.MapReduce
 {
@@ -31,7 +31,7 @@ namespace CorrugatedIron.Models.MapReduce
         internal RiakMapReduceResultPhase(uint phase, IEnumerable<RpbMapRedResp> results)
         {
             Phase = phase;
-            Values = results.Select(r => r.Response).Where(b => b != null).ToList();
+            Values = results.Select(r => r.response).Where(b => b != null).ToList();
             Success = true;
         }
 
@@ -40,9 +40,9 @@ namespace CorrugatedIron.Models.MapReduce
             Success = false;
         }
 
-        public IEnumerable<T> GetObjects<T>()
+        public IList<T> GetObjects<T>()
         {
-            var rVal = Values.Select(v => JsonConvert.DeserializeObject<T>(v.FromRiakString()));
+            var rVal = Values.Select(v => JsonConvert.DeserializeObject<T>(v.FromRiakString())).ToList();
             return rVal;
         }
 
