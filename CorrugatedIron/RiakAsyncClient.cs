@@ -14,51 +14,108 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Util;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace CorrugatedIron
 {
     public interface IRiakAsyncClient
     {
-        void Ping(Action<RiakResult> callback);
+        Task<RiakResult> Ping();
 
-        void Get(string bucket, string key, Action<RiakResult<RiakObject>> callback, uint rVal = RiakConstants.Defaults.RVal);
-        void Get(RiakObjectId objectId, Action<RiakResult<RiakObject>> callback, uint rVal = RiakConstants.Defaults.RVal);
-        void Get(IEnumerable<RiakObjectId> bucketKeyPairs, Action<IEnumerable<RiakResult<RiakObject>>> callback, uint rVal = RiakConstants.Defaults.RVal);
+        Task<RiakResult<RiakObject>> Get(string bucket, string key, uint rVal = RiakConstants.Defaults.RVal);
+        Task<RiakResult<RiakObject>> Get(RiakObjectId objectId, uint rVal = RiakConstants.Defaults.RVal);
+        Task<IEnumerable<RiakResult<RiakObject>>> Get(IEnumerable<RiakObjectId> bucketKeyPairs, uint rVal = RiakConstants.Defaults.RVal);
 
-        void Put(RiakObject value, Action<RiakResult<RiakObject>> callback, RiakPutOptions options = null);
-        void Put(IEnumerable<RiakObject> values, Action<IEnumerable<RiakResult<RiakObject>>> callback, RiakPutOptions options = null);
+        Task<RiakResult<RiakObject>> Put(RiakObject value, RiakPutOptions options = null);
+        Task<IEnumerable<RiakResult<RiakObject>>> Put(IEnumerable<RiakObject> values, RiakPutOptions options = null);
 
-        void Delete(string bucket, string key, Action<RiakResult> callback, RiakDeleteOptions options = null);
-        void Delete(RiakObjectId objectId, Action<RiakResult> callback, RiakDeleteOptions options = null);
-        void Delete(IEnumerable<RiakObjectId> objectIds, Action<IEnumerable<RiakResult>> callback, RiakDeleteOptions options = null);
+        Task<RiakResult> Delete(string bucket, string key, RiakDeleteOptions options = null);
+        Task<RiakResult> Delete(RiakObjectId objectId, RiakDeleteOptions options = null);
+        Task<IEnumerable<RiakResult>> Delete(IEnumerable<RiakObjectId> objectIds, RiakDeleteOptions options = null);
+        Task<IEnumerable<RiakResult>> DeleteBucket(string bucket, uint rwVal = RiakConstants.Defaults.RVal);
 
-        void DeleteBucket(string bucket, Action<IEnumerable<RiakResult>> callback, uint rwVal = RiakConstants.Defaults.RVal);
+        Task<RiakResult<RiakMapReduceResult>> MapReduce(RiakMapReduceQuery query);
+        Task<RiakResult<RiakStreamedMapReduceResult>> StreamMapReduce(RiakMapReduceQuery query);
 
-        void MapReduce(RiakMapReduceQuery query, Action<RiakResult<RiakMapReduceResult>> callback);
+        Task<RiakResult<IEnumerable<string>>> ListBuckets();
+        Task<RiakResult<IEnumerable<string>>> ListKeys(string bucket);
+        Task<RiakResult<IEnumerable<string>>> StreamListKeys(string bucket);
 
-        void StreamMapReduce(RiakMapReduceQuery query, Action<RiakResult<RiakStreamedMapReduceResult>> callback);
+        Task<RiakResult<RiakBucketProperties>> GetBucketProperties(string bucket, bool extended = false);
+        Task<RiakResult> SetBucketProperties(string bucket, RiakBucketProperties properties);
 
-        void ListBuckets(Action<RiakResult<IEnumerable<string>>> callback);
+        Task<RiakResult<IList<string>>> IndexGet(string bucket, string indexName, int value);
+        Task<RiakResult<IList<string>>> IndexGet(string bucket, string indexName, string value);
+        Task<RiakResult<IList<string>>> IndexGet(string bucket, string indexName, int minValue, int maxValue);
+        Task<RiakResult<IList<string>>> IndexGet(string bucket, string indexName, string minValue, string maxValue);
 
-        void ListKeys(string bucket, Action<RiakResult<IEnumerable<string>>> callback);
+        Task<RiakResult<IList<RiakObject>>> WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks);
 
-        void StreamListKeys(string bucket, Action<RiakResult<IEnumerable<string>>> callback);
-
-        void GetBucketProperties(string bucket, Action<RiakResult<RiakBucketProperties>> callback, bool extended = false);
-
-        void SetBucketProperties(string bucket, RiakBucketProperties properties, Action<RiakResult> callback);
-
-        void WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks, Action<RiakResult<IList<RiakObject>>> callback);
-
-        void GetServerInfo(Action<RiakResult<RiakServerInfo>> callback);
+        Task<RiakResult<RiakServerInfo>> GetServerInfo();
 
         void Batch(Action<IRiakBatchClient> batchAction);
+
+        [Obsolete("All async operations should use the functions that return Task<T>.")]
+        void Ping(Action<RiakResult> callback);
+
+        [Obsolete("All async operations should use the functions that return Task<T>.")]
+        void Get(string bucket, string key, Action<RiakResult<RiakObject>> callback, uint rVal = RiakConstants.Defaults.RVal);
+
+        [Obsolete("All async operations should use the functions that return Task<T>.")]
+        void Get(RiakObjectId objectId, Action<RiakResult<RiakObject>> callback, uint rVal = RiakConstants.Defaults.RVal);
+
+        [Obsolete("All async operations should use the functions that return Task<T>.")]
+        void Get(IEnumerable<RiakObjectId> bucketKeyPairs, Action<IEnumerable<RiakResult<RiakObject>>> callback, uint rVal = RiakConstants.Defaults.RVal);
+
+        [Obsolete("All async operations should use the functions that return Task<T>.")]
+        void Put(RiakObject value, Action<RiakResult<RiakObject>> callback, RiakPutOptions options = null);
+
+        [Obsolete("All async operations should use the functions that return Task<T>.")]
+        void Put(IEnumerable<RiakObject> values, Action<IEnumerable<RiakResult<RiakObject>>> callback, RiakPutOptions options = null);
+
+        [Obsolete("All async operations should use the functions that return Task<T>.")]
+        void Delete(string bucket, string key, Action<RiakResult> callback, RiakDeleteOptions options = null);
+
+        [Obsolete("All async operations should use the functions that return Task<T>.")]
+        void Delete(RiakObjectId objectId, Action<RiakResult> callback, RiakDeleteOptions options = null);
+
+        [Obsolete("All async operations should use the functions that return Task<T>.")]
+        void Delete(IEnumerable<RiakObjectId> objectIds, Action<IEnumerable<RiakResult>> callback, RiakDeleteOptions options = null);
+
+        [Obsolete("All async operations should use the functions that return Task<T>.")]
+        void DeleteBucket(string bucket, Action<IEnumerable<RiakResult>> callback, uint rwVal = RiakConstants.Defaults.RVal);
+
+        [Obsolete("All async operations should use the functions that return Task<T>.")]
+        void MapReduce(RiakMapReduceQuery query, Action<RiakResult<RiakMapReduceResult>> callback);
+
+        [Obsolete("All async operations should use the functions that return Task<T>.")]
+        void StreamMapReduce(RiakMapReduceQuery query, Action<RiakResult<RiakStreamedMapReduceResult>> callback);
+
+        [Obsolete("All async operations should use the functions that return Task<T>.")]
+        void ListBuckets(Action<RiakResult<IEnumerable<string>>> callback);
+
+        [Obsolete("All async operations should use the functions that return Task<T>.")]
+        void ListKeys(string bucket, Action<RiakResult<IEnumerable<string>>> callback);
+
+        [Obsolete("All async operations should use the functions that return Task<T>.")]
+        void StreamListKeys(string bucket, Action<RiakResult<IEnumerable<string>>> callback);
+
+        [Obsolete("All async operations should use the functions that return Task<T>.")]
+        void GetBucketProperties(string bucket, Action<RiakResult<RiakBucketProperties>> callback, bool extended = false);
+
+        [Obsolete("All async operations should use the functions that return Task<T>.")]
+        void SetBucketProperties(string bucket, RiakBucketProperties properties, Action<RiakResult> callback);
+
+        [Obsolete("All async operations should use the functions that return Task<T>.")]
+        void WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks, Action<RiakResult<IList<RiakObject>>> callback);
+
+        [Obsolete("All async operations should use the functions that return Task<T>.")]
+        void GetServerInfo(Action<RiakResult<RiakServerInfo>> callback);
     }
 
     internal class RiakAsyncClient : IRiakAsyncClient
@@ -69,6 +126,131 @@ namespace CorrugatedIron
         {
             _client = client;
         }
+
+        public Task<RiakResult> Ping()
+        {
+            return Task.Factory.StartNew(() => _client.Ping());
+        }
+
+        public Task<RiakResult<RiakObject>> Get(string bucket, string key, uint rVal = RiakConstants.Defaults.RVal)
+        {
+            return Task.Factory.StartNew(() => _client.Get(bucket, key, rVal));
+        }
+
+        public Task<RiakResult<RiakObject>> Get(RiakObjectId objectId, uint rVal = RiakConstants.Defaults.RVal)
+        {
+            return Task.Factory.StartNew(() => _client.Get(objectId.Bucket, objectId.Key, rVal));
+        }
+
+        public Task<IEnumerable<RiakResult<RiakObject>>> Get(IEnumerable<RiakObjectId> bucketKeyPairs, uint rVal = RiakConstants.Defaults.RVal)
+        {
+            return Task.Factory.StartNew(() => _client.Get(bucketKeyPairs, rVal));
+        }
+
+        public Task<IEnumerable<RiakResult<RiakObject>>> Put(IEnumerable<RiakObject> values, RiakPutOptions options)
+        {
+            return Task.Factory.StartNew(() => _client.Put(values, options));
+        }
+
+        public Task<RiakResult<RiakObject>> Put(RiakObject value, RiakPutOptions options)
+        {
+            return Task.Factory.StartNew(() => _client.Put(value, options));
+        }
+
+        public Task<RiakResult> Delete(string bucket, string key, RiakDeleteOptions options = null)
+        {
+            return Task.Factory.StartNew(() => _client.Delete(bucket, key, options));
+        }
+
+        public Task<RiakResult> Delete(RiakObjectId objectId, RiakDeleteOptions options = null)
+        {
+            return Task.Factory.StartNew(() => _client.Delete(objectId.Bucket, objectId.Key, options));
+        }
+
+        public Task<IEnumerable<RiakResult>> Delete(IEnumerable<RiakObjectId> objectIds, RiakDeleteOptions options = null)
+        {
+            return Task.Factory.StartNew(() => _client.Delete(objectIds, options));
+        }
+
+        public Task<IEnumerable<RiakResult>> DeleteBucket(string bucket, uint rwVal = RiakConstants.Defaults.RVal)
+        {
+            return Task.Factory.StartNew(() => _client.DeleteBucket(bucket, rwVal));
+        }
+
+        public Task<RiakResult<RiakMapReduceResult>> MapReduce(RiakMapReduceQuery query)
+        {
+            return Task.Factory.StartNew(() => _client.MapReduce(query));
+        }
+
+        public Task<RiakResult<RiakStreamedMapReduceResult>> StreamMapReduce(RiakMapReduceQuery query)
+        {
+            return Task.Factory.StartNew(() => _client.StreamMapReduce(query));
+        }
+
+        public Task<RiakResult<IEnumerable<string>>>  ListBuckets()
+        {
+            return Task.Factory.StartNew(() => _client.ListBuckets());
+        }
+
+        public Task<RiakResult<IEnumerable<string>>> ListKeys(string bucket)
+        {
+            return Task.Factory.StartNew(() => _client.ListKeys(bucket));
+        }
+
+        public Task<RiakResult<IEnumerable<string>>> StreamListKeys(string bucket)
+        {
+            return Task.Factory.StartNew(() => _client.StreamListKeys(bucket));
+        }
+
+        public Task<RiakResult<RiakBucketProperties>> GetBucketProperties(string bucket, bool extended = false)
+        {
+            return Task.Factory.StartNew(() => _client.GetBucketProperties(bucket, extended));
+        }
+
+        public Task<RiakResult> SetBucketProperties(string bucket, RiakBucketProperties properties)
+        {
+            return Task.Factory.StartNew(() => _client.SetBucketProperties(bucket, properties));
+        }
+
+        public Task<RiakResult<IList<string>>> IndexGet(string bucket, string indexName, int value)
+        {
+            return Task.Factory.StartNew(() => _client.IndexGet(bucket, indexName, value));
+        }
+
+        public Task<RiakResult<IList<string>>> IndexGet(string bucket, string indexName, string value)
+        {
+            return Task.Factory.StartNew(() => _client.IndexGet(bucket, indexName, value));
+        }
+
+        public Task<RiakResult<IList<string>>> IndexGet(string bucket, string indexName, int minValue, int maxValue)
+        {
+            return Task.Factory.StartNew(() => _client.IndexGet(bucket, indexName, minValue, maxValue));
+        }
+
+        public Task<RiakResult<IList<string>>> IndexGet(string bucket, string indexName, string minValue, string maxValue)
+        {
+            return Task.Factory.StartNew(() => _client.IndexGet(bucket, indexName, minValue, maxValue));
+        }
+
+        public Task<RiakResult<IList<RiakObject>>> WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks)
+        {
+            return Task.Factory.StartNew(() => _client.WalkLinks(riakObject, riakLinks));
+        }
+
+        public Task<RiakResult<RiakServerInfo>>  GetServerInfo()
+        {
+            return Task.Factory.StartNew(() => _client.GetServerInfo());
+        }
+
+        public void Batch(Action<IRiakBatchClient> batchAction)
+        {
+            Task.Factory.StartNew(() => _client.Batch(batchAction));
+        }
+
+
+        // -----------------------------------------------------------------------------------------------------------
+        // All functions below are marked as obsolete
+        // -----------------------------------------------------------------------------------------------------------
 
         public void Ping(Action<RiakResult> callback)
         {
@@ -163,11 +345,6 @@ namespace CorrugatedIron
         public void GetServerInfo(Action<RiakResult<RiakServerInfo>> callback)
         {
             ExecAsync(() => callback(_client.GetServerInfo()));
-        }
-
-        public void Batch(Action<IRiakBatchClient> batchAction)
-        {
-            ExecAsync(() => _client.Batch(batchAction));
         }
 
         private static void ExecAsync(Action action)

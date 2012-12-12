@@ -11,6 +11,8 @@
     <RootNamespace>CorrugatedIron.Tests.Live</RootNamespace>
     <AssemblyName>CorrugatedIron.Tests.Live</AssemblyName>
     <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -37,7 +39,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.4.5.7\lib\net40\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.4.5.10\lib\net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="protobuf-net">
+      <HintPath>..\packages\protobuf-net.2.0.0.602\lib\net40\protobuf-net.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -55,7 +60,6 @@
     <Compile Include="..\Metadata\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
-    <Compile Include="AsyncMethodTester.cs" />
     <Compile Include="BucketPropertyTests.cs" />
     <Compile Include="GeneralIntegrationTests.cs" />
     <Compile Include="IdleTests.cs" />
@@ -66,6 +70,7 @@
     <Compile Include="RiakConfigurationTests.cs" />
     <Compile Include="RiakMapReduceTests.cs" />
     <Compile Include="RiakObjectTests.cs" />
+    <Compile Include="RiakPbSearchTests.cs" />
     <Compile Include="RiakSearchMapReduceInputTests.cs" />
     <Compile Include="RiakIndexTests.cs" />
   </ItemGroup>
@@ -89,6 +94,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

@@ -14,6 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using CorrugatedIron.Extensions;
 using Newtonsoft.Json;
 
 namespace CorrugatedIron.Models.MapReduce.Inputs
@@ -27,7 +28,7 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
         public RiakBinIndexEqualityInput(string bucket, string index, string key)
         {
             Bucket = bucket;
-            Index = index;
+            Index = index.ToBinaryKey();
             Key = key;
         }
 

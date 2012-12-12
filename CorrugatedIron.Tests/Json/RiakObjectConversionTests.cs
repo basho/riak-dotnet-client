@@ -14,15 +14,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Models;
 using CorrugatedIron.Tests.Extensions;
 using CorrugatedIron.Util;
-using NUnit.Framework;
 using Newtonsoft.Json;
+using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace CorrugatedIron.Tests.Json.RiakObjectConversionTests
 {
@@ -56,7 +56,7 @@ namespace CorrugatedIron.Tests.Json.RiakObjectConversionTests
             obj.ContentType.ShouldEqual(RiakConstants.ContentTypes.ApplicationJson);
 
             var json = obj.Value.FromRiakString();
-            json.ShouldEqual("{\"Name\":{\"FirstName\":\"OJ\",\"Surname\":\"Reeves\"},\"PhoneNumbers\":[{\"Number\":\"12345678\",\"NumberType\":1}],\"DateOfBirth\":\"\\/Date(281664000000)\\/\",\"Email\":\"oj@buffered.io\"}");
+            json.ShouldEqual("{\"Name\":{\"FirstName\":\"OJ\",\"Surname\":\"Reeves\"},\"PhoneNumbers\":[{\"Number\":\"12345678\",\"NumberType\":1}],\"DateOfBirth\":\"1978-12-05T00:00:00Z\",\"Email\":\"oj@buffered.io\"}");
 
             var deserialisedPerson = obj.GetObject<Person>();
             deserialisedPerson.ShouldEqual(testPerson);
@@ -66,7 +66,7 @@ namespace CorrugatedIron.Tests.Json.RiakObjectConversionTests
         [ExpectedException(typeof(NotSupportedException))]
         public void NonJsonObjectsCantBeDeserialisedFromJson()
         {
-            var obj = new RiakObject("bucket", "key", "{\"Name\":{\"FirstName\":\"OJ\",\"Surname\":\"Reeves\"},\"PhoneNumbers\":[{\"Number\":\"12345678\",\"NumberType\":1}],\"DateOfBirth\":\"\\/Date(281664000000)\\/\",\"Email\":\"oj@buffered.io\"}", RiakConstants.ContentTypes.TextPlain);
+            var obj = new RiakObject("bucket", "key", "{\"Name\":{\"FirstName\":\"OJ\",\"Surname\":\"Reeves\"},\"PhoneNumbers\":[{\"Number\":\"12345678\",\"NumberType\":1}],\"DateOfBirth\":\"1978-12-05T00:00:00Z\",\"Email\":\"oj@buffered.io\"}", RiakConstants.ContentTypes.TextPlain);
             obj.GetObject<Person>();
         }
 
@@ -113,8 +113,7 @@ namespace CorrugatedIron.Tests.Json.RiakObjectConversionTests
                 var result = obj.GetObject<Person>();
             }
             sw.Stop();
-            Console.WriteLine("De" +
-                "serialisation took a total of {0} - {1} per iteration", sw.Elapsed, new TimeSpan(sw.ElapsedTicks / iterations));
+            Console.WriteLine("Deserialisation took a total of {0} - {1} per iteration", sw.Elapsed, new TimeSpan(sw.ElapsedTicks / iterations));
         }
 
         [Test]
@@ -147,7 +146,7 @@ namespace CorrugatedIron.Tests.Json.RiakObjectConversionTests
             obj.ContentType.ShouldEqual(RiakConstants.ContentTypes.ApplicationJson);
 
             var json = obj.Value.FromRiakString();
-            json.ShouldEqual("{\"Name\":{\"FirstName\":\"OJ\",\"Surname\":\"Reeves\"},\"PhoneNumbers\":[{\"Number\":\"12345678\",\"NumberType\":1}],\"DateOfBirth\":\"\\/Date(281664000000)\\/\",\"Email\":\"oj@buffered.io\"}");
+            json.ShouldEqual("{\"Name\":{\"FirstName\":\"OJ\",\"Surname\":\"Reeves\"},\"PhoneNumbers\":[{\"Number\":\"12345678\",\"NumberType\":1}],\"DateOfBirth\":\"1978-12-05T00:00:00Z\",\"Email\":\"oj@buffered.io\"}");
 
             var deserialisedPerson = obj.GetObject<Person>();
             deserialisedPerson.ShouldEqual(testPerson);

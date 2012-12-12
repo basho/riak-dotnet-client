@@ -14,14 +14,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using NUnit.Framework;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using NUnit.Framework;
 
 namespace CorrugatedIron.Tests.Extensions
 {
+    [System.Diagnostics.DebuggerNonUserCode]
     public static class UnitTestExtensions
     {
         public static void ShouldEqual<T>(this T actual, T expected)

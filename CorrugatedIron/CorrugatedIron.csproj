@@ -11,11 +11,13 @@
     <RootNamespace>CorrugatedIron</RootNamespace>
     <AssemblyName>CorrugatedIron</AssemblyName>
     <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
+    <DebugSymbols>True</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
+    <Optimize>False</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
@@ -23,25 +25,24 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
+    <Optimize>True</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
+    <SignAssembly>True</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>..\Metadata\CorrugatedIron.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.4.5.7\lib\net40\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.4.5.10\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="protobuf-net, Version=2.0.0.480, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\protobuf-net.2.0.0.480\lib\net40\protobuf-net.dll</HintPath>
+    <Reference Include="protobuf-net">
+      <HintPath>..\packages\protobuf-net.2.0.0.602\lib\net40\protobuf-net.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -75,6 +76,24 @@
     <Compile Include="Exceptions\RiakException.cs" />
     <Compile Include="IRiakBatchClient.cs" />
     <Compile Include="IRiakEndPoint.cs" />
+    <Compile Include="Messages\riak.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>riak.proto</DependentUpon>
+    </Compile>
+    <Compile Include="Messages\riak_kv.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>riak_kv.proto</DependentUpon>
+    </Compile>
+    <Compile Include="Messages\riak_search.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>riak_search.proto</DependentUpon>
+    </Compile>
     <Compile Include="Models\CommitHook\IRiakPostCommitHook.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -107,6 +126,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Models\MapReduce\Inputs\RiakBucketSearchInput.cs" />
+    <Compile Include="Models\MapReduce\Inputs\RiakIndex.cs" />
     <Compile Include="Models\MapReduce\IRiakMapReduceResult.cs" />
     <Compile Include="Models\MapReduce\KeyFilters\And.cs" />
     <Compile Include="Models\MapReduce\KeyFilters\Between.cs" />
@@ -177,11 +197,18 @@
     <Compile Include="Models\RiakPutOptions.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Models\RiakSearch\BaseSearchQuery.cs" />
-    <Compile Include="Models\RiakSearch\IRiakSearchQueryPart.cs" />
-    <Compile Include="Models\RiakSearch\RiakSearchBinaryLogicTerm.cs" />
-    <Compile Include="Models\RiakSearch\RiakSearchQuery.cs" />
     <Compile Include="Models\RiakServerInfo.cs" />
+    <Compile Include="Models\Search\BinaryTerm.cs" />
+    <Compile Include="Models\Search\GroupTerm.cs" />
+    <Compile Include="Models\Search\RangeTerm.cs" />
+    <Compile Include="Models\Search\RiakFluentSearch.cs" />
+    <Compile Include="Models\Search\RiakSearchRequest.cs" />
+    <Compile Include="Models\Search\RiakSearchResult.cs" />
+    <Compile Include="Models\Search\RiakSearchResultDocument.cs" />
+    <Compile Include="Models\Search\RiakSearchResultField.cs" />
+    <Compile Include="Models\Search\Term.cs" />
+    <Compile Include="Models\Search\Token.cs" />
+    <Compile Include="Models\Search\UnaryTerm.cs" />
     <Compile Include="RiakAsyncClient.cs" />
     <Compile Include="RiakClient.cs" />
     <Compile Include="Comms\RiakConnection.cs" />
@@ -200,35 +227,6 @@
     <Compile Include="Util\RiakConstants.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Messages\MessageCode.cs" />
-    <Compile Include="Messages\RpbBucketProps.cs" />
-    <Compile Include="Messages\RpbContent.cs" />
-    <Compile Include="Messages\RpbDelReq.cs" />
-    <Compile Include="Messages\RpbDelResp.cs" />
-    <Compile Include="Messages\RpbErrorResp.cs" />
-    <Compile Include="Messages\RpbGetBucketReq.cs" />
-    <Compile Include="Messages\RpbGetBucketResp.cs" />
-    <Compile Include="Messages\RpbGetClientIdReq.cs" />
-    <Compile Include="Messages\RpbGetClientIdResp.cs" />
-    <Compile Include="Messages\RpbGetReq.cs" />
-    <Compile Include="Messages\RpbGetResp.cs" />
-    <Compile Include="Messages\RpbGetServerInfoReq.cs" />
-    <Compile Include="Messages\RpbGetServerInfoResp.cs" />
-    <Compile Include="Messages\RpbLink.cs" />
-    <Compile Include="Messages\RpbListBucketsReq.cs" />
-    <Compile Include="Messages\RpbListBucketsResp.cs" />
-    <Compile Include="Messages\RpbListKeysReq.cs" />
-    <Compile Include="Messages\RpbListKeysResp.cs" />
-    <Compile Include="Messages\RpbMapRedReq.cs" />
-    <Compile Include="Messages\RpbMapRedResp.cs" />
-    <Compile Include="Messages\RpbPair.cs" />
-    <Compile Include="Messages\RpbPingReq.cs" />
-    <Compile Include="Messages\RpbPingResp.cs" />
-    <Compile Include="Messages\RpbPutReq.cs" />
-    <Compile Include="Messages\RpbPutResp.cs" />
-    <Compile Include="Messages\RpbSetBucketReq.cs" />
-    <Compile Include="Messages\RpbSetBucketResp.cs" />
-    <Compile Include="Messages\RpbSetClientIdReq.cs" />
-    <Compile Include="Messages\RpbSetClientIdResp.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Models\MapReduce\Inputs\RiakModuleFunctionArgInput.cs" />
     <Compile Include="Models\RiakDeleteOptions.cs" />
@@ -236,18 +234,23 @@
     <Compile Include="Models\MapReduce\Inputs\RiakIntIndexRangeInput.cs" />
     <Compile Include="Models\MapReduce\Inputs\RiakBinIndexEqualityInput.cs" />
     <Compile Include="Models\MapReduce\Inputs\RiakBinIndexRangeInput.cs" />
-    <Compile Include="Models\RiakSearch\Solr\SolrQuery.cs" />
-    <Compile Include="Models\RiakSearch\RiakSearchToken.cs" />
-    <Compile Include="Models\RiakSearch\RiakSearchRangeToken.cs" />
-    <Compile Include="Models\RiakSearch\RiakSearchTerm.cs" />
-    <Compile Include="Models\RiakSearch\RiakSearchPhraseToken.cs" />
-    <Compile Include="Models\RiakSearch\And.cs" />
-    <Compile Include="Models\RiakSearch\Or.cs" />
-    <Compile Include="Models\RiakSearch\Group.cs" />
+    <Compile Include="Models\RiakGetOptions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Metadata\CorrugatedIron.snk">
       <Link>CorrugatedIron.snk</Link>
+    </None>
+    <None Include="Messages\riak.proto">
+      <Generator>ProtoBufTool</Generator>
+      <LastGenOutput>riak.cs</LastGenOutput>
+    </None>
+    <None Include="Messages\riak_kv.proto">
+      <Generator>ProtoBufTool</Generator>
+      <LastGenOutput>riak_kv.cs</LastGenOutput>
+    </None>
+    <None Include="Messages\riak_search.proto">
+      <Generator>ProtoBufTool</Generator>
+      <LastGenOutput>riak_search.cs</LastGenOutput>
     </None>
     <None Include="packages.config" />
   </ItemGroup>
@@ -260,4 +263,5 @@
   </Target>
   -->
   <ItemGroup />
+  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
 </Project>

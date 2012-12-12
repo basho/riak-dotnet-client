@@ -16,15 +16,15 @@
 
 namespace CorrugatedIron.Messages
 {
-    internal enum MessageCode : byte
+    public enum MessageCode : byte
     {
         ErrorResp = 0,
         PingReq = 1,
         PingResp = 2,
-        GetClientIdReq = 3,
-        GetClientIdResp = 4,
-        SetClientIdReq = 5,
-        SetClientIdResp = 6,
+        GetClientIdReq = 3,     // Not used any more
+        GetClientIdResp = 4,    // Not used any more
+        SetClientIdReq = 5,     // Not used any more
+        SetClientIdResp = 6,    // Not used any more
         GetServerInfoReq = 7,
         GetServerInfoResp = 8,
         GetReq = 9,
@@ -42,6 +42,10 @@ namespace CorrugatedIron.Messages
         SetBucketReq = 21,
         SetBucketResp = 22,
         MapRedReq = 23,
-        MapRedResp = 24
+        MapRedResp = 24,
+        IndexReq = 25,
+        IndexResp = 26,
+        SearchQueryReq = 27,
+        SearchQueryResp = 28
     }
 }

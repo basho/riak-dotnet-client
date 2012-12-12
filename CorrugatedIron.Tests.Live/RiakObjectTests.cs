@@ -14,18 +14,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.Collections.Generic;
-using System.Linq;
-using CorrugatedIron.Models.MapReduce.KeyFilters;
+using CorrugatedIron.Extensions;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Models.MapReduce.Inputs;
 using CorrugatedIron.Tests.Extensions;
-using CorrugatedIron.Extensions;
 using CorrugatedIron.Tests.Live.LiveRiakConnectionTests;
 using NUnit.Framework;
+using System.Collections.Generic;
+using System.Linq;
 
-using Newtonsoft.Json;
 
 namespace CorrugatedIron.Tests.Live
 {

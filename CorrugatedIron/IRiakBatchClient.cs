@@ -14,10 +14,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.Collections.Generic;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
+using CorrugatedIron.Models.Search;
 using CorrugatedIron.Util;
+using System.Collections.Generic;
 
 namespace CorrugatedIron
 {
@@ -39,6 +40,8 @@ namespace CorrugatedIron
 
         IEnumerable<RiakResult> DeleteBucket(string bucket, uint rwVal = RiakConstants.Defaults.RVal);
 
+        RiakResult<RiakSearchResult> Search(RiakSearchRequest search);
+
         RiakResult<RiakMapReduceResult> MapReduce(RiakMapReduceQuery query);
 
         RiakResult<RiakStreamedMapReduceResult> StreamMapReduce(RiakMapReduceQuery query);
@@ -56,5 +59,12 @@ namespace CorrugatedIron
         RiakResult<IList<RiakObject>> WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks);
 
         RiakResult<RiakServerInfo> GetServerInfo();
+
+        RiakResult<IList<string>> IndexGet(string bucket, string indexName, int value);
+        RiakResult<IList<string>> IndexGet(string bucket, string indexName, string value);
+        RiakResult<IList<string>> IndexGet(string bucket, string indexName, int minValue, int maxValue);
+        RiakResult<IList<string>> IndexGet(string bucket, string indexName, string minValue, string maxValue);
+
+        //RiakResult<RiakSearchResult> Search(Action<RiakSearchRequest> prepareRequest)
     }
 }
