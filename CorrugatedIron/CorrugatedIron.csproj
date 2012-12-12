@@ -200,6 +200,7 @@
     <Compile Include="Models\RiakServerInfo.cs" />
     <Compile Include="Models\Search\BinaryTerm.cs" />
     <Compile Include="Models\Search\GroupTerm.cs" />
+    <Compile Include="Models\Search\ProximityTerm.cs" />
     <Compile Include="Models\Search\RangeTerm.cs" />
     <Compile Include="Models\Search\RiakFluentSearch.cs" />
     <Compile Include="Models\Search\RiakSearchRequest.cs" />
