@@ -49,10 +49,8 @@ namespace CorrugatedIron.Tests.Live
 
             var req = new RiakSearchRequest
             {
-                Query = new RiakFluentSearch("riak_search_bucket", "name")
+                Query = new RiakFluentSearch("riak_search_bucket", "name").Search("Alyssa").Build()
             };
-
-            req.Query.Search("Alyssa");
 
             var result = Client.Search(req);
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
@@ -70,10 +68,8 @@ namespace CorrugatedIron.Tests.Live
 
             var req = new RiakSearchRequest
             {
-                Query = new RiakFluentSearch("riak_search_bucket", "name")
+                Query = new RiakFluentSearch("riak_search_bucket", "name").Search(Token.StartsWith("Al")).Build()
             };
-
-            req.Query.Search(Token.StartsWith("Al"));
 
             var result = Client.Search(req);
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);

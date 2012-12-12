@@ -18,6 +18,7 @@ using CorrugatedIron.Comms;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Models.MapReduce.Inputs;
+using CorrugatedIron.Models.Search;
 using CorrugatedIron.Tests.Extensions;
 using CorrugatedIron.Util;
 using NUnit.Framework;
@@ -63,11 +64,27 @@ namespace CorrugatedIron.Tests.Live
             Client.Put(new RiakObject(Bucket, RiakSearchKey2, RiakSearchDoc2, RiakConstants.ContentTypes.ApplicationJson));
 
             var mr = new RiakMapReduceQuery()
-                .Inputs(new RiakBucketSearchInput
-                    {
-                        Bucket = Bucket,
-                        Query = "name:A1*"
-                    });
+                .Inputs(new RiakBucketSearchInput(Bucket, "name:A1*"));
+
+            var result = Client.MapReduce(mr);
+            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
+            
+            var mrResult = result.Value;
+            mrResult.PhaseResults.Count().ShouldEqual(1);
+            
+            mrResult.PhaseResults.ElementAt(0).Values.ShouldNotBeNull();
+            // TODO Add data introspection to test - need to verify the results, after all.
+        }
+        
+        [Test]
+        public void SearchingViaFluentSearchObjectWorks()
+        {
+            Client.Put(new RiakObject(Bucket, RiakSearchKey, RiakSearchDoc, RiakConstants.ContentTypes.ApplicationJson));
+            Client.Put(new RiakObject(Bucket, RiakSearchKey2, RiakSearchDoc2, RiakConstants.ContentTypes.ApplicationJson));
+
+            var search = new RiakFluentSearch(Bucket, "name").Search(Token.StartsWith("A1")).Build();
+            var mr = new RiakMapReduceQuery()
+                .Inputs(new RiakBucketSearchInput(search));
 
             var result = Client.MapReduce(mr);
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);

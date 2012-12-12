@@ -57,6 +57,16 @@ namespace CorrugatedIron.Tests
         }
 
         [Test]
+        public void SimpleUnaryTermWithProximitySerializesCorrectly()
+        {
+            var s = new RiakFluentSearch("bucket", "key")
+                .Proximity(5, "foo", "bar", "baz")
+                .Build();
+            var q = s.ToString();
+            Assert.AreEqual(@"key:""foo bar baz""~5", q);
+        }
+
+        [Test]
         public void SimpleAndTermSerializesCorrectly()
         {
             var s = new RiakFluentSearch("bucket", "key")
@@ -71,7 +81,7 @@ namespace CorrugatedIron.Tests
         public void SimpleRangeTermSerializesCorrectly()
         {
             var s = new RiakFluentSearch("bucket", "key")
-                .Search("10", "20")
+                .Between("10", "20", false)
                 .Build();
             var q = s.ToString();
             Assert.AreEqual("key:{10 TO 20}", q);
@@ -81,7 +91,7 @@ namespace CorrugatedIron.Tests
         public void SimpleInclusiveRangeTermSerializesCorrectly()
         {
             var s = new RiakFluentSearch("bucket", "key")
-                .Search("10", "20", true)
+                .Between("10", "20")
                 .Build();
             var q = s.ToString();
             Assert.AreEqual("key:[10 TO 20]", q);
@@ -169,14 +179,15 @@ namespace CorrugatedIron.Tests
             var s = new RiakFluentSearch("bucket", "key")
                 .Search("foo")
                 .Or("bar").Not()
-                .AndRange("10", "20", true)
-                .And("baz", t => t.Or("quux").OrRange("la", "da")).Not().Proximity(10)
+                .AndBetween("10", "20")
+                .And("baz", t => t.Or("quux").OrBetween("la", "da", false)).Not()
+                .AndProximity(3, "testing", "these words")
                 .Or("baz", t => t.And("schmoopy for president+")
                     .Boost(6)
                     .And(Token.StartsWith("dooby"), x => x.Or("fooby").Not()))
                 .Build();
             var q = s.ToString();
-            Assert.AreEqual(@"key:foo OR NOT key:bar AND key:[10 TO 20] AND NOT (key:baz OR key:quux OR key:{la TO da})~10 OR (key:baz AND key:schmoopy\ for\ president\+^6 AND (key:dooby* OR NOT key:fooby))", q);
+            Assert.AreEqual(@"key:foo OR NOT key:bar AND key:[10 TO 20] AND NOT (key:baz OR key:quux OR key:{la TO da}) AND key:""testing these\ words""~3 OR (key:baz AND key:schmoopy\ for\ president\+^6 AND (key:dooby* OR NOT key:fooby))", q);
         }
 
         [Test]
@@ -185,15 +196,16 @@ namespace CorrugatedIron.Tests
             var s = new RiakFluentSearch("bucket", "key")
                 .Search("foo")
                 .Or("bar").Not()
-                .AndRange("10", "20", true)
+                .AndBetween("10", "20", true)
                 .Or("otherkey", "baz", t => t.And("hash", Token.StartsWith("schmoopy for president+"))
                     .Boost(6)
                     .And("bash", "dooby", x => x.Or("dash", "fooby").Not())
                     .Or("smelly"))
-                .And("baz", t => t.Or("zoom", "quux").OrRange("la", "da")).Not().Proximity(10)
+                .And("baz", t => t.Or("zoom", "quux").OrBetween("la", "da", false)).Not()
+                .OrProximity("lala", 10, "wouldn't", "haven't").Not()
                 .Build();
             var q = s.ToString();
-            Assert.AreEqual(@"key:foo OR NOT key:bar AND key:[10 TO 20] OR (otherkey:baz AND hash:schmoopy\ for\ president\+*^6 AND (bash:dooby OR NOT dash:fooby) OR bash:smelly) AND NOT (otherkey:baz OR zoom:quux OR zoom:{la TO da})~10", q);
+            Assert.AreEqual(@"key:foo OR NOT key:bar AND key:[10 TO 20] OR (otherkey:baz AND hash:schmoopy\ for\ president\+*^6 AND (bash:dooby OR NOT dash:fooby) OR bash:smelly) AND NOT (otherkey:baz OR zoom:quux OR zoom:{la TO da}) OR NOT lala:""wouldn\'t haven\'t""~10", q);
         }
 
     }
