@@ -14,15 +14,38 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using CorrugatedIron.Models.Search;
 using Newtonsoft.Json;
 
 namespace CorrugatedIron.Models.MapReduce.Inputs
 {
     public class RiakBucketSearchInput : RiakPhaseInput
     {
-        public string Bucket { get; set; }
-        public string Query { get; set; }
-        public string Filter { get; set; } 
+        private readonly string _bucket;
+        private readonly string _query;
+        private string _filter;
+
+        public RiakBucketSearchInput(RiakFluentSearch query)
+            : this(query.Bucket, query.ToString())
+        {
+        }
+
+        public RiakBucketSearchInput(string bucket, string query)
+        {
+            _bucket = bucket;
+            _query = query;
+        }
+
+        public RiakBucketSearchInput Filter(RiakFluentSearch filter)
+        {
+            return Filter(filter.ToString());
+        }
+
+        public RiakBucketSearchInput Filter(string filter)
+        {
+            _filter = filter;
+            return this;
+        }
 
         public override JsonWriter WriteJson(JsonWriter writer)
         {
@@ -30,15 +53,15 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
             writer.WriteStartObject();
 
             writer.WritePropertyName("bucket");
-            writer.WriteValue(Bucket);
+            writer.WriteValue(_bucket);
 
             writer.WritePropertyName("query");
-            writer.WriteValue(Query);
+            writer.WriteValue(_query);
 
-            if (!string.IsNullOrEmpty(Filter))
+            if (!string.IsNullOrEmpty(_filter))
             {
                 writer.WritePropertyName("filter");
-                writer.WriteValue(Filter);
+                writer.WriteValue(_filter);
             }
 
             writer.WriteEndObject();
