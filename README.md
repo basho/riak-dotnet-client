@@ -16,6 +16,11 @@ Documentation
 
 Documentation for the project can be found on the [project website](http://corrugatediron.org/).
 
+Release Notes
+-------------
+
+Please see the [CorrugatedIron blog](http://CorrugatedIron.org/blog/) for release notes.
+
 License
 -------
 
