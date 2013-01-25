@@ -16,6 +16,9 @@
 
 using CorrugatedIron.Models.Search;
 using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CorrugatedIron.Tests
 {
@@ -208,5 +211,94 @@ namespace CorrugatedIron.Tests
             Assert.AreEqual(@"key:foo OR NOT key:bar AND key:[10 TO 20] OR (otherkey:baz AND hash:schmoopy\ for\ president\+*^6 AND (bash:dooby OR NOT dash:fooby) OR bash:smelly) AND NOT (otherkey:baz OR zoom:quux OR zoom:{la TO da}) OR NOT lala:""wouldn\'t haven\'t""~10", q);
         }
 
+        [Test]
+        public void FluentSearchOfSameFieldsInALoopSerializesCorrectly()
+        {
+            var values = new List<string>
+            {
+                "value1",
+                "value2",
+                "value3",
+                "value4",
+                "value5"
+            };
+
+            var term = default(Term);
+
+            foreach (var v in values)
+            {
+                term = term == null ? new RiakFluentSearch("bucket", "field").Search(v) : term.And(v);
+            }
+
+            var s = term.Build();
+
+            var q = s.ToString();
+            Assert.AreEqual("field:value1 AND field:value2 AND field:value3 AND field:value4 AND field:value5", q);
+        }
+
+        [Test]
+        public void FluentSearchOfSameFieldsInAListSerializesCorrectly()
+        {
+            var fieldsAndValues = new List<string>
+            {
+                "value1",
+                "value2",
+                "value3",
+                "value4",
+                "value5"
+            };
+
+            var s = fieldsAndValues.Aggregate((Term)null,
+                (a, v) => a == null ? new RiakFluentSearch("bucket", "field").Search(v) : a.And(v))
+                .Build();
+
+            var q = s.ToString();
+            Assert.AreEqual("field:value1 AND field:value2 AND field:value3 AND field:value4 AND field:value5", q);
+        }
+
+        [Test]
+        public void FluentSearchOfDifferentFieldsInALoopSerializesCorrectly()
+        {
+            var fieldsAndValues = new List<Tuple<string, string>>
+            {
+                Tuple.Create("field1", "value1"),
+                Tuple.Create("field2", "value2"),
+                Tuple.Create("field3", "value3"),
+                Tuple.Create("field4", "value4"),
+                Tuple.Create("field5", "value5"),
+            };
+
+            var term = default(Term);
+
+            foreach(var t in fieldsAndValues)
+            {
+                term = term == null ? new RiakFluentSearch("bucket", t.Item1).Search(t.Item2) : term.And(t.Item1, t.Item2);
+            }
+
+            var s = term.Build();
+            var q = s.ToString();
+
+            Assert.AreEqual("field1:value1 AND field2:value2 AND field3:value3 AND field4:value4 AND field5:value5", q);
+        }
+
+        [Test]
+        public void FluentSearchOfDifferentFieldsInAListSerializesCorrectly()
+        {
+            var fieldsAndValues = new List<Tuple<string, string>>
+            {
+                Tuple.Create("field1", "value1"),
+                Tuple.Create("field2", "value2"),
+                Tuple.Create("field3", "value3"),
+                Tuple.Create("field4", "value4"),
+                Tuple.Create("field5", "value5"),
+            };
+
+            var s = fieldsAndValues.Aggregate((Term)null,
+                (a, t) => a == null ? new RiakFluentSearch("bucket", t.Item1).Search(t.Item2) : a.And(t.Item1, t.Item2))
+                .Build();
+
+            var q = s.ToString();
+            Assert.AreEqual("field1:value1 AND field2:value2 AND field3:value3 AND field4:value4 AND field5:value5", q);
+        }
     }
 }
