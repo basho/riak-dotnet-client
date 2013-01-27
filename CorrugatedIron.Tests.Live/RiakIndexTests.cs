@@ -49,8 +49,8 @@ namespace CorrugatedIron.Tests.Live
         public void IndexesAreSavedWithAnObject()
         {
             var o = new RiakObject(Bucket, "the_object", "{ value: \"this is an object\" }");
-            o.AddIndex("tacos", "are great!");
-            o.AddIndex("age", 12);
+            o.BinIndex("tacos").Set("are great!");
+            o.IntIndex("age").Set(12);
             
             Client.Put(o);
             
@@ -69,7 +69,7 @@ namespace CorrugatedIron.Tests.Live
             for (var i = 0; i < 10; i++)
             {
                 var o = new RiakObject(Bucket, i.ToString(), "{ value: \"this is an object\" }");
-                o.AddIndex("age", 32);
+                o.IntIndex("age").Add(32);
                 
                 Client.Put(o);
             }
@@ -92,7 +92,7 @@ namespace CorrugatedIron.Tests.Live
             for (var i = 0; i < 10; i++)
             {
                 var o = new RiakObject(Bucket, i.ToString(), "{ value: \"this is an object\" }");
-                o.AddIndex("age", "32");
+                o.BinIndex("age").Set("32");
                 
                 Client.Put(o);
             }
@@ -115,13 +115,13 @@ namespace CorrugatedIron.Tests.Live
             for (var i = 0; i < 10; i++)
             {
                 var o = new RiakObject(Bucket, i.ToString(), "{\"value\":\"this is an object\"}");
-                o.AddIndex("age", 32);
+                o.IntIndex("age").Set(32, 20);
                 
                 Client.Put(o);
             }
             
             var mr = new RiakMapReduceQuery()
-                .Inputs(RiakIndex.Match(Bucket, "age", 32));
+                .Inputs(RiakIndex.Match(Bucket, "age", 20));
             
             var result = Client.MapReduce(mr);
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
@@ -143,7 +143,7 @@ namespace CorrugatedIron.Tests.Live
             for (var i = 0; i < 10; i++)
             {
                 var o = new RiakObject(Bucket, i.ToString(), "{ value: \"this is an object\" }");
-                o.AddIndex("age", 25 + i);
+                o.IntIndex("age").Set(25 + i);
                 
                 Client.Put(o);
             }
@@ -154,6 +154,7 @@ namespace CorrugatedIron.Tests.Live
             
             var result = Client.MapReduce(mr);
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
+            result.Value.PhaseResults.SelectMany(x => x.Values).Count().ShouldBeGreaterThan(0);
             
             // TODO write tests verifying results
         }
