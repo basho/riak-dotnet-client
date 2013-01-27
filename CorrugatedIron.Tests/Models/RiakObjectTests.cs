@@ -17,6 +17,7 @@
 using CorrugatedIron.Models;
 using CorrugatedIron.Tests.Extensions;
 using NUnit.Framework;
+using System.Linq;
 
 namespace CorrugatedIron.Tests.Models
 {
@@ -40,22 +41,66 @@ namespace CorrugatedIron.Tests.Models
         public void RiakIndexNameManglingIsHandledAutomatically()
         {
             var riakObject = new RiakObject(Bucket, Key, "value");
-            riakObject.AddIndex("name", "jeremiah");
-            riakObject.AddIndex("state_bin", "oregon");
-            riakObject.AddIndex("age", 32);
-            riakObject.AddIndex("cats_int", 2);
+            riakObject.BinIndex("name").Set("jeremiah");
+            riakObject.BinIndex("state_bin").Set("oregon");
+            riakObject.IntIndex("age").Add(32);
+            riakObject.IntIndex("cats_int").Add(2);
             
-            riakObject.Indexes.Keys.Contains("name").ShouldBeFalse();
-            riakObject.Indexes.Keys.Contains("age").ShouldBeFalse();
-            riakObject.Indexes.Keys.Contains("state").ShouldBeFalse();
-            riakObject.Indexes.Keys.Contains("state_bin_bin").ShouldBeFalse();
-            riakObject.Indexes.Keys.Contains("cats").ShouldBeFalse();
-            riakObject.Indexes.Keys.Contains("cats_int_int").ShouldBeFalse();
-            
-            riakObject.Indexes.Keys.Contains("name_bin").ShouldBeTrue();
-            riakObject.Indexes.Keys.Contains("age_int").ShouldBeTrue();
-            riakObject.Indexes.Keys.Contains("state_bin").ShouldBeTrue();
-            riakObject.Indexes.Keys.Contains("cats_int").ShouldBeTrue();
+            riakObject.BinIndexes.Values.Select(v => v.RiakIndexName).Contains("name").ShouldBeFalse();
+            riakObject.BinIndexes.Values.Select(v => v.RiakIndexName).Contains("name_bin").ShouldBeTrue();
+            riakObject.BinIndexes.Values.Select(v => v.RiakIndexName).Contains("state").ShouldBeFalse();
+            riakObject.BinIndexes.Values.Select(v => v.RiakIndexName).Contains("state_bin").ShouldBeFalse();
+            riakObject.BinIndexes.Values.Select(v => v.RiakIndexName).Contains("state_bin_bin").ShouldBeTrue();
+
+            riakObject.IntIndexes.Values.Select(v => v.RiakIndexName).Contains("age").ShouldBeFalse();
+            riakObject.IntIndexes.Values.Select(v => v.RiakIndexName).Contains("age_int").ShouldBeTrue();
+            riakObject.IntIndexes.Values.Select(v => v.RiakIndexName).Contains("cats").ShouldBeFalse();
+            riakObject.IntIndexes.Values.Select(v => v.RiakIndexName).Contains("cats_int").ShouldBeFalse();
+            riakObject.IntIndexes.Values.Select(v => v.RiakIndexName).Contains("cats_int_int").ShouldBeTrue();
+        }
+
+        [Test]
+        public void RiakIndexingSupportsMultipleValuesCorrectly()
+        {
+            var riakObject = new RiakObject(Bucket, Key, "value");
+
+            riakObject.BinIndex("jobs").Set("dogsbody");
+            riakObject.BinIndex("jobs").Values.Count.ShouldEqual(1);
+
+            riakObject.BinIndex("jobs").Add("toilet cleaner", "president", "juggler");
+            riakObject.BinIndex("jobs").Values.Count.ShouldEqual(4);
+
+            riakObject.BinIndex("jobs").Remove("dogsbody", "juggler");
+            riakObject.BinIndex("jobs").Values.Count.ShouldEqual(2);
+
+            riakObject.BinIndex("jobs").Set("general", "engineer", "cook");
+            riakObject.BinIndex("jobs").Values.Count.ShouldEqual(3);
+            riakObject.BinIndex("jobs").Values.Contains("general").ShouldBeTrue();
+
+            riakObject.BinIndex("jobs").Clear();
+            riakObject.BinIndex("jobs").Values.Count.ShouldEqual(0);
+
+            riakObject.BinIndex("jobs").Delete();
+            riakObject.BinIndexes.ContainsKey("jobs").ShouldBeFalse();
+
+            riakObject.IntIndex("years").Set(10);
+            riakObject.IntIndex("years").Values.Count.ShouldEqual(1);
+
+            riakObject.IntIndex("years").Add(20, 40, 999);
+            riakObject.IntIndex("years").Values.Count.ShouldEqual(4);
+
+            riakObject.IntIndex("years").Remove(40, 999);
+            riakObject.IntIndex("years").Values.Count.ShouldEqual(2);
+
+            riakObject.IntIndex("years").Set(51, 52, 53);
+            riakObject.IntIndex("years").Values.Count.ShouldEqual(3);
+            riakObject.IntIndex("years").Values.Contains(52).ShouldBeTrue();
+
+            riakObject.IntIndex("years").Clear();
+            riakObject.IntIndex("years").Values.Count.ShouldEqual(0);
+
+            riakObject.IntIndex("years").Delete();
+            riakObject.IntIndexes.ContainsKey("years").ShouldBeFalse();
         }
     }
 }

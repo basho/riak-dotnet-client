@@ -94,6 +94,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>riak_search.proto</DependentUpon>
     </Compile>
+    <Compile Include="Models\Index\BinIndex.cs" />
     <Compile Include="Models\CommitHook\IRiakPostCommitHook.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -109,6 +110,7 @@
     <Compile Include="Models\CommitHook\RiakJavascriptCommitHook.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Models\Index\IntIndex.cs" />
     <Compile Include="Models\MapReduce\Fluent\RiakFluentKeyFilter.cs" />
     <Compile Include="Models\MapReduce\Fluent\RiakFluentLinkPhase.cs" />
     <Compile Include="Models\MapReduce\Fluent\RiakFluentActionPhaseErlang.cs" />
@@ -210,6 +212,7 @@
     <Compile Include="Models\Search\Term.cs" />
     <Compile Include="Models\Search\Token.cs" />
     <Compile Include="Models\Search\UnaryTerm.cs" />
+    <Compile Include="Models\Index\SecondaryIndex.cs" />
     <Compile Include="RiakAsyncClient.cs" />
     <Compile Include="RiakClient.cs" />
     <Compile Include="Comms\RiakConnection.cs" />

@@ -16,6 +16,7 @@
 
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
+using CorrugatedIron.Models.Index;
 using CorrugatedIron.Util;
 using Newtonsoft.Json;
 using ProtoBuf;
@@ -40,6 +41,8 @@ namespace CorrugatedIron.Models
     {
         private List<string> _vtags;
         private readonly int _hashCode;
+        private readonly Dictionary<string, IntIndex> _intIndexes;
+        private readonly Dictionary<string, BinIndex> _binIndexes;
 
         public string Bucket { get; private set; }
         public string Key { get; private set; }
@@ -54,46 +57,15 @@ namespace CorrugatedIron.Models
         public uint LastModifiedUsec { get; internal set; }
         public IList<RiakLink> Links { get; private set; }
         public IList<RiakObject> Siblings { get; set; }
-        public IDictionary<string, string> BinIndexes { get; set; }
-        public IDictionary<string, int> IntIndexes { get; set; }
 
-        public IDictionary<string, string> Indexes
+        public IDictionary<string, IntIndex> IntIndexes
         {
-            get
-            {
-                var indexes = BinIndexes.Keys.ToDictionary(key => key, key => BinIndexes[key]);
+            get { return _intIndexes; }
+        }
 
-                foreach(var key in IntIndexes.Keys)
-                {
-                    indexes.Add(key, IntIndexes[key].ToString());
-                }
-
-                return indexes;
-            }
-
-            private set
-            {
-                if(BinIndexes == null)
-                {
-                    BinIndexes = new Dictionary<string, string>();
-                }
-                if(IntIndexes == null)
-                {
-                    IntIndexes = new Dictionary<string, int>();
-                }
-
-                foreach(var item in value)
-                {
-                    if(item.Key.IndexOf(RiakConstants.IndexSuffix.Integer) > -1)
-                    {
-                        IntIndexes.Add(item.Key, Convert.ToInt32(item.Value));
-                    }
-                    else
-                    {
-                        BinIndexes.Add(item.Key, item.Value);
-                    }
-                }
-            }
+        public IDictionary<string, BinIndex> BinIndexes
+        {
+            get { return _binIndexes; }
         }
 
         public bool HasChanged
@@ -139,32 +111,35 @@ namespace CorrugatedIron.Models
             ContentType = contentType;
             CharSet = charSet;
             UserMetaData = new Dictionary<string, string>();
-            Indexes = new Dictionary<string, string>();
             Links = new List<RiakLink>();
             Siblings = new List<RiakObject>();
 
-            BinIndexes = new Dictionary<string, string>();
-            IntIndexes = new Dictionary<string, int>();
+            _intIndexes = new Dictionary<string, IntIndex>();
+            _binIndexes = new Dictionary<string, BinIndex>();
         }
 
-        public void AddIndex(string index, string key)
+        public IntIndex IntIndex(string name)
         {
-            BinIndexes.Add(index.ToBinaryKey(), key);
+            IntIndex index = null;
+
+            if (!_intIndexes.TryGetValue(name, out index))
+            {
+                _intIndexes[name] = index = new IntIndex(this, name);
+            }
+
+            return index;
         }
 
-        public void AddIndex(string index, int key)
+        public BinIndex BinIndex(string name)
         {
-            IntIndexes.Add(index.ToIntegerKey(), key);
-        }
+            BinIndex index = null;
 
-        public void RemoveBinIndex(string index)
-        {
-            IntIndexes.Remove(index.ToBinaryKey());
-        }
+            if (!_binIndexes.TryGetValue(name, out index))
+            {
+                _binIndexes[name] = index = new BinIndex(this, name);
+            }
 
-        public void RemoveIntIndex(string index)
-        {
-            IntIndexes.Remove(index.ToIntegerKey());
+            return index;
         }
 
         public void LinkTo(string bucket, string key, string tag)
@@ -238,11 +213,29 @@ namespace CorrugatedIron.Models
             ContentEncoding = content.content_encoding.FromRiakString();
             ContentType = content.content_type.FromRiakString();
             UserMetaData = content.usermeta.ToDictionary(p => p.key.FromRiakString(), p => p.value.FromRiakString());
-            Indexes = content.indexes.ToDictionary(p => p.key.FromRiakString(), p => p.value.FromRiakString());
             Links = content.links.Select(l => new RiakLink(l)).ToList();
             Siblings = new List<RiakObject>();
             LastModified = content.last_mod;
             LastModifiedUsec = content.last_mod_usecs;
+
+            _intIndexes = new Dictionary<string, IntIndex>();
+            _binIndexes = new Dictionary<string, BinIndex>();
+
+            foreach (var index in content.indexes)
+            {
+                var name = index.key.FromRiakString();
+
+                if (name.EndsWith(RiakConstants.IndexSuffix.Integer))
+                {
+                   IntIndex(name.Remove(name.Length - RiakConstants.IndexSuffix.Integer.Length))
+                    .Add(index.value.FromRiakString());
+                }
+                else
+                {
+                   BinIndex(name.Remove(name.Length - RiakConstants.IndexSuffix.Binary.Length))
+                    .Add(index.value.FromRiakString());
+                }
+            }
 
             _hashCode = CalculateHashCode();
         }
@@ -273,8 +266,12 @@ namespace CorrugatedIron.Models
             };
 
             message.content.usermeta.AddRange(UserMetaData.Select(kv => new RpbPair { key = kv.Key.ToRiakString(), value = kv.Value.ToRiakString() }));
-            message.content.indexes.AddRange(Indexes.Select(kv => new RpbPair { key = kv.Key.ToRiakString(), value = kv.Value.ToRiakString() }));
             message.content.links.AddRange(Links.Select(l => l.ToMessage()));
+
+            message.content.indexes.AddRange(IntIndexes.Values.SelectMany(i =>
+                i.Values.Select(v => new RpbPair { key = i.RiakIndexName.ToRiakString(), value = v.ToString().ToRiakString() })));
+            message.content.indexes.AddRange(BinIndexes.Values.SelectMany(i =>
+                i.Values.Select(v => new RpbPair { key = i.RiakIndexName.ToRiakString(), value = v.ToRiakString() })));
             
             return message;
         }
@@ -319,14 +316,16 @@ namespace CorrugatedIron.Models
                 && Equals(other.CharSet, CharSet)
                 && Equals(other.VectorClock, VectorClock)
                 && Equals(other.UserMetaData, UserMetaData)
-                && Equals(other.Indexes, Indexes)
+                && Equals(other.BinIndexes, BinIndexes)
+                && Equals(other.IntIndexes, IntIndexes)
                 && other.LastModified == LastModified
                 && other.LastModifiedUsec == LastModifiedUsec
                 && Equals(other.Links, Links)
                 && Equals(other._vtags, _vtags)
                 && other.Links.SequenceEqual(Links)
                 && other.UserMetaData.SequenceEqual(UserMetaData)
-                && other.Indexes.SequenceEqual(Indexes);
+                && other.BinIndexes.SequenceEqual(BinIndexes)
+                && other.IntIndexes.SequenceEqual(IntIndexes);
         }
 
         public override int GetHashCode()
