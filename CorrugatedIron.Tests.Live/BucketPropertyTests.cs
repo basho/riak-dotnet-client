@@ -52,6 +52,31 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
         }
 
         [Test]
+        public void SettingPropertiesOnNewBucketWorksCorrectly()
+        {
+            var bucketName = Guid.NewGuid().ToString();
+            var props = new RiakBucketProperties()
+                .SetNVal(4)
+                .SetSearch(true)
+                .SetWVal("all")
+                .SetRVal("quorum");
+
+            var setResult = Client.SetBucketProperties(bucketName, props);
+            setResult.IsSuccess.ShouldBeTrue(setResult.ErrorMessage);
+
+            var getResult = Client.GetBucketProperties(bucketName, true);
+            getResult.IsSuccess.ShouldBeTrue(getResult.ErrorMessage);
+
+            props = getResult.Value;
+            props.NVal.HasValue.ShouldBeTrue();
+            props.NVal.Value.ShouldEqual(4U);
+            props.Search.HasValue.ShouldBeTrue();
+            props.Search.Value.ShouldBeTrue();
+            props.WVal.Right.ShouldEqual("all");
+            props.RVal.Right.ShouldEqual("quorum");
+        }
+
+        [Test]
         public void GettingWithoutExtendedFlagDoesNotReturnExtraProperties()
         {
             var result = Client.GetBucketProperties(PropertiesTestBucket);
