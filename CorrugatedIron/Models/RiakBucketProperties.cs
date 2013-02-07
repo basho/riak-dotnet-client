@@ -300,6 +300,8 @@ namespace CorrugatedIron.Models
 
         private static void ReadQuorum(JObject props, string key, Action<Either<uint, string>> setter)
         {
+            if (props[key] == null) return;
+
             if(props[key].Type == JTokenType.String)
             {
                 setter(new Either<uint, string>(props.Value<string>(key)));
