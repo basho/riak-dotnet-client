@@ -17,6 +17,7 @@
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.CommitHook;
+using CorrugatedIron.Models.Search;
 using CorrugatedIron.Tests.Extensions;
 using CorrugatedIron.Tests.Live.LiveRiakConnectionTests;
 using CorrugatedIron.Util;
@@ -105,6 +106,38 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
         }
 
         [Test]
+        public void SettingSearchOnRiakBucketMakesBucketSearchable()
+        {
+            var bucket = Guid.NewGuid().ToString();
+            var key = Guid.NewGuid().ToString();
+            var props = Client.GetBucketProperties(bucket, true).Value;
+            props.SetSearch(true);
+
+            var setResult = Client.SetBucketProperties(bucket, props);
+            setResult.IsSuccess.ShouldBeTrue(setResult.ErrorMessage);
+
+            var obj = new RiakObject(bucket, key, new { name = "OJ", age = 34 });
+            var putResult = Client.Put(obj);
+            putResult.IsSuccess.ShouldBeTrue(putResult.ErrorMessage);
+
+            var q = new RiakFluentSearch(bucket, "name")
+                .Search("OJ")
+                .And("age", "34")
+                .Build();
+
+            var search = new RiakSearchRequest
+            {
+                Query = q
+            };
+
+            var searchResult = Client.Search(search);
+            searchResult.IsSuccess.ShouldBeTrue(searchResult.ErrorMessage);
+            searchResult.Value.NumFound.ShouldEqual(1u);
+            searchResult.Value.Documents[0].Fields.Count.ShouldEqual(3);
+            searchResult.Value.Documents[0].Fields.First(x => x.Key == "id").Value.ShouldEqual(key);
+        }
+
+        [Test]
         public void SettingPropertiesOnNewBucketWorksCorrectly()
         {
             var bucketName = Guid.NewGuid().ToString();
@@ -123,8 +156,7 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
             props = getResult.Value;
             props.NVal.HasValue.ShouldBeTrue();
             props.NVal.Value.ShouldEqual(4U);
-            props.Search.HasValue.ShouldBeTrue();
-            props.Search.Value.ShouldBeTrue();
+            props.SearchEnabled.ShouldBeTrue();
             props.WVal.Right.ShouldEqual("all");
             props.RVal.Right.ShouldEqual("quorum");
         }
