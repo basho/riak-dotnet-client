@@ -19,7 +19,7 @@ Documentation for the project can be found on the [project website](http://corru
 Release Notes
 -------------
 
-Please see the [CorrugatedIron blog](http://CorrugatedIron.org/blog/) for release notes.
+Please see the [Release Notes](RELEASE_NOTES.md) document.
 
 License
 -------
