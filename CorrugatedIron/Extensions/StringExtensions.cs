@@ -15,6 +15,7 @@
 // under the License.
 
 using CorrugatedIron.Util;
+using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
@@ -29,6 +30,8 @@ namespace CorrugatedIron.Extensions
         private const string SearchTermPattern = @"[\+\-!\(\)\{\}\[\]^\""~\*\?\:\\]{1}";
         private const string SearchTermReplacement = @"\$&";
         private static readonly Regex SearchTermRegex = new Regex(SearchTermPattern, RegexOptions.Compiled);
+
+        private static List<string> magicStrings = new List<string> { "$key" };
 
         public static byte[] ToRiakString(this string value)
         {
@@ -57,7 +60,7 @@ namespace CorrugatedIron.Extensions
 
         public static bool IsBinaryKey(this string value)
         {
-            return value == "$key" || value.EndsWith(RiakConstants.IndexSuffix.Binary);
+            return magicStrings.Contains(value) || value.EndsWith(RiakConstants.IndexSuffix.Binary);
         }
 
         public static string ToIntegerKey(this string value)

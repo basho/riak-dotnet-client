@@ -18,6 +18,8 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
 {
     public static class RiakIndex
     {
+        private static string RiakKeysIndex = "$key";
+
         public static RiakIndexInput Match(string bucket, string index, string key)
         {
             return new RiakBinIndexEqualityInput(bucket, index, key);
@@ -36,6 +38,18 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
         public static RiakIndexInput Range(string bucket, string index, int start, int end)
         {
             return new RiakIntIndexRangeInput(bucket, index, start, end);
+        }
+
+        public static RiakIndexInput AllKeys(string bucket)
+        {
+            string first = char.ConvertFromUtf32(0x000000);
+            string last = char.ConvertFromUtf32(0x10FFFF);
+            return Keys(bucket, first, last);
+        }
+
+        public static RiakIndexInput Keys(string bucket, string start, string end) 
+        {
+            return new RiakBinIndexRangeInput(bucket, RiakKeysIndex, start, end);
         }
     }
 }
