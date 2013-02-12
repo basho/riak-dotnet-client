@@ -57,7 +57,7 @@ namespace CorrugatedIron.Extensions
 
         public static bool IsBinaryKey(this string value)
         {
-            return value.EndsWith(RiakConstants.IndexSuffix.Binary);
+            return value == "$key" || value.EndsWith(RiakConstants.IndexSuffix.Binary);
         }
 
         public static string ToIntegerKey(this string value)
