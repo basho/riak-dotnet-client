@@ -31,8 +31,6 @@ namespace CorrugatedIron.Extensions
         private const string SearchTermReplacement = @"\$&";
         private static readonly Regex SearchTermRegex = new Regex(SearchTermPattern, RegexOptions.Compiled);
 
-        private static List<string> magicStrings = new List<string> { "$key" };
-
         public static byte[] ToRiakString(this string value)
         {
             return value == null ? null : RiakEncoding.GetBytes(value);
@@ -53,24 +51,42 @@ namespace CorrugatedIron.Extensions
             return HttpUtility.UrlEncode(value);
         }
 
-        public static bool IsIntegerKey(this string value)
+        public static bool IsUserIntegerKey(this string value)
         {
-            return value.EndsWith(RiakConstants.IndexSuffix.Integer);
+            return RiakConstants.SystemIndexKeys.SystemIntKeys.Contains(value) 
+                || value.EndsWith(RiakConstants.IndexSuffix.Integer);
         }
 
-        public static bool IsBinaryKey(this string value)
+        public static bool IsUserBinaryKey(this string value)
         {
-            return magicStrings.Contains(value) || value.EndsWith(RiakConstants.IndexSuffix.Binary);
+            return RiakConstants.SystemIndexKeys.SystemBinKeys.Contains(value) 
+                || value.EndsWith(RiakConstants.IndexSuffix.Binary);
+        }
+
+        public static bool IsSystemIntegerKey(this string value)
+        {
+            return RiakConstants.SystemIndexKeys.SystemIntKeys.Contains(value);
+        }
+
+        public static bool IsSystemBinaryKey(this string value)
+        {
+            return RiakConstants.SystemIndexKeys.SystemBinKeys.Contains(value);
+        }
+
+        public static bool IsSystemKey(this string value)
+        {
+            return RiakConstants.SystemIndexKeys.SystemBinKeys.Contains(value)
+                || RiakConstants.SystemIndexKeys.SystemIntKeys.Contains(value);
         }
 
         public static string ToIntegerKey(this string value)
         {
-            return value.IsIntegerKey() ? value : value + RiakConstants.IndexSuffix.Integer;
+            return value.IsUserIntegerKey() ? value : value + RiakConstants.IndexSuffix.Integer;
         }
 
         public static string ToBinaryKey(this string value)
         {
-            return value.IsBinaryKey() ? value : value + RiakConstants.IndexSuffix.Binary;
+            return value.IsUserBinaryKey() ? value : value + RiakConstants.IndexSuffix.Binary;
         }
         
         public static string ToRiakSearchTerm(this string value) 

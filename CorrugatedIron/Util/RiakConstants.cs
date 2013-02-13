@@ -14,6 +14,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Collections.Generic;
+
 namespace CorrugatedIron.Util
 {
     public static class RiakConstants
@@ -91,6 +93,13 @@ namespace CorrugatedIron.Util
             public const string ToUpper = @"to_upper";
             public const string ToLower = @"to_lower";
             public const string Tokenize = @"tokenize";
+        }
+
+        public static class SystemIndexKeys {
+            public const string RiakKeysIndex = "$key";
+
+            public readonly static HashSet<string> SystemBinKeys = new HashSet<string> { "$keys" };
+            public readonly static HashSet<string> SystemIntKeys = new HashSet<string>();
         }
 
         public static class Rest
