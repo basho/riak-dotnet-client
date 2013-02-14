@@ -55,8 +55,8 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
         /// </remarks>
         public static RiakIndexInput AllKeys(string bucket)
         {
-            string first = char.ConvertFromUtf32(0x000000);
-            string last = char.ConvertFromUtf32(0x10FFFD);
+            string first = char.ConvertFromUtf32(0x0000);
+            string last = char.ConvertFromUtf32(0xFFFD);
             return Keys(bucket, first, last);
         }
 

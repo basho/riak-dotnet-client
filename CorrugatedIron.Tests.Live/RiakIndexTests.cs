@@ -20,6 +20,7 @@ using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Models.MapReduce.Inputs;
 using CorrugatedIron.Tests.Extensions;
 using NUnit.Framework;
+using System;
 using System.Linq;
 
 namespace CorrugatedIron.Tests.Live
@@ -114,19 +115,19 @@ namespace CorrugatedIron.Tests.Live
         {
             for (var i = 0; i < 10; i++)
             {
-                var o = new RiakObject(Bucket, i.ToString(), "{\"value\":\"this is an object\"}");
+                var o = new RiakObject(Bucket, Guid.NewGuid().ToString(), "{\"value\":\"this is an object\"}");
                 o.IntIndex("age").Set(32, 20);
                 
                 Client.Put(o);
             }
             
             var mr = new RiakMapReduceQuery()
-                .Inputs(RiakIndex.Match(Bucket, "age", 20));
+                .Inputs(RiakIndex.Match(Bucket, "age", 32));
             
             var result = Client.MapReduce(mr);
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
 
-            var keys = result.Value.PhaseResults.SelectMany(x => x.GetObjects<RiakObjectId>()).ToList();
+            var keys = result.Value.PhaseResults.SelectMany(x => x.GetObjectIds()).ToList();
             
             keys.Count().ShouldEqual(10);
             
@@ -142,19 +143,18 @@ namespace CorrugatedIron.Tests.Live
         {
             for (var i = 0; i < 10; i++)
             {
-                var o = new RiakObject(Bucket, i.ToString(), "{ value: \"this is an object\" }");
+                var o = new RiakObject(Bucket, Guid.NewGuid().ToString(), "{ value: \"this is an object\" }");
                 o.IntIndex("age").Set(25 + i);
                 
                 Client.Put(o);
             }
-            
+
             var mr = new RiakMapReduceQuery()
-                .Inputs(RiakIndex.Range(Bucket, "age", 27, 30))
-                .ReduceErlang(r => r.ModFun("riak_kv_mapreduce", "reduce_identity").Keep(true));
+                .Inputs(RiakIndex.Range(Bucket, "age", 27, 30));
             
             var result = Client.MapReduce(mr);
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
-            result.Value.PhaseResults.SelectMany(x => x.Values).Count().ShouldBeGreaterThan(0);
+            result.Value.PhaseResults.SelectMany(x => x.GetObjectIds()).Count().ShouldEqual(4);
             
             // TODO write tests verifying results
         }
@@ -162,15 +162,16 @@ namespace CorrugatedIron.Tests.Live
         [Test]
         public void KeysReturnsListOfKeys()
         {
+            var bucket = Bucket + "_" + Guid.NewGuid().ToString();
             for (var i = 0; i < 10; i++)
             {
-                var o = new RiakObject(Bucket, i.ToString(), "{ value: \"this is an object\" }");
+                var o = new RiakObject(bucket, Guid.NewGuid().ToString(), "{ value: \"this is an object\" }");
 
                 Client.Put(o);
             }
 
             var mr = new RiakMapReduceQuery()
-                .Inputs(RiakIndex.Keys(Bucket, "0", "zz"));
+                .Inputs(RiakIndex.Keys(bucket, "0", "zz"));
 
             var result = Client.MapReduce(mr);
             var keys = result.Value.PhaseResults.SelectMany(x => x.GetObjectIds()).ToList();
