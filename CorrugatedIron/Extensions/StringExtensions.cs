@@ -15,7 +15,6 @@
 // under the License.
 
 using CorrugatedIron.Util;
-using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
@@ -86,7 +85,7 @@ namespace CorrugatedIron.Extensions
 
         public static string ToBinaryKey(this string value)
         {
-            return value.IsSystemBinaryKey() ? value + RiakConstants.IndexSuffix.Binary : value;
+            return value.IsSystemBinaryKey() ? value : value + RiakConstants.IndexSuffix.Binary;
         }
         
         public static string ToRiakSearchTerm(this string value) 

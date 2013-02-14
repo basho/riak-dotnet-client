@@ -23,6 +23,7 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System;
 
 namespace CorrugatedIron.Tests.Live
 {
@@ -192,6 +193,33 @@ namespace CorrugatedIron.Tests.Live
                 riakResult.IsSuccess.ShouldBeTrue(riakResult.ErrorMessage);
                 riakResult.Value.ShouldNotBeNull();
             }
+        }
+
+        [Test]
+        public void ListKeysFromIndexReturnsAllKeys()
+        {
+            var bucket = TestBucket + "_" + Guid.NewGuid().ToString();
+            var originalKeyList = new List<string>();
+
+            for (var i = 0; i < 10; i++)
+            {
+                var o = new RiakObject(bucket, i.ToString(), "{ value: \"this is an object\" }");
+                originalKeyList.Add(i.ToString());
+
+                Client.Put(o);
+            }
+
+            var result = ((RiakClient)Client).ListKeysFromIndex(bucket);
+            var keys = result.Value;
+
+            keys.Count.ShouldEqual(10);
+
+            foreach (var key in keys)
+            {
+                originalKeyList.ShouldContain(key);
+            }
+
+            Client.DeleteBucket(bucket);
         }
     }
 }
