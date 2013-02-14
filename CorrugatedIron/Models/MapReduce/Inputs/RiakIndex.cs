@@ -50,14 +50,12 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
         /// the LevelDB backend and restart their cluster.</para>
         /// <para>This makes the assumption that all keys fall between the Unicode
         /// characters \u000000 and \u10FFFF (16-bit Unicode). This would typically
-        /// be used in a stand alone Map phase to return all keys as a List<RiakObjectId>.
+        /// be used in a stand alone Map phase to return all keys as a List&lt;RiakObjectId&gt;.
         /// See https://gist.github.com/peschkaj/4772825 for a working example.
         /// </remarks>
         public static RiakIndexInput AllKeys(string bucket)
         {
-            string first = char.ConvertFromUtf32(0x0000);
-            string last = char.ConvertFromUtf32(0xFFFD);
-            return Keys(bucket, first, last);
+            return Match(bucket, RiakConstants.SystemIndexKeys.RiakBucketIndex, bucket);
         }
 
         /// <summary>

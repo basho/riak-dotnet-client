@@ -41,12 +41,24 @@ namespace CorrugatedIron.Models.MapReduce
             Success = false;
         }
 
+        /// <summary>
+        /// Deserialize a List of <typeparam name="T">T</typeparam> from the phase results
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns>IList<typeparam name="T">T</typeparam></returns>
         public IList<T> GetObjects<T>()
         {
             var rVal = Values.Select(v => JsonConvert.DeserializeObject<T>(v.FromRiakString())).ToList();
             return rVal;
         }
 
+        /// <summary>
+        /// Deserialize a List of <see cref="CorrugatedIron.Models.RiakObjectId"/> from $key query
+        /// </summary>
+        /// <returns>IList of <see cref="CorrugatedIron.Models.RiakObjectId"/></returns>
+        /// <remarks>This is designed specifically to deal with the data structure that is returned from
+        /// Riak when querying the $key index. This should be used when querying $key directly or through
+        /// one of the convenience methods.</remarks>
         public IList<RiakObjectId> GetObjectIds()
         {
             var rVal = Values.SelectMany(v => JsonConvert.DeserializeObject<string[][]>(v.FromRiakString()).Select(

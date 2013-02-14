@@ -97,8 +97,9 @@ namespace CorrugatedIron.Util
 
         public static class SystemIndexKeys {
             public const string RiakKeysIndex = "$key";
+            public const string RiakBucketIndex = "$bucket";
 
-            public readonly static HashSet<string> SystemBinKeys = new HashSet<string> { "$keys" };
+            public readonly static HashSet<string> SystemBinKeys = new HashSet<string> { RiakKeysIndex, RiakBucketIndex };
             public readonly static HashSet<string> SystemIntKeys = new HashSet<string>();
         }
 
