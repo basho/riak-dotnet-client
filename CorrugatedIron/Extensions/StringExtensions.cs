@@ -90,5 +90,10 @@ namespace CorrugatedIron.Extensions
             
             return result;
         }
+
+        internal static uint ToRpbOption(this string value)
+        {
+            return RiakConstants.QuorumOptionsLookup[value];
+        }
     }
 }
