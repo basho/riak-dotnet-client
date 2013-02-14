@@ -158,6 +158,32 @@ namespace CorrugatedIron.Tests.Live
             
             // TODO write tests verifying results
         }
+
+        [Test]
+        public void KeysReturnsListOfKeys()
+        {
+            for (var i = 0; i < 10; i++)
+            {
+                var o = new RiakObject(Bucket, i.ToString(), "{ value: \"this is an object\" }");
+
+                Client.Put(o);
+            }
+
+            var mr = new RiakMapReduceQuery()
+                .Inputs(RiakIndex.Keys(Bucket, "0", "zz"));
+
+            var result = Client.MapReduce(mr);
+            var keys = result.Value.PhaseResults.SelectMany(x => x.GetObjectIds()).ToList();
+
+            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
+            keys.Count.ShouldEqual(10);
+
+            foreach (var key in keys)
+            {
+                key.Bucket.ShouldNotBeNullOrEmpty();
+                key.Key.ShouldNotBeNullOrEmpty();
+            }
+        }
     }
 }
 
