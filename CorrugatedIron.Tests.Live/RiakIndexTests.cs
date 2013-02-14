@@ -14,6 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Threading;
 using CorrugatedIron.Comms;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
@@ -121,7 +122,7 @@ namespace CorrugatedIron.Tests.Live
             }
             
             var mr = new RiakMapReduceQuery()
-                .Inputs(RiakIndex.Match(Bucket, "age", 20));
+                .Inputs(RiakIndex.Match(Bucket, "age", 32));
             
             var result = Client.MapReduce(mr);
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
@@ -157,6 +158,32 @@ namespace CorrugatedIron.Tests.Live
             result.Value.PhaseResults.SelectMany(x => x.Values).Count().ShouldBeGreaterThan(0);
             
             // TODO write tests verifying results
+        }
+
+        [Test]
+        public void KeysReturnsListOfKeys()
+        {
+            for (var i = 0; i < 10; i++)
+            {
+                var o = new RiakObject(Bucket, i.ToString(), "{ value: \"this is an object\" }");
+
+                Client.Put(o);
+            }           
+
+            var mr = new RiakMapReduceQuery()
+                .Inputs(RiakIndex.Keys(Bucket, "0", "zz"));
+
+            var result = Client.MapReduce(mr);
+            var keys = result.Value.PhaseResults.SelectMany(x => x.GetObjectIds()).ToList();
+
+            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
+            keys.Count.ShouldEqual(10);
+
+            foreach (var key in keys)
+            {
+                key.Bucket.ShouldNotBeNullOrEmpty();
+                key.Key.ShouldNotBeNullOrEmpty();
+            }
         }
     }
 }

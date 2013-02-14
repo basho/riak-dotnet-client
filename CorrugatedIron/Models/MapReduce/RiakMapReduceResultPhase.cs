@@ -14,6 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
 using Newtonsoft.Json;
@@ -39,6 +40,19 @@ namespace CorrugatedIron.Models.MapReduce
         {
             Success = false;
         }
+
+        public IList<RiakObjectId> GetObjectIds()
+        {
+            var l = new List<RiakObjectId>();
+
+            foreach (var v in Values)
+            {
+                var ss = JsonConvert.DeserializeObject<string[][]>(v.FromRiakString());
+                l.AddRange(ss.Select(g => new RiakObjectId(g[0], g[1])));
+            }
+
+            return l;
+        } 
 
         public IList<T> GetObjects<T>()
         {
