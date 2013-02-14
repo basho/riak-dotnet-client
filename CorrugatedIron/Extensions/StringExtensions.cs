@@ -81,12 +81,12 @@ namespace CorrugatedIron.Extensions
 
         public static string ToIntegerKey(this string value)
         {
-            return value.IsUserIntegerKey() ? value : value + RiakConstants.IndexSuffix.Integer;
+            return value.IsSystemIntegerKey() ? value : value + RiakConstants.IndexSuffix.Integer;
         }
 
         public static string ToBinaryKey(this string value)
         {
-            return value.IsUserBinaryKey() ? value : value + RiakConstants.IndexSuffix.Binary;
+            return value.IsSystemBinaryKey() ? value + RiakConstants.IndexSuffix.Binary : value;
         }
         
         public static string ToRiakSearchTerm(this string value) 
