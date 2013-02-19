@@ -483,7 +483,6 @@ namespace CorrugatedIron
 
             if(response.IsSuccess)
             {
-                //var mrResponse = CondenseResponse(response.Value);
                 return RiakResult<RiakMapReduceResult>.Success(new RiakMapReduceResult(response.Value));
             }
 
@@ -501,59 +500,6 @@ namespace CorrugatedIron
             }
 
             return RiakResult<RiakSearchResult>.Error(response.ResultCode, response.ErrorMessage, response.NodeOffline);
-        }
-
-        private IEnumerable<RiakResult<RpbMapRedResp>> CondenseResponse(IEnumerable<RiakResult<RpbMapRedResp>> originalResponse)
-        {
-            var resultList = new List<RiakResult<RpbMapRedResp>>(originalResponse);
-
-            if(resultList.Count() == 1)
-            {
-                return resultList;
-            }
-
-            var newResponse = new List<RiakResult<RpbMapRedResp>>();
-            RiakResult<RpbMapRedResp> previous = null;
-
-            foreach(var current in resultList)
-            {
-                if(previous == null)
-                {
-                    newResponse.Add(RiakResult<RpbMapRedResp>.Success(current.Value));
-                    previous = current;
-                }
-                else if(previous.Value.phase == current.Value.phase)
-                {
-                    var mrResp = new RpbMapRedResp { done = current.Value.done };
-
-
-                    if(current.Value.response != null)
-                    {
-                        var newLength = previous.Value.response.Length + current.Value.response.Length;
-
-                        var newValue = new List<byte>(newLength);
-                        newValue.AddRange(previous.Value.response);
-                        newValue.AddRange(current.Value.response);
-
-                        var index = newResponse.IndexOf(previous);
-
-                        mrResp.phase = current.Value.phase;
-                        mrResp.response = newValue.ToArray();
-
-                        newResponse.Remove(previous);
-                        newResponse.Insert(index, RiakResult<RpbMapRedResp>.Success(mrResp));
-
-                        previous = newResponse.ElementAt(index);
-                    }
-                }
-                else
-                {
-                    newResponse.Add(RiakResult<RpbMapRedResp>.Success(current.Value));
-                    previous = current;
-                }
-            }
-
-            return newResponse;
         }
 
         public RiakResult<RiakStreamedMapReduceResult> StreamMapReduce(RiakMapReduceQuery query)
