@@ -15,6 +15,7 @@
 // under the License.
 
 using CorrugatedIron.Util;
+using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
@@ -23,7 +24,7 @@ namespace CorrugatedIron.Extensions
 {
     public static class StringExtensions
     {
-        private static readonly System.Text.Encoding RiakEncoding = new UTF8Encoding(false);
+        private static readonly Encoding RiakEncoding = new UTF8Encoding(false);
 
         // + - && || ! ( ) { } [ ] ^ " ~ * ? : \
         private const string SearchTermPattern = @"[\+\-!\(\)\{\}\[\]^\""~\*\?\:\\]{1}";
@@ -107,6 +108,13 @@ namespace CorrugatedIron.Extensions
             }
             
             return result;
+        }
+
+        internal static uint ToRpbOption(this string value)
+        {
+            System.Diagnostics.Debug.Assert(new HashSet<string> { "all", "quorum", "one", "default" }.Contains(value), "Incorrect quorum value");
+
+            return RiakConstants.QuorumOptionsLookup[value];
         }
     }
 }

@@ -5,6 +5,7 @@ Release Notes
 
 ### Fixes
 
+* [Issue 67](https://github.com/DistributedNonsense/CorrugatedIron/issues/67) - Finally added support for the Either<TLeft, TRight> on all options.
 * [Issue 80](https://github.com/DistributedNonsense/CorrugatedIron/issues/80) - `$key` is auto-mucked to `$key_bin` 
 * [Issue 78](https://github.com/DistributedNonsense/CorrugatedIron/issues/78) - Enabling search via `SetBucketProperties()` now correctly enabled the search pre-commit hook.
 * [Issue 72](https://github.com/DistributedNonsense/CorrugatedIron/issues/72) - XML documentation is now included in the Nuget package for better support from Intellisense.
