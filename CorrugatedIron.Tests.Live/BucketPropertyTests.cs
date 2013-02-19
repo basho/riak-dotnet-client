@@ -17,6 +17,7 @@
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.CommitHook;
+using CorrugatedIron.Models.Search;
 using CorrugatedIron.Tests.Extensions;
 using CorrugatedIron.Tests.Live.LiveRiakConnectionTests;
 using CorrugatedIron.Util;
@@ -49,6 +50,115 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
             var results = Client.ListKeys(bucket);
             results.IsSuccess.ShouldBeTrue(results.ErrorMessage);
             results.Value.Count().ShouldEqual(10);
+        }
+
+        [Test]
+        public void SettingExtendedPropertiesToBucketWithSlashesInNameShouldReturnError()
+        {
+            const string bucketName = "not/valid/here";
+            var props = new RiakBucketProperties()
+                .SetNVal(4)
+                .SetSearch(true)
+                .SetWVal("all")
+                .SetRVal("quorum");
+
+            var setResult = Client.SetBucketProperties(bucketName, props);
+            setResult.IsSuccess.ShouldBeFalse();
+        }
+
+        [Test]
+        public void GettingExtendedPropertiesOnABucketWithoutExtendedPropertiesSetDoesntThrowAnException()
+        {
+            var bucketName = Guid.NewGuid().ToString();
+
+            var getResult = Client.GetBucketProperties(bucketName, true);
+            getResult.IsSuccess.ShouldBeTrue(getResult.ErrorMessage);
+        }
+
+        [Test]
+        public void GettingPropsOnInvalidBucketStraightAfterSettingDoesntThrowAnException()
+        {
+            // this bucket name must have ONE slash in it. If it has more or less then
+            // errors will come out as expected. If there's one, then Riak thinks we're putting
+            // a value in the cluster and so the operation works.
+            const string bucketName = "slartibartfast/dentartherdent";
+            var props = new RiakBucketProperties()
+                .SetNVal(4)
+                .SetSearch(true)
+                .SetWVal("all")
+                .SetRVal("quorum");
+
+            var setResult = Client.SetBucketProperties(bucketName, props);
+            setResult.IsSuccess.ShouldBeFalse();
+
+            // this shouldn't throw any exceptions
+            var getResult = Client.GetBucketProperties(bucketName, true);
+            getResult.IsSuccess.ShouldBeFalse();
+        }
+
+        [Test]
+        public void GettingExtendedPropertiesOnInvalidBucketReturnsError()
+        {
+            const string bucketName = "this/is/not/a/valid/bucket";
+
+            var getResult = Client.GetBucketProperties(bucketName, true);
+            getResult.IsSuccess.ShouldBeFalse();
+        }
+
+        [Test]
+        public void SettingSearchOnRiakBucketMakesBucketSearchable()
+        {
+            var bucket = Guid.NewGuid().ToString();
+            var key = Guid.NewGuid().ToString();
+            var props = Client.GetBucketProperties(bucket, true).Value;
+            props.SetSearch(true);
+
+            var setResult = Client.SetBucketProperties(bucket, props);
+            setResult.IsSuccess.ShouldBeTrue(setResult.ErrorMessage);
+
+            var obj = new RiakObject(bucket, key, new { name = "OJ", age = 34 });
+            var putResult = Client.Put(obj);
+            putResult.IsSuccess.ShouldBeTrue(putResult.ErrorMessage);
+
+            var q = new RiakFluentSearch(bucket, "name")
+                .Search("OJ")
+                .And("age", "34")
+                .Build();
+
+            var search = new RiakSearchRequest
+            {
+                Query = q
+            };
+
+            var searchResult = Client.Search(search);
+            searchResult.IsSuccess.ShouldBeTrue(searchResult.ErrorMessage);
+            searchResult.Value.NumFound.ShouldEqual(1u);
+            searchResult.Value.Documents[0].Fields.Count.ShouldEqual(3);
+            searchResult.Value.Documents[0].Fields.First(x => x.Key == "id").Value.ShouldEqual(key);
+        }
+
+        [Test]
+        public void SettingPropertiesOnNewBucketWorksCorrectly()
+        {
+            var bucketName = Guid.NewGuid().ToString();
+            var props = new RiakBucketProperties()
+                .SetNVal(4)
+                .SetSearch(true)
+                .SetWVal("all")
+                .SetRVal("quorum");
+
+            var setResult = Client.SetBucketProperties(bucketName, props);
+            setResult.IsSuccess.ShouldBeTrue(setResult.ErrorMessage);
+
+            var getResult = Client.GetBucketProperties(bucketName, true);
+            getResult.IsSuccess.ShouldBeTrue(getResult.ErrorMessage);
+
+            props = getResult.Value;
+            props.NVal.HasValue.ShouldBeTrue();
+            props.NVal.Value.ShouldEqual(4U);
+            props.SearchEnabled.ShouldBeTrue();
+            props.WVal.Right.ShouldEqual("all");
+            props.RVal.Right.ShouldEqual("quorum");
         }
 
         [Test]

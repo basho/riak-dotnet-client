@@ -27,6 +27,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Web;
 
 namespace CorrugatedIron
 {
@@ -198,13 +199,13 @@ namespace CorrugatedIron
             requests.ForEach(r => options.Populate(r));
 
             var results = UseConnection(conn =>
-                                        {
+            {
                 var responses = requests.Select(conn.PbcWriteRead<RpbGetReq, RpbGetResp>).ToList();
                 return RiakResult<IEnumerable<RiakResult<RpbGetResp>>>.Success(responses);
             });
             
             return results.Value.Zip(bucketKeyPairs, Tuple.Create).Select(result =>
-                                                                          {
+            {
                 if(!result.Item1.IsSuccess)
                 {
                     return RiakResult<RiakObject>.Error(result.Item1.ResultCode, result.Item1.ErrorMessage, result.Item1.NodeOffline);
@@ -220,7 +221,7 @@ namespace CorrugatedIron
                 if(result.Item1.Value.content.Count > 1)
                 {
                     o.Siblings = result.Item1.Value.content.Select(c =>
-                                                                   new RiakObject(result.Item2.Bucket, result.Item2.Key, c, result.Item1.Value.vclock)).ToList();
+                        new RiakObject(result.Item2.Bucket, result.Item2.Key, c, result.Item1.Value.vclock)).ToList();
                 }
                 
                 return RiakResult<RiakObject>.Success(o);
@@ -643,6 +644,20 @@ namespace CorrugatedIron
         }
 
         /// <summary>
+        /// Return a list of keys from the given bucket.
+        /// </summary>
+        /// <param name="bucket"></param>
+        /// <returns></returns>
+        /// <remarks>This uses the $key special index instead of the list keys API to 
+        /// quickly return an unsorted list of keys from Riak.</remarks>
+        public RiakResult<IList<string>> ListKeysFromIndex(string bucket)
+        {
+            return IndexGet(bucket, 
+                            RiakConstants.SystemIndexKeys.RiakBucketIndex, 
+                            bucket);
+        }
+
+        /// <summary>
         /// Returns all properties for a <paramref name="bucket"/>.
         /// </summary>
         /// <returns>
@@ -658,6 +673,12 @@ namespace CorrugatedIron
         {
             if(extended)
             {
+                // bucket names cannot have slashes in the names, the REST interface doesn't like it at all
+                if (bucket.Contains('/'))
+                {
+                    return RiakResult<RiakBucketProperties>.Error(ResultCode.HttpError, "Bucket names cannot contain slashes", false);
+                }
+
                 var request = new RiakRestRequest(ToBucketUri(bucket), RiakConstants.Rest.HttpMethod.Get)
                     .AddQueryParam(RiakConstants.Rest.QueryParameters.Bucket.GetPropertiesKey,
                         RiakConstants.Rest.QueryParameters.Bucket.GetPropertiesValue);
@@ -712,6 +733,12 @@ namespace CorrugatedIron
             }
             else
             {
+                // bucket names cannot have slashes in the names, the REST interface doesn't like it at all
+                if (bucket.Contains('/'))
+                {
+                    return RiakResult.Error(ResultCode.HttpError, "Bucket names cannot contain slashes", false);
+                }
+
                 var request = new RiakRestRequest(ToBucketUri(bucket), RiakConstants.Rest.HttpMethod.Put)
                 {
                     Body = properties.ToJsonString().ToRiakString(),
@@ -736,6 +763,7 @@ namespace CorrugatedIron
         /// <param name='indexQuery'>
         /// Index query.
         /// </param>
+        [Obsolete("This has been replaced by the IndexGet methods as of v1.1.1. This method will be removed by v1.3")]
         public RiakBucketKeyInput GetIndex(RiakIndexInput indexQuery)
         {
             var query = new RiakMapReduceQuery()
@@ -819,20 +847,20 @@ namespace CorrugatedIron
 
         public RiakResult<IList<string>> IndexGet(string bucket, string indexName, string minValue, string maxValue)
         {
-            return IndexGetRange(bucket, indexName, minValue, maxValue, RiakConstants.IndexSuffix.Binary);
+            return IndexGetRange(bucket, indexName.ToBinaryKey(), minValue, maxValue);
         }
 
         public RiakResult<IList<string>> IndexGet(string bucket, string indexName, int minValue, int maxValue)
         {
-            return IndexGetRange(bucket, indexName, minValue.ToString(), maxValue.ToString(), RiakConstants.IndexSuffix.Integer);
+            return IndexGetRange(bucket, indexName.ToIntegerKey(), minValue.ToString(), maxValue.ToString());
         }
 
-        private RiakResult<IList<string>> IndexGetRange(string bucket, string indexName, string minValue, string maxValue, string indexSuffix)
+        private RiakResult<IList<string>> IndexGetRange(string bucket, string indexName, string minValue, string maxValue)
         {
             var message = new RpbIndexReq
             {
                 bucket = bucket.ToRiakString(),
-                index = (indexName + indexSuffix).ToRiakString(),
+                index = indexName.ToRiakString(),
                 qtype = RpbIndexReq.IndexQueryType.range,
                 range_min = minValue.ToRiakString(),
                 range_max = maxValue.ToRiakString()
@@ -850,20 +878,20 @@ namespace CorrugatedIron
 
         public RiakResult<IList<string>> IndexGet(string bucket, string indexName, string value)
         {
-            return IndexGetEquals(bucket, indexName, value, RiakConstants.IndexSuffix.Binary);
+            return IndexGetEquals(bucket, indexName.ToBinaryKey(), value);
         }
 
         public RiakResult<IList<string>> IndexGet(string bucket, string indexName, int value)
         {
-            return IndexGetEquals(bucket, indexName, value.ToString(), RiakConstants.IndexSuffix.Integer);
+            return IndexGetEquals(bucket, indexName.ToIntegerKey(), value.ToString());
         }
 
-        private RiakResult<IList<string>> IndexGetEquals(string bucket, string indexName, string value, string indexSuffix)
+        private RiakResult<IList<string>> IndexGetEquals(string bucket, string indexName, string value)
         {
             var message = new RpbIndexReq
             {
                 bucket = bucket.ToRiakString(),
-                index = (indexName + indexSuffix).ToRiakString(),
+                index = indexName.ToRiakString(),
                 key = value.ToRiakString(),
                 qtype = RpbIndexReq.IndexQueryType.eq
             };
@@ -934,7 +962,7 @@ namespace CorrugatedIron
 
         private static string ToBucketUri(string bucket)
         {
-            return "{0}/{1}".Fmt(RiakConstants.Rest.Uri.RiakRoot, bucket);
+            return "{0}/{1}".Fmt(RiakConstants.Rest.Uri.RiakRoot, HttpUtility.UrlEncode(bucket));
         }
     }
 }
