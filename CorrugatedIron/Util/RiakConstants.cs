@@ -61,8 +61,6 @@ namespace CorrugatedIron.Util
             public const string Utf8 = @"UTF-8";
         }
 
-        //public const int MinClientIdLength = 4;
-
         public static class QuorumOptions
         {
             private const uint UintMax = uint.MaxValue;
@@ -71,6 +69,14 @@ namespace CorrugatedIron.Util
             public const uint All = UintMax - 3;
             public const uint Default = UintMax - 4;
         }
+
+        internal static Dictionary<string, uint> QuorumOptionsLookup = new Dictionary<string, uint>
+        {
+            {"one", QuorumOptions.One},
+            {"quorum", QuorumOptions.Quorum},
+            {"all", QuorumOptions.All},
+            {"default", QuorumOptions.Default}
+        };
 
         public static class Defaults
         {
@@ -95,7 +101,8 @@ namespace CorrugatedIron.Util
             public const string Tokenize = @"tokenize";
         }
 
-        public static class SystemIndexKeys {
+        public static class SystemIndexKeys
+        {
             public const string RiakKeysIndex = "$key";
             public const string RiakBucketIndex = "$bucket";
 

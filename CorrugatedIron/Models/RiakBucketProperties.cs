@@ -289,7 +289,7 @@ namespace CorrugatedIron.Models
 
         private RiakBucketProperties WriteQuorum(string value, Action<Either<uint, string>> setter)
         {
-            System.Diagnostics.Debug.Assert(new HashSet<string> { "all", "quorum", "one" }.Contains(value), "Incorrect quorum value");
+            System.Diagnostics.Debug.Assert(new HashSet<string> { "all", "quorum", "one", "default" }.Contains(value), "Incorrect quorum value");
 
             setter(new Either<uint, string>(value));
             return this;

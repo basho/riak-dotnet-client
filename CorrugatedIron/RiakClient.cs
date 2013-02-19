@@ -148,7 +148,7 @@ namespace CorrugatedIron
         [Obsolete("Use Get(string, string, RiakGetOptions) instead")]
         public RiakResult<RiakObject> Get(string bucket, string key, uint rVal = RiakConstants.Defaults.RVal)
         {
-            var options = new RiakGetOptions { R = rVal };
+            var options = new RiakGetOptions().SetR(rVal);
             return Get(bucket, key, options);
         }
 
@@ -162,11 +162,10 @@ namespace CorrugatedIron
         /// The number of nodes required to successfully respond to the read before the read is considered a success.
         /// </param>
         /// <remarks>If a node does not respond, that does not necessarily mean that the 
-        /// <paramref name="bucket"/>/<paramref name="key"/> combination is not available. It simply means
+        /// <paramref name="objectId"/> is not available. It simply means
         /// that fewer than <paramref name="rVal" /> nodes responded to the read request. Unfortunatley, 
         /// the Riak API does not allow us to distinguish between a 404 resulting from less than <paramref name="rVal"/>
-        /// nodes successfully responding and a <paramref name="bucket"/>/<paramref name="key"/> combination
-        /// not being found in Riak.
+        /// nodes successfully responding and an <paramref name="objectId"/> not being found in Riak.
         /// </remarks>
         [Obsolete("Use Get(string, string, RiakGetOptions) instead")]
         public RiakResult<RiakObject> Get(RiakObjectId objectId, uint rVal = RiakConstants.Defaults.RVal)
@@ -183,10 +182,10 @@ namespace CorrugatedIron
         /// <param name='options'>The <see cref="CorrugatedIron.Models.RiakGetOptions" /> responsible for 
         /// configuring the semantics of this single get request. These options will override any previously 
         /// defined bucket configuration properties.</param>
-        /// <returns>An <see cref="System.Collections.Generic.IEnumerable<T>"/> of <see cref="CorrugatedIron.Models.RiakResult<T>"/>
+        /// <returns>An <see cref="System.Collections.Generic.IEnumerable{T}"/> of <see cref="RiakResult{T}"/>
         /// is returned. You should verify the success or failure of each result separately.</returns>
         /// <remarks>Riak does not support multi get behavior. CorrugatedIron's multi get functionality wraps multiple
-        /// get requests and returns results as an IEnumerable<RiakResult<RiakObject>>. Callers should be aware that
+        /// get requests and returns results as an IEnumerable{RiakResult{RiakObject}}. Callers should be aware that
         /// this may result in partial success - all results should be evaluated individually in the calling application.
         /// In addition, applications should plan for multiple failures or multiple cases of siblings being present.</remarks>
         public IEnumerable<RiakResult<RiakObject>> Get(IEnumerable<RiakObjectId> bucketKeyPairs,
@@ -237,17 +236,16 @@ namespace CorrugatedIron
         /// <param name='rVal'>
         /// The number of nodes required to successfully respond to the read before the read is considered a success.
         /// </param>
-        /// <returns>An <see cref="System.Collections.Generic.IEnumerable<T>"/> of <see cref="CorrugatedIron.Models.RiakResult<T>"/>
+        /// <returns>An <see cref="System.Collections.Generic.IEnumerable{T}"/> of <see cref="RiakResult{TResult}"/>
         /// is returned. You should verify the success or failure of each result separately.</returns>
         /// <remarks>Riak does not support multi get behavior. CorrugatedIron's multi get functionality wraps multiple
-        /// get requests and returns results as an IEnumerable<RiakResult<RiakObject>>. Callers should be aware that
+        /// get requests and returns results as an IEnumerable{RiakResult{RiakObject}}. Callers should be aware that
         /// this may result in partial success - all results should be evaluated individually in the calling application.
         /// In addition, applications should plan for multiple failures or multiple cases of siblings being present.</remarks>
         [Obsolete("Use Get(IEnumerable<RiakObjectId>, RiakGetOptions) instead.")]
-        public IEnumerable<RiakResult<RiakObject>> Get(IEnumerable<RiakObjectId> bucketKeyPairs,
-            uint rVal = RiakConstants.Defaults.RVal)
+        public IEnumerable<RiakResult<RiakObject>> Get(IEnumerable<RiakObjectId> bucketKeyPairs, uint rVal = RiakConstants.Defaults.RVal)
         {
-            var options = new RiakGetOptions { R = rVal };
+            var options = new RiakGetOptions().SetR(rVal);
 
             return Get(bucketKeyPairs, options);
         }
@@ -290,18 +288,18 @@ namespace CorrugatedIron
         }
 
         /// <summary>
-        /// Persist an <see href="System.Collections.Generic.IEnumerable<T>"/> of <see cref="CorrugatedIron.Models.RiakObjectId"/> to Riak.
+        /// Persist an <see href="System.Collections.Generic.IEnumerable{T}"/> of <see cref="CorrugatedIron.Models.RiakObjectId"/> to Riak.
         /// </summary>
         /// <param name='values'>
-        /// The <see href="System.Collections.Generic.IEnumerable<T>"/> of <see cref="CorrugatedIron.Models.RiakObjectId"/> to save.
+        /// The <see href="System.Collections.Generic.IEnumerable{T}"/> of <see cref="CorrugatedIron.Models.RiakObjectId"/> to save.
         /// </param>
         /// <param name='options'>
         /// Put options.
         /// </param>
-        /// <returns>An <see cref="System.Collections.Generic.IEnumerable<T>"/> of <see cref="CorrugatedIron.Models.RiakResult<T>"/>
+        /// <returns>An <see cref="System.Collections.Generic.IEnumerable{T}"/> of <see cref="RiakResult{T}"/>
         /// is returned. You should verify the success or failure of each result separately.</returns>
         /// <remarks>Riak does not support multi put behavior. CorrugatedIron's multi put functionality wraps multiple
-        /// put requests and returns results as an IEnumerable<RiakResult<RiakObject>>. Callers should be aware that
+        /// put requests and returns results as an IEnumerable{RiakResult{RiakObject}}. Callers should be aware that
         /// this may result in partial success - all results should be evaluated individually in the calling application.
         /// In addition, applications should plan for multiple failures or multiple cases of siblings being present.</remarks>
         public IEnumerable<RiakResult<RiakObject>> Put(IEnumerable<RiakObject> values, RiakPutOptions options = null)
@@ -422,7 +420,7 @@ namespace CorrugatedIron
         /// </remarks>
         public IEnumerable<RiakResult> DeleteBucket(string bucket, uint rwVal)
         {
-            return DeleteBucket(bucket, new RiakDeleteOptions {Rw = rwVal});
+            return DeleteBucket(bucket, new RiakDeleteOptions().SetRw(rwVal));
         }
 
         /// <summary>
@@ -755,7 +753,7 @@ namespace CorrugatedIron
         }
         
         /// <summary>
-        /// Get the results of an index query prepared for use in a <see cref="CorrugatedIron.Models.MapReduce.MapReduceQuery"/>
+        /// Get the results of an index query prepared for use in a <see cref="CorrugatedIron.Models.MapReduce.RiakMapReduceQuery"/>
         /// </summary>
         /// <returns>
         /// A <see cref="RiakBucketKeyInput"/> of the index query results
