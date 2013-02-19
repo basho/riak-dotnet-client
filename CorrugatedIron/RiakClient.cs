@@ -794,10 +794,12 @@ namespace CorrugatedIron
             var query = new RiakMapReduceQuery()
                 .Inputs(input);
 
+            var lastLink = riakLinks.Last();
+
             foreach(var riakLink in riakLinks)
             {
                 var link = riakLink;
-                var keep = link == riakLinks.Last();
+                var keep = link == lastLink;
 
                 query.Link(l => l.FromRiakLink(link).Keep(keep));
             }
