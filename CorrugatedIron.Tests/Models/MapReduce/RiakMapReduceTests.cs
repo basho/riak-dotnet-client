@@ -114,6 +114,7 @@ namespace CorrugatedIron.Tests.Models.MapReduce
 
             var request = query.ToMessage();
             var requestString = request.request.FromRiakString();
+
             requestString.Contains("$key").ShouldBeTrue();
             requestString.Contains("$key_bin").ShouldBeFalse();
         }
