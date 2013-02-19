@@ -14,6 +14,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Collections.Generic;
+
 namespace CorrugatedIron.Util
 {
     public static class RiakConstants
@@ -69,6 +71,14 @@ namespace CorrugatedIron.Util
             public const uint All = UintMax - 3;
             public const uint Default = UintMax - 4;
         }
+
+        internal static Dictionary<string, uint> QuorumOptionsLookup = new Dictionary<string, uint>
+            {
+                {"one", QuorumOptions.One},
+                {"quorum", QuorumOptions.Quorum},
+                {"all", QuorumOptions.All},
+                {"default", QuorumOptions.Default}
+            };
 
         public static class Defaults
         {

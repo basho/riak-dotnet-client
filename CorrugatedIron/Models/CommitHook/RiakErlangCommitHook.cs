@@ -21,8 +21,15 @@ namespace CorrugatedIron.Models.CommitHook
 {
     public class RiakErlangCommitHook : RiakCommitHook, IRiakPreCommitHook, IRiakPostCommitHook
     {
+        internal static RiakErlangCommitHook RiakSearchCommitHook;
+
         public string Module { get; private set; }
         public string Function { get; private set; }
+
+        static RiakErlangCommitHook()
+        {
+            RiakSearchCommitHook = new RiakErlangCommitHook("riak_search_kv_hook", "precommit");
+        }
 
         public RiakErlangCommitHook(string module, string function)
         {
@@ -36,6 +43,38 @@ namespace CorrugatedIron.Models.CommitHook
             writer.WriteProperty("mod", Module);
             writer.WriteProperty("fun", Function);
             writer.WriteEndObject();
+        }
+
+        protected bool Equals(RiakErlangCommitHook other)
+        {
+            return string.Equals(Module, other.Module) && string.Equals(Function, other.Function);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+
+            return Equals((RiakErlangCommitHook)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (Module.GetHashCode() * 397) ^ Function.GetHashCode();
+            }
+        }
+
+        public static bool operator ==(RiakErlangCommitHook left, RiakErlangCommitHook right)
+        {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(RiakErlangCommitHook left, RiakErlangCommitHook right)
+        {
+            return !Equals(left, right);
         }
     }
 }

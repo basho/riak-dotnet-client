@@ -14,6 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Collections.Generic;
 using CorrugatedIron.Util;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -57,7 +58,7 @@ namespace CorrugatedIron.Extensions
 
         public static bool IsBinaryKey(this string value)
         {
-            return value.EndsWith(RiakConstants.IndexSuffix.Binary);
+            return value == "$key" || value.EndsWith(RiakConstants.IndexSuffix.Binary);
         }
 
         public static string ToIntegerKey(this string value)
@@ -89,6 +90,13 @@ namespace CorrugatedIron.Extensions
             }
             
             return result;
+        }
+
+        internal static uint ToRpbOption(this string value)
+        {
+            System.Diagnostics.Debug.Assert(new HashSet<string> { "all", "quorum", "one", "default" }.Contains(value), "Incorrect quorum value");
+
+            return RiakConstants.QuorumOptionsLookup[value];
         }
     }
 }

@@ -26,7 +26,8 @@ namespace CorrugatedIron
         ClusterOffline,
         NoConnections,
         BatchException,
-        NoRetries
+        NoRetries,
+        HttpError
     }
 
     public class RiakResult
