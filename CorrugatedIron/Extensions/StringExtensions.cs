@@ -15,6 +15,7 @@
 // under the License.
 
 using CorrugatedIron.Util;
+using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
@@ -23,7 +24,7 @@ namespace CorrugatedIron.Extensions
 {
     public static class StringExtensions
     {
-        private static readonly System.Text.Encoding RiakEncoding = new UTF8Encoding(false);
+        private static readonly Encoding RiakEncoding = new UTF8Encoding(false);
 
         // + - && || ! ( ) { } [ ] ^ " ~ * ? : \
         private const string SearchTermPattern = @"[\+\-!\(\)\{\}\[\]^\""~\*\?\:\\]{1}";
@@ -50,24 +51,42 @@ namespace CorrugatedIron.Extensions
             return HttpUtility.UrlEncode(value);
         }
 
-        public static bool IsIntegerKey(this string value)
+        public static bool IsUserIntegerKey(this string value)
         {
-            return value.EndsWith(RiakConstants.IndexSuffix.Integer);
+            return RiakConstants.SystemIndexKeys.SystemIntKeys.Contains(value) 
+                || value.EndsWith(RiakConstants.IndexSuffix.Integer);
         }
 
-        public static bool IsBinaryKey(this string value)
+        public static bool IsUserBinaryKey(this string value)
         {
-            return value.EndsWith(RiakConstants.IndexSuffix.Binary);
+            return RiakConstants.SystemIndexKeys.SystemBinKeys.Contains(value) 
+                || value.EndsWith(RiakConstants.IndexSuffix.Binary);
+        }
+
+        public static bool IsSystemIntegerKey(this string value)
+        {
+            return RiakConstants.SystemIndexKeys.SystemIntKeys.Contains(value);
+        }
+
+        public static bool IsSystemBinaryKey(this string value)
+        {
+            return RiakConstants.SystemIndexKeys.SystemBinKeys.Contains(value);
+        }
+
+        public static bool IsSystemKey(this string value)
+        {
+            return RiakConstants.SystemIndexKeys.SystemBinKeys.Contains(value)
+                || RiakConstants.SystemIndexKeys.SystemIntKeys.Contains(value);
         }
 
         public static string ToIntegerKey(this string value)
         {
-            return value.IsIntegerKey() ? value : value + RiakConstants.IndexSuffix.Integer;
+            return value.IsSystemIntegerKey() ? value : value + RiakConstants.IndexSuffix.Integer;
         }
 
         public static string ToBinaryKey(this string value)
         {
-            return value.IsBinaryKey() ? value : value + RiakConstants.IndexSuffix.Binary;
+            return value.IsSystemBinaryKey() ? value : value + RiakConstants.IndexSuffix.Binary;
         }
         
         public static string ToRiakSearchTerm(this string value) 
@@ -89,6 +108,13 @@ namespace CorrugatedIron.Extensions
             }
             
             return result;
+        }
+
+        internal static uint ToRpbOption(this string value)
+        {
+            System.Diagnostics.Debug.Assert(new HashSet<string> { "all", "quorum", "one", "default" }.Contains(value), "Incorrect quorum value");
+
+            return RiakConstants.QuorumOptionsLookup[value];
         }
     }
 }

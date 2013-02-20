@@ -28,6 +28,34 @@ namespace CorrugatedIron.Models.CommitHook
             Name = name;
         }
 
+        protected bool Equals(RiakJavascriptCommitHook other)
+        {
+            return string.Equals(Name, other.Name);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((RiakJavascriptCommitHook)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return Name.GetHashCode();
+        }
+
+        public static bool operator ==(RiakJavascriptCommitHook left, RiakJavascriptCommitHook right)
+        {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(RiakJavascriptCommitHook left, RiakJavascriptCommitHook right)
+        {
+            return !Equals(left, right);
+        }
+
         public override void WriteJson(JsonWriter writer)
         {
             writer.WriteStartObject();

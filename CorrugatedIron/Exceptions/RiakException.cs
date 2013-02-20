@@ -27,21 +27,21 @@ namespace CorrugatedIron.Exceptions
 
         public uint ErrorCode { get; private set; }
 
-        public bool NodeOffline { get; private set; }
+        internal bool NodeOffline { get; private set; }
 
         public string ErrorMessage
         {
             get { return _errorMessage; }
         }
 
-        public RiakException(uint errorCode, string errorMessage, bool nodeOffline = true)
+        internal RiakException(uint errorCode, string errorMessage, bool nodeOffline = true)
         {
             NodeOffline = nodeOffline;
             ErrorCode = errorCode;
             _errorMessage = "Riak returned an error. Code '{0}'. Message: {1}".Fmt(ErrorCode, errorMessage);
         }
 
-        public RiakException(string errorMessage, bool nodeOffline = true)
+        internal RiakException(string errorMessage, bool nodeOffline = true)
         {
             NodeOffline = nodeOffline;
             _errorMessage = errorMessage;

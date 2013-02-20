@@ -47,6 +47,8 @@ namespace CorrugatedIron.Models
                 && WVal == null
                 && PrVal == null
                 && PwVal == null
+                && PreCommitHooks == null
+                && PostCommitHooks == null
                 && string.IsNullOrEmpty(Backend);
             }
         }
@@ -55,7 +57,6 @@ namespace CorrugatedIron.Models
         public uint? NVal { get; private set; }
         public bool? AllowMultiple { get; private set; }
         public string Backend { get; private set; }
-        public bool? Search { get; private set; }
         public List<IRiakPreCommitHook> PreCommitHooks { get; private set; }
         public List<IRiakPostCommitHook> PostCommitHooks { get; private set; }
         public bool? NotFoundOk { get; private set; }
@@ -98,6 +99,15 @@ namespace CorrugatedIron.Models
         /// </summary>
         /// <value>The PW value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.</value>
         public Either<uint, string> PwVal { get; private set; }
+
+        /// <summary>
+        /// An indicator of whether search indexing is enabled on the bucket.
+        /// </summary>
+        public bool SearchEnabled
+        {
+            get { return PreCommitHooks != null && PreCommitHooks.FirstOrDefault(x => Equals(x, RiakErlangCommitHook.RiakSearchCommitHook)) != null; }
+            set { SetSearch(value); }
+        }
 
         public RiakBucketProperties SetBasicQuorum(bool value)
         {
@@ -195,21 +205,73 @@ namespace CorrugatedIron.Models
             return this;
         }
 
-        public RiakBucketProperties SetSearch(bool search)
+        /// <summary>
+        /// Enable or disable search on a bucket.
+        /// </summary>
+        /// <param name="enable">Set to <i>true</i> to enable search on this bucket, or <i>false</i>
+        /// to disable it.</param>
+        /// <returns>A reference to the current properties object.</returns>
+        /// <remarks>Enabling search on a bucket in Riak requires the adding of a pre-commit hook.
+        /// This helper function abstracts this problem from the user so that they don't have to do it
+        /// themselves. When adding or removing any form of pre or post commit hook in Riak via any
+        /// client, it is a very good idea to first get the bucket properties from Riak, make changes,
+        /// then set the properties back. This prevents accidental removal of other pre or post commit
+        /// hooks that might have been added beforehand.</remarks>
+        public RiakBucketProperties SetSearch(bool enable)
         {
-            Search = search;
+            if (enable)
+            {
+                AddPreCommitHook(RiakErlangCommitHook.RiakSearchCommitHook);
+            }
+            else
+            {
+                RemovePreCommitHook(RiakErlangCommitHook.RiakSearchCommitHook);
+            }
+
+            return this;
+        }
+
+        public RiakBucketProperties RemovePreCommitHook(IRiakPreCommitHook commitHook)
+        {
+            if (PreCommitHooks != null)
+            {
+                PreCommitHooks.RemoveAll(x => Equals(x, commitHook));
+            }
+
+            return this;
+        }
+
+        public RiakBucketProperties RemovePostCommitHook(IRiakPostCommitHook commitHook)
+        {
+            if (PostCommitHooks != null)
+            {
+                PostCommitHooks.RemoveAll(x => Equals(x, commitHook));
+            }
+
             return this;
         }
 
         public RiakBucketProperties AddPreCommitHook(IRiakPreCommitHook commitHook)
         {
-            (PreCommitHooks ?? (PreCommitHooks = new List<IRiakPreCommitHook>())).Add(commitHook);
+            var hooks = PreCommitHooks ?? (PreCommitHooks = new List<IRiakPreCommitHook>());
+
+            if (!hooks.Any(x => Equals(x, commitHook)))
+            {
+                hooks.Add(commitHook);
+            }
+
             return this;
         }
 
         public RiakBucketProperties AddPostCommitHook(IRiakPostCommitHook commitHook)
         {
-            (PostCommitHooks ?? (PostCommitHooks = new List<IRiakPostCommitHook>())).Add(commitHook);
+            var hooks = PostCommitHooks ?? (PostCommitHooks = new List<IRiakPostCommitHook>());
+            
+            if (!hooks.Any(x => Equals(x, commitHook)))
+            {
+                hooks.Add(commitHook);
+            }
+
             return this;
         }
 
@@ -227,7 +289,7 @@ namespace CorrugatedIron.Models
 
         private RiakBucketProperties WriteQuorum(string value, Action<Either<uint, string>> setter)
         {
-            System.Diagnostics.Debug.Assert(new HashSet<string> { "all", "quorum", "one" }.Contains(value), "Incorrect quorum value");
+            System.Diagnostics.Debug.Assert(new HashSet<string> { "all", "quorum", "one", "default" }.Contains(value), "Incorrect quorum value");
 
             setter(new Either<uint, string>(value));
             return this;
@@ -255,7 +317,6 @@ namespace CorrugatedIron.Models
             AllowMultiple = props.Value<bool?>("allow_mult");
             LastWriteWins = props.Value<bool?>("last_write_wins");
             Backend = props.Value<string>("backend");
-            Search = props.Value<bool?>("search");
             NotFoundOk = props.Value<bool?>("notfound_ok");
             BasicQuorum = props.Value<bool?>("basic_quorum");
 
@@ -300,6 +361,8 @@ namespace CorrugatedIron.Models
 
         private static void ReadQuorum(JObject props, string key, Action<Either<uint, string>> setter)
         {
+            if (props[key] == null) return;
+
             if(props[key].Type == JTokenType.String)
             {
                 setter(new Either<uint, string>(props.Value<string>(key)));
@@ -351,7 +414,6 @@ namespace CorrugatedIron.Models
                 .WriteEither("pr", PrVal)
                 .WriteEither("pw", PwVal)
                 .WriteNonNullProperty("backend", Backend)
-                .WriteNullableProperty("search", Search)
                 .WriteNullableProperty("notfound_ok", NotFoundOk)
                 .WriteNullableProperty("basic_quorum", BasicQuorum);
 

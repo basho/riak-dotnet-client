@@ -14,7 +14,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
+using System.Collections.Generic;
+using CorrugatedIron.Containers;
+using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
+using CorrugatedIron.Util;
 
 namespace CorrugatedIron.Models
 {
@@ -28,7 +33,7 @@ namespace CorrugatedIron.Models
         /// to indicate 'quorum', 'one', 'all', or 'default'. 
         /// </value>
         /// <remarks>Developers looking for an easy way to set this can look at <see cref="CorrugatedIron.Util.RiakConstants.QuorumOptions"/></remarks>
-        public uint? R { get; set; }
+        public Either<uint, string> R { get; private set; }
 
         /// <summary>
         /// Primary Read Quorum - the number of replicas that need to be available when retrieving the object.
@@ -38,7 +43,7 @@ namespace CorrugatedIron.Models
         /// to indicate 'quorum', 'one', 'all', or 'default'. 
         /// </value>
         /// <remarks>Developers looking for an easy way to set this can look at <see cref="CorrugatedIron.Util.RiakConstants.QuorumOptions"/></remarks>
-        public uint? Pr { get; set; }
+        public Either<uint, string> Pr { get; private set; }
 
         /// <summary>
         /// Basic Quorum semantics - whether to return early in some failure cases (eg. when r=1 and you get 2 errors and a success basic_quorum=true would return an error)
@@ -83,17 +88,36 @@ namespace CorrugatedIron.Models
         /// </value>
         public byte[] IfModified { get; set; }
 
+        public RiakGetOptions SetR(uint value)
+        {
+            return WriteQuorum(value, var => R = var);
+        }
+
+        public RiakGetOptions SetR(string value)
+        {
+            return WriteQuorum(value, var => R = var);
+        }
+
+        public RiakGetOptions SetPr(uint value)
+        {
+            return WriteQuorum(value, var => Pr = var);
+        }
+
+        public RiakGetOptions SetPr(string value)
+        {
+            return WriteQuorum(value, var => Pr = var);
+        }
+
+        public RiakGetOptions()
+        {
+            R = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
+            Pr = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
+        }
+
         internal void Populate(RpbGetReq request)
         {
-            if (R.HasValue)
-            {
-                request.r = R.Value;
-            }
-
-            if (Pr.HasValue)
-            {
-                request.pr = Pr.Value;
-            }
+            request.r = R.IsLeft ? R.Left : R.Right.ToRpbOption();
+            request.pr = Pr.IsLeft ? Pr.Left : Pr.Right.ToRpbOption();
 
             if (BasicQuorum.HasValue)
             {
@@ -119,6 +143,22 @@ namespace CorrugatedIron.Models
             {
                 request.if_modified = IfModified;
             }
+        }
+
+        private RiakGetOptions WriteQuorum(string value, Action<Either<uint, string>> setter)
+        {
+            System.Diagnostics.Debug.Assert(new HashSet<string> { "all", "quorum", "one", "default" }.Contains(value), "Incorrect quorum value");
+
+            setter(new Either<uint, string>(value));
+            return this;
+        }
+
+        private RiakGetOptions WriteQuorum(uint value, Action<Either<uint, string>> setter)
+        {
+            System.Diagnostics.Debug.Assert(value >= 1);
+
+            setter(new Either<uint, string>(value));
+            return this;
         }
     }
 }

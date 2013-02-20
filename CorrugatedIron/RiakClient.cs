@@ -27,6 +27,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Web;
 
 namespace CorrugatedIron
 {
@@ -147,7 +148,7 @@ namespace CorrugatedIron
         [Obsolete("Use Get(string, string, RiakGetOptions) instead")]
         public RiakResult<RiakObject> Get(string bucket, string key, uint rVal = RiakConstants.Defaults.RVal)
         {
-            var options = new RiakGetOptions { R = rVal };
+            var options = new RiakGetOptions().SetR(rVal);
             return Get(bucket, key, options);
         }
 
@@ -161,11 +162,10 @@ namespace CorrugatedIron
         /// The number of nodes required to successfully respond to the read before the read is considered a success.
         /// </param>
         /// <remarks>If a node does not respond, that does not necessarily mean that the 
-        /// <paramref name="bucket"/>/<paramref name="key"/> combination is not available. It simply means
+        /// <paramref name="objectId"/> is not available. It simply means
         /// that fewer than <paramref name="rVal" /> nodes responded to the read request. Unfortunatley, 
         /// the Riak API does not allow us to distinguish between a 404 resulting from less than <paramref name="rVal"/>
-        /// nodes successfully responding and a <paramref name="bucket"/>/<paramref name="key"/> combination
-        /// not being found in Riak.
+        /// nodes successfully responding and an <paramref name="objectId"/> not being found in Riak.
         /// </remarks>
         [Obsolete("Use Get(string, string, RiakGetOptions) instead")]
         public RiakResult<RiakObject> Get(RiakObjectId objectId, uint rVal = RiakConstants.Defaults.RVal)
@@ -182,10 +182,10 @@ namespace CorrugatedIron
         /// <param name='options'>The <see cref="CorrugatedIron.Models.RiakGetOptions" /> responsible for 
         /// configuring the semantics of this single get request. These options will override any previously 
         /// defined bucket configuration properties.</param>
-        /// <returns>An <see cref="System.Collections.Generic.IEnumerable<T>"/> of <see cref="CorrugatedIron.Models.RiakResult<T>"/>
+        /// <returns>An <see cref="System.Collections.Generic.IEnumerable{T}"/> of <see cref="RiakResult{T}"/>
         /// is returned. You should verify the success or failure of each result separately.</returns>
         /// <remarks>Riak does not support multi get behavior. CorrugatedIron's multi get functionality wraps multiple
-        /// get requests and returns results as an IEnumerable<RiakResult<RiakObject>>. Callers should be aware that
+        /// get requests and returns results as an IEnumerable{RiakResult{RiakObject}}. Callers should be aware that
         /// this may result in partial success - all results should be evaluated individually in the calling application.
         /// In addition, applications should plan for multiple failures or multiple cases of siblings being present.</remarks>
         public IEnumerable<RiakResult<RiakObject>> Get(IEnumerable<RiakObjectId> bucketKeyPairs,
@@ -198,13 +198,13 @@ namespace CorrugatedIron
             requests.ForEach(r => options.Populate(r));
 
             var results = UseConnection(conn =>
-                                        {
+            {
                 var responses = requests.Select(conn.PbcWriteRead<RpbGetReq, RpbGetResp>).ToList();
                 return RiakResult<IEnumerable<RiakResult<RpbGetResp>>>.Success(responses);
             });
             
             return results.Value.Zip(bucketKeyPairs, Tuple.Create).Select(result =>
-                                                                          {
+            {
                 if(!result.Item1.IsSuccess)
                 {
                     return RiakResult<RiakObject>.Error(result.Item1.ResultCode, result.Item1.ErrorMessage, result.Item1.NodeOffline);
@@ -220,7 +220,7 @@ namespace CorrugatedIron
                 if(result.Item1.Value.content.Count > 1)
                 {
                     o.Siblings = result.Item1.Value.content.Select(c =>
-                                                                   new RiakObject(result.Item2.Bucket, result.Item2.Key, c, result.Item1.Value.vclock)).ToList();
+                        new RiakObject(result.Item2.Bucket, result.Item2.Key, c, result.Item1.Value.vclock)).ToList();
                 }
                 
                 return RiakResult<RiakObject>.Success(o);
@@ -236,17 +236,16 @@ namespace CorrugatedIron
         /// <param name='rVal'>
         /// The number of nodes required to successfully respond to the read before the read is considered a success.
         /// </param>
-        /// <returns>An <see cref="System.Collections.Generic.IEnumerable<T>"/> of <see cref="CorrugatedIron.Models.RiakResult<T>"/>
+        /// <returns>An <see cref="System.Collections.Generic.IEnumerable{T}"/> of <see cref="RiakResult{TResult}"/>
         /// is returned. You should verify the success or failure of each result separately.</returns>
         /// <remarks>Riak does not support multi get behavior. CorrugatedIron's multi get functionality wraps multiple
-        /// get requests and returns results as an IEnumerable<RiakResult<RiakObject>>. Callers should be aware that
+        /// get requests and returns results as an IEnumerable{RiakResult{RiakObject}}. Callers should be aware that
         /// this may result in partial success - all results should be evaluated individually in the calling application.
         /// In addition, applications should plan for multiple failures or multiple cases of siblings being present.</remarks>
         [Obsolete("Use Get(IEnumerable<RiakObjectId>, RiakGetOptions) instead.")]
-        public IEnumerable<RiakResult<RiakObject>> Get(IEnumerable<RiakObjectId> bucketKeyPairs,
-            uint rVal = RiakConstants.Defaults.RVal)
+        public IEnumerable<RiakResult<RiakObject>> Get(IEnumerable<RiakObjectId> bucketKeyPairs, uint rVal = RiakConstants.Defaults.RVal)
         {
-            var options = new RiakGetOptions { R = rVal };
+            var options = new RiakGetOptions().SetR(rVal);
 
             return Get(bucketKeyPairs, options);
         }
@@ -289,18 +288,18 @@ namespace CorrugatedIron
         }
 
         /// <summary>
-        /// Persist an <see href="System.Collections.Generic.IEnumerable<T>"/> of <see cref="CorrugatedIron.Models.RiakObjectId"/> to Riak.
+        /// Persist an <see href="System.Collections.Generic.IEnumerable{T}"/> of <see cref="CorrugatedIron.Models.RiakObjectId"/> to Riak.
         /// </summary>
         /// <param name='values'>
-        /// The <see href="System.Collections.Generic.IEnumerable<T>"/> of <see cref="CorrugatedIron.Models.RiakObjectId"/> to save.
+        /// The <see href="System.Collections.Generic.IEnumerable{T}"/> of <see cref="CorrugatedIron.Models.RiakObjectId"/> to save.
         /// </param>
         /// <param name='options'>
         /// Put options.
         /// </param>
-        /// <returns>An <see cref="System.Collections.Generic.IEnumerable<T>"/> of <see cref="CorrugatedIron.Models.RiakResult<T>"/>
+        /// <returns>An <see cref="System.Collections.Generic.IEnumerable{T}"/> of <see cref="RiakResult{T}"/>
         /// is returned. You should verify the success or failure of each result separately.</returns>
         /// <remarks>Riak does not support multi put behavior. CorrugatedIron's multi put functionality wraps multiple
-        /// put requests and returns results as an IEnumerable<RiakResult<RiakObject>>. Callers should be aware that
+        /// put requests and returns results as an IEnumerable{RiakResult{RiakObject}}. Callers should be aware that
         /// this may result in partial success - all results should be evaluated individually in the calling application.
         /// In addition, applications should plan for multiple failures or multiple cases of siblings being present.</remarks>
         public IEnumerable<RiakResult<RiakObject>> Put(IEnumerable<RiakObject> values, RiakPutOptions options = null)
@@ -421,7 +420,7 @@ namespace CorrugatedIron
         /// </remarks>
         public IEnumerable<RiakResult> DeleteBucket(string bucket, uint rwVal)
         {
-            return DeleteBucket(bucket, new RiakDeleteOptions {Rw = rwVal});
+            return DeleteBucket(bucket, new RiakDeleteOptions().SetRw(rwVal));
         }
 
         /// <summary>
@@ -484,7 +483,6 @@ namespace CorrugatedIron
 
             if(response.IsSuccess)
             {
-                //var mrResponse = CondenseResponse(response.Value);
                 return RiakResult<RiakMapReduceResult>.Success(new RiakMapReduceResult(response.Value));
             }
 
@@ -502,59 +500,6 @@ namespace CorrugatedIron
             }
 
             return RiakResult<RiakSearchResult>.Error(response.ResultCode, response.ErrorMessage, response.NodeOffline);
-        }
-
-        private IEnumerable<RiakResult<RpbMapRedResp>> CondenseResponse(IEnumerable<RiakResult<RpbMapRedResp>> originalResponse)
-        {
-            var resultList = new List<RiakResult<RpbMapRedResp>>(originalResponse);
-
-            if(resultList.Count() == 1)
-            {
-                return resultList;
-            }
-
-            var newResponse = new List<RiakResult<RpbMapRedResp>>();
-            RiakResult<RpbMapRedResp> previous = null;
-
-            foreach(var current in resultList)
-            {
-                if(previous == null)
-                {
-                    newResponse.Add(RiakResult<RpbMapRedResp>.Success(current.Value));
-                    previous = current;
-                }
-                else if(previous.Value.phase == current.Value.phase)
-                {
-                    var mrResp = new RpbMapRedResp { done = current.Value.done };
-
-
-                    if(current.Value.response != null)
-                    {
-                        var newLength = previous.Value.response.Length + current.Value.response.Length;
-
-                        var newValue = new List<byte>(newLength);
-                        newValue.AddRange(previous.Value.response);
-                        newValue.AddRange(current.Value.response);
-
-                        var index = newResponse.IndexOf(previous);
-
-                        mrResp.phase = current.Value.phase;
-                        mrResp.response = newValue.ToArray();
-
-                        newResponse.Remove(previous);
-                        newResponse.Insert(index, RiakResult<RpbMapRedResp>.Success(mrResp));
-
-                        previous = newResponse.ElementAt(index);
-                    }
-                }
-                else
-                {
-                    newResponse.Add(RiakResult<RpbMapRedResp>.Success(current.Value));
-                    previous = current;
-                }
-            }
-
-            return newResponse;
         }
 
         public RiakResult<RiakStreamedMapReduceResult> StreamMapReduce(RiakMapReduceQuery query)
@@ -643,6 +588,20 @@ namespace CorrugatedIron
         }
 
         /// <summary>
+        /// Return a list of keys from the given bucket.
+        /// </summary>
+        /// <param name="bucket"></param>
+        /// <returns></returns>
+        /// <remarks>This uses the $key special index instead of the list keys API to 
+        /// quickly return an unsorted list of keys from Riak.</remarks>
+        public RiakResult<IList<string>> ListKeysFromIndex(string bucket)
+        {
+            return IndexGet(bucket, 
+                            RiakConstants.SystemIndexKeys.RiakBucketIndex, 
+                            bucket);
+        }
+
+        /// <summary>
         /// Returns all properties for a <paramref name="bucket"/>.
         /// </summary>
         /// <returns>
@@ -658,6 +617,12 @@ namespace CorrugatedIron
         {
             if(extended)
             {
+                // bucket names cannot have slashes in the names, the REST interface doesn't like it at all
+                if (bucket.Contains('/'))
+                {
+                    return RiakResult<RiakBucketProperties>.Error(ResultCode.HttpError, "Bucket names cannot contain slashes", false);
+                }
+
                 var request = new RiakRestRequest(ToBucketUri(bucket), RiakConstants.Rest.HttpMethod.Get)
                     .AddQueryParam(RiakConstants.Rest.QueryParameters.Bucket.GetPropertiesKey,
                         RiakConstants.Rest.QueryParameters.Bucket.GetPropertiesValue);
@@ -712,6 +677,12 @@ namespace CorrugatedIron
             }
             else
             {
+                // bucket names cannot have slashes in the names, the REST interface doesn't like it at all
+                if (bucket.Contains('/'))
+                {
+                    return RiakResult.Error(ResultCode.HttpError, "Bucket names cannot contain slashes", false);
+                }
+
                 var request = new RiakRestRequest(ToBucketUri(bucket), RiakConstants.Rest.HttpMethod.Put)
                 {
                     Body = properties.ToJsonString().ToRiakString(),
@@ -728,7 +699,7 @@ namespace CorrugatedIron
         }
         
         /// <summary>
-        /// Get the results of an index query prepared for use in a <see cref="CorrugatedIron.Models.MapReduce.MapReduceQuery"/>
+        /// Get the results of an index query prepared for use in a <see cref="CorrugatedIron.Models.MapReduce.RiakMapReduceQuery"/>
         /// </summary>
         /// <returns>
         /// A <see cref="RiakBucketKeyInput"/> of the index query results
@@ -736,6 +707,7 @@ namespace CorrugatedIron
         /// <param name='indexQuery'>
         /// Index query.
         /// </param>
+        [Obsolete("This has been replaced by the IndexGet methods as of v1.1.1. This method will be removed by v1.3")]
         public RiakBucketKeyInput GetIndex(RiakIndexInput indexQuery)
         {
             var query = new RiakMapReduceQuery()
@@ -762,16 +734,20 @@ namespace CorrugatedIron
         /// <remarks>Refer to http://wiki.basho.com/Links-and-Link-Walking.html for more information.</remarks>
         public RiakResult<IList<RiakObject>> WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks)
         {
+            System.Diagnostics.Debug.Assert(riakLinks.Count > 0, "Link walking requires at least one link");
+
             var input = new RiakBucketKeyInput();
             input.AddBucketKey(riakObject.Bucket, riakObject.Key);
 
             var query = new RiakMapReduceQuery()
                 .Inputs(input);
 
+            var lastLink = riakLinks.Last();
+
             foreach(var riakLink in riakLinks)
             {
                 var link = riakLink;
-                var keep = link == riakLinks.Last();
+                var keep = ReferenceEquals(link, lastLink);
 
                 query.Link(l => l.FromRiakLink(link).Keep(keep));
             }
@@ -819,20 +795,20 @@ namespace CorrugatedIron
 
         public RiakResult<IList<string>> IndexGet(string bucket, string indexName, string minValue, string maxValue)
         {
-            return IndexGetRange(bucket, indexName, minValue, maxValue, RiakConstants.IndexSuffix.Binary);
+            return IndexGetRange(bucket, indexName.ToBinaryKey(), minValue, maxValue);
         }
 
         public RiakResult<IList<string>> IndexGet(string bucket, string indexName, int minValue, int maxValue)
         {
-            return IndexGetRange(bucket, indexName, minValue.ToString(), maxValue.ToString(), RiakConstants.IndexSuffix.Integer);
+            return IndexGetRange(bucket, indexName.ToIntegerKey(), minValue.ToString(), maxValue.ToString());
         }
 
-        private RiakResult<IList<string>> IndexGetRange(string bucket, string indexName, string minValue, string maxValue, string indexSuffix)
+        private RiakResult<IList<string>> IndexGetRange(string bucket, string indexName, string minValue, string maxValue)
         {
             var message = new RpbIndexReq
             {
                 bucket = bucket.ToRiakString(),
-                index = (indexName + indexSuffix).ToRiakString(),
+                index = indexName.ToRiakString(),
                 qtype = RpbIndexReq.IndexQueryType.range,
                 range_min = minValue.ToRiakString(),
                 range_max = maxValue.ToRiakString()
@@ -850,20 +826,20 @@ namespace CorrugatedIron
 
         public RiakResult<IList<string>> IndexGet(string bucket, string indexName, string value)
         {
-            return IndexGetEquals(bucket, indexName, value, RiakConstants.IndexSuffix.Binary);
+            return IndexGetEquals(bucket, indexName.ToBinaryKey(), value);
         }
 
         public RiakResult<IList<string>> IndexGet(string bucket, string indexName, int value)
         {
-            return IndexGetEquals(bucket, indexName, value.ToString(), RiakConstants.IndexSuffix.Integer);
+            return IndexGetEquals(bucket, indexName.ToIntegerKey(), value.ToString());
         }
 
-        private RiakResult<IList<string>> IndexGetEquals(string bucket, string indexName, string value, string indexSuffix)
+        private RiakResult<IList<string>> IndexGetEquals(string bucket, string indexName, string value)
         {
             var message = new RpbIndexReq
             {
                 bucket = bucket.ToRiakString(),
-                index = (indexName + indexSuffix).ToRiakString(),
+                index = indexName.ToRiakString(),
                 key = value.ToRiakString(),
                 qtype = RpbIndexReq.IndexQueryType.eq
             };
@@ -934,7 +910,7 @@ namespace CorrugatedIron
 
         private static string ToBucketUri(string bucket)
         {
-            return "{0}/{1}".Fmt(RiakConstants.Rest.Uri.RiakRoot, bucket);
+            return "{0}/{1}".Fmt(RiakConstants.Rest.Uri.RiakRoot, HttpUtility.UrlEncode(bucket));
         }
     }
 }
