@@ -16,6 +16,7 @@
 
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Models.MapReduce;
+using CorrugatedIron.Models.MapReduce.Inputs;
 using CorrugatedIron.Tests.Extensions;
 using CorrugatedIron.Util;
 using NUnit.Framework;
@@ -100,6 +101,22 @@ namespace CorrugatedIron.Tests.Models.MapReduce
 
             var request = query.ToMessage();
             request.request.ShouldEqual(ComplexMrJobWithFilterText.ToRiakString());
+        }
+
+        [Test]
+        public void QueryingDollarKeyDoesNotAppendBinIndexSuffix() 
+        {
+            var query = new RiakMapReduceQuery 
+                {
+                    ContentType = MrContentType
+                }
+                .Inputs(RiakIndex.Range("animals", "$key", "0", "zzzzz"));
+
+            var request = query.ToMessage();
+            var requestString = request.request.FromRiakString();
+
+            requestString.Contains("$key").ShouldBeTrue();
+            requestString.Contains("$key_bin").ShouldBeFalse();
         }
     }
 }

@@ -424,13 +424,13 @@ namespace CorrugatedIron.Comms
                         : Encoding.Default
                 };
 
-                if(response.ContentLength > 0)
+                if (response.ContentLength > 0)
                 {
-                    using(var responseStream = response.GetResponseStream())
+                    using (var responseStream = response.GetResponseStream())
                     {
-                        if(responseStream != null)
+                        if (responseStream != null)
                         {
-                            using(var reader = new StreamReader(responseStream, result.ContentEncoding))
+                            using (var reader = new StreamReader(responseStream, result.ContentEncoding))
                             {
                                 result.Body = reader.ReadToEnd();
                             }
@@ -440,11 +440,20 @@ namespace CorrugatedIron.Comms
 
                 return RiakResult<RiakRestResponse>.Success(result);
             }
-            catch(RiakException ex)
+            catch (RiakException ex)
             {
                 return RiakResult<RiakRestResponse>.Error(ResultCode.CommunicationError, ex.Message, ex.NodeOffline);
             }
-            catch(Exception ex)
+            catch (WebException ex)
+            {
+                if (ex.Status == WebExceptionStatus.ProtocolError)
+                {
+                    return RiakResult<RiakRestResponse>.Error(ResultCode.HttpError, ex.Message, false);
+                }
+
+                return RiakResult<RiakRestResponse>.Error(ResultCode.HttpError, ex.Message, true);
+            }
+            catch (Exception ex)
             {
                 return RiakResult<RiakRestResponse>.Error(ResultCode.CommunicationError, ex.Message, true);
             }
