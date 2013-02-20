@@ -1,9 +1,23 @@
 Release Notes
 =============
 
+v1.2.0
+------
+
 ### Features
 
+We have made significant improvements in working with indexes as well as adding the following API changes:
+
+* We added two new APIs to the `RiakIndex` for Map/Reduce inputs - `AllKeys` and `Keys`. `AllKeys` uses the `$bucket` index to pass all keys into a Map/Reduce job. `Keys` uses the `$key` index to pass a list of keys in a range into an Map/Reduce job.
+* We added four `IndexGet` methods that are wrappers around protocol buffer requests to secondary indices - these make it easy to pull back a list of keys that match a specific index (`int`, `bin`, `int` range, or `bin` range).
+* `GetIndex` has been deprecated and will be removed in v1.3, adjust your client calls accordingly to use `IndexGet`.
+* `RiakGetOptions` and `RiakPutOptions` accept either an unsigned integer or one of a set of known strings for R, W, DW, etc. This brings these objects in line with other areas of the API.
+
 ### Fixes
+
+In addition to the issues listed below, we also fixed a bug where some Riak MapReduce results were being discarded by CorrugatedIron; this made it appear like Riak was exhibiting non-deterministic behavior on all Map/Reduce queries. 
+
+We were incorrectly handling Map/Reduce results when multiple tuples were returned within the same protocol buffer message from Riak. CorrugatedIron would only consume a single tuple from each message. This has been fixed within CI.
 
 * [Issue 91](https://github.com/DistributedNonsense/CorrugatedIron/issues/91) - Remove evidence of LastModifiedDate munging.
 * [Issue 90](https://github.com/DistributedNonsense/CorrugatedIron/issues/90) - Remove minor perf issue in `WalkLinks`.
@@ -12,7 +26,11 @@ Release Notes
 * [Issue 78](https://github.com/DistributedNonsense/CorrugatedIron/issues/78) - Enabling search via `SetBucketProperties()` now correctly enabled the search pre-commit hook.
 * [Issue 72](https://github.com/DistributedNonsense/CorrugatedIron/issues/72) - XML documentation is now included in the Nuget package for better support from Intellisense.
 * [Issue 71](https://github.com/DistributedNonsense/CorrugatedIron/issues/71) - Getting extended properties on a new bucket no longer throws exceptions.
-* [Issue 67](https://github.com/DistributedNonsense/CorrugatedIron/issues/67) - Finally added support for the Either<TLeft, TRight> on all options.
+* [Issue 67](https://github.com/DistributedNonsense/CorrugatedIron/issues/67) - Finally added support for the `Either<TLeft, TRight>` on all options.
+
+### Thanks
+
+We have had some great discussion from members of the community which is starting to drive out more interesting ideas and some extended goals for the future of **CorrugatedIron**. We're grateful for this involvement and hope to see more of it.
 
 v1.1.0
 ------
