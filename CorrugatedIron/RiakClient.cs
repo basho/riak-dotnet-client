@@ -788,6 +788,8 @@ namespace CorrugatedIron
         /// <remarks>Refer to http://wiki.basho.com/Links-and-Link-Walking.html for more information.</remarks>
         public RiakResult<IList<RiakObject>> WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks)
         {
+            System.Diagnostics.Debug.Assert(riakLinks.Count > 0, "Link walking requires at least one link");
+
             var input = new RiakBucketKeyInput();
             input.AddBucketKey(riakObject.Bucket, riakObject.Key);
 
@@ -799,7 +801,7 @@ namespace CorrugatedIron
             foreach(var riakLink in riakLinks)
             {
                 var link = riakLink;
-                var keep = link == lastLink;
+                var keep = ReferenceEquals(link, lastLink);
 
                 query.Link(l => l.FromRiakLink(link).Keep(keep));
             }
