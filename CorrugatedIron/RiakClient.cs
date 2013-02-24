@@ -703,6 +703,7 @@ namespace CorrugatedIron
         /// </summary>
         /// <param name="bucket">The name of the bucket to reset the properties on.</param>
         /// <returns>An indication of success or failure.</returns>
+        /// <remarks>This function requires Riak v1.3+.</remarks>
         public RiakResult ResetBucketProperties(string bucket)
         {
             var request = new RiakRestRequest(ToBucketPropsUri(bucket), RiakConstants.Rest.HttpMethod.Delete);
