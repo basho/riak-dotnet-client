@@ -35,6 +35,8 @@ namespace CorrugatedIron
     {
         void Batch(Action<IRiakBatchClient> batchAction);
 
+        T Batch<T>(Func<IRiakBatchClient, T> batchFunction);
+
         IRiakAsyncClient Async { get; }
     }
 
@@ -891,11 +893,18 @@ namespace CorrugatedIron
         /// </exception>
         public void Batch(Action<IRiakBatchClient> batchAction)
         {
-            Func<IRiakConnection, Action, RiakResult<IEnumerable<RiakResult<object>>>> batchFun = (conn, onFinish) =>
+            Batch<object>(c => { batchAction(c); return null; });
+        }
+
+        public T Batch<T>(Func<IRiakBatchClient, T> batchFun)
+        {
+            var funResult = default(T);
+
+            Func<IRiakConnection, Action, RiakResult<IEnumerable<RiakResult<object>>>> helperBatchFun = (conn, onFinish) =>
             {
                 try
                 {
-                    batchAction(new RiakClient(conn));
+                    funResult = batchFun(new RiakClient(conn));
                     return RiakResult<IEnumerable<RiakResult<object>>>.Success(null);
                 }
                 catch(Exception ex)
@@ -908,12 +917,14 @@ namespace CorrugatedIron
                 }
             };
 
-            var result = _endPoint.UseDelayedConnection(batchFun, RetryCount);
+            var result = _endPoint.UseDelayedConnection(helperBatchFun, RetryCount);
 
             if(!result.IsSuccess && result.ResultCode == ResultCode.BatchException)
             {
                 throw new Exception(result.ErrorMessage);
             }
+
+            return funResult;
         }
 
         private RiakResult UseConnection(Func<IRiakConnection, RiakResult> op)
