@@ -127,6 +127,7 @@ namespace CorrugatedIron.Util
             {
                 public const string RiakRoot = "/riak";
                 public const string MapReduce = "/mapred";
+                public const string BucketPropsFmt = "/buckets/{0}/props";
             }
 
             public static class Scheme
