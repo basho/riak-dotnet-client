@@ -56,6 +56,8 @@ namespace CorrugatedIron
 
         RiakResult SetBucketProperties(string bucket, RiakBucketProperties properties);
 
+        RiakResult ResetBucketProperties(string bucket);
+
         RiakResult<IList<RiakObject>> WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks);
 
         RiakResult<RiakServerInfo> GetServerInfo();

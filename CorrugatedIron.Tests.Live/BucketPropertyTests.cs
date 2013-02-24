@@ -317,6 +317,34 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
 
             completed.ShouldBeTrue();
         }
+
+        [Test]
+        public void ResettingBucketPropertiesWorksCorrectly()
+        {
+            const string bucket = "Schmoopy";
+
+            var props = new RiakBucketProperties()
+                .SetAllowMultiple(true)
+                .SetDwVal(10)
+                .SetWVal(5)
+                .SetLastWriteWins(true);
+
+            var setPropsResult = Client.SetBucketProperties(bucket, props);
+            setPropsResult.IsSuccess.ShouldBeTrue(setPropsResult.ErrorMessage);
+
+            var resetResult = Client.ResetBucketProperties(bucket);
+            resetResult.IsSuccess.ShouldBeTrue(resetResult.ErrorMessage);
+
+            var getPropsResult = Client.GetBucketProperties(bucket, true);
+            getPropsResult.IsSuccess.ShouldBeTrue(getPropsResult.ErrorMessage);
+
+            var resetProps = getPropsResult.Value;
+
+            resetProps.AllowMultiple.ShouldNotEqual(props.AllowMultiple);
+            resetProps.DwVal.ShouldNotEqual(props.DwVal);
+            resetProps.WVal.ShouldNotEqual(props.WVal);
+            resetProps.LastWriteWins.ShouldNotEqual(props.LastWriteWins);
+        }
     }
 
 }
