@@ -3,7 +3,8 @@ Release Notes
 
 ### Fixes
 
-* [Issue 94](https://github.com/DistributedNonsense/CorrugatedIron/issues/94) - Riak 1.3 Reset Bucket Properties functionality
+* [Issue 100](https://github.com/DistributedNonsense/CorrugatedIron/issues/100) - Slight refactor of Batch() to use TPL.
+* [Issue 94](https://github.com/DistributedNonsense/CorrugatedIron/issues/94) - Riak 1.3 Reset Bucket Properties functionality.
 
 v1.2.0
 ------
