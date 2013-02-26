@@ -58,7 +58,7 @@ namespace CorrugatedIron
 
         Task<RiakResult<RiakServerInfo>> GetServerInfo();
 
-        void Batch(Action<IRiakBatchClient> batchAction);
+        Task Batch(Action<IRiakBatchClient> batchAction);
 
         [Obsolete("All async operations should use the functions that return Task<T>.")]
         void Ping(Action<RiakResult> callback);
@@ -242,9 +242,14 @@ namespace CorrugatedIron
             return Task.Factory.StartNew(() => _client.GetServerInfo());
         }
 
-        public void Batch(Action<IRiakBatchClient> batchAction)
+        public Task Batch(Action<IRiakBatchClient> batchAction)
         {
-            Task.Factory.StartNew(() => _client.Batch(batchAction));
+            return Task.Factory.StartNew(() => _client.Batch(batchAction));
+        }
+
+        public Task<T> Batch<T>(Func<IRiakBatchClient, T> batchFunc)
+        {
+            return Task.Factory.StartNew<T>(() => _client.Batch(batchFunc));
         }
 
 
