@@ -1,8 +1,12 @@
 Release Notes
 =============
 
+v1.2.1
+------
+
 ### Fixes
 
+* [Issue 103](https://github.com/DistributedNonsense/CorrugatedIron/issues/103) - Add ListKeysFromIndex to IRiakClient.
 * [Issue 100](https://github.com/DistributedNonsense/CorrugatedIron/issues/100) - Slight refactor of Batch() to use TPL.
 * [Issue 94](https://github.com/DistributedNonsense/CorrugatedIron/issues/94) - Riak 1.3 Reset Bucket Properties functionality.
 
