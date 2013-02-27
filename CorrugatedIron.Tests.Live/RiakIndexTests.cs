@@ -22,6 +22,7 @@ using CorrugatedIron.Tests.Extensions;
 using NUnit.Framework;
 using System;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace CorrugatedIron.Tests.Live
 {
@@ -163,9 +164,12 @@ namespace CorrugatedIron.Tests.Live
         public void AllKeysReturnsListOfKeys()
         {
             var bucket = Bucket + "_" + Guid.NewGuid().ToString();
+            var originalKeys = new List<string>();
+
             for (var i = 0; i < 10; i++)
             {
                 var o = new RiakObject(bucket, Guid.NewGuid().ToString(), "{ value: \"this is an object\" }");
+                originalKeys.Add(o.Key);
 
                 Client.Put(o);
             }
@@ -183,6 +187,7 @@ namespace CorrugatedIron.Tests.Live
             {
                 key.Bucket.ShouldNotBeNullOrEmpty();
                 key.Key.ShouldNotBeNullOrEmpty();
+                originalKeys.Contains(key.Key).ShouldBeTrue();
             }
         }
 
@@ -190,9 +195,12 @@ namespace CorrugatedIron.Tests.Live
         public void KeysReturnsSelectiveListOfKeys()
         {
             var bucket = Bucket + "_" + Guid.NewGuid().ToString();
+            var originalKeys = new List<string>();
+
             for (var i = 0; i < 10; i++)
             {
                 var o = new RiakObject(bucket, i.ToString(), "{ value: \"this is an object\" }");
+                originalKeys.Add(o.Key);
 
                 Client.Put(o);
             }
@@ -213,6 +221,35 @@ namespace CorrugatedIron.Tests.Live
             {
                 key.Bucket.ShouldNotBeNullOrEmpty();
                 key.Key.ShouldNotBeNullOrEmpty();
+                originalKeys.Contains(key.Key).ShouldBeTrue();
+            }
+        }
+
+        [Test]
+        public void ListKeysUsingIndexReturnsAllKeys()
+        {
+            var bucket = Bucket + "_" + Guid.NewGuid().ToString();
+            var originalKeys = new HashSet<string>();
+
+            for (var i = 0; i < 10; i++)
+            {
+                var o = new RiakObject(bucket, Guid.NewGuid().ToString(), "{ value: \"this is an object\" }");
+                originalKeys.Add(o.Key);
+                
+                Client.Put(o);
+            }
+            
+            var result = Client.ListKeysFromIndex(bucket);
+
+            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
+
+            var keys = result.Value;
+            keys.Count.ShouldEqual(10);
+            
+            foreach (var key in keys)
+            {
+                key.ShouldNotBeNullOrEmpty();
+                originalKeys.Contains(key).ShouldBeTrue();
             }
         }
     }
