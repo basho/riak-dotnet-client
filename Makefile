@@ -1,9 +1,12 @@
 XBUILD=`which xbuild`
 
-all: compile
+all: release
 
-compile:
+release:
 	@$(XBUILD) ./CorrugatedIron.sln /property:configuration=Release
+
+debug:
+	@$(XBUILD) ./CorrugatedIron.sln /property:configuration=Debug
 
 clean:
 	rm -rf ./**/bin/
