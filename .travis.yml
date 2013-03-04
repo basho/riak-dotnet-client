@@ -1,0 +1,13 @@
+branches:
+  only:
+    - master
+    - develop
+
+language: c
+
+install:
+  - sudo apt-get install mono-devel mono-gmcs nunit-console
+
+script:
+  - ./.travis/PackageRestore.sh
+  - ./.travis/RunBuild.sh
