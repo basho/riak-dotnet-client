@@ -5,6 +5,11 @@ CorrugatedIron - a .NET client for Riak
 
 The easiest way to get hold of it is to install the [Nuget package](http://www.nuget.org/Packages/CorrugatedIron/).
 
+Travis-CI Build Status
+----------------------
+
+[![Branch: master](https://travis-ci.org/DistributedNonsense/CorrugatedIron.png?branch=master)](https://travis-ci.org/DistributedNonsense/CorrugatedIron) [![Branch: develop](https://travis-ci.org/DistributedNonsense/CorrugatedIron.png?branch=develop)](https://travis-ci.org/DistributedNonsense/CorrugatedIron)
+
 Authors
 -------
 
