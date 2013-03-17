@@ -17,6 +17,7 @@
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Models.MapReduce.Languages;
 using Newtonsoft.Json;
+using System.Collections;
 
 namespace CorrugatedIron.Models.MapReduce.Phases
 {
@@ -40,7 +41,12 @@ namespace CorrugatedIron.Models.MapReduce.Phases
         {
             Language.WriteJson(writer);
 
-            writer.WriteNonNullProperty("arg", _argument);
+            if (_argument != null)
+            {
+                var json = JsonConvert.SerializeObject(_argument);
+                writer.WritePropertyName("arg");
+                writer.WriteRawValue(json);
+            }
         }
     }
 }
