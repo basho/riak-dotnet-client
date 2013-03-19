@@ -17,7 +17,6 @@
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Models.MapReduce.Languages;
 using Newtonsoft.Json;
-using System.Collections;
 
 namespace CorrugatedIron.Models.MapReduce.Phases
 {
