@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+﻿// Copyright (c) 2013 - OJ Reeves & Jeremiah Peschka
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -21,7 +21,7 @@ using System.Collections.Generic;
 
 namespace CorrugatedIron.Comms
 {
-    internal class RiakConnectionPool : IDisposable
+    internal class RiakConnectionPool : IRiakConnectionManager
     {
         private readonly List<IRiakConnection> _allResources;
         private readonly ConcurrentStack<IRiakConnection> _resources;
