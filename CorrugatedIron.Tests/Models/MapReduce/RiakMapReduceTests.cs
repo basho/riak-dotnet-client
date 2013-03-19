@@ -38,6 +38,15 @@ namespace CorrugatedIron.Tests.Models.MapReduce
         private const string ComplexMrJobWithFilterText =
             @"{""inputs"":{""bucket"":""animals"",""key_filters"":[[""matches"",""spider""]]},""query"":[{""map"":{""language"":""javascript"",""source"":""function(o) { return [1]; }"",""keep"":false}},{""reduce"":{""language"":""javascript"",""name"":""Riak.reduceSum"",""keep"":true}}]}";
 
+        private const string MrJobWithArgumentsArray =
+            @"{""inputs"":""animals"",""query"":[{""reduce"":{""language"":""javascript"",""name"":""Riak.reduceSlice"",""arg"":[1,10],""keep"":true}}]}";
+
+        private const string MrJobWithObjectArgument =
+            @"{""inputs"":""animals"",""query"":[{""reduce"":{""language"":""javascript"",""name"":""Riak.reduceSlice"",""arg"":{""reduce_phase_only_1"":true},""keep"":true}}]}";
+
+        private const string MrJobWithValueTypeArgument =
+            @"{""inputs"":""animals"",""query"":[{""reduce"":{""language"":""javascript"",""name"":""Riak.reduceSlice"",""arg"":""slartibartfast"",""keep"":true}}]}";
+
         private const string MrContentType = RiakConstants.ContentTypes.ApplicationJson;
 
         [Test]
@@ -117,6 +126,39 @@ namespace CorrugatedIron.Tests.Models.MapReduce
 
             requestString.Contains("$key").ShouldBeTrue();
             requestString.Contains("$key_bin").ShouldBeFalse();
+        }
+
+        [Test]
+        public void BuildingMapReducePhaseWithArgumentsArrayProducesCorrectResult()
+        {
+            var query = new RiakMapReduceQuery { ContentType = MrContentType }
+                .Inputs("animals")
+                .ReduceJs(c => c.Name("Riak.reduceSlice").Keep(true).Argument(new [] { 1, 10 }));
+
+            var request = query.ToMessage();
+            request.request.ShouldEqual(MrJobWithArgumentsArray.ToRiakString());
+        }
+
+        [Test]
+        public void BuildingMapReducePhaseWithObjectArgumentProducesCorrectResult()
+        {
+            var query = new RiakMapReduceQuery { ContentType = MrContentType }
+                .Inputs("animals")
+                .ReduceJs(c => c.Name("Riak.reduceSlice").Keep(true).Argument(new { reduce_phase_only_1 = true }));
+
+            var request = query.ToMessage();
+            request.request.ShouldEqual(MrJobWithObjectArgument.ToRiakString());
+        }
+
+        [Test]
+        public void BuildingMapReducePhaseWithVaueTypeArgumentProducesCorrectResult()
+        {
+            var query = new RiakMapReduceQuery { ContentType = MrContentType }
+                .Inputs("animals")
+                .ReduceJs(c => c.Name("Riak.reduceSlice").Keep(true).Argument("slartibartfast"));
+
+            var request = query.ToMessage();
+            request.request.ShouldEqual(MrJobWithValueTypeArgument.ToRiakString());
         }
     }
 }

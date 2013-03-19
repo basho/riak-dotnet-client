@@ -1,6 +1,10 @@
 Release Notes
 =============
 
+### Fixes
+
+* [Issue 106](https://github.com/DistributedNonsense/CorrugatedIron/issues/106) - Fix problem where the `arg` parameter for Map/Reduce jobs was only supporting string elements. Now supports value types, collections and complex objects.
+
 v1.2.1
 ------
 
