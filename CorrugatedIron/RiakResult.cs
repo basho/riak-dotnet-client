@@ -27,7 +27,8 @@ namespace CorrugatedIron
         NoConnections,
         BatchException,
         NoRetries,
-        HttpError
+        HttpError,
+        InvalidRequest
     }
 
     public class RiakResult
