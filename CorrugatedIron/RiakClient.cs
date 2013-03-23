@@ -104,6 +104,16 @@ namespace CorrugatedIron
         /// </remarks>
         public RiakResult<RiakObject> Get(string bucket, string key, RiakGetOptions options = null)
         {
+            if (string.IsNullOrWhiteSpace(bucket))
+            {
+                return RiakResult<RiakObject>.Error(ResultCode.InvalidRequest, "Bucket cannot be null or whitespace", false);
+            }
+
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                return RiakResult<RiakObject>.Error(ResultCode.InvalidRequest, "Key cannot be null or whitespace", false);
+            }
+
             var request = new RpbGetReq { bucket = bucket.ToRiakString(), key = key.ToRiakString() };
 
             options = options ?? new RiakGetOptions();
@@ -264,6 +274,16 @@ namespace CorrugatedIron
         /// </param>
         public RiakResult<RiakObject> Put(RiakObject value, RiakPutOptions options = null)
         {
+            if (string.IsNullOrWhiteSpace(value.Bucket))
+            {
+                return RiakResult<RiakObject>.Error(ResultCode.InvalidRequest, "Bucket cannot be null or whitespace", false);
+            }
+
+            if (string.IsNullOrWhiteSpace(value.Key))
+            {
+                return RiakResult<RiakObject>.Error(ResultCode.InvalidRequest, "Key cannot be null or whitespace", false);
+            }
+
             options = options ?? new RiakPutOptions();
 
             var request = value.ToMessage();
@@ -357,6 +377,16 @@ namespace CorrugatedIron
         /// </param>
         public RiakResult Delete(string bucket, string key, RiakDeleteOptions options = null)
         {
+            if (string.IsNullOrWhiteSpace(bucket))
+            {
+                return RiakResult<RiakObject>.Error(ResultCode.InvalidRequest, "Bucket cannot be null or whitespace", false);
+            }
+
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                return RiakResult<RiakObject>.Error(ResultCode.InvalidRequest, "Key cannot be null or whitespace", false);
+            }
+
             options = options ?? new RiakDeleteOptions();
 
             var request = new RpbDelReq { bucket = bucket.ToRiakString(), key = key.ToRiakString() };
@@ -598,9 +628,7 @@ namespace CorrugatedIron
         /// quickly return an unsorted list of keys from Riak.</remarks>
         public RiakResult<IList<string>> ListKeysFromIndex(string bucket)
         {
-            return IndexGet(bucket, 
-                            RiakConstants.SystemIndexKeys.RiakBucketIndex, 
-                            bucket);
+            return IndexGet(bucket, RiakConstants.SystemIndexKeys.RiakBucketIndex, bucket);
         }
 
         /// <summary>
@@ -622,7 +650,7 @@ namespace CorrugatedIron
                 // bucket names cannot have slashes in the names, the REST interface doesn't like it at all
                 if (bucket.Contains('/'))
                 {
-                    return RiakResult<RiakBucketProperties>.Error(ResultCode.HttpError, "Bucket names cannot contain slashes", false);
+                    return RiakResult<RiakBucketProperties>.Error(ResultCode.InvalidRequest, "Bucket names cannot contain slashes", false);
                 }
 
                 var request = new RiakRestRequest(ToBucketUri(bucket), RiakConstants.Rest.HttpMethod.Get)
@@ -682,7 +710,7 @@ namespace CorrugatedIron
                 // bucket names cannot have slashes in the names, the REST interface doesn't like it at all
                 if (bucket.Contains('/'))
                 {
-                    return RiakResult.Error(ResultCode.HttpError, "Bucket names cannot contain slashes", false);
+                    return RiakResult.Error(ResultCode.InvalidRequest, "Bucket names cannot contain slashes", false);
                 }
 
                 var request = new RiakRestRequest(ToBucketUri(bucket), RiakConstants.Rest.HttpMethod.Put)
