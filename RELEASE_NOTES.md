@@ -1,6 +1,8 @@
 Release Notes
 =============
 
+* [Issue 111](https://github.com/DistributedNonsense/CorrugatedIron/issues/111) - Add support for per-node on-the-fly connections
+
 v1.2.1
 ------
 
