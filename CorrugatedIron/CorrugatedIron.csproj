@@ -61,8 +61,10 @@
     <Compile Include="..\Metadata\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
+    <Compile Include="Comms\IRiakConnectionManager.cs" />
     <Compile Include="Comms\LoadBalancing\ILoadBalancingStrategy.cs" />
     <Compile Include="Comms\LoadBalancing\RoundRobinStrategy.cs" />
+    <Compile Include="Comms\RiakOnTheFlyConnection.cs" />
     <Compile Include="Comms\RiakPbcSocket.cs" />
     <Compile Include="Config\Fluent\RiakClusterConfiguration.cs" />
     <Compile Include="Config\Fluent\RiakExternalLoadBalancerConfiguration.cs" />
