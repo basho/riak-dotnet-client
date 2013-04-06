@@ -14,6 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Collections.Generic;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Tests.Extensions;
@@ -70,6 +71,97 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             readResult.IsSuccess.ShouldBeTrue();
             readResult.Value.ShouldNotBeNull();
             readResult.Value.HasChanged.ShouldBeFalse();
+        }
+
+        [Test]
+        public void GetWithInvalidBucketReturnsInvalidRequest()
+        {
+            var getResult = Client.Get("", "key");
+            getResult.ResultCode.ShouldEqual(ResultCode.InvalidRequest);
+            getResult = Client.Get("foo/bar", "key");
+            getResult.ResultCode.ShouldEqual(ResultCode.InvalidRequest);
+            getResult = Client.Get("  ", "key");
+            getResult.ResultCode.ShouldEqual(ResultCode.InvalidRequest);
+            getResult = Client.Get(null, "key");
+            getResult.ResultCode.ShouldEqual(ResultCode.InvalidRequest);
+        }
+
+        [Test]
+        public void GetWithInvalidKeyReturnsInvalidRequest()
+        {
+            var getResult = Client.Get("bucket", "");
+            getResult.ResultCode.ShouldEqual(ResultCode.InvalidRequest);
+            getResult = Client.Get("bucket", "foo/bar");
+            getResult.ResultCode.ShouldEqual(ResultCode.InvalidRequest);
+            getResult = Client.Get("bucket", "  ");
+            getResult.ResultCode.ShouldEqual(ResultCode.InvalidRequest);
+            getResult = Client.Get("bucket", null);
+            getResult.ResultCode.ShouldEqual(ResultCode.InvalidRequest);
+        }
+
+        [Test]
+        public void MultiGetWithValidAndInvalidBucketsBehavesCorrectly()
+        {
+            var doc = new RiakObject(TestBucket, TestKey, TestJson, RiakConstants.ContentTypes.ApplicationJson);
+            var writeResult = Client.Put(doc);
+
+            writeResult.IsSuccess.ShouldBeTrue();
+            writeResult.Value.ShouldNotBeNull();
+
+            var getResults = Client.Get(new List<RiakObjectId>
+            {
+                new RiakObjectId(null, "key"),
+                new RiakObjectId("", "key"),
+                new RiakObjectId("  ", "key"),
+                new RiakObjectId("foo/bar", "key"),
+                new RiakObjectId(TestBucket, TestKey)
+            }).ToList();
+
+            getResults.Count(r => r.IsSuccess).ShouldEqual(1);
+        }
+
+        [Test]
+        public void MultiPutWithValidAndInvalidBucketsBehavesCorrectly()
+        {
+            var doc = new RiakObject(TestBucket, TestKey, TestJson, RiakConstants.ContentTypes.ApplicationJson);
+            var writeResult = Client.Put(doc);
+
+            writeResult.IsSuccess.ShouldBeTrue();
+            writeResult.Value.ShouldNotBeNull();
+
+            var putResults = Client.Put(new List<RiakObject>
+            {
+                new RiakObject(null, "key", TestJson, RiakConstants.ContentTypes.ApplicationJson),
+                new RiakObject("", "key", TestJson, RiakConstants.ContentTypes.ApplicationJson),
+                new RiakObject("  ", "key", TestJson, RiakConstants.ContentTypes.ApplicationJson),
+                new RiakObject("foo/bar", "key", TestJson, RiakConstants.ContentTypes.ApplicationJson),
+                new RiakObject(TestBucket, TestKey, TestJson, RiakConstants.ContentTypes.ApplicationJson)
+            }).ToList();
+
+            putResults.Count(r => r.IsSuccess).ShouldEqual(1);
+        }
+
+        [Test]
+        public void MultiDeleteWithValidAndInvalidBucketsBehavesCorrectly()
+        {
+            var doc = new RiakObject(TestBucket, TestKey, TestJson, RiakConstants.ContentTypes.ApplicationJson);
+            var writeResult = Client.Put(doc);
+
+            writeResult.IsSuccess.ShouldBeTrue();
+            writeResult.Value.ShouldNotBeNull();
+
+            var deleteResults = Client.Delete(new List<RiakObjectId>
+            {
+                new RiakObjectId(null, "key"),
+                new RiakObjectId("", "key"),
+                new RiakObjectId("  ", "key"),
+                new RiakObjectId("foo/bar", "key"),
+                new RiakObjectId(TestBucket, TestKey)
+            }).ToList();
+
+            deleteResults.Count(r => r.IsSuccess).ShouldEqual(1);
+            var deletedItemGetResult = Client.Get(TestBucket, TestKey);
+            deletedItemGetResult.ResultCode.ShouldEqual(ResultCode.NotFound);
         }
 
         [Test]
