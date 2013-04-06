@@ -63,6 +63,9 @@ namespace CorrugatedIron.Tests.Live
             
             ro.BinIndexes.Count.ShouldEqual(1);
             ro.IntIndexes.Count.ShouldEqual(1);
+
+			ro.BinIndex("tacos").Values[0].ShouldEqual("are great!");
+			ro.IntIndex("age").Values[0].ShouldEqual(12);
         }
 
         [Test]
