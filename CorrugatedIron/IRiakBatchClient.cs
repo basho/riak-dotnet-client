@@ -67,7 +67,7 @@ namespace CorrugatedIron
         RiakResult<IList<string>> IndexGet(string bucket, string indexName, int minValue, int maxValue);
         RiakResult<IList<string>> IndexGet(string bucket, string indexName, string minValue, string maxValue);
 
-		RiakResult<IList<string>> ListKeysFromIndex(string bucket);
+        RiakResult<IList<string>> ListKeysFromIndex(string bucket);
 
         //RiakResult<RiakSearchResult> Search(Action<RiakSearchRequest> prepareRequest)
     }

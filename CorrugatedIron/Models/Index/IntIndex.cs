@@ -17,10 +17,11 @@
 using CorrugatedIron.Util;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 
 namespace CorrugatedIron.Models.Index
 {
-    public class IntIndex : SecondaryIndex<IntIndex, int>
+    public class IntIndex : SecondaryIndex<IntIndex, BigInteger>
     {
         internal IntIndex(RiakObject container, string name)
             : base(container, name)
@@ -39,32 +40,32 @@ namespace CorrugatedIron.Models.Index
 
         public IntIndex Set(params string[] values)
         {
-            return Set(values.Select(int.Parse));
+            return Set(values.Select(BigInteger.Parse));
         }
 
         public IntIndex Set(IEnumerable<string> values)
         {
-            return Set(values.Select(int.Parse));
+            return Set(values.Select(BigInteger.Parse));
         }
 
         public IntIndex Add(params string[] values)
         {
-            return Add(values.Select(int.Parse));
+            return Add(values.Select(BigInteger.Parse));
         }
 
         public IntIndex Add(IEnumerable<string> values)
         {
-            return Add(values.Select(int.Parse));
+            return Add(values.Select(BigInteger.Parse));
         }
 
         public IntIndex Remove(params string[] values)
         {
-            return Remove(values.Select(int.Parse));
+            return Remove(values.Select(BigInteger.Parse));
         }
 
         public IntIndex Remove(IEnumerable<string> values)
         {
-            return Remove(values.Select(int.Parse));
+            return Remove(values.Select(BigInteger.Parse));
         }
 
         public RiakObject Delete()

@@ -1,12 +1,15 @@
 Release Notes
 =============
 
+This version includes a change which "breaks" the interface to integer secondary indexes. This was introduced beacuse integer 2i's in Riak are much bigger than a 32-bit int. This might result in some fun if any of your code is storing your 2i value in a 32-bit integer field. However, in most cases, direct usage of integer literals or comparisons with integer values will work as is because of the built-in implicit conversion from `int` to `BigInteger`.
+
 ### Fixes
 
 * [Issue 112](https://github.com/DistributedNonsense/CorrugatedIron/issues/112) - Prevent invalid bucket/keys names.
 * [Issue 111](https://github.com/DistributedNonsense/CorrugatedIron/issues/111) - Add support for per-node on-the-fly connections.
 * [Issue 109](https://github.com/DistributedNonsense/CorrugatedIron/issues/109) - Add `Binary` to the `CharSet` constants and add some docs.
 * [Issue 106](https://github.com/DistributedNonsense/CorrugatedIron/issues/106) - Fix problem where the `arg` parameter for Map/Reduce jobs was only supporting string elements. Now supports value types, collections and complex objects.
+* [Issue 105](https://github.com/DistributedNonsense/CorrugatedIron/issues/106) - Fixed 2i implementation to use `BigInteger` instead of `int`.
 
 v1.2.1
 ------
