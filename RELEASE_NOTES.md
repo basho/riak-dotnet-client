@@ -3,8 +3,9 @@ Release Notes
 
 ### Fixes
 
-* [Issue 106](https://github.com/DistributedNonsense/CorrugatedIron/issues/106) - Fix problem where the `arg` parameter for Map/Reduce jobs was only supporting string elements. Now supports value types, collections and complex objects.
 * [Issue 111](https://github.com/DistributedNonsense/CorrugatedIron/issues/111) - Add support for per-node on-the-fly connections
+* [Issue 109](https://github.com/DistributedNonsense/CorrugatedIron/issues/109) - Add `Binary` to the `CharSet` constants and add some docs.
+* [Issue 106](https://github.com/DistributedNonsense/CorrugatedIron/issues/106) - Fix problem where the `arg` parameter for Map/Reduce jobs was only supporting string elements. Now supports value types, collections and complex objects.
 
 v1.2.1
 ------
