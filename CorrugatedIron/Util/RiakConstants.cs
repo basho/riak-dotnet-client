@@ -59,6 +59,7 @@ namespace CorrugatedIron.Util
         public static class CharSets
         {
             public const string Utf8 = @"UTF-8";
+            public const string Binary = null;
         }
 
         public static class QuorumOptions
