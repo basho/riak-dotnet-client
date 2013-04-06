@@ -78,101 +78,101 @@ namespace CorrugatedIron.Models
             get { return _vtags ?? (_vtags = Siblings.Count == 0 ? new List<string> { VTag } : Siblings.Select(s => s.VTag).ToList()); }
         }
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="CorrugatedIron.Models.RiakObject"/> class.
-		/// </summary>
-		/// <param name="bucket">Bucket.</param>
-		/// <param name="key">Key.</param>
-		/// <remarks>When saving a binary object to Riak, one of the appropriate binary 
-		/// <see cref="cref="CorrugatedIron.Util.RiakConstants.ContentTypes"/> should be used.
-		/// If the content type is not know, fall back to application/octet-stream. In addition,
-		/// when saving binary data to Riak, a charSet of null/empty string should be used. The 
-		/// constant CharSets.Binary should be used.</remarks>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CorrugatedIron.Models.RiakObject"/> class.
+        /// </summary>
+        /// <param name="bucket">Bucket.</param>
+        /// <param name="key">Key.</param>
+        /// <remarks>When saving a binary object to Riak, one of the appropriate binary 
+        /// <see cref="cref="CorrugatedIron.Util.RiakConstants.ContentTypes"/> should be used.
+        /// If the content type is not know, fall back to application/octet-stream. In addition,
+        /// when saving binary data to Riak, a charSet of null/empty string should be used. The 
+        /// constant CharSets.Binary should be used.</remarks>
         public RiakObject(string bucket, string key)
             : this(bucket, key, null, RiakConstants.Defaults.ContentType)
         {
         }
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="CorrugatedIron.Models.RiakObject"/> class.
-		/// </summary>
-		/// <param name="bucket">Bucket.</param>
-		/// <param name="key">Key.</param>
-		/// <param name="value">Value.</param>
-		/// <remarks>When saving a binary object to Riak, one of the appropriate binary 
-		/// <see cref="cref="CorrugatedIron.Util.RiakConstants.ContentTypes"/> should be used.
-		/// If the content type is not know, fall back to application/octet-stream. In addition,
-		/// when saving binary data to Riak, a charSet of null/empty string should be used. The 
-		/// constant CharSets.Binary should be used.</remarks>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CorrugatedIron.Models.RiakObject"/> class.
+        /// </summary>
+        /// <param name="bucket">Bucket.</param>
+        /// <param name="key">Key.</param>
+        /// <param name="value">Value.</param>
+        /// <remarks>When saving a binary object to Riak, one of the appropriate binary 
+        /// <see cref="cref="CorrugatedIron.Util.RiakConstants.ContentTypes"/> should be used.
+        /// If the content type is not know, fall back to application/octet-stream. In addition,
+        /// when saving binary data to Riak, a charSet of null/empty string should be used. The 
+        /// constant CharSets.Binary should be used.</remarks>
         public RiakObject(string bucket, string key, string value)
             : this(bucket, key, value, RiakConstants.Defaults.ContentType)
         {
         }
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="CorrugatedIron.Models.RiakObject"/> class.
-		/// </summary>
-		/// <param name="bucket">Bucket.</param>
-		/// <param name="key">Key.</param>
-		/// <param name="value">Value.</param>
-		/// <remarks>When saving a binary object to Riak, one of the appropriate binary 
-		/// <see cref="cref="CorrugatedIron.Util.RiakConstants.ContentTypes"/> should be used.
-		/// If the content type is not know, fall back to application/octet-stream. In addition,
-		/// when saving binary data to Riak, a charSet of null/empty string should be used. The 
-		/// constant CharSets.Binary should be used.</remarks>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CorrugatedIron.Models.RiakObject"/> class.
+        /// </summary>
+        /// <param name="bucket">Bucket.</param>
+        /// <param name="key">Key.</param>
+        /// <param name="value">Value.</param>
+        /// <remarks>When saving a binary object to Riak, one of the appropriate binary 
+        /// <see cref="cref="CorrugatedIron.Util.RiakConstants.ContentTypes"/> should be used.
+        /// If the content type is not know, fall back to application/octet-stream. In addition,
+        /// when saving binary data to Riak, a charSet of null/empty string should be used. The 
+        /// constant CharSets.Binary should be used.</remarks>
         public RiakObject(string bucket, string key, object value)
             : this(bucket, key, value.ToJson(), RiakConstants.ContentTypes.ApplicationJson)
         {
         }
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="CorrugatedIron.Models.RiakObject"/> class.
-		/// </summary>
-		/// <param name="bucket">Bucket.</param>
-		/// <param name="key">Key.</param>
-		/// <param name="value">Value.</param>
-		/// <param name="contentType">Content type of the object. These should be MIME compliant content types.</param>
-		/// <remarks>When saving a binary object to Riak, one of the appropriate binary 
-		/// <see cref="cref="CorrugatedIron.Util.RiakConstants.ContentTypes"/> should be used.
-		/// If the content type is not know, fall back to application/octet-stream. In addition,
-		/// when saving binary data to Riak, a charSet of null/empty string should be used. The 
-		/// constant CharSets.Binary should be used.</remarks>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CorrugatedIron.Models.RiakObject"/> class.
+        /// </summary>
+        /// <param name="bucket">Bucket.</param>
+        /// <param name="key">Key.</param>
+        /// <param name="value">Value.</param>
+        /// <param name="contentType">Content type of the object. These should be MIME compliant content types.</param>
+        /// <remarks>When saving a binary object to Riak, one of the appropriate binary 
+        /// <see cref="cref="CorrugatedIron.Util.RiakConstants.ContentTypes"/> should be used.
+        /// If the content type is not know, fall back to application/octet-stream. In addition,
+        /// when saving binary data to Riak, a charSet of null/empty string should be used. The 
+        /// constant CharSets.Binary should be used.</remarks>
         public RiakObject(string bucket, string key, string value, string contentType)
             : this(bucket, key, value, contentType, RiakConstants.Defaults.CharSet)
         {
         }
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="CorrugatedIron.Models.RiakObject"/> class.
-		/// </summary>
-		/// <param name="bucket">Bucket.</param>
-		/// <param name="key">Key.</param>
-		/// <param name="value">Value.</param>
-		/// <param name="contentType">Content type of the object. These should be MIME compliant content types.</param>
-		/// <param name="charSet">Character set used to encode saved data.</param>
-		/// <remarks>When saving a binary object to Riak, one of the appropriate binary 
-		/// <see cref="cref="CorrugatedIron.Util.RiakConstants.ContentTypes"/> should be used.
-		/// If the content type is not know, fall back to application/octet-stream. In addition,
-		/// when saving binary data to Riak, a charSet of null/empty string should be used. The 
-		/// constant CharSets.Binary should be used.</remarks>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CorrugatedIron.Models.RiakObject"/> class.
+        /// </summary>
+        /// <param name="bucket">Bucket.</param>
+        /// <param name="key">Key.</param>
+        /// <param name="value">Value.</param>
+        /// <param name="contentType">Content type of the object. These should be MIME compliant content types.</param>
+        /// <param name="charSet">Character set used to encode saved data.</param>
+        /// <remarks>When saving a binary object to Riak, one of the appropriate binary 
+        /// <see cref="cref="CorrugatedIron.Util.RiakConstants.ContentTypes"/> should be used.
+        /// If the content type is not know, fall back to application/octet-stream. In addition,
+        /// when saving binary data to Riak, a charSet of null/empty string should be used. The 
+        /// constant CharSets.Binary should be used.</remarks>
         public RiakObject(string bucket, string key, string value, string contentType, string charSet)
             : this(bucket, key, value.ToRiakString(), contentType, charSet)
         {
         }
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="CorrugatedIron.Models.RiakObject"/> class.
-		/// </summary>
-		/// <param name="bucket">Bucket.</param>
-		/// <param name="key">Key.</param>
-		/// <param name="value">Value.</param>
-		/// <param name="contentType">Content type of the object. These should be MIME compliant content types.</param>
-		/// <param name="charSet">Character set used to encode saved data.</param>
-		/// <remarks>When saving a binary object to Riak, one of the appropriate binary 
-		/// <see cref="cref="CorrugatedIron.Util.RiakConstants.ContentTypes"/> should be used.
-		/// If the content type is not know, fall back to application/octet-stream. In addition,
-		/// when saving binary data to Riak, a charSet of null/empty string should be used. The 
-		/// constant CharSets.Binary should be used.</remarks>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CorrugatedIron.Models.RiakObject"/> class.
+        /// </summary>
+        /// <param name="bucket">Bucket.</param>
+        /// <param name="key">Key.</param>
+        /// <param name="value">Value.</param>
+        /// <param name="contentType">Content type of the object. These should be MIME compliant content types.</param>
+        /// <param name="charSet">Character set used to encode saved data.</param>
+        /// <remarks>When saving a binary object to Riak, one of the appropriate binary 
+        /// <see cref="cref="CorrugatedIron.Util.RiakConstants.ContentTypes"/> should be used.
+        /// If the content type is not know, fall back to application/octet-stream. In addition,
+        /// when saving binary data to Riak, a charSet of null/empty string should be used. The 
+        /// constant CharSets.Binary should be used.</remarks>
         public RiakObject(string bucket, string key, byte[] value, string contentType, string charSet)
         {
             Bucket = bucket;
