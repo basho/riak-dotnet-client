@@ -43,8 +43,8 @@ namespace CorrugatedIron.Tests.Live.LoadTests
         //private const int ThreadCount = 1;
         //private const int ActionCount = 1;
 
-        public WhenUnderLoad()
-            : base("riakLoadTestConfiguration")
+        public WhenUnderLoad(string configSection = "riakLoadTestConfiguration")
+            : base(configSection)
         {
         }
 
@@ -172,6 +172,15 @@ namespace CorrugatedIron.Tests.Live.LoadTests
                 }).Where(r => r != null).SelectMany(r => r);
 
             return results.ToList();
+        }
+    }
+
+    [TestFixture]
+    public class WhenUnderLoadWithOnTheFlyConnections : WhenUnderLoad
+    {
+        public WhenUnderLoadWithOnTheFlyConnections()
+            : base("riakOnTheFlyLoadTestConfiguration")
+        {
         }
     }
 }

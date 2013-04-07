@@ -31,12 +31,21 @@ namespace CorrugatedIron.Comms
 
     public class RiakNode : IRiakNode
     {
-        private readonly RiakConnectionPool _connections;
+        private readonly IRiakConnectionManager _connections;
         private bool _disposing;
 
         public RiakNode(IRiakNodeConfiguration nodeConfiguration, IRiakConnectionFactory connectionFactory)
         {
-            _connections = new RiakConnectionPool(nodeConfiguration, connectionFactory);
+            // assume that if the node has a pool size of 0 then the intent is to have the connections
+            // made on the fly
+            if (nodeConfiguration.PoolSize == 0)
+            {
+                _connections = new RiakOnTheFlyConnection(nodeConfiguration, connectionFactory);
+            }
+            else
+            {
+                _connections = new RiakConnectionPool(nodeConfiguration, connectionFactory);
+            }
         }
 
         public RiakResult UseConnection(Func<IRiakConnection, RiakResult> useFun)

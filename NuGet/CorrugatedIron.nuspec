@@ -19,7 +19,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>CorrugatedIron</id>
-    <version>1.2.1</version>
+    <version>1.3.0</version>
     <authors>OJ Reeves, Jeremiah Peschka</authors>
     <owners>OJ Reeves, Jeremiah Peschka</owners>
     <description>
@@ -29,7 +29,9 @@
 
       After installing this package, make sure that you modify either the app.config (for client apps) or web.config (for web apps) so that the details of the target Riak cluster are set correctly.
 
-      As of version 1.0.0 CorrugaedIron requires Riak version 1.2.1 or higher. Use CorrugatedIron version 0.2.3 if you aim to continue using Riak versions prior to 1.2.
+      As of version 1.0.0 CorrugatedIron requires Riak version 1.2.1 or higher. Use CorrugatedIron version 0.2.3 if you aim to continue using Riak versions prior to 1.2.
+      
+      As of version 1.2.1 some features of CorrugatedIron requires Riak version 1.3 or higher.
     </description>
     <summary>
       CorrugatedIron - the .NET client for Riak.
@@ -45,6 +47,7 @@
     </dependencies>
     <frameworkAssemblies>
       <frameworkAssembly assemblyName="System.configuration" />
+      <frameworkAssembly assemblyName="System.Numerics" />
     </frameworkAssemblies>
   </metadata>
   <files>
