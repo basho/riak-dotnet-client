@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+﻿// Copyright (c) 2013 - OJ Reeves & Jeremiah Peschka
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -22,7 +22,7 @@ using System.Reflection;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Distributed Nonsense")]
 [assembly: AssemblyProduct("CorrugatedIron")]
-[assembly: AssemblyCopyright("Copyright © 2011 OJ Reeves & Jeremiah Peschka")]
+[assembly: AssemblyCopyright("Copyright © 2013 OJ Reeves & Jeremiah Peschka")]
 [assembly: AssemblyTrademark("CorrugatedIron - Distributed Nonsense")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +32,5 @@ using System.Reflection;
 // move to the Major version number.
 // We'll use the revision number for hot fix release and probably leave the build
 // number there for when we do rc releases.
-[assembly: AssemblyVersion("1.2.1.0")] 
-[assembly: AssemblyFileVersion("1.2.1.0")]
+[assembly: AssemblyVersion("1.3.0.0")] 
+[assembly: AssemblyFileVersion("1.3.0.0")]
