@@ -51,6 +51,7 @@ namespace CorrugatedIron.Tests.Live
         public void IndexesAreSavedWithAnObject()
         {
             var o = new RiakObject(Bucket, "the_object", "{ value: \"this is an object\" }");
+
             o.BinIndex("tacos").Set("are great!");
             o.IntIndex("age").Set(12);
             
@@ -63,6 +64,9 @@ namespace CorrugatedIron.Tests.Live
             
             ro.BinIndexes.Count.ShouldEqual(1);
             ro.IntIndexes.Count.ShouldEqual(1);
+
+            ro.BinIndex("tacos").Values[0].ShouldEqual("are great!");
+            ro.IntIndex("age").Values[0].ShouldEqual(12);
         }
 
         [Test]
