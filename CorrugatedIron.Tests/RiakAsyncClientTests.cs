@@ -24,6 +24,8 @@ using System.Linq;
 
 namespace CorrugatedIron.Tests.RiakAsyncClientTests
 {
+
+    /*
     internal abstract class RiakAsyncClientTestBase<TResult>
     {
         protected Mock<IRiakClient> ClientMock;
@@ -141,4 +143,5 @@ namespace CorrugatedIron.Tests.RiakAsyncClientTests
             Result.Count().ShouldEqual(0);
         }
     }
+    */
 }

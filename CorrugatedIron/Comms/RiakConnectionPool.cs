@@ -18,6 +18,7 @@ using CorrugatedIron.Config;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace CorrugatedIron.Comms
 {
@@ -41,64 +42,54 @@ namespace CorrugatedIron.Comms
             }
         }
 
-        public Tuple<bool, TResult> Consume<TResult>(Func<IRiakConnection, TResult> consumer)
+        public Task<Tuple<bool, TResult>> Consume<TResult>(Func<IRiakConnection, Task<TResult>> consumer)
         {
-            if(_disposing) return Tuple.Create(false, default(TResult));
+            if(_disposing)
+                return TaskResult(Tuple.Create(false, default(TResult)));
 
             IRiakConnection instance = null;
-            try
+            if(_resources.TryPop(out instance))
             {
-                if(_resources.TryPop(out instance))
-                {
-                    var result = consumer(instance);
-                    return Tuple.Create(true, result);
-                }
-            }
-            catch(Exception)
-            {
-                return Tuple.Create(false, default(TResult));
-            }
-            finally
-            {
-                if(instance != null)
-                {
-                    _resources.Push(instance);
-                }
-            }
+                return consumer(instance).ContinueWith((Task<TResult> finishedTask) => {
+                    if (instance != null)
+                        _resources.Push(instance);
 
-            return Tuple.Create(false, default(TResult));
+                    // finshed task
+                    if (!finishedTask.IsFaulted)
+                        return Tuple.Create(true, finishedTask.Result);
+                    else
+                        return Tuple.Create(false, default(TResult));
+                });
+            }
+            else
+            {
+                return TaskResult(Tuple.Create(false, default(TResult)));
+            }
         }
 
-        public Tuple<bool, TResult> DelayedConsume<TResult>(Func<IRiakConnection, Action, TResult> consumer)
+        public Task<Tuple<bool, TResult>> DelayedConsume<TResult>(Func<IRiakConnection, Action, Task<TResult>> consumer)
         {
-            if(_disposing) return Tuple.Create(false, default(TResult));
+            if(_disposing)
+                return TaskResult(Tuple.Create(false, default(TResult)));
 
             IRiakConnection instance = null;
-            try
+            if(_resources.TryPop(out instance))
             {
-                if(_resources.TryPop(out instance))
-                {
-                    Action cleanup = () =>
-                    {
-                        var i = instance;
-                        instance = null;
-                        _resources.Push(i);
-                    };
-
-                    var result = consumer(instance, cleanup);
-                    return Tuple.Create(true, result);
-                }
+                return consumer(instance, () => {}).ContinueWith((Task<TResult> finishedTask) => {
+                    if (instance != null)
+                        _resources.Push(instance);
+                    
+                    // finshed task
+                    if (!finishedTask.IsFaulted)
+                        return Tuple.Create(true, finishedTask.Result);
+                    else
+                        return Tuple.Create(false, default(TResult));
+                });
             }
-            catch(Exception)
+            else
             {
-                if(instance != null)
-                {
-                    _resources.Push(instance);
-                }
-                return Tuple.Create(false, default(TResult));
+                return TaskResult(Tuple.Create(false, default(TResult)));
             }
-
-            return Tuple.Create(false, default(TResult));
         }
 
         public void Dispose()
@@ -111,6 +102,14 @@ namespace CorrugatedIron.Comms
             {
                 conn.Dispose();
             }
+        }
+        
+        // wrap a task result
+        private Task<T> TaskResult<T>(T result)
+        {
+            var source = new TaskCompletionSource<T>();
+            source.SetResult(result);
+            return source.Task;
         }
     }
 }

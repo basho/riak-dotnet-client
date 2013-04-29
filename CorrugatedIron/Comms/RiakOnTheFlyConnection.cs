@@ -16,6 +16,7 @@
 
 using CorrugatedIron.Config;
 using System;
+using System.Threading.Tasks;
 
 namespace CorrugatedIron.Comms
 {
@@ -31,44 +32,41 @@ namespace CorrugatedIron.Comms
             _connFactory = connFactory;
         }
 
-        public Tuple<bool, TResult> Consume<TResult>(Func<IRiakConnection, TResult> consumer)
+        public Task<Tuple<bool, TResult>> Consume<TResult>(Func<IRiakConnection, Task<TResult>> consumer)
         {
-            if(_disposing) return Tuple.Create(false, default(TResult));
+            if(_disposing)
+                return TaskResult(Tuple.Create(false, default(TResult)));
 
-            using (var conn = _connFactory.CreateConnection(_nodeConfig))
-            {
-                try
-                {
-                    var result = consumer(conn);
-                    return Tuple.Create(true, result);
-                }
-                catch(Exception)
-                {
+            // connection on the fly
+            var conn = _connFactory.CreateConnection(_nodeConfig);
+            return consumer(conn).ContinueWith((Task<TResult> finishedTask) => {
+                if (conn != null)
+                    conn.Dispose();
+
+                if (!finishedTask.IsFaulted)
+                    return Tuple.Create(true, finishedTask.Result);
+                else
                     return Tuple.Create(false, default(TResult));
-                }
-            }
+            });
         }
 
-        public Tuple<bool, TResult> DelayedConsume<TResult>(Func<IRiakConnection, Action, TResult> consumer)
+        // consume delayed
+        public Task<Tuple<bool, TResult>> DelayedConsume<TResult>(Func<IRiakConnection, Action, Task<TResult>> consumer)
         {
-            if(_disposing) return Tuple.Create(false, default(TResult));
+            if(_disposing)
+                return TaskResult(Tuple.Create(false, default(TResult)));
 
-            IRiakConnection conn = null;
-
-            try
-            {
-                conn = _connFactory.CreateConnection(_nodeConfig);
-                var result = consumer(conn, conn.Dispose);
-                return Tuple.Create(true, result);
-            }
-            catch(Exception)
-            {
+            // connection on the fly
+            var conn = _connFactory.CreateConnection(_nodeConfig);
+            return consumer(conn, () => {}).ContinueWith((Task<TResult> finishedTask) => {
                 if (conn != null)
-                {
                     conn.Dispose();
-                }
-                return Tuple.Create(false, default(TResult));
-            }
+
+                if (!finishedTask.IsFaulted)
+                    return Tuple.Create(true, finishedTask.Result);
+                else
+                    return Tuple.Create(false, default(TResult));
+            });
         }
 
         public void Dispose()
@@ -76,6 +74,14 @@ namespace CorrugatedIron.Comms
             if(_disposing) return;
 
             _disposing = true;
+        }
+
+        // wrap a task result
+        private Task<T> TaskResult<T>(T result)
+        {
+            var source = new TaskCompletionSource<T>();
+            source.SetResult(result);
+            return source.Task;
         }
     }
 }

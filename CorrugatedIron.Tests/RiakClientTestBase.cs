@@ -18,6 +18,7 @@ using CorrugatedIron.Comms;
 using CorrugatedIron.Config;
 using Moq;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace CorrugatedIron.Tests.RiakClientTests
 {
@@ -40,7 +41,8 @@ namespace CorrugatedIron.Tests.RiakClientTests
             ConnFactoryMock = new Mock<IRiakConnectionFactory>();
             NodeConfigMock = new Mock<IRiakNodeConfiguration>();
 
-            ConnMock.Setup(m => m.PbcWriteRead<TRequest, TResult>(It.IsAny<TRequest>())).Returns(() => Result);
+            ConnMock.Setup(m => m.PbcWriteRead<TRequest, TResult>(It.IsAny<TRequest>()))
+                    .Returns(() => Task<RiakResult<TResult>>.Factory.StartNew(() => Result));
             ConnFactoryMock.Setup(m => m.CreateConnection(It.IsAny<IRiakNodeConfiguration>())).Returns(ConnMock.Object);
             NodeConfigMock.SetupGet(m => m.PoolSize).Returns(1);
             ClusterConfigMock.SetupGet(m => m.RiakNodes).Returns(new List<IRiakNodeConfiguration> { NodeConfigMock.Object });

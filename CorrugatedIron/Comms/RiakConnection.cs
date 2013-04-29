@@ -28,6 +28,7 @@ using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace CorrugatedIron.Comms
 {
@@ -38,55 +39,144 @@ namespace CorrugatedIron.Comms
         void Disconnect();
 
         // PBC interface
-        RiakResult<TResult> PbcRead<TResult>()
+        Task<RiakResult<TResult>> PbcRead<TResult>()
             where TResult : class, new();
 
-        RiakResult PbcRead(MessageCode expectedMessageCode);
+        Task<RiakResult> PbcRead(MessageCode expectedMessageCode);
 
-        RiakResult PbcWrite<TRequest>(TRequest request)
+        Task<RiakResult> PbcWrite<TRequest>(TRequest request)
             where TRequest : class;
 
-        RiakResult PbcWrite(MessageCode messageCode);
+        Task<RiakResult> PbcWrite(MessageCode messageCode);
 
-        RiakResult<TResult> PbcWriteRead<TRequest, TResult>(TRequest request)
+        Task<RiakResult<TResult>> PbcWriteRead<TRequest, TResult>(TRequest request)
             where TRequest : class
             where TResult : class, new();
 
-        RiakResult<TResult> PbcWriteRead<TResult>(MessageCode messageCode)
+        Task<RiakResult<TResult>> PbcWriteRead<TResult>(MessageCode messageCode)
             where TResult : class, new();
 
-        RiakResult PbcWriteRead<TRequest>(TRequest request, MessageCode expectedMessageCode)
+        Task<RiakResult> PbcWriteRead<TRequest>(TRequest request, MessageCode expectedMessageCode)
             where TRequest : class;
 
-        RiakResult PbcWriteRead(MessageCode messageCode, MessageCode expectedMessageCode);
+        Task<RiakResult> PbcWriteRead(MessageCode messageCode, MessageCode expectedMessageCode);
 
-        RiakResult<IEnumerable<RiakResult<TResult>>> PbcRepeatRead<TResult>(Func<RiakResult<TResult>, bool> repeatRead)
+        Task<RiakResult<IEnumerable<RiakResult<TResult>>>> PbcRepeatRead<TResult>(Func<RiakResult<TResult>, bool> repeatRead)
             where TResult : class, new();
 
-        RiakResult<IEnumerable<RiakResult<TResult>>> PbcWriteRead<TResult>(MessageCode messageCode, Func<RiakResult<TResult>, bool> repeatRead)
+        Task<RiakResult<IEnumerable<RiakResult<TResult>>>> PbcWriteRead<TResult>(MessageCode messageCode, Func<RiakResult<TResult>, bool> repeatRead)
             where TResult : class, new();
 
-        RiakResult<IEnumerable<RiakResult<TResult>>> PbcWriteRead<TRequest, TResult>(TRequest request, Func<RiakResult<TResult>, bool> repeatRead)
+        Task<RiakResult<IEnumerable<RiakResult<TResult>>>> PbcWriteRead<TRequest, TResult>(TRequest request, Func<RiakResult<TResult>, bool> repeatRead)
             where TRequest : class
             where TResult : class, new();
 
-        RiakResult<IEnumerable<RiakResult<TResult>>> PbcStreamRead<TResult>(Func<RiakResult<TResult>, bool> repeatRead, Action onFinish)
+        Task<RiakResult<IEnumerable<RiakResult<TResult>>>> PbcStreamRead<TResult>(Func<RiakResult<TResult>, bool> repeatRead, Action onFinish)
             where TResult : class, new();
 
-        RiakResult<IEnumerable<RiakResult<TResult>>> PbcWriteStreamRead<TRequest, TResult>(TRequest request,
+        Task<RiakResult<IEnumerable<RiakResult<TResult>>>> PbcWriteStreamRead<TRequest, TResult>(TRequest request,
             Func<RiakResult<TResult>, bool> repeatRead, Action onFinish)
             where TRequest : class
             where TResult : class, new();
 
-        RiakResult<IEnumerable<RiakResult<TResult>>> PbcWriteStreamRead<TResult>(MessageCode messageCode,
+        Task<RiakResult<IEnumerable<RiakResult<TResult>>>> PbcWriteStreamRead<TResult>(MessageCode messageCode,
             Func<RiakResult<TResult>, bool> repeatRead, Action onFinish)
             where TResult : class, new();
 
         // REST interface
-        RiakResult<RiakRestResponse> RestRequest(RiakRestRequest request);
+        Task<RiakResult<RiakRestResponse>> RestRequest(RiakRestRequest request);
     }
 
+    // riak connection
     internal class RiakConnection : IRiakConnection
+    {
+        private SyncRiakConnection _syncConn;
+
+        public RiakConnection(IRiakNodeConfiguration nodeConfiguration)
+        {
+            _syncConn = new SyncRiakConnection(nodeConfiguration);
+        }
+
+        public void Disconnect()
+        {
+            _syncConn.Disconnect();
+        }
+        public Task<RiakResult<TResult>> PbcRead<TResult>() where TResult : class, new()
+        {
+            return Task<RiakResult<TResult>>.Factory.StartNew(() => _syncConn.PbcRead<TResult>());
+        }
+        public Task<RiakResult> PbcRead(MessageCode expectedMessageCode)
+        {
+            return Task<RiakResult>.Factory.StartNew(() => _syncConn.PbcRead(expectedMessageCode));
+        }
+        public Task<RiakResult> PbcWrite<TRequest>(TRequest request) where TRequest : class
+        {
+            return Task<RiakResult>.Factory.StartNew(() => _syncConn.PbcWrite(request));
+        }
+        public Task<RiakResult> PbcWrite(MessageCode messageCode)
+        {
+            return Task<RiakResult>.Factory.StartNew(() => _syncConn.PbcWrite(messageCode));
+        }
+        public Task<RiakResult<TResult>> PbcWriteRead<TRequest, TResult>(TRequest request) where TRequest : class where TResult : class, new()
+        {
+            return Task<RiakResult<TResult>>.Factory.StartNew(() => _syncConn.PbcWriteRead<TRequest, TResult>(request));
+        }
+        public Task<RiakResult<TResult>> PbcWriteRead<TResult>(MessageCode messageCode) where TResult : class, new()
+        {
+            return Task<RiakResult<TResult>>.Factory.StartNew(() => _syncConn.PbcWriteRead<TResult>(messageCode));
+        }
+        public Task<RiakResult> PbcWriteRead<TRequest>(TRequest request, MessageCode expectedMessageCode) where TRequest : class
+        {
+            return Task<RiakResult>.Factory.StartNew(() => _syncConn.PbcWriteRead(request, expectedMessageCode));
+        }
+        public Task<RiakResult> PbcWriteRead(MessageCode messageCode, MessageCode expectedMessageCode)
+        {
+            return Task<RiakResult>.Factory.StartNew(() => _syncConn.PbcWriteRead(messageCode, expectedMessageCode));
+        }
+        public Task<RiakResult<IEnumerable<RiakResult<TResult>>>> PbcRepeatRead<TResult>(Func<RiakResult<TResult>, bool> repeatRead) where TResult : class, new()
+        {
+            return Task<RiakResult<IEnumerable<RiakResult<TResult>>>>.Factory.StartNew(() => _syncConn.PbcRepeatRead(repeatRead));
+        }
+        public Task<RiakResult<IEnumerable<RiakResult<TResult>>>> PbcWriteRead<TResult>(MessageCode messageCode, Func<RiakResult<TResult>, bool> repeatRead) where TResult : class, new()
+        {
+            return Task<RiakResult<IEnumerable<RiakResult<TResult>>>>.Factory.StartNew(() => _syncConn.PbcWriteRead<TResult>(messageCode, repeatRead));
+        }
+        public Task<RiakResult<IEnumerable<RiakResult<TResult>>>> PbcWriteRead<TRequest, TResult>(TRequest request, Func<RiakResult<TResult>, bool> repeatRead) where TRequest : class where TResult : class, new()
+        {
+            return Task<RiakResult<IEnumerable<RiakResult<TResult>>>>.Factory.StartNew(() => _syncConn.PbcWriteRead(request, repeatRead));
+        }
+        public Task<RiakResult<IEnumerable<RiakResult<TResult>>>> PbcStreamRead<TResult>(Func<RiakResult<TResult>, bool> repeatRead, Action onFinish) where TResult : class, new()
+        {
+            return Task<RiakResult<IEnumerable<RiakResult<TResult>>>>.Factory.StartNew(() => _syncConn.PbcStreamRead(repeatRead, onFinish));
+        }
+        public Task<RiakResult<IEnumerable<RiakResult<TResult>>>> PbcWriteStreamRead<TRequest, TResult>(TRequest request, Func<RiakResult<TResult>, bool> repeatRead, Action onFinish) where TRequest : class where TResult : class, new()
+        {
+            return Task<RiakResult<IEnumerable<RiakResult<TResult>>>>.Factory.StartNew(() => _syncConn.PbcWriteStreamRead(request, repeatRead, onFinish));
+        }
+        public Task<RiakResult<IEnumerable<RiakResult<TResult>>>> PbcWriteStreamRead<TResult>(MessageCode messageCode, Func<RiakResult<TResult>, bool> repeatRead, Action onFinish) where TResult : class, new()
+        {
+            return Task<RiakResult<IEnumerable<RiakResult<TResult>>>>.Factory.StartNew(() => _syncConn.PbcWriteStreamRead(messageCode, repeatRead, onFinish));
+        }
+        public Task<RiakResult<RiakRestResponse>> RestRequest(RiakRestRequest request)
+        {
+            return Task<RiakResult<RiakRestResponse>>.Factory.StartNew(() => _syncConn.RestRequest(request));
+        }
+        public bool IsIdle
+        {
+            get
+            {
+                return _syncConn.IsIdle;
+            }
+        }
+
+        public void Dispose()
+        {
+            _syncConn.Dispose();
+        }
+    }
+
+    // old connection
+    internal class SyncRiakConnection
     {
         private readonly string _restRootUrl;
         private readonly RiakPbcSocket _socket;
@@ -96,12 +186,12 @@ namespace CorrugatedIron.Comms
             get { return _socket.IsConnected; }
         }
 
-        static RiakConnection()
+        static SyncRiakConnection()
         {
             ServicePointManager.ServerCertificateValidationCallback += ServerValidationCallback;
         }
 
-        public RiakConnection(IRiakNodeConfiguration nodeConfiguration)
+        public SyncRiakConnection(IRiakNodeConfiguration nodeConfiguration)
         {
             _restRootUrl = @"{0}://{1}:{2}".Fmt(nodeConfiguration.RestScheme, nodeConfiguration.HostAddress, nodeConfiguration.RestPort);
             _socket = new RiakPbcSocket(nodeConfiguration.HostAddress, nodeConfiguration.PbcPort, nodeConfiguration.NetworkReadTimeout,

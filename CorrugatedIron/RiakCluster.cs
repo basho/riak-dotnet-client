@@ -77,82 +77,101 @@ namespace CorrugatedIron
             return new RiakCluster(RiakClusterConfiguration.LoadFromConfig(configSectionName, configFileName), new RiakConnectionFactory());
         }
 
-        protected override TRiakResult UseConnection<TRiakResult>(Func<IRiakConnection, TRiakResult> useFun, Func<ResultCode, string, bool, TRiakResult> onError, int retryAttempts)
+        protected override Task<TRiakResult> UseConnection<TRiakResult>(Func<IRiakConnection, Task<TRiakResult>> useFun, Func<ResultCode, string, bool, TRiakResult> onError, int retryAttempts)
         {
-            if(retryAttempts < 0) return onError(ResultCode.NoRetries, "Unable to access a connection on the cluster.", false);
-            if (_disposing) return onError(ResultCode.ShuttingDown, "System currently shutting down", true);
+            if(retryAttempts < 0)
+                return TaskResult(onError(ResultCode.NoRetries, "Unable to access a connection on the cluster.", false));
+            if (_disposing)
+                return TaskResult(onError(ResultCode.ShuttingDown, "System currently shutting down", true));
 
-            var node = _loadBalancer.SelectNode();
-
+            // run on node, note that we have to do some harmless but annoying casting
+            var node = _loadBalancer.SelectNode() as RiakNode;
             if (node != null)
             {
-                var result = node.UseConnection(useFun);
-                if (!result.IsSuccess)
-                {
-                    TRiakResult nextResult = null;
-                    if (result.ResultCode == ResultCode.NoConnections)
-                    {
-                        Thread.Sleep(RetryWaitTime);
-                        nextResult = UseConnection(useFun, onError, retryAttempts - 1);
-                    }
-                    else if (result.ResultCode == ResultCode.CommunicationError)
-                    {
-                        if (result.NodeOffline)
+                Func<IRiakConnection, Task<RiakResult>> cUseFun = (
+                    c => useFun(c).ContinueWith((Task<TRiakResult> t) => (RiakResult)t.Result));
+
+                // use harmless casting
+                return node.UseConnection(cUseFun)
+                    .ContinueWith((Task<RiakResult> finishedTask) => {
+                        var result = (TRiakResult)finishedTask.Result;
+                        if (!result.IsSuccess)
                         {
-                            DeactivateNode(node);
+                            if (result.ResultCode == ResultCode.NoConnections)
+                            {
+                                return DelayTask(RetryWaitTime)
+                                    .ContinueWith(delayTask => {
+                                        return UseConnection(useFun, onError, retryAttempts - 1);
+                                    }).Unwrap();
+                            }
+                            else if (result.ResultCode == ResultCode.CommunicationError)
+                            {
+                                if (result.NodeOffline)
+                                {
+                                    DeactivateNode(node);
+                                }
+
+                                return DelayTask(RetryWaitTime)
+                                    .ContinueWith(delayTask => {
+                                        return UseConnection(useFun, onError, retryAttempts - 1);
+                                    }).Unwrap();
+                            }
                         }
 
-                        Thread.Sleep(RetryWaitTime);
-                        nextResult = UseConnection(useFun, onError, retryAttempts - 1);
-                    }
-
-                    // if the next result is successful then return that
-                    if (nextResult != null && nextResult.IsSuccess)
-                    {
-                        return nextResult;
-                    }
-
-                    // otherwise we'll return the result that we had at this call to make sure that
-                    // the correct/initial error is shown
-                    return onError(result.ResultCode, result.ErrorMessage, result.NodeOffline);
-                }
-                return (TRiakResult)result;
+                        // otherwise we'll return the result that we had at this call to make sure that
+                        // the correct/initial error is shown
+                        return TaskResult(onError(result.ResultCode, result.ErrorMessage, result.NodeOffline));
+                    }).Unwrap();
             }
-            return onError(ResultCode.ClusterOffline, "Unable to access functioning Riak node", true);
+
+            // can't get node
+            return TaskResult(onError(ResultCode.ClusterOffline, "Unable to access functioning Riak node", true));
         }
 
-        public override RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun, int retryAttempts)
+        public override Task<RiakResult<IEnumerable<TResult>>> UseDelayedConnection<TResult>(Func<IRiakConnection, Action, Task<RiakResult<IEnumerable<TResult>>>> useFun, int retryAttempts)
         {
-            if(retryAttempts < 0) return RiakResult<IEnumerable<TResult>>.Error(ResultCode.NoRetries, "Unable to access a connection on the cluster.", false);
-            if (_disposing) return RiakResult<IEnumerable<TResult>>.Error(ResultCode.ShuttingDown, "System currently shutting down", true);
+            if(retryAttempts < 0)
+                return TaskResult(RiakResult<IEnumerable<TResult>>.Error(ResultCode.NoRetries, "Unable to access a connection on the cluster.", false));
+            if (_disposing)
+                return TaskResult(RiakResult<IEnumerable<TResult>>.Error(ResultCode.ShuttingDown, "System currently shutting down", true));
 
+            // select a node
             var node = _loadBalancer.SelectNode();
-
             if (node != null)
             {
-                var result = node.UseDelayedConnection(useFun);
-                if (!result.IsSuccess)
-                {
-                    if (result.ResultCode == ResultCode.NoConnections)
-                    {
-                        Thread.Sleep(RetryWaitTime);
-                        return UseDelayedConnection(useFun, retryAttempts - 1);
-                    }
-
-                    if (result.ResultCode == ResultCode.CommunicationError)
-                    {
-                        if (result.NodeOffline)
+                return node.UseDelayedConnection(useFun)
+                    .ContinueWith((Task<RiakResult<IEnumerable<TResult>>> finishedTask) => {
+                        var result = finishedTask.Result;
+                        if (!result.IsSuccess)
                         {
-                            DeactivateNode(node);
+                            if (result.ResultCode == ResultCode.NoConnections)
+                            {
+                                return DelayTask(RetryWaitTime)
+                                    .ContinueWith(delayTask => {
+                                        return UseDelayedConnection(useFun, retryAttempts - 1);
+                                    }).Unwrap();
+                            }
+                            if (result.ResultCode == ResultCode.CommunicationError)
+                            {
+                                if (result.NodeOffline)
+                                {
+                                    DeactivateNode(node);
+                                }
+
+                                return DelayTask(RetryWaitTime)
+                                    .ContinueWith(delayTask => {
+                                        return UseDelayedConnection(useFun, retryAttempts - 1);
+                                    }).Unwrap();
+                            }
                         }
 
-                        Thread.Sleep(RetryWaitTime);
-                        return UseDelayedConnection(useFun, retryAttempts - 1);
-                    }
-                }
-                return result;
+                        // out of options
+                        return TaskResult(RiakResult<IEnumerable<TResult>>.Error(ResultCode.ClusterOffline, "Unable to access functioning Riak node", true));
+                    }).Unwrap();
             }
-            return RiakResult<IEnumerable<TResult>>.Error(ResultCode.ClusterOffline, "Unable to access functioning Riak node", true);
+
+            // no functioning node
+            return TaskResult(RiakResult<IEnumerable<TResult>>.Error(ResultCode.ClusterOffline, "Unable to access functioning Riak node", true));
         }
 
         private void DeactivateNode(IRiakNode node)
@@ -175,16 +194,17 @@ namespace CorrugatedIron
                 IRiakNode node = null;
                 while (_offlineNodes.TryDequeue(out node) && !_disposing)
                 {
-                    var result = node.UseConnection(c => c.PbcWriteRead(MessageCode.PingReq, MessageCode.PingResp));
-
-                    if (result.IsSuccess)
-                    {
-                        _loadBalancer.AddNode(node);
-                    }
-                    else
-                    {
-                        deadNodes.Add(node);
-                    }
+                    node.UseConnection(c => c.PbcWriteRead(MessageCode.PingReq, MessageCode.PingResp))
+                        .ContinueWith((Task<RiakResult> finishedTask) => {
+                            if (finishedTask.Result.IsSuccess)
+                            {
+                                _loadBalancer.AddNode(node);
+                            }
+                            else
+                            {
+                                deadNodes.Add(node);
+                            }
+                        }).Wait();
                 }
 
                 if (!_disposing)
@@ -204,6 +224,29 @@ namespace CorrugatedIron
             _disposing = true;
 
             _nodes.ForEach(n => n.Dispose());
+        }
+
+        // wrap a task result
+        private Task<T> TaskResult<T>(T result)
+        {
+            var source = new TaskCompletionSource<T>();
+            source.SetResult(result);
+            return source.Task;
+        }
+
+        // async timer
+        private Task DelayTask(int milliseconds)
+        {
+            var source = new TaskCompletionSource<object>();
+
+            var timer = null as Timer;
+            timer = new Timer(state => {
+                source.SetResult(new object());
+                timer.Dispose();
+                timer = null;
+            }, null, milliseconds, Timeout.Infinite);
+
+            return source.Task;
         }
     }
 }
