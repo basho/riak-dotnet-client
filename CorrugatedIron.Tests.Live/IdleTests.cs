@@ -13,7 +13,7 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
+using System.Threading.Tasks;
 using CorrugatedIron.Comms;
 using CorrugatedIron.Tests.Extensions;
 using CorrugatedIron.Tests.Live.LiveRiakConnectionTests;
@@ -32,9 +32,9 @@ namespace CorrugatedIron.Tests.Live.IdleTests
 
         private IRiakConnection GetIdleConnection()
         {
-            var result = Cluster.UseConnection(RiakResult<IRiakConnection>.Success, 1);
-            //System.Threading.Thread.Sleep(ClusterConfig.RiakNodes[0].IdleTimeout + 1000);
-            return result.Value;
+            var task = Cluster.UseConnection<IRiakConnection>(RiakResult<IRiakConnection>.SuccessTask, 1);
+            task.Wait();
+            return task.Result.Value;
         }
 
         [Test]

@@ -58,10 +58,11 @@ namespace CorrugatedIron.Comms
 
             // connection on the fly
             var conn = _connFactory.CreateConnection(_nodeConfig);
-            return consumer(conn, () => {}).ContinueWith((Task<TResult> finishedTask) => {
+            Action cleanup = (() => {
                 if (conn != null)
                     conn.Dispose();
-
+            });
+            return consumer(conn, cleanup).ContinueWith((Task<TResult> finishedTask) => {
                 if (!finishedTask.IsFaulted)
                     return Tuple.Create(true, finishedTask.Result);
                 else

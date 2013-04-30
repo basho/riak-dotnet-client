@@ -34,11 +34,9 @@ namespace CorrugatedIron
 {
     public interface IRiakClient : IRiakBatchClient
     {
-    /*
         void Batch(Action<IRiakBatchClient> batchAction);
 
         T Batch<T>(Func<IRiakBatchClient, T> batchFunction);
-        */
 
         IRiakAsyncClient Async { get; }
     }
@@ -526,38 +524,15 @@ namespace CorrugatedIron
             WaitFor(_client.Batch(batchAction));
         }
 
-        /*
         public T Batch<T>(Func<IRiakBatchClient, T> batchFun)
         {
-            var funResult = default(T);
-
-            Func<IRiakConnection, Action, RiakResult<IEnumerable<RiakResult<object>>>> helperBatchFun = (conn, onFinish) =>
-            {
-                try
-                {
-                    funResult = batchFun(new RiakClient(conn));
-                    return RiakResult<IEnumerable<RiakResult<object>>>.Success(null);
-                }
-                catch(Exception ex)
-                {
-                    return RiakResult<IEnumerable<RiakResult<object>>>.Error(ResultCode.BatchException, "{0}\n{1}".Fmt(ex.Message, ex.StackTrace), true);
-                }
-                finally
-                {
-                    onFinish();
-                }
-            };
-
-            var result = _endPoint.UseDelayedConnection(helperBatchFun, RetryCount);
-
-            if(!result.IsSuccess && result.ResultCode == ResultCode.BatchException)
-            {
-                throw new Exception(result.ErrorMessage);
-            }
-
-            return funResult;
+            return WaitFor(_client.Batch(ac => {
+                var c = new RiakClient((RiakAsyncClient)ac);
+                var s = new TaskCompletionSource<T>();
+                s.SetResult(batchFun(c));
+                return s.Task;
+            }));
         }
-        */
 
         // simple wrapper
         private T WaitFor<T>(Task<T> task)

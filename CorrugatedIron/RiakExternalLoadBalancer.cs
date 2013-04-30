@@ -91,11 +91,11 @@ namespace CorrugatedIron
         {
             if(retryAttempts < 0)
             {
-                return TaskResult(RiakResult<IEnumerable<TResult>>.Error(ResultCode.NoRetries, "Unable to access a connection on the cluster.", true));
+                return RiakResult<IEnumerable<TResult>>.ErrorTask(ResultCode.NoRetries, "Unable to access a connection on the cluster.", true);
             }
             if(_disposing)
             {
-                return TaskResult(RiakResult<IEnumerable<TResult>>.Error(ResultCode.ShuttingDown, "System currently shutting down", true));
+                return RiakResult<IEnumerable<TResult>>.ErrorTask(ResultCode.ShuttingDown, "System currently shutting down", true);
             }
 
             var node = _node;
@@ -113,7 +113,7 @@ namespace CorrugatedIron
                         return TaskResult(result);
                     }).Unwrap();
             }
-            return TaskResult(RiakResult<IEnumerable<TResult>>.Error(ResultCode.ClusterOffline, "Unable to access functioning Riak node", true));
+            return RiakResult<IEnumerable<TResult>>.ErrorTask(ResultCode.ClusterOffline, "Unable to access functioning Riak node", true);
         }
 
         public override void Dispose()

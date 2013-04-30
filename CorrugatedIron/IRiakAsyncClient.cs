@@ -11,9 +11,11 @@ namespace CorrugatedIron
     public interface IRiakAsyncClient : IRiakBatchAsyncClient
     {
      
-        Task Batch(Action<IRiakBatchAsyncClient> batchAction);
+        Task Batch(Func<IRiakBatchAsyncClient, Task> batchAction);
         
         Task Batch(Action<IRiakBatchClient> batchAction);
+
+        Task<T> Batch<T>(Func<IRiakBatchAsyncClient, Task<T>> batchFunction);
         
         [Obsolete("All async operations should use the functions that return Task<T>.")]
         void Ping(Action<RiakResult> callback);

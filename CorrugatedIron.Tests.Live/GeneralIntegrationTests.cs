@@ -546,6 +546,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             Client.ListBuckets().Value.Contains(bucket).ShouldBeFalse();
         }
 
+        /* no need for this test, given this is now asynchronous wrapper
         [Test]
         public void DeleteBucketDeletesAllKeysInABucketAsynchronously()
         {
@@ -562,7 +563,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             var keyList = Client.ListKeys(bucket);
             keyList.Value.Count().ShouldEqual(10);
 
-            var result = Client.Async.DeleteBucket(bucket).Result.ToList();
+            var result = Client.DeleteBucket(bucket).ToList();
             result.ForEach(x => x.IsSuccess.ShouldBeTrue(x.ErrorMessage));
             
             // This might fail if you check straight away
@@ -574,6 +575,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             keyList.Value.Count().ShouldEqual(0);
             Client.ListBuckets().Value.Contains(bucket).ShouldBeFalse();
         }
+        */
 
         [Test]
         public void DeletingAnObjectDeletesAnObject()

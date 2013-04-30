@@ -64,12 +64,12 @@ namespace CorrugatedIron
         {
             if (!IsValidBucketOrKey(bucket))
             {
-                return TaskResult(RiakResult<RiakObject>.Error(ResultCode.InvalidRequest, InvalidBucketErrorMessage, false));
+                return RiakResult<RiakObject>.ErrorTask(ResultCode.InvalidRequest, InvalidBucketErrorMessage, false);
             }
             
             if (!IsValidBucketOrKey(key))
             {
-                return TaskResult(RiakResult<RiakObject>.Error(ResultCode.InvalidRequest, InvalidKeyErrorMessage, false));
+                return RiakResult<RiakObject>.ErrorTask(ResultCode.InvalidRequest, InvalidKeyErrorMessage, false);
             }
             
             var request = new RpbGetReq { bucket = bucket.ToRiakString(), key = key.ToRiakString() };
@@ -117,11 +117,11 @@ namespace CorrugatedIron
                     var bk = bkp;
                     if (!IsValidBucketOrKey(bk.Bucket))
                     {
-                        return TaskResult(RiakResult<RpbGetResp>.Error(ResultCode.InvalidRequest, InvalidBucketErrorMessage, false));
+                        return RiakResult<RpbGetResp>.ErrorTask(ResultCode.InvalidRequest, InvalidBucketErrorMessage, false);
                     }
                     if (!IsValidBucketOrKey(bk.Key))
                     {
-                        return TaskResult(RiakResult<RpbGetResp>.Error(ResultCode.InvalidRequest, InvalidKeyErrorMessage, false));
+                        return RiakResult<RpbGetResp>.ErrorTask(ResultCode.InvalidRequest, InvalidKeyErrorMessage, false);
                     }
                     
                     var req = new RpbGetReq { bucket = bk.Bucket.ToRiakString(), key = bk.Key.ToRiakString() };
@@ -167,12 +167,12 @@ namespace CorrugatedIron
         {
             if (!IsValidBucketOrKey(value.Bucket))
             {
-                return TaskResult(RiakResult<RiakObject>.Error(ResultCode.InvalidRequest, InvalidBucketErrorMessage, false));
+                return RiakResult<RiakObject>.ErrorTask(ResultCode.InvalidRequest, InvalidBucketErrorMessage, false);
             }
             
             if (!IsValidBucketOrKey(value.Key))
             {
-                return TaskResult(RiakResult<RiakObject>.Error(ResultCode.InvalidRequest, InvalidKeyErrorMessage, false));
+                return RiakResult<RiakObject>.ErrorTask(ResultCode.InvalidRequest, InvalidKeyErrorMessage, false);
             }
 
             var request = value.ToMessage();
@@ -210,12 +210,12 @@ namespace CorrugatedIron
                 return AfterAll(values.Select(v => {
                     if (!IsValidBucketOrKey(v.Bucket))
                     {
-                        return TaskResult(RiakResult<RpbPutResp>.Error(ResultCode.InvalidRequest, InvalidBucketErrorMessage, false));
+                        return RiakResult<RpbPutResp>.ErrorTask(ResultCode.InvalidRequest, InvalidBucketErrorMessage, false);
                     }
                     
                     if (!IsValidBucketOrKey(v.Key))
                     {
-                        return TaskResult(RiakResult<RpbPutResp>.Error(ResultCode.InvalidRequest, InvalidKeyErrorMessage, false));
+                        return RiakResult<RpbPutResp>.ErrorTask(ResultCode.InvalidRequest, InvalidKeyErrorMessage, false);
                     }
                     
                     var msg = v.ToMessage();
@@ -252,12 +252,12 @@ namespace CorrugatedIron
         {
             if (!IsValidBucketOrKey(bucket))
             {
-                return TaskResult(RiakResult.Error(ResultCode.InvalidRequest, InvalidBucketErrorMessage, false));
+                return RiakResult.ErrorTask(ResultCode.InvalidRequest, InvalidBucketErrorMessage, false);
             }
             
             if (!IsValidBucketOrKey(key))
             {
-                return TaskResult(RiakResult.Error(ResultCode.InvalidRequest, InvalidKeyErrorMessage, false));
+                return RiakResult.ErrorTask(ResultCode.InvalidRequest, InvalidKeyErrorMessage, false);
             }
 
             var request = new RpbDelReq { bucket = bucket.ToRiakString(), key = key.ToRiakString() };
@@ -274,12 +274,12 @@ namespace CorrugatedIron
             return AfterAll(objectIds.Select(id => {
                 if (!IsValidBucketOrKey(id.Bucket))
                 {
-                    return TaskResult(RiakResult.Error(ResultCode.InvalidRequest, InvalidBucketErrorMessage, false));
+                    return RiakResult.ErrorTask(ResultCode.InvalidRequest, InvalidBucketErrorMessage, false);
                 }
                 
                 if (!IsValidBucketOrKey(id.Key))
                 {
-                    return TaskResult(RiakResult.Error(ResultCode.InvalidRequest, InvalidKeyErrorMessage, false));
+                    return RiakResult.ErrorTask(ResultCode.InvalidRequest, InvalidKeyErrorMessage, false);
                 }
                 
                 var req = new RpbDelReq { bucket = id.Bucket.ToRiakString(), key = id.Key.ToRiakString() };
@@ -314,7 +314,7 @@ namespace CorrugatedIron
                             var objectIds = keyResults.Value.Select(key => new RiakObjectId(bucket, key)).ToList();
                             return Delete(conn, objectIds, deleteOptions);
                         }
-                        return TaskResult(RiakResult<IEnumerable<RiakResult>>.Error(keyResults.ResultCode, keyResults.ErrorMessage, keyResults.NodeOffline));
+                        return RiakResult<IEnumerable<RiakResult>>.ErrorTask(keyResults.ResultCode, keyResults.ErrorMessage, keyResults.NodeOffline);
                     }).Unwrap();
             }).ContinueWith((Task<RiakResult<IEnumerable<RiakResult>>> finishedTask) => {
                 return finishedTask.Result.Value;
@@ -401,7 +401,7 @@ namespace CorrugatedIron
             // bucket names cannot have slashes in the names, the REST interface doesn't like it at all
             if (!IsValidBucketOrKey(bucket))
             {
-                return TaskResult(RiakResult<RiakBucketProperties>.Error(ResultCode.InvalidRequest, InvalidBucketErrorMessage, false));
+                return RiakResult<RiakBucketProperties>.ErrorTask(ResultCode.InvalidRequest, InvalidBucketErrorMessage, false);
             }
             
             if(extended)
@@ -446,7 +446,7 @@ namespace CorrugatedIron
         {
             if (!IsValidBucketOrKey(bucket))
             {
-                return TaskResult(RiakResult.Error(ResultCode.InvalidRequest, InvalidBucketErrorMessage, false));
+                return RiakResult.ErrorTask(ResultCode.InvalidRequest, InvalidBucketErrorMessage, false);
             }
             
             if(properties.CanUsePbc)
@@ -601,7 +601,7 @@ namespace CorrugatedIron
                                 return RiakResult<IList<RiakObject>>.Success(objects.Where(r => r.IsSuccess).Select(r => r.Value).ToList());
                             });
                     }
-                    return TaskResult(RiakResult<IList<RiakObject>>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline));
+                    return RiakResult<IList<RiakObject>>.ErrorTask(result.ResultCode, result.ErrorMessage, result.NodeOffline);
                 }).Unwrap();
         }
 
@@ -641,21 +641,22 @@ namespace CorrugatedIron
         public Task Batch(Action<IRiakBatchClient> batchAction)
         {
             return Batch<object>(ac => {
-                var c = new RiakClient((RiakAsyncClient)ac);
-                batchAction(c);
-                return null;
+                return Task<object>.Factory.StartNew(() => {
+                    var c = new RiakClient((RiakAsyncClient)ac);
+                    batchAction(c);
+                    return new object();
+                });
             });
         }
 
-        public Task Batch(Action<IRiakBatchAsyncClient> batchFunc)
+        public Task Batch(Func<IRiakBatchAsyncClient, Task> batchFunc)
         {
             return Batch<object>(ac => {
-                batchFunc(ac);
-                return null;
+                return batchFunc(ac).ContinueWith(t => new object());
             });
         }
 
-        private Task<T> Batch<T>(Func<IRiakBatchAsyncClient, Task<T>> batchFun)
+        public Task<T> Batch<T>(Func<IRiakBatchAsyncClient, Task<T>> batchFun)
         {
             var taskResult = default(T);
 
@@ -750,14 +751,6 @@ namespace CorrugatedIron
             return !string.IsNullOrWhiteSpace(value) && !value.Contains('/');
         }
 
-        // wrap a task result
-        private Task<T> TaskResult<T>(T result)
-        {
-            var source = new TaskCompletionSource<T>();
-            source.SetResult(result);
-            return source.Task;
-        }
-
         // wait for tasks to complete
         private Task<IEnumerable<T>> AfterAll<T>(IEnumerable<Task<T>> tasks)
         {
@@ -776,7 +769,9 @@ namespace CorrugatedIron
                 });
             }
 
-            // completed task
+            // completed task (handle no tasks case)
+            if (!tasks.Any())
+                source.SetResult(Enumerable.Empty<T>());
             return source.Task;
         }
 
