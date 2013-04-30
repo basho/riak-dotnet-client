@@ -50,6 +50,11 @@ namespace CorrugatedIron
             _endPoint = endPoint;
         }
 
+        internal RiakAsyncClient(IRiakConnection batchConnection)
+        {
+            _batchConnection = batchConnection;
+        }
+
         public Task<RiakResult> Ping()
         {
             return UseConnection(conn => conn.PbcWriteRead(MessageCode.PingReq, MessageCode.PingResp));
@@ -635,47 +640,57 @@ namespace CorrugatedIron
 
         public Task Batch(Action<IRiakBatchClient> batchAction)
         {
-            throw new NotImplementedException();
+            return Batch<object>(ac => {
+                var c = new RiakClient((RiakAsyncClient)ac);
+                batchAction(c);
+                return null;
+            });
         }
 
         public Task Batch(Action<IRiakBatchAsyncClient> batchFunc)
         {
-            throw new NotImplementedException();
+            return Batch<object>(ac => {
+                batchFunc(ac);
+                return null;
+            });
         }
 
-        public Task<T> Batch<T>(Func<IRiakBatchClient, T> batchFunc)
+        private Task<T> Batch<T>(Func<IRiakBatchAsyncClient, Task<T>> batchFun)
         {
-            throw new NotImplementedException();
-            /*
-            var funResult = default(T);
+            var taskResult = default(T);
 
             // no idea what this is
-            Func<IRiakConnection, Action, RiakResult<IEnumerable<RiakResult<object>>>> helperBatchFun = ((conn, onFinish) =>
+            Func<IRiakConnection, Action, Task<RiakResult<IEnumerable<RiakResult<object>>>>> helperBatchFun = ((conn, onFinish) =>
             {
-                try
-                {
-                    funResult = batchFun(new RiakClient(conn));
-                    return RiakResult<IEnumerable<RiakResult<object>>>.Success(null);
-                }
-                catch(Exception ex)
-                {
-                    return RiakResult<IEnumerable<RiakResult<object>>>.Error(ResultCode.BatchException, "{0}\n{1}".Fmt(ex.Message, ex.StackTrace), true);
-                }
-                finally
-                {
-                    onFinish();
-                }
+                return Task.Factory.StartNew(() => batchFun(new RiakAsyncClient(conn))).Unwrap()
+                    .ContinueWith((Task<T> finishedTask) => {
+                        onFinish();
+
+                        // exception or success
+                        if (!finishedTask.IsFaulted)
+                        {
+                            taskResult = finishedTask.Result;
+                            return RiakResult<IEnumerable<RiakResult<object>>>.Success(null);
+                        }
+                        else
+                        {
+                            var ex = finishedTask.Exception.Flatten().InnerExceptions.First();
+                            return RiakResult<IEnumerable<RiakResult<object>>>.Error(
+                                ResultCode.BatchException, "{0}\n{1}".Fmt(ex.Message, ex.StackTrace), true);
+                        }
+                    });
             });
-            
-            var result = _endPoint.UseDelayedConnection(helperBatchFun, RetryCount);
-            
-            if(!result.IsSuccess && result.ResultCode == ResultCode.BatchException)
-            {
-                throw new Exception(result.ErrorMessage);
-            }
-            
-            return funResult;
-            */
+
+            // apply task to connection
+            return _endPoint.UseDelayedConnection(helperBatchFun, RetryCount)
+                .ContinueWith((Task<RiakResult<IEnumerable<RiakResult<object>>>> finishedTask) => {
+                    var result = finishedTask.Result;
+                    if(!result.IsSuccess && result.ResultCode == ResultCode.BatchException)
+                    {
+                        throw new Exception(result.ErrorMessage);
+                    }
+                    return taskResult;
+                });
         }
 
         private Task<RiakResult<IEnumerable<string>>> ListKeys(IRiakConnection conn, string bucket)
@@ -752,7 +767,7 @@ namespace CorrugatedIron
             // complete all tasks
             foreach (var task in tasks)
             {
-                task.ContinueWith((Task<T> t) => {
+                task.ContinueWith(t => {
                     leftToComplete--;
                     if (leftToComplete == 0)
                     {

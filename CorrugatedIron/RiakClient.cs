@@ -523,8 +523,7 @@ namespace CorrugatedIron
         /// </exception>
         public void Batch(Action<IRiakBatchClient> batchAction)
         {
-            throw new NotImplementedException();
-            // WaitFor(_client.Batch(batchAction));
+            WaitFor(_client.Batch(batchAction));
         }
 
         /*

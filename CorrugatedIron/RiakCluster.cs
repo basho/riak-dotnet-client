@@ -33,6 +33,7 @@ namespace CorrugatedIron
         private readonly List<IRiakNode> _nodes;
         private readonly ConcurrentQueue<IRiakNode> _offlineNodes;
         private readonly int _nodePollTime;
+        private readonly Timer _nodePollTimer;
         private readonly int _defaultRetryCount;
         private bool _disposing;
 
@@ -51,7 +52,8 @@ namespace CorrugatedIron
             _defaultRetryCount = clusterConfiguration.DefaultRetryCount;
             RetryWaitTime = clusterConfiguration.DefaultRetryWaitTime;
 
-            Task.Factory.StartNew(NodeMonitor);
+            // node monitor is now asynchronous, just triggered by timer!
+            _nodePollTimer = new Timer(state => NodeMonitorCycle(), null, _nodePollTime, Timeout.Infinite);
         }
 
         /// <summary>
@@ -186,10 +188,14 @@ namespace CorrugatedIron
             }
         }
 
-        private void NodeMonitor()
+        // monitor node, started by timer
+        private void NodeMonitorCycle()
         {
-            while (!_disposing)
+            if (!_disposing)
             {
+                _nodePollTimer.Change(_nodePollTime, Timeout.Infinite);
+
+                // ping all offline nodes
                 var deadNodes = new List<IRiakNode>();
                 IRiakNode node = null;
                 while (_offlineNodes.TryDequeue(out node) && !_disposing)
@@ -213,8 +219,6 @@ namespace CorrugatedIron
                     {
                         _offlineNodes.Enqueue(deadNode);
                     }
-
-                    Thread.Sleep(_nodePollTime);
                 }
             }
         }
@@ -222,8 +226,8 @@ namespace CorrugatedIron
         public override void Dispose()
         {
             _disposing = true;
-
             _nodes.ForEach(n => n.Dispose());
+            _nodePollTimer.Dispose();
         }
 
         // wrap a task result

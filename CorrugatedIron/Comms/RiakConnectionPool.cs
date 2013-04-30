@@ -75,9 +75,11 @@ namespace CorrugatedIron.Comms
             IRiakConnection instance = null;
             if(_resources.TryPop(out instance))
             {
-                return consumer(instance, () => {}).ContinueWith((Task<TResult> finishedTask) => {
+                Action cleanup = (() => {
                     if (instance != null)
                         _resources.Push(instance);
+                });
+                return consumer(instance, cleanup).ContinueWith((Task<TResult> finishedTask) => {
                     
                     // finshed task
                     if (!finishedTask.IsFaulted)
