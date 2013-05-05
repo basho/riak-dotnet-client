@@ -214,13 +214,20 @@ namespace CorrugatedIron.Comms
                         var result = RiakResult<TResult>.Success(readTask.Result);
                         resultsList.Add(result);
 
-                        if (repeatRead(result))
+                        try
                         {
-                            readNext();
+                            if (repeatRead(result))
+                            {
+                                readNext();
+                            }
+                            else
+                            {
+                                source.SetResult(RiakResult<IEnumerable<RiakResult<TResult>>>.Success(resultsList));
+                            }
                         }
-                        else
+                        catch (Exception ex)
                         {
-                            source.SetResult(RiakResult<IEnumerable<RiakResult<TResult>>>.Success(resultsList));
+                            source.SetException(ex);
                         }
                     });
             });
@@ -336,64 +343,76 @@ namespace CorrugatedIron.Comms
             var asyncResult = req.BeginGetResponse(null, null);
             return Task<WebResponse>.Factory.FromAsync(asyncResult, req.EndGetResponse)
                 .ContinueWith((Task<WebResponse> responseTask) => {
-                    if (!responseTask.IsFaulted)
-                    {
-                        var response = (HttpWebResponse)responseTask.Result;
 
-                        var result = new RiakRestResponse()
-                        {
-                            ContentLength = response.ContentLength,
-                            ContentType = response.ContentType,
-                            StatusCode = response.StatusCode,
-                            Headers = response.Headers.AllKeys.ToDictionary(k => k, k => response.Headers[k]),
-                            ContentEncoding = !string.IsNullOrWhiteSpace(response.ContentEncoding)
-                                            ? Encoding.GetEncoding(response.ContentEncoding)
-                                            : Encoding.Default
-                        };
-                        
-                        if (response.ContentLength > 0)
-                        {
-                            using (var responseStream = response.GetResponseStream())
-                            {
-                                if (responseStream != null)
-                                {
-                                    using (var reader = new StreamReader(responseStream, result.ContentEncoding))
-                                    {
-                                        result.Body = reader.ReadToEnd();
-                                    }
-                                }
-                            }
-                        }
-                        
-                        return RiakResult<RiakRestResponse>.Success(result);
+                    // rethrow exception on fault
+                    if (responseTask.IsFaulted)
+                    {
+                        throw responseTask.Exception;
                     }
-                    else
-                    {
-                        var exceptions = responseTask.Exception.Flatten().InnerExceptions;
-                        var rEx = exceptions.OfType<RiakException>().FirstOrDefault();
-                        var wEx = exceptions.OfType<WebException>().FirstOrDefault();
 
-                        // process exceptions
-                        if (rEx != null)
+                    // pull out response
+                    var response = (HttpWebResponse)responseTask.Result;
+                    var result = new RiakRestResponse()
+                    {
+                        ContentLength = response.ContentLength,
+                        ContentType = response.ContentType,
+                        StatusCode = response.StatusCode,
+                        Headers = response.Headers.AllKeys.ToDictionary(k => k, k => response.Headers[k]),
+                        ContentEncoding = !string.IsNullOrWhiteSpace(response.ContentEncoding)
+                            ? Encoding.GetEncoding(response.ContentEncoding)
+                            : Encoding.Default
+                    };
+
+                    if (response.ContentLength > 0)
+                    {
+                        using (var responseStream = response.GetResponseStream())
                         {
-                            return RiakResult<RiakRestResponse>.Error(ResultCode.CommunicationError, rEx.Message, rEx.NodeOffline);
-                        }
-                        else if (wEx != null)
-                        {
-                            if (wEx.Status == WebExceptionStatus.ProtocolError)
+                            if (responseStream != null)
                             {
-                                return RiakResult<RiakRestResponse>.Error(ResultCode.HttpError, wEx.Message, false);
+                                return ReadStreamAsync(responseStream, (int)response.ContentLength)
+                                    .ContinueWith((Task<byte[]> readTask) => {
+                                        result.Body = result.ContentEncoding.GetString(readTask.Result);
+                                        return result;
+                                    });
                             }
-                            
-                            return RiakResult<RiakRestResponse>.Error(ResultCode.HttpError, wEx.Message, true);
+                        }
+                    }
+
+                    // end of the line
+                    throw new RiakException("Couldn't read HTTP response", false);
+                }).Unwrap()
+                    .ContinueWith((Task<RiakRestResponse> responseTask) => {
+                        if (!responseTask.IsFaulted)
+                        {
+                            return RiakResult<RiakRestResponse>.Success(responseTask.Result);
                         }
                         else
                         {
-                            var ex = exceptions.FirstOrDefault();
-                            return RiakResult<RiakRestResponse>.Error(ResultCode.CommunicationError, ex.Message, true);
+                            var exceptions = responseTask.Exception.Flatten().InnerExceptions;
+                            var rEx = exceptions.OfType<RiakException>().FirstOrDefault();
+                            var wEx = exceptions.OfType<WebException>().FirstOrDefault();
+
+                            // process exceptions
+                            if (rEx != null)
+                            {
+                                return RiakResult<RiakRestResponse>.Error(ResultCode.CommunicationError, rEx.Message, rEx.NodeOffline);
+                            }
+                            else if (wEx != null)
+                            {
+                                if (wEx.Status == WebExceptionStatus.ProtocolError)
+                                {
+                                    return RiakResult<RiakRestResponse>.Error(ResultCode.HttpError, wEx.Message, false);
+                                }
+                                
+                                return RiakResult<RiakRestResponse>.Error(ResultCode.HttpError, wEx.Message, true);
+                            }
+                            else
+                            {
+                                var ex = exceptions.FirstOrDefault();
+                                return RiakResult<RiakRestResponse>.Error(ResultCode.CommunicationError, ex.Message, true);
+                            }
                         }
-                    }
-                });
+                    });
         }
 
         public bool IsIdle
@@ -443,6 +462,57 @@ namespace CorrugatedIron.Comms
         private RiakResult GetExceptionResult(AggregateException aggregateException)
         {
             return GetExceptionResult<object>(aggregateException);
+        }
+
+        // read incoming stream asynchronously
+        private Task<byte[]> ReadStreamAsync(Stream stream, int length)
+        {
+            var source = new TaskCompletionSource<byte[]>();
+            var data = new byte[length];
+            var maxBufferSize = 1024 * 4;
+            var bytesToRetrieve = length;
+            var position = 0;
+
+            // continuation to read
+            Action readNextChunk;
+            readNextChunk = (() => {
+                var startRead = stream.BeginRead(data,
+                                                 position,
+                                                 Math.Min(bytesToRetrieve, maxBufferSize),
+                                                 null,
+                                                 null);
+                Task<int>.Factory.FromAsync(startRead, stream.EndRead)
+                    .ContinueWith((Task<int> finishedTask) => {
+                        if (finishedTask.IsFaulted)
+                        {
+                            source.SetException(finishedTask.Exception);
+                        }
+                        else
+                        {
+                            if (finishedTask.Result == 0)
+                            {
+                                source.SetException(new RiakException("Timed Out"));
+                            }
+                            else
+                            {
+                                position += finishedTask.Result;
+                                bytesToRetrieve -= finishedTask.Result;
+                                if (bytesToRetrieve == 0)
+                                {
+                                    source.SetResult(data);
+                                }
+                                else
+                                {
+                                    readNextChunk();
+                                }
+                            }
+                        }
+                    });
+            });
+
+            // start reading
+            readNextChunk();
+            return source.Task;
         }
 
         // tidy up messy exceptions
