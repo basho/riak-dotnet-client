@@ -16,6 +16,7 @@
 
 using CorrugatedIron.Messages;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CorrugatedIron.Models.Search
 {
@@ -28,9 +29,8 @@ namespace CorrugatedIron.Models.Search
         {
             Fields = new List<RiakSearchResultField>();
 
-            foreach (var f in doc.fields)
+            foreach (var field in doc.fields.Select(f => new RiakSearchResultField(f)))
             {
-                var field = new RiakSearchResultField(f);
                 Fields.Add(field);
 
                 if (field.Key == "id")
