@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+v1.3.1
+------
+
+This is a small bug fix release.
+
+### Fixes
+
+* [Issue 118](https://github.com/DistributedNonsense/CorrugatedIron/issues/118) - Fix problem where the Riak Search API didn't provide all the fields available when doing searches in Riak.
+
 v1.3.0
 ------
 
