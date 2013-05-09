@@ -14,6 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Collections.Generic;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.Search;
 using CorrugatedIron.Tests.Extensions;
@@ -98,6 +99,36 @@ namespace CorrugatedIron.Tests.Live
             result.Value.Documents.Count.ShouldEqual(1);
             result.Value.Documents[0].Fields.Count.ShouldEqual(5);
             result.Value.Documents[0].Id.Value.ShouldEqual("a.public");
+        }
+
+        [Test]
+        public void SettingFieldListReturnsOnlyFieldsSpecified()
+        {
+            Client.Put(new RiakObject(Bucket, RiakSearchKey, RiakSearchDoc, RiakConstants.ContentTypes.ApplicationJson));
+            Client.Put(new RiakObject(Bucket, RiakSearchKey2, RiakSearchDoc2, RiakConstants.ContentTypes.ApplicationJson));
+
+            var req = new RiakSearchRequest
+            {
+                Query = new RiakFluentSearch("riak_search_bucket", "bio"),
+                PreSort = PreSort.Key,
+                DefaultOperation = DefaultOperation.Or,
+                ReturnFields = new List<string>
+                {
+                    "bio", "favorites_album"
+                }
+            };
+
+            req.Query.Search("awesome")
+                .And("an")
+                .And("mathematician", t => t.Or("favorites_ablum", "Fame"));
+
+            var result = Client.Search(req);
+            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
+            result.Value.NumFound.ShouldEqual(1u);
+            result.Value.Documents.Count.ShouldEqual(1);
+            // "id" field is always returned
+            result.Value.Documents[0].Fields.Count.ShouldEqual(3);
+            result.Value.Documents[0].Id.ShouldNotBeNull();
         }
     }
 }
