@@ -37,7 +37,22 @@ namespace CorrugatedIron.Models
 
     public delegate T ResolveConflict<T>(List<T> conflictedObjects);
 
-    public class RiakObject
+	/// <summary>
+	/// <para>Implements a writeable vector clock interface. Callers must explictly use the
+	/// IWriteableVClock interface to set the vector clock value. This is by design and
+	/// is implemented in an attempt to prevent developers new to Riak from causing themselves
+	/// more pain. This trade off should present developers with a reliable way to explicitly
+	/// drop down to mucking about with vector clocks - it becomes apparent to a casual 
+	/// observer that something out of the ordinary is happening.</para>
+	/// <para>A better understanding of the usefulness of vector clocks can be found in 
+	/// John Daily's Understanding Riak’s Configurable Behaviors: Part 2 (http://basho.com/riaks-config-behaviors-part-2/).
+	/// </para>
+	/// </summary>
+	public interface IWriteableVClock {
+		void SetVClock(byte[] vclock);
+	}
+
+    public class RiakObject : IWriteableVClock
     {
         private List<string> _vtags;
         private readonly int _hashCode;
@@ -429,6 +444,10 @@ namespace CorrugatedIron.Models
                 return result;
             }
         }
+
+		void IWriteableVClock.SetVClock(byte[] vclock) {
+			VectorClock = vclock;
+		}
 
         public void SetObject<T>(T value, SerializeObjectToString<T> serializeObject)
             where T : class
