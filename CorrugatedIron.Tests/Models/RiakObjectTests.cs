@@ -14,10 +14,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Linq;
 using CorrugatedIron.Models;
 using CorrugatedIron.Tests.Extensions;
 using NUnit.Framework;
-using System.Linq;
 
 namespace CorrugatedIron.Tests.Models
 {
@@ -36,7 +36,7 @@ namespace CorrugatedIron.Tests.Models
             riakObjectId.Bucket.ShouldEqual(Bucket);
             riakObjectId.Key.ShouldEqual(Key);
         }
-        
+
         [Test]
         public void RiakIndexNameManglingIsHandledAutomatically()
         {
@@ -45,7 +45,7 @@ namespace CorrugatedIron.Tests.Models
             riakObject.BinIndex("state_bin").Set("oregon");
             riakObject.IntIndex("age").Add(32);
             riakObject.IntIndex("cats_int").Add(2);
-            
+
             riakObject.BinIndexes.Values.Select(v => v.RiakIndexName).Contains("name").ShouldBeFalse();
             riakObject.BinIndexes.Values.Select(v => v.RiakIndexName).Contains("name_bin").ShouldBeTrue();
             riakObject.BinIndexes.Values.Select(v => v.RiakIndexName).Contains("state").ShouldBeFalse();
@@ -101,6 +101,17 @@ namespace CorrugatedIron.Tests.Models
 
             riakObject.IntIndex("years").Delete();
             riakObject.IntIndexes.ContainsKey("years").ShouldBeFalse();
+        }
+
+        [Test]
+        public void VectorClocksCanBeSetThroughInterface()
+        {
+            var vclock = new byte[] { 0, 1, 2, 3, 4, 5 };
+
+            var riakObject = new RiakObject(Bucket, Key, "value");
+            ((IWriteableVClock)riakObject).SetVClock(vclock);
+
+            riakObject.VectorClock.ShouldEqual(vclock);
         }
     }
 }
