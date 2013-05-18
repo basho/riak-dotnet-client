@@ -19,6 +19,7 @@ using CorrugatedIron.Config;
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace CorrugatedIron
 {
@@ -49,56 +50,70 @@ namespace CorrugatedIron
             get { return _lbConfiguration.DefaultRetryCount; }
         }
 
-        protected override TRiakResult UseConnection<TRiakResult>(Func<IRiakConnection, TRiakResult> useFun, Func<ResultCode, string, bool, TRiakResult> onError, int retryAttempts)
+        protected override Task<TRiakResult> UseConnection<TRiakResult>(Func<IRiakConnection, Task<TRiakResult>> useFun, Func<ResultCode, string, bool, TRiakResult> onError, int retryAttempts)
         {
             if(retryAttempts < 0)
             {
-                return onError(ResultCode.NoRetries, "Unable to access a connection on the cluster.", true);
+                return TaskResult(onError(ResultCode.NoRetries, "Unable to access a connection on the cluster.", true));
             }
             if(_disposing)
             {
-                return onError(ResultCode.ShuttingDown, "System currently shutting down", true);
+                return TaskResult(onError(ResultCode.ShuttingDown, "System currently shutting down", true));
             }
 
+            // get result (note the harmless but annoying casting)
             var node = _node;
-
             if(node != null)
             {
-                var result = node.UseConnection(useFun);
-                if(!result.IsSuccess)
-                {
-                    Thread.Sleep(RetryWaitTime);
-                    return UseConnection(useFun, onError, retryAttempts - 1);
-                }
-                return (TRiakResult)result;
+                Func<IRiakConnection, Task<RiakResult>> cUseFun = (
+                    c => useFun(c).ContinueWith((Task<TRiakResult> t) => (RiakResult)t.Result));
+
+                // use harmess casting
+                return node.UseConnection(cUseFun)
+                    .ContinueWith((Task<RiakResult> finishedTask) => {
+                        var result = (TRiakResult)finishedTask.Result;
+                        if(!result.IsSuccess)
+                        {
+                            return TaskDelay(RetryWaitTime)
+                                .ContinueWith(finishedDelayTask => {
+                                    return UseConnection(useFun, onError, retryAttempts - 1);
+                                }).Unwrap();
+                        }
+                        return TaskResult(result);
+                    }).Unwrap();
             }
-            return onError(ResultCode.ClusterOffline, "Unable to access functioning Riak node", true);
+
+            // no functioning node
+            return TaskResult(onError(ResultCode.ClusterOffline, "Unable to access functioning Riak node", true));
         }
 
-        public override RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun, int retryAttempts)
+        public override Task<RiakResult<IEnumerable<TResult>>> UseDelayedConnection<TResult>(Func<IRiakConnection, Action, Task<RiakResult<IEnumerable<TResult>>>> useFun, int retryAttempts)
         {
             if(retryAttempts < 0)
             {
-                return RiakResult<IEnumerable<TResult>>.Error(ResultCode.NoRetries, "Unable to access a connection on the cluster.", true);
+                return RiakResult<IEnumerable<TResult>>.ErrorTask(ResultCode.NoRetries, "Unable to access a connection on the cluster.", true);
             }
             if(_disposing)
             {
-                return RiakResult<IEnumerable<TResult>>.Error(ResultCode.ShuttingDown, "System currently shutting down", true);
+                return RiakResult<IEnumerable<TResult>>.ErrorTask(ResultCode.ShuttingDown, "System currently shutting down", true);
             }
 
             var node = _node;
-
             if(node != null)
             {
-                var result = node.UseDelayedConnection(useFun);
-                if(!result.IsSuccess)
-                {
-                    Thread.Sleep(RetryWaitTime);
-                    return UseDelayedConnection(useFun, retryAttempts - 1);
-                }
-                return result;
+                return node.UseDelayedConnection(useFun)
+                    .ContinueWith((Task<RiakResult<IEnumerable<TResult>>> finishedTask) => {
+                        var result = finishedTask.Result;
+                        if(!result.IsSuccess)
+                        {
+                            return TaskDelay(RetryWaitTime).ContinueWith(finishedDelayTask => {
+                                return UseDelayedConnection(useFun, retryAttempts - 1);
+                            }).Unwrap();
+                        }
+                        return TaskResult(result);
+                    }).Unwrap();
             }
-            return RiakResult<IEnumerable<TResult>>.Error(ResultCode.ClusterOffline, "Unable to access functioning Riak node", true);
+            return RiakResult<IEnumerable<TResult>>.ErrorTask(ResultCode.ClusterOffline, "Unable to access functioning Riak node", true);
         }
 
         public override void Dispose()
@@ -106,6 +121,31 @@ namespace CorrugatedIron
             _disposing = true;
 
             _node.Dispose();
+        }
+
+        // wrap a task result
+        private Task<T> TaskResult<T>(T result)
+        {
+            var source = new TaskCompletionSource<T>();
+            source.SetResult(result);
+            return source.Task;
+        }
+
+        // create a delay task
+        private Task TaskDelay(int milliseconds)
+        {
+            var source = new TaskCompletionSource<object>();
+
+            // setup timer
+            var timer = null as Timer;
+            timer = new Timer(dummyState => {
+                source.SetResult(new object());
+                timer.Dispose();
+                timer = null;
+            }, null, milliseconds, Timeout.Infinite);
+
+            // give back the task
+            return source.Task;
         }
     }
 }

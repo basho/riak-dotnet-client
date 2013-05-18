@@ -13,6 +13,7 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
+using System.Threading.Tasks;
 
 namespace CorrugatedIron
 {
@@ -42,6 +43,13 @@ namespace CorrugatedIron
         {
         }
 
+        internal static Task<RiakResult> SuccessTask()
+        {
+            var source = new TaskCompletionSource<RiakResult>();
+            source.SetResult(RiakResult.Success());
+            return source.Task;
+        }
+
         internal static RiakResult Success()
         {
             return new RiakResult
@@ -49,6 +57,13 @@ namespace CorrugatedIron
                 IsSuccess = true,
                 ResultCode = ResultCode.Success
             };
+        }
+
+        internal static Task<RiakResult> ErrorTask(ResultCode code, string message, bool nodeOffline)
+        {
+            var source = new TaskCompletionSource<RiakResult>();
+            source.SetResult(RiakResult.Error(code, message, nodeOffline));
+            return source.Task;
         }
 
         internal static RiakResult Error(ResultCode code, string message, bool nodeOffline)
@@ -71,6 +86,13 @@ namespace CorrugatedIron
         {
         }
 
+        internal static Task<RiakResult<TResult>> SuccessTask(TResult value)
+        {
+            var source = new TaskCompletionSource<RiakResult<TResult>>();
+            source.SetResult(RiakResult<TResult>.Success(value));
+            return source.Task;
+        }
+
         internal static RiakResult<TResult> Success(TResult value)
         {
             return new RiakResult<TResult>
@@ -79,6 +101,13 @@ namespace CorrugatedIron
                 ResultCode = ResultCode.Success,
                 Value = value
             };
+        }
+
+        internal new static Task<RiakResult<TResult>> ErrorTask(ResultCode code, string message, bool nodeOffline)
+        {
+            var source = new TaskCompletionSource<RiakResult<TResult>>();
+            source.SetResult(RiakResult<TResult>.Error(code, message, nodeOffline));
+            return source.Task;
         }
 
         internal new static RiakResult<TResult> Error(ResultCode code, string message, bool nodeOffline)

@@ -17,6 +17,7 @@
 using CorrugatedIron.Comms;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace CorrugatedIron
 {
@@ -38,7 +39,7 @@ namespace CorrugatedIron
         [Obsolete("Clients no longer need a seed value, use CreateClient() instead")]
         public IRiakClient CreateClient(string seed)
         {
-            return new RiakClient(this, seed) { RetryCount = DefaultRetryCount };
+            return CreateClient();
         }
 
         /// <summary>
@@ -49,23 +50,29 @@ namespace CorrugatedIron
         /// </returns>
         public IRiakClient CreateClient()
         {
-            return new RiakClient(this) { RetryCount = DefaultRetryCount };
+            var asyncClient = CreateAsyncClient();
+            return new RiakClient(asyncClient);
         }
 
-        public RiakResult UseConnection(Func<IRiakConnection, RiakResult> useFun, int retryAttempts)
+        public IRiakAsyncClient CreateAsyncClient()
+        {
+            return new RiakAsyncClient(this) { RetryCount = DefaultRetryCount };
+        }
+
+        public Task<RiakResult> UseConnection(Func<IRiakConnection, Task<RiakResult>> useFun, int retryAttempts)
         {
             return UseConnection(useFun, RiakResult.Error, retryAttempts);
         }
 
-        public RiakResult<TResult> UseConnection<TResult>(Func<IRiakConnection, RiakResult<TResult>> useFun, int retryAttempts)
+        public Task<RiakResult<TResult>> UseConnection<TResult>(Func<IRiakConnection, Task<RiakResult<TResult>>> useFun, int retryAttempts)
         {
             return UseConnection(useFun, RiakResult<TResult>.Error, retryAttempts);
         }
 
-        protected abstract TRiakResult UseConnection<TRiakResult>(Func<IRiakConnection, TRiakResult> useFun, Func<ResultCode, string, bool, TRiakResult> onError, int retryAttempts)
+        protected abstract Task<TRiakResult> UseConnection<TRiakResult>(Func<IRiakConnection, Task<TRiakResult>> useFun, Func<ResultCode, string, bool, TRiakResult> onError, int retryAttempts)
             where TRiakResult : RiakResult;
 
-        public abstract RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun, int retryAttempts)
+        public abstract Task<RiakResult<IEnumerable<TResult>>> UseDelayedConnection<TResult>(Func<IRiakConnection, Action, Task<RiakResult<IEnumerable<TResult>>>> useFun, int retryAttempts)
             where TResult : RiakResult;
 
         public abstract void Dispose();

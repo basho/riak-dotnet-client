@@ -245,6 +245,8 @@
     <Compile Include="Models\MapReduce\Inputs\RiakBinIndexEqualityInput.cs" />
     <Compile Include="Models\MapReduce\Inputs\RiakBinIndexRangeInput.cs" />
     <Compile Include="Models\RiakGetOptions.cs" />
+    <Compile Include="IRiakAsyncBatchClient.cs" />
+    <Compile Include="IRiakAsyncClient.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Metadata\CorrugatedIron.snk">

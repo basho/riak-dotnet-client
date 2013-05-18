@@ -28,6 +28,7 @@ using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace CorrugatedIron.Comms
 {
@@ -38,336 +39,265 @@ namespace CorrugatedIron.Comms
         void Disconnect();
 
         // PBC interface
-        RiakResult<TResult> PbcRead<TResult>()
+        Task<RiakResult<TResult>> PbcRead<TResult>()
             where TResult : class, new();
 
-        RiakResult PbcRead(MessageCode expectedMessageCode);
+        Task<RiakResult> PbcRead(MessageCode expectedMessageCode);
 
-        RiakResult PbcWrite<TRequest>(TRequest request)
+        Task<RiakResult> PbcWrite<TRequest>(TRequest request)
             where TRequest : class;
 
-        RiakResult PbcWrite(MessageCode messageCode);
+        Task<RiakResult> PbcWrite(MessageCode messageCode);
 
-        RiakResult<TResult> PbcWriteRead<TRequest, TResult>(TRequest request)
+        Task<RiakResult<TResult>> PbcWriteRead<TRequest, TResult>(TRequest request)
             where TRequest : class
             where TResult : class, new();
 
-        RiakResult<TResult> PbcWriteRead<TResult>(MessageCode messageCode)
+        Task<RiakResult<TResult>> PbcWriteRead<TResult>(MessageCode messageCode)
             where TResult : class, new();
 
-        RiakResult PbcWriteRead<TRequest>(TRequest request, MessageCode expectedMessageCode)
+        Task<RiakResult> PbcWriteRead<TRequest>(TRequest request, MessageCode expectedMessageCode)
             where TRequest : class;
 
-        RiakResult PbcWriteRead(MessageCode messageCode, MessageCode expectedMessageCode);
+        Task<RiakResult> PbcWriteRead(MessageCode messageCode, MessageCode expectedMessageCode);
 
-        RiakResult<IEnumerable<RiakResult<TResult>>> PbcRepeatRead<TResult>(Func<RiakResult<TResult>, bool> repeatRead)
+        Task<RiakResult<IEnumerable<RiakResult<TResult>>>> PbcRepeatRead<TResult>(Func<RiakResult<TResult>, bool> repeatRead)
             where TResult : class, new();
 
-        RiakResult<IEnumerable<RiakResult<TResult>>> PbcWriteRead<TResult>(MessageCode messageCode, Func<RiakResult<TResult>, bool> repeatRead)
+        Task<RiakResult<IEnumerable<RiakResult<TResult>>>> PbcWriteRead<TResult>(MessageCode messageCode, Func<RiakResult<TResult>, bool> repeatRead)
             where TResult : class, new();
 
-        RiakResult<IEnumerable<RiakResult<TResult>>> PbcWriteRead<TRequest, TResult>(TRequest request, Func<RiakResult<TResult>, bool> repeatRead)
+        Task<RiakResult<IEnumerable<RiakResult<TResult>>>> PbcWriteRead<TRequest, TResult>(TRequest request, Func<RiakResult<TResult>, bool> repeatRead)
             where TRequest : class
             where TResult : class, new();
 
-        RiakResult<IEnumerable<RiakResult<TResult>>> PbcStreamRead<TResult>(Func<RiakResult<TResult>, bool> repeatRead, Action onFinish)
+        Task<RiakResult<IEnumerable<RiakResult<TResult>>>> PbcStreamRead<TResult>(Func<RiakResult<TResult>, bool> repeatRead, Action onFinish)
             where TResult : class, new();
 
-        RiakResult<IEnumerable<RiakResult<TResult>>> PbcWriteStreamRead<TRequest, TResult>(TRequest request,
+        Task<RiakResult<IEnumerable<RiakResult<TResult>>>> PbcWriteStreamRead<TRequest, TResult>(TRequest request,
             Func<RiakResult<TResult>, bool> repeatRead, Action onFinish)
             where TRequest : class
             where TResult : class, new();
 
-        RiakResult<IEnumerable<RiakResult<TResult>>> PbcWriteStreamRead<TResult>(MessageCode messageCode,
+        Task<RiakResult<IEnumerable<RiakResult<TResult>>>> PbcWriteStreamRead<TResult>(MessageCode messageCode,
             Func<RiakResult<TResult>, bool> repeatRead, Action onFinish)
             where TResult : class, new();
 
         // REST interface
-        RiakResult<RiakRestResponse> RestRequest(RiakRestRequest request);
+        Task<RiakResult<RiakRestResponse>> RestRequest(RiakRestRequest request);
     }
 
+    // riak connection
     internal class RiakConnection : IRiakConnection
     {
         private readonly string _restRootUrl;
         private readonly RiakPbcSocket _socket;
 
-        public bool IsIdle
-        {
-            get { return _socket.IsConnected; }
-        }
-
-        static RiakConnection()
-        {
-            ServicePointManager.ServerCertificateValidationCallback += ServerValidationCallback;
-        }
-
         public RiakConnection(IRiakNodeConfiguration nodeConfiguration)
         {
             _restRootUrl = @"{0}://{1}:{2}".Fmt(nodeConfiguration.RestScheme, nodeConfiguration.HostAddress, nodeConfiguration.RestPort);
             _socket = new RiakPbcSocket(nodeConfiguration.HostAddress, nodeConfiguration.PbcPort, nodeConfiguration.NetworkReadTimeout,
-                nodeConfiguration.NetworkWriteTimeout);
+                                        nodeConfiguration.NetworkWriteTimeout);
         }
 
-        public RiakResult<TResult> PbcRead<TResult>()
-            where TResult : class, new()
+        public void Disconnect()
         {
-            try
-            {
-                var result = _socket.Read<TResult>();
-                return RiakResult<TResult>.Success(result);
-            }
-            catch (RiakException ex)
-            {
-                if (ex.NodeOffline)
-                {
-                    Disconnect();
-                }
-                return RiakResult<TResult>.Error(ResultCode.CommunicationError, ex.Message, ex.NodeOffline);
-            }
-            catch (Exception ex)
-            {
-                Disconnect();
-                return RiakResult<TResult>.Error(ResultCode.CommunicationError, ex.Message, true);
-            }
+            _socket.Disconnect();
         }
 
-        public RiakResult PbcRead(MessageCode expectedMessageCode)
+        public Task<RiakResult<TResult>> PbcRead<TResult>() where TResult : class, new()
         {
-            try
-            {
-                _socket.Read(expectedMessageCode);
-                return RiakResult.Success();
-            }
-            catch (RiakException ex)
-            {
-                if (ex.NodeOffline)
-                {
-                    Disconnect();
-                }
-                return RiakResult.Error(ResultCode.CommunicationError, ex.Message, ex.NodeOffline);
-            }
-            catch(Exception ex)
-            {
-                Disconnect();
-                return RiakResult.Error(ResultCode.CommunicationError, ex.Message, true);
-            }
+            return _socket.ReadAsync<TResult>()
+                .ContinueWith((Task<TResult> finishedTask) => {
+                    if (!finishedTask.IsFaulted)
+                        return RiakResult<TResult>.Success(finishedTask.Result);
+                    else
+                        return GetExceptionResult<TResult>(finishedTask.Exception);
+                });
         }
 
-        public RiakResult<IEnumerable<RiakResult<TResult>>> PbcRepeatRead<TResult>(Func<RiakResult<TResult>, bool> repeatRead)
-            where TResult : class, new()
+        public Task<RiakResult> PbcRead(MessageCode expectedMessageCode)
         {
-            var results = new List<RiakResult<TResult>>();
-            try
-            {
-                RiakResult<TResult> result;
-                do
-                {
-                    result = RiakResult<TResult>.Success(_socket.Read<TResult>());
-                    results.Add(result);
-                } while(repeatRead(result));
-
-                return RiakResult<IEnumerable<RiakResult<TResult>>>.Success(results);
-            }
-            catch (RiakException ex)
-            {
-                if (ex.NodeOffline)
-                {
-                    Disconnect();
-                }
-                return RiakResult<IEnumerable<RiakResult<TResult>>>.Error(ResultCode.CommunicationError, ex.Message, ex.NodeOffline);
-            }
-            catch(Exception ex)
-            {
-                Disconnect();
-                return RiakResult<IEnumerable<RiakResult<TResult>>>.Error(ResultCode.CommunicationError, ex.Message, true);
-            }
+            return _socket.ReadAsync(expectedMessageCode)
+                .ContinueWith((Task<MessageCode> finishedTask) => {
+                    if (!finishedTask.IsFaulted)
+                        return RiakResult.Success();
+                    else
+                        return GetExceptionResult(finishedTask.Exception);
+                });
         }
 
-        public RiakResult PbcWrite<TRequest>(TRequest request)
-            where TRequest : class
+        public Task<RiakResult> PbcWrite<TRequest>(TRequest request) where TRequest : class
         {
-            try
-            {
-                _socket.Write(request);
-                return RiakResult.Success();
-            }
-            catch (RiakException ex)
-            {
-                if (ex.NodeOffline)
-                {
-                    Disconnect();
-                }
-                return RiakResult.Error(ResultCode.CommunicationError, ex.Message, ex.NodeOffline);
-            }
-            catch(Exception ex)
-            {
-                Disconnect();
-                return RiakResult.Error(ResultCode.CommunicationError, ex.Message, true);
-            }
+            return _socket.WriteAsync<TRequest>(request)
+                .ContinueWith((Task finishedTask) => {
+                    if (!finishedTask.IsFaulted)
+                        return RiakResult.Success();
+                    else
+                        return GetExceptionResult(finishedTask.Exception);
+                });
         }
 
-        public RiakResult PbcWrite(MessageCode messageCode)
+        public Task<RiakResult> PbcWrite(MessageCode messageCode)
         {
-            try
-            {
-                _socket.Write(messageCode);
-                return RiakResult.Success();
-            }
-            catch (RiakException ex)
-            {
-                if (ex.NodeOffline)
-                {
-                    Disconnect();
-                }
-                return RiakResult.Error(ResultCode.CommunicationError, ex.Message, ex.NodeOffline);
-            }
-            catch(Exception ex)
-            {
-                Disconnect();
-                return RiakResult.Error(ResultCode.CommunicationError, ex.Message, true);
-            }
+            return _socket.WriteAsync(messageCode)
+                .ContinueWith((Task finishedTask) => {
+                    if (!finishedTask.IsFaulted)
+                        return RiakResult.Success();
+                    else
+                        return GetExceptionResult(finishedTask.Exception);
+                });
         }
 
-        public RiakResult<TResult> PbcWriteRead<TRequest, TResult>(TRequest request)
-            where TRequest : class
-            where TResult : class, new()
+        public Task<RiakResult<TResult>> PbcWriteRead<TRequest, TResult>(TRequest request) where TRequest : class where TResult : class, new()
         {
-            var writeResult = PbcWrite(request);
-            if(writeResult.IsSuccess)
-            {
-                return PbcRead<TResult>();
-            }
-            return RiakResult<TResult>.Error(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline);
+            return PbcWrite(request)
+                .ContinueWith((Task<RiakResult> writeTask) => {
+                    var writeResult = writeTask.Result;
+                    if (writeResult.IsSuccess)
+                    {
+                        return PbcRead<TResult>();
+                    }
+                    return RiakResult<TResult>.ErrorTask(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline);
+                }).Unwrap();
         }
 
-        public RiakResult PbcWriteRead<TRequest>(TRequest request, MessageCode expectedMessageCode)
-            where TRequest : class
+        public Task<RiakResult<TResult>> PbcWriteRead<TResult>(MessageCode messageCode) where TResult : class, new()
         {
-            var writeResult = PbcWrite(request);
-            if(writeResult.IsSuccess)
-            {
-                return PbcRead(expectedMessageCode);
-            }
-            return RiakResult.Error(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline);
+            return PbcWrite(messageCode)
+                .ContinueWith((Task<RiakResult> writeTask) => {
+                    var writeResult = writeTask.Result;
+                    if (writeResult.IsSuccess)
+                    {
+                        return PbcRead<TResult>();
+                    }
+                    return RiakResult<TResult>.ErrorTask(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline);
+                }).Unwrap();
         }
 
-        public RiakResult<TResult> PbcWriteRead<TResult>(MessageCode messageCode)
-            where TResult : class, new()
+        public Task<RiakResult> PbcWriteRead<TRequest>(TRequest request, MessageCode expectedMessageCode) where TRequest : class
         {
-            var writeResult = PbcWrite(messageCode);
-            if(writeResult.IsSuccess)
-            {
-                return PbcRead<TResult>();
-            }
-            return RiakResult<TResult>.Error(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline);
+            return PbcWrite(request)
+                .ContinueWith((Task<RiakResult> writeTask) => {
+                    var writeResult = writeTask.Result;
+                    if (writeResult.IsSuccess)
+                    {
+                        return PbcRead(expectedMessageCode);
+                    }
+                    return RiakResult.ErrorTask(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline);
+                }).Unwrap();
         }
 
-        public RiakResult PbcWriteRead(MessageCode messageCode, MessageCode expectedMessageCode)
+        public Task<RiakResult> PbcWriteRead(MessageCode messageCode, MessageCode expectedMessageCode)
         {
-            var writeResult = PbcWrite(messageCode);
-            if(writeResult.IsSuccess)
-            {
-                return PbcRead(expectedMessageCode);
-            }
-            return RiakResult.Error(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline);
+            return PbcWrite(messageCode)
+                .ContinueWith((Task<RiakResult> writeTask) => {
+                    var writeResult = writeTask.Result;
+                    if (writeResult.IsSuccess)
+                    {
+                        return PbcRead(expectedMessageCode);
+                    }
+                    return RiakResult.ErrorTask(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline);
+                }).Unwrap();
         }
 
-        public RiakResult<IEnumerable<RiakResult<TResult>>> PbcWriteRead<TRequest, TResult>(TRequest request,
-            Func<RiakResult<TResult>, bool> repeatRead)
-            where TRequest : class
-            where TResult : class, new()
+        public Task<RiakResult<IEnumerable<RiakResult<TResult>>>> PbcRepeatRead<TResult>(Func<RiakResult<TResult>, bool> repeatRead) where TResult : class, new()
         {
-            var writeResult = PbcWrite(request);
-            if(writeResult.IsSuccess)
-            {
-                return PbcRepeatRead(repeatRead);
-            }
-            return RiakResult<IEnumerable<RiakResult<TResult>>>.Error(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline);
+            var source = new TaskCompletionSource<RiakResult<IEnumerable<RiakResult<TResult>>>>();
+            var resultsList = new List<RiakResult<TResult>>();
+
+            // repeat as a continuation
+            Action readNext = null;
+            readNext = (() => {
+                _socket.ReadAsync<TResult>()
+                    .ContinueWith((Task<TResult> readTask) => {
+                        var result = RiakResult<TResult>.Success(readTask.Result);
+                        resultsList.Add(result);
+
+                        try
+                        {
+                            if (repeatRead(result))
+                            {
+                                readNext();
+                            }
+                            else
+                            {
+                                source.SetResult(RiakResult<IEnumerable<RiakResult<TResult>>>.Success(resultsList));
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            source.SetException(ex);
+                        }
+                    });
+            });
+
+            // begin reading and completion task
+            readNext();
+            return source.Task;
         }
 
-        public RiakResult<IEnumerable<RiakResult<TResult>>> PbcWriteRead<TResult>(MessageCode messageCode,
-            Func<RiakResult<TResult>, bool> repeatRead)
-            where TResult : class, new()
+        public Task<RiakResult<IEnumerable<RiakResult<TResult>>>> PbcWriteRead<TResult>(MessageCode messageCode, Func<RiakResult<TResult>, bool> repeatRead) where TResult : class, new()
         {
-            var writeResult = PbcWrite(messageCode);
-            if(writeResult.IsSuccess)
-            {
-                return PbcRepeatRead(repeatRead);
-            }
-            return RiakResult<IEnumerable<RiakResult<TResult>>>.Error(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline);
+            return PbcWrite(messageCode)
+                .ContinueWith((Task<RiakResult> writeTask) => {
+                    var writeResult = writeTask.Result;
+                    if (writeResult.IsSuccess)
+                    {
+                        return PbcRepeatRead<TResult>(repeatRead);
+                    }
+                    return RiakResult<IEnumerable<RiakResult<TResult>>>.ErrorTask(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline);
+                }).Unwrap();
         }
 
-        public RiakResult<IEnumerable<RiakResult<TResult>>> PbcStreamRead<TResult>(Func<RiakResult<TResult>, bool> repeatRead, Action onFinish)
-            where TResult : class, new()
+        public Task<RiakResult<IEnumerable<RiakResult<TResult>>>> PbcWriteRead<TRequest, TResult>(TRequest request, Func<RiakResult<TResult>, bool> repeatRead) where TRequest : class where TResult : class, new()
+        {
+            return PbcWrite<TRequest>(request)
+                .ContinueWith((Task<RiakResult> writeTask) => {
+                    var writeResult = writeTask.Result;
+                    if (writeResult.IsSuccess)
+                    {
+                        return PbcRepeatRead<TResult>(repeatRead);
+                    }
+                    return RiakResult<IEnumerable<RiakResult<TResult>>>.ErrorTask(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline);
+                }).Unwrap();
+        }
+
+        public Task<RiakResult<IEnumerable<RiakResult<TResult>>>> PbcStreamRead<TResult>(Func<RiakResult<TResult>, bool> repeatRead, Action onFinish) where TResult : class, new()
         {
             var streamer = PbcStreamReadIterator(repeatRead, onFinish);
-            return RiakResult<IEnumerable<RiakResult<TResult>>>.Success(streamer);
+            return RiakResult<IEnumerable<RiakResult<TResult>>>.SuccessTask(streamer);
         }
 
-        private IEnumerable<RiakResult<TResult>> PbcStreamReadIterator<TResult>(Func<RiakResult<TResult>, bool> repeatRead, Action onFinish)
-            where TResult : class, new()
+        public Task<RiakResult<IEnumerable<RiakResult<TResult>>>> PbcWriteStreamRead<TRequest, TResult>(TRequest request, Func<RiakResult<TResult>, bool> repeatRead, Action onFinish) where TRequest : class where TResult : class, new()
         {
-            RiakResult<TResult> result;
-
-            do
-            {
-                result = PbcRead<TResult>();
-                if(!result.IsSuccess) break;
-                yield return result;
-            } while(repeatRead(result));
-
-            // clean up first..
-            onFinish();
-
-            // then return the failure to the client to indicate failure
-            yield return result;
+            return PbcWrite<TRequest>(request)
+                .ContinueWith((Task<RiakResult> writeTask) => {
+                    var writeResult = writeTask.Result;
+                    if (writeResult.IsSuccess)
+                    {
+                        var streamer = PbcStreamReadIterator(repeatRead, onFinish);
+                        return RiakResult<IEnumerable<RiakResult<TResult>>>.Success(streamer);
+                    }
+                    return RiakResult<IEnumerable<RiakResult<TResult>>>.Error(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline);
+                });
         }
 
-        public RiakResult<IEnumerable<RiakResult<TResult>>> PbcWriteStreamRead<TRequest, TResult>(TRequest request,
-            Func<RiakResult<TResult>, bool> repeatRead, Action onFinish)
-            where TRequest : class
-            where TResult : class, new()
+        public Task<RiakResult<IEnumerable<RiakResult<TResult>>>> PbcWriteStreamRead<TResult>(MessageCode messageCode, Func<RiakResult<TResult>, bool> repeatRead, Action onFinish) where TResult : class, new()
         {
-            var streamer = PbcWriteStreamReadIterator(request, repeatRead, onFinish);
-            return RiakResult<IEnumerable<RiakResult<TResult>>>.Success(streamer);
+            return PbcWrite(messageCode)
+                .ContinueWith((Task<RiakResult> writeTask) => {
+                    var writeResult = writeTask.Result;
+                    if (writeResult.IsSuccess)
+                    {
+                        var streamer = PbcStreamReadIterator(repeatRead, onFinish);
+                        return RiakResult<IEnumerable<RiakResult<TResult>>>.Success(streamer);
+                    }
+                    return RiakResult<IEnumerable<RiakResult<TResult>>>.Error(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline);
+                });
         }
 
-        public RiakResult<IEnumerable<RiakResult<TResult>>> PbcWriteStreamRead<TResult>(MessageCode messageCode,
-            Func<RiakResult<TResult>, bool> repeatRead, Action onFinish)
-            where TResult : class, new()
-        {
-            var streamer = PbcWriteStreamReadIterator(messageCode, repeatRead, onFinish);
-            return RiakResult<IEnumerable<RiakResult<TResult>>>.Success(streamer);
-        }
-
-        private IEnumerable<RiakResult<TResult>> PbcWriteStreamReadIterator<TRequest, TResult>(TRequest request,
-            Func<RiakResult<TResult>, bool> repeatRead, Action onFinish)
-            where TRequest : class
-            where TResult : class, new()
-        {
-            var writeResult = PbcWrite(request);
-            if(writeResult.IsSuccess)
-            {
-                return PbcStreamReadIterator(repeatRead, onFinish);
-            }
-            onFinish();
-            return new[] { RiakResult<TResult>.Error(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline) };
-        }
-
-        private IEnumerable<RiakResult<TResult>> PbcWriteStreamReadIterator<TResult>(MessageCode messageCode,
-            Func<RiakResult<TResult>, bool> repeatRead, Action onFinish)
-            where TResult : class, new()
-        {
-            var writeResult = PbcWrite(messageCode);
-            if(writeResult.IsSuccess)
-            {
-                return PbcStreamReadIterator(repeatRead, onFinish);
-            }
-            onFinish();
-            return new[] { RiakResult<TResult>.Error(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline) };
-        }
-
-        public RiakResult<RiakRestResponse> RestRequest(RiakRestRequest request)
+        public Task<RiakResult<RiakRestResponse>> RestRequest(RiakRestRequest request)
         {
             var baseUri = new StringBuilder(_restRootUrl).Append(request.Uri);
             if(request.QueryParams.Count > 0)
@@ -378,24 +308,24 @@ namespace CorrugatedIron.Comms
                 request.QueryParams.Skip(1).ForEach(kv => baseUri.Append("&").Append(kv.Key.UrlEncoded()).Append("=").Append(kv.Value.UrlEncoded()));
             }
             var targetUri = new Uri(baseUri.ToString());
-
+            
             var req = (HttpWebRequest)WebRequest.Create(targetUri);
             req.KeepAlive = true;
             req.Method = request.Method;
             req.Credentials = CredentialCache.DefaultCredentials;
-
+            
             if(!string.IsNullOrWhiteSpace(request.ContentType))
             {
                 req.ContentType = request.ContentType;
             }
-
+            
             if(!request.Cache)
             {
                 req.Headers.Set(RiakConstants.Rest.HttpHeaders.DisableCacheKey, RiakConstants.Rest.HttpHeaders.DisableCacheValue);
             }
-
+            
             request.Headers.ForEach(h => req.Headers.Set(h.Key, h.Value));
-
+            
             if(request.Body != null && request.Body.Length > 0)
             {
                 req.ContentLength = request.Body.Length;
@@ -409,70 +339,201 @@ namespace CorrugatedIron.Comms
                 req.ContentLength = 0;
             }
 
-            try
-            {
-                var response = (HttpWebResponse)req.GetResponse();
+            // process response
+            var asyncResult = req.BeginGetResponse(null, null);
+            return Task<WebResponse>.Factory.FromAsync(asyncResult, req.EndGetResponse)
+                .ContinueWith((Task<WebResponse> responseTask) => {
 
-                var result = new RiakRestResponse
-                {
-                    ContentLength = response.ContentLength,
-                    ContentType = response.ContentType,
-                    StatusCode = response.StatusCode,
-                    Headers = response.Headers.AllKeys.ToDictionary(k => k, k => response.Headers[k]),
-                    ContentEncoding = !string.IsNullOrWhiteSpace(response.ContentEncoding)
-                        ? Encoding.GetEncoding(response.ContentEncoding)
-                        : Encoding.Default
-                };
-
-                if (response.ContentLength > 0)
-                {
-                    using (var responseStream = response.GetResponseStream())
+                    // rethrow exception on fault
+                    if (responseTask.IsFaulted)
                     {
-                        if (responseStream != null)
+                        throw responseTask.Exception;
+                    }
+
+                    // pull out response
+                    var response = (HttpWebResponse)responseTask.Result;
+                    var result = new RiakRestResponse()
+                    {
+                        ContentLength = response.ContentLength,
+                        ContentType = response.ContentType,
+                        StatusCode = response.StatusCode,
+                        Headers = response.Headers.AllKeys.ToDictionary(k => k, k => response.Headers[k]),
+                        ContentEncoding = !string.IsNullOrWhiteSpace(response.ContentEncoding)
+                            ? Encoding.GetEncoding(response.ContentEncoding)
+                            : Encoding.Default
+                    };
+
+                    if (response.ContentLength > 0)
+                    {
+                        using (var responseStream = response.GetResponseStream())
                         {
-                            using (var reader = new StreamReader(responseStream, result.ContentEncoding))
+                            if (responseStream != null)
                             {
-                                result.Body = reader.ReadToEnd();
+                                return ReadStreamAsync(responseStream, (int)response.ContentLength)
+                                    .ContinueWith((Task<byte[]> readTask) => {
+                                        result.Body = result.ContentEncoding.GetString(readTask.Result);
+                                        return result;
+                                    });
                             }
                         }
                     }
-                }
 
-                return RiakResult<RiakRestResponse>.Success(result);
-            }
-            catch (RiakException ex)
-            {
-                return RiakResult<RiakRestResponse>.Error(ResultCode.CommunicationError, ex.Message, ex.NodeOffline);
-            }
-            catch (WebException ex)
-            {
-                if (ex.Status == WebExceptionStatus.ProtocolError)
-                {
-                    return RiakResult<RiakRestResponse>.Error(ResultCode.HttpError, ex.Message, false);
-                }
+                    // end of the line
+                    throw new RiakException("Couldn't read HTTP response", false);
+                }).Unwrap()
+                    .ContinueWith((Task<RiakRestResponse> responseTask) => {
+                        if (!responseTask.IsFaulted)
+                        {
+                            return RiakResult<RiakRestResponse>.Success(responseTask.Result);
+                        }
+                        else
+                        {
+                            var exceptions = responseTask.Exception.Flatten().InnerExceptions;
+                            var rEx = exceptions.OfType<RiakException>().FirstOrDefault();
+                            var wEx = exceptions.OfType<WebException>().FirstOrDefault();
 
-                return RiakResult<RiakRestResponse>.Error(ResultCode.HttpError, ex.Message, true);
-            }
-            catch (Exception ex)
-            {
-                return RiakResult<RiakRestResponse>.Error(ResultCode.CommunicationError, ex.Message, true);
-            }
+                            // process exceptions
+                            if (rEx != null)
+                            {
+                                return RiakResult<RiakRestResponse>.Error(ResultCode.CommunicationError, rEx.Message, rEx.NodeOffline);
+                            }
+                            else if (wEx != null)
+                            {
+                                if (wEx.Status == WebExceptionStatus.ProtocolError)
+                                {
+                                    return RiakResult<RiakRestResponse>.Error(ResultCode.HttpError, wEx.Message, false);
+                                }
+                                
+                                return RiakResult<RiakRestResponse>.Error(ResultCode.HttpError, wEx.Message, true);
+                            }
+                            else
+                            {
+                                var ex = exceptions.FirstOrDefault();
+                                return RiakResult<RiakRestResponse>.Error(ResultCode.CommunicationError, ex.Message, true);
+                            }
+                        }
+                    });
         }
 
-        private static bool ServerValidationCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+        public bool IsIdle
         {
-            return true;
+            get { return _socket.IsConnected; }
         }
 
         public void Dispose()
         {
-            _socket.Dispose();
             Disconnect();
+            _socket.Dispose();
         }
 
-        public void Disconnect()
+        // read as a stream - will add bits and pieces as they become available
+        private IEnumerable<RiakResult<TResult>> PbcStreamReadIterator<TResult>(Func<RiakResult<TResult>, bool> repeatRead, Action onFinish)
+            where TResult : class, new()
         {
-            _socket.Disconnect();
+            RiakResult<TResult> result;
+            
+            do
+            {
+
+                // block wait for result
+                var task = PbcRead<TResult>();
+                task.Wait();
+                result = task.Result;
+
+                // sync behaviour
+                if(!result.IsSuccess)
+                {
+                    break;
+                }
+                else
+                {
+                    yield return result;
+                }
+            } while(repeatRead(result));
+            
+            // clean up first..
+            onFinish();
+            
+            // then return the failure to the client to indicate failure
+            yield return result;
+        }
+
+        // tidy up messy exceptions
+        private RiakResult GetExceptionResult(AggregateException aggregateException)
+        {
+            return GetExceptionResult<object>(aggregateException);
+        }
+
+        // read incoming stream asynchronously
+        private Task<byte[]> ReadStreamAsync(Stream stream, int length)
+        {
+            var source = new TaskCompletionSource<byte[]>();
+            var data = new byte[length];
+            var maxBufferSize = 1024 * 4;
+            var bytesToRetrieve = length;
+            var position = 0;
+
+            // continuation to read
+            Action readNextChunk;
+            readNextChunk = (() => {
+                var startRead = stream.BeginRead(data,
+                                                 position,
+                                                 Math.Min(bytesToRetrieve, maxBufferSize),
+                                                 null,
+                                                 null);
+                Task<int>.Factory.FromAsync(startRead, stream.EndRead)
+                    .ContinueWith((Task<int> finishedTask) => {
+                        if (finishedTask.IsFaulted)
+                        {
+                            source.SetException(finishedTask.Exception);
+                        }
+                        else
+                        {
+                            if (finishedTask.Result == 0)
+                            {
+                                source.SetException(new RiakException("Timed Out"));
+                            }
+                            else
+                            {
+                                position += finishedTask.Result;
+                                bytesToRetrieve -= finishedTask.Result;
+                                if (bytesToRetrieve == 0)
+                                {
+                                    source.SetResult(data);
+                                }
+                                else
+                                {
+                                    readNextChunk();
+                                }
+                            }
+                        }
+                    });
+            });
+
+            // start reading
+            readNextChunk();
+            return source.Task;
+        }
+
+        // tidy up messy exceptions
+        private RiakResult<T> GetExceptionResult<T>(AggregateException aggregateException)
+        {
+            var exceptions = aggregateException.Flatten().InnerExceptions;
+            var rEx = exceptions.OfType<RiakException>().FirstOrDefault();
+            var fEx = exceptions.FirstOrDefault();
+            if (rEx != null)
+            {
+                if (rEx.NodeOffline)
+                {
+                    Disconnect();
+                }
+                return RiakResult<T>.Error(ResultCode.CommunicationError, rEx.Message, rEx.NodeOffline);
+            }
+            else
+            {
+                Disconnect();
+                return RiakResult<T>.Error(ResultCode.CommunicationError, fEx.Message, true);
+            }
         }
     }
 }
