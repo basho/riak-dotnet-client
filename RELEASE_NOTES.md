@@ -5,6 +5,10 @@ Release Notes
 
 * Enabled the setting of Vector Clock values via an explicit interface implementation. The property was not made writeable as it wasn't something that we felt that most users should use. Casting a `RiakObject` to an `IWriteableVclock` interface allows the Vclock to be set.
 
+### Fixes
+
+* [Issue 120](https://github.com/DistributedNonsense/CorrugatedIron/issues/120) - Update both `RiakBucketKeyInput` and `RiakBucketKeyKeyDataInput` classes so that their APIs are a little nicer to use. This also results in a bug fix in `RiakBucketKeyKeyDataInput` where the serialisation was (rather horribly) incorrect.
+
 v1.3.1
 ------
 
