@@ -64,7 +64,7 @@ namespace CorrugatedIron.Tests.Live.LoadTests
             }
 
             var input = new RiakBucketKeyInput();
-            keys.ForEach(k => input.AddBucketKey(MapReduceBucket, k));
+            keys.ForEach(k => input.Add(MapReduceBucket, k));
 
             var query = new RiakMapReduceQuery()
                 .Inputs(input)
@@ -123,7 +123,7 @@ namespace CorrugatedIron.Tests.Live.LoadTests
             }
 
             var input = new RiakBucketKeyInput();
-            keys.ForEach(k => input.AddBucketKey(MapReduceBucket, k));
+            keys.ForEach(k => input.Add(MapReduceBucket, k));
 
             var query = new RiakMapReduceQuery()
                 .Inputs(input)
