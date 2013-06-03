@@ -14,6 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Linq;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -29,9 +30,22 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
             BucketKeyKeyData = new List<Tuple<string, string, object>>();
         }
 
-        public void AddBucketKeyKeyData(string bucket, string key, object keyData)
+        public RiakBucketKeyKeyDataInput Add(string bucket, string key, object keyData)
         {
             BucketKeyKeyData.Add(new Tuple<string, string, object>(bucket, key, keyData));
+            return this;
+        }
+
+        public RiakBucketKeyKeyDataInput Add(params Tuple<string, string, object>[] pairs)
+        {
+            BucketKeyKeyData.AddRange(pairs);
+            return this;
+        }
+
+        public RiakBucketKeyKeyDataInput Add(IEnumerable<Tuple<string, string, object>> pairs)
+        {
+            BucketKeyKeyData.AddRange(pairs);
+            return this;
         }
 
         public override JsonWriter WriteJson(JsonWriter writer)
@@ -39,11 +53,15 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
             writer.WritePropertyName("inputs");
             writer.WriteStartArray();
 
+            var s = new JsonSerializer();
+
             BucketKeyKeyData.ForEach(bkkd =>
             {
-                writer.WriteRawValue(bkkd.Item1);
-                writer.WriteRawValue(bkkd.Item2);
-                writer.WriteRawValue(bkkd.Item3.ToString());
+                writer.WriteStartArray();
+                writer.WriteValue(bkkd.Item1);
+                writer.WriteValue(bkkd.Item2);
+                s.Serialize(writer, bkkd.Item3);
+                writer.WriteEndArray();
             });
 
             writer.WriteEndArray();

@@ -67,6 +67,7 @@
     <Compile Include="Comms\RoundRobinStrategyTests.cs" />
     <Compile Include="Json\RiakObjectConversionTests.cs" />
     <Compile Include="Json\TestObjects.cs" />
+    <Compile Include="Models\MapReduce\RiakMapReduceInputSerialisationTests.cs" />
     <Compile Include="Models\RiakBucketPropertyTests.cs" />
     <Compile Include="RiakAsyncClientTests.cs" />
     <Compile Include="RiakClientSetBucketPropertiesTests.cs" />
