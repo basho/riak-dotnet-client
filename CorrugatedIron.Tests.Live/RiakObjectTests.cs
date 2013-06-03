@@ -161,8 +161,8 @@ namespace CorrugatedIron.Tests.Live
             var jeremiah = Client.Get(TestBucket, Jeremiah).Value;
             var jLinks = jeremiah.Links;
 
-            var input = new RiakBucketKeyInput();
-            input.AddBucketKey(TestBucket, Jeremiah);
+            var input = new RiakBucketKeyInput()
+                .Add(TestBucket, Jeremiah);
 
             var query = new RiakMapReduceQuery()
                 .Inputs(input)
@@ -256,7 +256,6 @@ namespace CorrugatedIron.Tests.Live
 				RiakLink.AllLinks,
 				RiakLink.AllLinks
 			};
-
 
             var linkPeople = Client.WalkLinks(oj, linkPhases);
             linkPeople.IsSuccess.ShouldBeTrue();
