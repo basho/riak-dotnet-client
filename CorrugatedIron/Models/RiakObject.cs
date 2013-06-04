@@ -209,6 +209,7 @@ namespace CorrugatedIron.Models
         public IntIndex IntIndex(string name)
         {
             var index = default(IntIndex);
+            name = name.ToLower();
 
             if (!_intIndexes.TryGetValue(name, out index))
             {
@@ -221,6 +222,7 @@ namespace CorrugatedIron.Models
         public BinIndex BinIndex(string name)
         {
             var index = default(BinIndex);
+            name = name.ToLower();
 
             if (!_binIndexes.TryGetValue(name, out index))
             {
