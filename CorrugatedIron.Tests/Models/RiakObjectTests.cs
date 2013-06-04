@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+﻿// Copyright (c) 2013 - OJ Reeves & Jeremiah Peschka
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -112,6 +112,23 @@ namespace CorrugatedIron.Tests.Models
             ((IWriteableVClock)riakObject).SetVClock(vclock);
 
             riakObject.VectorClock.ShouldEqual(vclock);
+        }
+
+        [Test]
+        public void SecondaryIndexesAreForcedToLowerCase()
+        {
+            var obj = new RiakObject(Bucket, Key);
+
+            obj.BinIndex("UPPERCASE").Set("foo");
+            obj.IntIndex("MixedCase").Set(10);
+
+            obj.BinIndexes.ContainsKey("uppercase").ShouldBeTrue();
+            obj.IntIndexes.ContainsKey("mixedcase").ShouldBeTrue();
+
+            obj.BinIndex("UPPERCASE").Values.First().ShouldEqual("foo");
+            obj.BinIndex("uppercase").Values.First().ShouldEqual("foo");
+            obj.IntIndex("MixedCase").Values.First().ShouldEqual(10);
+            obj.IntIndex("mixedcase").Values.First().ShouldEqual(10);
         }
     }
 }

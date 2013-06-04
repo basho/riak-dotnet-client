@@ -1,6 +1,10 @@
 Release Notes
 =============
 
+### Fixes
+
+* [Issue 115](https://github.com/DistributedNonsense/CorrugatedIron/issues/115) - Fix problem where secondary indexes are not forced to lower case (like they are in Riak).
+
 ### Features
 
 * Enabled the setting of Vector Clock values via an explicit interface implementation. The property was not made writeable as it wasn't something that we felt that most users should use. Casting a `RiakObject` to an `IWriteableVclock` interface allows the Vclock to be set.
