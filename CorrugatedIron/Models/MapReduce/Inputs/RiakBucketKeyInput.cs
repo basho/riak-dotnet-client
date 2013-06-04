@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+﻿// Copyright (c) 2013 - OJ Reeves & Jeremiah Peschka
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -17,6 +17,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CorrugatedIron.Models.MapReduce.Inputs
 {
@@ -29,9 +30,40 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
             BucketKeyList = new List<Tuple<string, string>>();
         }
 
-        public void AddBucketKey(string bucket, string key)
+        public RiakBucketKeyInput Add(string bucket, string key)
         {
-            BucketKeyList.Add(new Tuple<string, string>(bucket, key));
+            BucketKeyList.Add(Tuple.Create(bucket, key));
+            return this;
+        }
+
+        public RiakBucketKeyInput Add(RiakObjectId objectId)
+        {
+            BucketKeyList.Add(Tuple.Create(objectId.Bucket, objectId.Key));
+            return this;
+        }
+
+        public RiakBucketKeyInput Add(params RiakObjectId[] objectIds)
+        {
+            BucketKeyList.AddRange(objectIds.Select(o => Tuple.Create(o.Bucket, o.Key)));
+            return this;
+        }
+
+        public RiakBucketKeyInput Add(IEnumerable<RiakObjectId> objectIds)
+        {
+            BucketKeyList.AddRange(objectIds.Select(o => Tuple.Create(o.Bucket, o.Key)));
+            return this;
+        }
+
+        public RiakBucketKeyInput Add(params Tuple<string, string>[] pairs)
+        {
+            BucketKeyList.AddRange(pairs);
+            return this;
+        }
+
+        public RiakBucketKeyInput Add(IEnumerable<Tuple<string, string>> pairs)
+        {
+            BucketKeyList.AddRange(pairs);
+            return this;
         }
 
         public override JsonWriter WriteJson(JsonWriter writer)
@@ -55,12 +87,7 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
         public static RiakBucketKeyInput FromRiakObjectIds(IEnumerable<RiakObjectId> riakObjectIds)
         {
             var rbki = new RiakBucketKeyInput();
-            
-            foreach(var objectid in riakObjectIds)
-            {
-                rbki.AddBucketKey(objectid.Bucket, objectid.Key);
-            }
-            
+            rbki.Add(riakObjectIds);
             return rbki;
         }
     }

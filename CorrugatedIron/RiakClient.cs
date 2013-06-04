@@ -831,8 +831,8 @@ namespace CorrugatedIron
         {
             System.Diagnostics.Debug.Assert(riakLinks.Count > 0, "Link walking requires at least one link");
 
-            var input = new RiakBucketKeyInput();
-            input.AddBucketKey(riakObject.Bucket, riakObject.Key);
+            var input = new RiakBucketKeyInput()
+                .Add(riakObject.Bucket, riakObject.Key);
 
             var query = new RiakMapReduceQuery()
                 .Inputs(input);

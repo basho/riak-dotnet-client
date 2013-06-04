@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+﻿// Copyright (c) 2013 - OJ Reeves & Jeremiah Peschka
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -14,10 +14,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Linq;
 using CorrugatedIron.Models;
 using CorrugatedIron.Tests.Extensions;
 using NUnit.Framework;
-using System.Linq;
 
 namespace CorrugatedIron.Tests.Models
 {
@@ -36,7 +36,7 @@ namespace CorrugatedIron.Tests.Models
             riakObjectId.Bucket.ShouldEqual(Bucket);
             riakObjectId.Key.ShouldEqual(Key);
         }
-        
+
         [Test]
         public void RiakIndexNameManglingIsHandledAutomatically()
         {
@@ -45,7 +45,7 @@ namespace CorrugatedIron.Tests.Models
             riakObject.BinIndex("state_bin").Set("oregon");
             riakObject.IntIndex("age").Add(32);
             riakObject.IntIndex("cats_int").Add(2);
-            
+
             riakObject.BinIndexes.Values.Select(v => v.RiakIndexName).Contains("name").ShouldBeFalse();
             riakObject.BinIndexes.Values.Select(v => v.RiakIndexName).Contains("name_bin").ShouldBeTrue();
             riakObject.BinIndexes.Values.Select(v => v.RiakIndexName).Contains("state").ShouldBeFalse();
@@ -101,6 +101,34 @@ namespace CorrugatedIron.Tests.Models
 
             riakObject.IntIndex("years").Delete();
             riakObject.IntIndexes.ContainsKey("years").ShouldBeFalse();
+        }
+
+        [Test]
+        public void VectorClocksCanBeSetThroughInterface()
+        {
+            var vclock = new byte[] { 0, 1, 2, 3, 4, 5 };
+
+            var riakObject = new RiakObject(Bucket, Key, "value");
+            ((IWriteableVClock)riakObject).SetVClock(vclock);
+
+            riakObject.VectorClock.ShouldEqual(vclock);
+        }
+
+        [Test]
+        public void SecondaryIndexesAreForcedToLowerCase()
+        {
+            var obj = new RiakObject(Bucket, Key);
+
+            obj.BinIndex("UPPERCASE").Set("foo");
+            obj.IntIndex("MixedCase").Set(10);
+
+            obj.BinIndexes.ContainsKey("uppercase").ShouldBeTrue();
+            obj.IntIndexes.ContainsKey("mixedcase").ShouldBeTrue();
+
+            obj.BinIndex("UPPERCASE").Values.First().ShouldEqual("foo");
+            obj.BinIndex("uppercase").Values.First().ShouldEqual("foo");
+            obj.IntIndex("MixedCase").Values.First().ShouldEqual(10);
+            obj.IntIndex("mixedcase").Values.First().ShouldEqual(10);
         }
     }
 }
