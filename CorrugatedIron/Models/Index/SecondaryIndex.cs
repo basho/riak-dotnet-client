@@ -1,4 +1,4 @@
-// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2013 - OJ Reeves & Jeremiah Peschka
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -50,7 +50,7 @@ namespace CorrugatedIron.Models.Index
             Container = container;
 
             _values = new HashSet<TIndex>();
-            _name = name;
+            _name = name.ToLower();
         }
 
         public TClass Clear()
