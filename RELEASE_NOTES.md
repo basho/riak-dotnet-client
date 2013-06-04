@@ -1,6 +1,9 @@
 Release Notes
 =============
 
+v1.3.2
+------
+
 ### Features
 
 * Enabled the setting of Vector Clock values via an explicit interface implementation. The property was not made writeable as it wasn't something that we felt that most users should use. Casting a `RiakObject` to an `IWriteableVclock` interface allows the Vclock to be set.
