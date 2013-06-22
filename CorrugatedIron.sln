@@ -77,7 +77,6 @@ Global
 		$3.scope = text/x-csharp
 		$0.TextStylePolicy = $4
 		$4.FileWidth = 120
-		$4.TabsToSpaces = False
 		$4.EolMarker = Unix
 		$4.inheritsSet = VisualStudio
 		$4.inheritsScope = text/plain
