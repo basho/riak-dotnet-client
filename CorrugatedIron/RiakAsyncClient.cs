@@ -125,19 +125,19 @@ namespace CorrugatedIron
 
         public Task<RiakResult<RiakObject>> Get(string bucket, string key, RiakGetOptions options = null)
         {
-            options = options ?? RiakConstants.Defaults.DefaultGetOptions;
+            options = options ?? RiakClient.DefaultGetOptions();
             return Task.Factory.StartNew(() => _client.Get(bucket, key, options));
         }
 
         public Task<RiakResult<RiakObject>> Get(RiakObjectId objectId, RiakGetOptions options = null)
         {
-            options = options ?? RiakConstants.Defaults.DefaultGetOptions;
+            options = options ?? RiakClient.DefaultGetOptions();
             return Task.Factory.StartNew(() => _client.Get(objectId.Bucket, objectId.Key, options));
         }
 
         public Task<IEnumerable<RiakResult<RiakObject>>> Get(IEnumerable<RiakObjectId> bucketKeyPairs, RiakGetOptions options = null)
         {
-            options = options ?? RiakConstants.Defaults.DefaultGetOptions;
+            options = options ?? RiakClient.DefaultGetOptions();
             return Task.Factory.StartNew(() => _client.Get(bucketKeyPairs, options));
         }
 
@@ -258,19 +258,19 @@ namespace CorrugatedIron
 
         public void Get(string bucket, string key, Action<RiakResult<RiakObject>> callback, RiakGetOptions options = null)
         {
-            options = options ?? RiakConstants.Defaults.DefaultGetOptions;
+            options = options ?? RiakClient.DefaultGetOptions();
             ExecAsync(() => callback(_client.Get(bucket, key, options)));
         }
 
         public void Get(RiakObjectId objectId, Action<RiakResult<RiakObject>> callback, RiakGetOptions options = null)
         {
-            options = options ?? RiakConstants.Defaults.DefaultGetOptions;
+            options = options ?? RiakClient.DefaultGetOptions();
             ExecAsync(() => callback(_client.Get(objectId.Bucket, objectId.Key, options)));
         }
 
         public void Get(IEnumerable<RiakObjectId> bucketKeyPairs, Action<IEnumerable<RiakResult<RiakObject>>> callback, RiakGetOptions options = null)
         {
-            options = options ?? RiakConstants.Defaults.DefaultGetOptions;
+            options = options ?? RiakClient.DefaultGetOptions();
             ExecAsync(() => callback(_client.Get(bucketKeyPairs, options)));
         }
 

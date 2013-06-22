@@ -87,8 +87,6 @@ namespace CorrugatedIron.Util
                 public const int Timeout = 30000;
             }
 
-            public static readonly RiakGetOptions DefaultGetOptions = (new RiakGetOptions()).SetR(RVal);
-
             public const uint RVal = QuorumOptions.Default;
             public const string ContentType = ContentTypes.ApplicationJson;
             public const string CharSet = CharSets.Utf8;

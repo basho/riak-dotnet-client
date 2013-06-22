@@ -179,7 +179,7 @@ namespace CorrugatedIron
         /// </remarks>
         public RiakResult<RiakObject> Get(RiakObjectId objectId, RiakGetOptions options = null)
         {
-            options = options ?? RiakConstants.Defaults.DefaultGetOptions;
+            options = options ?? DefaultGetOptions();
             return Get(objectId.Bucket, objectId.Key, options);
         }
 
@@ -1021,6 +1021,11 @@ namespace CorrugatedIron
         private static bool IsValidBucketOrKey(string value)
         {
             return !string.IsNullOrWhiteSpace(value) && !value.Contains('/');
+        }
+
+        internal static RiakGetOptions DefaultGetOptions()
+        {
+            return (new RiakGetOptions()).SetR(RiakConstants.Defaults.RVal);
         }
     }
 }
