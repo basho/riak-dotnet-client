@@ -124,14 +124,14 @@ namespace CorrugatedIron.Tests.RiakAsyncClientTests
         [SetUp]
         public void SetUp()
         {
-            ClientMock.Setup(m => m.Get(It.IsAny<IEnumerable<RiakObjectId>>(), RiakConstants.Defaults.DefaultGetOptions)).Returns(new List<RiakResult<RiakObject>>());
-            Result = AsyncClient.Get(new List<RiakObjectId>(), RiakConstants.Defaults.DefaultGetOptions).Result;
+            ClientMock.Setup(m => m.Get(It.IsAny<IEnumerable<RiakObjectId>>(), null)).Returns(new List<RiakResult<RiakObject>>());
+            Result = AsyncClient.Get(new List<RiakObjectId>()).Result;
         }
 
         [Test]
         public void AsyncClientInvokesCorrectClientFunction()
         {
-            ClientMock.Verify(m => m.Get(It.IsAny<IEnumerable<RiakObjectId>>(), null), Times.Once());
+            ClientMock.Verify(m => m.Get(It.IsAny<IEnumerable<RiakObjectId>>(), It.IsAny<RiakGetOptions>()), Times.Once());
         }
 
         [Test]
