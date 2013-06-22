@@ -15,6 +15,7 @@
 // under the License.
 
 using System.Collections.Generic;
+using CorrugatedIron.Models;
 
 namespace CorrugatedIron.Util
 {
@@ -85,6 +86,8 @@ namespace CorrugatedIron.Util
             {
                 public const int Timeout = 30000;
             }
+
+            public static readonly RiakGetOptions DefaultGetOptions = (new RiakGetOptions()).SetR(RVal);
 
             public const uint RVal = QuorumOptions.Default;
             public const string ContentType = ContentTypes.ApplicationJson;
