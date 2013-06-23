@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+v1.3.3
+------
+
+### Fixes
+
+* [Issue 123](https://github.com/DistributedNonsense/CorrugatedIron/issues/123) - Added `RiakGetOptions` to the `IRiakClient` interface. This breaks the previous `Get` methods that relied on the old mechanism using `uint` for R (the methods were marked as obsolete anyway, so nobody should have been using them.
+
 v1.3.2
 ------
 
