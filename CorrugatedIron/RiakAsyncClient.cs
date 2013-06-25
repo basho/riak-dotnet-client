@@ -27,9 +27,9 @@ namespace CorrugatedIron
     {
         Task<RiakResult> Ping();
 
-        Task<RiakResult<RiakObject>> Get(string bucket, string key, uint rVal = RiakConstants.Defaults.RVal);
-        Task<RiakResult<RiakObject>> Get(RiakObjectId objectId, uint rVal = RiakConstants.Defaults.RVal);
-        Task<IEnumerable<RiakResult<RiakObject>>> Get(IEnumerable<RiakObjectId> bucketKeyPairs, uint rVal = RiakConstants.Defaults.RVal);
+        Task<RiakResult<RiakObject>> Get(string bucket, string key, RiakGetOptions options = null);
+        Task<RiakResult<RiakObject>> Get(RiakObjectId objectId, RiakGetOptions options = null);
+        Task<IEnumerable<RiakResult<RiakObject>>> Get(IEnumerable<RiakObjectId> bucketKeyPairs, RiakGetOptions options = null);
 
         Task<RiakResult<RiakObject>> Put(RiakObject value, RiakPutOptions options = null);
         Task<IEnumerable<RiakResult<RiakObject>>> Put(IEnumerable<RiakObject> values, RiakPutOptions options = null);
@@ -62,15 +62,6 @@ namespace CorrugatedIron
 
         [Obsolete("All async operations should use the functions that return Task<T>.")]
         void Ping(Action<RiakResult> callback);
-
-        [Obsolete("All async operations should use the functions that return Task<T>.")]
-        void Get(string bucket, string key, Action<RiakResult<RiakObject>> callback, uint rVal = RiakConstants.Defaults.RVal);
-
-        [Obsolete("All async operations should use the functions that return Task<T>.")]
-        void Get(RiakObjectId objectId, Action<RiakResult<RiakObject>> callback, uint rVal = RiakConstants.Defaults.RVal);
-
-        [Obsolete("All async operations should use the functions that return Task<T>.")]
-        void Get(IEnumerable<RiakObjectId> bucketKeyPairs, Action<IEnumerable<RiakResult<RiakObject>>> callback, uint rVal = RiakConstants.Defaults.RVal);
 
         [Obsolete("All async operations should use the functions that return Task<T>.")]
         void Put(RiakObject value, Action<RiakResult<RiakObject>> callback, RiakPutOptions options = null);
@@ -132,19 +123,22 @@ namespace CorrugatedIron
             return Task.Factory.StartNew(() => _client.Ping());
         }
 
-        public Task<RiakResult<RiakObject>> Get(string bucket, string key, uint rVal = RiakConstants.Defaults.RVal)
+        public Task<RiakResult<RiakObject>> Get(string bucket, string key, RiakGetOptions options = null)
         {
-            return Task.Factory.StartNew(() => _client.Get(bucket, key, rVal));
+            options = options ?? RiakClient.DefaultGetOptions();
+            return Task.Factory.StartNew(() => _client.Get(bucket, key, options));
         }
 
-        public Task<RiakResult<RiakObject>> Get(RiakObjectId objectId, uint rVal = RiakConstants.Defaults.RVal)
+        public Task<RiakResult<RiakObject>> Get(RiakObjectId objectId, RiakGetOptions options = null)
         {
-            return Task.Factory.StartNew(() => _client.Get(objectId.Bucket, objectId.Key, rVal));
+            options = options ?? RiakClient.DefaultGetOptions();
+            return Task.Factory.StartNew(() => _client.Get(objectId.Bucket, objectId.Key, options));
         }
 
-        public Task<IEnumerable<RiakResult<RiakObject>>> Get(IEnumerable<RiakObjectId> bucketKeyPairs, uint rVal = RiakConstants.Defaults.RVal)
+        public Task<IEnumerable<RiakResult<RiakObject>>> Get(IEnumerable<RiakObjectId> bucketKeyPairs, RiakGetOptions options = null)
         {
-            return Task.Factory.StartNew(() => _client.Get(bucketKeyPairs, rVal));
+            options = options ?? RiakClient.DefaultGetOptions();
+            return Task.Factory.StartNew(() => _client.Get(bucketKeyPairs, options));
         }
 
         public Task<IEnumerable<RiakResult<RiakObject>>> Put(IEnumerable<RiakObject> values, RiakPutOptions options)
@@ -262,19 +256,22 @@ namespace CorrugatedIron
             ExecAsync(() => callback(_client.Ping()));
         }
 
-        public void Get(string bucket, string key, Action<RiakResult<RiakObject>> callback, uint rVal = RiakConstants.Defaults.RVal)
+        public void Get(string bucket, string key, Action<RiakResult<RiakObject>> callback, RiakGetOptions options = null)
         {
-            ExecAsync(() => callback(_client.Get(bucket, key, rVal)));
+            options = options ?? RiakClient.DefaultGetOptions();
+            ExecAsync(() => callback(_client.Get(bucket, key, options)));
         }
 
-        public void Get(RiakObjectId objectId, Action<RiakResult<RiakObject>> callback, uint rVal = RiakConstants.Defaults.RVal)
+        public void Get(RiakObjectId objectId, Action<RiakResult<RiakObject>> callback, RiakGetOptions options = null)
         {
-            ExecAsync(() => callback(_client.Get(objectId.Bucket, objectId.Key, rVal)));
+            options = options ?? RiakClient.DefaultGetOptions();
+            ExecAsync(() => callback(_client.Get(objectId.Bucket, objectId.Key, options)));
         }
 
-        public void Get(IEnumerable<RiakObjectId> bucketKeyPairs, Action<IEnumerable<RiakResult<RiakObject>>> callback, uint rVal = RiakConstants.Defaults.RVal)
+        public void Get(IEnumerable<RiakObjectId> bucketKeyPairs, Action<IEnumerable<RiakResult<RiakObject>>> callback, RiakGetOptions options = null)
         {
-            ExecAsync(() => callback(_client.Get(bucketKeyPairs, rVal)));
+            options = options ?? RiakClient.DefaultGetOptions();
+            ExecAsync(() => callback(_client.Get(bucketKeyPairs, options)));
         }
 
         public void Put(IEnumerable<RiakObject> values, Action<IEnumerable<RiakResult<RiakObject>>> callback, RiakPutOptions options)
