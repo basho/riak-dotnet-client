@@ -127,6 +127,33 @@ namespace CorrugatedIron.Messages
       get { return _deletedvclock; }
       set { _deletedvclock = value; }
     }
+
+    private uint _timeout = default(uint);
+    [global::ProtoBuf.ProtoMember(10, IsRequired = false, Name=@"timeout", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(uint))]
+    public uint timeout
+    {
+      get { return _timeout; }
+      set { _timeout = value; }
+    }
+
+    private bool _sloppy_quorum = default(bool);
+    [global::ProtoBuf.ProtoMember(11, IsRequired = false, Name=@"sloppy_quorum", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(default(bool))]
+    public bool sloppy_quorum
+    {
+      get { return _sloppy_quorum; }
+      set { _sloppy_quorum = value; }
+    }
+
+    private uint _n_val = default(uint);
+    [global::ProtoBuf.ProtoMember(12, IsRequired = false, Name=@"n_val", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(uint))]
+    public uint n_val
+    {
+      get { return _n_val; }
+      set { _n_val = value; }
+    }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -267,6 +294,42 @@ namespace CorrugatedIron.Messages
       get { return _return_head; }
       set { _return_head = value; }
     }
+
+    private uint _timeout = default(uint);
+    [global::ProtoBuf.ProtoMember(12, IsRequired = false, Name=@"timeout", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(uint))]
+    public uint timeout
+    {
+      get { return _timeout; }
+      set { _timeout = value; }
+    }
+
+    private bool _asis = default(bool);
+    [global::ProtoBuf.ProtoMember(13, IsRequired = false, Name=@"asis", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(default(bool))]
+    public bool asis
+    {
+      get { return _asis; }
+      set { _asis = value; }
+    }
+
+    private bool _sloppy_quorum = default(bool);
+    [global::ProtoBuf.ProtoMember(14, IsRequired = false, Name=@"sloppy_quorum", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(default(bool))]
+    public bool sloppy_quorum
+    {
+      get { return _sloppy_quorum; }
+      set { _sloppy_quorum = value; }
+    }
+
+    private uint _n_val = default(uint);
+    [global::ProtoBuf.ProtoMember(15, IsRequired = false, Name=@"n_val", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(uint))]
+    public uint n_val
+    {
+      get { return _n_val; }
+      set { _n_val = value; }
+    }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -389,6 +452,61 @@ namespace CorrugatedIron.Messages
       get { return _dw; }
       set { _dw = value; }
     }
+
+    private uint _timeout = default(uint);
+    [global::ProtoBuf.ProtoMember(10, IsRequired = false, Name=@"timeout", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(uint))]
+    public uint timeout
+    {
+      get { return _timeout; }
+      set { _timeout = value; }
+    }
+
+    private bool _sloppy_quorum = default(bool);
+    [global::ProtoBuf.ProtoMember(11, IsRequired = false, Name=@"sloppy_quorum", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(default(bool))]
+    public bool sloppy_quorum
+    {
+      get { return _sloppy_quorum; }
+      set { _sloppy_quorum = value; }
+    }
+
+    private uint _n_val = default(uint);
+    [global::ProtoBuf.ProtoMember(12, IsRequired = false, Name=@"n_val", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(uint))]
+    public uint n_val
+    {
+      get { return _n_val; }
+      set { _n_val = value; }
+    }
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"RpbListBucketsReq")]
+  public partial class RpbListBucketsReq : global::ProtoBuf.IExtensible
+  {
+    public RpbListBucketsReq() {}
+    
+
+    private uint _timeout = default(uint);
+    [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"timeout", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(uint))]
+    public uint timeout
+    {
+      get { return _timeout; }
+      set { _timeout = value; }
+    }
+
+    private bool _stream = default(bool);
+    [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"stream", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(default(bool))]
+    public bool stream
+    {
+      get { return _stream; }
+      set { _stream = value; }
+    }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -406,6 +524,15 @@ namespace CorrugatedIron.Messages
       get { return _buckets; }
     }
   
+
+    private bool _done = default(bool);
+    [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"done", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(default(bool))]
+    public bool done
+    {
+      get { return _done; }
+      set { _done = value; }
+    }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -422,6 +549,15 @@ namespace CorrugatedIron.Messages
     {
       get { return _bucket; }
       set { _bucket = value; }
+    }
+
+    private uint _timeout = default(uint);
+    [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"timeout", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(uint))]
+    public uint timeout
+    {
+      get { return _timeout; }
+      set { _timeout = value; }
     }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
@@ -448,64 +584,6 @@ namespace CorrugatedIron.Messages
     {
       get { return _done; }
       set { _done = value; }
-    }
-    private global::ProtoBuf.IExtension extensionObject;
-    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
-  }
-  
-  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"RpbGetBucketReq")]
-  public partial class RpbGetBucketReq : global::ProtoBuf.IExtensible
-  {
-    public RpbGetBucketReq() {}
-    
-    private byte[] _bucket;
-    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"bucket", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public byte[] bucket
-    {
-      get { return _bucket; }
-      set { _bucket = value; }
-    }
-    private global::ProtoBuf.IExtension extensionObject;
-    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
-  }
-  
-  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"RpbGetBucketResp")]
-  public partial class RpbGetBucketResp : global::ProtoBuf.IExtensible
-  {
-    public RpbGetBucketResp() {}
-    
-    private RpbBucketProps _props;
-    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"props", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public RpbBucketProps props
-    {
-      get { return _props; }
-      set { _props = value; }
-    }
-    private global::ProtoBuf.IExtension extensionObject;
-    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
-  }
-  
-  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"RpbSetBucketReq")]
-  public partial class RpbSetBucketReq : global::ProtoBuf.IExtensible
-  {
-    public RpbSetBucketReq() {}
-    
-    private byte[] _bucket;
-    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"bucket", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public byte[] bucket
-    {
-      get { return _bucket; }
-      set { _bucket = value; }
-    }
-    private RpbBucketProps _props;
-    [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"props", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public RpbBucketProps props
-    {
-      get { return _props; }
-      set { _props = value; }
     }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
@@ -626,6 +704,42 @@ namespace CorrugatedIron.Messages
       get { return _range_max; }
       set { _range_max = value; }
     }
+
+    private bool _return_terms = default(bool);
+    [global::ProtoBuf.ProtoMember(7, IsRequired = false, Name=@"return_terms", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(default(bool))]
+    public bool return_terms
+    {
+      get { return _return_terms; }
+      set { _return_terms = value; }
+    }
+
+    private bool _stream = default(bool);
+    [global::ProtoBuf.ProtoMember(8, IsRequired = false, Name=@"stream", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(default(bool))]
+    public bool stream
+    {
+      get { return _stream; }
+      set { _stream = value; }
+    }
+
+    private uint _max_results = default(uint);
+    [global::ProtoBuf.ProtoMember(9, IsRequired = false, Name=@"max_results", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(uint))]
+    public uint max_results
+    {
+      get { return _max_results; }
+      set { _max_results = value; }
+    }
+
+    private byte[] _continuation = null;
+    [global::ProtoBuf.ProtoMember(10, IsRequired = false, Name=@"continuation", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(null)]
+    public byte[] continuation
+    {
+      get { return _continuation; }
+      set { _continuation = value; }
+    }
     [global::ProtoBuf.ProtoContract(Name=@"IndexQueryType")]
     public enum IndexQueryType
     {
@@ -654,6 +768,159 @@ namespace CorrugatedIron.Messages
       get { return _keys; }
     }
   
+    private readonly global::System.Collections.Generic.List<RpbPair> _results = new global::System.Collections.Generic.List<RpbPair>();
+    [global::ProtoBuf.ProtoMember(2, Name=@"results", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public global::System.Collections.Generic.List<RpbPair> results
+    {
+      get { return _results; }
+    }
+  
+
+    private byte[] _continuation = null;
+    [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"continuation", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(null)]
+    public byte[] continuation
+    {
+      get { return _continuation; }
+      set { _continuation = value; }
+    }
+
+    private bool _done = default(bool);
+    [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"done", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(default(bool))]
+    public bool done
+    {
+      get { return _done; }
+      set { _done = value; }
+    }
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"RpbCSBucketReq")]
+  public partial class RpbCSBucketReq : global::ProtoBuf.IExtensible
+  {
+    public RpbCSBucketReq() {}
+    
+    private byte[] _bucket;
+    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"bucket", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public byte[] bucket
+    {
+      get { return _bucket; }
+      set { _bucket = value; }
+    }
+    private byte[] _start_key;
+    [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"start_key", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public byte[] start_key
+    {
+      get { return _start_key; }
+      set { _start_key = value; }
+    }
+
+    private byte[] _end_key = null;
+    [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"end_key", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(null)]
+    public byte[] end_key
+    {
+      get { return _end_key; }
+      set { _end_key = value; }
+    }
+
+    private bool _start_incl = (bool)true;
+    [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"start_incl", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue((bool)true)]
+    public bool start_incl
+    {
+      get { return _start_incl; }
+      set { _start_incl = value; }
+    }
+
+    private bool _end_incl = (bool)false;
+    [global::ProtoBuf.ProtoMember(5, IsRequired = false, Name=@"end_incl", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue((bool)false)]
+    public bool end_incl
+    {
+      get { return _end_incl; }
+      set { _end_incl = value; }
+    }
+
+    private byte[] _continuation = null;
+    [global::ProtoBuf.ProtoMember(6, IsRequired = false, Name=@"continuation", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(null)]
+    public byte[] continuation
+    {
+      get { return _continuation; }
+      set { _continuation = value; }
+    }
+
+    private uint _max_results = default(uint);
+    [global::ProtoBuf.ProtoMember(7, IsRequired = false, Name=@"max_results", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(uint))]
+    public uint max_results
+    {
+      get { return _max_results; }
+      set { _max_results = value; }
+    }
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"RpbCSBucketResp")]
+  public partial class RpbCSBucketResp : global::ProtoBuf.IExtensible
+  {
+    public RpbCSBucketResp() {}
+    
+    private readonly global::System.Collections.Generic.List<RpbIndexObject> _objects = new global::System.Collections.Generic.List<RpbIndexObject>();
+    [global::ProtoBuf.ProtoMember(1, Name=@"objects", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public global::System.Collections.Generic.List<RpbIndexObject> objects
+    {
+      get { return _objects; }
+    }
+  
+
+    private byte[] _continuation = null;
+    [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"continuation", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(null)]
+    public byte[] continuation
+    {
+      get { return _continuation; }
+      set { _continuation = value; }
+    }
+
+    private bool _done = default(bool);
+    [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"done", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(default(bool))]
+    public bool done
+    {
+      get { return _done; }
+      set { _done = value; }
+    }
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"RpbIndexObject")]
+  public partial class RpbIndexObject : global::ProtoBuf.IExtensible
+  {
+    public RpbIndexObject() {}
+    
+    private byte[] _key;
+    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"key", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public byte[] key
+    {
+      get { return _key; }
+      set { _key = value; }
+    }
+    private RpbGetResp _object;
+    [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"object", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public RpbGetResp @object
+    {
+      get { return _object; }
+      set { _object = value; }
+    }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -797,28 +1064,165 @@ namespace CorrugatedIron.Messages
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
   }
   
-  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"RpbBucketProps")]
-  public partial class RpbBucketProps : global::ProtoBuf.IExtensible
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"RpbCounterUpdateReq")]
+  public partial class RpbCounterUpdateReq : global::ProtoBuf.IExtensible
   {
-    public RpbBucketProps() {}
+    public RpbCounterUpdateReq() {}
     
-
-    private uint _n_val = default(uint);
-    [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"n_val", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(uint))]
-    public uint n_val
+    private byte[] _bucket;
+    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"bucket", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public byte[] bucket
     {
-      get { return _n_val; }
-      set { _n_val = value; }
+      get { return _bucket; }
+      set { _bucket = value; }
+    }
+    private byte[] _key;
+    [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"key", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public byte[] key
+    {
+      get { return _key; }
+      set { _key = value; }
+    }
+    private long _amount;
+    [global::ProtoBuf.ProtoMember(3, IsRequired = true, Name=@"amount", DataFormat = global::ProtoBuf.DataFormat.ZigZag)]
+    public long amount
+    {
+      get { return _amount; }
+      set { _amount = value; }
     }
 
-    private bool _allow_mult = default(bool);
-    [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"allow_mult", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    [global::System.ComponentModel.DefaultValue(default(bool))]
-    public bool allow_mult
+    private uint _w = default(uint);
+    [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"w", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(uint))]
+    public uint w
     {
-      get { return _allow_mult; }
-      set { _allow_mult = value; }
+      get { return _w; }
+      set { _w = value; }
+    }
+
+    private uint _dw = default(uint);
+    [global::ProtoBuf.ProtoMember(5, IsRequired = false, Name=@"dw", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(uint))]
+    public uint dw
+    {
+      get { return _dw; }
+      set { _dw = value; }
+    }
+
+    private uint _pw = default(uint);
+    [global::ProtoBuf.ProtoMember(6, IsRequired = false, Name=@"pw", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(uint))]
+    public uint pw
+    {
+      get { return _pw; }
+      set { _pw = value; }
+    }
+
+    private bool _returnvalue = default(bool);
+    [global::ProtoBuf.ProtoMember(7, IsRequired = false, Name=@"returnvalue", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(default(bool))]
+    public bool returnvalue
+    {
+      get { return _returnvalue; }
+      set { _returnvalue = value; }
+    }
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"RpbCounterUpdateResp")]
+  public partial class RpbCounterUpdateResp : global::ProtoBuf.IExtensible
+  {
+    public RpbCounterUpdateResp() {}
+    
+
+    private long _value = default(long);
+    [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"value", DataFormat = global::ProtoBuf.DataFormat.ZigZag)]
+    [global::System.ComponentModel.DefaultValue(default(long))]
+    public long value
+    {
+      get { return _value; }
+      set { _value = value; }
+    }
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"RpbCounterGetReq")]
+  public partial class RpbCounterGetReq : global::ProtoBuf.IExtensible
+  {
+    public RpbCounterGetReq() {}
+    
+    private byte[] _bucket;
+    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"bucket", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public byte[] bucket
+    {
+      get { return _bucket; }
+      set { _bucket = value; }
+    }
+    private byte[] _key;
+    [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"key", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public byte[] key
+    {
+      get { return _key; }
+      set { _key = value; }
+    }
+
+    private uint _r = default(uint);
+    [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"r", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(uint))]
+    public uint r
+    {
+      get { return _r; }
+      set { _r = value; }
+    }
+
+    private uint _pr = default(uint);
+    [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"pr", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(uint))]
+    public uint pr
+    {
+      get { return _pr; }
+      set { _pr = value; }
+    }
+
+    private bool _basic_quorum = default(bool);
+    [global::ProtoBuf.ProtoMember(5, IsRequired = false, Name=@"basic_quorum", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(default(bool))]
+    public bool basic_quorum
+    {
+      get { return _basic_quorum; }
+      set { _basic_quorum = value; }
+    }
+
+    private bool _notfound_ok = default(bool);
+    [global::ProtoBuf.ProtoMember(6, IsRequired = false, Name=@"notfound_ok", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(default(bool))]
+    public bool notfound_ok
+    {
+      get { return _notfound_ok; }
+      set { _notfound_ok = value; }
+    }
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"RpbCounterGetResp")]
+  public partial class RpbCounterGetResp : global::ProtoBuf.IExtensible
+  {
+    public RpbCounterGetResp() {}
+    
+
+    private long _value = default(long);
+    [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"value", DataFormat = global::ProtoBuf.DataFormat.ZigZag)]
+    [global::System.ComponentModel.DefaultValue(default(long))]
+    public long value
+    {
+      get { return _value; }
+      set { _value = value; }
     }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
