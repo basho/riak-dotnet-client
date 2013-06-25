@@ -15,6 +15,7 @@
 // under the License.
 
 using System.Collections.Generic;
+using CorrugatedIron.Models;
 
 namespace CorrugatedIron.Util
 {
