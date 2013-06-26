@@ -156,9 +156,10 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
             props = getResult.Value;
             props.NVal.HasValue.ShouldBeTrue();
             props.NVal.Value.ShouldEqual(4U);
-            props.SearchEnabled.ShouldBeTrue();
-            props.WVal.Right.ShouldEqual("all");
-            props.RVal.Right.ShouldEqual("quorum");
+            props.Search.ShouldNotEqual(null);
+            props.Search.Value.ShouldBeTrue();
+            props.WVal.ShouldEqual(RiakConstants.QuorumOptionsLookup["all"]);
+            props.RVal.ShouldEqual(RiakConstants.QuorumOptionsLookup["quorum"]);
         }
 
         [Test]
@@ -169,10 +170,10 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
             result.Value.AllowMultiple.HasValue.ShouldBeTrue();
             result.Value.NVal.HasValue.ShouldBeTrue();
             result.Value.LastWriteWins.HasValue.ShouldBeTrue();
-            result.Value.RVal.ShouldNotBeNull();
-            result.Value.RwVal.ShouldNotBeNull();
-            result.Value.DwVal.ShouldNotBeNull();
-            result.Value.WVal.ShouldNotBeNull();
+            result.Value.RVal.ShouldNotEqual(null);
+            result.Value.RwVal.ShouldNotEqual(null);
+            result.Value.DwVal.ShouldNotEqual(null);
+            result.Value.WVal.ShouldNotEqual(null);
         }
 
         [Test]
