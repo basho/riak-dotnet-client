@@ -44,6 +44,8 @@ namespace CorrugatedIron.Models
         public bool? HasPrecommit { get; private set; }
         public bool? HasPostcommit { get; private set; }
 
+        public bool? Search { get; private set; }
+
         /// <summary>
         /// The number of replicas that must return before a read is considered a succes.
         /// </summary>
@@ -87,8 +89,7 @@ namespace CorrugatedIron.Models
         /// </summary>
         public bool SearchEnabled
         {
-            get { return PreCommitHooks != null && PreCommitHooks.FirstOrDefault(x => Equals(x, RiakErlangCommitHook.RiakSearchCommitHook)) != null; }
-            set { SetSearch(value); }
+            get { return Search != null && Search.Value; }
         }
 
         public RiakBucketProperties SetBasicQuorum(bool value)
@@ -112,6 +113,18 @@ namespace CorrugatedIron.Models
         public RiakBucketProperties SetLastWriteWins(bool value)
         {
             LastWriteWins = value;
+            return this;
+        }
+
+        /// <summary>
+        /// Enable or disable search on a bucket.
+        /// </summary>
+        /// <param name="value">Set to <i>true</i> to enable search on this bucket, or <i>false</i>
+        /// to disable it.</param>
+        /// <returns>A reference to the current properties object.</returns>
+        public RiakBucketProperties SetSearch(bool value)
+        {
+            Search = value;
             return this;
         }
 
@@ -184,33 +197,6 @@ namespace CorrugatedIron.Models
         public RiakBucketProperties SetBackend(string backend)
         {
             Backend = backend;
-            return this;
-        }
-
-        /// <summary>
-        /// Enable or disable search on a bucket.
-        /// </summary>
-        /// <param name="enable">Set to <i>true</i> to enable search on this bucket, or <i>false</i>
-        /// to disable it.</param>
-        /// <returns>A reference to the current properties object.</returns>
-        /// <remarks>Enabling search on a bucket in Riak requires the adding of a pre-commit hook.
-        /// This helper function abstracts this problem from the user so that they don't have to do it
-        /// themselves. When adding or removing any form of pre or post commit hook in Riak via any
-        /// client, it is a very good idea to first get the bucket properties from Riak, make changes,
-        /// then set the properties back. This prevents accidental removal of other pre or post commit
-        /// hooks that might have been added beforehand.</remarks>
-        public RiakBucketProperties SetSearch(bool enable)
-        {
-            if (enable)
-            {
-                AddPreCommitHook(RiakErlangCommitHook.RiakSearchCommitHook);
-                HasPrecommit = true;
-            }
-            else
-            {
-                RemovePreCommitHook(RiakErlangCommitHook.RiakSearchCommitHook);
-            }
-
             return this;
         }
 
