@@ -46,7 +46,7 @@ namespace CorrugatedIron
         Task<RiakResult<IEnumerable<string>>> ListKeys(string bucket);
         Task<RiakResult<IEnumerable<string>>> StreamListKeys(string bucket);
 
-        Task<RiakResult<RiakBucketProperties>> GetBucketProperties(string bucket, bool extended = false);
+        Task<RiakResult<RiakBucketProperties>> GetBucketProperties(string bucket);
         Task<RiakResult> SetBucketProperties(string bucket, RiakBucketProperties properties);
 
         Task<RiakResult<IList<string>>> IndexGet(string bucket, string indexName, int value);
@@ -97,7 +97,7 @@ namespace CorrugatedIron
         void StreamListKeys(string bucket, Action<RiakResult<IEnumerable<string>>> callback);
 
         [Obsolete("All async operations should use the functions that return Task<T>.")]
-        void GetBucketProperties(string bucket, Action<RiakResult<RiakBucketProperties>> callback, bool extended = false);
+        void GetBucketProperties(string bucket, Action<RiakResult<RiakBucketProperties>> callback);
 
         [Obsolete("All async operations should use the functions that return Task<T>.")]
         void SetBucketProperties(string bucket, RiakBucketProperties properties, Action<RiakResult> callback);
@@ -196,9 +196,9 @@ namespace CorrugatedIron
             return Task.Factory.StartNew(() => _client.StreamListKeys(bucket));
         }
 
-        public Task<RiakResult<RiakBucketProperties>> GetBucketProperties(string bucket, bool extended = false)
+        public Task<RiakResult<RiakBucketProperties>> GetBucketProperties(string bucket)
         {
-            return Task.Factory.StartNew(() => _client.GetBucketProperties(bucket, extended));
+            return Task.Factory.StartNew(() => _client.GetBucketProperties(bucket));
         }
 
         public Task<RiakResult> SetBucketProperties(string bucket, RiakBucketProperties properties)
@@ -329,9 +329,9 @@ namespace CorrugatedIron
             ExecAsync(() => callback(_client.StreamListKeys(bucket)));
         }
 
-        public void GetBucketProperties(string bucket, Action<RiakResult<RiakBucketProperties>> callback, bool extended = false)
+        public void GetBucketProperties(string bucket, Action<RiakResult<RiakBucketProperties>> callback)
         {
-            ExecAsync(() => callback(_client.GetBucketProperties(bucket, extended)));
+            ExecAsync(() => callback(_client.GetBucketProperties(bucket)));
         }
 
         public void SetBucketProperties(string bucket, RiakBucketProperties properties, Action<RiakResult> callback)

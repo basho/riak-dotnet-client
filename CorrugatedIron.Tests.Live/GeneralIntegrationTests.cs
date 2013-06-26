@@ -428,7 +428,6 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
 
             // Do this via the REST interface - will be substantially slower than PBC
             var props = new RiakBucketProperties().SetAllowMultiple(true).SetLastWriteWins(false);
-            props.CanUsePbc.ShouldBeFalse();
             client.SetBucketProperties(MultiBucket, props).IsSuccess.ShouldBeTrue();
 
             var doc = new RiakObject(MultiBucket, MultiKey, MultiBodyOne, RiakConstants.ContentTypes.ApplicationJson);
@@ -449,7 +448,6 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         {
             // Do this via the PBC - noticable quicker than REST
             var props = new RiakBucketProperties().SetAllowMultiple(true);
-            props.CanUsePbc.ShouldBeTrue();
             Client.SetBucketProperties(MultiBucket, props).IsSuccess.ShouldBeTrue();
 
             var doc = new RiakObject(MultiBucket, MultiKey, MultiBodyOne, RiakConstants.ContentTypes.ApplicationJson);
@@ -471,7 +469,6 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
                 {
                     // Do this via the PBC - noticable quicker than REST
                     var props = new RiakBucketProperties().SetAllowMultiple(true);
-                    props.CanUsePbc.ShouldBeTrue();
                     batch.SetBucketProperties(MultiBucket, props).IsSuccess.ShouldBeTrue();
 
                     var doc = new RiakObject(MultiBucket, MultiKey, MultiBodyOne, RiakConstants.ContentTypes.ApplicationJson);

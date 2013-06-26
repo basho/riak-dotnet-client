@@ -52,7 +52,7 @@ namespace CorrugatedIron
 
         RiakResult<IEnumerable<string>> StreamListKeys(string bucket);
 
-        RiakResult<RiakBucketProperties> GetBucketProperties(string bucket, bool extended = false);
+        RiakResult<RiakBucketProperties> GetBucketProperties(string bucket);
 
         RiakResult SetBucketProperties(string bucket, RiakBucketProperties properties);
 
