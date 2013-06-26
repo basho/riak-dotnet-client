@@ -46,7 +46,7 @@ namespace CorrugatedIron.Tests.Live
             Cluster = new RiakCluster(ClusterConfig, new RiakConnectionFactory());
             Client = Cluster.CreateClient();
             
-            var props = Client.GetBucketProperties(Bucket, true).Value;
+            var props = Client.GetBucketProperties(Bucket).Value;
             props.SetSearch(true);
             Client.SetBucketProperties(Bucket, props);
         }

@@ -32,27 +32,6 @@ namespace CorrugatedIron.Models
 {
     public class RiakBucketProperties
     {
-        // At the moment, only the NVal and AllowMult can be set via the PBC
-        // so if the request has any other value set, we can't use that interface.
-        // We check those values and if they're missing we go with PBC as it's
-        // substantially quicker.
-        public bool CanUsePbc
-        {
-            get
-            {
-                return !LastWriteWins.HasValue
-                && RVal == null
-                && RwVal == null
-                && DwVal == null
-                && WVal == null
-                && PrVal == null
-                && PwVal == null
-                && PreCommitHooks == null
-                && PostCommitHooks == null
-                && string.IsNullOrEmpty(Backend);
-            }
-        }
-
         public bool? LastWriteWins { get; private set; }
         public uint? NVal { get; private set; }
         public bool? AllowMultiple { get; private set; }
@@ -61,6 +40,9 @@ namespace CorrugatedIron.Models
         public List<IRiakPostCommitHook> PostCommitHooks { get; private set; }
         public bool? NotFoundOk { get; private set; }
         public bool? BasicQuorum { get; private set; }
+        
+        public bool? HasPrecommit { get; private set; }
+        public bool? HasPostcommit { get; private set; }
 
         /// <summary>
         /// The number of replicas that must return before a read is considered a succes.
@@ -222,6 +204,7 @@ namespace CorrugatedIron.Models
             if (enable)
             {
                 AddPreCommitHook(RiakErlangCommitHook.RiakSearchCommitHook);
+                HasPrecommit = true;
             }
             else
             {
@@ -340,6 +323,17 @@ namespace CorrugatedIron.Models
             }
         }
 
+        private static IRiakPreCommitHook LoadPreCommitHook(RpbCommitHook hook)
+        {
+            if (hook.modfun == null)
+            {
+                return new RiakJavascriptCommitHook(hook.name.FromRiakString());
+            }
+
+            return new RiakErlangCommitHook(hook.modfun.module.FromRiakString(),
+                                            hook.modfun.function.FromRiakString());
+        }
+
         private static IRiakPreCommitHook LoadPreCommitHook(JObject hook)
         {
             JToken token;
@@ -359,6 +353,12 @@ namespace CorrugatedIron.Models
             return new RiakErlangCommitHook(hook.Value<string>("mod"), hook.Value<string>("fun"));
         }
 
+        private static IRiakPostCommitHook LoadPostCommitHook(RpbCommitHook hook)
+        {
+            return new RiakErlangCommitHook(hook.modfun.module.FromRiakString(),
+                                            hook.modfun.function.FromRiakString());
+        }
+
         private static void ReadQuorum(JObject props, string key, Action<Either<uint, string>> setter)
         {
             if (props[key] == null) return;
@@ -376,21 +376,64 @@ namespace CorrugatedIron.Models
         internal RiakBucketProperties(RpbBucketProps bucketProps)
         : this()
         {
-            AllowMultiple = bucketProps.allow_mult;
             NVal = bucketProps.n_val;
-        }
+            AllowMultiple = bucketProps.allow_mult;
+            LastWriteWins = bucketProps.last_write_wins;
+            Backend = bucketProps.backend.FromRiakString();
+            NotFoundOk = bucketProps.notfound_ok;
+            BasicQuorum = bucketProps.basic_quorum;
 
+            HasPrecommit = bucketProps.has_precommit;
+            HasPostcommit = bucketProps.has_postcommit;
+
+            RVal = new Either<uint, string>(bucketProps.w);
+            RwVal = new Either<uint, string>(bucketProps.rw);
+            DwVal = new Either<uint, string>(bucketProps.dw);
+            WVal = new Either<uint, string>(bucketProps.w);
+            PrVal = new Either<uint, string>(bucketProps.pr);
+            PwVal = new Either<uint, string>(bucketProps.pw);
+
+            var preCommitHooks = bucketProps.precommit;
+            if (preCommitHooks.Count > 0)
+            {
+                PreCommitHooks = preCommitHooks.Select(LoadPreCommitHook).ToList();
+            }
+
+            var postCommitHooks = bucketProps.postcommit;
+            if (postCommitHooks.Count > 0)
+            {
+                PostCommitHooks = postCommitHooks.Select(LoadPostCommitHook).ToList();
+            }
+        }
+        
         internal RpbBucketProps ToMessage()
         {
             var message = new RpbBucketProps();
+            
             if(AllowMultiple.HasValue)
             {
                 message.allow_mult = AllowMultiple.Value;
             }
+            
             if(NVal.HasValue)
             {
                 message.n_val = NVal.Value;
             }
+
+            if (LastWriteWins.HasValue)
+            {
+                message.last_write_wins = LastWriteWins.Value;
+            }
+
+            if (RVal != null)
+            {
+                if (RVal.IsLeft)
+                    message.r = RVal.Left;
+                else 
+                    // FIXME
+                    throw new NotImplementedException("oops!");
+            }
+
             return message;
         }
 

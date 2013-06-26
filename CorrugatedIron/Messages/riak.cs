@@ -424,9 +424,9 @@ namespace CorrugatedIron.Messages
       set { _search = value; }
     }
 
-    private RpbBucketProps.RpbReplMode _repl = RpbBucketProps.RpbReplMode.;
+    private RpbBucketProps.RpbReplMode _repl = RpbBucketProps.RpbReplMode.FALSE;
     [global::ProtoBuf.ProtoMember(24, IsRequired = false, Name=@"repl", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(RpbBucketProps.RpbReplMode.)]
+    [global::System.ComponentModel.DefaultValue(RpbBucketProps.RpbReplMode.FALSE)]
     public RpbBucketProps.RpbReplMode repl
     {
       get { return _repl; }

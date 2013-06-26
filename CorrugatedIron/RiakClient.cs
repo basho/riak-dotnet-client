@@ -679,7 +679,7 @@ namespace CorrugatedIron
         /// <param name='extended'>
         /// Extended parameters are retrieved by HTTP requests.
         /// </param>
-        public RiakResult<RiakBucketProperties> GetBucketProperties(string bucket, bool extended = false)
+        public RiakResult<RiakBucketProperties> GetBucketProperties(string bucket)
         {
             // bucket names cannot have slashes in the names, the REST interface doesn't like it at all
             if (!IsValidBucketOrKey(bucket))
@@ -687,38 +687,15 @@ namespace CorrugatedIron
                 return RiakResult<RiakBucketProperties>.Error(ResultCode.InvalidRequest, InvalidBucketErrorMessage, false);
             }
 
-            if(extended)
+            var bpReq = new RpbGetBucketReq { bucket = bucket.ToRiakString() };
+            var result = UseConnection(conn => conn.PbcWriteRead<RpbGetBucketReq, RpbGetBucketResp>(bpReq));
+
+            if(result.IsSuccess)
             {
-                var request = new RiakRestRequest(ToBucketUri(bucket), RiakConstants.Rest.HttpMethod.Get)
-                    .AddQueryParam(RiakConstants.Rest.QueryParameters.Bucket.GetPropertiesKey,
-                        RiakConstants.Rest.QueryParameters.Bucket.GetPropertiesValue);
-
-                var result = UseConnection(conn => conn.RestRequest(request));
-
-                if(result.IsSuccess)
-                {
-                    if(result.Value.StatusCode == HttpStatusCode.OK)
-                    {
-                        var response = new RiakBucketProperties(result.Value);
-                        return RiakResult<RiakBucketProperties>.Success(response);
-                    }
-                    return RiakResult<RiakBucketProperties>.Error(ResultCode.InvalidResponse,
-                        "Unexpected Status Code: {0} ({1})".Fmt(result.Value.StatusCode, (int)result.Value.StatusCode), false);
-                }
-                return RiakResult<RiakBucketProperties>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
+                var props = new RiakBucketProperties(result.Value.props);
+                return RiakResult<RiakBucketProperties>.Success(props);
             }
-            else
-            {
-                var bpReq = new RpbGetBucketReq { bucket = bucket.ToRiakString() };
-                var result = UseConnection(conn => conn.PbcWriteRead<RpbGetBucketReq, RpbGetBucketResp>(bpReq));
-
-                if(result.IsSuccess)
-                {
-                    var props = new RiakBucketProperties(result.Value.props);
-                    return RiakResult<RiakBucketProperties>.Success(props);
-                }
-                return RiakResult<RiakBucketProperties>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
-            }
+            return RiakResult<RiakBucketProperties>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
 
         /// <summary>
@@ -740,27 +717,9 @@ namespace CorrugatedIron
                 return RiakResult<RiakBucketProperties>.Error(ResultCode.InvalidRequest, InvalidBucketErrorMessage, false);
             }
 
-            if(properties.CanUsePbc)
-            {
-                var request = new RpbSetBucketReq { bucket = bucket.ToRiakString(), props = properties.ToMessage() };
-                var result = UseConnection(conn => conn.PbcWriteRead(request, MessageCode.SetBucketResp));
-                return result;
-            }
-            else
-            {
-                var request = new RiakRestRequest(ToBucketUri(bucket), RiakConstants.Rest.HttpMethod.Put)
-                {
-                    Body = properties.ToJsonString().ToRiakString(),
-                    ContentType = RiakConstants.ContentTypes.ApplicationJson
-                };
-
-                var result = UseConnection(conn => conn.RestRequest(request));
-                if(result.IsSuccess && result.Value.StatusCode != HttpStatusCode.NoContent)
-                {
-                    return RiakResult.Error(ResultCode.InvalidResponse, "Unexpected Status Code: {0} ({1})".Fmt(result.Value.StatusCode, (int)result.Value.StatusCode), result.NodeOffline);
-                }
-                return result;
-            }
+            var request = new RpbSetBucketReq { bucket = bucket.ToRiakString(), props = properties.ToMessage() };
+            var result = UseConnection(conn => conn.PbcWriteRead(request, MessageCode.SetBucketResp));
+            return result;
         }
 
         /// <summary>
