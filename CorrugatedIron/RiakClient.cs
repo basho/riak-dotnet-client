@@ -719,6 +719,7 @@ namespace CorrugatedIron
 
             var request = new RpbSetBucketReq { bucket = bucket.ToRiakString(), props = properties.ToMessage() };
             var result = UseConnection(conn => conn.PbcWriteRead(request, MessageCode.SetBucketResp));
+
             return result;
         }
 
@@ -727,24 +728,16 @@ namespace CorrugatedIron
         /// </summary>
         /// <param name="bucket">The name of the bucket to reset the properties on.</param>
         /// <returns>An indication of success or failure.</returns>
-        /// <remarks>This function requires Riak v1.3+.</remarks>
+        /// <remarks>This function requires Riak v1.4+.</remarks>
         public RiakResult ResetBucketProperties(string bucket)
         {
-            var request = new RiakRestRequest(ToBucketPropsUri(bucket), RiakConstants.Rest.HttpMethod.Delete);
-
-            var result = UseConnection(conn => conn.RestRequest(request));
-            if(result.IsSuccess)
+            if (!IsValidBucketOrKey(bucket))
             {
-                switch (result.Value.StatusCode)
-                {
-                    case HttpStatusCode.NoContent:
-                        return result;
-                    case HttpStatusCode.NotFound:
-                        return RiakResult.Error(ResultCode.NotFound, "Bucket {0} not found.".Fmt(bucket), false);
-                    default:
-                        return RiakResult.Error(ResultCode.InvalidResponse, "Unexpected Status Code: {0} ({1})".Fmt(result.Value.StatusCode, (int)result.Value.StatusCode), result.NodeOffline);
-                }
+                return RiakResult<RiakBucketProperties>.Error(ResultCode.InvalidRequest, InvalidBucketErrorMessage, false);
             }
+
+            var request = new RpbResetBucketReq { bucket = bucket.ToRiakString() };
+            var result = UseConnection(conn => conn.PbcWriteRead(request, MessageCode.ResetBucketResp));
             return result;
         }
         
