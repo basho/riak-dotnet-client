@@ -89,7 +89,8 @@ namespace CorrugatedIron.Comms
                 { MessageCode.IndexReq, typeof(RpbIndexReq) },
                 { MessageCode.IndexResp, typeof(RpbIndexResp) },
                 { MessageCode.SearchQueryReq, typeof(RpbSearchQueryReq) },
-                { MessageCode.SearchQueryResp, typeof(RpbSearchQueryResp) }
+                { MessageCode.SearchQueryResp, typeof(RpbSearchQueryResp) },
+                { MessageCode.ResetBucketReq, typeof(RpbResetBucketReq) }
             };
 
             TypeToMessageCodeMap = new Dictionary<Type, MessageCode>();
