@@ -15,6 +15,7 @@
 // under the License.
 
 using CorrugatedIron.Extensions;
+using CorrugatedIron.Messages;
 using Newtonsoft.Json;
 
 namespace CorrugatedIron.Models.CommitHook
@@ -43,6 +44,18 @@ namespace CorrugatedIron.Models.CommitHook
             writer.WriteProperty("mod", Module);
             writer.WriteProperty("fun", Function);
             writer.WriteEndObject();
+        }
+
+        public override RpbCommitHook ToRpbCommitHook()
+        {
+            return new RpbCommitHook
+                {
+                    modfun = new RpbModFun
+                        {
+                            function = Function.ToRiakString(),
+                            module = Module.ToRiakString()
+                        }
+                };
         }
 
         protected bool Equals(RiakErlangCommitHook other)

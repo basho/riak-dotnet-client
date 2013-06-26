@@ -229,6 +229,8 @@ namespace CorrugatedIron.Models
                 hooks.Add(commitHook);
             }
 
+            HasPrecommit = true;
+
             return this;
         }
 
@@ -241,18 +243,22 @@ namespace CorrugatedIron.Models
                 hooks.Add(commitHook);
             }
 
+            HasPostcommit = true;
+
             return this;
         }
 
         public RiakBucketProperties ClearPreCommitHooks()
         {
             (PreCommitHooks ?? (PreCommitHooks = new List<IRiakPreCommitHook>())).Clear();
+            HasPrecommit = false;
             return this;
         }
 
         public RiakBucketProperties ClearPostCommitHooks()
         {
             (PostCommitHooks ?? (PostCommitHooks = new List<IRiakPostCommitHook>())).Clear();
+            HasPostcommit = false;
             return this;
         }
 
@@ -384,12 +390,17 @@ namespace CorrugatedIron.Models
             HasPrecommit = bucketProps.has_precommit;
             HasPostcommit = bucketProps.has_postcommit;
 
-            RVal = bucketProps.w;  
+            RVal = bucketProps.r;  
             RwVal = bucketProps.rw;
             DwVal = bucketProps.dw;
             WVal = bucketProps.w;
             PrVal = bucketProps.pr;
             PwVal = bucketProps.pw;
+
+            Search = bucketProps.search;
+
+            HasPrecommit = bucketProps.has_precommit;
+            HasPostcommit = bucketProps.has_postcommit;
 
             var preCommitHooks = bucketProps.precommit;
             if (preCommitHooks.Count > 0)
@@ -425,10 +436,68 @@ namespace CorrugatedIron.Models
 
             if (RVal != null)
             {
-                message.r = (uint)RVal;
+                message.r = RVal.Value;
             }
 
+            if (RwVal != null)
+            {
+                message.rw = RwVal.Value;
+            }
 
+            if (DwVal != null)
+            {
+                message.dw = DwVal.Value;
+            }
+
+            if (WVal != null)
+            {
+                message.w = WVal.Value;
+            }
+
+            if (PrVal != null)
+            {
+                message.pr = PrVal.Value;
+            }
+
+            if (PwVal != null)
+            {
+                message.pw = PwVal.Value;
+            }
+
+            if (Search != null)
+            {
+                message.search = Search.Value;
+            }
+
+            if (HasPrecommit != null)
+            {
+                message.has_precommit = HasPrecommit.Value;
+            }
+
+            if (PreCommitHooks != null)
+            {
+                PreCommitHooks.ForEach(h =>
+                    {
+                        var hook = h.ToRpbCommitHook();
+                        if (!message.precommit.Any(x => Equals(x, hook)))
+                            message.precommit.Add(hook);
+                    });
+            }
+
+            if (HasPostcommit != null)
+            {
+                message.has_postcommit = HasPostcommit.Value;
+            }
+
+            if (PostCommitHooks != null)
+            {
+                PostCommitHooks.ForEach(h =>
+                    {
+                        var hook = h.ToRpbCommitHook();
+                        if (!message.postcommit.Any(x => Equals(x, hook)))
+                            message.postcommit.Add(hook);
+                    });
+            }
 
             return message;
         }
