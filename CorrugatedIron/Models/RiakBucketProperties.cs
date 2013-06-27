@@ -205,6 +205,11 @@ namespace CorrugatedIron.Models
             if (PreCommitHooks != null)
             {
                 PreCommitHooks.RemoveAll(x => Equals(x, commitHook));
+
+                if (PreCommitHooks.Count == 0)
+                {
+                    HasPrecommit = false;
+                }
             }
 
             return this;
@@ -215,6 +220,11 @@ namespace CorrugatedIron.Models
             if (PostCommitHooks != null)
             {
                 PostCommitHooks.RemoveAll(x => Equals(x, commitHook));
+
+                if (PostCommitHooks.Count == 0)
+                {
+                    HasPostcommit = false;
+                }
             }
 
             return this;
@@ -331,6 +341,44 @@ namespace CorrugatedIron.Models
             }
         }
 
+        internal RiakBucketProperties(RpbBucketProps bucketProps)
+            : this()
+        {
+            NVal = bucketProps.n_val;
+            AllowMultiple = bucketProps.allow_mult;
+            LastWriteWins = bucketProps.last_write_wins;
+            Backend = bucketProps.backend.FromRiakString();
+            NotFoundOk = bucketProps.notfound_ok;
+            BasicQuorum = bucketProps.basic_quorum;
+
+            HasPrecommit = bucketProps.has_precommit;
+            HasPostcommit = bucketProps.has_postcommit;
+
+            RVal = bucketProps.r;
+            RwVal = bucketProps.rw;
+            DwVal = bucketProps.dw;
+            WVal = bucketProps.w;
+            PrVal = bucketProps.pr;
+            PwVal = bucketProps.pw;
+
+            Search = bucketProps.search;
+
+            HasPrecommit = bucketProps.has_precommit;
+            HasPostcommit = bucketProps.has_postcommit;
+
+            var preCommitHooks = bucketProps.precommit;
+            if (preCommitHooks.Count > 0)
+            {
+                PreCommitHooks = preCommitHooks.Select(LoadPreCommitHook).ToList();
+            }
+
+            var postCommitHooks = bucketProps.postcommit;
+            if (postCommitHooks.Count > 0)
+            {
+                PostCommitHooks = postCommitHooks.Select(LoadPostCommitHook).ToList();
+            }
+        }
+
         private static IRiakPreCommitHook LoadPreCommitHook(RpbCommitHook hook)
         {
             if (hook.modfun == null)
@@ -377,43 +425,7 @@ namespace CorrugatedIron.Models
                        : props.Value<uint>(key));
         }
 
-        internal RiakBucketProperties(RpbBucketProps bucketProps)
-        : this()
-        {
-            NVal = bucketProps.n_val;
-            AllowMultiple = bucketProps.allow_mult;
-            LastWriteWins = bucketProps.last_write_wins;
-            Backend = bucketProps.backend.FromRiakString();
-            NotFoundOk = bucketProps.notfound_ok;
-            BasicQuorum = bucketProps.basic_quorum;
-
-            HasPrecommit = bucketProps.has_precommit;
-            HasPostcommit = bucketProps.has_postcommit;
-
-            RVal = bucketProps.r;  
-            RwVal = bucketProps.rw;
-            DwVal = bucketProps.dw;
-            WVal = bucketProps.w;
-            PrVal = bucketProps.pr;
-            PwVal = bucketProps.pw;
-
-            Search = bucketProps.search;
-
-            HasPrecommit = bucketProps.has_precommit;
-            HasPostcommit = bucketProps.has_postcommit;
-
-            var preCommitHooks = bucketProps.precommit;
-            if (preCommitHooks.Count > 0)
-            {
-                PreCommitHooks = preCommitHooks.Select(LoadPreCommitHook).ToList();
-            }
-
-            var postCommitHooks = bucketProps.postcommit;
-            if (postCommitHooks.Count > 0)
-            {
-                PostCommitHooks = postCommitHooks.Select(LoadPostCommitHook).ToList();
-            }
-        }
+        
         
         internal RpbBucketProps ToMessage()
         {
@@ -434,42 +446,42 @@ namespace CorrugatedIron.Models
                 message.last_write_wins = LastWriteWins.Value;
             }
 
-            if (RVal != null)
+            if (RVal.HasValue)
             {
                 message.r = RVal.Value;
             }
 
-            if (RwVal != null)
+            if (RwVal.HasValue)
             {
                 message.rw = RwVal.Value;
             }
 
-            if (DwVal != null)
+            if (DwVal.HasValue)
             {
                 message.dw = DwVal.Value;
             }
 
-            if (WVal != null)
+            if (WVal.HasValue)
             {
                 message.w = WVal.Value;
             }
 
-            if (PrVal != null)
+            if (PrVal.HasValue)
             {
                 message.pr = PrVal.Value;
             }
 
-            if (PwVal != null)
+            if (PwVal.HasValue)
             {
                 message.pw = PwVal.Value;
             }
 
-            if (Search != null)
+            if (Search.HasValue)
             {
                 message.search = Search.Value;
             }
 
-            if (HasPrecommit != null)
+            if (HasPrecommit.HasValue)
             {
                 message.has_precommit = HasPrecommit.Value;
             }
@@ -484,7 +496,7 @@ namespace CorrugatedIron.Models
                     });
             }
 
-            if (HasPostcommit != null)
+            if (HasPostcommit.HasValue)
             {
                 message.has_postcommit = HasPostcommit.Value;
             }
@@ -513,17 +525,19 @@ namespace CorrugatedIron.Models
                 jw.WritePropertyName("props");
                 jw.WriteStartObject();
                 jw.WriteNullableProperty("n_val", NVal)
-                .WriteNullableProperty("allow_mult", AllowMultiple)
-                .WriteNullableProperty("last_write_wins", LastWriteWins)
-                .WriteNullableProperty("r", RVal)
-                .WriteNullableProperty("rw", RwVal)
-                .WriteNullableProperty("dw", DwVal)
-                .WriteNullableProperty("w", WVal)
-                .WriteNullableProperty("pr", PrVal)
-                .WriteNullableProperty("pw", PwVal)
-                .WriteNonNullProperty("backend", Backend)
-                .WriteNullableProperty("notfound_ok", NotFoundOk)
-                .WriteNullableProperty("basic_quorum", BasicQuorum);
+                  .WriteNullableProperty("allow_mult", AllowMultiple)
+                  .WriteNullableProperty("last_write_wins", LastWriteWins)
+                  .WriteNullableProperty("r", RVal)
+                  .WriteNullableProperty("rw", RwVal)
+                  .WriteNullableProperty("dw", DwVal)
+                  .WriteNullableProperty("w", WVal)
+                  .WriteNullableProperty("pr", PrVal)
+                  .WriteNullableProperty("pw", PwVal)
+                  .WriteNonNullProperty("backend", Backend)
+                  .WriteNullableProperty("notfound_ok", NotFoundOk)
+                  .WriteNullableProperty("basic_quorum", BasicQuorum)
+                  .WriteNullableProperty("has_precommit", HasPrecommit)
+                  .WriteNullableProperty("has_postcommit", HasPostcommit);
 
                 if(PreCommitHooks != null)
                 {
