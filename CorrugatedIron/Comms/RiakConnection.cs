@@ -52,7 +52,7 @@ namespace CorrugatedIron.Comms
             where TRequest : class
             where TResult : class, new();
 
-        RiakResult<TResult> PbcWriteRead<TResult>(RpbListBucketsReq request, MessageCode messageCode)
+        RiakResult<TResult> PbcWriteRead<TResult>(MessageCode messageCode)
             where TResult : class, new();
 
         RiakResult PbcWriteRead<TRequest>(TRequest request, MessageCode expectedMessageCode)
@@ -251,7 +251,7 @@ namespace CorrugatedIron.Comms
             return RiakResult.Error(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline);
         }
 
-        public RiakResult<TResult> PbcWriteRead<TResult>(RpbListBucketsReq request, MessageCode messageCode)
+        public RiakResult<TResult> PbcWriteRead<TResult>(MessageCode messageCode)
             where TResult : class, new()
         {
             var writeResult = PbcWrite(messageCode);

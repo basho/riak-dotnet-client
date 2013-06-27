@@ -594,23 +594,7 @@ namespace CorrugatedIron
         /// physical I/O and can take a long time.</remarks>
         public RiakResult<IEnumerable<string>> ListBuckets()
         {
-            return ListBuckets(false);
-        }
-
-        public RiakResult<IEnumerable<string>> ListBuckets(uint timeout)
-        {
-            return ListBuckets(false, timeout);
-        } 
-        
-        public RiakResult<IEnumerable<string>> ListBuckets(bool stream, uint? timeout = null)
-        {
-            var request = new RpbListBucketsReq {stream = stream};
-
-            if (timeout != null)
-                request.timeout = timeout.Value;
-
-            var result =
-                UseConnection(conn => conn.PbcWriteRead<RpbListBucketsResp>(request, MessageCode.ListBucketsResp));
+            var result = UseConnection(conn => conn.PbcWriteRead<RpbListBucketsResp>(MessageCode.ListBucketsReq));
 
             if(result.IsSuccess)
             {
@@ -633,25 +617,16 @@ namespace CorrugatedIron
         /// a list of keys. This operation, while cheaper in Riak 1.0 than in earlier versions of Riak, should be avoided.</remarks>
         public RiakResult<IEnumerable<string>> ListKeys(string bucket)
         {
-            // TODO: move to default timeout construct
-            // TODO: supply riak configuration parameter
-            return UseConnection(conn => ListKeys(conn, bucket, 60000));
+            return UseConnection(conn => ListKeys(conn, bucket));
         }
 
-        public RiakResult<IEnumerable<string>> ListKeys(string bucket, uint timeout)
-        {
-            return UseConnection(conn => ListKeys(conn, bucket, timeout));
-        }
-
-        private static RiakResult<IEnumerable<string>> ListKeys(IRiakConnection conn, string bucket, uint timeout)
+        private static RiakResult<IEnumerable<string>> ListKeys(IRiakConnection conn, string bucket)
         {
             System.Diagnostics.Debug.Write(ListKeysWarning);
             System.Diagnostics.Trace.TraceWarning(ListKeysWarning);
             Console.WriteLine(ListKeysWarning);
 
-            var lkReq = new RpbListKeysReq {bucket = bucket.ToRiakString(), timeout = timeout.Value};
-
-
+            var lkReq = new RpbListKeysReq { bucket = bucket.ToRiakString() };
             var result = conn.PbcWriteRead<RpbListKeysReq, RpbListKeysResp>(lkReq,
                 lkr => lkr.IsSuccess && !lkr.Value.done);
             if(result.IsSuccess)
@@ -664,19 +639,11 @@ namespace CorrugatedIron
 
         public RiakResult<IEnumerable<string>> StreamListKeys(string bucket)
         {
-            // TODO: move to default timeout construct
-            // TODO: supply riak configuration parameter
-            return StreamListKeys(bucket, 60000);
-        }
-
-        public RiakResult<IEnumerable<string>> StreamListKeys(string bucket, uint timeout)
-        {
             System.Diagnostics.Debug.Write(ListKeysWarning);
             System.Diagnostics.Trace.TraceWarning(ListKeysWarning);
             Console.WriteLine(ListKeysWarning);
 
-            var lkReq = new RpbListKeysReq {bucket = bucket.ToRiakString(), timeout = timeout};
-
+            var lkReq = new RpbListKeysReq { bucket = bucket.ToRiakString() };
             var result = UseDelayedConnection((conn, onFinish) =>
                 conn.PbcWriteStreamRead<RpbListKeysReq, RpbListKeysResp>(lkReq, lkr => lkr.IsSuccess && !lkr.Value.done, onFinish));
 
@@ -687,8 +654,6 @@ namespace CorrugatedIron
             }
             return RiakResult<IEnumerable<string>>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
-
-        
 
         /// <summary>
         /// Return a list of keys from the given bucket.
@@ -862,7 +827,7 @@ namespace CorrugatedIron
         /// run on the same version of Riak.</remarks>
         public RiakResult<RiakServerInfo> GetServerInfo()
         {
-            var result = UseConnection(conn => conn.PbcWriteRead<RpbGetServerInfoResp>((RpbListBucketsReq)TODO, MessageCode.GetServerInfoReq));
+            var result = UseConnection(conn => conn.PbcWriteRead<RpbGetServerInfoResp>(MessageCode.GetServerInfoReq));
 
             if(result.IsSuccess)
             {
