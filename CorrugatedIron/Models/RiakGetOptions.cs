@@ -113,6 +113,12 @@ namespace CorrugatedIron.Models
             return WriteQuorum(value, var => Pr = var);
         }
 
+        public RiakGetOptions SetTimeout(uint value)
+        {
+            Timeout = value;
+            return this;
+        }
+
         public RiakGetOptions()
         {
             R = new Either<uint, string>(RiakConstants.QuorumOptions.Default);

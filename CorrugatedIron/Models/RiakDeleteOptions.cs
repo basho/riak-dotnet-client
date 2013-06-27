@@ -85,6 +85,11 @@ namespace CorrugatedIron.Models
         /// <remarks>Developers looking for an easy way to set this can look at <see cref="CorrugatedIron.Util.RiakConstants.QuorumOptions"/></remarks>
         public Either<uint, string> Dw { get; private set; }
 
+        /// <summary>
+        /// Query timeout parameter. If a request to Riak exceeds the query timeout, Riak should stop processing the request.
+        /// </summary>
+        public uint? Timeout { get; set; }
+
         public RiakDeleteOptions SetRw(uint value)
         {
             return WriteQuorum(value, var => Rw = var);
@@ -145,6 +150,12 @@ namespace CorrugatedIron.Models
             return WriteQuorum(value, var => Dw = var);
         }
 
+        public RiakDeleteOptions SetTimeout(uint value)
+        {
+            Timeout = value;
+            return this;
+        }
+
         public RiakDeleteOptions()
         {
             Rw = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
@@ -167,6 +178,11 @@ namespace CorrugatedIron.Models
             if(Vclock != null)
             {
                 request.vclock = Vclock;
+            }
+
+            if (Timeout != null)
+            {
+                request.timeout = Timeout.Value;
             }
         }
 
