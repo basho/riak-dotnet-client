@@ -47,10 +47,13 @@ namespace CorrugatedIron
         RiakResult<RiakStreamedMapReduceResult> StreamMapReduce(RiakMapReduceQuery query);
 
         RiakResult<IEnumerable<string>> ListBuckets();
+        RiakResult<IEnumerable<string>> ListBuckets(uint timeout);
 
         RiakResult<IEnumerable<string>> ListKeys(string bucket);
+        RiakResult<IEnumerable<string>> ListKeys(string bucket, uint timeout);
 
         RiakResult<IEnumerable<string>> StreamListKeys(string bucket);
+        RiakResult<IEnumerable<string>> StreamListKeys(string bucket, uint timeout);
 
         RiakResult<RiakBucketProperties> GetBucketProperties(string bucket);
 
