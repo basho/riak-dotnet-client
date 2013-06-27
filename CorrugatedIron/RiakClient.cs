@@ -676,9 +676,6 @@ namespace CorrugatedIron
         /// <param name='bucket'>
         /// The Riak bucket.
         /// </param>
-        /// <param name='extended'>
-        /// Extended parameters are retrieved by HTTP requests.
-        /// </param>
         public RiakResult<RiakBucketProperties> GetBucketProperties(string bucket)
         {
             // bucket names cannot have slashes in the names, the REST interface doesn't like it at all

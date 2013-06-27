@@ -32,7 +32,6 @@ namespace CorrugatedIron.Models
         public bool IfNotModified { get; set; }
         public bool IfNoneMatch { get; set; }
         public bool ReturnHead { get; set; }
-        public uint? Timeout { get; private set; }
 
         public RiakPutOptions SetW(uint value)
         {
@@ -64,13 +63,6 @@ namespace CorrugatedIron.Models
             return WriteQuorum(value, var => Pw = var);
         }
 
-        public RiakPutOptions SetTimeout(uint value)
-        {
-            Timeout = value;
-
-            return this;
-        }
-
         public RiakPutOptions()
         {
             ReturnBody = true;
@@ -84,11 +76,6 @@ namespace CorrugatedIron.Models
             request.w = W.IsLeft ? W.Left : W.Right.ToRpbOption();
             request.pw = Pw.IsLeft ? Pw.Left : Pw.Right.ToRpbOption();
             request.dw = Dw.IsLeft ? Dw.Left : Dw.Right.ToRpbOption();
-
-            if (Timeout != null)
-            {
-                request.timeout = Timeout.Value;
-            }
 
             request.if_not_modified = IfNotModified;
             request.if_none_match = IfNoneMatch;
