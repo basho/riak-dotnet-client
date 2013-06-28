@@ -21,6 +21,7 @@ using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Models.Search;
 using CorrugatedIron.Util;
 using System.Collections.Generic;
+using System.Numerics;
 
 namespace CorrugatedIron
 {
@@ -65,10 +66,10 @@ namespace CorrugatedIron
 
         RiakResult<RiakServerInfo> GetServerInfo();
 
-        RiakResult<IList<string>> IndexGet(string bucket, string indexName, int value);
-        RiakResult<IList<string>> IndexGet(string bucket, string indexName, string value);
-        RiakResult<IList<string>> IndexGet(string bucket, string indexName, int minValue, int maxValue);
-        RiakResult<IList<string>> IndexGet(string bucket, string indexName, string minValue, string maxValue);
+        RiakResult<IList<string>> IndexGet(string bucket, string indexName, BigInteger value, uint? maxResults = null, BigInteger? continuation = null);
+        RiakResult<IList<string>> IndexGet(string bucket, string indexName, string value, uint? maxResults = null, string continuation = null);
+        RiakResult<IList<string>> IndexGet(string bucket, string indexName, BigInteger minValue, BigInteger maxValue, uint? maxResults = null, BigInteger? continuation = null);
+        RiakResult<IList<string>> IndexGet(string bucket, string indexName, string minValue, string maxValue, uint? maxResults = null, string continuation = null);
 
         RiakResult<IList<string>> ListKeysFromIndex(string bucket);
 
