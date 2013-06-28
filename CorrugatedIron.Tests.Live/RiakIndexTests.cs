@@ -154,13 +154,11 @@ namespace CorrugatedIron.Tests.Live
                 Client.Put(o);
             }
 
-            var mr = new RiakMapReduceQuery()
-                .Inputs(RiakIndex.Range(Bucket, "age", 27, 30));
-            
-            var result = Client.MapReduce(mr);
+            var result = Client.IndexGet(Bucket, "age", 27, 30);
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
-            result.Value.PhaseResults.SelectMany(x => x.GetObjectIds()).Count().ShouldEqual(4);
-            
+            result.Value.Count.ShouldEqual(4);
+
+
             // TODO write tests verifying results
         }
 
@@ -193,6 +191,8 @@ namespace CorrugatedIron.Tests.Live
                 key.Key.ShouldNotBeNullOrEmpty();
                 originalKeys.Contains(key.Key).ShouldBeTrue();
             }
+
+            Client.DeleteBucket(bucket);
         }
 
         [Test]
@@ -227,6 +227,8 @@ namespace CorrugatedIron.Tests.Live
                 key.Key.ShouldNotBeNullOrEmpty();
                 originalKeys.Contains(key.Key).ShouldBeTrue();
             }
+
+            Client.DeleteBucket(bucket);
         }
 
         [Test]
@@ -255,6 +257,8 @@ namespace CorrugatedIron.Tests.Live
                 key.ShouldNotBeNullOrEmpty();
                 originalKeys.Contains(key).ShouldBeTrue();
             }
+
+            Client.DeleteBucket(bucket);
         }
     }
 }
