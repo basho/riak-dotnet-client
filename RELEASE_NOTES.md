@@ -1,6 +1,17 @@
 Release Notes
 =============
 
+v1.4.0
+------
+
+* **Support for Riak 1.4**
+* Bucket properties have been moved entirely to the Protocol Buffers interface. This breaks backwards compatability with Riak 1.3.x and earlier.
+* Index pagination (#127)
+* Reseting bucket properties through PB API (#126) - no API change here, we just do it the official way.
+* Counters are available via `RiakClient.IncrementCounter` and `RiakClient.GetCounter`. Various counter options are supplied via `RiakCounterUpdateOptions` and `RiakCounterGetOptions`. (#125)
+* Removed Either<uint, string> in many Riak*Options classes. Users can still set options quorum options using a string or an integer, but the internal representation has changed. New code should use `RiakConstants.QuorumOptions` for setting and comparing quorum options.
+* 
+
 v1.3.3
 ------
 
