@@ -255,7 +255,7 @@ namespace CorrugatedIron.Tests.Live
             var bucket = TestBucket + "_" + Guid.NewGuid().ToString();
             var counter = "counter";
 
-            var props = Client.GetBucketProperties(bucket).Value;
+            var props = Client.GetBucketProperties(bucket).Value ?? new RiakBucketProperties();
             props.SetAllowMultiple(true);
 
             Client.SetBucketProperties(bucket, props);
