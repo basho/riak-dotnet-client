@@ -55,10 +55,10 @@ namespace CorrugatedIron
         Task<RiakResult<RiakBucketProperties>> GetBucketProperties(string bucket);
         Task<RiakResult> SetBucketProperties(string bucket, RiakBucketProperties properties);
 
-        Task<RiakResult<IList<string>>> IndexGet(string bucket, string indexName, int value);
-        Task<RiakResult<IList<string>>> IndexGet(string bucket, string indexName, string value);
-        Task<RiakResult<IList<string>>> IndexGet(string bucket, string indexName, int minValue, int maxValue);
-        Task<RiakResult<IList<string>>> IndexGet(string bucket, string indexName, string minValue, string maxValue);
+        Task<RiakResult<IList<string>>> IndexGet(string bucket, string indexName, int value, uint? maxResults = null);
+        Task<RiakResult<IList<string>>> IndexGet(string bucket, string indexName, string value, uint? maxResults = null);
+        Task<RiakResult<IList<string>>> IndexGet(string bucket, string indexName, int minValue, int maxValue, uint? maxResults = null);
+        Task<RiakResult<IList<string>>> IndexGet(string bucket, string indexName, string minValue, string maxValue, uint? maxResults = null);
 
         Task<RiakResult<IList<RiakObject>>> WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks);
 
@@ -222,22 +222,22 @@ namespace CorrugatedIron
             return Task.Factory.StartNew(() => _client.SetBucketProperties(bucket, properties));
         }
 
-        public Task<RiakResult<IList<string>>> IndexGet(string bucket, string indexName, int value)
+        public Task<RiakResult<IList<string>>> IndexGet(string bucket, string indexName, int value, uint? maxResults = null)
         {
             return Task.Factory.StartNew(() => _client.IndexGet(bucket, indexName, value));
         }
 
-        public Task<RiakResult<IList<string>>> IndexGet(string bucket, string indexName, string value)
+        public Task<RiakResult<IList<string>>> IndexGet(string bucket, string indexName, string value, uint? maxResults = null)
         {
             return Task.Factory.StartNew(() => _client.IndexGet(bucket, indexName, value));
         }
 
-        public Task<RiakResult<IList<string>>> IndexGet(string bucket, string indexName, int minValue, int maxValue)
+        public Task<RiakResult<IList<string>>> IndexGet(string bucket, string indexName, int minValue, int maxValue, uint? maxResults = null)
         {
             return Task.Factory.StartNew(() => _client.IndexGet(bucket, indexName, minValue, maxValue));
         }
 
-        public Task<RiakResult<IList<string>>> IndexGet(string bucket, string indexName, string minValue, string maxValue)
+        public Task<RiakResult<IList<string>>> IndexGet(string bucket, string indexName, string minValue, string maxValue, uint? maxResults = null)
         {
             return Task.Factory.StartNew(() => _client.IndexGet(bucket, indexName, minValue, maxValue));
         }
