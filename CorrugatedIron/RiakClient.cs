@@ -900,17 +900,17 @@ namespace CorrugatedIron
             return RiakResult<RiakServerInfo>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
 
-        public RiakResult<IList<string>> IndexGet(string bucket, string indexName, string minValue, string maxValue, uint? maxResults = null, string continuation = null)
+        public RiakResult<IList<string>> IndexGet(string bucket, string indexName, string minValue, string maxValue, RiakIndexGetOptions options = null)
         {
-            return IndexGetRange(bucket, indexName.ToBinaryKey(), minValue, maxValue, maxResults, continuation);
+            return IndexGetRange(bucket, indexName.ToBinaryKey(), minValue, maxValue, options);
         }
 
-        public RiakResult<IList<string>> IndexGet(string bucket, string indexName, BigInteger minValue, BigInteger maxValue, uint? maxResults = null, BigInteger? continuation = null)
+        public RiakResult<IList<string>> IndexGet(string bucket, string indexName, BigInteger minValue, BigInteger maxValue, RiakIndexGetOptions options = null)
         {
-            return IndexGetRange(bucket, indexName.ToIntegerKey(), minValue.ToString(), maxValue.ToString(), maxResults, continuation.ToString());
+            return IndexGetRange(bucket, indexName.ToIntegerKey(), minValue.ToString(), maxValue.ToString(), options);
         }
 
-        private RiakResult<IList<string>> IndexGetRange(string bucket, string indexName, string minValue, string maxValue, uint? maxResults = null, string continuation = null)
+        private RiakResult<IList<string>> IndexGetRange(string bucket, string indexName, string minValue, string maxValue, RiakIndexGetOptions options = null)
         {
             var message = new RpbIndexReq
             {
@@ -921,11 +921,8 @@ namespace CorrugatedIron
                 range_max = maxValue.ToRiakString()
             };
 
-            if (maxResults.HasValue)
-                message.max_results = maxResults.Value;
-
-            if (!String.IsNullOrEmpty(continuation))
-                message.continuation = continuation.ToRiakString();
+            options = options ?? new RiakIndexGetOptions();
+            options.Populate(message);
 
             var result = UseConnection(conn => conn.PbcWriteRead<RpbIndexReq, RpbIndexResp>(message));
 
@@ -937,17 +934,17 @@ namespace CorrugatedIron
             return RiakResult<IList<string>>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
 
-        public RiakResult<IList<string>> IndexGet(string bucket, string indexName, string value, uint? maxResults = null, string continuation = null)
+        public RiakResult<IList<string>> IndexGet(string bucket, string indexName, string value, RiakIndexGetOptions options = null)
         {
-            return IndexGetEquals(bucket, indexName.ToBinaryKey(), value, maxResults, continuation.ToString());
+            return IndexGetEquals(bucket, indexName.ToBinaryKey(), value, options);
         }
 
-        public RiakResult<IList<string>> IndexGet(string bucket, string indexName, BigInteger value, uint? maxResults = null, BigInteger? continuation = null)
+        public RiakResult<IList<string>> IndexGet(string bucket, string indexName, BigInteger value, RiakIndexGetOptions options = null)
         {
-            return IndexGetEquals(bucket, indexName.ToIntegerKey(), value.ToString(), maxResults, continuation.ToString());
+            return IndexGetEquals(bucket, indexName.ToIntegerKey(), value.ToString(), options);
         }
 
-        private RiakResult<IList<string>> IndexGetEquals(string bucket, string indexName, string value, uint? maxResults = null, string continuation = null)
+        private RiakResult<IList<string>> IndexGetEquals(string bucket, string indexName, string value, RiakIndexGetOptions options = null)
         {
             var message = new RpbIndexReq
             {
@@ -957,11 +954,8 @@ namespace CorrugatedIron
                 qtype = RpbIndexReq.IndexQueryType.eq
             };
 
-            if (maxResults.HasValue)
-                message.max_results = maxResults.Value;
-
-            if (!String.IsNullOrEmpty(continuation) && !String.IsNullOrWhiteSpace(continuation))
-                message.continuation = continuation.ToRiakString();
+            options = options ?? new RiakIndexGetOptions();
+            options.Populate(message);
 
             var result = UseConnection(conn => conn.PbcWriteRead<RpbIndexReq, RpbIndexResp>(message));
 

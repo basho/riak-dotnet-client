@@ -66,10 +66,10 @@ namespace CorrugatedIron
 
         RiakResult<RiakServerInfo> GetServerInfo();
 
-        RiakResult<IList<string>> IndexGet(string bucket, string indexName, BigInteger value, uint? maxResults = null, BigInteger? continuation = null);
-        RiakResult<IList<string>> IndexGet(string bucket, string indexName, string value, uint? maxResults = null, string continuation = null);
-        RiakResult<IList<string>> IndexGet(string bucket, string indexName, BigInteger minValue, BigInteger maxValue, uint? maxResults = null, BigInteger? continuation = null);
-        RiakResult<IList<string>> IndexGet(string bucket, string indexName, string minValue, string maxValue, uint? maxResults = null, string continuation = null);
+        RiakResult<IList<string>> IndexGet(string bucket, string indexName, BigInteger value, RiakIndexGetOptions options = null);
+        RiakResult<IList<string>> IndexGet(string bucket, string indexName, string value, RiakIndexGetOptions options = null);
+        RiakResult<IList<string>> IndexGet(string bucket, string indexName, BigInteger minValue, BigInteger maxValue, RiakIndexGetOptions options = null);
+        RiakResult<IList<string>> IndexGet(string bucket, string indexName, string minValue, string maxValue, RiakIndexGetOptions options = null);
 
         RiakResult<IList<string>> ListKeysFromIndex(string bucket);
 
