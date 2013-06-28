@@ -191,6 +191,7 @@
     <Compile Include="Models\Rest\RiakRestResponse.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Models\RiakCounterGetOptions.cs" />
     <Compile Include="Models\RiakObjectId.cs" />
     <Compile Include="Models\RiakBucketProperties.cs">
       <SubType>Code</SubType>
@@ -206,6 +207,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Models\RiakServerInfo.cs" />
+    <Compile Include="Models\RiakCounterUpdateOptions.cs" />
     <Compile Include="Models\Search\BinaryTerm.cs" />
     <Compile Include="Models\Search\GroupTerm.cs" />
     <Compile Include="Models\Search\ProximityTerm.cs" />

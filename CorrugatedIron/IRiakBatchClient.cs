@@ -14,6 +14,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
+using CorrugatedIron.Containers;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Models.Search;
@@ -30,6 +32,9 @@ namespace CorrugatedIron
         RiakResult<RiakObject> Get(RiakObjectId objectId, RiakGetOptions options = null);
         RiakResult<RiakObject> Get(string bucket, string key, RiakGetOptions options = null);
         IEnumerable<RiakResult<RiakObject>> Get(IEnumerable<RiakObjectId> bucketKeyPairs, RiakGetOptions options = null);
+        
+        Tuple<RiakResult<RiakObject>, long?> IncrementCounter(string bucket, string counter, long amount, RiakCounterUpdateOptions options = null);
+        Tuple<RiakResult<RiakObject>, long?> GetCounter(string bucket, string counter, RiakCounterGetOptions options = null);
 
         RiakResult<RiakObject> Put(RiakObject value, RiakPutOptions options = null);
         IEnumerable<RiakResult<RiakObject>> Put(IEnumerable<RiakObject> values, RiakPutOptions options = null);
@@ -47,9 +52,7 @@ namespace CorrugatedIron
         RiakResult<RiakStreamedMapReduceResult> StreamMapReduce(RiakMapReduceQuery query);
 
         RiakResult<IEnumerable<string>> ListBuckets();
-
         RiakResult<IEnumerable<string>> ListKeys(string bucket);
-
         RiakResult<IEnumerable<string>> StreamListKeys(string bucket);
 
         RiakResult<RiakBucketProperties> GetBucketProperties(string bucket);
@@ -71,4 +74,5 @@ namespace CorrugatedIron
 
         //RiakResult<RiakSearchResult> Search(Action<RiakSearchRequest> prepareRequest)
     }
+
 }

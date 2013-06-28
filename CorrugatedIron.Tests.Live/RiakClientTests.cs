@@ -221,5 +221,56 @@ namespace CorrugatedIron.Tests.Live
 
             Client.DeleteBucket(bucket);
         }
+
+        [Test]
+        public void UpdatingCounterOnBucketWithoutAllowMultFails()
+        {
+            var bucket = TestBucket + "_" + Guid.NewGuid().ToString();
+            var counter = "counter";
+
+            var result = Client.IncrementCounter(bucket, counter, 1);
+
+            result.Item1.IsSuccess.ShouldBeFalse();
+        }
+
+        [Test]
+        public void UpdatingCounterOnBucketWithAllowMultIsSuccessful()
+        {
+            var bucket = TestBucket + "_" + Guid.NewGuid().ToString();
+            var counter = "counter";
+
+            var props = Client.GetBucketProperties(bucket).Value;
+            props.SetAllowMultiple(true);
+
+            Client.SetBucketProperties(bucket, props);
+
+            var result = Client.IncrementCounter(bucket, counter, 1);
+
+            result.Item1.IsSuccess.ShouldBeTrue();
+        }
+
+        [Test]
+        public void UpdatingCounterOnBucketWithReturnValueShouldReturnIncrementedCounterValue()
+        {
+            var bucket = TestBucket + "_" + Guid.NewGuid().ToString();
+            var counter = "counter";
+
+            var props = Client.GetBucketProperties(bucket).Value;
+            props.SetAllowMultiple(true);
+
+            Client.SetBucketProperties(bucket, props);
+
+            Client.IncrementCounter(bucket, counter, 1, new RiakCounterUpdateOptions().SetReturnValue(true));
+
+            var readResult = Client.GetCounter(bucket, counter);
+            var currentCounter = readResult.Item2;
+
+            var result = Client.IncrementCounter(bucket, counter, 1, new RiakCounterUpdateOptions().SetReturnValue(true));
+
+            result.Item1.IsSuccess.ShouldBeTrue();
+            result.Item1.ShouldNotBeNull();
+            result.Item2.ShouldBeGreaterThan(currentCounter);
+
+        }
     }
 }
