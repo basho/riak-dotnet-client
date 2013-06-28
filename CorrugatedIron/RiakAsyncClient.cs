@@ -42,6 +42,9 @@ namespace CorrugatedIron
         Task<RiakResult<RiakMapReduceResult>> MapReduce(RiakMapReduceQuery query);
         Task<RiakResult<RiakStreamedMapReduceResult>> StreamMapReduce(RiakMapReduceQuery query);
 
+        // TODO RiakResult<RiakObject> IncrementCounter(string bucket, string counter, RiakCounterUpdateOptions options = null);
+        // TODO RiakResult<RiakObject> GetCounter(string bucket, string counter, RiakCounterGetOptions options = null);
+
         Task<RiakResult<IEnumerable<string>>> ListBuckets();
         Task<RiakResult<IEnumerable<string>>> ListKeys(string bucket);
         Task<RiakResult<IEnumerable<string>>> StreamListKeys(string bucket);

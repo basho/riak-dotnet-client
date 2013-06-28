@@ -15,6 +15,7 @@
 // under the License.
 
 using CorrugatedIron.Comms;
+using CorrugatedIron.Containers;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
 using CorrugatedIron.Models;
@@ -83,6 +84,71 @@ namespace CorrugatedIron
         public RiakResult Ping()
         {
             return UseConnection(conn => conn.PbcWriteRead(MessageCode.PingReq, MessageCode.PingResp));
+        }
+
+        public Tuple<RiakResult<RiakObject>, long?> IncrementCounter(string bucket, string counter, long amount, RiakCounterUpdateOptions options = null)
+        {
+            if (!IsValidBucketOrKey(bucket))
+            {
+                return new Tuple<RiakResult<RiakObject>, long?>(RiakResult<RiakObject>.Error(ResultCode.InvalidRequest, InvalidBucketErrorMessage, false), null);
+            }
+
+            if (!IsValidBucketOrKey(counter))
+            {
+                return new Tuple<RiakResult<RiakObject>, long?>(RiakResult<RiakObject>.Error(ResultCode.InvalidRequest, InvalidKeyErrorMessage, false), null);
+            }
+
+            var request = new RpbCounterUpdateReq {bucket = bucket.ToRiakString(), key = counter.ToRiakString(), amount = amount};
+            options = options ?? new RiakCounterUpdateOptions();
+            options.Populate(request);
+
+            var result = UseConnection(conn => conn.PbcWriteRead<RpbCounterUpdateReq, RpbCounterUpdateResp>(request));
+
+            if (!result.IsSuccess)
+            {
+                return new Tuple<RiakResult<RiakObject>, long?>(RiakResult<RiakObject>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline), null);
+            }
+
+            var o = new RiakObject(bucket, counter, result.Value.value);
+            var cVal = 0L;
+            var parseResult = false;
+
+            if (options.ReturnValue != null && options.ReturnValue.Value)
+                parseResult= long.TryParse(o.Value.FromRiakString(), out cVal);
+
+            return parseResult ? new Tuple<RiakResult<RiakObject>, long?>(RiakResult<RiakObject>.Success(o), cVal)
+                               : new Tuple<RiakResult<RiakObject>, long?>(RiakResult<RiakObject>.Success(o), null);
+        }
+
+        public Tuple<RiakResult<RiakObject>, long?> GetCounter(string bucket, string counter, RiakCounterGetOptions options = null)
+        {
+            if (!IsValidBucketOrKey(bucket))
+            {
+                return new Tuple<RiakResult<RiakObject>, long?>(RiakResult<RiakObject>.Error(ResultCode.InvalidRequest, InvalidBucketErrorMessage, false), null);
+            }
+
+            if (!IsValidBucketOrKey(counter))
+            {
+                return new Tuple<RiakResult<RiakObject>, long?>(RiakResult<RiakObject>.Error(ResultCode.InvalidRequest, InvalidKeyErrorMessage, false), null);
+            }
+
+            var request = new RpbCounterGetReq {bucket = bucket.ToRiakString(), key = counter.ToRiakString()};
+            options = options ?? new RiakCounterGetOptions();
+            options.Populate(request);
+
+            var result = UseConnection(conn => conn.PbcWriteRead<RpbCounterGetReq, RpbCounterGetResp>(request));
+
+            if (!result.IsSuccess)
+            {
+                return new Tuple<RiakResult<RiakObject>, long?>(RiakResult<RiakObject>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline), null);
+            }
+
+            var o = new RiakObject(bucket, counter, result.Value.value);
+            long cVal;
+            var parseResult = long.TryParse(o.Value.FromRiakString(), out cVal);
+
+            return parseResult ? new Tuple<RiakResult<RiakObject>, long?>(RiakResult<RiakObject>.Success(o), cVal) 
+                               : new Tuple<RiakResult<RiakObject>, long?>(RiakResult<RiakObject>.Success(o), null);
         }
 
         /// <summary>
@@ -976,5 +1042,8 @@ namespace CorrugatedIron
         {
             return (new RiakGetOptions()).SetR(RiakConstants.Defaults.RVal);
         }
+
+
+        
     }
 }

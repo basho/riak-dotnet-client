@@ -39,6 +39,26 @@ namespace CorrugatedIron.Tests.Extensions
         {
             Assert.IsInstanceOf<T>(actual);
         }
+
+        public static void ShouldBeGreaterThan(this long? actual, long? expected)
+        {
+            Assert.GreaterOrEqual(actual, expected);
+        }
+
+        public static void ShouldBeLessThan(this long? actual, long? expected)
+        {
+            Assert.LessOrEqual(actual, expected);
+        }
+
+        public static void ShouldBeGreaterThan(this long actual, long expected)
+        {
+            Assert.GreaterOrEqual(actual, expected);
+        }
+
+        public static void ShouldBeLessThan(this long actual, long expected)
+        {
+            Assert.LessOrEqual(actual, expected);
+        }
         
         public static void ShouldBeGreaterThan(this int actual, int expected)
         {
