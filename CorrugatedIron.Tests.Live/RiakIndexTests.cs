@@ -260,6 +260,27 @@ namespace CorrugatedIron.Tests.Live
 
             Client.DeleteBucket(bucket);
         }
+
+        [Test]
+        public void GettingKeysWithReturnTermsDoesAThing()
+        {
+            var bucket = Bucket;
+            var keysAndTerms = new Dictionary<string, int>();
+
+            for (var i = 0; i < 10; i++)
+            {
+                var o = new RiakObject(bucket, Guid.NewGuid().ToString(), "{ value: \"this is an object\" }");
+                o.IntIndex("sandwiches").Set(i);
+                keysAndTerms.Add(o.Key, i);
+
+                Client.Put(o);
+            }
+            
+            var results = Client.IndexGet(bucket, "sandwiches", 2, 5, new RiakIndexGetOptions().SetReturnTerms(true).SetMaxResults(100).SetStream(false));
+
+            results.IsSuccess.ShouldBeTrue(results.ErrorMessage);
+            results.Value.Count.ShouldBeGreaterThan(0);
+        }
     }
 }
 

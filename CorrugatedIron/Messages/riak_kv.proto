@@ -243,7 +243,7 @@ message RpbCounterUpdateReq {
 
 // Counter update response? No message | error response
 message RpbCounterUpdateResp {
-        optional sint64 value = 1;
+        optional sint64 returnvalue = 1;
 }
 
 // counter value
@@ -258,5 +258,5 @@ message RpbCounterGetReq {
 
 // Counter value response
 message RpbCounterGetResp {
-    optional sint64 value = 1;
+    optional sint64 returnvalue = 1;
 }

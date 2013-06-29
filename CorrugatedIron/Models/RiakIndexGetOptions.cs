@@ -27,6 +27,11 @@ namespace CorrugatedIron.Models
         public uint? MaxResults { get; private set; }
         public string Continuation { get; private set; }
 
+        public RiakIndexGetOptions()
+        {
+            MaxResults = null;
+        }
+
         public RiakIndexGetOptions SetReturnTerms(bool value)
         {
             ReturnTerms = value;

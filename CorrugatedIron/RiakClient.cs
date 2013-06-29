@@ -15,19 +15,16 @@
 // under the License.
 
 using CorrugatedIron.Comms;
-using CorrugatedIron.Containers;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Models.MapReduce.Inputs;
-using CorrugatedIron.Models.Rest;
 using CorrugatedIron.Models.Search;
 using CorrugatedIron.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Web;
 using System.Numerics;
 
@@ -110,15 +107,14 @@ namespace CorrugatedIron
                 return new Tuple<RiakResult<RiakObject>, long?>(RiakResult<RiakObject>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline), null);
             }
 
-            var o = new RiakObject(bucket, counter, result.Value.value);
+            var o = new RiakObject(bucket, counter, result.Value.returnvalue);
             var cVal = 0L;
             var parseResult = false;
 
             if (options.ReturnValue != null && options.ReturnValue.Value)
                 parseResult= long.TryParse(o.Value.FromRiakString(), out cVal);
 
-            return parseResult ? new Tuple<RiakResult<RiakObject>, long?>(RiakResult<RiakObject>.Success(o), cVal)
-                               : new Tuple<RiakResult<RiakObject>, long?>(RiakResult<RiakObject>.Success(o), null);
+            return new Tuple<RiakResult<RiakObject>, long?>(RiakResult<RiakObject>.Success(o), parseResult ? (long?)cVal : null);
         }
 
         public Tuple<RiakResult<RiakObject>, long?> GetCounter(string bucket, string counter, RiakCounterGetOptions options = null)
@@ -144,12 +140,11 @@ namespace CorrugatedIron
                 return new Tuple<RiakResult<RiakObject>, long?>(RiakResult<RiakObject>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline), null);
             }
 
-            var o = new RiakObject(bucket, counter, result.Value.value);
+            var o = new RiakObject(bucket, counter, result.Value.returnvalue);
             long cVal;
             var parseResult = long.TryParse(o.Value.FromRiakString(), out cVal);
 
-            return parseResult ? new Tuple<RiakResult<RiakObject>, long?>(RiakResult<RiakObject>.Success(o), cVal) 
-                               : new Tuple<RiakResult<RiakObject>, long?>(RiakResult<RiakObject>.Success(o), null);
+            return new Tuple<RiakResult<RiakObject>, long?>(RiakResult<RiakObject>.Success(o), parseResult ? (long?)cVal : null);
         }
 
         /// <summary>
