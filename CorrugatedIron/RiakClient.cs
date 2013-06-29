@@ -18,6 +18,7 @@ using CorrugatedIron.Comms;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
 using CorrugatedIron.Models;
+using CorrugatedIron.Models.Index;
 using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Models.MapReduce.Inputs;
 using CorrugatedIron.Models.Search;
@@ -726,7 +727,8 @@ namespace CorrugatedIron
         /// quickly return an unsorted list of keys from Riak.</remarks>
         public RiakResult<IList<string>> ListKeysFromIndex(string bucket)
         {
-            return IndexGet(bucket, RiakConstants.SystemIndexKeys.RiakBucketIndex, bucket);
+            var result = IndexGet(bucket, RiakConstants.SystemIndexKeys.RiakBucketIndex, bucket);
+            return RiakResult<IList<string>>.Success(result.Value.Select(rir => rir.Key).ToList());
         }
 
         /// <summary>
@@ -895,17 +897,17 @@ namespace CorrugatedIron
             return RiakResult<RiakServerInfo>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
 
-        public RiakResult<IList<string>> IndexGet(string bucket, string indexName, string minValue, string maxValue, RiakIndexGetOptions options = null)
+        public RiakResult<IList<RiakIndexResult>> IndexGet(string bucket, string indexName, string minValue, string maxValue, RiakIndexGetOptions options = null)
         {
             return IndexGetRange(bucket, indexName.ToBinaryKey(), minValue, maxValue, options);
         }
 
-        public RiakResult<IList<string>> IndexGet(string bucket, string indexName, BigInteger minValue, BigInteger maxValue, RiakIndexGetOptions options = null)
+        public RiakResult<IList<RiakIndexResult>> IndexGet(string bucket, string indexName, BigInteger minValue, BigInteger maxValue, RiakIndexGetOptions options = null)
         {
             return IndexGetRange(bucket, indexName.ToIntegerKey(), minValue.ToString(), maxValue.ToString(), options);
         }
 
-        private RiakResult<IList<string>> IndexGetRange(string bucket, string indexName, string minValue, string maxValue, RiakIndexGetOptions options = null)
+        private RiakResult<IList<RiakIndexResult>> IndexGetRange(string bucket, string indexName, string minValue, string maxValue, RiakIndexGetOptions options = null)
         {
             var message = new RpbIndexReq
             {
@@ -923,23 +925,38 @@ namespace CorrugatedIron
 
             if (result.IsSuccess)
             {
-                return RiakResult<IList<string>>.Success(result.Value.keys.Select(k => k.FromRiakString()).ToList());
+                var r = new List<RiakIndexResult>();
+
+                if (options.ReturnTerms != null && options.ReturnTerms.Value)
+                {
+                    r.AddRange(
+                        result.Value.results.Select(pair =>
+                                                    new RiakIndexResult(pair.key.FromRiakString(),
+                                                                        pair.value.FromRiakString())));
+                }
+                else
+                {
+                    r.AddRange(
+                        result.Value.keys.Select(key => new RiakIndexResult(key.FromRiakString())));
+                }
+
+                return RiakResult<IList<RiakIndexResult>>.Success(r);
             }
 
-            return RiakResult<IList<string>>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
+            return RiakResult<IList<RiakIndexResult>>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
 
-        public RiakResult<IList<string>> IndexGet(string bucket, string indexName, string value, RiakIndexGetOptions options = null)
+        public RiakResult<IList<RiakIndexResult>> IndexGet(string bucket, string indexName, string value, RiakIndexGetOptions options = null)
         {
             return IndexGetEquals(bucket, indexName.ToBinaryKey(), value, options);
         }
 
-        public RiakResult<IList<string>> IndexGet(string bucket, string indexName, BigInteger value, RiakIndexGetOptions options = null)
+        public RiakResult<IList<RiakIndexResult>> IndexGet(string bucket, string indexName, BigInteger value, RiakIndexGetOptions options = null)
         {
             return IndexGetEquals(bucket, indexName.ToIntegerKey(), value.ToString(), options);
         }
 
-        private RiakResult<IList<string>> IndexGetEquals(string bucket, string indexName, string value, RiakIndexGetOptions options = null)
+        private RiakResult<IList<RiakIndexResult>> IndexGetEquals(string bucket, string indexName, string value, RiakIndexGetOptions options = null)
         {
             var message = new RpbIndexReq
             {
@@ -956,10 +973,18 @@ namespace CorrugatedIron
 
             if (result.IsSuccess)
             {
-                return RiakResult<IList<string>>.Success(result.Value.keys.Select(k => k.FromRiakString()).ToList());
+                if (options.ReturnTerms != null && options.ReturnTerms.Value)
+                    return
+                        RiakResult<IList<RiakIndexResult>>.Success(
+                            result.Value.results.Select(
+                                k => new RiakIndexResult(k.key.FromRiakString(), k.value.FromRiakString())).ToList());
+
+                return RiakResult<IList<RiakIndexResult>>.Success(
+                    result.Value.keys.Select(
+                        k => new RiakIndexResult(k.FromRiakString())).ToList());
             }
 
-            return RiakResult<IList<string>>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
+            return RiakResult<IList<RiakIndexResult>>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
 
         /// <summary>

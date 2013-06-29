@@ -118,6 +118,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Models\Index\IntIndex.cs" />
+    <Compile Include="Models\Index\RiakIndexResult.cs" />
     <Compile Include="Models\MapReduce\Fluent\RiakFluentKeyFilter.cs" />
     <Compile Include="Models\MapReduce\Fluent\RiakFluentLinkPhase.cs" />
     <Compile Include="Models\MapReduce\Fluent\RiakFluentActionPhaseErlang.cs" />
