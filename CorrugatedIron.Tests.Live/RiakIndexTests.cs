@@ -280,6 +280,12 @@ namespace CorrugatedIron.Tests.Live
 
             results.IsSuccess.ShouldBeTrue(results.ErrorMessage);
             results.Value.Count.ShouldEqual(4);
+
+            foreach (var indexResult in results.Value)
+            {
+                keysAndTerms.Keys.ShouldContain(indexResult.Key);
+                keysAndTerms[indexResult.Key].ShouldEqual(int.Parse(indexResult.Term));
+            }
         }
     }
 }

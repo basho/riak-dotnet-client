@@ -931,8 +931,8 @@ namespace CorrugatedIron
                 {
                     r.AddRange(
                         result.Value.results.Select(pair =>
-                                                    new RiakIndexResult(pair.key.FromRiakString(),
-                                                                        pair.value.FromRiakString())));
+                                                    new RiakIndexResult(pair.value.FromRiakString(),
+                                                                        pair.key.FromRiakString())));
                 }
                 else
                 {
