@@ -9,8 +9,8 @@ v1.4.0
 * Index pagination (#127)
 * Reseting bucket properties through PB API (#126) - no API change here, we just do it the official way.
 * Counters are available via `RiakClient.IncrementCounter` and `RiakClient.GetCounter`. Various counter options are supplied via `RiakCounterUpdateOptions` and `RiakCounterGetOptions`. (#125)
-* Removed Either<uint, string> in many Riak*Options classes. Users can still set options quorum options using a string or an integer, but the internal representation has changed. New code should use `RiakConstants.QuorumOptions` for setting and comparing quorum options.
-* 
+* Removed `Either<uint, string>` in many Riak*Options classes. Users can still set options quorum options using a string or an integer, but the internal representation has changed. New code should use `RiakConstants.QuorumOptions` for setting and comparing quorum options.
+* Created `RiakIndexResult` to deal with new possible riak index results containing either a list of keys or list of key + term pairs. (#142, #128) **N.B.** this will break CI 1.3.x and earlier range query operations.
 
 v1.3.3
 ------
