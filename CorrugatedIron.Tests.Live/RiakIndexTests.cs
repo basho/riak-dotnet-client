@@ -287,6 +287,25 @@ namespace CorrugatedIron.Tests.Live
                 keysAndTerms[indexResult.Key].ShouldEqual(int.Parse(indexResult.Term));
             }
         }
+
+        [Test]
+        public void GettingKeysWithContinuationDoesNotSetDone()
+        {
+            var bucket = Bucket;
+            
+            for (var i = 0; i < 1000; i++)
+            {
+                var o = new RiakObject(bucket, Guid.NewGuid().ToString(), "{ value: \"this is an object\" }");
+                o.IntIndex("position").Set(i);
+
+                Client.Put(o);
+            }
+
+            var results = Client.IndexGet(bucket, "position", 10, 500, new RiakIndexGetOptions().SetMaxResults(10));
+
+            results.IsSuccess.ShouldBeTrue(results.ErrorMessage);
+            results.Value.Count.ShouldEqual(10);
+        }
     }
 }
 
