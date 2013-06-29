@@ -32,8 +32,8 @@ namespace CorrugatedIron.Tests.Models
                 .AddPreCommitHook(new RiakErlangCommitHook("foo", "bar"))
                 .SetSearch(true);
 
-            props.PreCommitHooks.Count.ShouldEqual(2);
-            props.PreCommitHooks[1].ShouldEqual(RiakErlangCommitHook.RiakSearchCommitHook);
+            props.PreCommitHooks.Count.ShouldEqual(1);
+            props.Search.ShouldEqual(true);
         }
 
         [Test]
@@ -43,11 +43,11 @@ namespace CorrugatedIron.Tests.Models
                 .AddPreCommitHook(new RiakErlangCommitHook("foo", "bar"))
                 .SetSearch(true);
 
-            props.PreCommitHooks.Count.ShouldEqual(2);
-            props.PreCommitHooks[1].ShouldEqual(RiakErlangCommitHook.RiakSearchCommitHook);
+            props.PreCommitHooks.Count.ShouldEqual(1);
+            props.Search.ShouldEqual(true);
 
             props.SetSearch(false);
-            props.PreCommitHooks.Count.ShouldEqual(1);
+            props.Search.ShouldNotEqual(true);
             ((RiakErlangCommitHook)props.PreCommitHooks[0]).Function.ShouldEqual("bar");
         }
 
@@ -75,13 +75,15 @@ namespace CorrugatedIron.Tests.Models
                 .AddPostCommitHook(new RiakErlangCommitHook("mod", "fun"))
                 .AddPostCommitHook(new RiakErlangCommitHook("mod", "fun"));
 
-            props.PreCommitHooks.Count.ShouldEqual(3);
+            props.PreCommitHooks.Count.ShouldEqual(2);
             props.PostCommitHooks.Count.ShouldEqual(1);
 
+            // setting search should not change commit hook count
             props.SetSearch(true);
-            props.PreCommitHooks.Count.ShouldEqual(3);
+            props.PreCommitHooks.Count.ShouldEqual(2);
             props.PostCommitHooks.Count.ShouldEqual(1);
 
+            // setting search should not change commit hook count
             props.SetSearch(false);
             props.PreCommitHooks.Count.ShouldEqual(2);
             props.PostCommitHooks.Count.ShouldEqual(1);

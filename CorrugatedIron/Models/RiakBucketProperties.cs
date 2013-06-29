@@ -234,6 +234,11 @@ namespace CorrugatedIron.Models
         {
             var hooks = PreCommitHooks ?? (PreCommitHooks = new List<IRiakPreCommitHook>());
 
+            if (commitHook != null && (commitHook as RiakErlangCommitHook) == RiakErlangCommitHook.RiakSearchCommitHook)
+            {
+                return SetSearch(true);
+            }
+
             if (!hooks.Any(x => Equals(x, commitHook)))
             {
                 hooks.Add(commitHook);
