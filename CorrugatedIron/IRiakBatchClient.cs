@@ -35,8 +35,8 @@ namespace CorrugatedIron
         RiakResult<RiakObject> Get(string bucket, string key, RiakGetOptions options = null);
         IEnumerable<RiakResult<RiakObject>> Get(IEnumerable<RiakObjectId> bucketKeyPairs, RiakGetOptions options = null);
         
-        Tuple<RiakResult<RiakObject>, long?> IncrementCounter(string bucket, string counter, long amount, RiakCounterUpdateOptions options = null);
-        Tuple<RiakResult<RiakObject>, long?> GetCounter(string bucket, string counter, RiakCounterGetOptions options = null);
+        RiakCounterResult IncrementCounter(string bucket, string counter, long amount, RiakCounterUpdateOptions options = null);
+        RiakCounterResult GetCounter(string bucket, string counter, RiakCounterGetOptions options = null);
 
         RiakResult<RiakObject> Put(RiakObject value, RiakPutOptions options = null);
         IEnumerable<RiakResult<RiakObject>> Put(IEnumerable<RiakObject> values, RiakPutOptions options = null);

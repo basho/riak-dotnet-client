@@ -230,7 +230,7 @@ namespace CorrugatedIron.Tests.Live
 
             var result = Client.IncrementCounter(bucket, counter, 1);
 
-            result.Item1.IsSuccess.ShouldBeFalse();
+            result.Result.IsSuccess.ShouldBeFalse();
         }
 
         [Test]
@@ -246,7 +246,7 @@ namespace CorrugatedIron.Tests.Live
 
             var result = Client.IncrementCounter(bucket, counter, 1);
 
-            result.Item1.IsSuccess.ShouldBeTrue();
+            result.Result.IsSuccess.ShouldBeTrue();
         }
 
         [Test]
@@ -263,13 +263,13 @@ namespace CorrugatedIron.Tests.Live
             Client.IncrementCounter(bucket, counter, 1, new RiakCounterUpdateOptions().SetReturnValue(true));
 
             var readResult = Client.GetCounter(bucket, counter);
-            var currentCounter = readResult.Item2;
+            var currentCounter = readResult.Value;
 
             var result = Client.IncrementCounter(bucket, counter, 1, new RiakCounterUpdateOptions().SetReturnValue(true));
 
-            result.Item1.IsSuccess.ShouldBeTrue();
-            result.Item1.ShouldNotBeNull();
-            result.Item2.ShouldBeGreaterThan(currentCounter);
+            result.Result.IsSuccess.ShouldBeTrue();
+            result.Result.ShouldNotBeNull();
+            result.Value.ShouldBeGreaterThan(currentCounter);
 
         }
     }

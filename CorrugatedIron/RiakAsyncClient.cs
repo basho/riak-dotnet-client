@@ -32,8 +32,8 @@ namespace CorrugatedIron
         Task<RiakResult<RiakObject>> Get(RiakObjectId objectId, RiakGetOptions options = null);
         Task<IEnumerable<RiakResult<RiakObject>>> Get(IEnumerable<RiakObjectId> bucketKeyPairs, RiakGetOptions options = null);
 
-        Task<Tuple<RiakResult<RiakObject>, long?>> IncrementCounter(string bucket, string counter, long amount, RiakCounterUpdateOptions options = null);
-        Task<Tuple<RiakResult<RiakObject>, long?>> GetCounter(string bucket, string counter, RiakCounterGetOptions options = null);
+        Task<RiakCounterResult> IncrementCounter(string bucket, string counter, long amount, RiakCounterUpdateOptions options = null);
+        Task<RiakCounterResult> GetCounter(string bucket, string counter, RiakCounterGetOptions options = null);
 
         Task<RiakResult<RiakObject>> Put(RiakObject value, RiakPutOptions options = null);
         Task<IEnumerable<RiakResult<RiakObject>>> Put(IEnumerable<RiakObject> values, RiakPutOptions options = null);
@@ -145,12 +145,12 @@ namespace CorrugatedIron
             return Task.Factory.StartNew(() => _client.Get(bucketKeyPairs, options));
         }
 
-        public Task<Tuple<RiakResult<RiakObject>, long?>> IncrementCounter(string bucket, string counter, long amount, RiakCounterUpdateOptions options = null)
+        public Task<RiakCounterResult> IncrementCounter(string bucket, string counter, long amount, RiakCounterUpdateOptions options = null)
         {
             return Task.Factory.StartNew(() => _client.IncrementCounter(bucket, counter, amount, options));
         }
 
-        public Task<Tuple<RiakResult<RiakObject>, long?>> GetCounter(string bucket, string counter, RiakCounterGetOptions options = null) 
+        public Task<RiakCounterResult> GetCounter(string bucket, string counter, RiakCounterGetOptions options = null) 
         {
             return Task.Factory.StartNew(() => _client.GetCounter(bucket, counter, options));
         }

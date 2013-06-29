@@ -194,6 +194,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Models\RiakCounterGetOptions.cs" />
+    <Compile Include="Models\RiakCounterResult.cs" />
     <Compile Include="Models\RiakIndexGetOptions.cs" />
     <Compile Include="Models\RiakObjectId.cs" />
     <Compile Include="Models\RiakBucketProperties.cs">
