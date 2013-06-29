@@ -279,7 +279,7 @@ namespace CorrugatedIron.Tests.Live
             var results = Client.IndexGet(bucket, "sandwiches", 2, 5, new RiakIndexGetOptions().SetReturnTerms(true).SetMaxResults(100).SetStream(false));
 
             results.IsSuccess.ShouldBeTrue(results.ErrorMessage);
-            results.Value.Count.ShouldBeGreaterThan(0);
+            results.Value.Count.ShouldEqual(4);
         }
     }
 }
