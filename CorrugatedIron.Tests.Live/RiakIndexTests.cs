@@ -86,7 +86,7 @@ namespace CorrugatedIron.Tests.Live
 
             foreach (var v in result.Value)
             {
-                var key = int.Parse(v);
+                var key = int.Parse(v.Key);
                 key.ShouldBeLessThan(10);
                 key.ShouldBeGreaterThan(-1);
             }
@@ -109,7 +109,7 @@ namespace CorrugatedIron.Tests.Live
 
             foreach (var v in result.Value)
             {
-                var key = int.Parse(v);
+                var key = int.Parse(v.Key);
                 key.ShouldBeLessThan(10);
                 key.ShouldBeGreaterThan(-1);
             }
