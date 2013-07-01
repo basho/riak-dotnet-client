@@ -63,6 +63,7 @@ Global
 		$2.inheritsSet = null
 		$2.scope = text/x-csharp
 		$0.CSharpFormattingPolicy = $3
+		$3.StatementBraceStyle = NextLine
 		$3.ElseIfNewLinePlacement = SameLine
 		$3.BeforeMethodDeclarationParentheses = False
 		$3.BeforeMethodCallParentheses = False
