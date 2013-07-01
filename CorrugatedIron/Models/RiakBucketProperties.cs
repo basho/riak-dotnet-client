@@ -89,7 +89,8 @@ namespace CorrugatedIron.Models
         /// </summary>
         public bool SearchEnabled
         {
-            get { return Search != null && Search.Value; }
+            get { return (Search.HasValue && Search.Value) || 
+                         (PreCommitHooks != null && PreCommitHooks.FirstOrDefault(x => Equals(x, RiakErlangCommitHook.RiakSearchCommitHook)) != null); }
         }
 
         public RiakBucketProperties SetBasicQuorum(bool value)
@@ -122,9 +123,23 @@ namespace CorrugatedIron.Models
         /// <param name="value">Set to <i>true</i> to enable search on this bucket, or <i>false</i>
         /// to disable it.</param>
         /// <returns>A reference to the current properties object.</returns>
-        public RiakBucketProperties SetSearch(bool value)
+        public RiakBucketProperties SetSearch(bool enable, bool addHooks = false)
         {
-            Search = value;
+            if (addHooks) 
+            {
+                if (enable)
+                {
+                    AddPreCommitHook(RiakErlangCommitHook.RiakSearchCommitHook);
+                }
+                else
+                {
+                    RemovePreCommitHook(RiakErlangCommitHook.RiakSearchCommitHook);
+                }                  
+            } 
+            else 
+            {
+                Search = enable;
+            }
             return this;
         }
 
@@ -230,26 +245,24 @@ namespace CorrugatedIron.Models
             return this;
         }
 
-        public RiakBucketProperties AddPreCommitHook(IRiakPreCommitHook commitHook)
+        public RiakBucketProperties AddPreCommitHook(IRiakPreCommitHook commitHook, bool commitFlags = true)
         {
             var hooks = PreCommitHooks ?? (PreCommitHooks = new List<IRiakPreCommitHook>());
-
-            if (commitHook != null && (commitHook as RiakErlangCommitHook) == RiakErlangCommitHook.RiakSearchCommitHook)
-            {
-                return SetSearch(true);
-            }
 
             if (!hooks.Any(x => Equals(x, commitHook)))
             {
                 hooks.Add(commitHook);
             }
 
-            HasPrecommit = true;
+            if (commitFlags)
+            {
+                HasPrecommit = true;
+            }
 
             return this;
         }
 
-        public RiakBucketProperties AddPostCommitHook(IRiakPostCommitHook commitHook)
+        public RiakBucketProperties AddPostCommitHook(IRiakPostCommitHook commitHook, bool commitFlags = true)
         {
             var hooks = PostCommitHooks ?? (PostCommitHooks = new List<IRiakPostCommitHook>());
             
@@ -258,22 +271,34 @@ namespace CorrugatedIron.Models
                 hooks.Add(commitHook);
             }
 
-            HasPostcommit = true;
+            if (commitFlags)
+            {
+                HasPostcommit = true;
+            }
 
             return this;
         }
 
-        public RiakBucketProperties ClearPreCommitHooks()
+        public RiakBucketProperties ClearPreCommitHooks(bool commitFlags = true)
         {
             (PreCommitHooks ?? (PreCommitHooks = new List<IRiakPreCommitHook>())).Clear();
-            HasPrecommit = false;
+
+            if (commitFlags)
+            {
+                HasPrecommit = false;
+            }
+
             return this;
         }
 
-        public RiakBucketProperties ClearPostCommitHooks()
+        public RiakBucketProperties ClearPostCommitHooks(bool commitFlags = true)
         {
             (PostCommitHooks ?? (PostCommitHooks = new List<IRiakPostCommitHook>())).Clear();
-            HasPostcommit = false;
+
+            if (commitFlags)
+            {
+                HasPostcommit = false;
+            }
             return this;
         }
 
