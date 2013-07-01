@@ -272,5 +272,22 @@ namespace CorrugatedIron.Tests.Live
             result.Value.ShouldBeGreaterThan(currentCounter);
 
         }
+
+        [Test]
+        public void ReadingWithTimeoutSetToZeroShouldImmediatelyReturn()
+        {
+            var bucket = TestBucket + "_" + Guid.NewGuid().ToString();
+
+            for (var i = 0; i < 10; i++)
+            {
+                var o = new RiakObject(bucket, i.ToString(), "{ value: \"this is an object\" }");
+
+                Client.Put(o);
+            }
+
+            var result = Client.Get(bucket, "2", new RiakGetOptions().SetTimeout(0).SetPr(RiakConstants.QuorumOptions.All));
+
+            result.IsSuccess.ShouldBeFalse();
+        }
     }
 }
