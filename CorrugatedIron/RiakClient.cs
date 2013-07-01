@@ -995,8 +995,13 @@ namespace CorrugatedIron
                 if (result.Done.HasValue)
                     r.SetDone(result.Done.Value);
 
-                if (result.Continuation != null && !string.IsNullOrEmpty(result.Continuation))
-                    r.SetContinuation(result.Continuation);
+                if (result.Value.continuation != null)
+                {
+                    var continuation = result.Value.continuation.FromRiakString();
+
+                    if (!string.IsNullOrEmpty(continuation))
+                        r.SetContinuation(continuation);
+                }
 
                 return r;
             }
