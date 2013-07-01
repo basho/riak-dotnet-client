@@ -976,22 +976,29 @@ namespace CorrugatedIron
 
             if (result.IsSuccess)
             {
-                var r = new List<RiakIndexResult>();
-
+                var l = new List<RiakIndexResult>();
                 if (options.ReturnTerms != null && options.ReturnTerms.Value)
                 {
-                    r.AddRange(
+                    l.AddRange(
                         result.Value.results.Select(pair =>
                                                     new RiakIndexResult(pair.value.FromRiakString(),
                                                                         pair.key.FromRiakString())));
                 }
                 else
                 {
-                    r.AddRange(
+                    l.AddRange(
                         result.Value.keys.Select(key => new RiakIndexResult(key.FromRiakString())));
                 }
 
-                return RiakResult<IList<RiakIndexResult>>.Success(r);
+                var r = RiakResult<IList<RiakIndexResult>>.Success(l);
+
+                if (result.Done.HasValue)
+                    r.SetDone(result.Done.Value);
+
+                if (result.Continuation != null && !string.IsNullOrEmpty(result.Continuation))
+                    r.SetContinuation(result.Continuation);
+
+                return r;
             }
 
             return RiakResult<IList<RiakIndexResult>>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);

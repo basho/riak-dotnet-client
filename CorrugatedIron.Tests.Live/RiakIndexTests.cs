@@ -305,6 +305,7 @@ namespace CorrugatedIron.Tests.Live
 
             results.IsSuccess.ShouldBeTrue(results.ErrorMessage);
             results.Value.Count.ShouldEqual(10);
+            results.Done.ShouldNotEqual(true);
         }
     }
 }
