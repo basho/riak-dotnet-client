@@ -36,6 +36,8 @@ namespace CorrugatedIron
         public bool IsSuccess { get; protected set; }
         public string ErrorMessage { get; protected set; }
         public ResultCode ResultCode { get; protected set; }
+        public bool? Done { get; protected set; }
+        public string Continuation { get; protected set; }
         internal bool NodeOffline { get; set; }
 
         protected RiakResult()
@@ -60,6 +62,18 @@ namespace CorrugatedIron
                 ErrorMessage = message,
                 NodeOffline = nodeOffline
             };
+        }
+
+        internal RiakResult SetDone(bool? value)
+        {
+            Done = value;
+            return this;
+        }
+
+        internal RiakResult SetContinuation(string value)
+        {
+            Continuation = value;
+            return this;
         }
     }
 
