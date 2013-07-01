@@ -32,6 +32,8 @@ namespace CorrugatedIron.Models
 {
     public class RiakBucketProperties
     {
+        private bool? _addHooks;
+
         public bool? LastWriteWins { get; private set; }
         public uint? NVal { get; private set; }
         public bool? AllowMultiple { get; private set; }
@@ -127,6 +129,8 @@ namespace CorrugatedIron.Models
         {
             if (addHooks) 
             {
+                _addHooks = enable;
+
                 if (enable)
                 {
                     AddPreCommitHook(RiakErlangCommitHook.RiakSearchCommitHook);
@@ -249,6 +253,11 @@ namespace CorrugatedIron.Models
         {
             var hooks = PreCommitHooks ?? (PreCommitHooks = new List<IRiakPreCommitHook>());
 
+            if (commitHook != null && (commitHook as RiakErlangCommitHook) == RiakErlangCommitHook.RiakSearchCommitHook)
+            {
+                return SetSearch(true);
+            }
+
             if (!hooks.Any(x => Equals(x, commitHook)))
             {
                 hooks.Add(commitHook);
@@ -283,11 +292,6 @@ namespace CorrugatedIron.Models
         {
             (PreCommitHooks ?? (PreCommitHooks = new List<IRiakPreCommitHook>())).Clear();
 
-            if (commitFlags)
-            {
-                HasPrecommit = false;
-            }
-
             return this;
         }
 
@@ -295,10 +299,6 @@ namespace CorrugatedIron.Models
         {
             (PostCommitHooks ?? (PostCommitHooks = new List<IRiakPostCommitHook>())).Clear();
 
-            if (commitFlags)
-            {
-                HasPostcommit = false;
-            }
             return this;
         }
 
@@ -514,6 +514,21 @@ namespace CorrugatedIron.Models
             if (HasPrecommit.HasValue)
             {
                 message.has_precommit = HasPrecommit.Value;
+            }
+
+            // Due to the amusing differences between 1.3 and 1.4 we've added
+            // this elegant shim to figure out if we should add commit hooks,
+            // remove them, or just wander around setting the Search boolean.
+            if (_addHooks.HasValue)
+            {
+                if (_addHooks.Value)
+                {
+                    AddPreCommitHook(RiakErlangCommitHook.RiakSearchCommitHook);
+                }
+                else
+                {
+                    RemovePreCommitHook(RiakErlangCommitHook.RiakSearchCommitHook);
+                }
             }
 
             if (PreCommitHooks != null)
