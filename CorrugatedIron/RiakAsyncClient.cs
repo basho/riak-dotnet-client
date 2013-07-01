@@ -51,7 +51,9 @@ namespace CorrugatedIron
         Task<RiakResult<IEnumerable<string>>> StreamListKeys(string bucket);
 
         Task<RiakResult<RiakBucketProperties>> GetBucketProperties(string bucket);
-        Task<RiakResult> SetBucketProperties(string bucket, RiakBucketProperties properties);
+        Task<RiakResult> SetBucketProperties(string bucket, RiakBucketProperties properties, bool useHttp = false);
+
+        Task<RiakResult> ResetBucketProperties(string bucket, bool useHttp = false);
 
         Task<RiakResult<IList<RiakIndexResult>>> IndexGet(string bucket, string indexName, int value, RiakIndexGetOptions options = null);
         Task<RiakResult<IList<RiakIndexResult>>> IndexGet(string bucket, string indexName, string value, RiakIndexGetOptions options = null);
@@ -215,9 +217,14 @@ namespace CorrugatedIron
             return Task.Factory.StartNew(() => _client.GetBucketProperties(bucket));
         }
 
-        public Task<RiakResult> SetBucketProperties(string bucket, RiakBucketProperties properties)
+        public Task<RiakResult> SetBucketProperties(string bucket, RiakBucketProperties properties, bool useHttp = false)
         {
-            return Task.Factory.StartNew(() => _client.SetBucketProperties(bucket, properties));
+            return Task.Factory.StartNew(() => _client.SetBucketProperties(bucket, properties, useHttp));
+        }
+
+        public Task<RiakResult> ResetBucketProperties(string bucket, bool useHttp = false)
+        {
+            return Task.Factory.StartNew(() => _client.ResetBucketProperties(bucket, useHttp));
         }
 
         public Task<RiakResult<IList<RiakIndexResult>>> IndexGet(string bucket, string indexName, int value, RiakIndexGetOptions options = null)

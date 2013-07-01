@@ -5,7 +5,7 @@ v1.4.0
 ------
 
 * **Support for Riak 1.4**
-* Bucket properties have been moved entirely to the Protocol Buffers interface. This breaks backwards compatability with Riak 1.3.x and earlier.
+* Bucket properties calls have been moved entirely to the Protocol Buffers interface. Riak 1.3 and earlier users should make sure to set the `useHttp` parameter to `true`. This won't make any difference for setting bucket properties - `extended` was renamed to `useHttp`.
 * Index pagination (#127)
 * Reseting bucket properties through PB API (#126) - no API change here, we just do it the official way.
 * Counters are available via `RiakClient.IncrementCounter` and `RiakClient.GetCounter`. Various counter options are supplied via `RiakCounterUpdateOptions` and `RiakCounterGetOptions`. (#125)
