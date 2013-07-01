@@ -22,12 +22,14 @@ using CorrugatedIron.Models.Index;
 using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Models.MapReduce.Inputs;
 using CorrugatedIron.Models.Search;
+using CorrugatedIron.Models.Rest;
 using CorrugatedIron.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Numerics;
+using System.Net;
 
 namespace CorrugatedIron
 {
@@ -771,7 +773,31 @@ namespace CorrugatedIron
         /// <param name='properties'>
         /// The Properties.
         /// </param>
-        public RiakResult SetBucketProperties(string bucket, RiakBucketProperties properties)
+        /// <param name='useHttp'>When true, CorrugatedIron will use the HTTP interface</param>
+        public RiakResult SetBucketProperties(string bucket, RiakBucketProperties properties, bool useHttp = false)
+        {
+            return useHttp ? SetHttpBucketProperties(bucket, properties) : SetPbcBucketProperties(bucket, properties);
+        }
+
+        internal RiakResult SetHttpBucketProperties(string bucket, RiakBucketProperties properties)
+        {
+            var request = new RiakRestRequest(ToBucketUri(bucket), RiakConstants.Rest.HttpMethod.Put)
+            {
+                Body = properties.ToJsonString().ToRiakString(),
+                ContentType = RiakConstants.ContentTypes.ApplicationJson
+            };
+
+            var result = UseConnection(conn => conn.RestRequest(request));
+            if(result.IsSuccess && result.Value.StatusCode != HttpStatusCode.NoContent)
+            {
+                return RiakResult.Error(ResultCode.InvalidResponse, "Unexpected Status Code: {0} ({1})".Fmt(result.Value.StatusCode, (int)result.Value.StatusCode), result.NodeOffline);
+            }
+
+            return result;
+        }
+
+
+        internal RiakResult SetPbcBucketProperties(string bucket, RiakBucketProperties properties)
         {
             if (!IsValidBucketOrKey(bucket))
             {
@@ -788,17 +814,42 @@ namespace CorrugatedIron
         /// Reset the properties on a bucket back to their defaults.
         /// </summary>
         /// <param name="bucket">The name of the bucket to reset the properties on.</param>
+        /// <param name="useHttp">Whether or not to use the HTTP interface to Riak. Set to true for Riak 1.3 and earlier</param> 
         /// <returns>An indication of success or failure.</returns>
-        /// <remarks>This function requires Riak v1.4+.</remarks>
-        public RiakResult ResetBucketProperties(string bucket)
+        public RiakResult ResetBucketProperties(string bucket, bool useHttp = false)
         {
             if (!IsValidBucketOrKey(bucket))
             {
                 return RiakResult<RiakBucketProperties>.Error(ResultCode.InvalidRequest, InvalidBucketErrorMessage, false);
             }
 
+            return useHttp ? ResetHttpBucketProperties(bucket) : ResetPbcBucketProperties(bucket);
+        }
+
+        internal RiakResult ResetPbcBucketProperties(string bucket)
+        {
             var request = new RpbResetBucketReq { bucket = bucket.ToRiakString() };
             var result = UseConnection(conn => conn.PbcWriteRead(request, MessageCode.ResetBucketResp));
+            return result;
+        }
+
+        internal RiakResult ResetHttpBucketProperties(string bucket)
+        {
+            var request = new RiakRestRequest(ToBucketPropsUri(bucket), RiakConstants.Rest.HttpMethod.Delete);
+
+            var result = UseConnection(conn => conn.RestRequest(request));
+            if(result.IsSuccess)
+            {
+                switch (result.Value.StatusCode)
+                {
+                    case HttpStatusCode.NoContent:
+                    return result;
+                    case HttpStatusCode.NotFound:
+                    return RiakResult.Error(ResultCode.NotFound, "Bucket {0} not found.".Fmt(bucket), false);
+                    default:
+                    return RiakResult.Error(ResultCode.InvalidResponse, "Unexpected Status Code: {0} ({1})".Fmt(result.Value.StatusCode, (int)result.Value.StatusCode), result.NodeOffline);
+                }
+            }
             return result;
         }
         
