@@ -78,6 +78,7 @@ namespace CorrugatedIron.Comms
                 { MessageCode.PutReq, typeof(RpbPutReq) },
                 { MessageCode.PutResp, typeof(RpbPutResp) },
                 { MessageCode.DelReq, typeof(RpbDelReq) },
+                { MessageCode.ListBucketsReq, typeof(RpbListBucketsReq) },
                 { MessageCode.ListBucketsResp, typeof(RpbListBucketsResp) },
                 { MessageCode.ListKeysReq, typeof(RpbListKeysReq) },
                 { MessageCode.ListKeysResp, typeof(RpbListKeysResp) },
