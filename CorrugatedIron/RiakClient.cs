@@ -669,6 +669,21 @@ namespace CorrugatedIron
             return RiakResult<IEnumerable<string>>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
 
+        public RiakResult<IEnumerable<string>> StreamListBuckets()
+        {
+            var lbReq = new RpbListBucketsReq { stream = true };
+            var result = UseDelayedConnection((conn, onFinish) =>
+                                              conn.PbcWriteStreamRead<RpbListBucketsReq, RpbListBucketsResp>(lbReq, lbr => lbr.IsSuccess && !lbr.Value.done, onFinish));
+
+            if(result.IsSuccess)
+            {
+                var buckets = result.Value.Where(r => r.IsSuccess).SelectMany(r => r.Value.buckets).Select(k => k.FromRiakString());
+                return RiakResult<IEnumerable<string>>.Success(buckets);
+            }
+
+            return RiakResult<IEnumerable<string>>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
+        }
+
         /// <summary>
         /// Lists all keys in the specified <paramref name="bucket"/>.
         /// </summary>

@@ -410,6 +410,17 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         }
 
         [Test]
+        public void StreamListBucketsIncludesTestBucket()
+        {
+            var doc = new RiakObject(TestBucket, TestKey, TestJson, RiakConstants.ContentTypes.ApplicationJson);
+            Client.Put(doc).IsSuccess.ShouldBeTrue();
+
+            var result = Client.StreamListBuckets();
+            result.IsSuccess.ShouldBeTrue();
+            result.Value.ShouldContain(TestBucket);
+        }
+
+        [Test]
         public void WritesWithAllowMultProducesMultiple()
         {
             DoAllowMultProducesMultipleTest(Client);
