@@ -27,9 +27,9 @@ namespace CorrugatedIron
         int RetryCount { get; set; }
         RiakResult Ping();
 
-        RiakResult<RiakObject> Get(string bucket, string key, uint rVal = RiakConstants.Defaults.RVal);
-        RiakResult<RiakObject> Get(RiakObjectId objectId, uint rVal = RiakConstants.Defaults.RVal);
-        IEnumerable<RiakResult<RiakObject>> Get(IEnumerable<RiakObjectId> bucketKeyPairs, uint rVal = RiakConstants.Defaults.RVal);
+        RiakResult<RiakObject> Get(RiakObjectId objectId, RiakGetOptions options = null);
+        RiakResult<RiakObject> Get(string bucket, string key, RiakGetOptions options = null);
+        IEnumerable<RiakResult<RiakObject>> Get(IEnumerable<RiakObjectId> bucketKeyPairs, RiakGetOptions options = null);
 
         RiakResult<RiakObject> Put(RiakObject value, RiakPutOptions options = null);
         IEnumerable<RiakResult<RiakObject>> Put(IEnumerable<RiakObject> values, RiakPutOptions options = null);

@@ -149,20 +149,16 @@ namespace CorrugatedIron
         /// <param name='key'>
         /// The key.
         /// </param>
-        /// <param name='rVal'>
-        /// The number of nodes required to successfully respond to the read before the read is considered a success.
-        /// </param>
         /// <remarks>If a node does not respond, that does not necessarily mean that the 
         /// <paramref name="bucket"/>/<paramref name="key"/> combination is not available. It simply means
-        /// that fewer than <paramref name="rVal" /> nodes responded to the read request. Unfortunatley, 
+        /// that fewer than the default number nodes responded to the read request. Unfortunatley, 
         /// the Riak API does not allow us to distinguish between a 404 resulting from less than <paramref name="rVal"/>
         /// nodes successfully responding and a <paramref name="bucket"/>/<paramref name="key"/> combination
         /// not being found in Riak.
         /// </remarks>
-        [Obsolete("Use Get(string, string, RiakGetOptions) instead")]
-        public RiakResult<RiakObject> Get(string bucket, string key, uint rVal = RiakConstants.Defaults.RVal)
+        public RiakResult<RiakObject> Get(string bucket, string key)
         {
-            var options = new RiakGetOptions().SetR(rVal);
+            var options = new RiakGetOptions().SetR(RiakConstants.Defaults.RVal);
             return Get(bucket, key, options);
         }
 
@@ -172,19 +168,19 @@ namespace CorrugatedIron
         /// <param name='objectId'>
         /// Object identifier made up of a key and bucket. <see cref="CorrugatedIron.Models.RiakObjectId"/>
         /// </param>
-        /// <param name='rVal'>
-        /// The number of nodes required to successfully respond to the read before the read is considered a success.
-        /// </param>
+        /// <param name='options'>The <see cref="CorrugatedIron.Models.RiakGetOptions" /> responsible for 
+        /// configuring the semantics of this single get request. These options will override any previously 
+        /// defined bucket configuration properties.</param>
         /// <remarks>If a node does not respond, that does not necessarily mean that the 
         /// <paramref name="objectId"/> is not available. It simply means
         /// that fewer than <paramref name="rVal" /> nodes responded to the read request. Unfortunatley, 
         /// the Riak API does not allow us to distinguish between a 404 resulting from less than <paramref name="rVal"/>
         /// nodes successfully responding and an <paramref name="objectId"/> not being found in Riak.
         /// </remarks>
-        [Obsolete("Use Get(string, string, RiakGetOptions) instead")]
-        public RiakResult<RiakObject> Get(RiakObjectId objectId, uint rVal = RiakConstants.Defaults.RVal)
+        public RiakResult<RiakObject> Get(RiakObjectId objectId, RiakGetOptions options = null)
         {
-            return Get(objectId.Bucket, objectId.Key, rVal);
+            options = options ?? DefaultGetOptions();
+            return Get(objectId.Bucket, objectId.Key, options);
         }
 
         /// <summary>
@@ -1025,6 +1021,11 @@ namespace CorrugatedIron
         private static bool IsValidBucketOrKey(string value)
         {
             return !string.IsNullOrWhiteSpace(value) && !value.Contains('/');
+        }
+
+        internal static RiakGetOptions DefaultGetOptions()
+        {
+            return (new RiakGetOptions()).SetR(RiakConstants.Defaults.RVal);
         }
     }
 }
