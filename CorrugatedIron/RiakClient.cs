@@ -967,12 +967,12 @@ namespace CorrugatedIron
 
         public RiakResult<IList<RiakIndexResult>> StreamIndexGet(string bucket, string indexName, BigInteger value, RiakIndexGetOptions options = null)
         {
-            return StreamIndexGetEquals(bucket, indexName, value.ToString(), options);
+            return StreamIndexGetEquals(bucket, indexName.ToIntegerKey(), value.ToString(), options);
         }
 
         public RiakResult<IList<RiakIndexResult>> StreamIndexGet(string bucket, string indexName, string value, RiakIndexGetOptions options = null)
         {
-            return StreamIndexGetEquals(bucket, indexName, value, options);
+            return StreamIndexGetEquals(bucket, indexName.ToBinaryKey(), value, options);
         }
 
         private RiakResult<IList<RiakIndexResult>> StreamIndexGetEquals(string bucket, string indexName, string value,
@@ -1032,13 +1032,13 @@ namespace CorrugatedIron
         public RiakResult<IList<RiakIndexResult>> StreamIndexGet(string bucket, string indexName, BigInteger minValue, BigInteger maxValue,
                                          RiakIndexGetOptions options = null)
         {
-            return StreamIndexGetRange(bucket, indexName, minValue.ToString(), maxValue.ToString(), options);
+            return StreamIndexGetRange(bucket, indexName.ToIntegerKey(), minValue.ToString(), maxValue.ToString(), options);
         }
 
         public RiakResult<IList<RiakIndexResult>> StreamIndexGet(string bucket, string indexName, string minValue, string maxValue,
                                          RiakIndexGetOptions options = null)
         {
-            return StreamIndexGetRange(bucket, indexName, minValue, maxValue, options);
+            return StreamIndexGetRange(bucket, indexName.ToBinaryKey(), minValue, maxValue, options);
         }
 
         private RiakResult<IList<RiakIndexResult>> StreamIndexGetRange(string bucket, string indexName, string minValue, string maxValue,
