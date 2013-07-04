@@ -317,7 +317,7 @@ namespace CorrugatedIron.Tests.Live
         {
             var bucket = Bucket;
 
-            for (var i = 0; i < 1000; i++)
+            for (var i = 0; i < 10; i++)
             {
                 var o = new RiakObject(bucket, Guid.NewGuid().ToString(), "{ value: \"this is an object\" }");
                 o.IntIndex("position").Set(i % 2);
@@ -329,8 +329,6 @@ namespace CorrugatedIron.Tests.Live
 
             results.IsSuccess.ShouldBeTrue(results.ErrorMessage);
             results.Value.Count.ShouldEqual(500);
-
-            
         }
     }
 }
