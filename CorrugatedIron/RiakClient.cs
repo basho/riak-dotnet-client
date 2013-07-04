@@ -735,6 +735,8 @@ namespace CorrugatedIron
             return RiakResult<IEnumerable<string>>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
 
+        
+
         /// <summary>
         /// Return a list of keys from the given bucket.
         /// </summary>
@@ -963,6 +965,142 @@ namespace CorrugatedIron
             return RiakResult<RiakServerInfo>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
 
+        public RiakResult<IList<RiakIndexResult>> StreamIndexGet(string bucket, string indexName, BigInteger value, RiakIndexGetOptions options = null)
+        {
+            return StreamIndexGetEquals(bucket, indexName, value.ToString(), options);
+        }
+
+        public RiakResult<IList<RiakIndexResult>> StreamIndexGet(string bucket, string indexName, string value, RiakIndexGetOptions options = null)
+        {
+            return StreamIndexGetEquals(bucket, indexName, value, options);
+        }
+
+        private RiakResult<IList<RiakIndexResult>> StreamIndexGetEquals(string bucket, string indexName, string value,
+                                                                        RiakIndexGetOptions options = null)
+        {
+            var message = new RpbIndexReq
+            {
+                bucket = bucket.ToRiakString(),
+                index = indexName.ToRiakString(),
+                key = value.ToRiakString(),
+                qtype = RpbIndexReq.IndexQueryType.eq,
+                stream = true
+            };
+
+            options = options ?? new RiakIndexGetOptions();
+            options.Populate(message);
+
+            var result = UseDelayedConnection((conn, onFinish) => 
+                                              conn.PbcWriteStreamRead<RpbIndexReq, RpbIndexResp>(message, lbr => lbr.IsSuccess && !lbr.Value.done, onFinish));
+
+            if (result.IsSuccess)
+            {
+                var l = new List<RiakIndexResult>();
+
+                if (ReturnTerms(options))
+                {
+                    l.AddRange(
+                        result.Value.SelectMany(rv => rv.Value.results.Select(pair =>
+                                                                              new RiakIndexResult(pair.value.FromRiakString(),
+                                                                                                  pair.key.FromRiakString()))));
+                }
+                else
+                {
+                    l.AddRange(
+                        result.Value.SelectMany(rv => rv.Value.results.Select(pair => new RiakIndexResult(pair.key.FromRiakString()))));
+                }
+
+                var r = RiakResult<IList<RiakIndexResult>>.Success(l);
+
+                if (result.Done.HasValue)
+                    r.SetDone(result.Done.Value);
+
+                if (result.Value.Last().Value.continuation != null)
+                {
+                    var continuation = result.Value.Last().Value.continuation.FromRiakString();
+
+                    if (!string.IsNullOrEmpty(continuation))
+                        r.SetContinuation(continuation);
+                }
+
+                return r;
+            }
+
+            return RiakResult<IList<RiakIndexResult>>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
+        }
+
+        public RiakResult<IList<RiakIndexResult>> StreamIndexGet(string bucket, string indexName, BigInteger minValue, BigInteger maxValue,
+                                         RiakIndexGetOptions options = null)
+        {
+            return StreamIndexGetRange(bucket, indexName, minValue.ToString(), maxValue.ToString(), options);
+        }
+
+        public RiakResult<IList<RiakIndexResult>> StreamIndexGet(string bucket, string indexName, string minValue, string maxValue,
+                                         RiakIndexGetOptions options = null)
+        {
+            return StreamIndexGetRange(bucket, indexName, minValue, maxValue, options);
+        }
+
+        private RiakResult<IList<RiakIndexResult>> StreamIndexGetRange(string bucket, string indexName, string minValue, string maxValue,
+                                         RiakIndexGetOptions options = null)
+        {
+            var message = new RpbIndexReq
+                {
+                    bucket = bucket.ToRiakString(),
+                    index = indexName.ToRiakString(),
+                    qtype = RpbIndexReq.IndexQueryType.range,
+                    range_min = minValue.ToRiakString(),
+                    range_max = maxValue.ToRiakString(),
+                    stream = true
+                };
+
+            options = options ?? new RiakIndexGetOptions();
+            options.Populate(message);
+
+            var result = UseDelayedConnection((conn, onFinish) =>
+                                              conn.PbcWriteStreamRead<RpbIndexReq, RpbIndexResp>(message, lbr => lbr.IsSuccess && !lbr.Value.done, onFinish));
+
+            if (result.IsSuccess)
+            {
+                var l = new List<RiakIndexResult>();
+
+                if (ReturnTerms(options))
+                {
+                    l.AddRange(
+                        result.Value.SelectMany(rv => rv.Value.results.Select(pair => 
+                                                                              new RiakIndexResult(pair.value.FromRiakString(), 
+                                                                                                  pair.key.FromRiakString()))));
+                }
+                else
+                {
+                    l.AddRange(
+                        result.Value.SelectMany(rv => rv.Value.results.Select(pair => new RiakIndexResult(pair.key.FromRiakString()))));
+                }
+
+                var r = RiakResult<IList<RiakIndexResult>>.Success(l);
+
+                if (result.Done.HasValue)
+                    r.SetDone(result.Done.Value);
+
+                if (result.Value.Last().Value.continuation != null)
+                {
+                    var continuation = result.Value.Last().Value.continuation.FromRiakString();
+
+                    if (!string.IsNullOrEmpty(continuation))
+                        r.SetContinuation(continuation);
+                }
+
+                return r;
+            }
+
+            return RiakResult<IList<RiakIndexResult>>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
+        }
+
+        private static bool ReturnTerms(RiakIndexGetOptions options)
+        {
+            return options.ReturnTerms != null && options.ReturnTerms.Value;
+        }
+
         public RiakResult<IList<RiakIndexResult>> IndexGet(string bucket, string indexName, string minValue, string maxValue, RiakIndexGetOptions options = null)
         {
             return IndexGetRange(bucket, indexName.ToBinaryKey(), minValue, maxValue, options);
@@ -975,6 +1113,11 @@ namespace CorrugatedIron
 
         private RiakResult<IList<RiakIndexResult>> IndexGetRange(string bucket, string indexName, string minValue, string maxValue, RiakIndexGetOptions options = null)
         {
+            options = options ?? new RiakIndexGetOptions();
+
+            if (options.Stream.HasValue && options.Stream.Value)
+                return StreamIndexGetRange(bucket, indexName, minValue, maxValue, options);
+
             var message = new RpbIndexReq
             {
                 bucket = bucket.ToRiakString(),
@@ -983,8 +1126,7 @@ namespace CorrugatedIron
                 range_min = minValue.ToRiakString(),
                 range_max = maxValue.ToRiakString()
             };
-
-            options = options ?? new RiakIndexGetOptions();
+            
             options.Populate(message);
 
             var result = UseConnection(conn => conn.PbcWriteRead<RpbIndexReq, RpbIndexResp>(message));
@@ -992,7 +1134,7 @@ namespace CorrugatedIron
             if (result.IsSuccess)
             {
                 var l = new List<RiakIndexResult>();
-                if (options.ReturnTerms != null && options.ReturnTerms.Value)
+                if (ReturnTerms(options))
                 {
                     l.AddRange(
                         result.Value.results.Select(pair =>
@@ -1036,6 +1178,11 @@ namespace CorrugatedIron
 
         private RiakResult<IList<RiakIndexResult>> IndexGetEquals(string bucket, string indexName, string value, RiakIndexGetOptions options = null)
         {
+            options = options ?? new RiakIndexGetOptions();
+
+            if (options.Stream.HasValue && options.Stream.Value)
+                return StreamIndexGetEquals(bucket, indexName, value, options);
+
             var message = new RpbIndexReq
             {
                 bucket = bucket.ToRiakString(),
@@ -1044,14 +1191,13 @@ namespace CorrugatedIron
                 qtype = RpbIndexReq.IndexQueryType.eq
             };
 
-            options = options ?? new RiakIndexGetOptions();
             options.Populate(message);
 
             var result = UseConnection(conn => conn.PbcWriteRead<RpbIndexReq, RpbIndexResp>(message));
 
             if (result.IsSuccess)
             {
-                if (options.ReturnTerms != null && options.ReturnTerms.Value)
+                if (ReturnTerms(options))
                     return
                         RiakResult<IList<RiakIndexResult>>.Success(
                             result.Value.results.Select(
