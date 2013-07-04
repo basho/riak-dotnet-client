@@ -19,6 +19,7 @@ using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Models.MapReduce.Inputs;
 using CorrugatedIron.Tests.Extensions;
+using CorrugatedIron.Util;
 using NUnit.Framework;
 using System;
 using System.Linq;
@@ -309,6 +310,27 @@ namespace CorrugatedIron.Tests.Live
             results.Done.ShouldNotEqual(true);
             results.Done.ShouldEqual(null);
             results.Continuation.ShouldNotBeNull();
+        }
+
+        [Test]
+        public void StreamingIndexGetReturnsAllData()
+        {
+            var bucket = Bucket;
+
+            for (var i = 0; i < 1000; i++)
+            {
+                var o = new RiakObject(bucket, Guid.NewGuid().ToString(), "{ value: \"this is an object\" }");
+                o.IntIndex("position").Set(i % 2);
+
+                Client.Put(o, new RiakPutOptions().SetW(RiakConstants.QuorumOptions.All));
+            }
+
+            var results = Client.StreamIndexGet(bucket, "position", 0);
+
+            results.IsSuccess.ShouldBeTrue(results.ErrorMessage);
+            results.Value.Count.ShouldEqual(500);
+
+            
         }
     }
 }

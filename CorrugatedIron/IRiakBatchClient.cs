@@ -44,13 +44,11 @@ namespace CorrugatedIron
         RiakResult Delete(string bucket, string key, RiakDeleteOptions options = null);
         RiakResult Delete(RiakObjectId objectId, RiakDeleteOptions options = null);
         IEnumerable<RiakResult> Delete(IEnumerable<RiakObjectId> objectIds, RiakDeleteOptions options = null);
-
         IEnumerable<RiakResult> DeleteBucket(string bucket, uint rwVal = RiakConstants.Defaults.RVal);
 
         RiakResult<RiakSearchResult> Search(RiakSearchRequest search);
 
         RiakResult<RiakMapReduceResult> MapReduce(RiakMapReduceQuery query);
-
         RiakResult<RiakStreamedMapReduceResult> StreamMapReduce(RiakMapReduceQuery query);
 
         RiakResult<IEnumerable<string>> ListBuckets();
@@ -59,9 +57,7 @@ namespace CorrugatedIron
         RiakResult<IEnumerable<string>> StreamListKeys(string bucket);
 
         RiakResult<RiakBucketProperties> GetBucketProperties(string bucket);
-
         RiakResult SetBucketProperties(string bucket, RiakBucketProperties properties, bool useHttp = false);
-
         RiakResult ResetBucketProperties(string bucket, bool useHttp = false);
 
         RiakResult<IList<RiakObject>> WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks);
@@ -72,6 +68,11 @@ namespace CorrugatedIron
         RiakResult<IList<RiakIndexResult>> IndexGet(string bucket, string indexName, string value, RiakIndexGetOptions options = null);
         RiakResult<IList<RiakIndexResult>> IndexGet(string bucket, string indexName, BigInteger minValue, BigInteger maxValue, RiakIndexGetOptions options = null);
         RiakResult<IList<RiakIndexResult>> IndexGet(string bucket, string indexName, string minValue, string maxValue, RiakIndexGetOptions options = null);
+
+        RiakResult<IList<RiakIndexResult>> StreamIndexGet(string bucket, string indexName, BigInteger value, RiakIndexGetOptions options = null);
+        RiakResult<IList<RiakIndexResult>> StreamIndexGet(string bucket, string indexName, string value, RiakIndexGetOptions options = null);
+        RiakResult<IList<RiakIndexResult>> StreamIndexGet(string bucket, string indexName, BigInteger minValue, BigInteger maxValue, RiakIndexGetOptions options = null);
+        RiakResult<IList<RiakIndexResult>> StreamIndexGet(string bucket, string indexName, string minValue, string maxValue, RiakIndexGetOptions options = null);
 
         RiakResult<IList<string>> ListKeysFromIndex(string bucket);
 
