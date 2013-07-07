@@ -77,52 +77,52 @@ namespace CorrugatedIron
 
         Task Batch(Action<IRiakBatchClient> batchAction);
 
-        [Obsolete("All async operations should use the functions that return Task<T>.")]
+        [Obsolete("All async operations should use the functions that return Task<T>. This will be removed in CorrugatedIron 1.5.")]
         void Ping(Action<RiakResult> callback);
 
-        [Obsolete("All async operations should use the functions that return Task<T>.")]
+        [Obsolete("All async operations should use the functions that return Task<T>. This will be removed in CorrugatedIron 1.5.")]
         void Put(RiakObject value, Action<RiakResult<RiakObject>> callback, RiakPutOptions options = null);
 
-        [Obsolete("All async operations should use the functions that return Task<T>.")]
+        [Obsolete("All async operations should use the functions that return Task<T>. This will be removed in CorrugatedIron 1.5.")]
         void Put(IEnumerable<RiakObject> values, Action<IEnumerable<RiakResult<RiakObject>>> callback, RiakPutOptions options = null);
 
-        [Obsolete("All async operations should use the functions that return Task<T>.")]
+        [Obsolete("All async operations should use the functions that return Task<T>. This will be removed in CorrugatedIron 1.5.")]
         void Delete(string bucket, string key, Action<RiakResult> callback, RiakDeleteOptions options = null);
 
-        [Obsolete("All async operations should use the functions that return Task<T>.")]
+        [Obsolete("All async operations should use the functions that return Task<T>. This will be removed in CorrugatedIron 1.5.")]
         void Delete(RiakObjectId objectId, Action<RiakResult> callback, RiakDeleteOptions options = null);
 
-        [Obsolete("All async operations should use the functions that return Task<T>.")]
+        [Obsolete("All async operations should use the functions that return Task<T>. This will be removed in CorrugatedIron 1.5.")]
         void Delete(IEnumerable<RiakObjectId> objectIds, Action<IEnumerable<RiakResult>> callback, RiakDeleteOptions options = null);
 
-        [Obsolete("All async operations should use the functions that return Task<T>.")]
+        [Obsolete("All async operations should use the functions that return Task<T>. This will be removed in CorrugatedIron 1.5.")]
         void DeleteBucket(string bucket, Action<IEnumerable<RiakResult>> callback, uint rwVal = RiakConstants.Defaults.RVal);
 
-        [Obsolete("All async operations should use the functions that return Task<T>.")]
+        [Obsolete("All async operations should use the functions that return Task<T>. This will be removed in CorrugatedIron 1.5.")]
         void MapReduce(RiakMapReduceQuery query, Action<RiakResult<RiakMapReduceResult>> callback);
 
-        [Obsolete("All async operations should use the functions that return Task<T>.")]
+        [Obsolete("All async operations should use the functions that return Task<T>. This will be removed in CorrugatedIron 1.5.")]
         void StreamMapReduce(RiakMapReduceQuery query, Action<RiakResult<RiakStreamedMapReduceResult>> callback);
 
-        [Obsolete("All async operations should use the functions that return Task<T>.")]
+        [Obsolete("All async operations should use the functions that return Task<T>. This will be removed in CorrugatedIron 1.5.")]
         void ListBuckets(Action<RiakResult<IEnumerable<string>>> callback);
 
-        [Obsolete("All async operations should use the functions that return Task<T>.")]
+        [Obsolete("All async operations should use the functions that return Task<T>. This will be removed in CorrugatedIron 1.5.")]
         void ListKeys(string bucket, Action<RiakResult<IEnumerable<string>>> callback);
 
-        [Obsolete("All async operations should use the functions that return Task<T>.")]
+        [Obsolete("All async operations should use the functions that return Task<T>. This will be removed in CorrugatedIron 1.5.")]
         void StreamListKeys(string bucket, Action<RiakResult<IEnumerable<string>>> callback);
 
-        [Obsolete("All async operations should use the functions that return Task<T>.")]
+        [Obsolete("All async operations should use the functions that return Task<T>. This will be removed in CorrugatedIron 1.5.")]
         void GetBucketProperties(string bucket, Action<RiakResult<RiakBucketProperties>> callback);
 
-        [Obsolete("All async operations should use the functions that return Task<T>.")]
+        [Obsolete("All async operations should use the functions that return Task<T>. This will be removed in CorrugatedIron 1.5.")]
         void SetBucketProperties(string bucket, RiakBucketProperties properties, Action<RiakResult> callback);
 
-        [Obsolete("All async operations should use the functions that return Task<T>.")]
+        [Obsolete("All async operations should use the functions that return Task<T>. This will be removed in CorrugatedIron 1.5.")]
         void WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks, Action<RiakResult<IList<RiakObject>>> callback);
 
-        [Obsolete("All async operations should use the functions that return Task<T>.")]
+        [Obsolete("All async operations should use the functions that return Task<T>. This will be removed in CorrugatedIron 1.5.")]
         void GetServerInfo(Action<RiakResult<RiakServerInfo>> callback);
     }
 
