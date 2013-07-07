@@ -61,7 +61,7 @@ namespace CorrugatedIron
             Async = new RiakAsyncClient(this);
         }
 
-        [Obsolete("This method should no longer be used, use RiakClient(IRiakEndPoint) instead")]
+        [Obsolete("This method should no longer be used, use RiakClient(IRiakEndPoint) instead. This will be removed in CorrugatedIron 1.5")]
         internal RiakClient(IRiakEndPoint endPoint, string seed = null) : this(endPoint) { }
 
         private RiakClient(IRiakConnection batchConnection)
@@ -70,7 +70,7 @@ namespace CorrugatedIron
             Async = new RiakAsyncClient(this);
         }
 
-        [Obsolete("This method should no longer be used, use RiakClient(IRiakConnection) instead")]
+        [Obsolete("This method should no longer be used, use RiakClient(IRiakConnection) instead. This will be removed in CorrugatedIron 1.5")]
         private RiakClient(IRiakConnection batchConnection, byte[] clientId) : this(batchConnection) { }
 
         /// <summary>
@@ -333,7 +333,7 @@ namespace CorrugatedIron
         /// get requests and returns results as an IEnumerable{RiakResult{RiakObject}}. Callers should be aware that
         /// this may result in partial success - all results should be evaluated individually in the calling application.
         /// In addition, applications should plan for multiple failures or multiple cases of siblings being present.</remarks>
-        [Obsolete("Use Get(IEnumerable<RiakObjectId>, RiakGetOptions) instead.")]
+        [Obsolete("Use Get(IEnumerable<RiakObjectId>, RiakGetOptions) instead. This will be removed in CorrugatedIron 1.5")]
         public IEnumerable<RiakResult<RiakObject>> Get(IEnumerable<RiakObjectId> bucketKeyPairs, uint rVal = RiakConstants.Defaults.RVal)
         {
             var options = new RiakGetOptions().SetR(rVal);
@@ -669,6 +669,16 @@ namespace CorrugatedIron
             return RiakResult<IEnumerable<string>>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
 
+        /// <summary>
+        /// Lists all buckets available on the Riak cluster. This uses an <see cref="System.Collections.Generic.IEnumerable&lt;T&gt;"/> 
+        /// of <see cref="string"/> to lazy initialize the collection of bucket names. 
+        /// </summary>
+        /// <returns>
+        /// An <see cref="System.Collections.Generic.IEnumerable&lt;T&gt;"/> of <see cref="string"/> bucket names.
+        /// </returns>
+        /// <remarks>Buckets provide a logical namespace for keys. Listing buckets requires folding over all keys in a cluster and 
+        /// reading a list of buckets from disk. This operation, while non-blocking in Riak 1.0 and newer, still produces considerable
+        /// physical I/O and can take a long time. Callers should fully enumerate the collection or else close the connection when finished.</remarks>
         public RiakResult<IEnumerable<string>> StreamListBuckets()
         {
             var lbReq = new RpbListBucketsReq { stream = true };
@@ -868,27 +878,6 @@ namespace CorrugatedIron
                 }
             }
             return result;
-        }
-        
-        /// <summary>
-        /// Get the results of an index query prepared for use in a <see cref="CorrugatedIron.Models.MapReduce.RiakMapReduceQuery"/>
-        /// </summary>
-        /// <returns>
-        /// A <see cref="RiakBucketKeyInput"/> of the index query results
-        /// </returns>
-        /// <param name='indexQuery'>
-        /// Index query.
-        /// </param>
-        [Obsolete("This has been replaced by the IndexGet methods as of v1.1.1. This method will be removed by v1.3")]
-        public RiakBucketKeyInput GetIndex(RiakIndexInput indexQuery)
-        {
-            var query = new RiakMapReduceQuery()
-                .Inputs(indexQuery).ReduceErlang(r => r.ModFun("riak_kv_mapreduce", "reduce_identity").Keep(true));
-            var result = MapReduce(query);
-            
-            var keys = result.Value.PhaseResults.OrderBy(pr => pr.Phase).ElementAt(0).GetObjects<RiakObjectId>();
-            
-            return RiakBucketKeyInput.FromRiakObjectIds(keys);
         }
 
         /// <summary>
