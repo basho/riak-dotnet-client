@@ -87,6 +87,15 @@ namespace CorrugatedIron
             return UseConnection(conn => conn.PbcWriteRead(MessageCode.PingReq, MessageCode.PingResp));
         }
 
+        /// <summary>
+        /// Increments a Riak counter. 
+        /// </summary>
+        /// <param name="bucket">The bucket</param>
+        /// <param name="counter">The name of the counter</param>
+        /// <param name="amount">The amount to increment/decrement the counter</param>
+        /// <param name="options">The <see cref="RiakCounterUpdateOptions"/></param>
+        /// <returns><see cref="RiakCounterResult"/></returns>
+        /// <remarks>Only available in Riak 1.4+. If the counter is not initialized, then the counter will be initialized to 0 and then incremented.</remarks>
         public RiakCounterResult IncrementCounter(string bucket, string counter, long amount, RiakCounterUpdateOptions options = null)
         {
             if (!IsValidBucketOrKey(bucket))
@@ -120,6 +129,14 @@ namespace CorrugatedIron
             return new RiakCounterResult(RiakResult<RiakObject>.Success(o), parseResult ? (long?)cVal : null);
         }
 
+        /// <summary>
+        /// Returns the value of a counter
+        /// </summary>
+        /// <param name="bucket">The bucket</param>
+        /// <param name="counter">The counter</param>
+        /// <param name="options"><see cref="RiakCounterGetOptions"/> describing how to read the counter.</param>
+        /// <returns><see cref="RiakCounterResult"/></returns>
+        /// <remarks>Only available in Riak 1.4+.</remarks>
         public RiakCounterResult GetCounter(string bucket, string counter, RiakCounterGetOptions options = null)
         {
             if (!IsValidBucketOrKey(bucket))
@@ -609,6 +626,11 @@ namespace CorrugatedIron
             return RiakResult<IEnumerable<RiakResult>>.Success(responses);
         }
 
+        /// <summary>
+        /// Execute a map reduce query.
+        /// </summary>
+        /// <param name="query">A <see cref="RiakMapReduceQuery"/></param>
+        /// <returns>A <see cref="RiakResult"/> of <see cref="RiakMapReduceResult"/></returns>
         public RiakResult<RiakMapReduceResult> MapReduce(RiakMapReduceQuery query)
         {
             var request = query.ToMessage();
@@ -622,6 +644,11 @@ namespace CorrugatedIron
             return RiakResult<RiakMapReduceResult>.Error(response.ResultCode, response.ErrorMessage, response.NodeOffline);
         }
 
+        /// <summary>
+        /// Perform a Riak Search query
+        /// </summary>
+        /// <param name="search">The <see cref="RiakSearchRequest"/></param>
+        /// <returns>A <see cref="RiakResult"/> of <see cref="RiakSearchResult"/></returns>
         public RiakResult<RiakSearchResult> Search(RiakSearchRequest search)
         {
             var request = search.ToMessage();
@@ -635,6 +662,12 @@ namespace CorrugatedIron
             return RiakResult<RiakSearchResult>.Error(response.ResultCode, response.ErrorMessage, response.NodeOffline);
         }
 
+        /// <summary>
+        /// Perform a map reduce query and stream the results.
+        /// </summary>
+        /// <param name="query">The query</param>
+        /// <returns>A <see cref="RiakResult"/> of <see cref="RiakStreamedMapReduceResult"/></returns>
+        /// <remarks>Make sure to fully enumerate the <see cref="RiakStreamedMapReduceResult"/> or connections may be left open.</remarks>
         public RiakResult<RiakStreamedMapReduceResult> StreamMapReduce(RiakMapReduceQuery query)
         {
             var request = query.ToMessage();
@@ -727,6 +760,14 @@ namespace CorrugatedIron
             return RiakResult<IEnumerable<string>>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
 
+        /// <summary>
+        /// Performs a streaming list keys operation.
+        /// </summary>
+        /// <param name="bucket">The bucket</param>
+        /// <returns>An <see cref="System.Collections.Generic.IEnumerable{T}"/></returns>
+        /// <remarks>While this streams results back to the client, alleviating pressure on Riak, this still relies on
+        /// folding over all keys present in the Riak cluster. Use at your own risk. A better approach would be to
+        /// use <see cref="ListKeysFromIndex"/></remarks>
         public RiakResult<IEnumerable<string>> StreamListKeys(string bucket)
         {
             System.Diagnostics.Debug.Write(ListKeysWarning);
@@ -954,11 +995,31 @@ namespace CorrugatedIron
             return RiakResult<RiakServerInfo>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
 
+        /// <summary>
+        /// Retrieve index results using the streaming interface.
+        /// </summary>
+        /// <param name="bucket">The bucket</param>
+        /// <param name="indexName">The index</param>
+        /// <param name="value">The indexed value to search for</param>
+        /// <param name="options">The <see cref="RiakIndexGetOptions"/></param>
+        /// <returns>A <see cref="RiakResult{T}"/> of <see cref="RiakStreamedIndexResult"/> containing an <see cref="IEnumerable{T}"/>
+        /// of <see cref="RiakIndexKeyTerm"/></returns>
+        /// <remarks>Make sure to fully enumerate the <see cref="IEnumerable{T}"/> of <see cref="RiakIndexKeyTerm"/>.</remarks>
         public RiakResult<RiakStreamedIndexResult> StreamIndexGet(string bucket, string indexName, BigInteger value, RiakIndexGetOptions options = null)
         {
             return StreamIndexGetEquals(bucket, indexName.ToIntegerKey(), value.ToString(), options);
         }
 
+        /// <summary>
+        /// Retrieve index results using the streaming interface.
+        /// </summary>
+        /// <param name="bucket">The bucket</param>
+        /// <param name="indexName">The index</param>
+        /// <param name="value">The indexed value to search for</param>
+        /// <param name="options">The <see cref="RiakIndexGetOptions"/></param>
+        /// <returns>A <see cref="RiakResult{T}"/> of <see cref="RiakStreamedIndexResult"/> containing an <see cref="IEnumerable{T}"/>
+        /// of <see cref="RiakIndexKeyTerm"/></returns>
+        /// <remarks>Make sure to fully enumerate the <see cref="IEnumerable{T}"/> of <see cref="RiakIndexKeyTerm"/>.</remarks>
         public RiakResult<RiakStreamedIndexResult> StreamIndexGet(string bucket, string indexName, string value, RiakIndexGetOptions options = null)
         {
             return StreamIndexGetEquals(bucket, indexName.ToBinaryKey(), value, options);
@@ -992,11 +1053,33 @@ namespace CorrugatedIron
             return RiakResult<RiakStreamedIndexResult>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
 
+        /// <summary>
+        /// Retrieve index results using the streaming interface.
+        /// </summary>
+        /// <param name="bucket">The bucket</param>
+        /// <param name="indexName">The index</param>
+        /// <param name="minValue">The start of the indexed range to search for</param>
+        /// <param name="maxValue">The end of the indexed range to search for</param>
+        /// <param name="options">The <see cref="RiakIndexGetOptions"/></param>
+        /// <returns>A <see cref="RiakResult{T}"/> of <see cref="RiakStreamedIndexResult"/> containing an <see cref="IEnumerable{T}"/>
+        /// of <see cref="RiakIndexKeyTerm"/></returns>
+        /// <remarks>Make sure to fully enumerate the <see cref="IEnumerable{T}"/> of <see cref="RiakIndexKeyTerm"/>.</remarks>
         public RiakResult<RiakStreamedIndexResult> StreamIndexGet(string bucket, string indexName, BigInteger minValue, BigInteger maxValue, RiakIndexGetOptions options = null)
         {
             return StreamIndexGetRange(bucket, indexName.ToIntegerKey(), minValue.ToString(), maxValue.ToString(), options);
         }
 
+        /// <summary>
+        /// Retrieve index results using the streaming interface.
+        /// </summary>
+        /// <param name="bucket">The bucket</param>
+        /// <param name="indexName">The index</param>
+        /// <param name="minValue">The start of the indexed range to search for</param>
+        /// <param name="maxValue">The end of the indexed range to search for</param>
+        /// <param name="options">The <see cref="RiakIndexGetOptions"/></param>
+        /// <returns>A <see cref="RiakResult{T}"/> of <see cref="RiakStreamedIndexResult"/> containing an <see cref="IEnumerable{T}"/>
+        /// of <see cref="RiakIndexKeyTerm"/></returns>
+        /// <remarks>Make sure to fully enumerate the <see cref="IEnumerable{T}"/> of <see cref="RiakIndexKeyTerm"/>.</remarks>
         public RiakResult<RiakStreamedIndexResult> StreamIndexGet(string bucket, string indexName, string minValue, string maxValue, RiakIndexGetOptions options = null)
         {
             return StreamIndexGetRange(bucket, indexName.ToBinaryKey(), minValue, maxValue, options);
@@ -1036,11 +1119,29 @@ namespace CorrugatedIron
             return options.ReturnTerms != null && options.ReturnTerms.Value;
         }
 
+        /// <summary>
+        /// Retrieve a range of indexed values.
+        /// </summary>
+        /// <param name="bucket">The bucket</param>
+        /// <param name="indexName">The index</param>
+        /// <param name="minValue">The start of the indexed range to search for</param>
+        /// <param name="maxValue">The end of the indexed range to search for</param>
+        /// <param name="options">The <see cref="RiakIndexGetOptions"/></param>
+        /// <returns>A <see cref="RiakResult{T}"/> of <see cref="RiakIndexResult"/></returns>
         public RiakResult<RiakIndexResult> IndexGet(string bucket, string indexName, string minValue, string maxValue, RiakIndexGetOptions options = null)
         {
             return IndexGetRange(bucket, indexName.ToBinaryKey(), minValue, maxValue, options);
         }
 
+        /// <summary>
+        /// Retrieve a range of indexed values.
+        /// </summary>
+        /// <param name="bucket">The bucket</param>
+        /// <param name="indexName">The index</param>
+        /// <param name="minValue">The start of the indexed range to search for</param>
+        /// <param name="maxValue">The end of the indexed range to search for</param>
+        /// <param name="options">The <see cref="RiakIndexGetOptions"/></param>
+        /// <returns>A <see cref="RiakResult{T}"/> of <see cref="RiakIndexResult"/></returns>
         public RiakResult<RiakIndexResult> IndexGet(string bucket, string indexName, BigInteger minValue, BigInteger maxValue, RiakIndexGetOptions options = null)
         {
             return IndexGetRange(bucket, indexName.ToIntegerKey(), minValue.ToString(), maxValue.ToString(), options);
@@ -1083,11 +1184,27 @@ namespace CorrugatedIron
             return RiakResult<RiakIndexResult>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
 
+        /// <summary>
+        /// Retrieve a indexed values
+        /// </summary>
+        /// <param name="bucket">The bucket</param>
+        /// <param name="indexName">The index</param>
+        /// <param name="value">The indexed value to search for</param>
+        /// <param name="options">The <see cref="RiakIndexGetOptions"/></param>
+        /// <returns>A <see cref="RiakResult{T}"/> of <see cref="RiakIndexResult"/></returns>
         public RiakResult<RiakIndexResult> IndexGet(string bucket, string indexName, string value, RiakIndexGetOptions options = null)
         {
             return IndexGetEquals(bucket, indexName.ToBinaryKey(), value, options);
         }
 
+        /// <summary>
+        /// Retrieve a indexed values
+        /// </summary>
+        /// <param name="bucket">The bucket</param>
+        /// <param name="indexName">The index</param>
+        /// <param name="value">The indexed value to search for</param>
+        /// <param name="options">The <see cref="RiakIndexGetOptions"/></param>
+        /// <returns>A <see cref="RiakResult{T}"/> of <see cref="RiakIndexResult"/></returns>
         public RiakResult<RiakIndexResult> IndexGet(string bucket, string indexName, BigInteger value, RiakIndexGetOptions options = null)
         {
             return IndexGetEquals(bucket, indexName.ToIntegerKey(), value.ToString(), options);
