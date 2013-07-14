@@ -70,6 +70,30 @@ namespace CorrugatedIron.Models
             return this;
         }
 
+        public RiakPutOptions SetIfNotModified(bool value)
+        {
+            IfNotModified = value;
+            return this;
+        }
+
+        public RiakPutOptions SetIfNoneMatch(bool value)
+        {
+            IfNoneMatch = value;
+            return this;
+        }
+
+        public RiakPutOptions SetReturnBody(bool value)
+        {
+            ReturnBody = value;
+            return this;
+        }
+
+        public RiakPutOptions SetReturnHead(bool value)
+        {
+            ReturnHead = value;
+            return this;
+        }
+
         public RiakPutOptions()
         {
             ReturnBody = true;
