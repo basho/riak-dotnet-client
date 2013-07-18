@@ -32,26 +32,7 @@ namespace CorrugatedIron.Models
 {
     public class RiakBucketProperties
     {
-        // At the moment, only the NVal and AllowMult can be set via the PBC
-        // so if the request has any other value set, we can't use that interface.
-        // We check those values and if they're missing we go with PBC as it's
-        // substantially quicker.
-        public bool CanUsePbc
-        {
-            get
-            {
-                return !LastWriteWins.HasValue
-                && RVal == null
-                && RwVal == null
-                && DwVal == null
-                && WVal == null
-                && PrVal == null
-                && PwVal == null
-                && PreCommitHooks == null
-                && PostCommitHooks == null
-                && string.IsNullOrEmpty(Backend);
-            }
-        }
+        private bool? _addHooks;
 
         public bool? LastWriteWins { get; private set; }
         public uint? NVal { get; private set; }
@@ -61,6 +42,11 @@ namespace CorrugatedIron.Models
         public List<IRiakPostCommitHook> PostCommitHooks { get; private set; }
         public bool? NotFoundOk { get; private set; }
         public bool? BasicQuorum { get; private set; }
+        
+        public bool? HasPrecommit { get; private set; }
+        public bool? HasPostcommit { get; private set; }
+
+        public bool? Search { get; private set; }
 
         /// <summary>
         /// The number of replicas that must return before a read is considered a succes.
@@ -68,45 +54,45 @@ namespace CorrugatedIron.Models
         /// <value>
         /// The R value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.
         /// </value>
-        public Either<uint, string> RVal { get; private set; }
+        public uint? RVal { get; private set; }
 
         /// <summary>
         /// The number of replicas that must return before a delete is considered a success.
         /// </summary>
         /// <value>The RW Value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.</value>
-        public Either<uint, string> RwVal { get; private set; }
+        public uint? RwVal { get; private set; }
 
         /// <summary>
         /// The number of replicas that must commit to durable storage and respond before a write is considered a success. 
         /// </summary>
         /// <value>The DW value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.</value>
-        public Either<uint, string> DwVal { get; private set; }
+        public uint? DwVal { get; private set; }
 
         /// <summary>
         /// The number of replicas that must respond before a write is considered a success.
         /// </summary>
         /// <value>The W value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.</value>
-        public Either<uint, string> WVal { get; private set; }
+        public uint? WVal { get; private set; }
 
         /// <summary>
         /// The number of primary replicas that must respond before a read is considered a success.
         /// </summary>
         /// <value>The PR value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.</value>
-        public Either<uint, string> PrVal { get; private set; }
+        public uint? PrVal { get; private set; }
 
         /// <summary>
         /// The number of primary replicas that must respond before a write is considered a success.
         /// </summary>
         /// <value>The PW value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.</value>
-        public Either<uint, string> PwVal { get; private set; }
+        public uint? PwVal { get; private set; }
 
         /// <summary>
         /// An indicator of whether search indexing is enabled on the bucket.
         /// </summary>
         public bool SearchEnabled
         {
-            get { return PreCommitHooks != null && PreCommitHooks.FirstOrDefault(x => Equals(x, RiakErlangCommitHook.RiakSearchCommitHook)) != null; }
-            set { SetSearch(value); }
+            get { return (Search.HasValue && Search.Value) || 
+                         (PreCommitHooks != null && PreCommitHooks.FirstOrDefault(x => Equals(x, RiakErlangCommitHook.RiakSearchCommitHook)) != null); }
         }
 
         public RiakBucketProperties SetBasicQuorum(bool value)
@@ -130,6 +116,34 @@ namespace CorrugatedIron.Models
         public RiakBucketProperties SetLastWriteWins(bool value)
         {
             LastWriteWins = value;
+            return this;
+        }
+
+        /// <summary>
+        /// Enable or disable search on a bucket.
+        /// </summary>
+        /// <param name="value">Set to <i>true</i> to enable search on this bucket, or <i>false</i>
+        /// to disable it.</param>
+        /// <returns>A reference to the current properties object.</returns>
+        public RiakBucketProperties SetSearch(bool enable, bool addHooks = false)
+        {
+            if (addHooks) 
+            {
+                _addHooks = enable;
+
+                if (enable)
+                {
+                    AddPreCommitHook(RiakErlangCommitHook.RiakSearchCommitHook);
+                }
+                else
+                {
+                    RemovePreCommitHook(RiakErlangCommitHook.RiakSearchCommitHook);
+                }                  
+            } 
+            else 
+            {
+                Search = enable;
+            }
             return this;
         }
 
@@ -205,37 +219,16 @@ namespace CorrugatedIron.Models
             return this;
         }
 
-        /// <summary>
-        /// Enable or disable search on a bucket.
-        /// </summary>
-        /// <param name="enable">Set to <i>true</i> to enable search on this bucket, or <i>false</i>
-        /// to disable it.</param>
-        /// <returns>A reference to the current properties object.</returns>
-        /// <remarks>Enabling search on a bucket in Riak requires the adding of a pre-commit hook.
-        /// This helper function abstracts this problem from the user so that they don't have to do it
-        /// themselves. When adding or removing any form of pre or post commit hook in Riak via any
-        /// client, it is a very good idea to first get the bucket properties from Riak, make changes,
-        /// then set the properties back. This prevents accidental removal of other pre or post commit
-        /// hooks that might have been added beforehand.</remarks>
-        public RiakBucketProperties SetSearch(bool enable)
-        {
-            if (enable)
-            {
-                AddPreCommitHook(RiakErlangCommitHook.RiakSearchCommitHook);
-            }
-            else
-            {
-                RemovePreCommitHook(RiakErlangCommitHook.RiakSearchCommitHook);
-            }
-
-            return this;
-        }
-
         public RiakBucketProperties RemovePreCommitHook(IRiakPreCommitHook commitHook)
         {
             if (PreCommitHooks != null)
             {
                 PreCommitHooks.RemoveAll(x => Equals(x, commitHook));
+
+                if (PreCommitHooks.Count == 0)
+                {
+                    HasPrecommit = false;
+                }
             }
 
             return this;
@@ -246,24 +239,39 @@ namespace CorrugatedIron.Models
             if (PostCommitHooks != null)
             {
                 PostCommitHooks.RemoveAll(x => Equals(x, commitHook));
+
+                if (PostCommitHooks.Count == 0)
+                {
+                    HasPostcommit = false;
+                }
             }
 
             return this;
         }
 
-        public RiakBucketProperties AddPreCommitHook(IRiakPreCommitHook commitHook)
+        public RiakBucketProperties AddPreCommitHook(IRiakPreCommitHook commitHook, bool commitFlags = true)
         {
             var hooks = PreCommitHooks ?? (PreCommitHooks = new List<IRiakPreCommitHook>());
+
+            if (commitHook != null && (commitHook as RiakErlangCommitHook) == RiakErlangCommitHook.RiakSearchCommitHook)
+            {
+                return SetSearch(true);
+            }
 
             if (!hooks.Any(x => Equals(x, commitHook)))
             {
                 hooks.Add(commitHook);
             }
 
+            if (commitFlags)
+            {
+                HasPrecommit = true;
+            }
+
             return this;
         }
 
-        public RiakBucketProperties AddPostCommitHook(IRiakPostCommitHook commitHook)
+        public RiakBucketProperties AddPostCommitHook(IRiakPostCommitHook commitHook, bool commitFlags = true)
         {
             var hooks = PostCommitHooks ?? (PostCommitHooks = new List<IRiakPostCommitHook>());
             
@@ -272,18 +280,41 @@ namespace CorrugatedIron.Models
                 hooks.Add(commitHook);
             }
 
+            if (commitFlags)
+            {
+                HasPostcommit = true;
+            }
+
             return this;
         }
 
-        public RiakBucketProperties ClearPreCommitHooks()
+        public RiakBucketProperties ClearPreCommitHooks(bool commitFlags = true)
         {
             (PreCommitHooks ?? (PreCommitHooks = new List<IRiakPreCommitHook>())).Clear();
+
             return this;
         }
 
-        public RiakBucketProperties ClearPostCommitHooks()
+        public RiakBucketProperties ClearPostCommitHooks(bool commitFlags = true)
         {
             (PostCommitHooks ?? (PostCommitHooks = new List<IRiakPostCommitHook>())).Clear();
+
+            return this;
+        }
+
+        private RiakBucketProperties WriteQuorum(string value, Action<uint> setter)
+        {
+            System.Diagnostics.Debug.Assert(new HashSet<string> { "all", "quorum", "one", "default" }.Contains(value), "Incorrect quorum value");
+
+            setter(RiakConstants.QuorumOptionsLookup[value]);
+            return this;
+        }
+
+        private RiakBucketProperties WriteQuorum(uint value, Action<uint> setter)
+        {
+            System.Diagnostics.Debug.Assert(value >= 1);
+
+            setter(value);
             return this;
         }
 
@@ -340,6 +371,55 @@ namespace CorrugatedIron.Models
             }
         }
 
+        internal RiakBucketProperties(RpbBucketProps bucketProps)
+            : this()
+        {
+            NVal = bucketProps.n_val;
+            AllowMultiple = bucketProps.allow_mult;
+            LastWriteWins = bucketProps.last_write_wins;
+            Backend = bucketProps.backend.FromRiakString();
+            NotFoundOk = bucketProps.notfound_ok;
+            BasicQuorum = bucketProps.basic_quorum;
+
+            HasPrecommit = bucketProps.has_precommit;
+            HasPostcommit = bucketProps.has_postcommit;
+
+            RVal = bucketProps.r;
+            RwVal = bucketProps.rw;
+            DwVal = bucketProps.dw;
+            WVal = bucketProps.w;
+            PrVal = bucketProps.pr;
+            PwVal = bucketProps.pw;
+
+            Search = bucketProps.search;
+
+            HasPrecommit = bucketProps.has_precommit;
+            HasPostcommit = bucketProps.has_postcommit;
+
+            var preCommitHooks = bucketProps.precommit;
+            if (preCommitHooks.Count > 0)
+            {
+                PreCommitHooks = preCommitHooks.Select(LoadPreCommitHook).ToList();
+            }
+
+            var postCommitHooks = bucketProps.postcommit;
+            if (postCommitHooks.Count > 0)
+            {
+                PostCommitHooks = postCommitHooks.Select(LoadPostCommitHook).ToList();
+            }
+        }
+
+        private static IRiakPreCommitHook LoadPreCommitHook(RpbCommitHook hook)
+        {
+            if (hook.modfun == null)
+            {
+                return new RiakJavascriptCommitHook(hook.name.FromRiakString());
+            }
+
+            return new RiakErlangCommitHook(hook.modfun.module.FromRiakString(),
+                                            hook.modfun.function.FromRiakString());
+        }
+
         private static IRiakPreCommitHook LoadPreCommitHook(JObject hook)
         {
             JToken token;
@@ -359,38 +439,123 @@ namespace CorrugatedIron.Models
             return new RiakErlangCommitHook(hook.Value<string>("mod"), hook.Value<string>("fun"));
         }
 
-        private static void ReadQuorum(JObject props, string key, Action<Either<uint, string>> setter)
+        private static IRiakPostCommitHook LoadPostCommitHook(RpbCommitHook hook)
+        {
+            return new RiakErlangCommitHook(hook.modfun.module.FromRiakString(),
+                                            hook.modfun.function.FromRiakString());
+        }
+
+        private static void ReadQuorum(JObject props, string key, Action<uint> setter)
         {
             if (props[key] == null) return;
 
-            if(props[key].Type == JTokenType.String)
-            {
-                setter(new Either<uint, string>(props.Value<string>(key)));
-            }
-            else
-            {
-                setter(new Either<uint, string>(props.Value<uint>(key)));
-            }
+
+            setter(props[key].Type == JTokenType.String
+                       ? RiakConstants.QuorumOptionsLookup[props.Value<string>(key)]
+                       : props.Value<uint>(key));
         }
 
-        internal RiakBucketProperties(RpbBucketProps bucketProps)
-        : this()
-        {
-            AllowMultiple = bucketProps.allow_mult;
-            NVal = bucketProps.n_val;
-        }
-
+        
+        
         internal RpbBucketProps ToMessage()
         {
             var message = new RpbBucketProps();
+            
             if(AllowMultiple.HasValue)
             {
                 message.allow_mult = AllowMultiple.Value;
             }
+            
             if(NVal.HasValue)
             {
                 message.n_val = NVal.Value;
             }
+
+            if (LastWriteWins.HasValue)
+            {
+                message.last_write_wins = LastWriteWins.Value;
+            }
+
+            if (RVal.HasValue)
+            {
+                message.r = RVal.Value;
+            }
+
+            if (RwVal.HasValue)
+            {
+                message.rw = RwVal.Value;
+            }
+
+            if (DwVal.HasValue)
+            {
+                message.dw = DwVal.Value;
+            }
+
+            if (WVal.HasValue)
+            {
+                message.w = WVal.Value;
+            }
+
+            if (PrVal.HasValue)
+            {
+                message.pr = PrVal.Value;
+            }
+
+            if (PwVal.HasValue)
+            {
+                message.pw = PwVal.Value;
+            }
+
+            if (Search.HasValue)
+            {
+                message.search = Search.Value;
+            }
+
+            if (HasPrecommit.HasValue)
+            {
+                message.has_precommit = HasPrecommit.Value;
+            }
+
+            // Due to the amusing differences between 1.3 and 1.4 we've added
+            // this elegant shim to figure out if we should add commit hooks,
+            // remove them, or just wander around setting the Search boolean.
+            if (_addHooks.HasValue)
+            {
+                if (_addHooks.Value)
+                {
+                    AddPreCommitHook(RiakErlangCommitHook.RiakSearchCommitHook);
+                }
+                else
+                {
+                    RemovePreCommitHook(RiakErlangCommitHook.RiakSearchCommitHook);
+                }
+            }
+
+            if (PreCommitHooks != null)
+            {
+                PreCommitHooks.ForEach(h =>
+                    {
+                        var hook = h.ToRpbCommitHook();
+                        if (!message.precommit.Any(x => Equals(x, hook)))
+                            message.precommit.Add(hook);
+                    });
+            }
+
+            if (HasPostcommit.HasValue)
+            {
+                message.has_postcommit = HasPostcommit.Value;
+            }
+
+            if (PostCommitHooks != null)
+            {
+                PostCommitHooks.ForEach(h =>
+                    {
+                        var hook = h.ToRpbCommitHook();
+                        if (!message.postcommit.Any(x => Equals(x, hook)))
+                            message.postcommit.Add(hook);
+                    });
+            }
+
             return message;
         }
 
@@ -405,17 +570,19 @@ namespace CorrugatedIron.Models
                 jw.WritePropertyName("props");
                 jw.WriteStartObject();
                 jw.WriteNullableProperty("n_val", NVal)
-                .WriteNullableProperty("allow_mult", AllowMultiple)
-                .WriteNullableProperty("last_write_wins", LastWriteWins)
-                .WriteEither("r", RVal)
-                .WriteEither("rw", RwVal)
-                .WriteEither("dw", DwVal)
-                .WriteEither("w", WVal)
-                .WriteEither("pr", PrVal)
-                .WriteEither("pw", PwVal)
-                .WriteNonNullProperty("backend", Backend)
-                .WriteNullableProperty("notfound_ok", NotFoundOk)
-                .WriteNullableProperty("basic_quorum", BasicQuorum);
+                  .WriteNullableProperty("allow_mult", AllowMultiple)
+                  .WriteNullableProperty("last_write_wins", LastWriteWins)
+                  .WriteNullableProperty("r", RVal)
+                  .WriteNullableProperty("rw", RwVal)
+                  .WriteNullableProperty("dw", DwVal)
+                  .WriteNullableProperty("w", WVal)
+                  .WriteNullableProperty("pr", PrVal)
+                  .WriteNullableProperty("pw", PwVal)
+                  .WriteNonNullProperty("backend", Backend)
+                  .WriteNullableProperty("notfound_ok", NotFoundOk)
+                  .WriteNullableProperty("basic_quorum", BasicQuorum)
+                  .WriteNullableProperty("has_precommit", HasPrecommit)
+                  .WriteNullableProperty("has_postcommit", HasPostcommit);
 
                 if(PreCommitHooks != null)
                 {

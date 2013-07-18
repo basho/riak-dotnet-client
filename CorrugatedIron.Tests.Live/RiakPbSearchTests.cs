@@ -38,7 +38,7 @@ namespace CorrugatedIron.Tests.Live
         {
             base.SetUp();
             
-            var props = Client.GetBucketProperties(Bucket, true).Value;
+            var props = Client.GetBucketProperties(Bucket).Value;
             props.SetSearch(true);
             Client.SetBucketProperties(Bucket, props);
         }
