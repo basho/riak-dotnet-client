@@ -22,8 +22,12 @@
 */
 
 /*
-** Revision: 1.2
+** Revision: 1.4
 */
+
+// Java package specifiers
+option java_package = "com.basho.riak.protobuf";
+option java_outer_classname = "RiakKvPB";
 
 import "riak.proto"; // for RpbPair
 
@@ -49,6 +53,9 @@ message RpbGetReq {
     optional bytes if_modified = 7;     // fail if the supplied vclock does not match
     optional bool head = 8;             // return everything but the value
     optional bool deletedvclock = 9;    // return the tombstone's vclock, if applicable
+    optional uint32 timeout = 10;
+    optional bool sloppy_quorum = 11;   // Experimental, may change/disappear
+    optional uint32 n_val = 12;         // Experimental, may change/disappear
 }
 
 // Get Response - if the record was not found there will be no content/vclock
@@ -73,6 +80,10 @@ message RpbPutReq {
     optional bool if_not_modified = 9;
     optional bool if_none_match = 10;
     optional bool return_head = 11;
+    optional uint32 timeout = 12;
+    optional bool asis = 13;
+    optional bool sloppy_quorum = 14; // Experimental, may change/disappear
+    optional uint32 n_val = 15;       // Experimental, may change/disappear
 }
 
 // Put response - same as get response with optional key if one was generated
@@ -94,21 +105,31 @@ message RpbDelReq {
     optional uint32 pr = 7;
     optional uint32 pw = 8;
     optional uint32 dw = 9;
+    optional uint32 timeout = 10;
+    optional bool sloppy_quorum = 11; // Experimental, may change/disappear
+    optional uint32 n_val = 12;       // Experimental, may change/disappear
 }
 
 // Delete response - not defined, will return a RpbDelResp on success or RpbErrorResp on failure
 
-// List buckets request - no message defined, just send RpbListBucketsReq
+// List buckets request 
+message RpbListBucketsReq {
+    optional uint32 timeout = 1;
+    optional bool stream = 2;
+}
 
-// List buckets response
+// List buckets response - one or more of these packets will be sent
+// the last one will have done set true (and may not have any buckets in it)
 message RpbListBucketsResp {
     repeated bytes buckets = 1;
+    optional bool done = 2;
 }
 
 
 // List keys in bucket request
 message RpbListKeysReq {
     required bytes bucket = 1;
+    optional uint32 timeout = 2;
 }
 
 // List keys in bucket response - one or more of these packets will be sent
@@ -117,25 +138,6 @@ message RpbListKeysResp {
     repeated bytes keys = 1;
     optional bool done = 2;
 }
-
-// Get bucket properties request
-message RpbGetBucketReq {
-    required bytes bucket = 1;
-}
-
-// Get bucket properties response
-message RpbGetBucketResp {
-    required RpbBucketProps props = 1;
-}
-
-// Set bucket properties request
-message RpbSetBucketReq {
-    required bytes bucket = 1;
-    required RpbBucketProps props = 2;
-}
-
-
-// Set bucket properties response - no message defined, just send RpbSetBucketResp
 
 
 // Map/Reduce request
@@ -163,14 +165,46 @@ message RpbIndexReq {
     required bytes bucket = 1;
     required bytes index = 2;
     required IndexQueryType qtype = 3;
-    optional bytes key = 4;
+    optional bytes key = 4; // key here means equals value for index?
     optional bytes range_min = 5;
     optional bytes range_max = 6;
+    optional bool return_terms = 7;
+    optional bool stream = 8;
+    optional uint32 max_results = 9;
+    optional bytes continuation = 10;
 }
 
 // Secondary Index query response
 message RpbIndexResp {
     repeated bytes keys = 1;
+    repeated RpbPair results = 2;
+    optional bytes continuation = 3;
+    optional bool done = 4;
+}
+
+// added solely for riak_cs currently
+// for folding over a bucket and returning
+// objects.
+message RpbCSBucketReq {
+    required bytes bucket = 1;
+    required bytes start_key = 2;
+    optional bytes end_key = 3;
+    optional bool start_incl = 4 [default = true];
+    optional bool end_incl = 5 [default = false];
+    optional bytes continuation = 6;
+    optional uint32 max_results = 7;
+}
+
+// return for CS bucket fold
+message RpbCSBucketResp {
+    repeated RpbIndexObject objects = 1;
+    optional bytes continuation = 2;
+    optional bool done = 3;
+}
+
+message RpbIndexObject {
+    required bytes key = 1;
+    required RpbGetResp object = 2;
 }
 
 // Content message included in get/put responses
@@ -196,8 +230,33 @@ message RpbLink {
     optional bytes tag = 3;
 }
 
-// Bucket properties
-message RpbBucketProps {
-    optional uint32 n_val = 1;
-    optional bool allow_mult = 2;
+// Counter update request
+message RpbCounterUpdateReq {
+    required bytes bucket = 1;
+    required bytes key = 2;
+    required sint64 amount = 3;
+    optional uint32 w = 4;
+    optional uint32 dw = 5;
+    optional uint32 pw = 6;
+    optional bool returnvalue = 7;
+}
+
+// Counter update response? No message | error response
+message RpbCounterUpdateResp {
+        optional sint64 returnvalue = 1;
+}
+
+// counter value
+message RpbCounterGetReq {
+    required bytes bucket = 1;
+    required bytes key = 2;
+    optional uint32 r = 3;
+    optional uint32 pr = 4;
+    optional bool basic_quorum = 5;
+    optional bool notfound_ok = 6;
+}
+
+// Counter value response
+message RpbCounterGetResp {
+    optional sint64 returnvalue = 1;
 }

@@ -78,6 +78,7 @@ namespace CorrugatedIron.Comms
                 { MessageCode.PutReq, typeof(RpbPutReq) },
                 { MessageCode.PutResp, typeof(RpbPutResp) },
                 { MessageCode.DelReq, typeof(RpbDelReq) },
+                { MessageCode.ListBucketsReq, typeof(RpbListBucketsReq) },
                 { MessageCode.ListBucketsResp, typeof(RpbListBucketsResp) },
                 { MessageCode.ListKeysReq, typeof(RpbListKeysReq) },
                 { MessageCode.ListKeysResp, typeof(RpbListKeysResp) },
@@ -89,7 +90,14 @@ namespace CorrugatedIron.Comms
                 { MessageCode.IndexReq, typeof(RpbIndexReq) },
                 { MessageCode.IndexResp, typeof(RpbIndexResp) },
                 { MessageCode.SearchQueryReq, typeof(RpbSearchQueryReq) },
-                { MessageCode.SearchQueryResp, typeof(RpbSearchQueryResp) }
+                { MessageCode.SearchQueryResp, typeof(RpbSearchQueryResp) },
+                { MessageCode.ResetBucketReq, typeof(RpbResetBucketReq) },
+                { MessageCode.CsBucketReq, typeof(RpbCSBucketReq) },
+                { MessageCode.CsBucketResp, typeof(RpbCSBucketResp) },
+                { MessageCode.CounterUpdateReq, typeof(RpbCounterUpdateReq) },
+                { MessageCode.CounterUpdateResp, typeof(RpbCounterUpdateResp) },
+                { MessageCode.CounterGetReq, typeof(RpbCounterGetReq) },
+                { MessageCode.CounterGetResp, typeof(RpbCounterGetResp) }
             };
 
             TypeToMessageCodeMap = new Dictionary<Type, MessageCode>();

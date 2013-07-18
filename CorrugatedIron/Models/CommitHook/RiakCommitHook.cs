@@ -14,6 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using CorrugatedIron.Messages;
 using Newtonsoft.Json;
 using System.IO;
 using System.Text;
@@ -24,6 +25,7 @@ namespace CorrugatedIron.Models.CommitHook
     {
         string ToJsonString();
         void WriteJson(JsonWriter writer);
+        RpbCommitHook ToRpbCommitHook();
     }
 
     public abstract class RiakCommitHook : IRiakCommitHook
@@ -42,5 +44,6 @@ namespace CorrugatedIron.Models.CommitHook
         }
 
         public abstract void WriteJson(JsonWriter writer);
+        public abstract RpbCommitHook ToRpbCommitHook();
     }
 }

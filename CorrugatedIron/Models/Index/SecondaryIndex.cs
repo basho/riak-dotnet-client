@@ -59,12 +59,12 @@ namespace CorrugatedIron.Models.Index
             return TypedThis;
         }
 
-        public TClass Add(IEnumerable<TIndex> values)
+        public virtual TClass Add(IEnumerable<TIndex> values)
         {
             return Add(values.ToArray());
         }
 
-        public TClass Add(params TIndex[] values)
+        public virtual TClass Add(params TIndex[] values)
         {
             foreach (var val in values)
             {
