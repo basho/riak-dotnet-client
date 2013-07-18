@@ -221,5 +221,73 @@ namespace CorrugatedIron.Tests.Live
 
             Client.DeleteBucket(bucket);
         }
+
+        [Test]
+        public void UpdatingCounterOnBucketWithoutAllowMultFails()
+        {
+            var bucket = TestBucket + "_" + Guid.NewGuid().ToString();
+            var counter = "counter";
+
+            var result = Client.IncrementCounter(bucket, counter, 1);
+
+            result.Result.IsSuccess.ShouldBeFalse();
+        }
+
+        [Test]
+        public void UpdatingCounterOnBucketWithAllowMultIsSuccessful()
+        {
+            var bucket = TestBucket + "_" + Guid.NewGuid().ToString();
+            var counter = "counter";
+
+            var props = Client.GetBucketProperties(bucket).Value;
+            props.SetAllowMultiple(true);
+
+            Client.SetBucketProperties(bucket, props);
+
+            var result = Client.IncrementCounter(bucket, counter, 1);
+
+            result.Result.IsSuccess.ShouldBeTrue();
+        }
+
+        [Test]
+        public void UpdatingCounterOnBucketWithReturnValueShouldReturnIncrementedCounterValue()
+        {
+            var bucket = TestBucket + "_" + Guid.NewGuid().ToString();
+            var counter = "counter";
+
+            var props = Client.GetBucketProperties(bucket).Value ?? new RiakBucketProperties();
+            props.SetAllowMultiple(true);
+
+            Client.SetBucketProperties(bucket, props);
+
+            Client.IncrementCounter(bucket, counter, 1, new RiakCounterUpdateOptions().SetReturnValue(true));
+
+            var readResult = Client.GetCounter(bucket, counter);
+            var currentCounter = readResult.Value;
+
+            var result = Client.IncrementCounter(bucket, counter, 1, new RiakCounterUpdateOptions().SetReturnValue(true));
+
+            result.Result.IsSuccess.ShouldBeTrue();
+            result.Result.ShouldNotBeNull();
+            result.Value.ShouldBeGreaterThan(currentCounter);
+
+        }
+
+        [Test]
+        public void ReadingWithTimeoutSetToZeroShouldImmediatelyReturn()
+        {
+            var bucket = TestBucket + "_" + Guid.NewGuid().ToString();
+
+            for (var i = 0; i < 10; i++)
+            {
+                var o = new RiakObject(bucket, i.ToString(), "{ value: \"this is an object\" }");
+
+                Client.Put(o);
+            }
+
+            var result = Client.Get(bucket, "2", new RiakGetOptions().SetTimeout(0).SetPr(RiakConstants.QuorumOptions.All));
+
+            result.IsSuccess.ShouldBeFalse();
+        }
     }
 }

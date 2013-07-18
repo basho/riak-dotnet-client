@@ -14,6 +14,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Collections.Generic;
+using System.Linq;
 using CorrugatedIron.Util;
 
 namespace CorrugatedIron.Models.Index
@@ -39,6 +41,16 @@ namespace CorrugatedIron.Models.Index
         {
             Container.BinIndexes.Remove(Name);
             return Container;
+        }
+
+        public override BinIndex Add(IEnumerable<string> values)
+        {
+            return base.Add(values.Where(value => !string.IsNullOrEmpty(value)).ToArray());
+        }
+
+        public new BinIndex Add(params string[] values)
+        {
+            return base.Add(values.Where(value => !string.IsNullOrEmpty(value)).ToArray());
         }
     }
 }

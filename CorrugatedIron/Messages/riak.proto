@@ -22,8 +22,13 @@
 */
 
 /*
-** Revision: 1.2
+** Revision: 1.4
 */
+
+// Java package specifiers
+option java_package = "com.basho.riak.protobuf";
+option java_outer_classname = "RiakPB";
+
 
 // Error response - may be generated for any Req
 message RpbErrorResp {
@@ -41,4 +46,89 @@ message RpbGetServerInfoResp {
 message RpbPair {
     required bytes key = 1;
     optional bytes value = 2;
+}
+
+
+// Get bucket properties request
+message RpbGetBucketReq {
+    required bytes bucket = 1;
+}
+
+// Get bucket properties response
+message RpbGetBucketResp {
+    required RpbBucketProps props = 1;
+}
+
+// Set bucket properties request
+message RpbSetBucketReq {
+    required bytes bucket = 1;
+    required RpbBucketProps props = 2;
+}
+
+// Set bucket properties response - no message defined, just send
+// RpbSetBucketResp
+
+// Reset bucket properties request
+message RpbResetBucketReq {
+    required bytes bucket = 1;
+}
+
+// Reset bucket properties response - no message defined, just send
+// RpbResetBucketResp
+
+// Module-Function pairs for commit hooks and other bucket properties
+// that take functions
+message RpbModFun {
+    required bytes module = 1;
+    required bytes function = 2;
+}
+
+// A commit hook, which may either be a modfun or a JavaScript named
+// function
+message RpbCommitHook {
+    optional RpbModFun modfun = 1;
+    optional bytes name = 2;
+}
+
+// Bucket properties
+message RpbBucketProps {
+    // Declared in riak_core_app
+    optional uint32 n_val = 1;
+    optional bool allow_mult = 2;
+    optional bool last_write_wins = 3;
+    repeated RpbCommitHook precommit = 4;
+    optional bool has_precommit = 5 [default = false];
+    repeated RpbCommitHook postcommit = 6;
+    optional bool has_postcommit = 7 [default = false];
+    optional RpbModFun chash_keyfun = 8;
+
+    // Declared in riak_kv_app
+    optional RpbModFun linkfun = 9;
+    optional uint32 old_vclock = 10;
+    optional uint32 young_vclock = 11;
+    optional uint32 big_vclock = 12;
+    optional uint32 small_vclock = 13;
+    optional uint32 pr = 14;
+    optional uint32 r = 15;
+    optional uint32 w = 16;
+    optional uint32 pw = 17;
+    optional uint32 dw = 18;
+    optional uint32 rw = 19;
+    optional bool basic_quorum = 20;
+    optional bool notfound_ok = 21;
+
+    // Used by riak_kv_multi_backend
+    optional bytes backend = 22;
+
+    // Used by riak_search bucket fixup
+    optional bool search = 23;
+
+    // Used by riak_repl bucket fixup
+    enum RpbReplMode {
+        FALSE = 0;
+        REALTIME = 1;
+        FULLSYNC = 2;
+        TRUE = 3;
+    }
+    optional RpbReplMode repl = 24;
 }

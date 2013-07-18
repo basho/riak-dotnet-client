@@ -15,6 +15,7 @@
 // under the License.
 
 using CorrugatedIron.Extensions;
+using CorrugatedIron.Messages;
 using Newtonsoft.Json;
 
 namespace CorrugatedIron.Models.CommitHook
@@ -61,6 +62,11 @@ namespace CorrugatedIron.Models.CommitHook
             writer.WriteStartObject();
             writer.WriteProperty("name", Name);
             writer.WriteEndObject();
+        }
+
+        public override RpbCommitHook ToRpbCommitHook()
+        {
+            return new RpbCommitHook {name = Name.ToRiakString()};
         }
     }
 }

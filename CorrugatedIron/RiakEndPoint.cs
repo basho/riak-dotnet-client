@@ -35,7 +35,7 @@ namespace CorrugatedIron
         /// An optional seed to generate the Client Id for the <see cref="CorrugatedIron.RiakClient"/>. Having a unique Client Id is important for
         /// generating good vclocks. For more information about the importance of vector clocks, refer to http://wiki.basho.com/Vector-Clocks.html
         /// </param>
-        [Obsolete("Clients no longer need a seed value, use CreateClient() instead")]
+        [Obsolete("Clients no longer need a seed value, use CreateClient() instead. This will be removed in CorrugatedIron 1.5")]
         public IRiakClient CreateClient(string seed)
         {
             return new RiakClient(this, seed) { RetryCount = DefaultRetryCount };

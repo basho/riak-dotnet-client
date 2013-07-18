@@ -26,7 +26,7 @@ namespace CorrugatedIron
 
         IRiakClient CreateClient();
 
-        [Obsolete("Clients no longer need a seed value, use CreateClient() instead")]
+        [Obsolete("Clients no longer need a seed value, use CreateClient() instead. This will be removed in CorrugatedIron 1.5")]
         IRiakClient CreateClient(string seed);
 
         RiakResult<TResult> UseConnection<TResult>(Func<IRiakConnection, RiakResult<TResult>> useFun, int retryAttempts);
