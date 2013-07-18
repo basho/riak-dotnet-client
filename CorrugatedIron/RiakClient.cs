@@ -18,16 +18,18 @@ using CorrugatedIron.Comms;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
 using CorrugatedIron.Models;
+using CorrugatedIron.Models.Index;
 using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Models.MapReduce.Inputs;
-using CorrugatedIron.Models.Rest;
 using CorrugatedIron.Models.Search;
+using CorrugatedIron.Models.Rest;
 using CorrugatedIron.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Web;
+using System.Numerics;
+using System.Net;
 
 namespace CorrugatedIron
 {
@@ -59,7 +61,7 @@ namespace CorrugatedIron
             Async = new RiakAsyncClient(this);
         }
 
-        [Obsolete("This method should no longer be used, use RiakClient(IRiakEndPoint) instead")]
+        [Obsolete("This method should no longer be used, use RiakClient(IRiakEndPoint) instead. This will be removed in CorrugatedIron 1.5")]
         internal RiakClient(IRiakEndPoint endPoint, string seed = null) : this(endPoint) { }
 
         private RiakClient(IRiakConnection batchConnection)
@@ -68,7 +70,7 @@ namespace CorrugatedIron
             Async = new RiakAsyncClient(this);
         }
 
-        [Obsolete("This method should no longer be used, use RiakClient(IRiakConnection) instead")]
+        [Obsolete("This method should no longer be used, use RiakClient(IRiakConnection) instead. This will be removed in CorrugatedIron 1.5")]
         private RiakClient(IRiakConnection batchConnection, byte[] clientId) : this(batchConnection) { }
 
         /// <summary>
@@ -83,6 +85,86 @@ namespace CorrugatedIron
         public RiakResult Ping()
         {
             return UseConnection(conn => conn.PbcWriteRead(MessageCode.PingReq, MessageCode.PingResp));
+        }
+
+        /// <summary>
+        /// Increments a Riak counter. 
+        /// </summary>
+        /// <param name="bucket">The bucket</param>
+        /// <param name="counter">The name of the counter</param>
+        /// <param name="amount">The amount to increment/decrement the counter</param>
+        /// <param name="options">The <see cref="RiakCounterUpdateOptions"/></param>
+        /// <returns><see cref="RiakCounterResult"/></returns>
+        /// <remarks>Only available in Riak 1.4+. If the counter is not initialized, then the counter will be initialized to 0 and then incremented.</remarks>
+        public RiakCounterResult IncrementCounter(string bucket, string counter, long amount, RiakCounterUpdateOptions options = null)
+        {
+            if (!IsValidBucketOrKey(bucket))
+            {
+                return new RiakCounterResult(RiakResult<RiakObject>.Error(ResultCode.InvalidRequest, InvalidBucketErrorMessage, false), null);
+            }
+
+            if (!IsValidBucketOrKey(counter))
+            {
+                return new RiakCounterResult(RiakResult<RiakObject>.Error(ResultCode.InvalidRequest, InvalidKeyErrorMessage, false), null);
+            }
+
+            var request = new RpbCounterUpdateReq {bucket = bucket.ToRiakString(), key = counter.ToRiakString(), amount = amount};
+            options = options ?? new RiakCounterUpdateOptions();
+            options.Populate(request);
+
+            var result = UseConnection(conn => conn.PbcWriteRead<RpbCounterUpdateReq, RpbCounterUpdateResp>(request));
+
+            if (!result.IsSuccess)
+            {
+                return new RiakCounterResult(RiakResult<RiakObject>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline), null);
+            }
+
+            var o = new RiakObject(bucket, counter, result.Value.returnvalue);
+            var cVal = 0L;
+            var parseResult = false;
+
+            if (options.ReturnValue != null && options.ReturnValue.Value)
+                parseResult= long.TryParse(o.Value.FromRiakString(), out cVal);
+
+            return new RiakCounterResult(RiakResult<RiakObject>.Success(o), parseResult ? (long?)cVal : null);
+        }
+
+        /// <summary>
+        /// Returns the value of a counter
+        /// </summary>
+        /// <param name="bucket">The bucket</param>
+        /// <param name="counter">The counter</param>
+        /// <param name="options"><see cref="RiakCounterGetOptions"/> describing how to read the counter.</param>
+        /// <returns><see cref="RiakCounterResult"/></returns>
+        /// <remarks>Only available in Riak 1.4+.</remarks>
+        public RiakCounterResult GetCounter(string bucket, string counter, RiakCounterGetOptions options = null)
+        {
+            if (!IsValidBucketOrKey(bucket))
+            {
+                return new RiakCounterResult(RiakResult<RiakObject>.Error(ResultCode.InvalidRequest, InvalidBucketErrorMessage, false), null);
+            }
+
+            if (!IsValidBucketOrKey(counter))
+            {
+                return new RiakCounterResult(RiakResult<RiakObject>.Error(ResultCode.InvalidRequest, InvalidKeyErrorMessage, false), null);
+            }
+
+            var request = new RpbCounterGetReq {bucket = bucket.ToRiakString(), key = counter.ToRiakString()};
+            options = options ?? new RiakCounterGetOptions();
+            options.Populate(request);
+
+            var result = UseConnection(conn => conn.PbcWriteRead<RpbCounterGetReq, RpbCounterGetResp>(request));
+
+            if (!result.IsSuccess)
+            {
+                return new RiakCounterResult(RiakResult<RiakObject>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline), null);
+            }
+
+            var o = new RiakObject(bucket, counter, result.Value.returnvalue);
+            long cVal;
+            var parseResult = long.TryParse(o.Value.FromRiakString(), out cVal);
+
+            return new RiakCounterResult(RiakResult<RiakObject>.Success(o), parseResult ? (long?)cVal : null);
         }
 
         /// <summary>
@@ -268,7 +350,7 @@ namespace CorrugatedIron
         /// get requests and returns results as an IEnumerable{RiakResult{RiakObject}}. Callers should be aware that
         /// this may result in partial success - all results should be evaluated individually in the calling application.
         /// In addition, applications should plan for multiple failures or multiple cases of siblings being present.</remarks>
-        [Obsolete("Use Get(IEnumerable<RiakObjectId>, RiakGetOptions) instead.")]
+        [Obsolete("Use Get(IEnumerable<RiakObjectId>, RiakGetOptions) instead. This will be removed in CorrugatedIron 1.5")]
         public IEnumerable<RiakResult<RiakObject>> Get(IEnumerable<RiakObjectId> bucketKeyPairs, uint rVal = RiakConstants.Defaults.RVal)
         {
             var options = new RiakGetOptions().SetR(rVal);
@@ -544,6 +626,11 @@ namespace CorrugatedIron
             return RiakResult<IEnumerable<RiakResult>>.Success(responses);
         }
 
+        /// <summary>
+        /// Execute a map reduce query.
+        /// </summary>
+        /// <param name="query">A <see cref="RiakMapReduceQuery"/></param>
+        /// <returns>A <see cref="RiakResult"/> of <see cref="RiakMapReduceResult"/></returns>
         public RiakResult<RiakMapReduceResult> MapReduce(RiakMapReduceQuery query)
         {
             var request = query.ToMessage();
@@ -557,6 +644,11 @@ namespace CorrugatedIron
             return RiakResult<RiakMapReduceResult>.Error(response.ResultCode, response.ErrorMessage, response.NodeOffline);
         }
 
+        /// <summary>
+        /// Perform a Riak Search query
+        /// </summary>
+        /// <param name="search">The <see cref="RiakSearchRequest"/></param>
+        /// <returns>A <see cref="RiakResult"/> of <see cref="RiakSearchResult"/></returns>
         public RiakResult<RiakSearchResult> Search(RiakSearchRequest search)
         {
             var request = search.ToMessage();
@@ -570,6 +662,12 @@ namespace CorrugatedIron
             return RiakResult<RiakSearchResult>.Error(response.ResultCode, response.ErrorMessage, response.NodeOffline);
         }
 
+        /// <summary>
+        /// Perform a map reduce query and stream the results.
+        /// </summary>
+        /// <param name="query">The query</param>
+        /// <returns>A <see cref="RiakResult"/> of <see cref="RiakStreamedMapReduceResult"/></returns>
+        /// <remarks>Make sure to fully enumerate the <see cref="RiakStreamedMapReduceResult"/> or connections may be left open.</remarks>
         public RiakResult<RiakStreamedMapReduceResult> StreamMapReduce(RiakMapReduceQuery query)
         {
             var request = query.ToMessage();
@@ -601,6 +699,31 @@ namespace CorrugatedIron
                 var buckets = result.Value.buckets.Select(b => b.FromRiakString());
                 return RiakResult<IEnumerable<string>>.Success(buckets.ToList());
             }
+            return RiakResult<IEnumerable<string>>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
+        }
+
+        /// <summary>
+        /// Lists all buckets available on the Riak cluster. This uses an <see cref="System.Collections.Generic.IEnumerable&lt;T&gt;"/> 
+        /// of <see cref="string"/> to lazy initialize the collection of bucket names. 
+        /// </summary>
+        /// <returns>
+        /// An <see cref="System.Collections.Generic.IEnumerable&lt;T&gt;"/> of <see cref="string"/> bucket names.
+        /// </returns>
+        /// <remarks>Buckets provide a logical namespace for keys. Listing buckets requires folding over all keys in a cluster and 
+        /// reading a list of buckets from disk. This operation, while non-blocking in Riak 1.0 and newer, still produces considerable
+        /// physical I/O and can take a long time. Callers should fully enumerate the collection or else close the connection when finished.</remarks>
+        public RiakResult<IEnumerable<string>> StreamListBuckets()
+        {
+            var lbReq = new RpbListBucketsReq { stream = true };
+            var result = UseDelayedConnection((conn, onFinish) =>
+                                              conn.PbcWriteStreamRead<RpbListBucketsReq, RpbListBucketsResp>(lbReq, lbr => lbr.IsSuccess && !lbr.Value.done, onFinish));
+
+            if(result.IsSuccess)
+            {
+                var buckets = result.Value.Where(r => r.IsSuccess).SelectMany(r => r.Value.buckets).Select(k => k.FromRiakString());
+                return RiakResult<IEnumerable<string>>.Success(buckets);
+            }
+
             return RiakResult<IEnumerable<string>>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
 
@@ -637,6 +760,14 @@ namespace CorrugatedIron
             return RiakResult<IEnumerable<string>>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
 
+        /// <summary>
+        /// Performs a streaming list keys operation.
+        /// </summary>
+        /// <param name="bucket">The bucket</param>
+        /// <returns>An <see cref="System.Collections.Generic.IEnumerable{T}"/></returns>
+        /// <remarks>While this streams results back to the client, alleviating pressure on Riak, this still relies on
+        /// folding over all keys present in the Riak cluster. Use at your own risk. A better approach would be to
+        /// use <see cref="ListKeysFromIndex"/></remarks>
         public RiakResult<IEnumerable<string>> StreamListKeys(string bucket)
         {
             System.Diagnostics.Debug.Write(ListKeysWarning);
@@ -655,6 +786,8 @@ namespace CorrugatedIron
             return RiakResult<IEnumerable<string>>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
 
+        
+
         /// <summary>
         /// Return a list of keys from the given bucket.
         /// </summary>
@@ -664,7 +797,8 @@ namespace CorrugatedIron
         /// quickly return an unsorted list of keys from Riak.</remarks>
         public RiakResult<IList<string>> ListKeysFromIndex(string bucket)
         {
-            return IndexGet(bucket, RiakConstants.SystemIndexKeys.RiakBucketIndex, bucket);
+            var result = IndexGet(bucket, RiakConstants.SystemIndexKeys.RiakBucketIndex, bucket);
+            return RiakResult<IList<string>>.Success(result.Value.IndexKeyTerms.Select(ikt => ikt.Key).ToList());
         }
 
         /// <summary>
@@ -676,10 +810,7 @@ namespace CorrugatedIron
         /// <param name='bucket'>
         /// The Riak bucket.
         /// </param>
-        /// <param name='extended'>
-        /// Extended parameters are retrieved by HTTP requests.
-        /// </param>
-        public RiakResult<RiakBucketProperties> GetBucketProperties(string bucket, bool extended = false)
+        public RiakResult<RiakBucketProperties> GetBucketProperties(string bucket)
         {
             // bucket names cannot have slashes in the names, the REST interface doesn't like it at all
             if (!IsValidBucketOrKey(bucket))
@@ -687,38 +818,15 @@ namespace CorrugatedIron
                 return RiakResult<RiakBucketProperties>.Error(ResultCode.InvalidRequest, InvalidBucketErrorMessage, false);
             }
 
-            if(extended)
+            var bpReq = new RpbGetBucketReq { bucket = bucket.ToRiakString() };
+            var result = UseConnection(conn => conn.PbcWriteRead<RpbGetBucketReq, RpbGetBucketResp>(bpReq));
+
+            if(result.IsSuccess)
             {
-                var request = new RiakRestRequest(ToBucketUri(bucket), RiakConstants.Rest.HttpMethod.Get)
-                    .AddQueryParam(RiakConstants.Rest.QueryParameters.Bucket.GetPropertiesKey,
-                        RiakConstants.Rest.QueryParameters.Bucket.GetPropertiesValue);
-
-                var result = UseConnection(conn => conn.RestRequest(request));
-
-                if(result.IsSuccess)
-                {
-                    if(result.Value.StatusCode == HttpStatusCode.OK)
-                    {
-                        var response = new RiakBucketProperties(result.Value);
-                        return RiakResult<RiakBucketProperties>.Success(response);
-                    }
-                    return RiakResult<RiakBucketProperties>.Error(ResultCode.InvalidResponse,
-                        "Unexpected Status Code: {0} ({1})".Fmt(result.Value.StatusCode, (int)result.Value.StatusCode), false);
-                }
-                return RiakResult<RiakBucketProperties>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
+                var props = new RiakBucketProperties(result.Value.props);
+                return RiakResult<RiakBucketProperties>.Success(props);
             }
-            else
-            {
-                var bpReq = new RpbGetBucketReq { bucket = bucket.ToRiakString() };
-                var result = UseConnection(conn => conn.PbcWriteRead<RpbGetBucketReq, RpbGetBucketResp>(bpReq));
-
-                if(result.IsSuccess)
-                {
-                    var props = new RiakBucketProperties(result.Value.props);
-                    return RiakResult<RiakBucketProperties>.Success(props);
-                }
-                return RiakResult<RiakBucketProperties>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
-            }
+            return RiakResult<RiakBucketProperties>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
 
         /// <summary>
@@ -733,43 +841,67 @@ namespace CorrugatedIron
         /// <param name='properties'>
         /// The Properties.
         /// </param>
-        public RiakResult SetBucketProperties(string bucket, RiakBucketProperties properties)
+        /// <param name='useHttp'>When true, CorrugatedIron will use the HTTP interface</param>
+        public RiakResult SetBucketProperties(string bucket, RiakBucketProperties properties, bool useHttp = false)
+        {
+            return useHttp ? SetHttpBucketProperties(bucket, properties) : SetPbcBucketProperties(bucket, properties);
+        }
+
+        internal RiakResult SetHttpBucketProperties(string bucket, RiakBucketProperties properties)
+        {
+            var request = new RiakRestRequest(ToBucketUri(bucket), RiakConstants.Rest.HttpMethod.Put)
+            {
+                Body = properties.ToJsonString().ToRiakString(),
+                ContentType = RiakConstants.ContentTypes.ApplicationJson
+            };
+
+            var result = UseConnection(conn => conn.RestRequest(request));
+            if(result.IsSuccess && result.Value.StatusCode != HttpStatusCode.NoContent)
+            {
+                return RiakResult.Error(ResultCode.InvalidResponse, "Unexpected Status Code: {0} ({1})".Fmt(result.Value.StatusCode, (int)result.Value.StatusCode), result.NodeOffline);
+            }
+
+            return result;
+        }
+
+
+        internal RiakResult SetPbcBucketProperties(string bucket, RiakBucketProperties properties)
         {
             if (!IsValidBucketOrKey(bucket))
             {
                 return RiakResult<RiakBucketProperties>.Error(ResultCode.InvalidRequest, InvalidBucketErrorMessage, false);
             }
 
-            if(properties.CanUsePbc)
-            {
-                var request = new RpbSetBucketReq { bucket = bucket.ToRiakString(), props = properties.ToMessage() };
-                var result = UseConnection(conn => conn.PbcWriteRead(request, MessageCode.SetBucketResp));
-                return result;
-            }
-            else
-            {
-                var request = new RiakRestRequest(ToBucketUri(bucket), RiakConstants.Rest.HttpMethod.Put)
-                {
-                    Body = properties.ToJsonString().ToRiakString(),
-                    ContentType = RiakConstants.ContentTypes.ApplicationJson
-                };
+            var request = new RpbSetBucketReq { bucket = bucket.ToRiakString(), props = properties.ToMessage() };
+            var result = UseConnection(conn => conn.PbcWriteRead(request, MessageCode.SetBucketResp));
 
-                var result = UseConnection(conn => conn.RestRequest(request));
-                if(result.IsSuccess && result.Value.StatusCode != HttpStatusCode.NoContent)
-                {
-                    return RiakResult.Error(ResultCode.InvalidResponse, "Unexpected Status Code: {0} ({1})".Fmt(result.Value.StatusCode, (int)result.Value.StatusCode), result.NodeOffline);
-                }
-                return result;
-            }
+            return result;
         }
 
         /// <summary>
         /// Reset the properties on a bucket back to their defaults.
         /// </summary>
         /// <param name="bucket">The name of the bucket to reset the properties on.</param>
+        /// <param name="useHttp">Whether or not to use the HTTP interface to Riak. Set to true for Riak 1.3 and earlier</param> 
         /// <returns>An indication of success or failure.</returns>
-        /// <remarks>This function requires Riak v1.3+.</remarks>
-        public RiakResult ResetBucketProperties(string bucket)
+        public RiakResult ResetBucketProperties(string bucket, bool useHttp = false)
+        {
+            if (!IsValidBucketOrKey(bucket))
+            {
+                return RiakResult<RiakBucketProperties>.Error(ResultCode.InvalidRequest, InvalidBucketErrorMessage, false);
+            }
+
+            return useHttp ? ResetHttpBucketProperties(bucket) : ResetPbcBucketProperties(bucket);
+        }
+
+        internal RiakResult ResetPbcBucketProperties(string bucket)
+        {
+            var request = new RpbResetBucketReq { bucket = bucket.ToRiakString() };
+            var result = UseConnection(conn => conn.PbcWriteRead(request, MessageCode.ResetBucketResp));
+            return result;
+        }
+
+        internal RiakResult ResetHttpBucketProperties(string bucket)
         {
             var request = new RiakRestRequest(ToBucketPropsUri(bucket), RiakConstants.Rest.HttpMethod.Delete);
 
@@ -779,35 +911,14 @@ namespace CorrugatedIron
                 switch (result.Value.StatusCode)
                 {
                     case HttpStatusCode.NoContent:
-                        return result;
+                    return result;
                     case HttpStatusCode.NotFound:
-                        return RiakResult.Error(ResultCode.NotFound, "Bucket {0} not found.".Fmt(bucket), false);
+                    return RiakResult.Error(ResultCode.NotFound, "Bucket {0} not found.".Fmt(bucket), false);
                     default:
-                        return RiakResult.Error(ResultCode.InvalidResponse, "Unexpected Status Code: {0} ({1})".Fmt(result.Value.StatusCode, (int)result.Value.StatusCode), result.NodeOffline);
+                    return RiakResult.Error(ResultCode.InvalidResponse, "Unexpected Status Code: {0} ({1})".Fmt(result.Value.StatusCode, (int)result.Value.StatusCode), result.NodeOffline);
                 }
             }
             return result;
-        }
-        
-        /// <summary>
-        /// Get the results of an index query prepared for use in a <see cref="CorrugatedIron.Models.MapReduce.RiakMapReduceQuery"/>
-        /// </summary>
-        /// <returns>
-        /// A <see cref="RiakBucketKeyInput"/> of the index query results
-        /// </returns>
-        /// <param name='indexQuery'>
-        /// Index query.
-        /// </param>
-        [Obsolete("This has been replaced by the IndexGet methods as of v1.1.1. This method will be removed by v1.3")]
-        public RiakBucketKeyInput GetIndex(RiakIndexInput indexQuery)
-        {
-            var query = new RiakMapReduceQuery()
-                .Inputs(indexQuery).ReduceErlang(r => r.ModFun("riak_kv_mapreduce", "reduce_identity").Keep(true));
-            var result = MapReduce(query);
-            
-            var keys = result.Value.PhaseResults.OrderBy(pr => pr.Phase).ElementAt(0).GetObjects<RiakObjectId>();
-            
-            return RiakBucketKeyInput.FromRiakObjectIds(keys);
         }
 
         /// <summary>
@@ -884,17 +995,159 @@ namespace CorrugatedIron
             return RiakResult<RiakServerInfo>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
 
-        public RiakResult<IList<string>> IndexGet(string bucket, string indexName, string minValue, string maxValue)
+        /// <summary>
+        /// Retrieve index results using the streaming interface.
+        /// </summary>
+        /// <param name="bucket">The bucket</param>
+        /// <param name="indexName">The index</param>
+        /// <param name="value">The indexed value to search for</param>
+        /// <param name="options">The <see cref="RiakIndexGetOptions"/></param>
+        /// <returns>A <see cref="RiakResult{T}"/> of <see cref="RiakStreamedIndexResult"/> containing an <see cref="IEnumerable{T}"/>
+        /// of <see cref="RiakIndexKeyTerm"/></returns>
+        /// <remarks>Make sure to fully enumerate the <see cref="IEnumerable{T}"/> of <see cref="RiakIndexKeyTerm"/>.</remarks>
+        public RiakResult<RiakStreamedIndexResult> StreamIndexGet(string bucket, string indexName, BigInteger value, RiakIndexGetOptions options = null)
         {
-            return IndexGetRange(bucket, indexName.ToBinaryKey(), minValue, maxValue);
+            return StreamIndexGetEquals(bucket, indexName.ToIntegerKey(), value.ToString(), options);
         }
 
-        public RiakResult<IList<string>> IndexGet(string bucket, string indexName, int minValue, int maxValue)
+        /// <summary>
+        /// Retrieve index results using the streaming interface.
+        /// </summary>
+        /// <param name="bucket">The bucket</param>
+        /// <param name="indexName">The index</param>
+        /// <param name="value">The indexed value to search for</param>
+        /// <param name="options">The <see cref="RiakIndexGetOptions"/></param>
+        /// <returns>A <see cref="RiakResult{T}"/> of <see cref="RiakStreamedIndexResult"/> containing an <see cref="IEnumerable{T}"/>
+        /// of <see cref="RiakIndexKeyTerm"/></returns>
+        /// <remarks>Make sure to fully enumerate the <see cref="IEnumerable{T}"/> of <see cref="RiakIndexKeyTerm"/>.</remarks>
+        public RiakResult<RiakStreamedIndexResult> StreamIndexGet(string bucket, string indexName, string value, RiakIndexGetOptions options = null)
         {
-            return IndexGetRange(bucket, indexName.ToIntegerKey(), minValue.ToString(), maxValue.ToString());
+            return StreamIndexGetEquals(bucket, indexName.ToBinaryKey(), value, options);
         }
 
-        private RiakResult<IList<string>> IndexGetRange(string bucket, string indexName, string minValue, string maxValue)
+        private RiakResult<RiakStreamedIndexResult> StreamIndexGetEquals(string bucket, string indexName, string value,
+                                                                        RiakIndexGetOptions options = null)
+        {
+            var message = new RpbIndexReq
+            {
+                bucket = bucket.ToRiakString(),
+                index = indexName.ToRiakString(),
+                key = value.ToRiakString(),
+                qtype = RpbIndexReq.IndexQueryType.eq,
+                stream = true
+            };
+
+            options = options ?? new RiakIndexGetOptions();
+            options.Populate(message);
+
+            var result = UseDelayedConnection((conn, onFinish) => 
+                                              conn.PbcWriteStreamRead<RpbIndexReq, RpbIndexResp>(message, lbr => lbr.IsSuccess && !lbr.Value.done, onFinish));
+
+            if (result.IsSuccess)
+            {
+                return
+                    RiakResult<RiakStreamedIndexResult>.Success(new RiakStreamedIndexResult(ReturnTerms(options),
+                                                                                            result.Value));
+            }
+
+            return RiakResult<RiakStreamedIndexResult>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
+        }
+
+        /// <summary>
+        /// Retrieve index results using the streaming interface.
+        /// </summary>
+        /// <param name="bucket">The bucket</param>
+        /// <param name="indexName">The index</param>
+        /// <param name="minValue">The start of the indexed range to search for</param>
+        /// <param name="maxValue">The end of the indexed range to search for</param>
+        /// <param name="options">The <see cref="RiakIndexGetOptions"/></param>
+        /// <returns>A <see cref="RiakResult{T}"/> of <see cref="RiakStreamedIndexResult"/> containing an <see cref="IEnumerable{T}"/>
+        /// of <see cref="RiakIndexKeyTerm"/></returns>
+        /// <remarks>Make sure to fully enumerate the <see cref="IEnumerable{T}"/> of <see cref="RiakIndexKeyTerm"/>.</remarks>
+        public RiakResult<RiakStreamedIndexResult> StreamIndexGet(string bucket, string indexName, BigInteger minValue, BigInteger maxValue, RiakIndexGetOptions options = null)
+        {
+            return StreamIndexGetRange(bucket, indexName.ToIntegerKey(), minValue.ToString(), maxValue.ToString(), options);
+        }
+
+        /// <summary>
+        /// Retrieve index results using the streaming interface.
+        /// </summary>
+        /// <param name="bucket">The bucket</param>
+        /// <param name="indexName">The index</param>
+        /// <param name="minValue">The start of the indexed range to search for</param>
+        /// <param name="maxValue">The end of the indexed range to search for</param>
+        /// <param name="options">The <see cref="RiakIndexGetOptions"/></param>
+        /// <returns>A <see cref="RiakResult{T}"/> of <see cref="RiakStreamedIndexResult"/> containing an <see cref="IEnumerable{T}"/>
+        /// of <see cref="RiakIndexKeyTerm"/></returns>
+        /// <remarks>Make sure to fully enumerate the <see cref="IEnumerable{T}"/> of <see cref="RiakIndexKeyTerm"/>.</remarks>
+        public RiakResult<RiakStreamedIndexResult> StreamIndexGet(string bucket, string indexName, string minValue, string maxValue, RiakIndexGetOptions options = null)
+        {
+            return StreamIndexGetRange(bucket, indexName.ToBinaryKey(), minValue, maxValue, options);
+        }
+
+        private RiakResult<RiakStreamedIndexResult> StreamIndexGetRange(string bucket, string indexName, string minValue, string maxValue,
+                                         RiakIndexGetOptions options = null)
+        {
+            var message = new RpbIndexReq
+                {
+                    bucket = bucket.ToRiakString(),
+                    index = indexName.ToRiakString(),
+                    qtype = RpbIndexReq.IndexQueryType.range,
+                    range_min = minValue.ToRiakString(),
+                    range_max = maxValue.ToRiakString(),
+                    stream = true
+                };
+
+            options = options ?? new RiakIndexGetOptions();
+            options.Populate(message);
+
+            var result = UseDelayedConnection((conn, onFinish) =>
+                                              conn.PbcWriteStreamRead<RpbIndexReq, RpbIndexResp>(message, lbr => lbr.IsSuccess && !lbr.Value.done, onFinish));
+
+            if (result.IsSuccess)
+            {
+                return
+                    RiakResult<RiakStreamedIndexResult>.Success(new RiakStreamedIndexResult(ReturnTerms(options),
+                                                                                            result.Value));
+            }
+
+            return RiakResult<RiakStreamedIndexResult>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
+        }
+
+        private static bool ReturnTerms(RiakIndexGetOptions options)
+        {
+            return options.ReturnTerms != null && options.ReturnTerms.Value;
+        }
+
+        /// <summary>
+        /// Retrieve a range of indexed values.
+        /// </summary>
+        /// <param name="bucket">The bucket</param>
+        /// <param name="indexName">The index</param>
+        /// <param name="minValue">The start of the indexed range to search for</param>
+        /// <param name="maxValue">The end of the indexed range to search for</param>
+        /// <param name="options">The <see cref="RiakIndexGetOptions"/></param>
+        /// <returns>A <see cref="RiakResult{T}"/> of <see cref="RiakIndexResult"/></returns>
+        public RiakResult<RiakIndexResult> IndexGet(string bucket, string indexName, string minValue, string maxValue, RiakIndexGetOptions options = null)
+        {
+            return IndexGetRange(bucket, indexName.ToBinaryKey(), minValue, maxValue, options);
+        }
+
+        /// <summary>
+        /// Retrieve a range of indexed values.
+        /// </summary>
+        /// <param name="bucket">The bucket</param>
+        /// <param name="indexName">The index</param>
+        /// <param name="minValue">The start of the indexed range to search for</param>
+        /// <param name="maxValue">The end of the indexed range to search for</param>
+        /// <param name="options">The <see cref="RiakIndexGetOptions"/></param>
+        /// <returns>A <see cref="RiakResult{T}"/> of <see cref="RiakIndexResult"/></returns>
+        public RiakResult<RiakIndexResult> IndexGet(string bucket, string indexName, BigInteger minValue, BigInteger maxValue, RiakIndexGetOptions options = null)
+        {
+            return IndexGetRange(bucket, indexName.ToIntegerKey(), minValue.ToString(), maxValue.ToString(), options);
+        }
+
+        private RiakResult<RiakIndexResult> IndexGetRange(string bucket, string indexName, string minValue, string maxValue, RiakIndexGetOptions options = null)
         {
             var message = new RpbIndexReq
             {
@@ -905,27 +1158,59 @@ namespace CorrugatedIron
                 range_max = maxValue.ToRiakString()
             };
 
+            options = options ?? new RiakIndexGetOptions();
+            options.Populate(message);
+
             var result = UseConnection(conn => conn.PbcWriteRead<RpbIndexReq, RpbIndexResp>(message));
 
             if (result.IsSuccess)
             {
-                return RiakResult<IList<string>>.Success(result.Value.keys.Select(k => k.FromRiakString()).ToList());
+                var r = RiakResult<RiakIndexResult>.Success(new RiakIndexResult(ReturnTerms(options), result));
+
+                if (result.Done.HasValue)
+                    r.SetDone(result.Done.Value);
+
+                if (result.Value.continuation != null)
+                {
+                    var continuation = result.Value.continuation.FromRiakString();
+
+                    if (!string.IsNullOrEmpty(continuation))
+                        r.SetContinuation(continuation);
+                }
+
+                return r;
             }
 
-            return RiakResult<IList<string>>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
+            return RiakResult<RiakIndexResult>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
 
-        public RiakResult<IList<string>> IndexGet(string bucket, string indexName, string value)
+        /// <summary>
+        /// Retrieve a indexed values
+        /// </summary>
+        /// <param name="bucket">The bucket</param>
+        /// <param name="indexName">The index</param>
+        /// <param name="value">The indexed value to search for</param>
+        /// <param name="options">The <see cref="RiakIndexGetOptions"/></param>
+        /// <returns>A <see cref="RiakResult{T}"/> of <see cref="RiakIndexResult"/></returns>
+        public RiakResult<RiakIndexResult> IndexGet(string bucket, string indexName, string value, RiakIndexGetOptions options = null)
         {
-            return IndexGetEquals(bucket, indexName.ToBinaryKey(), value);
+            return IndexGetEquals(bucket, indexName.ToBinaryKey(), value, options);
         }
 
-        public RiakResult<IList<string>> IndexGet(string bucket, string indexName, int value)
+        /// <summary>
+        /// Retrieve a indexed values
+        /// </summary>
+        /// <param name="bucket">The bucket</param>
+        /// <param name="indexName">The index</param>
+        /// <param name="value">The indexed value to search for</param>
+        /// <param name="options">The <see cref="RiakIndexGetOptions"/></param>
+        /// <returns>A <see cref="RiakResult{T}"/> of <see cref="RiakIndexResult"/></returns>
+        public RiakResult<RiakIndexResult> IndexGet(string bucket, string indexName, BigInteger value, RiakIndexGetOptions options = null)
         {
-            return IndexGetEquals(bucket, indexName.ToIntegerKey(), value.ToString());
+            return IndexGetEquals(bucket, indexName.ToIntegerKey(), value.ToString(), options);
         }
 
-        private RiakResult<IList<string>> IndexGetEquals(string bucket, string indexName, string value)
+        private RiakResult<RiakIndexResult> IndexGetEquals(string bucket, string indexName, string value, RiakIndexGetOptions options = null)
         {
             var message = new RpbIndexReq
             {
@@ -935,14 +1220,17 @@ namespace CorrugatedIron
                 qtype = RpbIndexReq.IndexQueryType.eq
             };
 
+            options = options ?? new RiakIndexGetOptions();
+            options.Populate(message);
+
             var result = UseConnection(conn => conn.PbcWriteRead<RpbIndexReq, RpbIndexResp>(message));
 
             if (result.IsSuccess)
             {
-                return RiakResult<IList<string>>.Success(result.Value.keys.Select(k => k.FromRiakString()).ToList());
+                return RiakResult<RiakIndexResult>.Success(new RiakIndexResult(ReturnTerms(options), result));
             }
 
-            return RiakResult<IList<string>>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
+            return RiakResult<RiakIndexResult>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
 
         /// <summary>
@@ -1027,5 +1315,8 @@ namespace CorrugatedIron
         {
             return (new RiakGetOptions()).SetR(RiakConstants.Defaults.RVal);
         }
+
+
+        
     }
 }

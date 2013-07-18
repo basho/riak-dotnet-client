@@ -36,6 +36,7 @@ namespace CorrugatedIron
         public bool IsSuccess { get; protected set; }
         public string ErrorMessage { get; protected set; }
         public ResultCode ResultCode { get; protected set; }
+        
         internal bool NodeOffline { get; set; }
 
         protected RiakResult()
@@ -66,6 +67,18 @@ namespace CorrugatedIron
     public class RiakResult<TResult> : RiakResult
     {
         public TResult Value { get; private set; }
+
+        /// <summary>Is the current paginated query done?</summary>
+        /// <remarks>Valid for Riak 1.4 and newer only.</remarks>
+        public bool? Done { get; protected set; }
+
+        /// <summary>
+        /// An opaque continuation returned if there are still additional 
+        /// results to be returned in a paginated query. This value should
+        /// be supplied to the next query issued to Riak.
+        /// </summary>
+        /// <remarks>Valid for Riak 1.4 and newer only.</remarks>
+        public string Continuation { get; protected set; }
 
         private RiakResult()
         {
@@ -100,6 +113,8 @@ namespace CorrugatedIron
                 result = (result * 397) ^ IsSuccess.GetHashCode();
                 result = (result * 397) ^ ResultCode.GetHashCode();
                 result = (result * 397) ^ NodeOffline.GetHashCode();
+                result = (result * 397) ^ Done.GetHashCode();
+                result = (result * 397) ^ Continuation.GetHashCode();
                 return result;
             }
         }
@@ -134,7 +149,23 @@ namespace CorrugatedIron
             return Equals(other.Value, Value)
                 && Equals(other.IsSuccess, IsSuccess)
                 && Equals(other.ResultCode, ResultCode)
-                && Equals(other.NodeOffline, NodeOffline);
+                && Equals(other.NodeOffline, NodeOffline)
+                && Equals(other.Continuation, Continuation)
+                && (other.Done.HasValue
+                    && Done.HasValue 
+                    && Equals(other.Done.Value && Done.Value));
+        }
+
+        internal RiakResult SetDone(bool? value)
+        {
+            Done = value;
+            return this;
+        }
+
+        internal RiakResult SetContinuation(string value)
+        {
+            Continuation = value;
+            return this;
         }
     }
 }

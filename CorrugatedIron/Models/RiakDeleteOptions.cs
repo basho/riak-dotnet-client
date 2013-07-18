@@ -85,6 +85,8 @@ namespace CorrugatedIron.Models
         /// <remarks>Developers looking for an easy way to set this can look at <see cref="CorrugatedIron.Util.RiakConstants.QuorumOptions"/></remarks>
         public Either<uint, string> Dw { get; private set; }
 
+        public uint? Timeout { get; set; }
+
         public RiakDeleteOptions SetRw(uint value)
         {
             return WriteQuorum(value, var => Rw = var);
@@ -145,6 +147,12 @@ namespace CorrugatedIron.Models
             return WriteQuorum(value, var => Dw = var);
         }
 
+        public RiakDeleteOptions SetTimeout(uint? value)
+        {
+            Timeout = value;
+            return this;
+        }
+
         public RiakDeleteOptions()
         {
             Rw = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
@@ -163,6 +171,9 @@ namespace CorrugatedIron.Models
             request.w = W.IsLeft ? W.Left : W.Right.ToRpbOption();
             request.pw = Pw.IsLeft ? Pw.Left : Pw.Right.ToRpbOption();
             request.dw = Dw.IsLeft ? Dw.Left : Dw.Right.ToRpbOption();
+
+            if (Timeout.HasValue)
+                request.timeout = Timeout.Value;
 
             if(Vclock != null)
             {

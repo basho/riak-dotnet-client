@@ -46,6 +46,14 @@ namespace CorrugatedIron.Messages
         IndexReq = 25,
         IndexResp = 26,
         SearchQueryReq = 27,
-        SearchQueryResp = 28
+        SearchQueryResp = 28,
+        ResetBucketReq = 29,
+        ResetBucketResp = 30,
+        CsBucketReq = 40,
+        CsBucketResp = 41,
+        CounterUpdateReq = 50,
+        CounterUpdateResp = 51,
+        CounterGetReq = 52,
+        CounterGetResp = 53
     }
 }

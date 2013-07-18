@@ -88,6 +88,11 @@ namespace CorrugatedIron.Models
         /// </value>
         public byte[] IfModified { get; set; }
 
+        /// <summary>
+        /// Query timeout parameter. If a request to Riak exceeds the query timeout, Riak should stop processing the request.
+        /// </summary>
+        public uint? Timeout { get; set; }
+
         public RiakGetOptions SetR(uint value)
         {
             return WriteQuorum(value, var => R = var);
@@ -106,6 +111,12 @@ namespace CorrugatedIron.Models
         public RiakGetOptions SetPr(string value)
         {
             return WriteQuorum(value, var => Pr = var);
+        }
+
+        public RiakGetOptions SetTimeout(uint value)
+        {
+            Timeout = value;
+            return this;
         }
 
         public RiakGetOptions()
@@ -142,6 +153,11 @@ namespace CorrugatedIron.Models
             if (IfModified != null)
             {
                 request.if_modified = IfModified;
+            }
+
+            if (Timeout.HasValue)
+            {
+                request.timeout = Timeout.Value;
             }
         }
 

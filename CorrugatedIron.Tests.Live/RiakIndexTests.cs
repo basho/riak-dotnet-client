@@ -19,6 +19,7 @@ using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Models.MapReduce.Inputs;
 using CorrugatedIron.Tests.Extensions;
+using CorrugatedIron.Util;
 using NUnit.Framework;
 using System;
 using System.Linq;
@@ -82,11 +83,11 @@ namespace CorrugatedIron.Tests.Live
 
             var result = Client.IndexGet(Bucket, "age", 32);
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
-            result.Value.Count.ShouldEqual(10);
+            result.Value.IndexKeyTerms.Count().ShouldEqual(10);
 
-            foreach (var v in result.Value)
+            foreach (var v in result.Value.IndexKeyTerms)
             {
-                var key = int.Parse(v);
+                var key = int.Parse(v.Key);
                 key.ShouldBeLessThan(10);
                 key.ShouldBeGreaterThan(-1);
             }
@@ -105,11 +106,11 @@ namespace CorrugatedIron.Tests.Live
 
             var result = Client.IndexGet(Bucket, "age", "32");
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
-            result.Value.Count.ShouldEqual(10);
+            result.Value.IndexKeyTerms.Count().ShouldEqual(10);
 
-            foreach (var v in result.Value)
+            foreach (var v in result.Value.IndexKeyTerms)
             {
-                var key = int.Parse(v);
+                var key = int.Parse(v.Key);
                 key.ShouldBeLessThan(10);
                 key.ShouldBeGreaterThan(-1);
             }
@@ -154,13 +155,11 @@ namespace CorrugatedIron.Tests.Live
                 Client.Put(o);
             }
 
-            var mr = new RiakMapReduceQuery()
-                .Inputs(RiakIndex.Range(Bucket, "age", 27, 30));
-            
-            var result = Client.MapReduce(mr);
+            var result = Client.IndexGet(Bucket, "age", 27, 30);
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
-            result.Value.PhaseResults.SelectMany(x => x.GetObjectIds()).Count().ShouldEqual(4);
-            
+            result.Value.IndexKeyTerms.Count().ShouldEqual(4);
+
+
             // TODO write tests verifying results
         }
 
@@ -193,6 +192,8 @@ namespace CorrugatedIron.Tests.Live
                 key.Key.ShouldNotBeNullOrEmpty();
                 originalKeys.Contains(key.Key).ShouldBeTrue();
             }
+
+            Client.DeleteBucket(bucket);
         }
 
         [Test]
@@ -227,6 +228,8 @@ namespace CorrugatedIron.Tests.Live
                 key.Key.ShouldNotBeNullOrEmpty();
                 originalKeys.Contains(key.Key).ShouldBeTrue();
             }
+
+            Client.DeleteBucket(bucket);
         }
 
         [Test]
@@ -255,6 +258,78 @@ namespace CorrugatedIron.Tests.Live
                 key.ShouldNotBeNullOrEmpty();
                 originalKeys.Contains(key).ShouldBeTrue();
             }
+
+            Client.DeleteBucket(bucket);
+        }
+
+        [Test]
+        public void GettingKeysWithReturnTermsDoesAThing()
+        {
+            var bucket = Bucket;
+            var keysAndTerms = new Dictionary<string, int>();
+
+            for (var i = 0; i < 10; i++)
+            {
+                var o = new RiakObject(bucket, Guid.NewGuid().ToString(), "{ value: \"this is an object\" }");
+                o.IntIndex("sandwiches").Set(i);
+                keysAndTerms.Add(o.Key, i);
+
+                Client.Put(o);
+            }
+            
+            var results = Client.IndexGet(bucket, "sandwiches", 2, 5, new RiakIndexGetOptions().SetReturnTerms(true).SetMaxResults(100).SetStream(false));
+
+            results.IsSuccess.ShouldBeTrue(results.ErrorMessage);
+            results.Value.IndexKeyTerms.Count().ShouldEqual(4);
+
+            foreach (var indexResult in results.Value.IndexKeyTerms)
+            {
+                keysAndTerms.Keys.ShouldContain(indexResult.Key);
+                keysAndTerms[indexResult.Key].ShouldEqual(int.Parse(indexResult.Term));
+            }
+        }
+
+        [Test]
+        public void GettingKeysWithContinuationDoesNotSetDone()
+        {
+            var bucket = Bucket;
+            
+            for (var i = 0; i < 1000; i++)
+            {
+                var o = new RiakObject(bucket, Guid.NewGuid().ToString(), "{ value: \"this is an object\" }");
+                o.IntIndex("position").Set(i);
+
+                Client.Put(o);
+            }
+
+            var results = Client.IndexGet(bucket, "position", 10, 500, new RiakIndexGetOptions().SetMaxResults(10));
+
+            results.IsSuccess.ShouldBeTrue(results.ErrorMessage);
+            results.Value.IndexKeyTerms.Count().ShouldEqual(10);
+
+            results.Done.ShouldNotEqual(true);
+            results.Done.ShouldEqual(null);
+            results.Continuation.ShouldNotBeNull();
+        }
+
+        [Test]
+        public void StreamingIndexGetReturnsAllData()
+        {
+            var bucket = Bucket;
+
+            for (var i = 0; i < 10; i++)
+            {
+                var o = new RiakObject(bucket, Guid.NewGuid().ToString(), "{ value: \"this is an object\" }");
+                o.IntIndex("position").Set(i % 2);
+
+                Client.Put(o, new RiakPutOptions().SetW(RiakConstants.QuorumOptions.All)
+                                                  .SetDw(RiakConstants.QuorumOptions.All));
+            }
+
+            var results = Client.StreamIndexGet(bucket, "position", 0);
+
+            results.IsSuccess.ShouldBeTrue(results.ErrorMessage);
+            results.Value.IndexKeyTerms.Count().ShouldEqual(5);
         }
     }
 }
