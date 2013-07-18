@@ -19,7 +19,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>CorrugatedIron</id>
-    <version>1.4.0-rc1</version>
+    <version>1.4.0</version>
     <authors>OJ Reeves, Jeremiah Peschka</authors>
     <owners>OJ Reeves, Jeremiah Peschka</owners>
     <description>
