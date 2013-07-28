@@ -40,6 +40,7 @@ namespace CorrugatedIron
         Task<RiakResult<RiakObject>> Put(RiakObject value, RiakPutOptions options = null);
         Task<IEnumerable<RiakResult<RiakObject>>> Put(IEnumerable<RiakObject> values, RiakPutOptions options = null);
 
+        Task<RiakResult> Delete(RiakObject riakObject, RiakDeleteOptions options = null);
         Task<RiakResult> Delete(string bucket, string key, RiakDeleteOptions options = null);
         Task<RiakResult> Delete(RiakObjectId objectId, RiakDeleteOptions options = null);
         Task<IEnumerable<RiakResult>> Delete(IEnumerable<RiakObjectId> objectIds, RiakDeleteOptions options = null);
@@ -176,6 +177,11 @@ namespace CorrugatedIron
         public Task<RiakResult<RiakObject>> Put(RiakObject value, RiakPutOptions options)
         {
             return Task.Factory.StartNew(() => _client.Put(value, options));
+        }
+
+        public Task<RiakResult> Delete(RiakObject riakObject, RiakDeleteOptions options = null)
+        {
+            return Task.Factory.StartNew(() => _client.Delete(riakObject, options));
         }
 
         public Task<RiakResult> Delete(string bucket, string key, RiakDeleteOptions options = null)

@@ -469,6 +469,17 @@ namespace CorrugatedIron
         }
 
         /// <summary>
+        /// Delete the data identified by the <paramref name="riakObject"/>
+        /// </summary>
+        /// <param name='riakObject'>
+        /// The object to delete
+        /// </param>
+        public RiakResult Delete(RiakObject riakObject, RiakDeleteOptions options = null)
+        {
+            return Delete(riakObject.Bucket, riakObject.Key, options);
+        }
+
+        /// <summary>
         /// Delete the record identified by <paramref name="key"/> from a <paramref name="bucket"/>.
         /// </summary>
         /// <param name='bucket'>
