@@ -86,6 +86,8 @@ namespace CorrugatedIron.Models
         /// <value>The PW value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.</value>
         public uint? PwVal { get; private set; }
 
+        public RiakConstants.RiakEnterprise.ReplicationMode? ReplicationMode { get; private set; }
+
         /// <summary>
         /// An indicator of whether search indexing is enabled on the bucket.
         /// </summary>
@@ -216,6 +218,12 @@ namespace CorrugatedIron.Models
         public RiakBucketProperties SetBackend(string backend)
         {
             Backend = backend;
+            return this;
+        }
+
+        public RiakBucketProperties SetReplicationMode(RiakConstants.RiakEnterprise.ReplicationMode replicationMode)
+        {
+            ReplicationMode = replicationMode;
             return this;
         }
 
@@ -369,6 +377,8 @@ namespace CorrugatedIron.Models
             {
                 PostCommitHooks = postCommitHooks.Cast<JObject>().Select(LoadPostCommitHook).ToList();
             }
+
+            ReplicationMode = (RiakConstants.RiakEnterprise.ReplicationMode)props.Value<int?>("repl");
         }
 
         internal RiakBucketProperties(RpbBucketProps bucketProps)
@@ -407,6 +417,8 @@ namespace CorrugatedIron.Models
             {
                 PostCommitHooks = postCommitHooks.Select(LoadPostCommitHook).ToList();
             }
+
+            ReplicationMode = (RiakConstants.RiakEnterprise.ReplicationMode)bucketProps.repl;
         }
 
         private static IRiakPreCommitHook LoadPreCommitHook(RpbCommitHook hook)
