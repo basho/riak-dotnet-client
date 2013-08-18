@@ -42,6 +42,16 @@ namespace CorrugatedIron.Models
         public List<IRiakPostCommitHook> PostCommitHooks { get; private set; }
         public bool? NotFoundOk { get; private set; }
         public bool? BasicQuorum { get; private set; }
+        /// <summary>
+        /// If the length of the vector clock is larger than BigVclock, vector clocks will be pruned.
+        /// </summary>
+        /// <remarks>See http://docs.basho.com/riak/latest/theory/concepts/Vector-Clocks/#Vector-Clock-Pruning </remarks>
+        public uint? BigVclock { get; private set; }
+        /// <summary>
+        /// If the length of the vector clock is smaller than SmallVclock, vector clocks will not be pruned.
+        /// </summary>
+        /// <remarks>See http://docs.basho.com/riak/latest/theory/concepts/Vector-Clocks/#Vector-Clock-Pruning </remarks>
+        public uint? SmallVclock { get; private set; }
         
         public bool? HasPrecommit { get; private set; }
         public bool? HasPostcommit { get; private set; }
@@ -224,6 +234,18 @@ namespace CorrugatedIron.Models
         public RiakBucketProperties SetReplicationMode(RiakConstants.RiakEnterprise.ReplicationMode replicationMode)
         {
             ReplicationMode = replicationMode;
+            return this;
+        }
+
+        public RiakBucketProperties SetBigVclock(uint? bigVclock)
+        {
+            BigVclock = bigVclock;
+            return this;
+        }
+
+        public RiakBucketProperties SetSmallVclock(uint? smallVclock)
+        {
+            SmallVclock = smallVclock;
             return this;
         }
 
