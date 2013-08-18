@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+v1.4.1
+------
+
+Maintenance release - just some API clean up, really
+
+* Support added to bucket properties for Replication Mode (#132)
+* Support added to bucket properties for `big_vclock` and `little_vclock` (#131)
+* `IRiakClient.Delete` accepts a RiakObject (#158) - it's now possible to pass in a full RiakObject and have CorrugatedIron generate the correct RiakObjectId for deletion.
+
 v1.4.0
 ------
 
