@@ -80,10 +80,7 @@ namespace CorrugatedIron.Config.Fluent
 
         public int NetworkConnectTimeout
         {
-            get
-            {
-                return this._networkConnectTimeout;
-            }
+            get { return _networkConnectTimeout; }
         }
 
         public RiakNodeConfiguration SetName(string name)
