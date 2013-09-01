@@ -424,13 +424,22 @@ namespace CorrugatedIron.Messages
       set { _search = value; }
     }
 
-    private RpbBucketProps.RpbReplMode _repl = RpbBucketProps.RpbReplMode.FALSE;
+    private RpbBucketProps.RpbReplMode? _repl = null;
     [global::ProtoBuf.ProtoMember(24, IsRequired = false, Name=@"repl", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(RpbBucketProps.RpbReplMode.FALSE)]
-    public RpbBucketProps.RpbReplMode repl
+    [global::System.ComponentModel.DefaultValue(null)]
+    public RpbBucketProps.RpbReplMode? repl
     {
       get { return _repl; }
       set { _repl = value; }
+    }
+
+    private byte[] _yz_index = null;
+    [global::ProtoBuf.ProtoMember(25, IsRequired = false, Name=@"yz_index", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(null)]
+    public byte[] yz_index
+    {
+      get { return _yz_index; }
+      set { _yz_index = value; }
     }
     [global::ProtoBuf.ProtoContract(Name=@"RpbReplMode")]
     public enum RpbReplMode

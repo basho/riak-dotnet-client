@@ -131,4 +131,6 @@ message RpbBucketProps {
         TRUE = 3;
     }
     optional RpbReplMode repl = 24;
+
+	optional bytes yz_index = 25;
 }
