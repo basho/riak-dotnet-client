@@ -27,5 +27,7 @@ namespace CorrugatedIron.Config
         //int IdleTimeout { get; }
         int NetworkReadTimeout { get; }
         int NetworkWriteTimeout { get; }
+
+        int NetworkConnectTimeout { get;  }
     }
 }
