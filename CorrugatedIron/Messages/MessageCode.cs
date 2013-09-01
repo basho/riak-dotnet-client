@@ -54,6 +54,17 @@ namespace CorrugatedIron.Messages
         CounterUpdateReq = 50,
         CounterUpdateResp = 51,
         CounterGetReq = 52,
-        CounterGetResp = 53
+        CounterGetResp = 53,
+        YokozunaIndexGetReq = 54,
+        YokozunaIndexGetResp = 55,
+        YokozunaIndexPutReq = 56,
+        YokozunaIndexDeleteReq = 57,
+        YokozunaIndexSchemaGetReq = 58,
+        YokozunaIndexSchemaGetResp = 59,
+        YokozunaIndexSchemaPutReq = 60,
+        DtFetchReq = 80,
+        DtFetchResp = 81,
+        DtUpdateReq = 82,
+        DtUpdateResp = 83
     }
 }
