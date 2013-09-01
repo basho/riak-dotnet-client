@@ -29,6 +29,8 @@ namespace CorrugatedIron.Config.Fluent
         private int _poolSize = 30;
         private int _networkReadTimeout = 2000;
         private int _networkWriteTimeout = 2000;
+
+        private int _networkConnectTimeout = 30000;
         private bool _vnodeVclocks = true;
 
         public string Name
@@ -74,6 +76,11 @@ namespace CorrugatedIron.Config.Fluent
         public bool VnodeVclocks
         {
             get { return _vnodeVclocks; }
+        }
+
+        public int NetworkConnectTimeout
+        {
+            get { return _networkConnectTimeout; }
         }
 
         public RiakNodeConfiguration SetName(string name)
@@ -127,6 +134,11 @@ namespace CorrugatedIron.Config.Fluent
         public RiakNodeConfiguration SetNetworkWriteTimeout(int networkWriteTimeout)
         {
             _networkWriteTimeout = networkWriteTimeout;
+            return this;
+        }
+        public RiakNodeConfiguration SetNetworkConnectTimeout(int networkConnectTimeout)
+        {
+            _networkConnectTimeout = networkConnectTimeout;
             return this;
         }
 

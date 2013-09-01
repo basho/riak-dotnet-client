@@ -14,6 +14,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Threading.Tasks;
+
 using CorrugatedIron.Exceptions;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
@@ -32,6 +34,7 @@ namespace CorrugatedIron.Comms
         private readonly int _port;
         private readonly int _receiveTimeout;
         private readonly int _sendTimeout;
+        private readonly int _connectTimeout;
         private static readonly Dictionary<MessageCode, Type> MessageCodeToTypeMap;
         private static readonly Dictionary<Type, MessageCode> TypeToMessageCodeMap;
         private Socket _pbcSocket;
@@ -46,7 +49,20 @@ namespace CorrugatedIron.Comms
                     socket.NoDelay = true;
                     socket.Connect(_server, _port);
 
-                    if(!socket.Connected)
+                    
+                    var wait = socket.BeginConnect(_server, _port,null,null);
+                    bool connectionTimedOut;
+                    if (wait.AsyncWaitHandle.WaitOne(_connectTimeout))
+                    {
+                        socket.EndConnect(wait);
+                        connectionTimedOut = false;
+                    }
+                    else
+                    {
+                        connectionTimedOut = true;
+                        Task.Factory.StartNew(() =>{try{socket.Close();} catch{}});
+                    }
+                    if(connectionTimedOut || !socket.Connected)
                     {
                         throw new RiakException("Unable to connect to remote server: {0}:{1}".Fmt(_server, _port));
                     }
@@ -108,12 +124,13 @@ namespace CorrugatedIron.Comms
             }
         }
 
-        public RiakPbcSocket(string server, int port, int receiveTimeout, int sendTimeout)
+        public RiakPbcSocket(string server, int port, int receiveTimeout, int sendTimeout, int connectTimeout)
         {
             _server = server;
             _port = port;
             _receiveTimeout = receiveTimeout;
             _sendTimeout = sendTimeout;
+            _connectTimeout = connectTimeout;
         }
 
         public void Write(MessageCode messageCode)

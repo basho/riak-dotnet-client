@@ -83,5 +83,12 @@ namespace CorrugatedIron.Config
             get { return (int)this["networkWriteTimeout"]; }
             set { this["networkWriteTimeout"] = value; }
         }
+
+        [ConfigurationProperty("networkConnectTimeout", DefaultValue = 30000, IsRequired = false)]
+        public int NetworkConnectTimeout
+        {
+            get { return (int)this["networkConnectTimeout"]; }
+            set { this["networkConnectTimeout"] = value; }
+        }
     }
 }

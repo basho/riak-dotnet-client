@@ -105,7 +105,7 @@ namespace CorrugatedIron.Comms
         {
             _restRootUrl = @"{0}://{1}:{2}".Fmt(nodeConfiguration.RestScheme, nodeConfiguration.HostAddress, nodeConfiguration.RestPort);
             _socket = new RiakPbcSocket(nodeConfiguration.HostAddress, nodeConfiguration.PbcPort, nodeConfiguration.NetworkReadTimeout,
-                nodeConfiguration.NetworkWriteTimeout);
+                nodeConfiguration.NetworkWriteTimeout, nodeConfiguration.NetworkConnectTimeout);
         }
 
         public RiakResult<TResult> PbcRead<TResult>()
