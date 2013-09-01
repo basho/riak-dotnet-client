@@ -119,7 +119,7 @@ namespace CorrugatedIron
                 return new RiakCounterResult(RiakResult<RiakObject>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline), null);
             }
 
-            var o = new RiakObject(bucket, counter, result.Value.returnvalue);
+            var o = new RiakObject(bucket, counter, result.Value.value);
             var cVal = 0L;
             var parseResult = false;
 
@@ -160,7 +160,7 @@ namespace CorrugatedIron
                 return new RiakCounterResult(RiakResult<RiakObject>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline), null);
             }
 
-            var o = new RiakObject(bucket, counter, result.Value.returnvalue);
+            var o = new RiakObject(bucket, counter, result.Value.value);
             long cVal;
             var parseResult = long.TryParse(o.Value.FromRiakString(), out cVal);
 
