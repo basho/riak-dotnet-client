@@ -1328,6 +1328,29 @@ namespace CorrugatedIron
         }
 
 
-        
+        public RiakResult<RiakObject> DtFetch(string bucket, string key,
+                                              string bucketType = RiakConstants.Defaults.BucketType,
+                                              RiakDtFetchOptions options = null)
+        {
+            var message = new DtFetchReq
+                {
+                    bucket = bucket.ToRiakString(),
+                    type = bucketType.ToRiakString(),
+                    key = key.ToRiakString()
+                };
+
+            options = options ?? new RiakDtFetchOptions();
+
+            options.Populate(message);
+
+            var result = UseConnection(conn => conn.PbcWriteRead<DtFetchReq, DtFetchResp>(message));
+
+            if (result.IsSuccess)
+            {
+                return RiakResult<RiakObject>.Success(new RiakObject(bucket, key, result));
+            }
+
+            return RiakResult<RiakObject>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
+        }
     }
 }

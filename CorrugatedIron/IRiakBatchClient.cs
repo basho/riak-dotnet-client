@@ -75,7 +75,8 @@ namespace CorrugatedIron
 
         RiakResult<IList<string>> ListKeysFromIndex(string bucket);
 
+        RiakResult<RiakObject> DtFetch(string bucket, string key, string bucketType = RiakConstants.Defaults.BucketType, RiakDtFetchOptions options = null);
+
         //RiakResult<RiakSearchResult> Search(Action<RiakSearchRequest> prepareRequest)
     }
-
 }
