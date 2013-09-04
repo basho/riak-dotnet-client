@@ -19,28 +19,37 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Numerics;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
 
 namespace CorrugatedIron.Models.RiakDt
 {
-    public class CounterOp
+    public class CounterOperation
     {
         public long Value { get; private set; }
 
-        public CounterOp(long value)
+        public CounterOperation(long value)
         {
             Value = value;
         }
+
+        public DtOp ToDtOp()
+        {
+            return new DtOp
+                {
+                    counter_op = new CounterOp
+                        {
+                            increment = Value
+                        }
+                };
+        }
     }
 
-    public class Counter : IRiakDtType<CounterOp>, IChangeTracking 
+    public class Counter : IRiakDtType<CounterOperation>, IChangeTracking 
     {
         public bool IsChanged { get; private set; }
         private long _value;
-        private byte[] _context;
-        private DtFetchResp.DataType _dataType = DtFetchResp.DataType.COUNTER;
+        private readonly byte[] _context;
 
         public long Value 
         { 
@@ -55,23 +64,29 @@ namespace CorrugatedIron.Models.RiakDt
             }
             private set { _value = value; }
         }
+        public string Bucket { get; private set; }
+        public string BucketType { get; private set; }
+        public string Key { get; private set; }
 
-        private readonly List<CounterOp> _operations = new List<CounterOp>();
+        private readonly List<CounterOperation> _operations = new List<CounterOperation>();
 
-        public Counter(DtFetchResp response)
+        public Counter(string bucket, string bucketType, string key, DtFetchResp response)
         {
+            Bucket = bucket;
+            BucketType = bucketType;
+            Key = key;
             Value = response.counter_value;
             _context = response.context;
         }
         
         public Counter Increment(long value = 1)
         {
-            _operations.Add(new CounterOp(value));
+            _operations.Add(new CounterOperation(value));
             IsChanged = true;
             return this;
         }
 
-        public ReadOnlyCollection<CounterOp> Operations
+        public ReadOnlyCollection<CounterOperation> Operations
         {
             get { return _operations.AsReadOnly(); }
         }
@@ -86,7 +101,7 @@ namespace CorrugatedIron.Models.RiakDt
             return new MapEntry
                 {
                     counter_value = Value,
-                    field = new MapField()
+                    field = new MapField
                         {
                             name = fieldName.ToRiakString(),
                             type = MapField.MapFieldType.COUNTER
@@ -101,11 +116,43 @@ namespace CorrugatedIron.Models.RiakDt
             IsChanged = false;
         }
 
-        
+        public List<DtUpdateReq> ToUpdateRequestList(RiakDtUpdateOptions options)
+        {
+            options = options ?? new RiakDtUpdateOptions();
+
+            return
+                _operations.Select(o =>
+                    {
+                        var req = new DtUpdateReq()
+                            {
+                                bucket = Bucket.ToRiakString(),
+                                type = BucketType.ToRiakString(),
+                                key = Key.ToRiakString(),
+                                op = o.ToDtOp()
+                            };
+
+                        if (options.IncludeContext)
+                            req.context = _context;
+
+                        options.Populate(req);
+
+                        return req;
+                    }).ToList();
+        }
+
+        private List<DtOp> ToCounterOpList()
+        {
+            return _operations.Select(op => op.ToDtOp()).ToList();
+        }
     }
+
+
 
     public interface IRiakDtType<T> 
     {
+        string Bucket { get; }
+        string BucketType { get; }
+        string Key { get; }
         ReadOnlyCollection<T> Operations { get; }
         MapEntry ToMapEntry(string fieldName);
     }
