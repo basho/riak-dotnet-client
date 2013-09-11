@@ -523,9 +523,12 @@ namespace CorrugatedIron.Models
             {
                 var soba = new SerializeObjectToByteArray<T>(theObject =>
                 {
-                    var ms = new MemoryStream();
-                    Serializer.Serialize(ms, value);
-                    return ms.ToArray();
+                    using (var ms = new MemoryStream())
+                    {
+                        Serializer.Serialize(ms, value);
+                        return ms.ToArray();
+                    }
+                    
                 });
                 SetObject(value, ContentType, soba);
                 return;
@@ -582,9 +585,12 @@ namespace CorrugatedIron.Models
             {
                 var deserializeObject = new DeserializeObject<T>((value, contentType) =>
                 {
-                    var ms = new MemoryStream();
-                    ms.Write(value, 0, Value.Length);
-                    return Serializer.Deserialize<T>(ms);
+                    using (var ms = new MemoryStream())
+                    {
+                        ms.Write(value, 0, Value.Length);
+                        ms.Position = 0;
+                        return Serializer.Deserialize<T>(ms);
+                    }
                 });
 
                 return GetObject(deserializeObject);
