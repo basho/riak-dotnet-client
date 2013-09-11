@@ -24,6 +24,7 @@ using CorrugatedIron.Tests.Extensions;
 using CorrugatedIron.Tests.Live.LiveRiakConnectionTests;
 using CorrugatedIron.Util;
 using NUnit.Framework;
+using ProtoBuf;
 
 namespace CorrugatedIron.Tests.Live
 {
@@ -34,9 +35,12 @@ namespace CorrugatedIron.Tests.Live
         protected const string Brent = "brent";
         protected const string Rob = "rob";
 
+        [ProtoContract]
         protected class Person
         {
+            [ProtoMember(1)]
             public string Name { get; set; }
+            [ProtoMember(2)]
             public string CurrentlyDrinking { get; set; }
         }
 
@@ -260,6 +264,85 @@ namespace CorrugatedIron.Tests.Live
             var linkPeople = Client.WalkLinks(oj, linkPhases);
             linkPeople.IsSuccess.ShouldBeTrue();
             linkPeople.Value.Count.ShouldEqual(6);
+        }
+    }
+
+
+
+    [TestFixture]
+    public class WhenSerializingObjects : RiakObjectTestBase
+    {
+        [ProtoContract]
+        class ProtoBufPerson
+        {
+            [ProtoMember(1)]
+            public int Id { get; set; }
+            [ProtoMember(2)]
+            public string Name { get; set; }
+            [ProtoMember(3)]
+            public Address Address { get; set; }
+        }
+        [ProtoContract]
+        class Address
+        {
+            [ProtoMember(1)]
+            public string Line1 { get; set; }
+            [ProtoMember(2)]
+            public string Line2 { get; set; }
+        }
+
+        [Test]
+        public void SavedObjectsShouldBeIdentical()
+        {
+            // create a proto-contract class (https://code.google.com/p/protobuf-net/wiki/GettingStarted)
+            //var testPerson = new ProtoBufPerson()
+            //{
+            //    Id = 42,
+            //    Name = "alex",
+            //    Address = new Address()
+            //    {
+            //        Line1 = "16 dusty road",
+            //        Line2 = "santa fe, nm 87508"
+            //    }
+            //};
+            const string bucketName = "test";
+            var ojPerson = new Person() {Name = "oj", CurrentlyDrinking = "tea"};
+
+            var oj = new RiakObject(bucketName, OJ) {ContentType = RiakConstants.ContentTypes.ProtocolBuffers};
+            oj.SetObject(ojPerson);
+
+            var putResult = Client.Put(oj);
+
+            var getResult = Client.Get(bucketName, OJ);
+            var newPerson = getResult.Value.GetObject<Person>();
+
+            ojPerson.Name.ShouldEqual(newPerson.Name);
+
+
+            var testPerson = new ProtoBufPerson()
+            {
+                Id = 42,
+                Name = "alex",
+                Address = new Address()
+                {
+                    Line1 = "16 dusty road",
+                    Line2 = "santa fe, nm 87508"
+                }
+            };
+
+            var ro = new RiakObject(bucketName, testPerson.Id.ToString());
+            ro.ContentType = RiakConstants.ContentTypes.ProtocolBuffers;
+            ro.SetObject(testPerson);
+
+            var putResult2 = Client.Put(ro);
+
+            var getResult2 = Client.Get(bucketName, testPerson.Id.ToString());
+            var testPerson2 = getResult2.Value.GetObject<ProtoBufPerson>();
+
+            testPerson.Id.ShouldEqual(testPerson2.Id);
+            testPerson.Name.ShouldEqual(testPerson2.Name);
+            testPerson.Address.Line1.ShouldEqual(testPerson2.Address.Line1);
+            testPerson.Address.Line2.ShouldEqual(testPerson2.Address.Line2);
         }
     }
 }
