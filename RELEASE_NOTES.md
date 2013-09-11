@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+v1.4.2
+------
+
+Protocol Buffers fix
+
+* Fixed (#171) where protobuf messages weren't making it through `GetObject<T>`
+* In the process of implementing the fix, found a memory leak in `GetObject<T>` and another in `SetObject<T>`
+
 v1.4.1
 ------
 
