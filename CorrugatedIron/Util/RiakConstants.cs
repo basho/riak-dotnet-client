@@ -46,7 +46,7 @@ namespace CorrugatedIron.Util
             public const string ImagePng = @"image/png";
             public const string ErlangBinary = @"application/x-erlang-binary";
             public const string Xml = @"application/xml";
-            public const string ProtocolBuffers = @"application/x-protobuf";
+            public const string ProtocolBuffers = ApplicationOctetStream; //@"application/x-protobuf";
         }
 
         public static class IndexSuffix
