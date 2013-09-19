@@ -75,7 +75,7 @@ namespace CorrugatedIron.Models.RiakDt
             Bucket = bucket;
             BucketType = bucketType;
             Key = key;
-            Value = response.counter_value;
+            Value = response.value.counter_value;
             _context = response.context;
         }
         
