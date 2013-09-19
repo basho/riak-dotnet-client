@@ -69,5 +69,10 @@ namespace CorrugatedIron.Extensions
         {
             return items.Contains(val);
         }
+
+        public static HashSet<T> ToHashSet<T>(this IEnumerable<T> source)
+        {
+            return new HashSet<T>(source);
+        }
     }
 }
