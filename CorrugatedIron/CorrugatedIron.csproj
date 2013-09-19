@@ -212,6 +212,7 @@
     <Compile Include="Models\RiakCounterGetOptions.cs" />
     <Compile Include="Models\RiakCounterResult.cs" />
     <Compile Include="Models\RiakDtFetchOptions.cs" />
+    <Compile Include="Models\RiakDtUpdateOptions.cs" />
     <Compile Include="Models\RiakDt\Counter.cs" />
     <Compile Include="Models\RiakDt\MapFieldName.cs" />
     <Compile Include="Models\RiakIndexGetOptions.cs" />

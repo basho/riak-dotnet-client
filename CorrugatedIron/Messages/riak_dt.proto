@@ -41,14 +41,14 @@ option java_outer_classname = "RiakDtPB";
 message MapField {
     /*
      * The types that can be stored in a map are limited to counters,
-     * sets, registers, and flags. Other types may be allowed in the
-     * future.
+     * sets, registers, flags, and maps.
      */
     enum MapFieldType {
         COUNTER  = 1;
         SET      = 2;
         REGISTER = 3;
         FLAG     = 4;
+        MAP      = 5;
     }
 
     required bytes        name = 1;
@@ -66,6 +66,7 @@ message MapEntry {
     repeated bytes    set_value      = 3;
     optional bytes    register_value = 4;
     optional bool     flag_value     = 5;
+    repeated MapEntry map_value      = 6;
 }
 
 /*
@@ -97,13 +98,26 @@ message DtFetchReq {
     optional bool include_context = 11 [default=true];
 }
 
+
+/*
+ * The value of the fetched data type. If present in the response,
+ * then empty values (sets, maps) should be treated as such.
+ */
+message DtValue {
+    optional sint64   counter_value = 1;
+    repeated bytes    set_value     = 2;
+    repeated MapEntry map_value     = 3;
+}
+
+
 /*
  * The response to a "Fetch" request. If the `include_context` option
  * is specified, an opaque "context" value will be returned along with
  * the user-friendly data. When sending an "Update" request, the
  * client should send this context as well, similar to how one would
  * send a vclock for KV updates. The `type` field indicates which
- * value field to expect.
+ * value type to expect. When the `value` field is missing from the
+ * message, the client should interpret it as a "not found".
  */
 message DtFetchResp {
     enum DataType {
@@ -114,11 +128,7 @@ message DtFetchResp {
 
     optional bytes    context = 1;
     required DataType type    = 2;
-
-    // Types
-    optional sint64   counter_value = 3;
-    repeated bytes    set_value     = 4;
-    repeated MapEntry map_value     = 5;
+    optional DtValue  value   = 3;
 }
 
 /*
@@ -170,6 +180,7 @@ message MapUpdate {
      */
     optional bytes     register_op = 4;
     optional FlagOp    flag_op     = 5;
+    optional MapOp     map_op      = 6;
 }
 
 /*
@@ -219,7 +230,7 @@ message DtUpdateReq {
     optional uint32 w               =  6;
     optional uint32 dw              =  7;
     optional uint32 pw              =  8;
-    optional bool   return_body     =  9;
+    optional bool   return_body     =  9 [default=false];
     optional uint32 timeout         = 10;
     optional bool   sloppy_quorum   = 11;  // Experimental, may change/disappear
     optional uint32 n_val           = 12;  // Experimental, may change/disappear

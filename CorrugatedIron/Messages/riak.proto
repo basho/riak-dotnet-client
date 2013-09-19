@@ -52,6 +52,7 @@ message RpbPair {
 // Get bucket properties request
 message RpbGetBucketReq {
     required bytes bucket = 1;
+    optional bytes type = 2;
 }
 
 // Get bucket properties response
@@ -63,6 +64,7 @@ message RpbGetBucketResp {
 message RpbSetBucketReq {
     required bytes bucket = 1;
     required RpbBucketProps props = 2;
+    optional bytes type = 3;
 }
 
 // Set bucket properties response - no message defined, just send
@@ -71,7 +73,28 @@ message RpbSetBucketReq {
 // Reset bucket properties request
 message RpbResetBucketReq {
     required bytes bucket = 1;
+    optional bytes type = 2;
 }
+
+// Get bucket properties request
+message RpbGetBucketTypeReq {
+    required bytes type = 1;
+}
+
+// Set bucket properties request
+message RpbSetBucketTypeReq {
+    required bytes type = 1;
+    required RpbBucketProps props = 2;
+}
+
+// Set bucket properties response - no message defined, just send
+// RpbSetBucketResp
+
+// Reset bucket properties request
+message RpbResetBucketTypeReq {
+    required bytes type = 1;
+}
+
 
 // Reset bucket properties response - no message defined, just send
 // RpbResetBucketResp
@@ -132,5 +155,5 @@ message RpbBucketProps {
     }
     optional RpbReplMode repl = 24;
 
-	optional bytes yz_index = 25;
+    optional bytes yz_index = 25;
 }

@@ -43,7 +43,10 @@ namespace CorrugatedIron.Messages
       REGISTER = 3,
             
       [global::ProtoBuf.ProtoEnum(Name=@"FLAG", Value=4)]
-      FLAG = 4
+      FLAG = 4,
+            
+      [global::ProtoBuf.ProtoEnum(Name=@"MAP", Value=5)]
+      MAP = 5
     }
   
     private global::ProtoBuf.IExtension extensionObject;
@@ -97,6 +100,13 @@ namespace CorrugatedIron.Messages
       get { return _flag_value; }
       set { _flag_value = value; }
     }
+    private readonly global::System.Collections.Generic.List<MapEntry> _map_value = new global::System.Collections.Generic.List<MapEntry>();
+    [global::ProtoBuf.ProtoMember(6, Name=@"map_value", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public global::System.Collections.Generic.List<MapEntry> map_value
+    {
+      get { return _map_value; }
+    }
+  
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -205,6 +215,39 @@ namespace CorrugatedIron.Messages
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
   }
   
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"DtValue")]
+  public partial class DtValue : global::ProtoBuf.IExtensible
+  {
+    public DtValue() {}
+    
+
+    private long _counter_value = default(long);
+    [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"counter_value", DataFormat = global::ProtoBuf.DataFormat.ZigZag)]
+    [global::System.ComponentModel.DefaultValue(default(long))]
+    public long counter_value
+    {
+      get { return _counter_value; }
+      set { _counter_value = value; }
+    }
+    private readonly global::System.Collections.Generic.List<byte[]> _set_value = new global::System.Collections.Generic.List<byte[]>();
+    [global::ProtoBuf.ProtoMember(2, Name=@"set_value", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public global::System.Collections.Generic.List<byte[]> set_value
+    {
+      get { return _set_value; }
+    }
+  
+    private readonly global::System.Collections.Generic.List<MapEntry> _map_value = new global::System.Collections.Generic.List<MapEntry>();
+    [global::ProtoBuf.ProtoMember(3, Name=@"map_value", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public global::System.Collections.Generic.List<MapEntry> map_value
+    {
+      get { return _map_value; }
+    }
+  
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"DtFetchResp")]
   public partial class DtFetchResp : global::ProtoBuf.IExtensible
   {
@@ -227,28 +270,14 @@ namespace CorrugatedIron.Messages
       set { _type = value; }
     }
 
-    private long _counter_value = default(long);
-    [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"counter_value", DataFormat = global::ProtoBuf.DataFormat.ZigZag)]
-    [global::System.ComponentModel.DefaultValue(default(long))]
-    public long counter_value
+    private DtValue _value = null;
+    [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"value", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(null)]
+    public DtValue value
     {
-      get { return _counter_value; }
-      set { _counter_value = value; }
+      get { return _value; }
+      set { _value = value; }
     }
-    private readonly global::System.Collections.Generic.List<byte[]> _set_value = new global::System.Collections.Generic.List<byte[]>();
-    [global::ProtoBuf.ProtoMember(4, Name=@"set_value", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public global::System.Collections.Generic.List<byte[]> set_value
-    {
-      get { return _set_value; }
-    }
-  
-    private readonly global::System.Collections.Generic.List<MapEntry> _map_value = new global::System.Collections.Generic.List<MapEntry>();
-    [global::ProtoBuf.ProtoMember(5, Name=@"map_value", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public global::System.Collections.Generic.List<MapEntry> map_value
-    {
-      get { return _map_value; }
-    }
-  
     [global::ProtoBuf.ProtoContract(Name=@"DataType")]
     public enum DataType
     {
@@ -353,11 +382,20 @@ namespace CorrugatedIron.Messages
 
     private MapUpdate.FlagOp _flag_op;
     [global::ProtoBuf.ProtoMember(5, IsRequired = false, Name=@"flag_op", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    //[global::System.ComponentModel.DefaultValue(MapUpdate.FlagOp.)]
+    [global::System.ComponentModel.DefaultValue(null)]
     public MapUpdate.FlagOp flag_op
     {
       get { return _flag_op; }
       set { _flag_op = value; }
+    }
+
+    private MapOp _map_op = null;
+    [global::ProtoBuf.ProtoMember(6, IsRequired = false, Name=@"map_op", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(null)]
+    public MapOp map_op
+    {
+      get { return _map_op; }
+      set { _map_op = value; }
     }
     [global::ProtoBuf.ProtoContract(Name=@"FlagOp")]
     public enum FlagOp
@@ -515,9 +553,9 @@ namespace CorrugatedIron.Messages
       set { _pw = value; }
     }
 
-    private bool _return_body = default(bool);
+    private bool _return_body = (bool)false;
     [global::ProtoBuf.ProtoMember(9, IsRequired = false, Name=@"return_body", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    [global::System.ComponentModel.DefaultValue(default(bool))]
+    [global::System.ComponentModel.DefaultValue((bool)false)]
     public bool return_body
     {
       get { return _return_body; }
