@@ -14,22 +14,29 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CorrugatedIron.Models
-{
-    public class RiakCounterResult
-    {
-        public RiakResult<RiakObject> Result { get; private set; }
-        public long? Value { get; internal set; }
-        public byte[] Context { get; internal set; }
+using CorrugatedIron.Extensions;
+using CorrugatedIron.Messages;
 
-        public RiakCounterResult(RiakResult<RiakObject> result)
+namespace CorrugatedIron.Models.RiakDt
+{
+    public class RiakDtMapField
+    {
+        public enum RiakDtMapFieldType
         {
-            Result = result;
+            Counter = MapField.MapFieldType.COUNTER,
+            Set = MapField.MapFieldType.SET,
+            Register = MapField.MapFieldType.REGISTER,
+            Flag = MapField.MapFieldType.FLAG,
+            Map = MapField.MapFieldType.MAP
         }
 
-        public RiakCounterResult(RiakResult<RiakObject> result, long? value) : this(result)
+        public string Name { get; private set; }
+        public RiakDtMapFieldType Type { get; private set; }
+
+        internal RiakDtMapField(MapField mapField)
         {
-            Value = value;
+            Name = mapField.name.FromRiakString();
+            Type = (RiakDtMapFieldType)mapField.type;
         }
     }
 }
