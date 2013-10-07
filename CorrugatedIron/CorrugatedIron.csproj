@@ -43,7 +43,6 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
@@ -212,10 +211,14 @@
     <Compile Include="Models\RiakCounterGetOptions.cs" />
     <Compile Include="Models\RiakCounterResult.cs" />
     <Compile Include="Models\RiakDtFetchOptions.cs" />
+    <Compile Include="Models\RiakDt\IDtOp.cs" />
+    <Compile Include="Models\RiakDt\IRiakDtType.cs" />
+    <Compile Include="Models\RiakDt\RiakDtMapEntry.cs" />
+    <Compile Include="Models\RiakDt\RiakDtMapField.cs" />
     <Compile Include="Models\RiakDt\RiakDtMapResult.cs" />
     <Compile Include="Models\RiakDt\RiakDtSetResult.cs" />
     <Compile Include="Models\RiakDtUpdateOptions.cs" />
-    <Compile Include="Models\RiakDt\Counter.cs" />
+    <Compile Include="Models\RiakDt\RiakDtCounter.cs" />
     <Compile Include="Models\RiakIndexGetOptions.cs" />
     <Compile Include="Models\RiakObjectId.cs" />
     <Compile Include="Models\RiakBucketProperties.cs">

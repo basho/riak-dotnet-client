@@ -38,5 +38,10 @@ namespace CorrugatedIron.Models.RiakDt
             Name = mapField.name.FromRiakString();
             Type = (RiakDtMapFieldType)mapField.type;
         }
+
+        public MapField ToMapField()
+        {
+            return new MapField {name = Name.ToRiakString(), type = (MapField.MapFieldType)Type};
+        }
     }
 }

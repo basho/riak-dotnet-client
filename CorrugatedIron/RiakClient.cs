@@ -1569,5 +1569,75 @@ namespace CorrugatedIron
 
             return rmr;
         }
+
+        public RiakDtMapResult DtUpdateMap<T>(string bucket,
+                                              string key,
+                                              SerializeObjectToByteArray<T> serialize,
+                                              byte[] context = null,
+                                              List<RiakDtMapField> adds = null,
+                                              List<RiakDtMapField> removes = null,
+                                              /* Is this the right way to represent updates?
+                                               * It seems like there should be something better, but it requires data
+                                               * structures that track themselves and my guess is building the update
+                                               * should be handled long before we get to calling DtUpdateMap<T>
+                                               */
+                                              List<MapUpdate> updates = null,
+                                              string bucketType = RiakConstants.Defaults.BucketType,
+                                              RiakDtUpdateOptions options = null
+            )
+        {
+            if (!IsValidBucketOrKeyOrBucketType(bucket))
+            {
+                return new RiakDtMapResult(RiakResult<RiakObject>.Error(ResultCode.InvalidRequest, InvalidBucketErrorMessage, false));
+            }
+
+            if (!IsValidBucketOrKeyOrBucketType(key))
+            {
+                return new RiakDtMapResult(RiakResult<RiakObject>.Error(ResultCode.InvalidRequest, InvalidKeyErrorMessage, false));
+            }
+
+            if (bucketType != RiakConstants.Defaults.BucketType && !IsValidBucketOrKeyOrBucketType(bucketType))
+            {
+                return new RiakDtMapResult(RiakResult<RiakObject>.Error(ResultCode.InvalidRequest, InvalidBucketTypeErrorMessage, false));
+            }
+
+            var request = new DtUpdateReq
+                {
+                    bucket = bucket.ToRiakString(),
+                    key = key.ToRiakString(),
+                    type = bucketType.ToRiakString()
+                };
+
+            options = options ?? new RiakDtUpdateOptions();
+            options.Populate(request);
+
+            if (adds != null)
+                request.op.map_op.adds.AddRange(adds.Select(a => a.ToMapField()));
+
+            if (removes != null)
+                request.op.map_op.removes.AddRange(removes.Select(a => a.ToMapField()));
+
+            if (updates != null)
+                request.op.map_op.updates.AddRange(updates);
+
+            if (context != null)
+                request.context = context;
+
+            var result = UseConnection(conn => conn.PbcWriteRead<DtUpdateReq, DtUpdateResp>(request));
+
+            if (!result.IsSuccess)
+                return new RiakDtMapResult(RiakResult<RiakObject>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline));
+
+            var rmr =
+                new RiakDtMapResult(RiakResult<RiakObject>.Success(new RiakObject(bucket, key, result.Value.map_value)));
+
+            if (options.IncludeContext)
+                rmr.Context = result.Value.context;
+
+            if (options.ReturnBody)
+                rmr.Values.AddRange(result.Value.map_value.Select(mv => new RiakDtMapEntry(mv)));
+
+            return rmr;
+        }
     }
 }
