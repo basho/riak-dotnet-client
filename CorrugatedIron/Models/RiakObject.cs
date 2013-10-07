@@ -33,7 +33,7 @@ namespace CorrugatedIron.Models
 
     public delegate byte[] SerializeObjectToByteArray<in T>(T theObject);
 
-    public delegate T DeserializeObject<out T>(byte[] theObject, string contentType);
+    public delegate T DeserializeObject<out T>(byte[] theObject, string contentType = null);
 
     public delegate T ResolveConflict<T>(List<T> conflictedObjects);
 
@@ -598,7 +598,7 @@ namespace CorrugatedIron.Models
 
             if (ContentType == RiakConstants.ContentTypes.Xml)
             {
-                var deserializeObject = new DeserializeObject<T>((value, contenType) =>
+                var deserializeObject = new DeserializeObject<T>((value, contentType) =>
                 {
                     var r = XmlReader.Create(Value.FromRiakString());
                     var serde = new XmlSerializer(typeof(T));

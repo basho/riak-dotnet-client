@@ -15,3 +15,13 @@ CorrugatedIron Build Process
 * Make any changes to documentation that might be required.
 
 Give yourself a pat on the back and have some tea.
+
+Regenerating .proto files
+=========================
+
+To regenerate .proto files
+
+* cd to the directory containing the PBC definitions (CorrugatedIron\Messages)
+* execute (outside of PowerShell) `"C:\Program Files (x86)\protobuf-net\protobuf-net-VS9\protogen.exe" -p:detectMissing=true -ns:CorrugatedIron.Messages -i:riak_kv.proto -o:riak_kv.cs`
+* recompile CorrugatedIron
+* pray for rain

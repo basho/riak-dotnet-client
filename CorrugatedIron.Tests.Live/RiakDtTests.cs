@@ -14,22 +14,20 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CorrugatedIron.Models
+using CorrugatedIron.Tests.Live.LiveRiakConnectionTests;
+using NUnit.Framework;
+
+namespace CorrugatedIron.Tests.Live
 {
-    public class RiakCounterResult
+    [TestFixture]
+    public class RiakDtTests : LiveRiakConnectionTestBase
     {
-        public RiakResult<RiakObject> Result { get; private set; }
-        public long? Value { get; internal set; }
-        public byte[] Context { get; internal set; }
+        private const string Bucket = "riak_dt_bucket";
 
-        public RiakCounterResult(RiakResult<RiakObject> result)
+        [TearDown]
+        public void TearDown()
         {
-            Result = result;
-        }
-
-        public RiakCounterResult(RiakResult<RiakObject> result, long? value) : this(result)
-        {
-            Value = value;
+            Client.DeleteBucket(Bucket);
         }
     }
 }

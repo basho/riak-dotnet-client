@@ -14,22 +14,39 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CorrugatedIron.Models
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using CorrugatedIron.Extensions;
+
+namespace CorrugatedIron.Models.RiakDt
 {
-    public class RiakCounterResult
+    public class RiakDtSetResult
     {
         public RiakResult<RiakObject> Result { get; private set; }
-        public long? Value { get; internal set; }
         public byte[] Context { get; internal set; }
+        public List<byte[]> Values { get; internal set; } 
 
-        public RiakCounterResult(RiakResult<RiakObject> result)
+        public RiakDtSetResult(RiakResult<RiakObject> result, 
+                               byte[] context = null,
+                               List<byte[]> values = null )
         {
             Result = result;
+
+            if (context != null)
+                Context = context;
+
+            Values = values ?? new List<byte[]>();
         }
 
-        public RiakCounterResult(RiakResult<RiakObject> result, long? value) : this(result)
+        public ISet<T> GetObjects<T>(DeserializeObject<T> deserializeObject)
         {
-            Value = value;
+            if (deserializeObject == null)
+            {
+                throw new ArgumentException("deserializeObject must not be null");
+            }
+
+            return Values.Select(v => deserializeObject(v)).ToHashSet();
         }
     }
 }
