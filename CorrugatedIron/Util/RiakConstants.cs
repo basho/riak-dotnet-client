@@ -94,6 +94,8 @@ namespace CorrugatedIron.Util
 
         public static class Defaults
         {
+            public const string BucketType = "default";
+
             public static class Rest
             {
                 public const int Timeout = 30000;

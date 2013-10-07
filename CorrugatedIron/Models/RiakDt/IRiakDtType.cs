@@ -14,22 +14,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CorrugatedIron.Models
+using System.Collections.ObjectModel;
+using CorrugatedIron.Messages;
+
+namespace CorrugatedIron.Models.RiakDt
 {
-    public class RiakCounterResult
+    public interface IRiakDtType<T>
     {
-        public RiakResult<RiakObject> Result { get; private set; }
-        public long? Value { get; internal set; }
-        public byte[] Context { get; internal set; }
-
-        public RiakCounterResult(RiakResult<RiakObject> result)
-        {
-            Result = result;
-        }
-
-        public RiakCounterResult(RiakResult<RiakObject> result, long? value) : this(result)
-        {
-            Value = value;
-        }
+        string Bucket { get; }
+        string BucketType { get; }
+        string Key { get; }
+        ReadOnlyCollection<T> Operations { get; }
+        MapEntry ToMapEntry(string fieldName);
     }
 }
