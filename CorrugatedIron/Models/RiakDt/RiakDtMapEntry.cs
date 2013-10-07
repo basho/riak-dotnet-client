@@ -14,17 +14,40 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using CorrugatedIron.Messages;
 
 namespace CorrugatedIron.Models.RiakDt
 {
     public class RiakDtMapEntry
     {
         public RiakDtMapField Field { get; internal set; }
-        public long CounterValue { get; internal set; }
+        public RiakDtCounter Counter { get; internal set; }
         public List<byte[]> SetValue { get; internal set; }
         public byte[] RegisterValue { get; internal set; }
         public bool? FlagValue { get; internal set; }
-        public RiakDtMapEntry MapValue { get; internal set; }
+        public List<RiakDtMapEntry> MapValue { get; internal set; }
+
+        internal RiakDtMapEntry(MapEntry entry)
+        {
+            Field = new RiakDtMapField(entry.field);
+
+            if (Field.Type == RiakDtMapField.RiakDtMapFieldType.Counter)
+                Counter = new RiakDtCounter {Value = entry.counter_value};
+
+            if (Field.Type == RiakDtMapField.RiakDtMapFieldType.Flag)
+                FlagValue = entry.flag_value;
+
+            if (Field.Type == RiakDtMapField.RiakDtMapFieldType.Map)
+                MapValue.AddRange(entry.map_value.Select(mv => new RiakDtMapEntry(mv)));
+
+            if (Field.Type == RiakDtMapField.RiakDtMapFieldType.Register)
+                RegisterValue = entry.register_value;
+
+            if (Field.Type == RiakDtMapField.RiakDtMapFieldType.Set)
+                SetValue.AddRange(entry.set_value);
+        }
     }
 }

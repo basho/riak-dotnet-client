@@ -14,7 +14,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -24,7 +23,7 @@ using CorrugatedIron.Messages;
 
 namespace CorrugatedIron.Models.RiakDt
 {
-    public class CounterOperation
+    public class CounterOperation : IDtOp
     {
         public long Value { get; private set; }
 
@@ -45,7 +44,7 @@ namespace CorrugatedIron.Models.RiakDt
         }
     }
 
-    public class Counter : IRiakDtType<CounterOperation>, IChangeTracking 
+    public class RiakDtCounter : IRiakDtType<CounterOperation>, IDtOp, IChangeTracking 
     {
         public bool IsChanged { get; private set; }
         private long _value;
@@ -62,7 +61,7 @@ namespace CorrugatedIron.Models.RiakDt
 
                 return _value;
             }
-            private set { _value = value; }
+            internal set { _value = value; }
         }
         public string Bucket { get; private set; }
         public string BucketType { get; private set; }
@@ -70,7 +69,12 @@ namespace CorrugatedIron.Models.RiakDt
 
         private readonly List<CounterOperation> _operations = new List<CounterOperation>();
 
-        public Counter(string bucket, string bucketType, string key, DtFetchResp response)
+        public RiakDtCounter()
+        {
+            
+        }
+
+        public RiakDtCounter(string bucket, string bucketType, string key, DtFetchResp response)
         {
             Bucket = bucket;
             BucketType = bucketType;
@@ -79,7 +83,7 @@ namespace CorrugatedIron.Models.RiakDt
             _context = response.context;
         }
         
-        public Counter Increment(long value = 1)
+        public RiakDtCounter Increment(long value = 1)
         {
             _operations.Add(new CounterOperation(value));
             IsChanged = true;
@@ -91,7 +95,7 @@ namespace CorrugatedIron.Models.RiakDt
             get { return _operations.AsReadOnly(); }
         }
 
-        public static Counter operator ++(Counter counter)
+        public static RiakDtCounter operator ++(RiakDtCounter counter)
         {
             return counter.Increment();
         }
@@ -116,44 +120,57 @@ namespace CorrugatedIron.Models.RiakDt
             IsChanged = false;
         }
 
-        public List<DtUpdateReq> ToUpdateRequestList(RiakDtUpdateOptions options)
+        public CounterOp ToCounterOp()
+        {
+            var sum = _operations.Sum(op => op.Value);
+
+            if (sum == 0)
+                return null;
+
+            return new CounterOp
+                {
+                    increment = sum
+                };
+        }
+
+        /// <summary>
+        /// Compress all operations in a RiakDtCounter into a single DtUpdateReq
+        /// </summary>
+        /// <param name="options">The RiakDtUpdateOptions</param>
+        /// <returns>Returns a valid DtUpdateReq or null.</returns>
+        /// <remarks>A null value will be returned when the net of all counter
+        /// operations will produce no change to the counter value. That is:
+        /// when the sum of all operations is 0, null will be returned. In these
+        /// situations, the caller should not submit any changes to Riak. </remarks>
+        public DtUpdateReq ToDtUpdateRequest(RiakDtUpdateOptions options)
         {
             options = options ?? new RiakDtUpdateOptions();
 
-            return
-                _operations.Select(o =>
-                    {
-                        var req = new DtUpdateReq()
-                            {
-                                bucket = Bucket.ToRiakString(),
-                                type = BucketType.ToRiakString(),
-                                key = Key.ToRiakString(),
-                                op = o.ToDtOp()
-                            };
+            var request = new DtUpdateReq
+                {
+                    op = {counter_op = ToCounterOp()}
+                };
 
-                        if (options.IncludeContext)
-                            req.context = _context;
+            /* We shouldn't send any operations in to Riak in this case.
+             * This means that whatever calls ToDtUpdateRequest needs to 
+             * be aware of possible null values
+             */
+            if (request.op.counter_op == null || request.op.counter_op.increment == 0)
+                return null;
 
-                        options.Populate(req);
+            if (options.IncludeContext && _context != null)
+                request.context = _context;
 
-                        return req;
-                    }).ToList();
+            options.Populate(request);
+
+            return request;
         }
 
-        private List<DtOp> ToCounterOpList()
+        public DtOp ToDtOp()
         {
-            return _operations.Select(op => op.ToDtOp()).ToList();
+            var co = ToCounterOp();
+
+            return co == null ? null : new DtOp { counter_op = ToCounterOp() };
         }
-    }
-
-
-
-    public interface IRiakDtType<T> 
-    {
-        string Bucket { get; }
-        string BucketType { get; }
-        string Key { get; }
-        ReadOnlyCollection<T> Operations { get; }
-        MapEntry ToMapEntry(string fieldName);
     }
 }
