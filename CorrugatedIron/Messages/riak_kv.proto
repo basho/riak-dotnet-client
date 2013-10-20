@@ -56,6 +56,7 @@ message RpbGetReq {
     optional uint32 timeout = 10;
     optional bool sloppy_quorum = 11;   // Experimental, may change/disappear
     optional uint32 n_val = 12;         // Experimental, may change/disappear
+    optional bytes type = 13;           // Bucket type, if not set we assume the 'default' type
 }
 
 // Get Response - if the record was not found there will be no content/vclock
@@ -84,6 +85,7 @@ message RpbPutReq {
     optional bool asis = 13;
     optional bool sloppy_quorum = 14; // Experimental, may change/disappear
     optional uint32 n_val = 15;       // Experimental, may change/disappear
+    optional bytes type = 16;         // Bucket type, if not set we assume the 'default' type
 }
 
 // Put response - same as get response with optional key if one was generated
@@ -108,6 +110,7 @@ message RpbDelReq {
     optional uint32 timeout = 10;
     optional bool sloppy_quorum = 11; // Experimental, may change/disappear
     optional uint32 n_val = 12;       // Experimental, may change/disappear
+    optional bytes type = 13;         // Bucket type, if not set we assume the 'default' type
 }
 
 // Delete response - not defined, will return a RpbDelResp on success or RpbErrorResp on failure
@@ -116,6 +119,7 @@ message RpbDelReq {
 message RpbListBucketsReq {
     optional uint32 timeout = 1;
     optional bool stream = 2;
+    optional bytes type = 3;         // Bucket type, if not set we assume the 'default' type
 }
 
 // List buckets response - one or more of these packets will be sent
@@ -130,6 +134,7 @@ message RpbListBucketsResp {
 message RpbListKeysReq {
     required bytes bucket = 1;
     optional uint32 timeout = 2;
+    optional bytes type = 3;         // Bucket type, if not set we assume the 'default' type
 }
 
 // List keys in bucket response - one or more of these packets will be sent
@@ -173,6 +178,7 @@ message RpbIndexReq {
     optional uint32 max_results = 9;
     optional bytes continuation = 10;
     optional uint32 timeout = 11;
+    optional bytes type = 12;         // Bucket type, if not set we assume the 'default' type
 }
 
 // Secondary Index query response
@@ -195,6 +201,7 @@ message RpbCSBucketReq {
     optional bytes continuation = 6;
     optional uint32 max_results = 7;
     optional uint32 timeout = 8;
+    optional bytes type = 9;         // Bucket type, if not set we assume the 'default' type
 }
 
 // return for CS bucket fold
@@ -241,6 +248,7 @@ message RpbCounterUpdateReq {
     optional uint32 dw = 5;
     optional uint32 pw = 6;
     optional bool returnvalue = 7;
+    optional bytes type = 8;         // Bucket type, if not set we assume the 'default' type
 }
 
 // Counter update response? No message | error response
@@ -256,6 +264,7 @@ message RpbCounterGetReq {
     optional uint32 pr = 4;
     optional bool basic_quorum = 5;
     optional bool notfound_ok = 6;
+    optional bytes type = 7;         // Bucket type, if not set we assume the 'default' type
 }
 
 // Counter value response
