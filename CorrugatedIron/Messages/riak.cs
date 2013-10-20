@@ -7,8 +7,6 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Option: missing-value detection (*Specified/ShouldSerialize*/Reset*) enabled
-    
 // Generated from: riak.proto
 namespace CorrugatedIron.Messages
 {
@@ -42,41 +40,23 @@ namespace CorrugatedIron.Messages
     public RpbGetServerInfoResp() {}
     
 
-    private byte[] _node;
+    private byte[] _node = null;
     [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"node", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(null)]
     public byte[] node
     {
-      get { return _node?? null; }
+      get { return _node; }
       set { _node = value; }
     }
-    [global::System.Xml.Serialization.XmlIgnore]
-    [global::System.ComponentModel.Browsable(false)]
-    public bool nodeSpecified
-    {
-      get { return _node != null; }
-      set { if (value == (_node== null)) _node = value ? node : (byte[])null; }
-    }
-    private bool ShouldSerializenode() { return nodeSpecified; }
-    private void Resetnode() { nodeSpecified = false; }
-    
 
-    private byte[] _server_version;
+    private byte[] _server_version = null;
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"server_version", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(null)]
     public byte[] server_version
     {
-      get { return _server_version?? null; }
+      get { return _server_version; }
       set { _server_version = value; }
     }
-    [global::System.Xml.Serialization.XmlIgnore]
-    [global::System.ComponentModel.Browsable(false)]
-    public bool server_versionSpecified
-    {
-      get { return _server_version != null; }
-      set { if (value == (_server_version== null)) _server_version = value ? server_version : (byte[])null; }
-    }
-    private bool ShouldSerializeserver_version() { return server_versionSpecified; }
-    private void Resetserver_version() { server_versionSpecified = false; }
-    
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -95,23 +75,14 @@ namespace CorrugatedIron.Messages
       set { _key = value; }
     }
 
-    private byte[] _value;
+    private byte[] _value = null;
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"value", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(null)]
     public byte[] value
     {
-      get { return _value?? null; }
+      get { return _value; }
       set { _value = value; }
     }
-    [global::System.Xml.Serialization.XmlIgnore]
-    [global::System.ComponentModel.Browsable(false)]
-    public bool valueSpecified
-    {
-      get { return _value != null; }
-      set { if (value == (_value== null)) _value = value ? this.value : (byte[])null; }
-    }
-    private bool ShouldSerializevalue() { return valueSpecified; }
-    private void Resetvalue() { valueSpecified = false; }
-    
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -130,23 +101,14 @@ namespace CorrugatedIron.Messages
       set { _bucket = value; }
     }
 
-    private byte[] _type;
+    private byte[] _type = null;
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"type", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(null)]
     public byte[] type
     {
-      get { return _type?? null; }
+      get { return _type; }
       set { _type = value; }
     }
-    [global::System.Xml.Serialization.XmlIgnore]
-    [global::System.ComponentModel.Browsable(false)]
-    public bool typeSpecified
-    {
-      get { return _type != null; }
-      set { if (value == (_type== null)) _type = value ? type : (byte[])null; }
-    }
-    private bool ShouldSerializetype() { return typeSpecified; }
-    private void Resettype() { typeSpecified = false; }
-    
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -189,23 +151,14 @@ namespace CorrugatedIron.Messages
       set { _props = value; }
     }
 
-    private byte[] _type;
+    private byte[] _type = null;
     [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"type", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(null)]
     public byte[] type
     {
-      get { return _type?? null; }
+      get { return _type; }
       set { _type = value; }
     }
-    [global::System.Xml.Serialization.XmlIgnore]
-    [global::System.ComponentModel.Browsable(false)]
-    public bool typeSpecified
-    {
-      get { return _type != null; }
-      set { if (value == (_type== null)) _type = value ? type : (byte[])null; }
-    }
-    private bool ShouldSerializetype() { return typeSpecified; }
-    private void Resettype() { typeSpecified = false; }
-    
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -224,23 +177,14 @@ namespace CorrugatedIron.Messages
       set { _bucket = value; }
     }
 
-    private byte[] _type;
+    private byte[] _type = null;
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"type", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(null)]
     public byte[] type
     {
-      get { return _type?? null; }
+      get { return _type; }
       set { _type = value; }
     }
-    [global::System.Xml.Serialization.XmlIgnore]
-    [global::System.ComponentModel.Browsable(false)]
-    public bool typeSpecified
-    {
-      get { return _type != null; }
-      set { if (value == (_type== null)) _type = value ? type : (byte[])null; }
-    }
-    private bool ShouldSerializetype() { return typeSpecified; }
-    private void Resettype() { typeSpecified = false; }
-    
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -343,23 +287,14 @@ namespace CorrugatedIron.Messages
       set { _modfun = value; }
     }
 
-    private byte[] _name;
+    private byte[] _name = null;
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"name", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(null)]
     public byte[] name
     {
-      get { return _name?? null; }
+      get { return _name; }
       set { _name = value; }
     }
-    [global::System.Xml.Serialization.XmlIgnore]
-    [global::System.ComponentModel.Browsable(false)]
-    public bool nameSpecified
-    {
-      get { return _name != null; }
-      set { if (value == (_name== null)) _name = value ? name : (byte[])null; }
-    }
-    private bool ShouldSerializename() { return nameSpecified; }
-    private void Resetname() { nameSpecified = false; }
-    
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -371,59 +306,32 @@ namespace CorrugatedIron.Messages
     public RpbBucketProps() {}
     
 
-    private uint? _n_val;
+    private uint _n_val = default(uint);
     [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"n_val", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(uint))]
     public uint n_val
     {
-      get { return _n_val?? default(uint); }
+      get { return _n_val; }
       set { _n_val = value; }
     }
-    [global::System.Xml.Serialization.XmlIgnore]
-    [global::System.ComponentModel.Browsable(false)]
-    public bool n_valSpecified
-    {
-      get { return _n_val != null; }
-      set { if (value == (_n_val== null)) _n_val = value ? n_val : (uint?)null; }
-    }
-    private bool ShouldSerializen_val() { return n_valSpecified; }
-    private void Resetn_val() { n_valSpecified = false; }
-    
 
-    private bool? _allow_mult;
+    private bool _allow_mult = default(bool);
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"allow_mult", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(default(bool))]
     public bool allow_mult
     {
-      get { return _allow_mult?? default(bool); }
+      get { return _allow_mult; }
       set { _allow_mult = value; }
     }
-    [global::System.Xml.Serialization.XmlIgnore]
-    [global::System.ComponentModel.Browsable(false)]
-    public bool allow_multSpecified
-    {
-      get { return _allow_mult != null; }
-      set { if (value == (_allow_mult== null)) _allow_mult = value ? allow_mult : (bool?)null; }
-    }
-    private bool ShouldSerializeallow_mult() { return allow_multSpecified; }
-    private void Resetallow_mult() { allow_multSpecified = false; }
-    
 
-    private bool? _last_write_wins;
+    private bool _last_write_wins = default(bool);
     [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"last_write_wins", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(default(bool))]
     public bool last_write_wins
     {
-      get { return _last_write_wins?? default(bool); }
+      get { return _last_write_wins; }
       set { _last_write_wins = value; }
     }
-    [global::System.Xml.Serialization.XmlIgnore]
-    [global::System.ComponentModel.Browsable(false)]
-    public bool last_write_winsSpecified
-    {
-      get { return _last_write_wins != null; }
-      set { if (value == (_last_write_wins== null)) _last_write_wins = value ? last_write_wins : (bool?)null; }
-    }
-    private bool ShouldSerializelast_write_wins() { return last_write_winsSpecified; }
-    private void Resetlast_write_wins() { last_write_winsSpecified = false; }
-    
     private readonly global::System.Collections.Generic.List<RpbCommitHook> _precommit = new global::System.Collections.Generic.List<RpbCommitHook>();
     [global::ProtoBuf.ProtoMember(4, Name=@"precommit", DataFormat = global::ProtoBuf.DataFormat.Default)]
     public global::System.Collections.Generic.List<RpbCommitHook> precommit
@@ -432,23 +340,14 @@ namespace CorrugatedIron.Messages
     }
   
 
-    private bool? _has_precommit;
+    private bool _has_precommit = (bool)false;
     [global::ProtoBuf.ProtoMember(5, IsRequired = false, Name=@"has_precommit", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue((bool)false)]
     public bool has_precommit
     {
-      get { return _has_precommit?? (bool)false; }
+      get { return _has_precommit; }
       set { _has_precommit = value; }
     }
-    [global::System.Xml.Serialization.XmlIgnore]
-    [global::System.ComponentModel.Browsable(false)]
-    public bool has_precommitSpecified
-    {
-      get { return _has_precommit != null; }
-      set { if (value == (_has_precommit== null)) _has_precommit = value ? has_precommit : (bool?)null; }
-    }
-    private bool ShouldSerializehas_precommit() { return has_precommitSpecified; }
-    private void Resethas_precommit() { has_precommitSpecified = false; }
-    
     private readonly global::System.Collections.Generic.List<RpbCommitHook> _postcommit = new global::System.Collections.Generic.List<RpbCommitHook>();
     [global::ProtoBuf.ProtoMember(6, Name=@"postcommit", DataFormat = global::ProtoBuf.DataFormat.Default)]
     public global::System.Collections.Generic.List<RpbCommitHook> postcommit
@@ -457,23 +356,14 @@ namespace CorrugatedIron.Messages
     }
   
 
-    private bool? _has_postcommit;
+    private bool _has_postcommit = (bool)false;
     [global::ProtoBuf.ProtoMember(7, IsRequired = false, Name=@"has_postcommit", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue((bool)false)]
     public bool has_postcommit
     {
-      get { return _has_postcommit?? (bool)false; }
+      get { return _has_postcommit; }
       set { _has_postcommit = value; }
     }
-    [global::System.Xml.Serialization.XmlIgnore]
-    [global::System.ComponentModel.Browsable(false)]
-    public bool has_postcommitSpecified
-    {
-      get { return _has_postcommit != null; }
-      set { if (value == (_has_postcommit== null)) _has_postcommit = value ? has_postcommit : (bool?)null; }
-    }
-    private bool ShouldSerializehas_postcommit() { return has_postcommitSpecified; }
-    private void Resethas_postcommit() { has_postcommitSpecified = false; }
-    
 
     private RpbModFun _chash_keyfun = null;
     [global::ProtoBuf.ProtoMember(8, IsRequired = false, Name=@"chash_keyfun", DataFormat = global::ProtoBuf.DataFormat.Default)]
@@ -493,293 +383,148 @@ namespace CorrugatedIron.Messages
       set { _linkfun = value; }
     }
 
-    private uint? _old_vclock;
+    private uint _old_vclock = default(uint);
     [global::ProtoBuf.ProtoMember(10, IsRequired = false, Name=@"old_vclock", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(uint))]
     public uint old_vclock
     {
-      get { return _old_vclock?? default(uint); }
+      get { return _old_vclock; }
       set { _old_vclock = value; }
     }
-    [global::System.Xml.Serialization.XmlIgnore]
-    [global::System.ComponentModel.Browsable(false)]
-    public bool old_vclockSpecified
-    {
-      get { return _old_vclock != null; }
-      set { if (value == (_old_vclock== null)) _old_vclock = value ? old_vclock : (uint?)null; }
-    }
-    private bool ShouldSerializeold_vclock() { return old_vclockSpecified; }
-    private void Resetold_vclock() { old_vclockSpecified = false; }
-    
 
-    private uint? _young_vclock;
+    private uint _young_vclock = default(uint);
     [global::ProtoBuf.ProtoMember(11, IsRequired = false, Name=@"young_vclock", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(uint))]
     public uint young_vclock
     {
-      get { return _young_vclock?? default(uint); }
+      get { return _young_vclock; }
       set { _young_vclock = value; }
     }
-    [global::System.Xml.Serialization.XmlIgnore]
-    [global::System.ComponentModel.Browsable(false)]
-    public bool young_vclockSpecified
-    {
-      get { return _young_vclock != null; }
-      set { if (value == (_young_vclock== null)) _young_vclock = value ? young_vclock : (uint?)null; }
-    }
-    private bool ShouldSerializeyoung_vclock() { return young_vclockSpecified; }
-    private void Resetyoung_vclock() { young_vclockSpecified = false; }
-    
 
-    private uint? _big_vclock;
+    private uint _big_vclock = default(uint);
     [global::ProtoBuf.ProtoMember(12, IsRequired = false, Name=@"big_vclock", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(uint))]
     public uint big_vclock
     {
-      get { return _big_vclock?? default(uint); }
+      get { return _big_vclock; }
       set { _big_vclock = value; }
     }
-    [global::System.Xml.Serialization.XmlIgnore]
-    [global::System.ComponentModel.Browsable(false)]
-    public bool big_vclockSpecified
-    {
-      get { return _big_vclock != null; }
-      set { if (value == (_big_vclock== null)) _big_vclock = value ? big_vclock : (uint?)null; }
-    }
-    private bool ShouldSerializebig_vclock() { return big_vclockSpecified; }
-    private void Resetbig_vclock() { big_vclockSpecified = false; }
-    
 
-    private uint? _small_vclock;
+    private uint _small_vclock = default(uint);
     [global::ProtoBuf.ProtoMember(13, IsRequired = false, Name=@"small_vclock", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(uint))]
     public uint small_vclock
     {
-      get { return _small_vclock?? default(uint); }
+      get { return _small_vclock; }
       set { _small_vclock = value; }
     }
-    [global::System.Xml.Serialization.XmlIgnore]
-    [global::System.ComponentModel.Browsable(false)]
-    public bool small_vclockSpecified
-    {
-      get { return _small_vclock != null; }
-      set { if (value == (_small_vclock== null)) _small_vclock = value ? small_vclock : (uint?)null; }
-    }
-    private bool ShouldSerializesmall_vclock() { return small_vclockSpecified; }
-    private void Resetsmall_vclock() { small_vclockSpecified = false; }
-    
 
-    private uint? _pr;
+    private uint _pr = default(uint);
     [global::ProtoBuf.ProtoMember(14, IsRequired = false, Name=@"pr", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(uint))]
     public uint pr
     {
-      get { return _pr?? default(uint); }
+      get { return _pr; }
       set { _pr = value; }
     }
-    [global::System.Xml.Serialization.XmlIgnore]
-    [global::System.ComponentModel.Browsable(false)]
-    public bool prSpecified
-    {
-      get { return _pr != null; }
-      set { if (value == (_pr== null)) _pr = value ? pr : (uint?)null; }
-    }
-    private bool ShouldSerializepr() { return prSpecified; }
-    private void Resetpr() { prSpecified = false; }
-    
 
-    private uint? _r;
+    private uint _r = default(uint);
     [global::ProtoBuf.ProtoMember(15, IsRequired = false, Name=@"r", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(uint))]
     public uint r
     {
-      get { return _r?? default(uint); }
+      get { return _r; }
       set { _r = value; }
     }
-    [global::System.Xml.Serialization.XmlIgnore]
-    [global::System.ComponentModel.Browsable(false)]
-    public bool rSpecified
-    {
-      get { return _r != null; }
-      set { if (value == (_r== null)) _r = value ? r : (uint?)null; }
-    }
-    private bool ShouldSerializer() { return rSpecified; }
-    private void Resetr() { rSpecified = false; }
-    
 
-    private uint? _w;
+    private uint _w = default(uint);
     [global::ProtoBuf.ProtoMember(16, IsRequired = false, Name=@"w", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(uint))]
     public uint w
     {
-      get { return _w?? default(uint); }
+      get { return _w; }
       set { _w = value; }
     }
-    [global::System.Xml.Serialization.XmlIgnore]
-    [global::System.ComponentModel.Browsable(false)]
-    public bool wSpecified
-    {
-      get { return _w != null; }
-      set { if (value == (_w== null)) _w = value ? w : (uint?)null; }
-    }
-    private bool ShouldSerializew() { return wSpecified; }
-    private void Resetw() { wSpecified = false; }
-    
 
-    private uint? _pw;
+    private uint _pw = default(uint);
     [global::ProtoBuf.ProtoMember(17, IsRequired = false, Name=@"pw", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(uint))]
     public uint pw
     {
-      get { return _pw?? default(uint); }
+      get { return _pw; }
       set { _pw = value; }
     }
-    [global::System.Xml.Serialization.XmlIgnore]
-    [global::System.ComponentModel.Browsable(false)]
-    public bool pwSpecified
-    {
-      get { return _pw != null; }
-      set { if (value == (_pw== null)) _pw = value ? pw : (uint?)null; }
-    }
-    private bool ShouldSerializepw() { return pwSpecified; }
-    private void Resetpw() { pwSpecified = false; }
-    
 
-    private uint? _dw;
+    private uint _dw = default(uint);
     [global::ProtoBuf.ProtoMember(18, IsRequired = false, Name=@"dw", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(uint))]
     public uint dw
     {
-      get { return _dw?? default(uint); }
+      get { return _dw; }
       set { _dw = value; }
     }
-    [global::System.Xml.Serialization.XmlIgnore]
-    [global::System.ComponentModel.Browsable(false)]
-    public bool dwSpecified
-    {
-      get { return _dw != null; }
-      set { if (value == (_dw== null)) _dw = value ? dw : (uint?)null; }
-    }
-    private bool ShouldSerializedw() { return dwSpecified; }
-    private void Resetdw() { dwSpecified = false; }
-    
 
-    private uint? _rw;
+    private uint _rw = default(uint);
     [global::ProtoBuf.ProtoMember(19, IsRequired = false, Name=@"rw", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(uint))]
     public uint rw
     {
-      get { return _rw?? default(uint); }
+      get { return _rw; }
       set { _rw = value; }
     }
-    [global::System.Xml.Serialization.XmlIgnore]
-    [global::System.ComponentModel.Browsable(false)]
-    public bool rwSpecified
-    {
-      get { return _rw != null; }
-      set { if (value == (_rw== null)) _rw = value ? rw : (uint?)null; }
-    }
-    private bool ShouldSerializerw() { return rwSpecified; }
-    private void Resetrw() { rwSpecified = false; }
-    
 
-    private bool? _basic_quorum;
+    private bool _basic_quorum = default(bool);
     [global::ProtoBuf.ProtoMember(20, IsRequired = false, Name=@"basic_quorum", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(default(bool))]
     public bool basic_quorum
     {
-      get { return _basic_quorum?? default(bool); }
+      get { return _basic_quorum; }
       set { _basic_quorum = value; }
     }
-    [global::System.Xml.Serialization.XmlIgnore]
-    [global::System.ComponentModel.Browsable(false)]
-    public bool basic_quorumSpecified
-    {
-      get { return _basic_quorum != null; }
-      set { if (value == (_basic_quorum== null)) _basic_quorum = value ? basic_quorum : (bool?)null; }
-    }
-    private bool ShouldSerializebasic_quorum() { return basic_quorumSpecified; }
-    private void Resetbasic_quorum() { basic_quorumSpecified = false; }
-    
 
-    private bool? _notfound_ok;
+    private bool _notfound_ok = default(bool);
     [global::ProtoBuf.ProtoMember(21, IsRequired = false, Name=@"notfound_ok", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(default(bool))]
     public bool notfound_ok
     {
-      get { return _notfound_ok?? default(bool); }
+      get { return _notfound_ok; }
       set { _notfound_ok = value; }
     }
-    [global::System.Xml.Serialization.XmlIgnore]
-    [global::System.ComponentModel.Browsable(false)]
-    public bool notfound_okSpecified
-    {
-      get { return _notfound_ok != null; }
-      set { if (value == (_notfound_ok== null)) _notfound_ok = value ? notfound_ok : (bool?)null; }
-    }
-    private bool ShouldSerializenotfound_ok() { return notfound_okSpecified; }
-    private void Resetnotfound_ok() { notfound_okSpecified = false; }
-    
 
-    private byte[] _backend;
+    private byte[] _backend = null;
     [global::ProtoBuf.ProtoMember(22, IsRequired = false, Name=@"backend", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(null)]
     public byte[] backend
     {
-      get { return _backend?? null; }
+      get { return _backend; }
       set { _backend = value; }
     }
-    [global::System.Xml.Serialization.XmlIgnore]
-    [global::System.ComponentModel.Browsable(false)]
-    public bool backendSpecified
-    {
-      get { return _backend != null; }
-      set { if (value == (_backend== null)) _backend = value ? backend : (byte[])null; }
-    }
-    private bool ShouldSerializebackend() { return backendSpecified; }
-    private void Resetbackend() { backendSpecified = false; }
-    
 
-    private bool? _search;
+    private bool _search = default(bool);
     [global::ProtoBuf.ProtoMember(23, IsRequired = false, Name=@"search", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(default(bool))]
     public bool search
     {
-      get { return _search?? default(bool); }
+      get { return _search; }
       set { _search = value; }
     }
-    [global::System.Xml.Serialization.XmlIgnore]
-    [global::System.ComponentModel.Browsable(false)]
-    public bool searchSpecified
-    {
-      get { return _search != null; }
-      set { if (value == (_search== null)) _search = value ? search : (bool?)null; }
-    }
-    private bool ShouldSerializesearch() { return searchSpecified; }
-    private void Resetsearch() { searchSpecified = false; }
-    
 
-    private RpbBucketProps.RpbReplMode? _repl;
+    private RpbBucketProps.RpbReplMode _repl;
     [global::ProtoBuf.ProtoMember(24, IsRequired = false, Name=@"repl", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     public RpbBucketProps.RpbReplMode repl
     {
-      get { return _repl.Value; }
+      get { return _repl; }
       set { _repl = value; }
     }
-    [global::System.Xml.Serialization.XmlIgnore]
-    [global::System.ComponentModel.Browsable(false)]
-    public bool replSpecified
-    {
-      get { return _repl != null; }
-      set { if (value == (_repl== null)) _repl = value ? repl : (RpbBucketProps.RpbReplMode?)null; }
-    }
-    private bool ShouldSerializerepl() { return replSpecified; }
-    private void Resetrepl() { replSpecified = false; }
-    
 
-    private byte[] _yz_index;
+    private byte[] _yz_index = null;
     [global::ProtoBuf.ProtoMember(25, IsRequired = false, Name=@"yz_index", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(null)]
     public byte[] yz_index
     {
-      get { return _yz_index?? null; }
+      get { return _yz_index; }
       set { _yz_index = value; }
     }
-    [global::System.Xml.Serialization.XmlIgnore]
-    [global::System.ComponentModel.Browsable(false)]
-    public bool yz_indexSpecified
-    {
-      get { return _yz_index != null; }
-      set { if (value == (_yz_index== null)) _yz_index = value ? yz_index : (byte[])null; }
-    }
-    private bool ShouldSerializeyz_index() { return yz_indexSpecified; }
-    private void Resetyz_index() { yz_indexSpecified = false; }
-    
     [global::ProtoBuf.ProtoContract(Name=@"RpbReplMode")]
     public enum RpbReplMode
     {
@@ -797,6 +542,30 @@ namespace CorrugatedIron.Messages
       TRUE = 3
     }
   
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"RpbAuthReq")]
+  public partial class RpbAuthReq : global::ProtoBuf.IExtensible
+  {
+    public RpbAuthReq() {}
+    
+    private byte[] _user;
+    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"user", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public byte[] user
+    {
+      get { return _user; }
+      set { _user = value; }
+    }
+    private byte[] _password;
+    [global::ProtoBuf.ProtoMember(2, IsRequired = true, Name=@"password", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public byte[] password
+    {
+      get { return _password; }
+      set { _password = value; }
+    }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }

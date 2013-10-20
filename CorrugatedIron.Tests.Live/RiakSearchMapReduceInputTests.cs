@@ -26,7 +26,7 @@ using System.Linq;
 
 namespace CorrugatedIron.Tests.Live
 {
-    [TestFixture]
+    [TestFixture(Ignore = true, IgnoreReason = "Riak Search functionality has been deprecated in favor of Yokozuna/Solr.")]
     public class RiakSearchMapReduceInputTests : RiakMapReduceTests
     {
         // N.B. You need to install the search hooks on the riak_search_bucket first via `bin/search-cmd install riak_search_bucket`
