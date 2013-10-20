@@ -157,3 +157,9 @@ message RpbBucketProps {
 
     optional bytes yz_index = 25;
 }
+
+// Authentication request
+message RpbAuthReq {
+    required bytes user = 1;
+    required bytes password = 2;
+}
