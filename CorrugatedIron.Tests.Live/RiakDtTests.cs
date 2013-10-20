@@ -19,11 +19,15 @@ using NUnit.Framework;
 
 namespace CorrugatedIron.Tests.Live
 {
+
     [TestFixture]
     public class RiakDtTests : LiveRiakConnectionTestBase
     {
         private const string Bucket = "riak_dt_bucket";
 
+        /// <summary>
+        /// The tearing of the down, it is done here.
+        /// </summary>
         [TearDown]
         public void TearDown()
         {
