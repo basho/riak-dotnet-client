@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+v2.0.0
+------
+
+* Removed checks for slashes in key and bucket names (#184).
+
 v1.4.2
 ------
 
