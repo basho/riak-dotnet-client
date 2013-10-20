@@ -7,8 +7,6 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Option: missing-value detection (*Specified/ShouldSerialize*/Reset*) enabled
-    
 // Generated from: riak_yokozuna.proto
 namespace CorrugatedIron.Messages
 {
@@ -25,23 +23,14 @@ namespace CorrugatedIron.Messages
       set { _name = value; }
     }
 
-    private byte[] _schema;
+    private byte[] _schema = null;
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"schema", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(null)]
     public byte[] schema
     {
-      get { return _schema?? null; }
+      get { return _schema; }
       set { _schema = value; }
     }
-    [global::System.Xml.Serialization.XmlIgnore]
-    [global::System.ComponentModel.Browsable(false)]
-    public bool schemaSpecified
-    {
-      get { return _schema != null; }
-      set { if (value == (_schema== null)) _schema = value ? schema : (byte[])null; }
-    }
-    private bool ShouldSerializeschema() { return schemaSpecified; }
-    private void Resetschema() { schemaSpecified = false; }
-    
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -53,23 +42,14 @@ namespace CorrugatedIron.Messages
     public RpbYokozunaIndexGetReq() {}
     
 
-    private byte[] _name;
+    private byte[] _name = null;
     [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"name", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(null)]
     public byte[] name
     {
-      get { return _name?? null; }
+      get { return _name; }
       set { _name = value; }
     }
-    [global::System.Xml.Serialization.XmlIgnore]
-    [global::System.ComponentModel.Browsable(false)]
-    public bool nameSpecified
-    {
-      get { return _name != null; }
-      set { if (value == (_name== null)) _name = value ? name : (byte[])null; }
-    }
-    private bool ShouldSerializename() { return nameSpecified; }
-    private void Resetname() { nameSpecified = false; }
-    
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -139,23 +119,14 @@ namespace CorrugatedIron.Messages
       set { _name = value; }
     }
 
-    private byte[] _content;
+    private byte[] _content = null;
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"content", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(null)]
     public byte[] content
     {
-      get { return _content?? null; }
+      get { return _content; }
       set { _content = value; }
     }
-    [global::System.Xml.Serialization.XmlIgnore]
-    [global::System.ComponentModel.Browsable(false)]
-    public bool contentSpecified
-    {
-      get { return _content != null; }
-      set { if (value == (_content== null)) _content = value ? content : (byte[])null; }
-    }
-    private bool ShouldSerializecontent() { return contentSpecified; }
-    private void Resetcontent() { contentSpecified = false; }
-    
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
