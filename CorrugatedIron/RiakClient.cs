@@ -101,16 +101,6 @@ namespace CorrugatedIron
         /// <remarks>Only available in Riak 1.4+. If the counter is not initialized, then the counter will be initialized to 0 and then incremented.</remarks>
         public RiakCounterResult IncrementCounter(string bucket, string counter, long amount, RiakCounterUpdateOptions options = null)
         {
-            if (!IsValidBucketOrKeyOrBucketType(bucket))
-            {
-                return new RiakCounterResult(RiakResult<RiakObject>.Error(ResultCode.InvalidRequest, InvalidBucketErrorMessage, false), null);
-            }
-
-            if (!IsValidBucketOrKeyOrBucketType(counter))
-            {
-                return new RiakCounterResult(RiakResult<RiakObject>.Error(ResultCode.InvalidRequest, InvalidKeyErrorMessage, false), null);
-            }
-
             var request = new RpbCounterUpdateReq {bucket = bucket.ToRiakString(), key = counter.ToRiakString(), amount = amount};
             options = options ?? new RiakCounterUpdateOptions();
             options.Populate(request);
@@ -142,16 +132,6 @@ namespace CorrugatedIron
         /// <remarks>Only available in Riak 1.4+.</remarks>
         public RiakCounterResult GetCounter(string bucket, string counter, RiakCounterGetOptions options = null)
         {
-            if (!IsValidBucketOrKeyOrBucketType(bucket))
-            {
-                return new RiakCounterResult(RiakResult<RiakObject>.Error(ResultCode.InvalidRequest, InvalidBucketErrorMessage, false), null);
-            }
-
-            if (!IsValidBucketOrKeyOrBucketType(counter))
-            {
-                return new RiakCounterResult(RiakResult<RiakObject>.Error(ResultCode.InvalidRequest, InvalidKeyErrorMessage, false), null);
-            }
-
             var request = new RpbCounterGetReq {bucket = bucket.ToRiakString(), key = counter.ToRiakString()};
             options = options ?? new RiakCounterGetOptions();
             options.Populate(request);
@@ -191,16 +171,6 @@ namespace CorrugatedIron
         /// </remarks>
         public RiakResult<RiakObject> Get(string bucket, string key, RiakGetOptions options = null)
         {
-            if (!IsValidBucketOrKeyOrBucketType(bucket))
-            {
-                return RiakResult<RiakObject>.Error(ResultCode.InvalidRequest, InvalidBucketErrorMessage, false);
-            }
-
-            if (!IsValidBucketOrKeyOrBucketType(key))
-            {
-                return RiakResult<RiakObject>.Error(ResultCode.InvalidRequest, InvalidKeyErrorMessage, false);
-            }
-
             var request = new RpbGetReq { bucket = bucket.ToRiakString(), key = key.ToRiakString() };
 
             options = options ?? new RiakGetOptions();
@@ -296,15 +266,6 @@ namespace CorrugatedIron
                 {
                     // modified closure FTW
                     var bk = bkp;
-                    if (!IsValidBucketOrKeyOrBucketType(bk.Bucket))
-                    {
-                        return RiakResult<RpbGetResp>.Error(ResultCode.InvalidRequest, InvalidBucketErrorMessage, false);
-                    }
-
-                    if (!IsValidBucketOrKeyOrBucketType(bk.Key))
-                    {
-                        return RiakResult<RpbGetResp>.Error(ResultCode.InvalidRequest, InvalidKeyErrorMessage, false);
-                    }
 
                     var req = new RpbGetReq { bucket = bk.Bucket.ToRiakString(), key = bk.Key.ToRiakString() };
                     options.Populate(req);
@@ -373,16 +334,6 @@ namespace CorrugatedIron
         /// </param>
         public RiakResult<RiakObject> Put(RiakObject value, RiakPutOptions options = null)
         {
-            if (!IsValidBucketOrKeyOrBucketType(value.Bucket))
-            {
-                return RiakResult<RiakObject>.Error(ResultCode.InvalidRequest, InvalidBucketErrorMessage, false);
-            }
-
-            if (!IsValidBucketOrKeyOrBucketType(value.Key))
-            {
-                return RiakResult<RiakObject>.Error(ResultCode.InvalidRequest, InvalidKeyErrorMessage, false);
-            }
-
             options = options ?? new RiakPutOptions();
 
             var request = value.ToMessage();
@@ -431,16 +382,6 @@ namespace CorrugatedIron
             {
                 var responses = values.Select(v =>
                 {
-                    if (!IsValidBucketOrKeyOrBucketType(v.Bucket))
-                    {
-                        return RiakResult<RpbPutResp>.Error(ResultCode.InvalidRequest, InvalidBucketErrorMessage, false);
-                    }
-
-                    if (!IsValidBucketOrKeyOrBucketType(v.Key))
-                    {
-                        return RiakResult<RpbPutResp>.Error(ResultCode.InvalidRequest, InvalidKeyErrorMessage, false);
-                    }
-
                     var msg = v.ToMessage();
                     options.Populate(msg);
 
@@ -496,16 +437,6 @@ namespace CorrugatedIron
         /// </param>
         public RiakResult Delete(string bucket, string key, RiakDeleteOptions options = null)
         {
-            if (!IsValidBucketOrKeyOrBucketType(bucket))
-            {
-                return RiakResult<RiakObject>.Error(ResultCode.InvalidRequest, InvalidBucketErrorMessage, false);
-            }
-
-            if (!IsValidBucketOrKeyOrBucketType(key))
-            {
-                return RiakResult<RiakObject>.Error(ResultCode.InvalidRequest, InvalidKeyErrorMessage, false);
-            }
-
             options = options ?? new RiakDeleteOptions();
 
             var request = new RpbDelReq { bucket = bucket.ToRiakString(), key = key.ToRiakString() };
@@ -622,16 +553,6 @@ namespace CorrugatedIron
 
             var responses = objectIds.Select(id =>
                 {
-                    if (!IsValidBucketOrKeyOrBucketType(id.Bucket))
-                    {
-                        return RiakResult.Error(ResultCode.InvalidRequest, InvalidBucketErrorMessage, false);
-                    }
-
-                    if (!IsValidBucketOrKeyOrBucketType(id.Key))
-                    {
-                        return RiakResult.Error(ResultCode.InvalidRequest, InvalidKeyErrorMessage, false);
-                    }
-
                     var req = new RpbDelReq { bucket = id.Bucket.ToRiakString(), key = id.Key.ToRiakString() };
                     options.Populate(req);
                     return conn.PbcWriteRead(req, MessageCode.DelResp);
@@ -826,12 +747,6 @@ namespace CorrugatedIron
         /// </param>
         public RiakResult<RiakBucketProperties> GetBucketProperties(string bucket)
         {
-            // bucket names cannot have slashes in the names, the REST interface doesn't like it at all
-            if (!IsValidBucketOrKeyOrBucketType(bucket))
-            {
-                return RiakResult<RiakBucketProperties>.Error(ResultCode.InvalidRequest, InvalidBucketErrorMessage, false);
-            }
-
             var bpReq = new RpbGetBucketReq { bucket = bucket.ToRiakString() };
             var result = UseConnection(conn => conn.PbcWriteRead<RpbGetBucketReq, RpbGetBucketResp>(bpReq));
 
@@ -881,11 +796,6 @@ namespace CorrugatedIron
 
         internal RiakResult SetPbcBucketProperties(string bucket, RiakBucketProperties properties)
         {
-            if (!IsValidBucketOrKeyOrBucketType(bucket))
-            {
-                return RiakResult<RiakBucketProperties>.Error(ResultCode.InvalidRequest, InvalidBucketErrorMessage, false);
-            }
-
             var request = new RpbSetBucketReq { bucket = bucket.ToRiakString(), props = properties.ToMessage() };
             var result = UseConnection(conn => conn.PbcWriteRead(request, MessageCode.SetBucketResp));
 
@@ -900,11 +810,6 @@ namespace CorrugatedIron
         /// <returns>An indication of success or failure.</returns>
         public RiakResult ResetBucketProperties(string bucket, bool useHttp = false)
         {
-            if (!IsValidBucketOrKeyOrBucketType(bucket))
-            {
-                return RiakResult<RiakBucketProperties>.Error(ResultCode.InvalidRequest, InvalidBucketErrorMessage, false);
-            }
-
             return useHttp ? ResetHttpBucketProperties(bucket) : ResetPbcBucketProperties(bucket);
         }
 
@@ -1320,11 +1225,6 @@ namespace CorrugatedIron
             return RiakConstants.Rest.Uri.BucketPropsFmt.Fmt(HttpUtility.UrlEncode(bucket));
         }
 
-        private static bool IsValidBucketOrKeyOrBucketType(string value)
-        {
-            return !string.IsNullOrWhiteSpace(value) && !value.Contains('/');
-        }
-
         internal static RiakGetOptions DefaultGetOptions()
         {
             return (new RiakGetOptions()).SetR(RiakConstants.Defaults.RVal);
@@ -1391,21 +1291,6 @@ namespace CorrugatedIron
                                                  string bucketType = RiakConstants.Defaults.BucketType,
                                                  RiakDtUpdateOptions options = null)
         {
-            if (!IsValidBucketOrKeyOrBucketType(bucket))
-            {
-                return new RiakCounterResult(RiakResult<RiakObject>.Error(ResultCode.InvalidRequest, InvalidBucketErrorMessage, false), null);
-            }
-
-            if (!IsValidBucketOrKeyOrBucketType(key))
-            {
-                return new RiakCounterResult(RiakResult<RiakObject>.Error(ResultCode.InvalidRequest, InvalidKeyErrorMessage, false), null);
-            }
-
-            if (bucketType != RiakConstants.Defaults.BucketType && !IsValidBucketOrKeyOrBucketType(bucketType))
-            {
-                return new RiakCounterResult(RiakResult<RiakObject>.Error(ResultCode.InvalidRequest, InvalidBucketTypeErrorMessage, false), null);
-            }
-
             options = options ?? new RiakDtUpdateOptions();
 
             var request = new DtUpdateReq
@@ -1479,21 +1364,6 @@ namespace CorrugatedIron
                                               string bucketType = RiakConstants.Defaults.BucketType,
                                               RiakDtUpdateOptions options = null)
         {
-            if (!IsValidBucketOrKeyOrBucketType(bucket))
-            {
-                return new RiakDtSetResult(RiakResult<RiakObject>.Error(ResultCode.InvalidRequest, InvalidBucketErrorMessage, false));
-            }
-
-            if (!IsValidBucketOrKeyOrBucketType(key))
-            {
-                return new RiakDtSetResult(RiakResult<RiakObject>.Error(ResultCode.InvalidRequest, InvalidKeyErrorMessage, false));
-            }
-
-            if (bucketType != RiakConstants.Defaults.BucketType && !IsValidBucketOrKeyOrBucketType(bucketType))
-            {
-                return new RiakDtSetResult(RiakResult<RiakObject>.Error(ResultCode.InvalidRequest, InvalidBucketTypeErrorMessage, false));
-            }
-
             var request = new DtUpdateReq
                 {
                     bucket = bucket.ToRiakString(),
@@ -1530,21 +1400,6 @@ namespace CorrugatedIron
                                           string bucketType = RiakConstants.Defaults.BucketType,
                                           RiakDtFetchOptions options = null)
         {
-            if (!IsValidBucketOrKeyOrBucketType(bucket))
-            {
-                return new RiakDtMapResult(RiakResult<RiakObject>.Error(ResultCode.InvalidRequest, InvalidBucketErrorMessage, false));
-            }
-
-            if (!IsValidBucketOrKeyOrBucketType(key))
-            {
-                return new RiakDtMapResult(RiakResult<RiakObject>.Error(ResultCode.InvalidRequest, InvalidKeyErrorMessage, false));
-            }
-
-            if (bucketType != RiakConstants.Defaults.BucketType && !IsValidBucketOrKeyOrBucketType(bucketType))
-            {
-                return new RiakDtMapResult(RiakResult<RiakObject>.Error(ResultCode.InvalidRequest, InvalidBucketTypeErrorMessage, false));
-            }
-
             var message = new DtFetchReq
             {
                 bucket = bucket.ToRiakString(),
@@ -1586,21 +1441,6 @@ namespace CorrugatedIron
                                               RiakDtUpdateOptions options = null
             )
         {
-            if (!IsValidBucketOrKeyOrBucketType(bucket))
-            {
-                return new RiakDtMapResult(RiakResult<RiakObject>.Error(ResultCode.InvalidRequest, InvalidBucketErrorMessage, false));
-            }
-
-            if (!IsValidBucketOrKeyOrBucketType(key))
-            {
-                return new RiakDtMapResult(RiakResult<RiakObject>.Error(ResultCode.InvalidRequest, InvalidKeyErrorMessage, false));
-            }
-
-            if (bucketType != RiakConstants.Defaults.BucketType && !IsValidBucketOrKeyOrBucketType(bucketType))
-            {
-                return new RiakDtMapResult(RiakResult<RiakObject>.Error(ResultCode.InvalidRequest, InvalidBucketTypeErrorMessage, false));
-            }
-
             var request = new DtUpdateReq
                 {
                     bucket = bucket.ToRiakString(),
