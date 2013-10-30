@@ -62,6 +62,7 @@ namespace CorrugatedIron.Models
 
         private List<string> _vtags;
 
+        public string BucketType { get; private set; }
         public string Bucket { get; private set; }
         public string Key { get; private set; }
         public byte[] Value { get; set; }
@@ -139,7 +140,12 @@ namespace CorrugatedIron.Models
         /// when saving binary data to Riak, a charSet of null/empty string should be used. The 
         /// constant CharSets.Binary should be used.</remarks>
         public RiakObject(string bucket, string key, object value)
-            : this(bucket, key, value.ToJson(), RiakConstants.ContentTypes.ApplicationJson)
+            : this(new RiakObjectId(bucket, key), value.ToJson(), RiakConstants.ContentTypes.ApplicationJson)
+        {
+        }
+
+        public RiakObject(RiakObjectId objectId, object value)
+            : this(objectId, value.ToJson(), RiakConstants.ContentTypes.ApplicationJson)
         {
         }
 
@@ -156,7 +162,12 @@ namespace CorrugatedIron.Models
         /// when saving binary data to Riak, a charSet of null/empty string should be used. The 
         /// constant CharSets.Binary should be used.</remarks>
         public RiakObject(string bucket, string key, string value, string contentType)
-            : this(bucket, key, value, contentType, RiakConstants.Defaults.CharSet)
+            : this(new RiakObjectId(bucket, key), value, contentType, RiakConstants.Defaults.CharSet)
+        {
+        }
+
+        public RiakObject(RiakObjectId objectId, string value, string contentType)
+            : this(objectId, value, contentType, RiakConstants.Defaults.CharSet)
         {
         }
 
@@ -174,7 +185,12 @@ namespace CorrugatedIron.Models
         /// when saving binary data to Riak, a charSet of null/empty string should be used. The 
         /// constant CharSets.Binary should be used.</remarks>
         public RiakObject(string bucket, string key, string value, string contentType, string charSet)
-            : this(bucket, key, value.ToRiakString(), contentType, charSet)
+            : this(new RiakObjectId(null, bucket, key), value.ToRiakString(), contentType, charSet)
+        {
+        }
+
+        public RiakObject(RiakObjectId objectId, string value, string contentType, string charSet)
+            : this(objectId, value.ToRiakString(), contentType, charSet)
         {
         }
 
@@ -192,9 +208,34 @@ namespace CorrugatedIron.Models
         /// when saving binary data to Riak, a charSet of null/empty string should be used. The 
         /// constant CharSets.Binary should be used.</remarks>
         public RiakObject(string bucket, string key, byte[] value, string contentType, string charSet)
+            : this(null, bucket, key, value, contentType, charSet)
         {
-            Bucket = bucket;
-            Key = key;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CorrugatedIron.Models.RiakObject"/> class.
+        /// </summary>
+        /// <param name="bucketType">Riak bucket type - a collection of buckets with similar configuraiton</param> 
+        /// <param name="bucket">Bucket.</param>
+        /// <param name="key">Key.</param>
+        /// <param name="value">Value.</param>
+        /// <param name="contentType">Content type of the object. These should be MIME compliant content types.</param>
+        /// <param name="charSet">Character set used to encode saved data.</param>
+        /// <remarks>When saving a binary object to Riak, one of the appropriate binary 
+        /// <see cref="CorrugatedIron.Util.RiakConstants.ContentTypes"/> should be used.
+        /// If the content type is not know, fall back to application/octet-stream. In addition,
+        /// when saving binary data to Riak, a charSet of null/empty string should be used. The 
+        /// constant CharSets.Binary should be used.</remarks>
+        public RiakObject(string bucketType, string bucket, string key, byte[] value, string contentType, string charSet)
+            : this(new RiakObjectId(bucketType, bucket, key), value, contentType, charSet)
+        {
+        }
+
+        public RiakObject(RiakObjectId objectId, byte[] value, string contentType, string charSet)
+        {
+            BucketType = objectId.BucketType;
+            Bucket = objectId.Bucket;
+            Key = objectId.Key;
             Value = value;
             ContentType = contentType;
             CharSet = charSet;
@@ -292,8 +333,9 @@ namespace CorrugatedIron.Models
             return new RiakObjectId(Bucket, Key);
         }
 
-        internal RiakObject(string bucket, string key, RpbContent content, byte[] vectorClock)
+        internal RiakObject(string bucketType, string bucket, string key, RpbContent content, byte[] vectorClock)
         {
+            BucketType = bucketType;
             Bucket = bucket;
             Key = key;
             VectorClock = vectorClock;
@@ -318,16 +360,21 @@ namespace CorrugatedIron.Models
                 if (name.EndsWith(RiakConstants.IndexSuffix.Integer))
                 {
                     IntIndex(name.Remove(name.Length - RiakConstants.IndexSuffix.Integer.Length))
-                     .Add(index.value.FromRiakString());
+                        .Add(index.value.FromRiakString());
                 }
                 else
                 {
                     BinIndex(name.Remove(name.Length - RiakConstants.IndexSuffix.Binary.Length))
-                     .Add(index.value.FromRiakString());
+                        .Add(index.value.FromRiakString());
                 }
             }
 
             _hashCode = CalculateHashCode();
+        }
+
+        internal RiakObject(string bucket, string key, RpbContent content, byte[] vectorClock)
+            : this(null, bucket, key, content, vectorClock)
+        {
         }
 
         internal RiakObject(string bucket, string key, ICollection<RpbContent> contents, byte[] vectorClock)
@@ -344,6 +391,7 @@ namespace CorrugatedIron.Models
         {
             var message = new RpbPutReq
             {
+                type = BucketType.ToRiakString(),   
                 bucket = Bucket.ToRiakString(),
                 key = Key.ToRiakString(),
                 vclock = VectorClock,
@@ -398,7 +446,8 @@ namespace CorrugatedIron.Models
                 return true;
             }
 
-            return Equals(other.Bucket, Bucket)
+            return Equals(other.BucketType, Bucket)
+                && Equals(other.Bucket, Bucket)
                 && Equals(other.Key, Key)
                 && Equals(other.Value, Value)
                 && Equals(other.ContentType, ContentType)
@@ -432,7 +481,8 @@ namespace CorrugatedIron.Models
         {
             unchecked
             {
-                var result = (Bucket != null ? Bucket.GetHashCode() : 0);
+                var result = (BucketType != null ? BucketType.GetHashCode() : 0);
+                result = (result * 397) ^ (Bucket != null ? Bucket.GetHashCode() : 0);
                 result = (result * 397) ^ (Key != null ? Key.GetHashCode() : 0);
                 result = (result * 397) ^ (Value != null ? Value.GetHashCode() : 0);
                 result = (result * 397) ^ (ContentType != null ? ContentType.GetHashCode() : 0);
