@@ -98,6 +98,8 @@ namespace CorrugatedIron.Models
 
         public RiakConstants.RiakEnterprise.ReplicationMode? ReplicationMode { get; private set; }
 
+        public string YokozunaIndex { get; private set; }
+
         /// <summary>
         /// An indicator of whether search indexing is enabled on the bucket.
         /// </summary>
@@ -246,6 +248,12 @@ namespace CorrugatedIron.Models
         public RiakBucketProperties SetSmallVclock(uint? smallVclock)
         {
             SmallVclock = smallVclock;
+            return this;
+        }
+
+        public RiakBucketProperties SetYokozunaIndex(string yokozunaIndex)
+        {
+            YokozunaIndex = yokozunaIndex;
             return this;
         }
 
@@ -400,7 +408,9 @@ namespace CorrugatedIron.Models
                 PostCommitHooks = postCommitHooks.Cast<JObject>().Select(LoadPostCommitHook).ToList();
             }
 
-            ReplicationMode = (RiakConstants.RiakEnterprise.ReplicationMode)props.Value<int?>("repl");
+            var value = props.Value<int?>("repl");
+            if (value != null)
+                ReplicationMode = (RiakConstants.RiakEnterprise.ReplicationMode)value;
         }
 
         internal RiakBucketProperties(RpbBucketProps bucketProps)
@@ -440,7 +450,10 @@ namespace CorrugatedIron.Models
                 PostCommitHooks = postCommitHooks.Select(LoadPostCommitHook).ToList();
             }
 
-            ReplicationMode = (RiakConstants.RiakEnterprise.ReplicationMode)bucketProps.repl;
+            if (bucketProps.repl != null)
+                ReplicationMode = (RiakConstants.RiakEnterprise.ReplicationMode)bucketProps.repl;
+
+            YokozunaIndex = bucketProps.yz_index.FromRiakString();
         }
 
         private static IRiakPreCommitHook LoadPreCommitHook(RpbCommitHook hook)
@@ -488,8 +501,6 @@ namespace CorrugatedIron.Models
                        ? RiakConstants.QuorumOptionsLookup[props.Value<string>(key)]
                        : props.Value<uint>(key));
         }
-
-        
         
         internal RpbBucketProps ToMessage()
         {
@@ -590,6 +601,9 @@ namespace CorrugatedIron.Models
                     });
             }
 
+            if (!String.IsNullOrEmpty(YokozunaIndex))
+                message.yz_index = YokozunaIndex.ToRiakString();
+
             return message;
         }
 
@@ -633,6 +647,9 @@ namespace CorrugatedIron.Models
                     PostCommitHooks.ForEach(hook => hook.WriteJson(jw));
                     jw.WriteEndArray();
                 }
+
+                if (!String.IsNullOrEmpty(YokozunaIndex))
+                    jw.WriteNonNullProperty("yz_index", YokozunaIndex);
 
                 jw.WriteEndObject();
                 jw.WriteEndObject();

@@ -1210,6 +1210,24 @@ namespace CorrugatedIron.Messages
     private bool ShouldSerializecontinuation() { return continuationSpecified; }
     private void Resetcontinuation() { continuationSpecified = false; }
     
+
+    private uint? _timeout;
+    [global::ProtoBuf.ProtoMember(11, IsRequired = false, Name=@"timeout", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public uint timeout
+    {
+      get { return _timeout?? default(uint); }
+      set { _timeout = value; }
+    }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool timeoutSpecified
+    {
+      get { return _timeout != null; }
+      set { if (value == (_timeout== null)) _timeout = value ? timeout : (uint?)null; }
+    }
+    private bool ShouldSerializetimeout() { return timeoutSpecified; }
+    private void Resettimeout() { timeoutSpecified = false; }
+    
     [global::ProtoBuf.ProtoContract(Name=@"IndexQueryType")]
     public enum IndexQueryType
     {
@@ -1394,6 +1412,24 @@ namespace CorrugatedIron.Messages
     }
     private bool ShouldSerializemax_results() { return max_resultsSpecified; }
     private void Resetmax_results() { max_resultsSpecified = false; }
+    
+
+    private uint? _timeout;
+    [global::ProtoBuf.ProtoMember(8, IsRequired = false, Name=@"timeout", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public uint timeout
+    {
+      get { return _timeout?? default(uint); }
+      set { _timeout = value; }
+    }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool timeoutSpecified
+    {
+      get { return _timeout != null; }
+      set { if (value == (_timeout== null)) _timeout = value ? timeout : (uint?)null; }
+    }
+    private bool ShouldSerializetimeout() { return timeoutSpecified; }
+    private void Resettimeout() { timeoutSpecified = false; }
     
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
@@ -1814,22 +1850,27 @@ namespace CorrugatedIron.Messages
     public RpbCounterUpdateResp() {}
     
 
-    private long? _returnvalue;
-    [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"returnvalue", DataFormat = global::ProtoBuf.DataFormat.ZigZag)]
-    public long returnvalue
+    private long? _value;
+    [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"value", DataFormat = global::ProtoBuf.DataFormat.ZigZag)]
+    public long value
     {
-      get { return _returnvalue?? default(long); }
-      set { _returnvalue = value; }
+      get { return _value?? default(long); }
+      set { _value = value; }
     }
     [global::System.Xml.Serialization.XmlIgnore]
     [global::System.ComponentModel.Browsable(false)]
-    public bool returnvalueSpecified
+    public bool valueSpecified
     {
-      get { return _returnvalue != null; }
-      set { if (value == (_returnvalue== null)) _returnvalue = value ? returnvalue : (long?)null; }
+      get { return _value != null; }
+      set {
+          if (value == (_value == null))
+          {
+              _value = value ? this.value : (long?)null;
+          }
+      }
     }
-    private bool ShouldSerializereturnvalue() { return returnvalueSpecified; }
-    private void Resetreturnvalue() { returnvalueSpecified = false; }
+    private bool ShouldSerializevalue() { return valueSpecified; }
+    private void Resetvalue() { valueSpecified = false; }
     
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
@@ -1938,22 +1979,22 @@ namespace CorrugatedIron.Messages
     public RpbCounterGetResp() {}
     
 
-    private long? _returnvalue;
-    [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"returnvalue", DataFormat = global::ProtoBuf.DataFormat.ZigZag)]
-    public long returnvalue
+    private long? _value;
+    [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"value", DataFormat = global::ProtoBuf.DataFormat.ZigZag)]
+    public long value
     {
-      get { return _returnvalue?? default(long); }
-      set { _returnvalue = value; }
+      get { return _value?? default(long); }
+      set { _value = value; }
     }
     [global::System.Xml.Serialization.XmlIgnore]
     [global::System.ComponentModel.Browsable(false)]
-    public bool returnvalueSpecified
+    public bool valueSpecified
     {
-      get { return _returnvalue != null; }
-      set { if (value == (_returnvalue== null)) _returnvalue = value ? returnvalue : (long?)null; }
+      get { return _value != null; }
+      set { if (value == (_value== null)) _value = value ? this.value : (long?)null; }
     }
-    private bool ShouldSerializereturnvalue() { return returnvalueSpecified; }
-    private void Resetreturnvalue() { returnvalueSpecified = false; }
+    private bool ShouldSerializevalue() { return valueSpecified; }
+    private void Resetvalue() { valueSpecified = false; }
     
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
