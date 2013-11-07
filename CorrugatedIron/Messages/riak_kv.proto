@@ -172,6 +172,7 @@ message RpbIndexReq {
     optional bool stream = 8;
     optional uint32 max_results = 9;
     optional bytes continuation = 10;
+    optional uint32 timeout = 11;
 }
 
 // Secondary Index query response
@@ -193,6 +194,7 @@ message RpbCSBucketReq {
     optional bool end_incl = 5 [default = false];
     optional bytes continuation = 6;
     optional uint32 max_results = 7;
+    optional uint32 timeout = 8;
 }
 
 // return for CS bucket fold
@@ -243,7 +245,7 @@ message RpbCounterUpdateReq {
 
 // Counter update response? No message | error response
 message RpbCounterUpdateResp {
-        optional sint64 returnvalue = 1;
+        optional sint64 value = 1;
 }
 
 // counter value
@@ -258,5 +260,5 @@ message RpbCounterGetReq {
 
 // Counter value response
 message RpbCounterGetResp {
-    optional sint64 returnvalue = 1;
+    optional sint64 value = 1;
 }

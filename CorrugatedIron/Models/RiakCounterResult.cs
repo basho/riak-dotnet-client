@@ -19,7 +19,8 @@ namespace CorrugatedIron.Models
     public class RiakCounterResult
     {
         public RiakResult<RiakObject> Result { get; private set; }
-        public long? Value { get; private set; }
+        public long? Value { get; internal set; }
+        public byte[] Context { get; internal set; }
 
         public RiakCounterResult(RiakResult<RiakObject> result)
         {
