@@ -749,7 +749,7 @@ namespace CorrugatedIron.Messages
     [global::ProtoBuf.ProtoMember(24, IsRequired = false, Name=@"repl", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     public RpbBucketProps.RpbReplMode repl
     {
-      get { return _repl.Value; }
+      get { return _repl.HasValue ? _repl.Value : RpbReplMode.FALSE; }
       set { _repl = value; }
     }
     [global::System.Xml.Serialization.XmlIgnore]
