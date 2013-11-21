@@ -45,7 +45,7 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
             writer.WriteValue(Index);
 
             writer.WritePropertyName("key");
-            writer.WriteValue(Key);
+            writer.WriteValue(Key.ToString());
             writer.WriteEndObject();
 
             return writer;

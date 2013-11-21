@@ -47,10 +47,10 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
             writer.WriteValue(Index);
 
             writer.WritePropertyName("start");
-            writer.WriteValue(Start);
+            writer.WriteValue(Start.ToString());
 
             writer.WritePropertyName("end");
-            writer.WriteValue(End);
+            writer.WriteValue(End.ToString());
 
             writer.WriteEndObject();
 
