@@ -13,6 +13,7 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
+using System.Numerics;
 using CorrugatedIron.Util;
 
 namespace CorrugatedIron.Models.MapReduce.Inputs
@@ -30,12 +31,12 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
             return new RiakBinIndexRangeInput(bucket, index, start, end);
         }
 
-        public static RiakIndexInput Match(string bucket, string index, int key)
+        public static RiakIndexInput Match(string bucket, string index, BigInteger key)
         {
             return new RiakIntIndexEqualityInput(bucket, index, key);
         }
 
-        public static RiakIndexInput Range(string bucket, string index, int start, int end)
+        public static RiakIndexInput Range(string bucket, string index, BigInteger start, BigInteger end)
         {
             return new RiakIntIndexRangeInput(bucket, index, start, end);
         }
