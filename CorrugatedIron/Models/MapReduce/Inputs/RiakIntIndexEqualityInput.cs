@@ -14,6 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Numerics;
 using CorrugatedIron.Extensions;
 using Newtonsoft.Json;
 
@@ -23,9 +24,9 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
     {
         public string Bucket { get; set; }
         public string Index { get; set; }
-        public int Key { get; set; }
+        public BigInteger Key { get; set; }
 
-        public RiakIntIndexEqualityInput(string bucket, string index, int key)
+        public RiakIntIndexEqualityInput(string bucket, string index, BigInteger key)
         {
             Bucket = bucket;
             Index = index.ToIntegerKey();
@@ -44,7 +45,7 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
             writer.WriteValue(Index);
 
             writer.WritePropertyName("key");
-            writer.WriteValue(Key);
+            writer.WriteValue(Key.ToString());
             writer.WriteEndObject();
 
             return writer;
