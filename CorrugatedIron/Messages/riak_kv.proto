@@ -179,6 +179,9 @@ message RpbIndexReq {
     optional bytes continuation = 10;
     optional uint32 timeout = 11;
     optional bytes type = 12;         // Bucket type, if not set we assume the 'default' type
+    optional bytes term_regex = 13;
+    // Whether to use pagination sort for non-paginated queries
+    optional bool pagination_sort = 14;
 }
 
 // Secondary Index query response
@@ -248,7 +251,6 @@ message RpbCounterUpdateReq {
     optional uint32 dw = 5;
     optional uint32 pw = 6;
     optional bool returnvalue = 7;
-    optional bytes type = 8;         // Bucket type, if not set we assume the 'default' type
 }
 
 // Counter update response? No message | error response
@@ -264,7 +266,6 @@ message RpbCounterGetReq {
     optional uint32 pr = 4;
     optional bool basic_quorum = 5;
     optional bool notfound_ok = 6;
-    optional bytes type = 7;         // Bucket type, if not set we assume the 'default' type
 }
 
 // Counter value response

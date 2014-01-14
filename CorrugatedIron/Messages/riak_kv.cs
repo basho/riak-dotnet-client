@@ -813,6 +813,25 @@ namespace CorrugatedIron.Messages
       [global::ProtoBuf.ProtoEnum(Name=@"range", Value=1)]
       range = 1
     }
+
+        private byte[] _term_regex = null;
+        [global::ProtoBuf.ProtoMember(13, IsRequired = false, Name="@term_regex", DataFormat =  global::ProtoBuf.DataFormat.Default)]
+        [global::System.ComponentModel.DefaultValue(null)]
+        public byte[] term_regex
+        {
+            get { return _term_regex; }
+            set { _term_regex = value; }
+        }
+
+        private byte[] _pagination_sort = null;
+        [global::ProtoBuf.ProtoMember(13, IsRequired = false, Name="@pagination_sort", DataFormat =  global::ProtoBuf.DataFormat.Default)]
+        [global::System.ComponentModel.DefaultValue(null)]
+        public byte[] pagination_sort
+        {
+            get { return _pagination_sort; }
+            set { _pagination_sort = value; }
+        }
+     
   
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
@@ -1207,15 +1226,7 @@ namespace CorrugatedIron.Messages
       get { return _returnvalue; }
       set { _returnvalue = value; }
     }
-
-    private byte[] _type = null;
-    [global::ProtoBuf.ProtoMember(8, IsRequired = false, Name=@"type", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    [global::System.ComponentModel.DefaultValue(null)]
-    public byte[] type
-    {
-      get { return _type; }
-      set { _type = value; }
-    }
+    
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -1295,15 +1306,7 @@ namespace CorrugatedIron.Messages
       get { return _notfound_ok; }
       set { _notfound_ok = value; }
     }
-
-    private byte[] _type = null;
-    [global::ProtoBuf.ProtoMember(7, IsRequired = false, Name=@"type", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    [global::System.ComponentModel.DefaultValue(null)]
-    public byte[] type
-    {
-      get { return _type; }
-      set { _type = value; }
-    }
+    
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
