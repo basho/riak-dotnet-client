@@ -251,7 +251,7 @@ namespace CorrugatedIron
         /// <summary>
         /// Retrieve multiple objects from Riak.
         /// </summary>
-        /// <param name='bucketKeyPairs'>
+        /// <param name='objectIds'>
         /// An <see href="System.Collections.Generic.IEnumerable&lt;T&gt;"/> of <see cref="CorrugatedIron.Models.RiakObjectId"/> to be retrieved
         /// </param>
         /// <param name='options'>The <see cref="CorrugatedIron.Models.RiakGetOptions" /> responsible for 
@@ -263,16 +263,16 @@ namespace CorrugatedIron
         /// get requests and returns results as an IEnumerable{RiakResult{RiakObject}}. Callers should be aware that
         /// this may result in partial success - all results should be evaluated individually in the calling application.
         /// In addition, applications should plan for multiple failures or multiple cases of siblings being present.</remarks>
-        public IEnumerable<RiakResult<RiakObject>> Get(IEnumerable<RiakObjectId> bucketKeyPairs,
+        public IEnumerable<RiakResult<RiakObject>> Get(IEnumerable<RiakObjectId> objectIds,
                                                        RiakGetOptions options = null)
         {
-            bucketKeyPairs = bucketKeyPairs.ToList();
+            objectIds = objectIds.ToList();
 
             options = options ?? new RiakGetOptions();
 
             var results = UseConnection(conn =>
             {
-                var responses = bucketKeyPairs.Select(bkp =>
+                var responses = objectIds.Select(bkp =>
                 {
                     // modified closure FTW
                     var bk = bkp;
@@ -288,7 +288,7 @@ namespace CorrugatedIron
                 return RiakResult<IEnumerable<RiakResult<RpbGetResp>>>.Success(responses);
             });
 
-            return results.Value.Zip(bucketKeyPairs, Tuple.Create).Select(result =>
+            return results.Value.Zip(objectIds, Tuple.Create).Select(result =>
             {
                 if(!result.Item1.IsSuccess)
                 {
@@ -315,7 +315,7 @@ namespace CorrugatedIron
         /// <summary>
         /// Retrieve multiple objects from Riak.
         /// </summary>
-        /// <param name='bucketKeyPairs'>
+        /// <param name='objectIds'>
         /// An <see href="System.Collections.Generic.IEnumerable&lt;T&gt;"/> of <see cref="CorrugatedIron.Models.RiakObjectId"/> to be retrieved
         /// </param>
         /// <param name='rVal'>
@@ -328,11 +328,11 @@ namespace CorrugatedIron
         /// this may result in partial success - all results should be evaluated individually in the calling application.
         /// In addition, applications should plan for multiple failures or multiple cases of siblings being present.</remarks>
         [Obsolete("Use Get(IEnumerable<RiakObjectId>, RiakGetOptions) instead. This will be removed in CorrugatedIron 1.5")]
-        public IEnumerable<RiakResult<RiakObject>> Get(IEnumerable<RiakObjectId> bucketKeyPairs, uint rVal = RiakConstants.Defaults.RVal)
+        public IEnumerable<RiakResult<RiakObject>> Get(IEnumerable<RiakObjectId> objectIds, uint rVal = RiakConstants.Defaults.RVal)
         {
             var options = new RiakGetOptions().SetR(rVal);
 
-            return Get(bucketKeyPairs, options);
+            return Get(objectIds, options);
         }
 
         /// <summary>
@@ -452,6 +452,19 @@ namespace CorrugatedIron
             return Delete(null, bucket, key, options);
         }
 
+        /// <summary>
+        /// Delete the record identified by <paramref name="key"/> from a <paramref name="bucket"/>.
+        /// </summary>
+        /// <param name='bucketType'>The bucket type</param>
+        /// <param name='bucket'>
+        /// The name of the bucket that contains the record to be deleted.
+        /// </param>
+        /// <param name='key'>
+        /// The key identifying the record to be deleted.
+        /// </param>
+        /// <param name='options'>
+        /// Delete options
+        /// </param>
         public RiakResult Delete(string bucketType, string bucket, string key, RiakDeleteOptions options = null)
         {
             return Delete(new RiakObjectId(bucketType, bucket, key), options);
@@ -527,6 +540,32 @@ namespace CorrugatedIron
             return DeleteBucket(null, bucket, new RiakDeleteOptions().SetRw(rwVal));
         }
 
+        /// <summary>
+        /// Deletes the contents of the specified <paramref name="bucket"/>.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="System.Collections.Generic.IEnumerable&lt;T&gt;"/> of <see cref="CorrugatedIron.RiakResult"/> listing the success of all deletes
+        /// </returns>
+        /// <param name="bucketType">The bucket type</param>
+        /// <param name='bucket'>
+        /// The bucket to be deleted.
+        /// </param>
+        /// <param name='rwVal'>
+        /// The number of nodes that must respond successfully to a delete request.
+        /// </param>
+        /// <remarks>
+        /// /// <para>
+        /// Because of the <see cref="CorrugatedIron.RiakClient.ListKeys"/> operation, this may be a time consuming operation on
+        /// production systems and may cause memory problems for the client. This should be used either in testing or on small buckets with 
+        /// known amounts of data.
+        /// </para>
+        /// <para>
+        /// A delete bucket operation actually deletes all keys in the bucket individually. 
+        /// A <see cref="CorrugatedIron.RiakClient.ListKeys"/> operation is performed to retrieve a list of keys
+        /// The keys retrieved from the <see cref="CorrugatedIron.RiakClient.ListKeys"/> are then deleted through
+        /// <see cref="CorrugatedIron.RiakClient.Delete"/>. 
+        /// </para>
+        /// </remarks>
         public IEnumerable<RiakResult> DeleteBucket(string bucketType, string bucket, uint rwVal)
         {
             return DeleteBucket(bucketType, bucket, new RiakDeleteOptions().SetRw(rwVal));
@@ -573,6 +612,32 @@ namespace CorrugatedIron
             return results.Value;
         }
 
+        /// <summary>
+        /// Deletes the contents of the specified <paramref name="bucket"/>.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="System.Collections.Generic.IEnumerable&lt;T&gt;"/> of <see cref="CorrugatedIron.RiakResult"/> listing the success of all deletes
+        /// </returns>
+        /// <param name="bucketType">The bucket type.</param>
+        /// <param name='bucket'>
+        /// The bucket to be deleted.
+        /// </param>
+        /// <param name='deleteOptions'>
+        /// Options for Riak delete operation <see cref="CorrugatedIron.Models.RiakDeleteOptions"/>
+        /// </param>
+        /// <remarks>
+        /// <para>
+        /// A delete bucket operation actually deletes all keys in the bucket individually. 
+        /// A <see cref="CorrugatedIron.RiakClient.ListKeys"/> operation is performed to retrieve a list of keys
+        /// The keys retrieved from the <see cref="CorrugatedIron.RiakClient.ListKeys"/> are then deleted through
+        /// <see cref="CorrugatedIron.RiakClient.Delete"/>. 
+        /// </para>
+        /// <para>
+        /// Because of the <see cref="CorrugatedIron.RiakClient.ListKeys"/> operation, this may be a time consuming operation on
+        /// production systems and may cause memory problems for the client. This should be used either in testing or on small buckets with 
+        /// known amounts of data.
+        /// </para>
+        /// </remarks>
         public IEnumerable<RiakResult> DeleteBucket(string bucketType, string bucket, RiakDeleteOptions deleteOptions)
         {
             var results = UseConnection(conn => {
@@ -806,7 +871,7 @@ namespace CorrugatedIron
 
         public RiakResult<IList<string>> ListKeysFromIndex(string bucketType, string bucket)
         {
-            var result = IndexGet(bucketType, bucket, RiakConstants.SystemIndexKeys.RiakBucketIndex, bucket);
+            var result = GetSecondaryIndex(new RiakIndexId(bucketType, bucket, RiakConstants.SystemIndexKeys.RiakBucketIndex), bucket);
             return RiakResult<IList<string>>.Success(result.Value.IndexKeyTerms.Select(ikt => ikt.Key).ToList());
         }
 
@@ -850,6 +915,7 @@ namespace CorrugatedIron
         /// The Properties.
         /// </param>
         /// <param name='useHttp'>When true, CorrugatedIron will use the HTTP interface</param>
+        /// <remarks>There is, as of CorrugatedIron 2.0, no reason to use the HTTP interface. This is kept for legacy reasons.</remarks>
         public RiakResult SetBucketProperties(string bucket, RiakBucketProperties properties, bool useHttp = false)
         {
             return useHttp ? SetHttpBucketProperties(bucket, properties) : SetBucketProperties(null, bucket, properties);
@@ -895,6 +961,7 @@ namespace CorrugatedIron
         /// <param name="bucket">The name of the bucket to reset the properties on.</param>
         /// <param name="useHttp">Whether or not to use the HTTP interface to Riak. Set to true for Riak 1.3 and earlier</param> 
         /// <returns>An indication of success or failure.</returns>
+        /// <remarks>There is, as of CorrugatedIron 2.0, no reason to use the HTTP interface. This is kept for legacy reasons.</remarks>
         public RiakResult ResetBucketProperties(string bucket, bool useHttp = false)
         {
             return useHttp ? ResetHttpBucketProperties(bucket) : ResetPbcBucketProperties(null, bucket);
