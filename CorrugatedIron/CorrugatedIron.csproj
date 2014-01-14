@@ -311,5 +311,7 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
+<!-- Commenting this out until I can get a better understanding of what's going on with 
+     Xamarin Studio and the $() macros -->
+<!--  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />-->
 </Project>

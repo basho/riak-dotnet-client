@@ -243,7 +243,7 @@ namespace CorrugatedIron
                 return RiakResult<RiakObject>.Error(ResultCode.NotFound, "Unable to find value in Riak", false);
             }
 
-            var o = new RiakObject(bucket, key, result.Value.content, result.Value.vclock);
+            var o = new RiakObject(objectId.Bucket, objectId.Key, result.Value.content, result.Value.vclock);
 
             return RiakResult<RiakObject>.Success(o);
         }
