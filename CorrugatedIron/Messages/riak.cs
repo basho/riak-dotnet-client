@@ -492,7 +492,7 @@ namespace CorrugatedIron.Messages
       set { _search = value; }
     }
 
-    private RpbBucketProps.RpbReplMode _repl;
+    private RpbBucketProps.RpbReplMode? _repl;
     [global::ProtoBuf.ProtoMember(24, IsRequired = false, Name=@"repl", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     public RpbBucketProps.RpbReplMode repl
     {
