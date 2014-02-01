@@ -56,6 +56,7 @@ message RpbGetReq {
     optional uint32 timeout = 10;
     optional bool sloppy_quorum = 11;   // Experimental, may change/disappear
     optional uint32 n_val = 12;         // Experimental, may change/disappear
+    optional bytes type = 13;           // Bucket type, if not set we assume the 'default' type
 }
 
 // Get Response - if the record was not found there will be no content/vclock
@@ -84,6 +85,7 @@ message RpbPutReq {
     optional bool asis = 13;
     optional bool sloppy_quorum = 14; // Experimental, may change/disappear
     optional uint32 n_val = 15;       // Experimental, may change/disappear
+    optional bytes type = 16;         // Bucket type, if not set we assume the 'default' type
 }
 
 // Put response - same as get response with optional key if one was generated
@@ -108,6 +110,7 @@ message RpbDelReq {
     optional uint32 timeout = 10;
     optional bool sloppy_quorum = 11; // Experimental, may change/disappear
     optional uint32 n_val = 12;       // Experimental, may change/disappear
+    optional bytes type = 13;         // Bucket type, if not set we assume the 'default' type
 }
 
 // Delete response - not defined, will return a RpbDelResp on success or RpbErrorResp on failure
@@ -116,6 +119,7 @@ message RpbDelReq {
 message RpbListBucketsReq {
     optional uint32 timeout = 1;
     optional bool stream = 2;
+    optional bytes type = 3;         // Bucket type, if not set we assume the 'default' type
 }
 
 // List buckets response - one or more of these packets will be sent
@@ -130,6 +134,7 @@ message RpbListBucketsResp {
 message RpbListKeysReq {
     required bytes bucket = 1;
     optional uint32 timeout = 2;
+    optional bytes type = 3;         // Bucket type, if not set we assume the 'default' type
 }
 
 // List keys in bucket response - one or more of these packets will be sent
@@ -173,6 +178,10 @@ message RpbIndexReq {
     optional uint32 max_results = 9;
     optional bytes continuation = 10;
     optional uint32 timeout = 11;
+    optional bytes type = 12;         // Bucket type, if not set we assume the 'default' type
+    optional bytes term_regex = 13;
+    // Whether to use pagination sort for non-paginated queries
+    optional bool pagination_sort = 14;
 }
 
 // Secondary Index query response
@@ -195,6 +204,7 @@ message RpbCSBucketReq {
     optional bytes continuation = 6;
     optional uint32 max_results = 7;
     optional uint32 timeout = 8;
+    optional bytes type = 9;         // Bucket type, if not set we assume the 'default' type
 }
 
 // return for CS bucket fold

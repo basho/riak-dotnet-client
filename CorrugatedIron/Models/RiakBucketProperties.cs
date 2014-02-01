@@ -453,7 +453,7 @@ namespace CorrugatedIron.Models
             if (bucketProps.repl != null)
                 ReplicationMode = (RiakConstants.RiakEnterprise.ReplicationMode)bucketProps.repl;
 
-            YokozunaIndex = bucketProps.yz_index.FromRiakString();
+            YokozunaIndex = bucketProps.search_index.FromRiakString();
         }
 
         private static IRiakPreCommitHook LoadPreCommitHook(RpbCommitHook hook)
@@ -602,7 +602,7 @@ namespace CorrugatedIron.Models
             }
 
             if (!String.IsNullOrEmpty(YokozunaIndex))
-                message.yz_index = YokozunaIndex.ToRiakString();
+                message.search_index = YokozunaIndex.ToRiakString();
 
             return message;
         }

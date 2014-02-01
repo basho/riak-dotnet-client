@@ -23,6 +23,7 @@ namespace CorrugatedIron.Models
     public class RiakObjectId
     {
         public string Bucket { get; set; }
+        public string BucketType { get; set; }
         public string Key { get; set; }
 
         public RiakObjectId()
@@ -40,6 +41,11 @@ namespace CorrugatedIron.Models
         {
             Bucket = bucket;
             Key = key;
+        }
+
+        public RiakObjectId(string bucketType, string bucket, string key) : this (bucket, key)
+        {
+            BucketType = bucketType;
         }
 
         internal RiakLink ToRiakLink(string tag)
@@ -83,6 +89,7 @@ namespace CorrugatedIron.Models
             unchecked
             {
                 int result = (Bucket != null ? Bucket.GetHashCode() : 0);
+                result = (result * 397) ^ (BucketType != null ? BucketType.GetHashCode() : 0);
                 result = (result * 397) ^ (Key != null ? Key.GetHashCode() : 0);
 
                 return result;

@@ -90,15 +90,6 @@ message RpbSetBucketTypeReq {
 // Set bucket properties response - no message defined, just send
 // RpbSetBucketResp
 
-// Reset bucket properties request
-message RpbResetBucketTypeReq {
-    required bytes type = 1;
-}
-
-
-// Reset bucket properties response - no message defined, just send
-// RpbResetBucketResp
-
 // Module-Function pairs for commit hooks and other bucket properties
 // that take functions
 message RpbModFun {
@@ -155,5 +146,15 @@ message RpbBucketProps {
     }
     optional RpbReplMode repl = 24;
 
-    optional bytes yz_index = 25;
+    // Search index
+    optional bytes search_index = 25;
+
+    // KV Datatypes
+    optional bytes datatype = 26;
+}
+
+// Authentication request
+message RpbAuthReq {
+    required bytes user = 1;
+    required bytes password = 2;
 }

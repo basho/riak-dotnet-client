@@ -122,6 +122,13 @@ namespace CorrugatedIron.Comms
                 {
                     Disconnect();
                 }
+
+                if (ex.Message.Contains("Bucket cannot be zero-length")
+                    || ex.Message.Contains("Key cannot be zero-length"))
+                {
+                    return RiakResult<TResult>.Error(ResultCode.InvalidRequest, ex.Message, ex.NodeOffline);
+                }
+
                 return RiakResult<TResult>.Error(ResultCode.CommunicationError, ex.Message, ex.NodeOffline);
             }
             catch (Exception ex)

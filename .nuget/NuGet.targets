@@ -50,13 +50,13 @@
         <BuildCommand>$(NuGetCommand) pack "$(ProjectPath)" -p Configuration=$(Configuration) -o "$(PackageOutputDir)" -symbols</BuildCommand>
 
         <!-- Make the build depend on restore packages -->
-        <BuildDependsOn Condition="$(RestorePackages) == 'true'">
+        <BuildDependsOn Condition="$(RestorePackages) == 'false'">
             RestorePackages;
             $(BuildDependsOn);
         </BuildDependsOn>
 
         <!-- Make the build depend on restore packages -->
-        <BuildDependsOn Condition="$(BuildPackage) == 'true'">
+        <BuildDependsOn Condition="$(BuildPackage) == 'false'">
             $(BuildDependsOn);
             BuildPackage;
         </BuildDependsOn>
