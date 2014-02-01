@@ -23,26 +23,26 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
 {
     public class RiakBucketKeyKeyDataInput : RiakPhaseInput
     {
-        private List<Tuple<string, string, object>> BucketKeyKeyData { get; set; }
+        private List<Tuple<string, string, object, string>> BucketKeyKeyData { get; set; }
 
         public RiakBucketKeyKeyDataInput()
         {
-            BucketKeyKeyData = new List<Tuple<string, string, object>>();
+            BucketKeyKeyData = new List<Tuple<string, string, object, string>>();
         }
 
-        public RiakBucketKeyKeyDataInput Add(string bucket, string key, object keyData)
+        public RiakBucketKeyKeyDataInput Add(string bucket, string key, object keyData, string type = null)
         {
-            BucketKeyKeyData.Add(new Tuple<string, string, object>(bucket, key, keyData));
+            BucketKeyKeyData.Add(new Tuple<string, string, object, string>(bucket, key, keyData, type));
             return this;
         }
 
-        public RiakBucketKeyKeyDataInput Add(params Tuple<string, string, object>[] pairs)
+        public RiakBucketKeyKeyDataInput Add(params Tuple<string, string, object, string>[] pairs)
         {
             BucketKeyKeyData.AddRange(pairs);
             return this;
         }
 
-        public RiakBucketKeyKeyDataInput Add(IEnumerable<Tuple<string, string, object>> pairs)
+        public RiakBucketKeyKeyDataInput Add(IEnumerable<Tuple<string, string, object, string>> pairs)
         {
             BucketKeyKeyData.AddRange(pairs);
             return this;
@@ -61,6 +61,8 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
                 writer.WriteValue(bkkd.Item1);
                 writer.WriteValue(bkkd.Item2);
                 s.Serialize(writer, bkkd.Item3);
+                if (!String.IsNullOrEmpty(bkkd.Item4))
+                    writer.WriteValue(bkkd.Item4);
                 writer.WriteEndArray();
             });
 
