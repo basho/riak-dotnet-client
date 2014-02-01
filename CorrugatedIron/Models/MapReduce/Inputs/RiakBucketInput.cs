@@ -23,9 +23,11 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
     public class RiakBucketInput : RiakPhaseInput
     {
         private readonly string _bucket;
+        private readonly string _type;
 
-        public RiakBucketInput(string bucket)
+        public RiakBucketInput(string bucket, string type = null)
         {
+            _type = type;
             _bucket = bucket;
             Filters = new List<IRiakKeyFilterToken>();
         }
@@ -39,6 +41,12 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
 
                 writer.WritePropertyName("bucket");
                 writer.WriteValue(_bucket);
+
+                if (!string.IsNullOrEmpty(_type))
+                {
+                    writer.WritePropertyName("bucket_type");
+                    writer.WriteValue(_type);
+                }
 
                 writer.WritePropertyName("key_filters");
                 writer.WriteStartArray();
@@ -59,7 +67,7 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
 
         public static implicit operator RiakBucketInput(string bucket)
         {
-            return new RiakBucketInput(bucket);
+            return new RiakBucketInput(bucket, null);
         }
     }
 }
