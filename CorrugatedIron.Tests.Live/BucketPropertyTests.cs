@@ -53,20 +53,6 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
         }
 
         [Test]
-        public void SettingExtendedPropertiesToBucketWithSlashesInNameShouldReturnError()
-        {
-            const string bucketName = "not/valid/here";
-            var props = new RiakBucketProperties()
-                .SetNVal(4)
-                .SetSearch(true)
-                .SetWVal("all")
-                .SetRVal("quorum");
-
-            var setResult = Client.SetBucketProperties(bucketName, props);
-            setResult.IsSuccess.ShouldBeFalse();
-        }
-
-        [Test]
         public void GettingExtendedPropertiesOnABucketWithoutExtendedPropertiesSetDoesntThrowAnException()
         {
             var bucketName = Guid.NewGuid().ToString();
@@ -75,37 +61,8 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
             getResult.IsSuccess.ShouldBeTrue(getResult.ErrorMessage);
         }
 
-        [Test]
-        public void GettingPropsOnInvalidBucketStraightAfterSettingDoesntThrowAnException()
-        {
-            // this bucket name must have ONE slash in it. If it has more or less then
-            // errors will come out as expected. If there's one, then Riak thinks we're putting
-            // a value in the cluster and so the operation works.
-            const string bucketName = "slartibartfast/dentartherdent";
-            var props = new RiakBucketProperties()
-                .SetNVal(4)
-                .SetSearch(true)
-                .SetWVal("all")
-                .SetRVal("quorum");
-
-            var setResult = Client.SetBucketProperties(bucketName, props);
-            setResult.IsSuccess.ShouldBeFalse();
-
-            // this shouldn't throw any exceptions
-            var getResult = Client.GetBucketProperties(bucketName);
-            getResult.IsSuccess.ShouldBeFalse();
-        }
-
-        [Test]
-        public void GettingExtendedPropertiesOnInvalidBucketReturnsError()
-        {
-            const string bucketName = "this/is/not/a/valid/bucket";
-
-            var getResult = Client.GetBucketProperties(bucketName);
-            getResult.IsSuccess.ShouldBeFalse();
-        }
-
-        [Test]
+        [Test()]
+        [Ignore("Riak Search functionality has been deprecated in favor of Yokozuna/Solr.")]
         public void SettingSearchOnRiakBucketMakesBucketSearchable()
         {
             var bucket = Guid.NewGuid().ToString();
@@ -301,6 +258,7 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
         }
 
         [Test]
+        [Ignore("A ring state bug in Riak prevents this from running correctly - https://github.com/basho/riak_kv/issues/660")]
         public void ResettingBucketPropertiesWorksCorrectly()
         {
             const string bucket = "Schmoopy";

@@ -24,7 +24,7 @@ using NUnit.Framework;
 
 namespace CorrugatedIron.Tests.Live
 {
-    [TestFixture]
+    [TestFixture(Ignore = true, IgnoreReason = "Riak Search functionality has been deprecated in favor of Yokozuna/Solr.")]
     public class WhenQueryingRiakSearchViaPbc : LiveRiakConnectionTestBase
     {
         private const string Bucket = "riak_search_bucket";
