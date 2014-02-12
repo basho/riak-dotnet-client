@@ -229,7 +229,6 @@ namespace CorrugatedIron.Comms
 
         private byte[] ReceiveAll(byte[] resultBuffer)
         {
-            PbcSocket.ReceiveTimeout = 0;
             int totalBytesReceived = 0;
             int lengthToReceive = resultBuffer.Length;
             while(lengthToReceive > 0)
