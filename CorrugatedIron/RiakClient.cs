@@ -64,17 +64,11 @@ namespace CorrugatedIron
             Async = new RiakAsyncClient(this);
         }
 
-        [Obsolete("This method should no longer be used, use RiakClient(IRiakEndPoint) instead. This will be removed in CorrugatedIron 1.5")]
-        internal RiakClient(IRiakEndPoint endPoint, string seed = null) : this(endPoint) { }
-
         private RiakClient(IRiakConnection batchConnection)
         {
             _batchConnection = batchConnection;
             Async = new RiakAsyncClient(this);
         }
-
-        [Obsolete("This method should no longer be used, use RiakClient(IRiakConnection) instead. This will be removed in CorrugatedIron 1.5")]
-        private RiakClient(IRiakConnection batchConnection, byte[] clientId) : this(batchConnection) { }
 
         /// <summary>
         /// Ping this instance of Riak
@@ -310,29 +304,6 @@ namespace CorrugatedIron
                 
                 return RiakResult<RiakObject>.Success(o);
             });
-        }
-
-        /// <summary>
-        /// Retrieve multiple objects from Riak.
-        /// </summary>
-        /// <param name='objectIds'>
-        /// An <see href="System.Collections.Generic.IEnumerable&lt;T&gt;"/> of <see cref="CorrugatedIron.Models.RiakObjectId"/> to be retrieved
-        /// </param>
-        /// <param name='rVal'>
-        /// The number of nodes required to successfully respond to the read before the read is considered a success.
-        /// </param>
-        /// <returns>An <see cref="System.Collections.Generic.IEnumerable{T}"/> of <see cref="RiakResult{TResult}"/>
-        /// is returned. You should verify the success or failure of each result separately.</returns>
-        /// <remarks>Riak does not support multi get behavior. CorrugatedIron's multi get functionality wraps multiple
-        /// get requests and returns results as an IEnumerable{RiakResult{RiakObject}}. Callers should be aware that
-        /// this may result in partial success - all results should be evaluated individually in the calling application.
-        /// In addition, applications should plan for multiple failures or multiple cases of siblings being present.</remarks>
-        [Obsolete("Use Get(IEnumerable<RiakObjectId>, RiakGetOptions) instead. This will be removed in CorrugatedIron 1.5")]
-        public IEnumerable<RiakResult<RiakObject>> Get(IEnumerable<RiakObjectId> objectIds, uint rVal = RiakConstants.Defaults.RVal)
-        {
-            var options = new RiakGetOptions().SetR(rVal);
-
-            return Get(objectIds, options);
         }
 
         /// <summary>
