@@ -450,8 +450,7 @@ namespace CorrugatedIron.Models
                 PostCommitHooks = postCommitHooks.Select(LoadPostCommitHook).ToList();
             }
 
-            if (bucketProps.repl != null)
-                ReplicationMode = (RiakConstants.RiakEnterprise.ReplicationMode)bucketProps.repl;
+            ReplicationMode = (RiakConstants.RiakEnterprise.ReplicationMode)bucketProps.repl;
 
             YokozunaIndex = bucketProps.search_index.FromRiakString();
         }
