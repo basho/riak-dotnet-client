@@ -122,7 +122,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
 
             var putResults = Client.Put(new List<RiakObject>
             {
-                new RiakObject(null, "key", TestJson, RiakConstants.ContentTypes.ApplicationJson),
+                new RiakObject((string)null, "key", TestJson, RiakConstants.ContentTypes.ApplicationJson),
                 new RiakObject("", "key", TestJson, RiakConstants.ContentTypes.ApplicationJson),
                 new RiakObject("  ", "key", TestJson, RiakConstants.ContentTypes.ApplicationJson),
                 new RiakObject("foo/bar", "key", TestJson, RiakConstants.ContentTypes.ApplicationJson),
