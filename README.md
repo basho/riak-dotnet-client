@@ -32,4 +32,3 @@ License
 
 **CorrugatedIron** is Open Source software released under the Apache 2.0 License.
 Please see the [LICENSE](http://corrugatediron.org/LICENSE.txt) file for full license details.
-
