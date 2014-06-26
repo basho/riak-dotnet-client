@@ -3,6 +3,7 @@
 DIR=`dirname $0`
 cd ${DIR}/..
 make debug
-echo "Make result: $?"
-exit $?
+rc=$?
+echo "Make result: $rc"
+exit $rc
 
