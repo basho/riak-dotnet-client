@@ -14,3 +14,4 @@ install:
 script:
   - ./.travis/PackageRestore.sh
   - ./.travis/RunBuild.sh
+  - ./.travis/RunTests.sh
