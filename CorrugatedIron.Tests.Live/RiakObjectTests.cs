@@ -311,7 +311,8 @@ namespace CorrugatedIron.Tests.Live
             var oj = new RiakObject(bucketName, OJ) {ContentType = RiakConstants.ContentTypes.ProtocolBuffers};
             oj.SetObject(ojPerson);
 
-            var putResult = Client.Put(oj);
+			// Don't capture result to avoid compiler warning
+            Client.Put(oj);
 
             var getResult = Client.Get(bucketName, OJ);
             var newPerson = getResult.Value.GetObject<Person>();
@@ -334,7 +335,8 @@ namespace CorrugatedIron.Tests.Live
             ro.ContentType = RiakConstants.ContentTypes.ProtocolBuffers;
             ro.SetObject(testPerson);
 
-            var putResult2 = Client.Put(ro);
+			// Don't capture result to avoid compiler warning
+			Client.Put(ro);
 
             var getResult2 = Client.Get(bucketName, testPerson.Id.ToString());
             var testPerson2 = getResult2.Value.GetObject<ProtoBufPerson>();
