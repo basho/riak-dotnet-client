@@ -28,6 +28,12 @@ namespace CorrugatedIron.Tests.Models
         private const string Key = "key";
 
         [Test]
+		public void AssertWeBreakTheBuild()
+        {
+			Assert.IsTrue(false);
+        }
+
+        [Test]
         public void ToRiakObjectIdProducesAValidRiakObjectId()
         {
             var riakObject = new RiakObject(Bucket, Key, "value");
