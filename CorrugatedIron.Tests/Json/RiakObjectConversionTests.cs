@@ -110,7 +110,7 @@ namespace CorrugatedIron.Tests.Json.RiakObjectConversionTests
 
             for (var i = 0; i < iterations; ++i)
             {
-				// Don't capture result to avoid compiler warning
+                // Don't capture result to avoid compiler warning
                 obj.GetObject<Person>();
             }
             sw.Stop();
