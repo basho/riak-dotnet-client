@@ -217,10 +217,10 @@ namespace CorrugatedIron.Tests.Live
             jeremiah.RemoveLink(linkToRemove);
 
             var ojLinks = new List<RiakLink>
-			{
-				new RiakLink(TestBucket, OJ, "friends"),
-				new RiakLink(TestBucket, OJ, "coworkers")
-			};
+            {
+                new RiakLink(TestBucket, OJ, "friends"),
+                new RiakLink(TestBucket, OJ, "coworkers")
+            };
 
             jeremiah.Links.ShouldNotContain(linkToRemove);
 
@@ -241,10 +241,10 @@ namespace CorrugatedIron.Tests.Live
             jeremiah = result.Value;
 
             var ojLinks = new List<RiakLink>
-			{
-				new RiakLink(TestBucket, OJ, "friends"),
-				new RiakLink(TestBucket, OJ, "coworkers")
-			};
+            {
+                new RiakLink(TestBucket, OJ, "friends"),
+                new RiakLink(TestBucket, OJ, "coworkers")
+            };
 
             jeremiah.Links.ShouldNotContain(linkToRemove);
 
@@ -256,10 +256,10 @@ namespace CorrugatedIron.Tests.Live
         {
             var oj = Client.Get(TestBucket, OJ).Value;
             var linkPhases = new List<RiakLink>
-			{
-				RiakLink.AllLinks,
-				RiakLink.AllLinks
-			};
+            {
+                RiakLink.AllLinks,
+                RiakLink.AllLinks
+            };
 
             var linkPeople = Client.WalkLinks(oj, linkPhases);
             linkPeople.IsSuccess.ShouldBeTrue();
@@ -311,7 +311,7 @@ namespace CorrugatedIron.Tests.Live
             var oj = new RiakObject(bucketName, OJ) {ContentType = RiakConstants.ContentTypes.ProtocolBuffers};
             oj.SetObject(ojPerson);
 
-			// Don't capture result to avoid compiler warning
+            // Don't capture result to avoid compiler warning
             Client.Put(oj);
 
             var getResult = Client.Get(bucketName, OJ);
@@ -335,8 +335,8 @@ namespace CorrugatedIron.Tests.Live
             ro.ContentType = RiakConstants.ContentTypes.ProtocolBuffers;
             ro.SetObject(testPerson);
 
-			// Don't capture result to avoid compiler warning
-			Client.Put(ro);
+            // Don't capture result to avoid compiler warning
+            Client.Put(ro);
 
             var getResult2 = Client.Get(bucketName, testPerson.Id.ToString());
             var testPerson2 = getResult2.Value.GetObject<ProtoBufPerson>();
