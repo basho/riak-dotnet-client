@@ -1,6 +1,8 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30501.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CorrugatedIron", "CorrugatedIron\CorrugatedIron.csproj", "{A2CA0CDC-85BB-489D-99D0-3EE1D135BE17}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CorrugatedIron.Tests", "CorrugatedIron.Tests\CorrugatedIron.Tests.csproj", "{E765CC5E-3C83-42CB-9B9A-C8AF400AC0AC}"
@@ -13,13 +15,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Metadata", "Metadata", "{C6
 		Metadata\VersionInfo.cs = Metadata\VersionInfo.cs
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{7C41693C-65D6-45C6-8074-851AFA56B9C8}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\NuGet.Config = .nuget\NuGet.Config
-		.nuget\nuget.exe = .nuget\nuget.exe
-		.nuget\NuGet.targets = .nuget\NuGet.targets
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nuspec", "Nuspec", "{6D31FDF6-D21D-4784-A8BF-CDDFCEDD1091}"
 	ProjectSection(SolutionItems) = preProject
 		NuGet\CorrugatedIron.nuspec = NuGet\CorrugatedIron.nuspec
@@ -30,16 +25,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{439A3CE3-A
 		RELEASE_NOTES.md = RELEASE_NOTES.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{FD5F81AF-F8DA-4A49-BCF9-8CC9BC5BB8BA}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{5D52E2FA-931C-4E77-BF2B-3A9F0D0CD834}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5D52E2FA-931C-4E77-BF2B-3A9F0D0CD834}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5D52E2FA-931C-4E77-BF2B-3A9F0D0CD834}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5D52E2FA-931C-4E77-BF2B-3A9F0D0CD834}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A2CA0CDC-85BB-489D-99D0-3EE1D135BE17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A2CA0CDC-85BB-489D-99D0-3EE1D135BE17}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A2CA0CDC-85BB-489D-99D0-3EE1D135BE17}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -48,18 +46,22 @@ Global
 		{E765CC5E-3C83-42CB-9B9A-C8AF400AC0AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E765CC5E-3C83-42CB-9B9A-C8AF400AC0AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E765CC5E-3C83-42CB-9B9A-C8AF400AC0AC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D52E2FA-931C-4E77-BF2B-3A9F0D0CD834}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D52E2FA-931C-4E77-BF2B-3A9F0D0CD834}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D52E2FA-931C-4E77-BF2B-3A9F0D0CD834}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D52E2FA-931C-4E77-BF2B-3A9F0D0CD834}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = CorrugatedIron\CorrugatedIron.csproj
 		Policies = $0
-		$0.TextStylePolicy = $1
+		$0.TextStylePolicy = $4
 		$1.FileWidth = 120
 		$1.TabsToSpaces = False
 		$1.inheritsSet = VisualStudio
 		$1.inheritsScope = text/plain
-		$0.TextStylePolicy = $2
 		$2.inheritsSet = null
 		$2.scope = text/x-csharp
 		$0.CSharpFormattingPolicy = $3
@@ -76,7 +78,6 @@ Global
 		$3.inheritsSet = Mono
 		$3.inheritsScope = text/x-csharp
 		$3.scope = text/x-csharp
-		$0.TextStylePolicy = $4
 		$4.FileWidth = 120
 		$4.EolMarker = Unix
 		$4.inheritsSet = VisualStudio
@@ -85,8 +86,5 @@ Global
 		$0.DotNetNamingPolicy = $5
 		$5.DirectoryNamespaceAssociation = None
 		$5.ResourceNamePolicy = FileFormatDefault
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal
