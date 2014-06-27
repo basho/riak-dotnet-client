@@ -6,7 +6,10 @@ branches:
 language: c
 
 install:
-  - sudo apt-get install mono-devel mono-gmcs nunit-console
+  - sudo apt-get install python-software-properties
+  - sudo apt-add-repository ppa:directhex/monoxide
+  - sudo apt-get update
+  - sudo apt-get install mono-devel=3.2.1+dfsg-1~pre2 mono-gmcs=3.2.1+dfsg-1~pre2 nunit-console
 
 script:
   - ./.travis/PackageRestore.sh
