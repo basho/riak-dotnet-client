@@ -12,6 +12,7 @@ configure:
 	@${RIAK_ADMIN} bucket-type activate yokozuna
 
 compile:
+	../.travis/InstallMono.sh
 	../.travis/PackageRestore.sh
 	../.travis/RunBuild.sh
 
