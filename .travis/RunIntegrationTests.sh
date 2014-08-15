@@ -1,7 +1,7 @@
 #!/bin/sh
 
 runTest(){
-   nunit-console -nologo -nodots -labels $@
+   mono ./packages/NUnit.Runners.2.6.3/tools/nunit-console.exe -nologo -nodots -labels $@
    if [ $? -ne 0 ]
    then   
      exit 1
