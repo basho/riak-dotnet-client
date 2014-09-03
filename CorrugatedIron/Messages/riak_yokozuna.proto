@@ -34,6 +34,7 @@ option java_outer_classname = "RiakYokozunaPB";
 message RpbYokozunaIndex {
     required bytes name   =  1;  // Index name
     optional bytes schema =  2;  // Schema name
+    optional uint32 n_val =  3;  // N value
 }
 
 // GET request - If a name is given, return matching index, else return all

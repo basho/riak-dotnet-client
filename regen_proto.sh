@@ -8,10 +8,10 @@ protogen() {
     cd ~/bin/ProtoGen;
 
     mono protogen.exe -ns:CorrugatedIron.messages -i:$cipath/riak.proto -o:$cipath/riak.cs
-#    mono ~/bin/ProtoGen/protogen.exe -ns:CorrugatedIron.messages -i:riak_dt.proto -o:riak_dt.cs
-#    mono ~/bin/ProtoGen/protogen.exe -ns:CorrugatedIron.messages -i:riak_kv.proto -o:riak_kv.cs
-#    mono ~/bin/ProtoGen/protogen.exe -ns:CorrugatedIron.messages -i:riak_search.proto -o:riak_search.cs
-#    mono ~/bin/ProtoGen/protogen.exe -ns:CorrugatedIron.messages -i:riak_yokozuna.proto -o:riak_yokozuna.cs
+    mono protogen.exe -ns:CorrugatedIron.messages -i:$cipath/riak_dt.proto -o:$cipath/riak_dt.cs
+    mono protogen.exe -ns:CorrugatedIron.messages -i:$cipath/riak_kv.proto -o:$cipath/riak_kv.cs
+    mono protogen.exe -ns:CorrugatedIron.messages -i:$cipath/riak_search.proto -o:$cipath/riak_search.cs
+    mono protogen.exe -ns:CorrugatedIron.messages -i:$cipath/riak_yokozuna.proto -o:$cipath/riak_yokozuna.cs
     PATH=$old_path;
 }
 
