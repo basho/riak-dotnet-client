@@ -6,9 +6,9 @@ branches:
 language: c
 
 install:
-  - ./.travis/InstallMono.sh
+  - ./.mono-build-scripts/InstallMono.sh
 
 script:
-  - ./.travis/PackageRestore.sh
-  - ./.travis/RunBuild.sh
-  - ./.travis/RunTests.sh
+  - ./.mono-build-scripts/PackageRestore.sh
+  - ./.mono-build-scripts/RunBuild.sh
+  - ./.mono-build-scripts/RunTests.sh
