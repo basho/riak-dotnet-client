@@ -29,7 +29,7 @@ using System.Threading.Tasks;
 
 namespace CorrugatedIron.Tests.Live.LoadTests
 {
-    [TestFixture]
+    [TestFixture("riakLoadTestConfiguration")]
     public class WhenUnderLoad : LiveRiakConnectionTestBase
     {
         // thread count is currently set to the same
@@ -43,11 +43,8 @@ namespace CorrugatedIron.Tests.Live.LoadTests
         //private const int ThreadCount = 1;
         //private const int ActionCount = 1;
 
-        public WhenUnderLoad(string configSection = "riakLoadTestConfiguration")
-            : base(configSection)
-        {
-        }
-
+        public WhenUnderLoad(string configSection) : base(configSection) { }
+      
         [Test]
         public void LotsOfConcurrentMapRedRequestsShouldWork()
         {
@@ -175,12 +172,9 @@ namespace CorrugatedIron.Tests.Live.LoadTests
         }
     }
 
-    [TestFixture]
+    [TestFixture("riakOnTheFlyLoadTestConfiguration")]
     public class WhenUnderLoadWithOnTheFlyConnections : WhenUnderLoad
     {
-        public WhenUnderLoadWithOnTheFlyConnections()
-            : base("riakOnTheFlyLoadTestConfiguration")
-        {
-        }
+        public WhenUnderLoadWithOnTheFlyConnections(string configSection) : base(configSection) { }
     }
 }

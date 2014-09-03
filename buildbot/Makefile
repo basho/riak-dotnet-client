@@ -12,9 +12,9 @@ configure:
 	@${RIAK_ADMIN} bucket-type activate yokozuna
 
 compile:
-	../.travis/InstallMono.sh
-	../.travis/PackageRestore.sh
-	../.travis/RunBuild.sh
+	../.mono-build-scripts/InstallMono.sh
+	../.mono-build-scripts/PackageRestore.sh
+	../.mono-build-scripts/RunBuild.sh
 
 lint:
 	echo "Nope" >> /dev/null
@@ -22,10 +22,10 @@ lint:
 test: unit-tests integration-tests
 
 unit-tests:
-	../.travis/RunTests.sh
+	../.mono-build-scripts/RunTests.sh
 
 integration-tests:
 	@mv ../CorrugatedIron.Tests.Live/bin/Debug/CorrugatedIron.Tests.Live.dll.config ../CorrugatedIron.Tests.Live/bin/Debug/CorrugatedIron.Tests.Live.dll.config.original
 	@cp App.config ../CorrugatedIron.Tests.Live/bin/Debug/CorrugatedIron.Tests.Live.dll.config
-	../.travis/RunIntegrationTests.sh
+	../.mono-build-scripts/RunIntegrationTests.sh
 
