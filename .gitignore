@@ -31,3 +31,4 @@ test-results
 *.ncrunchproject
 *.ncrunchsolution
 _NCrunch_*
+TestResult.xml
