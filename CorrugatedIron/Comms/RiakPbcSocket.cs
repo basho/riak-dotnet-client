@@ -97,7 +97,26 @@ namespace CorrugatedIron.Comms
                 { MessageCode.CounterUpdateReq, typeof(RpbCounterUpdateReq) },
                 { MessageCode.CounterUpdateResp, typeof(RpbCounterUpdateResp) },
                 { MessageCode.CounterGetReq, typeof(RpbCounterGetReq) },
-                { MessageCode.CounterGetResp, typeof(RpbCounterGetResp) }
+                { MessageCode.CounterGetResp, typeof(RpbCounterGetResp) },
+
+                { MessageCode.YokozunaIndexGetReq, typeof(RpbYokozunaIndexGetReq) },
+                { MessageCode.YokozunaIndexGetResp , typeof(RpbYokozunaIndexGetResp) },
+                { MessageCode.YokozunaIndexPutReq , typeof(RpbYokozunaIndexPutReq) },
+                { MessageCode.YokozunaIndexDeleteReq , typeof(RpbYokozunaIndexDeleteReq) },
+                { MessageCode.YokozunaSchemaGetReq , typeof(RpbYokozunaSchemaGetReq) },
+                { MessageCode.YokozunaSchemaGetResp , typeof(RpbYokozunaSchemaGetResp) },
+                { MessageCode.YokozunaSchemaPutReq , typeof(RpbYokozunaSchemaPutReq) },
+
+                { MessageCode.DtFetchReq, typeof(DtFetchReq) },
+                { MessageCode.DtFetchResp, typeof(DtFetchResp) },
+                { MessageCode.DtUpdateReq, typeof(DtUpdateReq) },
+                { MessageCode.DtUpdateResp, typeof(DtUpdateResp) },
+
+                { MessageCode.GetBucketTypeReq, typeof(RpbGetBucketTypeReq) },
+                { MessageCode.SetBucketTypeReq, typeof(RpbSetBucketTypeReq) },
+                { MessageCode.AuthReq, typeof(RpbAuthReq) },
+
+
             };
 
             TypeToMessageCodeMap = new Dictionary<Type, MessageCode>();
