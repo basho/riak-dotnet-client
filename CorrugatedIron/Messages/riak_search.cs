@@ -47,7 +47,6 @@ namespace CorrugatedIron.Messages
       get { return _index; }
       set { _index = value; }
     }
-
     private uint _rows = default(uint);
     [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"rows", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(uint))]
@@ -56,7 +55,6 @@ namespace CorrugatedIron.Messages
       get { return _rows; }
       set { _rows = value; }
     }
-
     private uint _start = default(uint);
     [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"start", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(uint))]
@@ -65,7 +63,6 @@ namespace CorrugatedIron.Messages
       get { return _start; }
       set { _start = value; }
     }
-
     private byte[] _sort = null;
     [global::ProtoBuf.ProtoMember(5, IsRequired = false, Name=@"sort", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(null)]
@@ -74,7 +71,6 @@ namespace CorrugatedIron.Messages
       get { return _sort; }
       set { _sort = value; }
     }
-
     private byte[] _filter = null;
     [global::ProtoBuf.ProtoMember(6, IsRequired = false, Name=@"filter", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(null)]
@@ -83,7 +79,6 @@ namespace CorrugatedIron.Messages
       get { return _filter; }
       set { _filter = value; }
     }
-
     private byte[] _df = null;
     [global::ProtoBuf.ProtoMember(7, IsRequired = false, Name=@"df", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(null)]
@@ -92,7 +87,6 @@ namespace CorrugatedIron.Messages
       get { return _df; }
       set { _df = value; }
     }
-
     private byte[] _op = null;
     [global::ProtoBuf.ProtoMember(8, IsRequired = false, Name=@"op", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(null)]
@@ -108,7 +102,6 @@ namespace CorrugatedIron.Messages
       get { return _fl; }
     }
   
-
     private byte[] _presort = null;
     [global::ProtoBuf.ProtoMember(10, IsRequired = false, Name=@"presort", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(null)]
@@ -134,7 +127,6 @@ namespace CorrugatedIron.Messages
       get { return _docs; }
     }
   
-
     private float _max_score = default(float);
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"max_score", DataFormat = global::ProtoBuf.DataFormat.FixedSize)]
     [global::System.ComponentModel.DefaultValue(default(float))]
@@ -143,7 +135,6 @@ namespace CorrugatedIron.Messages
       get { return _max_score; }
       set { _max_score = value; }
     }
-
     private uint _num_found = default(uint);
     [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"num_found", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(uint))]

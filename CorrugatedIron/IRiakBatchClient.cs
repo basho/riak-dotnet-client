@@ -106,7 +106,7 @@ namespace CorrugatedIron
         RiakDtSetResult DtFetchSet(RiakObjectId objectId, RiakDtFetchOptions options = null);
         RiakDtSetResult DtUpdateSet<T>(string bucketType, string bucket, string key, SerializeObjectToByteArray<T> serialize, byte[] context = null, List<T> adds = null, List<T> removes = null, RiakDtUpdateOptions options = null);
         RiakDtMapResult DtFetchMap(string bucketType, string bucket, string key, RiakDtFetchOptions options = null);
-        RiakDtMapResult DtUpdateMap<T>(string bucketType, string bucket, string key, SerializeObjectToByteArray<T> serialize, byte[] context = null, List<RiakDtMapField> adds = null, List<RiakDtMapField> removes = null, List<MapUpdate> updates = null, RiakDtUpdateOptions options = null);
+        RiakDtMapResult DtUpdateMap<T>(string bucketType, string bucket, string key, SerializeObjectToByteArray<T> serialize, byte[] context = null, List<RiakDtMapField> removes = null, List<MapUpdate> updates = null, RiakDtUpdateOptions options = null);
 
         //RiakResult<RiakSearchResult> Search(Action<RiakSearchRequest> prepareRequest)
     }
