@@ -1674,7 +1674,6 @@ namespace CorrugatedIron
                                               string key,
                                               SerializeObjectToByteArray<T> serialize,
                                               byte[] context = null,
-                                              List<RiakDtMapField> adds = null,
                                               List<RiakDtMapField> removes = null,
                                               /* Is this the right way to represent updates?
                                                * It seems like there should be something better, but it requires data
@@ -1686,13 +1685,12 @@ namespace CorrugatedIron
             )
         {
             return DtUpdateMap(new RiakObjectId(bucketType, bucket, key),
-                               serialize, context, adds, removes, updates, options);
+                               serialize, context, removes, updates, options);
         }
 
         public RiakDtMapResult DtUpdateMap<T>(RiakObjectId objectId,
                                               SerializeObjectToByteArray<T> serialize,
                                               byte[] context = null,
-                                              List<RiakDtMapField> adds = null,
                                               List<RiakDtMapField> removes = null,
                                               List<MapUpdate> updates = null,
                                               RiakDtUpdateOptions options = null)
@@ -1706,9 +1704,6 @@ namespace CorrugatedIron
 
             options = options ?? new RiakDtUpdateOptions();
             options.Populate(request);
-
-            if (adds != null)
-                request.op.map_op.adds.AddRange(adds.Select(a => a.ToMapField()));
 
             if (removes != null)
                 request.op.map_op.removes.AddRange(removes.Select(a => a.ToMapField()));

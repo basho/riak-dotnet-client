@@ -22,7 +22,6 @@ namespace CorrugatedIron.Messages
       get { return _name; }
       set { _name = value; }
     }
-
     private byte[] _schema = null;
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"schema", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(null)]
@@ -30,6 +29,14 @@ namespace CorrugatedIron.Messages
     {
       get { return _schema; }
       set { _schema = value; }
+    }
+    private uint _n_val = default(uint);
+    [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"n_val", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(uint))]
+    public uint n_val
+    {
+      get { return _n_val; }
+      set { _n_val = value; }
     }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
@@ -41,7 +48,6 @@ namespace CorrugatedIron.Messages
   {
     public RpbYokozunaIndexGetReq() {}
     
-
     private byte[] _name = null;
     [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"name", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(null)]
@@ -118,7 +124,6 @@ namespace CorrugatedIron.Messages
       get { return _name; }
       set { _name = value; }
     }
-
     private byte[] _content = null;
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"content", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(null)]
