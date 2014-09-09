@@ -131,6 +131,12 @@ namespace CorrugatedIron.Models
             return this;
         }
 
+        public RiakDtFetchOptions SetIncludeContext(bool value)
+        {
+            IncludeContext = value;
+            return this;
+        }
+
         public RiakDtFetchOptions()
         {
             R = new Either<uint, string>(RiakConstants.QuorumOptions.Default);

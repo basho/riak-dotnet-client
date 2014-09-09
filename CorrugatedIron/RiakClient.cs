@@ -1581,10 +1581,13 @@ namespace CorrugatedIron
                 return new RiakDtSetResult(RiakResult<RiakObject>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline));
 
             var rsr =
-                new RiakDtSetResult(RiakResult<RiakObject>.Success(new RiakObject(objectId, result.Value)), result.Value.context, result.Value.value.set_value);
+                new RiakDtSetResult(RiakResult<RiakObject>.Success(new RiakObject(objectId, result.Value)));
 
             if (options.IncludeContext.HasValue && options.IncludeContext.Value)
                 rsr.Context = result.Value.context;
+
+            if (result.Value.value != null)
+                rsr.Values = result.Value.value.set_value;
 
             return rsr;
         }
@@ -1629,7 +1632,7 @@ namespace CorrugatedIron
             var response = UseConnection(conn => conn.PbcWriteRead<DtUpdateReq, DtUpdateResp>(request));
 
             var rdsr =
-                new RiakDtSetResult(RiakResult<RiakObject>.Success(new RiakObject(objectId, response.Value.set_value)));
+                new RiakDtSetResult(RiakResult<RiakObject>.Success(new RiakObject(objectId, response.Value)));
 
             if (options.IncludeContext)
                 rdsr.Context = response.Value.context;
@@ -1641,15 +1644,21 @@ namespace CorrugatedIron
         }
 
         public RiakDtMapResult DtFetchMap(string bucket,
-                                          string key,
-                                          string bucketType = null,
+            string key,
+            string bucketType = null,
+            RiakDtFetchOptions options = null)
+        {
+            return DtFetchMap(new RiakObjectId(bucketType, bucket, key), options);
+        }
+
+        public RiakDtMapResult DtFetchMap(RiakObjectId objectId,
                                           RiakDtFetchOptions options = null)
         {
             var message = new DtFetchReq
             {
-                bucket = bucket.ToRiakString(),
-                type = bucketType.ToRiakString(),
-                key = key.ToRiakString()
+                bucket = objectId.Bucket.ToRiakString(),
+                type = objectId.BucketType.ToRiakString(),
+                key = objectId.Key.ToRiakString()
             };
 
             options = options ?? new RiakDtFetchOptions();
@@ -1662,7 +1671,7 @@ namespace CorrugatedIron
                 return new RiakDtMapResult(RiakResult<RiakObject>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline));
 
             var rmr =
-                new RiakDtMapResult(RiakResult<RiakObject>.Success(new RiakObject(bucket, key, result.Value.value)));
+                new RiakDtMapResult(RiakResult<RiakObject>.Success(new RiakObject(objectId.Bucket, objectId.Key, result.Value.value)));
 
             if (options.IncludeContext.HasValue && options.IncludeContext.Value)
                 rmr.Context = result.Value.context;
