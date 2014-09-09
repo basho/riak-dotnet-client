@@ -88,6 +88,12 @@ namespace CorrugatedIron.Models
             return this;
         }
 
+        public RiakDtUpdateOptions SetIncludeContext(bool value)
+        {
+            IncludeContext = value;
+            return this;
+        }
+
         public RiakDtUpdateOptions()
         {
             IncludeContext = true;

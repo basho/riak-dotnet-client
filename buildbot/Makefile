@@ -8,8 +8,16 @@ preconfigure:
 
 
 configure:
-	@${RIAK_ADMIN} bucket-type create yokozuna '{"props":{}}'
-	@${RIAK_ADMIN} bucket-type activate yokozuna
+	@${RIAK_ADMIN} bucket-type create plain '{"props":{}}'
+	@${RIAK_ADMIN} bucket-type create search '{"props":{}}'
+	@${RIAK_ADMIN} bucket-type create maps '{"props":{"datatype":"map"}}'
+	@${RIAK_ADMIN} bucket-type create sets '{"props":{"datatype":"set"}}'
+	@${RIAK_ADMIN} bucket-type create counters '{"props":{"datatype":"counter"}}'
+	@${RIAK_ADMIN} bucket-type activate plain
+	@${RIAK_ADMIN} bucket-type activate search
+	@${RIAK_ADMIN} bucket-type activate maps
+	@${RIAK_ADMIN} bucket-type activate sets
+	@${RIAK_ADMIN} bucket-type activate counters
 
 compile:
 	../.mono-build-scripts/InstallMono.sh

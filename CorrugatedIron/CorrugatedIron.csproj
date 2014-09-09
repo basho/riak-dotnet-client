@@ -215,6 +215,7 @@
     <Compile Include="Models\RiakDt\RiakDtSetResult.cs" />
     <Compile Include="Models\RiakDtUpdateOptions.cs" />
     <Compile Include="Models\RiakDt\RiakDtCounter.cs" />
+    <Compile Include="Models\RiakDt\SetOperation.cs" />
     <Compile Include="Models\RiakIndexGetOptions.cs" />
     <Compile Include="Models\RiakObjectId.cs" />
     <Compile Include="Models\RiakBucketProperties.cs">
