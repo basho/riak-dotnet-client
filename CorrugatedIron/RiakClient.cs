@@ -1508,35 +1508,31 @@ namespace CorrugatedIron
 
             var rcr = new RiakCounterResult(RiakResult<RiakObject>.Success(o));
 
-            if (options.IncludeContext.HasValue && options.IncludeContext.Value)
-                rcr.Context = result.Value.context;
+            if (result.Value.value != null)
+                rcr.Value = result.Value.value.counter_value;
 
             return rcr;
         }
 
         public RiakCounterResult DtUpdateCounter(string bucketType, string bucket, string key,
-                                                 long amount,
-                                                 byte[] context,
-                                                 RiakDtUpdateOptions options = null)
+                                                 long amount, RiakDtUpdateOptions options = null)
         {
-            return DtUpdateCounter(new RiakObjectId(bucketType, bucket, key), amount, context, options);
+            return DtUpdateCounter(new RiakObjectId(bucketType, bucket, key), amount, options);
         }
 
         public RiakCounterResult DtUpdateCounter(RiakObjectId objectId, long amount, 
-                                                 byte[] context, RiakDtUpdateOptions options = null)
+                                                 RiakDtUpdateOptions options = null)
         {
             var request = new DtUpdateReq
             {
                 type = objectId.BucketType.ToRiakString(),
                 bucket = objectId.Bucket.ToRiakString(), 
-                key = objectId.Key.ToRiakString()
+                key = objectId.Key.ToRiakString(),
+                op = new CounterOperation(amount).ToDtOp()
             };
 
             options = options ?? new RiakDtUpdateOptions();
             options.Populate(request);
-
-            if (context != null)
-                request.context = context;
 
             var result = UseConnection(conn => conn.PbcWriteRead<DtUpdateReq, DtUpdateResp>(request));
 
@@ -1548,9 +1544,6 @@ namespace CorrugatedIron
             var o = new RiakObject(objectId, result.Value.counter_value);
 
             var rcr = new RiakCounterResult(RiakResult<RiakObject>.Success(o));
-
-            if (options.IncludeContext)
-                rcr.Context = result.Value.context;
 
             if (options.ReturnBody)
                 rcr.Value = result.Value.counter_value;

@@ -101,8 +101,8 @@ namespace CorrugatedIron
         
         RiakCounterResult DtFetchCounter(string bucketType, string bucket, string key, RiakDtFetchOptions options = null);
         RiakCounterResult DtFetchCounter(RiakObjectId objectId, RiakDtFetchOptions options = null);
-        RiakCounterResult DtUpdateCounter(string bucketType, string bucket, string key, long amount, byte[] context, RiakDtUpdateOptions options = null);
-        RiakCounterResult DtUpdateCounter(RiakObjectId objectId, long amount, byte[] context, RiakDtUpdateOptions options = null);
+        RiakCounterResult DtUpdateCounter(string bucketType, string bucket, string key, long amount, RiakDtUpdateOptions options = null);
+        RiakCounterResult DtUpdateCounter(RiakObjectId objectId, long amount, RiakDtUpdateOptions options = null);
         
         RiakDtSetResult DtFetchSet(string bucketType, string bucket, string key, RiakDtFetchOptions options = null);
         RiakDtSetResult DtFetchSet(RiakObjectId objectId, RiakDtFetchOptions options = null);
