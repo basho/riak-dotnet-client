@@ -104,9 +104,9 @@ namespace CorrugatedIron
         RiakCounterResult DtUpdateCounter(RiakObjectId objectId, long amount, byte[] context, RiakDtUpdateOptions options = null);
         RiakDtSetResult DtFetchSet(string bucketType, string bucket, string key, RiakDtFetchOptions options = null);
         RiakDtSetResult DtFetchSet(RiakObjectId objectId, RiakDtFetchOptions options = null);
-        RiakDtSetResult DtUpdateSet<T>(string bucketType, string bucket, string key, SerializeObjectToByteArray<T> serialize, byte[] context = null, List<T> adds = null, List<T> removes = null, RiakDtUpdateOptions options = null);
+        RiakDtSetResult DtUpdateSet<T>(string bucketType, string bucket, string key, SerializeObjectToByteArray<T> serialize, byte[] context, List<T> adds = null, List<T> removes = null, RiakDtUpdateOptions options = null);
         RiakDtMapResult DtFetchMap(string bucketType, string bucket, string key, RiakDtFetchOptions options = null);
-        RiakDtMapResult DtUpdateMap<T>(string bucketType, string bucket, string key, SerializeObjectToByteArray<T> serialize, byte[] context = null, List<RiakDtMapField> removes = null, List<MapUpdate> updates = null, RiakDtUpdateOptions options = null);
+        RiakDtMapResult DtUpdateMap<T>(string bucketType, string bucket, string key, SerializeObjectToByteArray<T> serialize, byte[] context, List<RiakDtMapField> removes = null, List<MapUpdate> updates = null, RiakDtUpdateOptions options = null);
 
         //RiakResult<RiakSearchResult> Search(Action<RiakSearchRequest> prepareRequest)
     }

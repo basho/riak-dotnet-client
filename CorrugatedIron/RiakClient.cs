@@ -1581,7 +1581,7 @@ namespace CorrugatedIron
                 return new RiakDtSetResult(RiakResult<RiakObject>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline));
 
             var rsr =
-                new RiakDtSetResult(RiakResult<RiakObject>.Success(new RiakObject(objectId, result.Value.value)));
+                new RiakDtSetResult(RiakResult<RiakObject>.Success(new RiakObject(objectId, result.Value)), result.Value.context, result.Value.value.set_value);
 
             if (options.IncludeContext.HasValue && options.IncludeContext.Value)
                 rsr.Context = result.Value.context;
@@ -1593,7 +1593,7 @@ namespace CorrugatedIron
                                               string bucket,
                                               string key,
                                               SerializeObjectToByteArray<T> serialize,
-                                              byte[] context = null,
+                                              byte[] context,
                                               List<T> adds = null,
                                               List<T> removes = null,
                                               RiakDtUpdateOptions options = null)
@@ -1603,7 +1603,7 @@ namespace CorrugatedIron
 
         public RiakDtSetResult DtUpdateSet<T>(RiakObjectId objectId,
                                               SerializeObjectToByteArray<T> serialize,
-                                              byte[] context = null,
+                                              byte[] context,
                                               List<T> adds = null,
                                               List<T> removes = null,
                                               RiakDtUpdateOptions options = null)
@@ -1613,7 +1613,8 @@ namespace CorrugatedIron
                 type = objectId.BucketType.ToRiakString(),
                 bucket = objectId.Bucket.ToRiakString(),
                 key = objectId.Key.ToRiakString(),
-                context = context
+                context = context,
+                op = new SetOperation().ToDtOp()
             };
 
             options = options ?? new RiakDtUpdateOptions();
@@ -1673,7 +1674,7 @@ namespace CorrugatedIron
                                               string bucket,
                                               string key,
                                               SerializeObjectToByteArray<T> serialize,
-                                              byte[] context = null,
+                                              byte[] context,
                                               List<RiakDtMapField> removes = null,
                                               /* Is this the right way to represent updates?
                                                * It seems like there should be something better, but it requires data
@@ -1690,7 +1691,7 @@ namespace CorrugatedIron
 
         public RiakDtMapResult DtUpdateMap<T>(RiakObjectId objectId,
                                               SerializeObjectToByteArray<T> serialize,
-                                              byte[] context = null,
+                                              byte[] context,
                                               List<RiakDtMapField> removes = null,
                                               List<MapUpdate> updates = null,
                                               RiakDtUpdateOptions options = null)
