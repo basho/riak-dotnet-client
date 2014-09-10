@@ -40,19 +40,18 @@ namespace CorrugatedIron.Tests.Live
         [Test]
         public void TestSetOperations()
         {
-            var updateOptions = new RiakDtUpdateOptions().SetReturnBody(true);
             var key = "TestSetOperations_" + _random.Next();
             Console.WriteLine("Using {0} for TestSetOperations() key", key);
             
             var id = new RiakObjectId(SetBucketType, Bucket, key);
-            var initialSet = Client.DtFetchSet(id, new RiakDtFetchOptions().SetIncludeContext(true));
+            var initialSet = Client.DtFetchSet(id);
 
             Assert.IsNull(initialSet.Context);
             Assert.IsEmpty(initialSet.Values);
              
             // Single Add
             var add = new List<string> { "foo" };
-            var updatedSet1 = Client.DtUpdateSet(id, _encoder, initialSet.Context, add, null, updateOptions);
+            var updatedSet1 = Client.DtUpdateSet(id, _encoder, initialSet.Context, add, null);
             var valuesAsStrings1 = updatedSet1.GetObjects(_decoder).ToList();
 
             Assert.AreEqual(1, updatedSet1.Values.Count);
@@ -60,7 +59,7 @@ namespace CorrugatedIron.Tests.Live
 
             // Many Add
             var manyAdds = new List<string> { "foo", "bar", "baz", "qux" };
-            var updatedSet2 = Client.DtUpdateSet(id, _encoder, initialSet.Context, manyAdds, null, updateOptions);
+            var updatedSet2 = Client.DtUpdateSet(id, _encoder, initialSet.Context, manyAdds, null);
             var valuesAsStrings2 = updatedSet2.GetObjects(_decoder).ToList();
 
             Assert.AreEqual(4, updatedSet2.Values.Count);
@@ -71,7 +70,7 @@ namespace CorrugatedIron.Tests.Live
 
             // Single Remove
             var remove = new List<string> { "baz" };
-            var updatedSet3 = Client.DtUpdateSet(id, _encoder, initialSet.Context, null, remove, updateOptions);
+            var updatedSet3 = Client.DtUpdateSet(id, _encoder, initialSet.Context, null, remove);
             var valuesAsStrings3 = updatedSet3.GetObjects(_decoder).ToList();
 
             Assert.AreEqual(3, updatedSet3.Values.Count);
@@ -81,7 +80,7 @@ namespace CorrugatedIron.Tests.Live
 
             // Many Remove
             var manyRemove = new List<string> { "foo", "bar", "qux" };
-            var updatedSet4 = Client.DtUpdateSet(id, _encoder, initialSet.Context, null, manyRemove, updateOptions);
+            var updatedSet4 = Client.DtUpdateSet(id, _encoder, initialSet.Context, null, manyRemove);
 
             Assert.AreEqual(0, updatedSet4.Values.Count);
         }
@@ -89,7 +88,6 @@ namespace CorrugatedIron.Tests.Live
         [Test]
         public void TestCounterOperations()
         {
-            var updateOptions = new RiakDtUpdateOptions().SetReturnBody(true);
             var key = "TestCounterOperations_" + _random.Next();
             Console.WriteLine("Using {0} for TestCounterOperations() key", key);
             
@@ -101,11 +99,11 @@ namespace CorrugatedIron.Tests.Live
             Assert.IsFalse(initialCounter.Value.HasValue);
 
             // Increment one
-            var updatedCounter1 = Client.DtUpdateCounter(id, 1, updateOptions);
+            var updatedCounter1 = Client.DtUpdateCounter(id, 1);
             Assert.AreEqual(1, updatedCounter1.Value);
 
             // Increment many
-            var updatedCounter2 = Client.DtUpdateCounter(id, 4, updateOptions);
+            var updatedCounter2 = Client.DtUpdateCounter(id, 4);
             Assert.AreEqual(5, updatedCounter2.Value);
 
             // Fetch non-empty counter
@@ -113,11 +111,11 @@ namespace CorrugatedIron.Tests.Live
             Assert.AreEqual(5, incrementedCounter.Value);
 
             // Decrement one
-            var updatedCounter3 = Client.DtUpdateCounter(id, -1, updateOptions);
+            var updatedCounter3 = Client.DtUpdateCounter(id, -1);
             Assert.AreEqual(4, updatedCounter3.Value);
 
             // Decrement many
-            var updatedCounter4 = Client.DtUpdateCounter(id, -4, updateOptions);
+            var updatedCounter4 = Client.DtUpdateCounter(id, -4);
             Assert.AreEqual(0, updatedCounter4.Value);
         }
 

@@ -1576,7 +1576,7 @@ namespace CorrugatedIron
             var rsr =
                 new RiakDtSetResult(RiakResult<RiakObject>.Success(new RiakObject(objectId, result.Value)));
 
-            if (options.IncludeContext.HasValue && options.IncludeContext.Value)
+            if (options.IncludeContext)
                 rsr.Context = result.Value.context;
 
             if (result.Value.value != null)
@@ -1666,7 +1666,7 @@ namespace CorrugatedIron
             var rmr =
                 new RiakDtMapResult(RiakResult<RiakObject>.Success(new RiakObject(objectId.Bucket, objectId.Key, result.Value.value)));
 
-            if (options.IncludeContext.HasValue && options.IncludeContext.Value)
+            if (options.IncludeContext)
                 rmr.Context = result.Value.context;
 
             return rmr;
