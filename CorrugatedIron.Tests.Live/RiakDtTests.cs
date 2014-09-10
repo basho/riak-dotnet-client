@@ -59,7 +59,7 @@ namespace CorrugatedIron.Tests.Live
 
             // Many Add
             var manyAdds = new List<string> { "foo", "bar", "baz", "qux" };
-            var updatedSet2 = Client.DtUpdateSet(id, _encoder, initialSet.Context, manyAdds, null);
+            var updatedSet2 = Client.DtUpdateSet(id, _encoder, updatedSet1.Context, manyAdds, null);
             var valuesAsStrings2 = updatedSet2.GetObjects(_decoder).ToList();
 
             Assert.AreEqual(4, updatedSet2.Values.Count);
@@ -70,7 +70,7 @@ namespace CorrugatedIron.Tests.Live
 
             // Single Remove
             var remove = new List<string> { "baz" };
-            var updatedSet3 = Client.DtUpdateSet(id, _encoder, initialSet.Context, null, remove);
+            var updatedSet3 = Client.DtUpdateSet(id, _encoder, updatedSet2.Context, null, remove);
             var valuesAsStrings3 = updatedSet3.GetObjects(_decoder).ToList();
 
             Assert.AreEqual(3, updatedSet3.Values.Count);
@@ -80,7 +80,7 @@ namespace CorrugatedIron.Tests.Live
 
             // Many Remove
             var manyRemove = new List<string> { "foo", "bar", "qux" };
-            var updatedSet4 = Client.DtUpdateSet(id, _encoder, initialSet.Context, null, manyRemove);
+            var updatedSet4 = Client.DtUpdateSet(id, _encoder, updatedSet3.Context, null, manyRemove);
 
             Assert.AreEqual(0, updatedSet4.Values.Count);
         }
