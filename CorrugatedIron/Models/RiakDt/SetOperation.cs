@@ -12,4 +12,15 @@ namespace CorrugatedIron.Models.RiakDt
             };
         }
     }
+
+    public class MapOperation :IDtOp
+    {
+        public DtOp ToDtOp()
+        {
+            return new DtOp
+            {
+                map_op = new MapOp()
+            };
+        }
+    }
 }
