@@ -1669,6 +1669,9 @@ namespace CorrugatedIron
             if (options.IncludeContext)
                 rmr.Context = result.Value.context;
 
+            if (result.Value.value != null)
+                rmr.Values = result.Value.value.map_value.Select(mapEntry => new RiakDtMapEntry(mapEntry)).ToList();
+
             return rmr;
         }
 
@@ -1702,7 +1705,8 @@ namespace CorrugatedIron
             {
                 type = objectId.BucketType.ToRiakString(),
                 bucket = objectId.Bucket.ToRiakString(),
-                key = objectId.Key.ToRiakString()
+                key = objectId.Key.ToRiakString(),
+                op = new MapOperation().ToDtOp(),
             };
 
             options = options ?? new RiakDtUpdateOptions();
@@ -1729,7 +1733,7 @@ namespace CorrugatedIron
                 rmr.Context = result.Value.context;
 
             if (options.ReturnBody)
-                rmr.Values.AddRange(result.Value.map_value.Select(mv => new RiakDtMapEntry(mv)));
+                rmr.Values = result.Value.map_value.Select(mv => new RiakDtMapEntry(mv)).ToList();
 
             return rmr;
         }

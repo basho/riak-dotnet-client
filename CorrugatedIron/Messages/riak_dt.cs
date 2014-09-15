@@ -363,7 +363,8 @@ namespace CorrugatedIron.Messages
     }
     private MapUpdate.FlagOp _flag_op = MapUpdate.FlagOp.ENABLE;
     [global::ProtoBuf.ProtoMember(5, IsRequired = false, Name=@"flag_op", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(MapUpdate.FlagOp.ENABLE)]
+    // @alexmoore - if the next line is uncommented, protobuf-net will not include the field if it's set to ENABLE, causing problems on Riak's side.
+    //[global::System.ComponentModel.DefaultValue(MapUpdate.FlagOp.ENABLE)]
     public MapUpdate.FlagOp flag_op
     {
       get { return _flag_op; }
