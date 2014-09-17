@@ -1,10 +1,15 @@
 RIAK_CONF = ${RIAK_DIR}/etc/riak.conf
+ADVANCED_CONF = ${RIAK_DIR}/etc/advanced.config
 RIAK_ADMIN = ${RIAK_DIR}/bin/riak-admin
 
 preconfigure:
 	echo "storage_backend = leveldb" >> ${RIAK_CONF}
 	echo "search = on" >> ${RIAK_CONF}
 	echo "listener.protobuf.internal = 127.0.0.1:8087" >> ${RIAK_CONF}
+	cp ${ADVANCED_CONF} "${ADVANCED_CONF}.old"
+	sed -i '' -e '$ d' ${ADVANCED_CONF}
+	sed -i '' -e '$ d' ${ADVANCED_CONF}
+	cat advanced_config_append >> ${ADVANCED_CONF}
 
 
 configure:
