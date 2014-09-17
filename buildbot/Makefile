@@ -6,10 +6,12 @@ preconfigure:
 	echo "storage_backend = leveldb" >> ${RIAK_CONF}
 	echo "search = on" >> ${RIAK_CONF}
 	echo "listener.protobuf.internal = 127.0.0.1:8087" >> ${RIAK_CONF}
+	cat ${ADVANCED_CONF}
 	cp ${ADVANCED_CONF} "${ADVANCED_CONF}.old"
 	sed -i '' -e '$ d' ${ADVANCED_CONF}
 	sed -i '' -e '$ d' ${ADVANCED_CONF}
 	cat advanced_config_append >> ${ADVANCED_CONF}
+	cat ${ADVANCED_CONF}
 
 
 configure:
