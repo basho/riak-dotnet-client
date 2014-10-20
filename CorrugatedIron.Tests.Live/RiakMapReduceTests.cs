@@ -35,7 +35,7 @@ namespace CorrugatedIron.Tests.Live
         protected IRiakClusterConfiguration ClusterConfig;
 
         protected const string MrContentType = RiakConstants.ContentTypes.ApplicationJson;
-        protected string Bucket = "fluent_key_bucket";
+        protected string Bucket = "test_bucket_fluent_key";
         protected const string EmptyBody = "{}";
 
         public RiakMapReduceTests(string section = "riak1NodeConfiguration")
@@ -51,7 +51,7 @@ namespace CorrugatedIron.Tests.Live
         [SetUp]
         public void SetUp()
         {
-            Cluster = new RiakCluster(ClusterConfig, new RiakConnectionFactory());
+            Cluster = new RiakCluster(ClusterConfig);
             Client = Cluster.CreateClient();
         }
 
@@ -69,7 +69,7 @@ namespace CorrugatedIron.Tests.Live
                 Client.Put(new RiakObject(Bucket, string.Format("time_{0}", i), EmptyBody, RiakConstants.ContentTypes.ApplicationJson));
             }
 
-            var mr = new RiakMapReduceQuery {ContentType = MrContentType};
+            var mr = new RiakMapReduceQuery { ContentType = MrContentType };
 
             mr.Inputs(Bucket)
                 .Filter(f => f.Equal("time_8"))
@@ -77,9 +77,9 @@ namespace CorrugatedIron.Tests.Live
                 .ReduceJs(r => r.Name("Riak.reduceSum").Keep(true));
 
             var result = Client.MapReduce(mr);
-            result.IsSuccess.ShouldBeTrue();
+            result.ShouldNotBeNull();
 
-            var mrResult = result.Value;
+            var mrResult = result;
             mrResult.PhaseResults.ShouldNotBeNull();
             mrResult.PhaseResults.Count().ShouldEqual(2);
 
@@ -88,8 +88,8 @@ namespace CorrugatedIron.Tests.Live
 
             mrResult.PhaseResults.ElementAt(0).Values.Count().ShouldEqual(0);
             mrResult.PhaseResults.ElementAt(1).Values.Count().ShouldNotEqual(0);
-            
-            
+
+
             var values = JsonConvert.DeserializeObject<int[]>(mrResult.PhaseResults.ElementAt(1).Values.First().FromRiakString());
             values[0].ShouldEqual(1);
         }
@@ -110,9 +110,9 @@ namespace CorrugatedIron.Tests.Live
                 .ReduceJs(r => r.Name("Riak.reduceSum").Keep(true));
 
             var result = Client.MapReduce(mr);
-            result.IsSuccess.ShouldBeTrue();
+            result.ShouldNotBeNull();
 
-            var mrResult = result.Value;
+            var mrResult = result;
             mrResult.PhaseResults.ShouldNotBeNull();
             mrResult.PhaseResults.Count().ShouldEqual(2);
 
@@ -121,9 +121,8 @@ namespace CorrugatedIron.Tests.Live
 
             mrResult.PhaseResults.ElementAt(0).Values.Count().ShouldEqual(0);
             mrResult.PhaseResults.ElementAt(1).Values.Count().ShouldNotEqual(0);
-   
-            
-            var values = result.Value.PhaseResults.ElementAt(1).GetObjects<int[]>().First();
+
+            var values = result.PhaseResults.ElementAt(1).GetObjects<int[]>().First();
             values[0].ShouldEqual(10);
         }
 
@@ -146,13 +145,13 @@ namespace CorrugatedIron.Tests.Live
                 .ReduceJs(r => r.Name("Riak.reduceSum").Keep(true));
 
             var result = Client.MapReduce(mr);
-            result.IsSuccess.ShouldBeTrue();
+            result.ShouldNotBeNull();
 
-            var mrResult = result.Value;
+            var mrResult = result;
             mrResult.PhaseResults.ShouldNotBeNull();
             mrResult.PhaseResults.Count().ShouldEqual(2);
 
-            var values = result.Value.PhaseResults.ElementAt(1).GetObjects<int[]>().First();
+            var values = result.PhaseResults.ElementAt(1).GetObjects<int[]>().First();
             values[0].ShouldEqual(5);
         }
     }

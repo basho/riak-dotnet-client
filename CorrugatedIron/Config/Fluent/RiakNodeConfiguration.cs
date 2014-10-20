@@ -27,9 +27,11 @@ namespace CorrugatedIron.Config.Fluent
         private string _restScheme = "http";
         private int _restPort = 8098;
         private int _poolSize = 30;
+        private int _idleTimeout = 2000;
         private int _networkReadTimeout = 2000;
         private int _networkWriteTimeout = 2000;
         private bool _vnodeVclocks = true;
+        private int _bufferSize = 2097152;
 
         public string Name
         {
@@ -59,6 +61,16 @@ namespace CorrugatedIron.Config.Fluent
         public int PoolSize
         {
             get { return _poolSize; }
+        }
+
+        public int BufferSize
+        {
+            get { return _bufferSize; } 
+        }
+
+        public int IdleTimeout
+        {
+            get { return _idleTimeout; }
         }
 
         public int NetworkReadTimeout
@@ -124,6 +136,12 @@ namespace CorrugatedIron.Config.Fluent
             return this;
         }
 
+        public RiakNodeConfiguration SetIdleTimeout(int idleTimeout)
+        {
+            _idleTimeout = idleTimeout;
+            return this;
+        }
+
         public RiakNodeConfiguration SetNetworkWriteTimeout(int networkWriteTimeout)
         {
             _networkWriteTimeout = networkWriteTimeout;
@@ -133,6 +151,12 @@ namespace CorrugatedIron.Config.Fluent
         public RiakNodeConfiguration SetVnodeVclocks(bool vnodeVclocks)
         {
             _vnodeVclocks = vnodeVclocks;
+            return this;
+        }
+
+        public RiakNodeConfiguration SetBufferSize(int bufferSize)
+        {
+            _bufferSize = bufferSize;
             return this;
         }
     }

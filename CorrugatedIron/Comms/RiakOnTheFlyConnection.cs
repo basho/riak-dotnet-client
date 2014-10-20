@@ -14,61 +14,30 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Threading.Tasks;
+using CorrugatedIron.Comms.Sockets;
 using CorrugatedIron.Config;
-using System;
+using CorrugatedIron.Extensions;
 
 namespace CorrugatedIron.Comms
 {
     internal class RiakOnTheFlyConnection : IRiakConnectionManager
     {
         private readonly IRiakNodeConfiguration _nodeConfig;
-        private readonly IRiakConnectionFactory _connFactory;
+        private readonly SocketAwaitablePool _pool;
+        private readonly BlockingBufferManager _bufferManager;
+        private readonly string _serverUrl;
         private bool _disposing;
+        private readonly BlockingLimitedList<RiakPbcSocket> _resources;
 
-        public RiakOnTheFlyConnection(IRiakNodeConfiguration nodeConfig, IRiakConnectionFactory connFactory)
+        public RiakOnTheFlyConnection(IRiakNodeConfiguration nodeConfig, int bufferPoolSize = 20)
         {
             _nodeConfig = nodeConfig;
-            _connFactory = connFactory;
-        }
+            _serverUrl = @"{0}://{1}:{2}".Fmt(nodeConfig.RestScheme, nodeConfig.HostAddress, nodeConfig.RestPort);
+            _pool = new SocketAwaitablePool(nodeConfig.PoolSize);
+            _bufferManager = new BlockingBufferManager(nodeConfig.BufferSize, bufferPoolSize);
 
-        public Tuple<bool, TResult> Consume<TResult>(Func<IRiakConnection, TResult> consumer)
-        {
-            if(_disposing) return Tuple.Create(false, default(TResult));
-
-            using (var conn = _connFactory.CreateConnection(_nodeConfig))
-            {
-                try
-                {
-                    var result = consumer(conn);
-                    return Tuple.Create(true, result);
-                }
-                catch(Exception)
-                {
-                    return Tuple.Create(false, default(TResult));
-                }
-            }
-        }
-
-        public Tuple<bool, TResult> DelayedConsume<TResult>(Func<IRiakConnection, Action, TResult> consumer)
-        {
-            if(_disposing) return Tuple.Create(false, default(TResult));
-
-            IRiakConnection conn = null;
-
-            try
-            {
-                conn = _connFactory.CreateConnection(_nodeConfig);
-                var result = consumer(conn, conn.Dispose);
-                return Tuple.Create(true, result);
-            }
-            catch(Exception)
-            {
-                if (conn != null)
-                {
-                    conn.Dispose();
-                }
-                return Tuple.Create(false, default(TResult));
-            }
+            _resources = new BlockingLimitedList<RiakPbcSocket>(bufferPoolSize);
         }
 
         public void Dispose()
@@ -76,6 +45,49 @@ namespace CorrugatedIron.Comms
             if(_disposing) return;
 
             _disposing = true;
+        }
+
+        public async Task<string> CreateServerUrl()
+        {
+            return _serverUrl;
+        }
+
+        public async Task Release(string serverUrl)
+        {
+        }
+
+        public async Task<RiakPbcSocket> CreateSocket()
+        {
+            var socket = new RiakPbcSocket(
+                    _nodeConfig.HostAddress,
+                    _nodeConfig.PbcPort,
+                    _nodeConfig.NetworkReadTimeout,
+                    _nodeConfig.NetworkWriteTimeout,
+                    _nodeConfig.IdleTimeout,
+                    _pool,
+                    _bufferManager);
+
+            _resources.Enqueue(socket);
+
+            return socket;
+        }
+
+        public async Task Release(RiakPbcSocket socket)
+        {
+            _resources.Dequeue(socket);
+
+            if (_disposing) return;
+
+            if (socket != null)
+            {
+                socket.Dispose();
+            }
+        }
+
+        public async Task ReleaseAll()
+        {
+            //We going to let other RiakPbcSockets die a natural garbage collection death, as we may have a few open sockets
+            _resources.Clear();
         }
     }
 }

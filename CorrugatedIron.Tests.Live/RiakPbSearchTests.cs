@@ -24,7 +24,7 @@ using NUnit.Framework;
 
 namespace CorrugatedIron.Tests.Live
 {
-    [TestFixture(Ignore = true, IgnoreReason = "Riak Search functionality has been deprecated in favor of Yokozuna/Solr.")]
+    [TestFixture]
     public class WhenQueryingRiakSearchViaPbc : LiveRiakConnectionTestBase
     {
         private const string Bucket = "riak_search_bucket";
@@ -34,13 +34,13 @@ namespace CorrugatedIron.Tests.Live
         private const string RiakSearchDoc2 = "{\"name\":\"Alan Q. Public\", \"bio\":\"I'm an exciting awesome mathematician\", \"favorites\":{\"book\":\"Prelude to Mathematics\",\"album\":\"The Fame Monster\"}}";
 
         [SetUp]
-        public new void SetUp() 
+        public new void SetUp()
         {
             base.SetUp();
-            
-            var props = Client.GetBucketProperties(Bucket).Value;
+
+            var props = Client.GetBucketProperties(Bucket);
             props.SetSearch(true);
-            Client.SetBucketProperties(Bucket, props);
+            Client.SetBucketProperties(Bucket, props).ShouldBeTrue();
         }
 
         [Test]
@@ -54,11 +54,11 @@ namespace CorrugatedIron.Tests.Live
             };
 
             var result = Client.Search(req);
-            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
-            result.Value.NumFound.ShouldEqual(1u);
-            result.Value.Documents.Count.ShouldEqual(1);
-            result.Value.Documents[0].Fields.Count.ShouldEqual(5);
-            result.Value.Documents[0].Id.Value.ShouldEqual("a.hacker");
+            result.ShouldNotBeNull();
+            result.NumFound.ShouldEqual(1u);
+            result.Documents.Count.ShouldEqual(1);
+            result.Documents[0].Fields.Count.ShouldEqual(5);
+            result.Documents[0].Id.Value.ShouldEqual("a.hacker");
         }
 
         [Test]
@@ -73,9 +73,9 @@ namespace CorrugatedIron.Tests.Live
             };
 
             var result = Client.Search(req);
-            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
-            result.Value.NumFound.ShouldEqual(2u);
-            result.Value.Documents.Count.ShouldEqual(2);
+            result.ShouldNotBeNull();
+            result.NumFound.ShouldEqual(2u);
+            result.Documents.Count.ShouldEqual(2);
         }
 
         [Test]
@@ -94,11 +94,11 @@ namespace CorrugatedIron.Tests.Live
                 .And("mathematician", t => t.Or("favorites_ablum", "Fame"));
 
             var result = Client.Search(req);
-            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
-            result.Value.NumFound.ShouldEqual(1u);
-            result.Value.Documents.Count.ShouldEqual(1);
-            result.Value.Documents[0].Fields.Count.ShouldEqual(5);
-            result.Value.Documents[0].Id.Value.ShouldEqual("a.public");
+            result.ShouldNotBeNull();
+            result.NumFound.ShouldEqual(1u);
+            result.Documents.Count.ShouldEqual(1);
+            result.Documents[0].Fields.Count.ShouldEqual(5);
+            result.Documents[0].Id.Value.ShouldEqual("a.public");
         }
 
         [Test]
@@ -123,12 +123,12 @@ namespace CorrugatedIron.Tests.Live
                 .And("mathematician", t => t.Or("favorites_ablum", "Fame"));
 
             var result = Client.Search(req);
-            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
-            result.Value.NumFound.ShouldEqual(1u);
-            result.Value.Documents.Count.ShouldEqual(1);
+            result.ShouldNotBeNull();
+            result.NumFound.ShouldEqual(1u);
+            result.Documents.Count.ShouldEqual(1);
             // "id" field is always returned
-            result.Value.Documents[0].Fields.Count.ShouldEqual(3);
-            result.Value.Documents[0].Id.ShouldNotBeNull();
+            result.Documents[0].Fields.Count.ShouldEqual(3);
+            result.Documents[0].Id.ShouldNotBeNull();
         }
     }
 }
