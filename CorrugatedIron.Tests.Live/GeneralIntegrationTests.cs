@@ -682,7 +682,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         }
 
         [Test]
-        public async void AsyncListKeysReturnsTheCorrectNumberOfResults()
+        public void AsyncListKeysReturnsTheCorrectNumberOfResults()
         {
             var bucket = string.Format("{0}_{1}", TestBucket, Guid.NewGuid());
 

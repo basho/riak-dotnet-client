@@ -96,16 +96,17 @@ namespace CorrugatedIron.Comms
             }
         }
 
-        public async Task<string> CreateServerUrl()
+        public Task<string> CreateServerUrl()
         {
-            return _serverUrl;
+            return Task.FromResult(_serverUrl);
         }
 
-        public async Task Release(string serverUrl)
+        public Task Release(string serverUrl)
         {
+            return Task.FromResult(false);
         }
 
-        public async Task<RiakPbcSocket> CreateSocket()
+        public Task<RiakPbcSocket> CreateSocket()
         {
             if (_disposing) throw new ObjectDisposedException(this.GetType().Name);
 
@@ -113,25 +114,29 @@ namespace CorrugatedIron.Comms
 
             if (_resources.TryTake(out socket, _createSocketTimeout))
             {
-                return socket;
+                return Task.FromResult(socket);
             }
 
             throw new TimeoutException("Unable to create socket with in " + _createSocketTimeout);
         }
 
-        public async Task Release(RiakPbcSocket socket)
+        public Task Release(RiakPbcSocket socket)
         {
-            if (_disposing) return;
+            if (_disposing) return Task.FromResult(false);
 
             _resources.Add(socket);
+
+            return Task.FromResult(false);
         }
 
-        public async Task ReleaseAll()
+        public Task ReleaseAll()
         {
-            if (_disposing) return;
+            if (_disposing) return Task.FromResult(false);
 
             //We going to let other RiakPbcSockets die a natural garbage collection death, as we may have a few open sockets
             Init();
+
+            return Task.FromResult(false);
         }
     }
 }

@@ -539,22 +539,22 @@ namespace CorrugatedIron
             }
         }
 
-        public async Task<RiakMapReduceResult> MapReduce(RiakMapReduceQuery query)
+        public Task<RiakMapReduceResult> MapReduce(RiakMapReduceQuery query)
         {
             var request = query.ToMessage();
             var response = _connection
                 .PbcWriteRead<RpbMapRedReq, RpbMapRedResp>(_endPoint, request, r => !r.done);
 
-            return new RiakMapReduceResult(response);
+            return Task.FromResult(new RiakMapReduceResult(response));
         }
 
-        public async Task<RiakStreamedMapReduceResult> StreamMapReduce(RiakMapReduceQuery query)
+        public Task<RiakStreamedMapReduceResult> StreamMapReduce(RiakMapReduceQuery query)
         {
             var request = query.ToMessage();
             var response = _connection
                 .PbcWriteStreamRead<RpbMapRedReq, RpbMapRedResp>(_endPoint, request, r => !r.done);
 
-            return new RiakStreamedMapReduceResult(response);
+            return Task.FromResult(new RiakStreamedMapReduceResult(response));
         }
 
         public IObservable<Either<RiakException, string>> StreamListBuckets()
@@ -830,7 +830,7 @@ namespace CorrugatedIron
             return StreamIndexGetRange(bucket, indexName.ToBinaryKey(), minValue, maxValue, options);
         }
 
-        private async Task<Either<RiakException, RiakStreamedIndexResult>> StreamIndexGetEquals(string bucket, string indexName, string value, RiakIndexGetOptions options = null)
+        private Task<Either<RiakException, RiakStreamedIndexResult>> StreamIndexGetEquals(string bucket, string indexName, string value, RiakIndexGetOptions options = null)
         {
             var message = new RpbIndexReq
             {
@@ -853,15 +853,15 @@ namespace CorrugatedIron
                 var riakStreamedIndexResult = new RiakStreamedIndexResult(includeTerms, result);
 
 
-                return new Either<RiakException, RiakStreamedIndexResult>(riakStreamedIndexResult);
+                return Task.FromResult(new Either<RiakException, RiakStreamedIndexResult>(riakStreamedIndexResult));
             }
             catch (RiakException riakException)
             {
-                return new Either<RiakException, RiakStreamedIndexResult>(riakException);
+                return Task.FromResult(new Either<RiakException, RiakStreamedIndexResult>(riakException));
             }
         }
 
-        private async Task<Either<RiakException, RiakStreamedIndexResult>> StreamIndexGetRange(string bucket, string indexName, string minValue, string maxValue, RiakIndexGetOptions options = null)
+        private Task<Either<RiakException, RiakStreamedIndexResult>> StreamIndexGetRange(string bucket, string indexName, string minValue, string maxValue, RiakIndexGetOptions options = null)
         {
             var message = new RpbIndexReq
             {
@@ -882,11 +882,11 @@ namespace CorrugatedIron
                 var includeTerms = ReturnTerms(options);
                 var riakStreamedIndexResult = new RiakStreamedIndexResult(includeTerms, result);
 
-                return new Either<RiakException, RiakStreamedIndexResult>(riakStreamedIndexResult);
+                return Task.FromResult(new Either<RiakException, RiakStreamedIndexResult>(riakStreamedIndexResult));
             }
             catch (RiakException riakException)
             {
-                return new Either<RiakException, RiakStreamedIndexResult>(riakException);
+                return Task.FromResult(new Either<RiakException, RiakStreamedIndexResult>(riakException));
             }
         }
 

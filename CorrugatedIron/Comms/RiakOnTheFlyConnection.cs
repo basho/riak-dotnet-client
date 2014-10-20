@@ -30,19 +30,24 @@ namespace CorrugatedIron.Comms
         private bool _disposing;
         private readonly BlockingLimitedList<RiakPbcSocket> _resources;
 
-        public RiakOnTheFlyConnection(IRiakNodeConfiguration nodeConfig, int bufferPoolSize = 20)
+        public RiakOnTheFlyConnection(IRiakNodeConfiguration nodeConfig)
         {
+            var poolSize = nodeConfig.PoolSize;
+            if (poolSize == 0)
+            {
+                poolSize = 20;
+            }
             _nodeConfig = nodeConfig;
             _serverUrl = @"{0}://{1}:{2}".Fmt(nodeConfig.RestScheme, nodeConfig.HostAddress, nodeConfig.RestPort);
-            _pool = new SocketAwaitablePool(nodeConfig.PoolSize);
-            _bufferManager = new BlockingBufferManager(nodeConfig.BufferSize, bufferPoolSize);
+            _pool = new SocketAwaitablePool(poolSize);
+            _bufferManager = new BlockingBufferManager(nodeConfig.BufferSize, poolSize);
 
-            _resources = new BlockingLimitedList<RiakPbcSocket>(bufferPoolSize);
+            _resources = new BlockingLimitedList<RiakPbcSocket>(poolSize);
         }
 
         public void Dispose()
         {
-            if(_disposing) return;
+            if (_disposing) return;
 
             _disposing = true;
         }
