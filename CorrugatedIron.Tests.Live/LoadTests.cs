@@ -14,6 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Diagnostics;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
@@ -29,7 +30,7 @@ using System.Threading.Tasks;
 
 namespace CorrugatedIron.Tests.Live.LoadTests
 {
-    [TestFixture("riakLoadTestConfiguration")]
+    [TestFixture]
     public class WhenUnderLoad : LiveRiakConnectionTestBase
     {
         // thread count is currently set to the same
@@ -38,13 +39,16 @@ namespace CorrugatedIron.Tests.Live.LoadTests
         // connection recovery/retry across nodes is
         // functioning and the load-balancing strategies
         // are in place.
-        private const int ThreadCount = 70;
-        private const int ActionCount = 30;
+        private const int ThreadCount = 30;
+        private const int ActionCount = 70;
         //private const int ThreadCount = 1;
         //private const int ActionCount = 1;
 
-        public WhenUnderLoad(string configSection) : base(configSection) { }
-      
+        public WhenUnderLoad(string configSection = "riakLoadTestConfiguration")
+            : base(configSection)
+        {
+        }
+
         [Test]
         public void LotsOfConcurrentMapRedRequestsShouldWork()
         {
@@ -57,7 +61,7 @@ namespace CorrugatedIron.Tests.Live.LoadTests
                 keys.Add(key);
 
                 var result = Client.Put(doc, new RiakPutOptions { ReturnBody = true });
-                result.IsSuccess.ShouldBeTrue();
+                result.ShouldNotBeNull();
             }
 
             var input = new RiakBucketKeyInput();
@@ -69,18 +73,21 @@ namespace CorrugatedIron.Tests.Live.LoadTests
                 .ReduceJs(r => r.Name(@"Riak.reduceSum").Keep(true));
             query.Compile();
 
-            var results = new List<RiakResult<RiakMapReduceResult>>[ThreadCount];
+            var results = new List<RiakMapReduceResult>[ThreadCount];
+            var watch = Stopwatch.StartNew();
             Parallel.For(0, ThreadCount, i =>
-                {
-                    results[i] = DoMapRed(query);
-                });
+            {
+                results[i] = DoMapRed(query);
+            });
+            watch.Stop();
+            var executionTime = watch.Elapsed;
 
             var failures = 0;
             foreach (var r in results.SelectMany(l => l))
             {
-                if (r.IsSuccess)
+                if (r != null)
                 {
-                    var resultValue = JsonConvert.DeserializeObject<int[]>(r.Value.PhaseResults.ElementAt(1).Values.First().FromRiakString())[0];
+                    var resultValue = JsonConvert.DeserializeObject<int[]>(r.PhaseResults.ElementAt(1).Values.First().FromRiakString())[0];
                     resultValue.ShouldEqual(10);
                     //r.Value.PhaseResults.ElementAt(1).GetObject<int[]>()[0].ShouldEqual(10);
                 }
@@ -88,15 +95,15 @@ namespace CorrugatedIron.Tests.Live.LoadTests
                 {
                     // the only acceptable result is that it ran out of retries when
                     // talking to the cluster (trying to get a connection)
-                    r.ResultCode.ShouldEqual(ResultCode.NoRetries);
+                    //r.ResultCode.ShouldEqual(ResultCode.NoRetries);
                     ++failures;
                 }
             }
 
-            Console.WriteLine("Total of {0} out of {1} failed to execute due to connection contention", failures, ThreadCount * ActionCount);
+            Console.WriteLine("Total of {0} out of {1} failed to execute due to connection contention. Execution time = {2} milliseconds, for an average of {3} milliseconds", failures, ThreadCount * ActionCount, executionTime.TotalMilliseconds, (executionTime.TotalMilliseconds / (ThreadCount * ActionCount)));
         }
 
-        private List<RiakResult<RiakMapReduceResult>> DoMapRed(RiakMapReduceQuery query)
+        private List<RiakMapReduceResult> DoMapRed(RiakMapReduceQuery query)
         {
             var client = Cluster.CreateClient();
 
@@ -116,7 +123,7 @@ namespace CorrugatedIron.Tests.Live.LoadTests
                 keys.Add(key);
 
                 var result = Client.Put(doc, new RiakPutOptions { ReturnBody = true });
-                result.IsSuccess.ShouldBeTrue();
+                result.ShouldNotBeNull();
             }
 
             var input = new RiakBucketKeyInput();
@@ -129,10 +136,13 @@ namespace CorrugatedIron.Tests.Live.LoadTests
             query.Compile();
 
             var results = new List<RiakMapReduceResultPhase>[ThreadCount];
+            var watch = Stopwatch.StartNew();
             Parallel.For(0, ThreadCount, i =>
-                {
-                    results[i] = DoStreamingMapRed(query);
-                });
+            {
+                results[i] = DoStreamingMapRed(query);
+            });
+            watch.Stop();
+            var executionTime = watch.Elapsed;
 
             var failures = 0;
             foreach (var result in results)
@@ -151,7 +161,8 @@ namespace CorrugatedIron.Tests.Live.LoadTests
                     ++failures;
                 }
             }
-            Console.WriteLine("Total of {0} out of {1} failed to execute due to connection contention", failures, ThreadCount * ActionCount);
+
+            Console.WriteLine("Total of {0} out of {1} failed to execute due to connection contention. Execution time = {2} milliseconds, for an average of {3} milliseconds", failures, ThreadCount * ActionCount, executionTime.TotalMilliseconds, (executionTime.TotalMilliseconds / (ThreadCount * ActionCount)));
         }
 
         private List<RiakMapReduceResultPhase> DoStreamingMapRed(RiakMapReduceQuery query)
@@ -159,22 +170,31 @@ namespace CorrugatedIron.Tests.Live.LoadTests
             var client = Cluster.CreateClient();
 
             var results = ActionCount.Times(() =>
+            {
+                var streamedResults = client.StreamMapReduce(query);
+                if (streamedResults != null)
                 {
-                    var streamedResults = client.StreamMapReduce(query);
-                    if (streamedResults.IsSuccess)
-                    {
-                        return streamedResults.Value.PhaseResults;
-                    }
-                    return null;
-                }).Where(r => r != null).SelectMany(r => r);
+                    return streamedResults.PhaseResults;
+                }
+                return null;
+            }).Where(r => r != null).SelectMany(r => r);
 
             return results.ToList();
         }
     }
 
-    [TestFixture("riakOnTheFlyLoadTestConfiguration")]
+    [TestFixture]
     public class WhenUnderLoadWithOnTheFlyConnections : WhenUnderLoad
     {
-        public WhenUnderLoadWithOnTheFlyConnections(string configSection) : base(configSection) { }
+        public WhenUnderLoadWithOnTheFlyConnections()
+            : base("riakOnTheFlyLoadTestConfiguration")
+        {
+        }
+    }
+
+    [TestFixture]
+    public class WhenUnderLoadWithRiakConnectionPool : WhenUnderLoad
+    {
+
     }
 }

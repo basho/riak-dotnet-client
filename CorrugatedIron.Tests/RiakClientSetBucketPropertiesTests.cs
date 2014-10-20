@@ -14,6 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Threading.Tasks;
 using CorrugatedIron.Comms;
 using CorrugatedIron.Messages;
 using CorrugatedIron.Models;
@@ -22,7 +23,6 @@ using CorrugatedIron.Util;
 using Moq;
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace CorrugatedIron.Tests.RiakClientSetBucketPropertiesTests
@@ -33,7 +33,6 @@ namespace CorrugatedIron.Tests.RiakClientSetBucketPropertiesTests
 
         public MockCluster()
         {
-            RetryWaitTime = 200;
         }
 
         public void Dispose()
@@ -47,23 +46,60 @@ namespace CorrugatedIron.Tests.RiakClientSetBucketPropertiesTests
 
         public IRiakClient CreateClient(string seed)
         {
-            return new Mock<IRiakClient>().Object;
+            return CreateClient();
         }
 
-        public int RetryWaitTime { get; set; }
-
-        public RiakResult<TResult> UseConnection<TResult>(Func<IRiakConnection, RiakResult<TResult>> useFun, int retryAttempts)
+        public Task GetSingleResultViaPbc(Func<RiakPbcSocket, Task> useFun)
         {
-            return useFun(ConnectionMock.Object);
+            throw new NotImplementedException();
         }
 
-        public RiakResult UseConnection(Func<IRiakConnection, RiakResult> useFun, int retryAttempts)
+        public Task<TResult> GetSingleResultViaPbc<TResult>(Func<RiakPbcSocket, Task<TResult>> useFun)
         {
-            return useFun(ConnectionMock.Object);
+            throw new NotImplementedException();
         }
 
-        public RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun, int retryAttempts)
-            where TResult : RiakResult
+        public Task GetMultipleResultViaPbc(Func<RiakPbcSocket, Task> useFun)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task GetSingleResultViaPbc(IRiakEndPointContext riakEndPointContext, Func<RiakPbcSocket, Task> useFun)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<TResult> GetSingleResultViaPbc<TResult>(IRiakEndPointContext riakEndPointContext, Func<RiakPbcSocket, Task<TResult>> useFun)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task GetMultipleResultViaPbc(IRiakEndPointContext riakEndPointContext, Func<RiakPbcSocket, Task> useFun)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task GetSingleResultViaRest(Func<string, Task> useFun)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<TResult> GetSingleResultViaRest<TResult>(Func<string, Task<TResult>> useFun)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task GetMultipleResultViaRest(Func<string, Task> useFun)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task GetMultipleResultViaPbc(Action<RiakPbcSocket> useFun)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task GetMultipleResultViaRest(Action<string> useFun)
         {
             throw new NotImplementedException();
         }
@@ -79,49 +115,45 @@ namespace CorrugatedIron.Tests.RiakClientSetBucketPropertiesTests
         {
             Cluster = new MockCluster();
             ClientId = System.Text.Encoding.Default.GetBytes("fadjskl").Take(4).ToArray();
-            Client = new RiakClient(Cluster);
+            Client = new RiakClient(Cluster, Cluster.ConnectionMock.Object);
         }
     }
 
     [TestFixture]
     public class WhenSettingBucketPropertiesWithExtendedProperties : RiakClientSetBucketPropertiesTestBase
     {
-        protected RiakResult Response;
+
         [SetUp]
         public void SetUp()
         {
-            var result = RiakResult<RiakRestResponse>.Success(new RiakRestResponse { StatusCode = System.Net.HttpStatusCode.NoContent });
-            Cluster.ConnectionMock.Setup(m => m.RestRequest(It.IsAny<RiakRestRequest>())).Returns(result);
+            var result = new RiakRestResponse { StatusCode = System.Net.HttpStatusCode.NoContent };
 
-            Response = Client.SetBucketProperties("foo", new RiakBucketProperties().SetAllowMultiple(true).SetRVal("one"));
+            Cluster.ConnectionMock.Setup(m => m.RestRequest(It.IsAny<IRiakEndPoint>(), It.IsAny<RiakRestRequest>())).Returns(Task.FromResult(result));
+            Client.SetBucketProperties("foo", new RiakBucketProperties().SetAllowMultiple(true).SetRVal("one"), true);
         }
 
         [Test]
-        [Ignore]
         public void RestInterfaceIsInvokedWithAppropriateValues()
         {
-            Cluster.ConnectionMock.Verify(m => m.RestRequest(It.Is<RiakRestRequest>(r => r.ContentType == RiakConstants.ContentTypes.ApplicationJson
-                && r.Method == RiakConstants.Rest.HttpMethod.Put)), Times.Once());
+            Cluster.ConnectionMock.Verify(m => m.RestRequest(Cluster, It.Is<RiakRestRequest>(r => r.ContentType == RiakConstants.ContentTypes.ApplicationJson && r.Method == RiakConstants.Rest.HttpMethod.Put)), Times.Once());
         }
     }
 
     [TestFixture]
     public class WhenSettingBucketPropertiesWithoutExtendedProperties : RiakClientSetBucketPropertiesTestBase
     {
-        protected RiakResult Response;
+
         [SetUp]
         public void SetUp()
         {
-            var result = RiakResult.Success();
-            Cluster.ConnectionMock.Setup(m => m.PbcWriteRead(It.IsAny<RpbSetBucketReq>(), MessageCode.SetBucketResp)).Returns(result);
-
-            Response = Client.SetBucketProperties("foo", new RiakBucketProperties().SetAllowMultiple(true));
+            Cluster.ConnectionMock.Setup(m => m.PbcWriteRead(It.IsAny<IRiakEndPoint>(), It.IsAny<RpbSetBucketReq>(), MessageCode.SetBucketResp)).Returns(Task.FromResult(false));
+            Client.SetBucketProperties("foo", new RiakBucketProperties().SetAllowMultiple(true), false);
         }
 
         [Test]
         public void PbcInterfaceIsInvokedWithAppropriateValues()
         {
-            Cluster.ConnectionMock.Verify(m => m.PbcWriteRead(It.Is<RpbSetBucketReq>(r => r.props.allow_mult), MessageCode.SetBucketResp), Times.Once());
+            Cluster.ConnectionMock.Verify(m => m.PbcWriteRead(It.IsAny<IRiakEndPoint>(), It.Is<RpbSetBucketReq>(r => r.props.allow_mult), MessageCode.SetBucketResp), Times.Once());
         }
     }
 }

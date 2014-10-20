@@ -14,10 +14,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
 
@@ -25,24 +23,43 @@ namespace CorrugatedIron.Models.Index
 {
     public class RiakIndexResult : IRiakIndexResult
     {
+        private readonly string _continuation;
+        private readonly bool _done;
         private readonly IEnumerable<RiakIndexKeyTerm> _indexKeyTerms;
+
+        public string Continuation
+        {
+            get { return _continuation; }
+        }
+
+        public bool Done
+        {
+            get { return _done; }
+        }
 
         public IEnumerable<RiakIndexKeyTerm> IndexKeyTerms
         {
             get { return _indexKeyTerms; }
         }
 
-        internal RiakIndexResult(bool includeTerms, RiakResult<RpbIndexResp> response)
+        internal RiakIndexResult(bool includeTerms, RpbIndexResp response)
         {
+            _done = response.done;
+
+            if (response.continuation != null)
+            {
+                _continuation = response.continuation.FromRiakString();
+            }
+
             if (includeTerms)
             {
-                _indexKeyTerms = response.Value.results.Select(pair =>
+                _indexKeyTerms = response.results.Select(pair =>
                                                 new RiakIndexKeyTerm(pair.value.FromRiakString(),
                                                                     pair.key.FromRiakString()));
             }
             else
             {
-                _indexKeyTerms = response.Value.keys.Select(key => new RiakIndexKeyTerm(key.FromRiakString()));
+                _indexKeyTerms = response.keys.Select(key => new RiakIndexKeyTerm(key.FromRiakString()));
             }
         }
     }

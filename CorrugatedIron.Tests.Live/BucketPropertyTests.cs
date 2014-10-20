@@ -14,6 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using CorrugatedIron.Exceptions;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.CommitHook;
@@ -24,18 +25,19 @@ using CorrugatedIron.Util;
 using NUnit.Framework;
 using System;
 using System.Linq;
-using System.Threading;
 
 namespace CorrugatedIron.Tests.Live.BucketPropertyTests
 {
     [TestFixture]
     public class WhenDealingWithBucketProperties : LiveRiakConnectionTestBase
     {
+        protected string Bucket = "test_bucket_bucket_properties";
+
         // use the one node configuration here because we might run the risk
         // of hitting different nodes in the configuration before the props
         // are replicated to other nodes.
         public WhenDealingWithBucketProperties()
-            :base("riak1NodeConfiguration")
+            : base("riak1NodeConfiguration")
         {
         }
 
@@ -43,39 +45,88 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
         public void ListKeysReturnsAllkeys()
         {
             Func<string> generator = () => Guid.NewGuid().ToString();
-            var bucket = generator();
-            var pairs = generator.Replicate(10).Select(f => new RiakObject(bucket, f(), "foo", RiakConstants.ContentTypes.TextPlain)).ToList();
-            Client.Put(pairs);
+            var bucket = string.Format("{0}_{1}", Bucket, generator());
+            var pairs = generator
+                .Replicate(10)
+                .Select(f => new RiakObject(bucket, f(), "foo", RiakConstants.ContentTypes.TextPlain))
+                .ToList();
 
-            var results = Client.ListKeys(bucket);
-            results.IsSuccess.ShouldBeTrue(results.ErrorMessage);
-            results.Value.Count().ShouldEqual(10);
+            var postResults = Client.Put(pairs);
+
+            var results = Client.ListKeys(bucket).ToList();
+
+
+
+            results.Count().ShouldEqual(10);
+        }
+
+        [Test]
+        public void SettingExtendedPropertiesToBucketWithSlashesInNameShouldReturnError()
+        {
+            var bucketName = string.Format("{0}_{1}", Bucket, "not/valid/here");
+            var props = new RiakBucketProperties()
+                .SetNVal(4)
+                .SetSearch(true)
+                .SetWVal("all")
+                .SetRVal("quorum");
+
+            RiakException exception = null;
+            try
+            {
+                var getResult = Client.SetBucketProperties(bucketName, props);
+            }
+            catch (RiakException riakException)
+            {
+                exception = riakException;
+            }
+
+            exception.ShouldNotBeNull();
+            exception.ErrorCode.ShouldEqual((uint)ResultCode.InvalidRequest);
         }
 
         [Test]
         public void GettingExtendedPropertiesOnABucketWithoutExtendedPropertiesSetDoesntThrowAnException()
         {
-            var bucketName = Guid.NewGuid().ToString();
-
+            var bucketName = string.Format("{0}_{1}", Bucket, Guid.NewGuid());
             var getResult = Client.GetBucketProperties(bucketName);
-            getResult.IsSuccess.ShouldBeTrue(getResult.ErrorMessage);
+
+            getResult.ShouldNotBeNull();
         }
 
-        [Test()]
-        [Ignore("Riak Search functionality has been deprecated in favor of Yokozuna/Solr.")]
+
+
+        [Test]
+        public void GettingExtendedPropertiesOnInvalidBucketReturnsError()
+        {
+            var bucketName = string.Format("{0}_{1}", Bucket, "this/is/not/a/valid/bucket");
+            RiakException exception = null;
+            try
+            {
+                var getResult = Client.GetBucketProperties(bucketName);
+            }
+            catch (RiakException riakException)
+            {
+                exception = riakException;
+            }
+
+            exception.ShouldNotBeNull();
+            exception.ErrorCode.ShouldEqual((uint)ResultCode.InvalidRequest);
+        }
+
+        [Test]
         public void SettingSearchOnRiakBucketMakesBucketSearchable()
         {
-            var bucket = Guid.NewGuid().ToString();
+            var bucket = string.Format("{0}_{1}", Bucket, Guid.NewGuid());
             var key = Guid.NewGuid().ToString();
-            var props = Client.GetBucketProperties(bucket).Value;
+            var props = Client.GetBucketProperties(bucket);
             props.SetSearch(true);
 
             var setResult = Client.SetBucketProperties(bucket, props);
-            setResult.IsSuccess.ShouldBeTrue(setResult.ErrorMessage);
+            setResult.ShouldBeTrue();
 
             var obj = new RiakObject(bucket, key, new { name = "OJ", age = 34 });
             var putResult = Client.Put(obj);
-            putResult.IsSuccess.ShouldBeTrue(putResult.ErrorMessage);
+            putResult.ShouldNotBeNull();
 
             var q = new RiakFluentSearch(bucket, "name")
                 .Search("OJ")
@@ -88,16 +139,17 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
             };
 
             var searchResult = Client.Search(search);
-            searchResult.IsSuccess.ShouldBeTrue(searchResult.ErrorMessage);
-            searchResult.Value.NumFound.ShouldEqual(1u);
-            searchResult.Value.Documents[0].Fields.Count.ShouldEqual(3);
-            searchResult.Value.Documents[0].Fields.First(x => x.Key == "id").Value.ShouldEqual(key);
+            searchResult.ShouldNotBeNull();
+            searchResult.NumFound.ShouldEqual(1u);
+            searchResult.Documents[0].Fields.Count.ShouldEqual(3);
+            searchResult.Documents[0].Fields.First(x => x.Key == "id").Value.ShouldEqual(key);
         }
 
         [Test]
         public void SettingPropertiesOnNewBucketWorksCorrectly()
         {
-            var bucketName = Guid.NewGuid().ToString();
+            var bucketName = string.Format("{0}_{1}", Bucket, Guid.NewGuid());
+
             var props = new RiakBucketProperties()
                 .SetNVal(4)
                 .SetSearch(true)
@@ -105,12 +157,12 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
                 .SetRVal("quorum");
 
             var setResult = Client.SetBucketProperties(bucketName, props);
-            setResult.IsSuccess.ShouldBeTrue(setResult.ErrorMessage);
+            setResult.ShouldBeTrue();
 
             var getResult = Client.GetBucketProperties(bucketName);
-            getResult.IsSuccess.ShouldBeTrue(getResult.ErrorMessage);
+            getResult.ShouldNotBeNull();
 
-            props = getResult.Value;
+            props = getResult;
             props.NVal.HasValue.ShouldBeTrue();
             props.NVal.Value.ShouldEqual(4U);
             props.Search.ShouldNotEqual(null);
@@ -123,14 +175,13 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
         public void GettingWithExtendedFlagReturnsExtraProperties()
         {
             var result = Client.GetBucketProperties(PropertiesTestBucket);
-            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
-            result.Value.AllowMultiple.HasValue.ShouldBeTrue();
-            result.Value.NVal.HasValue.ShouldBeTrue();
-            result.Value.LastWriteWins.HasValue.ShouldBeTrue();
-            result.Value.RVal.ShouldNotEqual(null);
-            result.Value.RwVal.ShouldNotEqual(null);
-            result.Value.DwVal.ShouldNotEqual(null);
-            result.Value.WVal.ShouldNotEqual(null);
+            result.AllowMultiple.HasValue.ShouldBeTrue();
+            result.NVal.HasValue.ShouldBeTrue();
+            result.LastWriteWins.HasValue.ShouldBeTrue();
+            result.RVal.ShouldNotEqual(null);
+            result.RwVal.ShouldNotEqual(null);
+            result.DwVal.ShouldNotEqual(null);
+            result.WVal.ShouldNotEqual(null);
         }
 
         [Test]
@@ -138,16 +189,14 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
         {
             // make sure we're all clear first
             var result = Client.GetBucketProperties(PropertiesTestBucket);
-            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
 
-            var props = result.Value;
+            var props = result;
             props.ClearPostCommitHooks().ClearPreCommitHooks();
-            Client.SetBucketProperties(PropertiesTestBucket, props).IsSuccess.ShouldBeTrue();
+            Client.SetBucketProperties(PropertiesTestBucket, props).ShouldBeTrue();
 
             // when we load, the commit hook lists should be null
             result = Client.GetBucketProperties(PropertiesTestBucket);
-            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
-            props = result.Value;
+            props = result;
             props.PreCommitHooks.ShouldBeNull();
             props.PostCommitHooks.ShouldBeNull();
 
@@ -156,13 +205,11 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
                 .AddPreCommitHook(new RiakErlangCommitHook("my_mod", "do_fun"))
                 .AddPostCommitHook(new RiakErlangCommitHook("my_other_mod", "do_more"));
 
-            var propResult = Client.SetBucketProperties(PropertiesTestBucket, props);
-            propResult.IsSuccess.ShouldBeTrue(propResult.ErrorMessage);
+            Client.SetBucketProperties(PropertiesTestBucket, props).ShouldBeTrue();
 
             // load them out again and make sure they got loaded up
             result = Client.GetBucketProperties(PropertiesTestBucket);
-            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
-            props = result.Value;
+            props = result;
 
             props.PreCommitHooks.ShouldNotBeNull();
             props.PreCommitHooks.Count.ShouldEqual(2);
@@ -176,39 +223,39 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
         public void CommitHooksAreStoredAndLoadedProperlyInBatch()
         {
             Client.Batch(batch =>
-                {
-                    // make sure we're all clear first
-                    var result = batch.GetBucketProperties(PropertiesTestBucket);
-                    result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
-                    var props = result.Value;
-                    props.ClearPostCommitHooks().ClearPreCommitHooks();
-                    var propResult = batch.SetBucketProperties(PropertiesTestBucket, props);
-                    propResult.IsSuccess.ShouldBeTrue(propResult.ErrorMessage);
+            {
+                // make sure we're all clear first
+                var result = batch.GetBucketProperties(PropertiesTestBucket);
+                result.ShouldNotBeNull();
+                var props = result;
+                props.ClearPostCommitHooks().ClearPreCommitHooks();
+                var propResult = batch.SetBucketProperties(PropertiesTestBucket, props);
+                propResult.ShouldBeTrue();
 
-                    // when we load, the commit hook lists should be null
-                    result = batch.GetBucketProperties(PropertiesTestBucket);
-                    result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
-                    props = result.Value;
-                    props.PreCommitHooks.ShouldBeNull();
-                    props.PostCommitHooks.ShouldBeNull();
+                // when we load, the commit hook lists should be null
+                result = batch.GetBucketProperties(PropertiesTestBucket);
+                result.ShouldNotBeNull();
+                props = result;
+                props.PreCommitHooks.ShouldBeNull();
+                props.PostCommitHooks.ShouldBeNull();
 
-                    // we then store something in each
-                    props.AddPreCommitHook(new RiakJavascriptCommitHook("Foo.doBar"))
-                        .AddPreCommitHook(new RiakErlangCommitHook("my_mod", "do_fun"))
-                        .AddPostCommitHook(new RiakErlangCommitHook("my_other_mod", "do_more"));
-                    propResult = batch.SetBucketProperties(PropertiesTestBucket, props);
-                    propResult.IsSuccess.ShouldBeTrue(propResult.ErrorMessage);
+                // we then store something in each
+                props.AddPreCommitHook(new RiakJavascriptCommitHook("Foo.doBar"))
+                    .AddPreCommitHook(new RiakErlangCommitHook("my_mod", "do_fun"))
+                    .AddPostCommitHook(new RiakErlangCommitHook("my_other_mod", "do_more"));
+                propResult = batch.SetBucketProperties(PropertiesTestBucket, props);
+                propResult.ShouldBeTrue();
 
-                    // load them out again and make sure they got loaded up
-                    result = batch.GetBucketProperties(PropertiesTestBucket);
-                    result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
-                    props = result.Value;
+                // load them out again and make sure they got loaded up
+                result = batch.GetBucketProperties(PropertiesTestBucket);
+                result.ShouldNotBeNull();
+                props = result;
 
-                    props.PreCommitHooks.ShouldNotBeNull();
-                    props.PreCommitHooks.Count.ShouldEqual(2);
-                    props.PostCommitHooks.ShouldNotBeNull();
-                    props.PostCommitHooks.Count.ShouldEqual(1);
-                });
+                props.PreCommitHooks.ShouldNotBeNull();
+                props.PreCommitHooks.Count.ShouldEqual(2);
+                props.PostCommitHooks.ShouldNotBeNull();
+                props.PostCommitHooks.Count.ShouldEqual(1);
+            });
         }
 
         [Test]
@@ -216,41 +263,41 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
         {
             var completed = false;
             var task = Client.Async.Batch(batch =>
-                {
-                    // make sure we're all clear first
-                    var result = batch.GetBucketProperties(PropertiesTestBucket);
-                    result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
-                    var props = result.Value;
-                    props.ClearPostCommitHooks().ClearPreCommitHooks();
-                    var propResult = batch.SetBucketProperties(PropertiesTestBucket, props);
-                    propResult.IsSuccess.ShouldBeTrue(propResult.ErrorMessage);
+            {
+                // make sure we're all clear first
+                var result = batch.GetBucketProperties(PropertiesTestBucket).ConfigureAwait(false).GetAwaiter().GetResult();
+                result.ShouldNotBeNull();
+                var props = result;
+                props.ClearPostCommitHooks().ClearPreCommitHooks();
+                var propResult = batch.SetBucketProperties(PropertiesTestBucket, props).ConfigureAwait(false).GetAwaiter().GetResult();
+                propResult.ShouldBeTrue();
 
-                    // when we load, the commit hook lists should be null
-                    result = batch.GetBucketProperties(PropertiesTestBucket);
-                    result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
-                    props = result.Value;
-                    props.PreCommitHooks.ShouldBeNull();
-                    props.PostCommitHooks.ShouldBeNull();
+                // when we load, the commit hook lists should be null
+                result = batch.GetBucketProperties(PropertiesTestBucket).ConfigureAwait(false).GetAwaiter().GetResult();
+                result.ShouldNotBeNull();
+                props = result;
+                props.PreCommitHooks.ShouldBeNull();
+                props.PostCommitHooks.ShouldBeNull();
 
-                    // we then store something in each
-                    props.AddPreCommitHook(new RiakJavascriptCommitHook("Foo.doBar"))
-                        .AddPreCommitHook(new RiakErlangCommitHook("my_mod", "do_fun"))
-                        .AddPostCommitHook(new RiakErlangCommitHook("my_other_mod", "do_more"));
-                    propResult = batch.SetBucketProperties(PropertiesTestBucket, props);
-                    propResult.IsSuccess.ShouldBeTrue(propResult.ErrorMessage);
+                // we then store something in each
+                props.AddPreCommitHook(new RiakJavascriptCommitHook("Foo.doBar"))
+                    .AddPreCommitHook(new RiakErlangCommitHook("my_mod", "do_fun"))
+                    .AddPostCommitHook(new RiakErlangCommitHook("my_other_mod", "do_more"));
+                propResult = batch.SetBucketProperties(PropertiesTestBucket, props).ConfigureAwait(false).GetAwaiter().GetResult();
+                propResult.ShouldBeTrue();
 
-                    // load them out again and make sure they got loaded up
-                    result = batch.GetBucketProperties(PropertiesTestBucket);
-                    result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
-                    props = result.Value;
+                // load them out again and make sure they got loaded up
+                result = batch.GetBucketProperties(PropertiesTestBucket).ConfigureAwait(false).GetAwaiter().GetResult();
+                result.ShouldNotBeNull();
+                props = result;
 
-                    props.PreCommitHooks.ShouldNotBeNull();
-                    props.PreCommitHooks.Count.ShouldEqual(2);
-                    props.PostCommitHooks.ShouldNotBeNull();
-                    props.PostCommitHooks.Count.ShouldEqual(1);
+                props.PreCommitHooks.ShouldNotBeNull();
+                props.PreCommitHooks.Count.ShouldEqual(2);
+                props.PostCommitHooks.ShouldNotBeNull();
+                props.PostCommitHooks.Count.ShouldEqual(1);
 
-                    completed = true;
-                });
+                completed = true;
+            });
 
             task.Wait();
 
@@ -258,10 +305,9 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
         }
 
         [Test]
-        [Ignore("A ring state bug in Riak prevents this from running correctly - https://github.com/basho/riak_kv/issues/660")]
         public void ResettingBucketPropertiesWorksCorrectly()
         {
-            const string bucket = "Schmoopy";
+            var bucket = string.Format("{0}_{1}", Bucket, "Schmoopy");
 
             var props = new RiakBucketProperties()
                 .SetAllowMultiple(true)
@@ -269,16 +315,14 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
                 .SetWVal(5)
                 .SetLastWriteWins(true);
 
-            var setPropsResult = Client.SetBucketProperties(bucket, props);
-            setPropsResult.IsSuccess.ShouldBeTrue(setPropsResult.ErrorMessage);
+            Client.SetBucketProperties(bucket, props).ShouldBeTrue();
 
-            var resetResult = Client.ResetBucketProperties(bucket);
-            resetResult.IsSuccess.ShouldBeTrue(resetResult.ErrorMessage);
+            Client.ResetBucketProperties(bucket).ShouldBeTrue();
 
             var getPropsResult = Client.GetBucketProperties(bucket);
-            getPropsResult.IsSuccess.ShouldBeTrue(getPropsResult.ErrorMessage);
+            getPropsResult.ShouldNotBeNull();
 
-            var resetProps = getPropsResult.Value;
+            var resetProps = getPropsResult;
 
             resetProps.AllowMultiple.ShouldNotEqual(props.AllowMultiple);
             resetProps.DwVal.ShouldNotEqual(props.DwVal);

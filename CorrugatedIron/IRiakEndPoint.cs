@@ -14,22 +14,26 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Threading.Tasks;
 using CorrugatedIron.Comms;
 using System;
-using System.Collections.Generic;
 
 namespace CorrugatedIron
 {
     public interface IRiakEndPoint : IDisposable
     {
-        int RetryWaitTime { get; set; }
-
         IRiakClient CreateClient();
 
-        RiakResult<TResult> UseConnection<TResult>(Func<IRiakConnection, RiakResult<TResult>> useFun, int retryAttempts);
-        RiakResult UseConnection(Func<IRiakConnection, RiakResult> useFun, int retryAttempts);
+        Task GetSingleResultViaPbc(Func<RiakPbcSocket, Task> useFun);
+        Task<TResult> GetSingleResultViaPbc<TResult>(Func<RiakPbcSocket, Task<TResult>> useFun);
+        Task GetMultipleResultViaPbc(Func<RiakPbcSocket, Task> useFun);
 
-        RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun, int retryAttempts)
-            where TResult : RiakResult;
+        Task GetSingleResultViaPbc(IRiakEndPointContext riakEndPointContext, Func<RiakPbcSocket, Task> useFun);
+        Task<TResult> GetSingleResultViaPbc<TResult>(IRiakEndPointContext riakEndPointContext, Func<RiakPbcSocket, Task<TResult>> useFun);
+        Task GetMultipleResultViaPbc(IRiakEndPointContext riakEndPointContext, Func<RiakPbcSocket, Task> useFun);
+
+        Task GetSingleResultViaRest(Func<string, Task> useFun);
+        Task<TResult> GetSingleResultViaRest<TResult>(Func<string, Task<TResult>> useFun);
+        Task GetMultipleResultViaRest(Func<string, Task> useFun);
     }
 }

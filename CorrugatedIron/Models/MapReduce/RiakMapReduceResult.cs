@@ -14,10 +14,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
+using System.Reactive.Linq;
+using CorrugatedIron.Exceptions;
 using CorrugatedIron.Messages;
 using System.Collections.Generic;
 using System.Linq;
-using CorrugatedIron.Extensions;
 
 namespace CorrugatedIron.Models.MapReduce
 {
@@ -25,24 +27,40 @@ namespace CorrugatedIron.Models.MapReduce
     {
         private readonly IEnumerable<RiakMapReduceResultPhase> _phaseResults;
 
+        public bool IsSuccess { get; set; }
+        public string ErrorMessage { get; set; }
+
+        internal RiakMapReduceResult(IObservable<RpbMapRedResp> response)
+        {
+            try
+            {
+                var res = response.ToEnumerable().ToList();
+
+                var phases = res
+                    .GroupBy(r => r.phase)
+                    .Select(g => new
+                    {
+                        Phase = g.Key,
+                        PhaseResults = g.Select(rr => rr)
+                    });
+
+                _phaseResults = phases
+                    .OrderBy(p => p.Phase)
+                    .Select(p => new RiakMapReduceResultPhase(p.Phase, p.PhaseResults))
+                    .ToList();
+
+                IsSuccess = true;
+            }
+            catch (RiakException riakException)
+            {
+                IsSuccess = false;
+                ErrorMessage = riakException.ErrorMessage;
+            }
+        }
+
         public IEnumerable<RiakMapReduceResultPhase> PhaseResults
         {
             get { return _phaseResults; }
-        }
-
-        internal RiakMapReduceResult(IEnumerable<RiakResult<RpbMapRedResp>> response)
-        {
-            var phases = from r in response
-                         group r by r.Value.phase
-                         into g
-                         select new
-                         {
-                             Phase = g.Key,
-                             Success = g.First().IsSuccess,
-                             PhaseResults = g.Select(rr => rr.Value)
-                         };
-
-            _phaseResults = phases.OrderBy(p => p.Phase).Select(p => p.Success ? new RiakMapReduceResultPhase(p.Phase, p.PhaseResults) : new RiakMapReduceResultPhase()).ToList();
         }
     }
 }

@@ -14,80 +14,203 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Runtime.ExceptionServices;
+using System.Threading.Tasks;
 using CorrugatedIron.Config;
 using System;
-using System.Collections.Generic;
 
 namespace CorrugatedIron.Comms
 {
-    public interface IRiakNode : IDisposable
-    {
-        RiakResult UseConnection(Func<IRiakConnection, RiakResult> useFun);
-        RiakResult<TResult> UseConnection<TResult>(Func<IRiakConnection, RiakResult<TResult>> useFun);
-
-        RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun)
-            where TResult : RiakResult;
-    }
-
     public class RiakNode : IRiakNode
     {
-        private readonly IRiakConnectionManager _connections;
-        private bool _disposing;
+        private readonly IRiakConnectionManager _connectionManager;
 
-        public RiakNode(IRiakNodeConfiguration nodeConfiguration, IRiakConnectionFactory connectionFactory)
+        public RiakNode(IRiakNodeConfiguration nodeConfiguration)
         {
             // assume that if the node has a pool size of 0 then the intent is to have the connections
             // made on the fly
             if (nodeConfiguration.PoolSize == 0)
             {
-                _connections = new RiakOnTheFlyConnection(nodeConfiguration, connectionFactory);
+                _connectionManager = new RiakOnTheFlyConnection(nodeConfiguration);
             }
             else
             {
-                _connections = new RiakConnectionPool(nodeConfiguration, connectionFactory);
+                _connectionManager = new RiakConnectionPool(nodeConfiguration);
             }
         }
 
-        public RiakResult UseConnection(Func<IRiakConnection, RiakResult> useFun)
+        public async Task<RiakPbcSocket> CreateSocket()
         {
-            return UseConnection(useFun, RiakResult.Error);
+            return await _connectionManager.CreateSocket().ConfigureAwait(false);
         }
 
-        public RiakResult<TResult> UseConnection<TResult>(Func<IRiakConnection, RiakResult<TResult>> useFun)
+        public async Task Release(RiakPbcSocket socket)
         {
-            return UseConnection(useFun, RiakResult<TResult>.Error);
+            await _connectionManager.Release(socket).ConfigureAwait(false);
         }
 
-        private TRiakResult UseConnection<TRiakResult>(Func<IRiakConnection, TRiakResult> useFun, Func<ResultCode, string, bool, TRiakResult> onError)
-            where TRiakResult : RiakResult
+        public async Task ReleaseAll()
         {
-            if(_disposing) return onError(ResultCode.ShuttingDown, "Connection is shutting down", true);
+            await _connectionManager.ReleaseAll().ConfigureAwait(false);
+        }
 
-            var response = _connections.Consume(useFun);
-            if(response.Item1)
+        public async Task GetSingleResultViaPbc(Func<RiakPbcSocket, Task> useFun)
+        {
+            RiakPbcSocket socket = null;
+            ExceptionDispatchInfo capturedException = null;
+            try
             {
-                return response.Item2;
+                socket = await _connectionManager.CreateSocket().ConfigureAwait(false);
+                await useFun(socket).ConfigureAwait(false);
             }
-            return onError(ResultCode.NoConnections, "Unable to acquire connection", true);
+            catch (Exception ex)
+            {
+                capturedException = ExceptionDispatchInfo.Capture(ex);
+            }
+
+            await _connectionManager.Release(socket).ConfigureAwait(false);
+
+            if (capturedException != null)
+            {
+                capturedException.Throw();
+            }
         }
 
-        public RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun)
-            where TResult : RiakResult
+        public async Task GetSingleResultViaPbc(RiakPbcSocket socket, Func<RiakPbcSocket, Task> useFun)
         {
-            if(_disposing) return RiakResult<IEnumerable<TResult>>.Error(ResultCode.ShuttingDown, "Connection is shutting down", true);
+            await useFun(socket).ConfigureAwait(false);
+        }
 
-            var response = _connections.DelayedConsume(useFun);
-            if(response.Item1)
+        public async Task<TResult> GetSingleResultViaPbc<TResult>(Func<RiakPbcSocket, Task<TResult>> useFun)
+        {
+            var result = default(TResult);
+            RiakPbcSocket socket = null;
+            ExceptionDispatchInfo capturedException = null;
+            try
             {
-                return response.Item2;
+                socket = await _connectionManager.CreateSocket().ConfigureAwait(false);
+                result = await useFun(socket).ConfigureAwait(false);
             }
-            return RiakResult<IEnumerable<TResult>>.Error(ResultCode.NoConnections, "Unable to acquire connection", true);
+            catch (Exception ex)
+            {
+                capturedException = ExceptionDispatchInfo.Capture(ex);
+            }
+
+            await _connectionManager.Release(socket).ConfigureAwait(false);
+
+            if (capturedException != null)
+            {
+                capturedException.Throw();
+            }
+
+            return result;
+        }
+
+        public async Task<TResult> GetSingleResultViaPbc<TResult>(RiakPbcSocket socket, Func<RiakPbcSocket, Task<TResult>> useFun)
+        {
+            var result = await useFun(socket).ConfigureAwait(false);
+            return result;
+        }
+
+        public async Task GetMultipleResultViaPbc(Func<RiakPbcSocket, Task> useFun)
+        {
+            RiakPbcSocket socket = null;
+            ExceptionDispatchInfo capturedException = null;
+            try
+            {
+                socket = await _connectionManager.CreateSocket().ConfigureAwait(false);
+                await useFun(socket).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                capturedException = ExceptionDispatchInfo.Capture(ex);
+            }
+
+            await _connectionManager.Release(socket).ConfigureAwait(false);
+
+            if (capturedException != null)
+            {
+                capturedException.Throw();
+            }
+        }
+
+        public async Task GetMultipleResultViaPbc(RiakPbcSocket socket, Func<RiakPbcSocket, Task> useFun)
+        {
+            await useFun(socket).ConfigureAwait(false);
+        }
+
+        public async Task GetSingleResultViaRest(Func<string, Task> useFun)
+        {
+            string serverUrl = null;
+            ExceptionDispatchInfo capturedException = null;
+            try
+            {
+                serverUrl = await _connectionManager.CreateServerUrl().ConfigureAwait(false);
+                await useFun(serverUrl).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                capturedException = ExceptionDispatchInfo.Capture(ex);
+            }
+
+            await _connectionManager.Release(serverUrl).ConfigureAwait(false);
+
+            if (capturedException != null)
+            {
+                capturedException.Throw();
+            }
+        }
+
+        public async Task<TResult> GetSingleResultViaRest<TResult>(Func<string, Task<TResult>> useFun)
+        {
+            var result = default(TResult);
+            string serverUrl = null;
+            ExceptionDispatchInfo capturedException = null;
+            try
+            {
+                serverUrl = await _connectionManager.CreateServerUrl().ConfigureAwait(false);
+                result = await useFun(serverUrl).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                capturedException = ExceptionDispatchInfo.Capture(ex);
+            }
+
+            await _connectionManager.Release(serverUrl).ConfigureAwait(false);
+
+            if (capturedException != null)
+            {
+                capturedException.Throw();
+            }
+
+            return result;
+        }
+
+        public async Task GetMultipleResultViaRest(Func<string, Task> useFun)
+        {
+            string serverUrl = null;
+            ExceptionDispatchInfo capturedException = null;
+            try
+            {
+                serverUrl = await _connectionManager.CreateServerUrl().ConfigureAwait(false);
+                await useFun(serverUrl).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                capturedException = ExceptionDispatchInfo.Capture(ex);
+            }
+
+            await _connectionManager.Release(serverUrl).ConfigureAwait(false);
+
+            if (capturedException != null)
+            {
+                capturedException.Throw();
+            }
         }
 
         public void Dispose()
         {
-            _disposing = true;
-            _connections.Dispose();
+            _connectionManager.Dispose();
         }
     }
 }

@@ -14,7 +14,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Comms;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Models.MapReduce.Inputs;
@@ -26,7 +25,7 @@ using System.Linq;
 
 namespace CorrugatedIron.Tests.Live
 {
-    [TestFixture(Ignore = true, IgnoreReason = "Riak Search functionality has been deprecated in favor of Yokozuna/Solr.")]
+    [TestFixture]
     public class RiakSearchMapReduceInputTests : RiakMapReduceTests
     {
         // N.B. You need to install the search hooks on the riak_search_bucket first via `bin/search-cmd install riak_search_bucket`
@@ -35,28 +34,28 @@ namespace CorrugatedIron.Tests.Live
         private const string RiakSearchDoc = "{\"name\":\"Alyssa P. Hacker\", \"bio\":\"I'm an engineer, making awesome things.\", \"favorites\":{\"book\":\"The Moon is a Harsh Mistress\",\"album\":\"Magical Mystery Tour\", }}";
         private const string RiakSearchDoc2 = "{\"name\":\"Alan Q. Public\", \"bio\":\"I'm an exciting mathematician\", \"favorites\":{\"book\":\"Prelude to Mathematics\",\"album\":\"The Fame Monster\"}}";
 
-        public RiakSearchMapReduceInputTests ()
+        public RiakSearchMapReduceInputTests()
         {
             Bucket = "riak_search_bucket";
         }
-        
+
         [SetUp]
-        public void SetUp() 
+        public void SetUp()
         {
-            Cluster = new RiakCluster(ClusterConfig, new RiakConnectionFactory());
+            Cluster = new RiakCluster(ClusterConfig);
             Client = Cluster.CreateClient();
-            
-            var props = Client.GetBucketProperties(Bucket).Value;
+
+            var props = Client.GetBucketProperties(Bucket);
             props.SetSearch(true);
-            Client.SetBucketProperties(Bucket, props);
+            Client.SetBucketProperties(Bucket, props).ShouldBeTrue();
         }
-        
+
         [TearDown]
         public void TearDown()
         {
             Client.DeleteBucket(Bucket);
         }
-        
+
         [Test]
         public void SearchingByNameReturnsTheObjectId()
         {
@@ -67,15 +66,15 @@ namespace CorrugatedIron.Tests.Live
                 .Inputs(new RiakBucketSearchInput(Bucket, "name:A1*"));
 
             var result = Client.MapReduce(mr);
-            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
-            
-            var mrResult = result.Value;
+            result.ShouldNotBeNull();
+
+            var mrResult = result;
             mrResult.PhaseResults.Count().ShouldEqual(1);
-            
+
             mrResult.PhaseResults.ElementAt(0).Values.ShouldNotBeNull();
             // TODO Add data introspection to test - need to verify the results, after all.
         }
-        
+
         [Test]
         public void SearchingViaFluentSearchObjectWorks()
         {
@@ -87,11 +86,11 @@ namespace CorrugatedIron.Tests.Live
                 .Inputs(new RiakBucketSearchInput(search));
 
             var result = Client.MapReduce(mr);
-            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
-            
-            var mrResult = result.Value;
+            result.ShouldNotBeNull();
+
+            var mrResult = result;
             mrResult.PhaseResults.Count().ShouldEqual(1);
-            
+
             mrResult.PhaseResults.ElementAt(0).Values.ShouldNotBeNull();
             // TODO Add data introspection to test - need to verify the results, after all.
         }

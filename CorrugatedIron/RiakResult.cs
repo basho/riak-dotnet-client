@@ -16,21 +16,6 @@
 
 namespace CorrugatedIron
 {
-    public enum ResultCode
-    {
-        Success = 0,
-        ShuttingDown,
-        NotFound,
-        CommunicationError,
-        InvalidResponse,
-        ClusterOffline,
-        NoConnections,
-        BatchException,
-        NoRetries,
-        HttpError,
-        InvalidRequest
-    }
-
     public class RiakResult
     {
         public bool IsSuccess { get; protected set; }

@@ -13,6 +13,8 @@
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>True</DebugSymbols>
@@ -24,6 +26,7 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>
     </DocumentationFile>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -33,6 +36,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\CorrugatedIron.xml</DocumentationFile>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>True</SignAssembly>
@@ -43,6 +47,18 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Reactive.Core">
+      <HintPath>..\packages\Rx-Core.2.2.5\lib\net45\System.Reactive.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reactive.Interfaces">
+      <HintPath>..\packages\Rx-Interfaces.2.2.5\lib\net45\System.Reactive.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reactive.Linq">
+      <HintPath>..\packages\Rx-Linq.2.2.5\lib\net45\System.Reactive.Linq.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reactive.PlatformServices">
+      <HintPath>..\packages\Rx-PlatformServices.2.2.5\lib\net45\System.Reactive.PlatformServices.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
@@ -63,11 +79,19 @@
     <Compile Include="..\Metadata\VersionInfo.cs">
       <Link>Properties\VersionInfo.cs</Link>
     </Compile>
+    <Compile Include="Comms\IRiakConnection.cs" />
     <Compile Include="Comms\IRiakConnectionManager.cs" />
+    <Compile Include="Comms\IRiakNode.cs" />
     <Compile Include="Comms\LoadBalancing\ILoadBalancingStrategy.cs" />
     <Compile Include="Comms\LoadBalancing\RoundRobinStrategy.cs" />
     <Compile Include="Comms\RiakOnTheFlyConnection.cs" />
     <Compile Include="Comms\RiakPbcSocket.cs" />
+    <Compile Include="Comms\Sockets\BlockingBufferManager.cs" />
+    <Compile Include="Comms\Sockets\BlockingLimitedList.cs" />
+    <Compile Include="Comms\Sockets\SocketAwaitable.cs" />
+    <Compile Include="Comms\Sockets\SocketAwaitablePool.cs" />
+    <Compile Include="Comms\Sockets\SocketAwaiter.cs" />
+    <Compile Include="Comms\Sockets\SocketEx.cs" />
     <Compile Include="Config\Fluent\RiakClusterConfiguration.cs" />
     <Compile Include="Config\Fluent\RiakExternalLoadBalancerConfiguration.cs" />
     <Compile Include="Config\Fluent\RiakNodeConfiguration.cs" />
@@ -81,8 +105,13 @@
     <Compile Include="Containers\Either.cs" />
     <Compile Include="Exceptions\RiakInvalidDataException.cs" />
     <Compile Include="Exceptions\RiakException.cs" />
+    <Compile Include="IRiakAsyncBatchClient.cs" />
+    <Compile Include="IRiakAsyncClient.cs" />
     <Compile Include="IRiakBatchClient.cs" />
+    <Compile Include="IRiakClient.cs" />
+    <Compile Include="IRiakClusterManager.cs" />
     <Compile Include="IRiakEndPoint.cs" />
+    <Compile Include="IRiakEndPointContext.cs" />
     <Compile Include="Messages\riak_dt.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -131,6 +160,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Models\Index\IntIndex.cs" />
+    <Compile Include="Models\Index\RiakIndexItem.cs" />
     <Compile Include="Models\Index\RiakIndexKeyTerm.cs" />
     <Compile Include="Models\Index\RiakIndexResult.cs" />
     <Compile Include="Models\Index\RiakStreamedIndexResult.cs" />
@@ -202,6 +232,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Models\MapReduce\RiakStreamedMapReduceResult.cs" />
+    <Compile Include="Models\Pong.cs" />
     <Compile Include="Models\Rest\RiakRestRequest.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -249,15 +280,18 @@
     <Compile Include="Models\Search\Token.cs" />
     <Compile Include="Models\Search\UnaryTerm.cs" />
     <Compile Include="Models\Index\SecondaryIndex.cs" />
+    <Compile Include="ResultCode.cs" />
     <Compile Include="RiakAsyncClient.cs" />
+    <Compile Include="RiakBatch.cs" />
     <Compile Include="RiakClient.cs" />
     <Compile Include="Comms\RiakConnection.cs" />
-    <Compile Include="Comms\RiakConnectionFactory.cs" />
     <Compile Include="RiakCluster.cs" />
     <Compile Include="Comms\RiakNode.cs" />
     <Compile Include="Models\MapReduce\RiakMapReduceResult.cs" />
-    <Compile Include="RiakEndPoint.cs" />
+    <Compile Include="RiakClusterManager.cs" />
+    <Compile Include="RiakEndPointContext.cs" />
     <Compile Include="RiakExternalLoadBalancer.cs" />
+    <Compile Include="RiakNodeEndpoint.cs" />
     <Compile Include="RiakResult.cs" />
     <Compile Include="Config\RiakClusterConfiguration.cs" />
     <Compile Include="Config\RiakNodeConfiguration.cs" />
@@ -303,6 +337,7 @@
     </None>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

@@ -62,22 +62,28 @@ namespace CorrugatedIron.Config
             set { this["poolSize"] = value; }
         }
 
-        // -- TODO: put this back in when we've got the idling stuff figured out
-        //[ConfigurationProperty("idleTimeout", DefaultValue = 15000, IsRequired = false)]
-        //public int IdleTimeout
-        //{
-        //    get { return (int)this["idleTimeout"]; }
-        //    set { this["idleTimeout"] = value; }
-        //}
+        [ConfigurationProperty("bufferSize", DefaultValue = 2097152, IsRequired = false)]
+        public int BufferSize
+        {
+            get { return (int)this["bufferSize"]; }
+            set { this["bufferSize"] = value; }
+        }
 
-        [ConfigurationProperty("networkReadTimeout", DefaultValue = 4000, IsRequired = false)]
+        [ConfigurationProperty("idleTimeout", DefaultValue = 2000, IsRequired = false)]
+        public int IdleTimeout
+        {
+            get { return (int)this["idleTimeout"]; }
+            set { this["idleTimeout"] = value; }
+        }
+
+        [ConfigurationProperty("networkReadTimeout", DefaultValue = 10000, IsRequired = false)]
         public int NetworkReadTimeout
         {
             get { return (int)this["networkReadTimeout"]; }
             set { this["networkReadTimeout"] = value; }
         }
 
-        [ConfigurationProperty("networkWriteTimeout", DefaultValue = 4000, IsRequired = false)]
+        [ConfigurationProperty("networkWriteTimeout", DefaultValue = 10000, IsRequired = false)]
         public int NetworkWriteTimeout
         {
             get { return (int)this["networkWriteTimeout"]; }

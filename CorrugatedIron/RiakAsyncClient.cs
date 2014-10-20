@@ -14,10 +14,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Diagnostics;
+using System.Linq;
+using System.Net;
 using System.Numerics;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using System.Web;
+using CorrugatedIron.Comms;
+using CorrugatedIron.Containers;
+using CorrugatedIron.Exceptions;
+using CorrugatedIron.Extensions;
+using CorrugatedIron.Messages;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.Index;
 using CorrugatedIron.Models.MapReduce;
+using CorrugatedIron.Models.MapReduce.Inputs;
+using CorrugatedIron.Models.Rest;
 using CorrugatedIron.Models.Search;
 using CorrugatedIron.Util;
 using System;
@@ -26,357 +39,966 @@ using System.Threading.Tasks;
 
 namespace CorrugatedIron
 {
-    public interface IRiakAsyncClient
-    {
-        Task<RiakResult> Ping();
-
-        Task<RiakResult<RiakObject>> Get(string bucket, string key, RiakGetOptions options = null);
-        Task<RiakResult<RiakObject>> Get(RiakObjectId objectId, RiakGetOptions options = null);
-        Task<IEnumerable<RiakResult<RiakObject>>> Get(IEnumerable<RiakObjectId> bucketKeyPairs, RiakGetOptions options = null);
-
-        Task<RiakCounterResult> IncrementCounter(string bucket, string counter, long amount, RiakCounterUpdateOptions options = null);
-        Task<RiakCounterResult> GetCounter(string bucket, string counter, RiakCounterGetOptions options = null);
-
-        Task<RiakResult<RiakObject>> Put(RiakObject value, RiakPutOptions options = null);
-        Task<IEnumerable<RiakResult<RiakObject>>> Put(IEnumerable<RiakObject> values, RiakPutOptions options = null);
-
-        Task<RiakResult> Delete(RiakObject riakObject, RiakDeleteOptions options = null);
-        Task<RiakResult> Delete(string bucket, string key, RiakDeleteOptions options = null);
-        Task<RiakResult> Delete(RiakObjectId objectId, RiakDeleteOptions options = null);
-        Task<IEnumerable<RiakResult>> Delete(IEnumerable<RiakObjectId> objectIds, RiakDeleteOptions options = null);
-        Task<IEnumerable<RiakResult>> DeleteBucket(string bucket, uint rwVal = RiakConstants.Defaults.RVal);
-
-        Task<RiakResult<RiakSearchResult>> Search(RiakSearchRequest search);
-
-        Task<RiakResult<RiakMapReduceResult>> MapReduce(RiakMapReduceQuery query);
-        Task<RiakResult<RiakStreamedMapReduceResult>> StreamMapReduce(RiakMapReduceQuery query);
-
-        Task<RiakResult<IEnumerable<string>>> ListBuckets();
-        Task<RiakResult<IEnumerable<string>>> StreamListBuckets();
-        Task<RiakResult<IEnumerable<string>>> ListKeys(string bucket);
-        Task<RiakResult<IEnumerable<string>>> StreamListKeys(string bucket);
-
-        Task<RiakResult<RiakBucketProperties>> GetBucketProperties(string bucket);
-        Task<RiakResult> SetBucketProperties(string bucket, RiakBucketProperties properties, bool useHttp = false);
-        Task<RiakResult> ResetBucketProperties(string bucket, bool useHttp = false);
-
-        Task<RiakResult<IList<RiakObject>>> WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks);
-
-        Task<RiakResult<RiakServerInfo>> GetServerInfo();
-
-        Task<RiakResult<RiakIndexResult>> IndexGet(string bucket, string indexName, int value, RiakIndexGetOptions options = null);
-        Task<RiakResult<RiakIndexResult>> IndexGet(string bucket, string indexName, string value, RiakIndexGetOptions options = null);
-        Task<RiakResult<RiakIndexResult>> IndexGet(string bucket, string indexName, int minValue, int maxValue, RiakIndexGetOptions options = null);
-        Task<RiakResult<RiakIndexResult>> IndexGet(string bucket, string indexName, string minValue, string maxValue, RiakIndexGetOptions options = null);
-
-        Task<RiakResult<RiakStreamedIndexResult>> StreamIndexGet(string bucket, string indexName, BigInteger value, RiakIndexGetOptions options = null);
-        Task<RiakResult<RiakStreamedIndexResult>> StreamIndexGet(string bucket, string indexName, string value, RiakIndexGetOptions options = null);
-        Task<RiakResult<RiakStreamedIndexResult>> StreamIndexGet(string bucket, string indexName, BigInteger minValue, BigInteger maxValue, RiakIndexGetOptions options = null);
-        Task<RiakResult<RiakStreamedIndexResult>> StreamIndexGet(string bucket, string indexName, string minValue, string maxValue, RiakIndexGetOptions options = null);
-
-        Task<RiakResult<IList<string>>> ListKeysFromIndex(string bucket);
-
-        Task Batch(Action<IRiakBatchClient> batchAction);
-    }
-
     internal class RiakAsyncClient : IRiakAsyncClient
     {
-        private readonly IRiakClient _client;
+        private const string ListKeysWarning = "*** [CI] -> ListKeys is an expensive operation and should not be used in Production scenarios. ***";
+        private const string InvalidBucketErrorMessage = "Bucket cannot be blank or contain forward-slashes";
+        private const string InvalidKeyErrorMessage = "Key cannot be blank or contain forward-slashes";
 
-        public RiakAsyncClient(IRiakClient client)
+        private readonly IRiakEndPoint _endPoint;
+        private readonly IRiakConnection _connection;
+
+        internal RiakAsyncClient(IRiakEndPoint endPoint, IRiakConnection connection)
         {
-            _client = client;
+            _endPoint = endPoint;
+            _connection = connection;
         }
 
-        public Task<RiakResult> Ping()
+        public Task Batch(Action<IRiakAsyncBatchClient> batchAction)
         {
-            return Task.Factory.StartNew(() => _client.Ping());
+            if (_endPoint is RiakBatch)
+            {
+                batchAction(this);
+                return Task.FromResult(false);
+            }
+
+            using (var batchEndPoint = new RiakBatch(_endPoint, new RiakEndPointContext()))
+            {
+                using (var batchedAsyncClient = new RiakAsyncClient(batchEndPoint, _connection))
+                {
+                    batchAction(batchedAsyncClient);
+                    return Task.FromResult(false);
+                }
+            }
         }
 
-        public Task<RiakResult<RiakObject>> Get(string bucket, string key, RiakGetOptions options = null)
+        public Task<T> Batch<T>(Func<IRiakAsyncBatchClient, T> batchFunction)
+        {
+            if (_endPoint is RiakBatch)
+            {
+                return Task.FromResult(batchFunction(this));
+            }
+
+            using (var batchEndPoint = new RiakBatch(_endPoint, new RiakEndPointContext()))
+            {
+                using (var batchedAsyncClient = new RiakAsyncClient(batchEndPoint, _connection))
+                {
+                    return Task.FromResult(batchFunction(batchedAsyncClient));
+                }
+            }
+        }
+
+        public IObservable<T> Batch<T>(Func<IRiakAsyncBatchClient, IObservable<T>> batchFunction)
+        {
+            if (_endPoint is RiakBatch)
+            {
+                return batchFunction(this);
+            }
+
+            using (var batchEndPoint = new RiakBatch(_endPoint, new RiakEndPointContext()))
+            {
+                using (var batchedAsyncClient = new RiakAsyncClient(batchEndPoint, _connection))
+                {
+                    return batchFunction(batchedAsyncClient);
+                }
+            }
+        }
+
+        #region Helper functions
+
+        private static bool IsValidBucketOrKey(string value)
+        {
+            return !string.IsNullOrWhiteSpace(value) && !value.Contains("/");
+        }
+
+        private static RiakGetOptions DefaultGetOptions()
+        {
+            return (new RiakGetOptions()).SetR(RiakConstants.Defaults.RVal);
+        }
+
+        #endregion
+
+        public async Task<Pong> Ping()
+        {
+            var startTime = Stopwatch.StartNew();
+            await _connection.PbcWriteRead(_endPoint, MessageCode.PingReq, MessageCode.PingResp).ConfigureAwait(false);
+            startTime.Stop();
+
+            var pong = new Pong
+            {
+                ResponseTime = startTime.Elapsed
+            };
+
+            return pong;
+        }
+
+        public async Task<Either<RiakException, RiakObject>> Get(string bucket, string key, RiakGetOptions options = null)
         {
             options = options ?? RiakClient.DefaultGetOptions();
-            return Task.Factory.StartNew(() => _client.Get(bucket, key, options));
+
+            if (!IsValidBucketOrKey(bucket))
+            {
+                return new Either<RiakException, RiakObject>(new RiakException((uint)ResultCode.InvalidRequest, InvalidBucketErrorMessage, false));
+            }
+
+            if (!IsValidBucketOrKey(key))
+            {
+                return new Either<RiakException, RiakObject>(new RiakException((uint)ResultCode.InvalidRequest, InvalidKeyErrorMessage, false));
+            }
+
+            var request = new RpbGetReq { bucket = bucket.ToRiakString(), key = key.ToRiakString() };
+
+            options = options ?? new RiakGetOptions();
+            options.Populate(request);
+
+            try
+            {
+                var result = await _connection.PbcWriteRead<RpbGetReq, RpbGetResp>(_endPoint, request).ConfigureAwait(false);
+
+                if (result.vclock == null)
+                {
+                    return new Either<RiakException, RiakObject>(new RiakException((uint)ResultCode.NotFound, "Unable to find value in Riak", false));
+                }
+
+                var riakObject = new RiakObject(bucket, key, result.content, result.vclock);
+
+                return new Either<RiakException, RiakObject>(riakObject);
+            }
+            catch (RiakException riakException)
+            {
+                return new Either<RiakException, RiakObject>(riakException);
+            }
         }
 
-        public Task<RiakResult<RiakObject>> Get(RiakObjectId objectId, RiakGetOptions options = null)
+        public Task<Either<RiakException, RiakObject>> Get(RiakObjectId objectId, RiakGetOptions options = null)
         {
-            options = options ?? RiakClient.DefaultGetOptions();
-            return Task.Factory.StartNew(() => _client.Get(objectId.Bucket, objectId.Key, options));
+            options = options ?? DefaultGetOptions();
+            return Get(objectId.Bucket, objectId.Key, options);
         }
 
-        public Task<IEnumerable<RiakResult<RiakObject>>> Get(IEnumerable<RiakObjectId> bucketKeyPairs, RiakGetOptions options = null)
+        public IObservable<Either<RiakException, RiakObject>> Get(IEnumerable<RiakObjectId> bucketKeyPairs, RiakGetOptions options = null)
         {
-            options = options ?? RiakClient.DefaultGetOptions();
-            return Task.Factory.StartNew(() => _client.Get(bucketKeyPairs, options));
+            var observable = Observable.Create<Either<RiakException, RiakObject>>(async obs =>
+            {
+                try
+                {
+                    bucketKeyPairs = bucketKeyPairs.ToList();
+                    options = options ?? new RiakGetOptions();
+
+                    foreach (var bucketKeyPair in bucketKeyPairs)
+                    {
+
+                        // modified closure FTW
+                        var bk = bucketKeyPair;
+                        if (!IsValidBucketOrKey(bk.Bucket))
+                        {
+                            obs.OnNext(new Either<RiakException, RiakObject>(new RiakException((uint)ResultCode.InvalidRequest, InvalidBucketErrorMessage, false)));
+                            continue;
+                        }
+
+                        if (!IsValidBucketOrKey(bk.Key))
+                        {
+                            obs.OnNext(new Either<RiakException, RiakObject>(new RiakException((uint)ResultCode.InvalidRequest, InvalidKeyErrorMessage, false)));
+                            continue;
+                        }
+
+                        var req = new RpbGetReq
+                        {
+                            bucket = bk.Bucket.ToRiakString(),
+                            key = bk.Key.ToRiakString()
+                        };
+                        options.Populate(req);
+
+                        try
+                        {
+                            var result = await _connection.PbcWriteRead<RpbGetReq, RpbGetResp>(_endPoint, req)
+                                        .ConfigureAwait(false);
+
+                            if (result.vclock == null)
+                            {
+                                obs.OnNext(new Either<RiakException, RiakObject>(new RiakException((uint)ResultCode.NotFound, "Unable to find value in Riak", false)));
+                                continue;
+                            }
+
+                            var riakObject = new RiakObject(bk.Bucket, bk.Key, result.content.First(), result.vclock);
+
+                            if (result.content.Count > 1)
+                            {
+                                riakObject.Siblings = result.content
+                                    .Select(c => new RiakObject(bk.Bucket, bk.Key, c, result.vclock))
+                                    .ToList();
+                            }
+
+                            obs.OnNext(new Either<RiakException, RiakObject>(riakObject));
+                        }
+                        catch (RiakException riakException)
+                        {
+                            obs.OnNext(new Either<RiakException, RiakObject>(riakException));
+                        }
+                    }
+
+                    obs.OnCompleted();
+
+                }
+                catch (Exception exception)
+                {
+                    obs.OnError(exception);
+                }
+                return Disposable.Empty;
+            });
+
+            return observable;
         }
 
-        public Task<RiakCounterResult> IncrementCounter(string bucket, string counter, long amount, RiakCounterUpdateOptions options = null)
+        public async Task<Either<RiakException, RiakCounterResult>> IncrementCounter(string bucket, string counter, long amount, RiakCounterUpdateOptions options = null)
         {
-            return Task.Factory.StartNew(() => _client.IncrementCounter(bucket, counter, amount, options));
+            if (!IsValidBucketOrKey(bucket))
+            {
+                return new Either<RiakException, RiakCounterResult>(new RiakException((uint)ResultCode.InvalidRequest, InvalidBucketErrorMessage, false));
+            }
+
+            if (!IsValidBucketOrKey(counter))
+            {
+                return new Either<RiakException, RiakCounterResult>(new RiakException((uint)ResultCode.InvalidRequest, InvalidKeyErrorMessage, false));
+            }
+
+            var request = new RpbCounterUpdateReq { bucket = bucket.ToRiakString(), key = counter.ToRiakString(), amount = amount };
+            options = options ?? new RiakCounterUpdateOptions();
+            options.Populate(request);
+
+            try
+            {
+                var result = await _connection.PbcWriteRead<RpbCounterUpdateReq, RpbCounterUpdateResp>(_endPoint, request)
+                            .ConfigureAwait(false);
+
+                var riakObject = new RiakObject(bucket, counter, result.value);
+                var cVal = 0L;
+                var parseResult = false;
+
+                if (options.ReturnValue != null && options.ReturnValue.Value)
+                {
+                    parseResult = long.TryParse(riakObject.Value.FromRiakString(), out cVal);
+                }
+
+                return new Either<RiakException, RiakCounterResult>(new RiakCounterResult(riakObject, parseResult ? (long?)cVal : null));
+            }
+            catch (RiakException riakException)
+            {
+                return new Either<RiakException, RiakCounterResult>(riakException);
+            }
         }
 
-        public Task<RiakCounterResult> GetCounter(string bucket, string counter, RiakCounterGetOptions options = null) 
+        public async Task<Either<RiakException, RiakCounterResult>> GetCounter(string bucket, string counter, RiakCounterGetOptions options = null)
         {
-            return Task.Factory.StartNew(() => _client.GetCounter(bucket, counter, options));
+            if (!IsValidBucketOrKey(bucket))
+            {
+                return new Either<RiakException, RiakCounterResult>(new RiakException((uint)ResultCode.InvalidRequest, InvalidBucketErrorMessage, false));
+            }
+
+            if (!IsValidBucketOrKey(counter))
+            {
+                return new Either<RiakException, RiakCounterResult>(new RiakException((uint)ResultCode.InvalidRequest, InvalidKeyErrorMessage, false));
+            }
+
+            var request = new RpbCounterGetReq { bucket = bucket.ToRiakString(), key = counter.ToRiakString() };
+            options = options ?? new RiakCounterGetOptions();
+            options.Populate(request);
+
+            try
+            {
+                var result = await _connection.PbcWriteRead<RpbCounterGetReq, RpbCounterGetResp>(_endPoint, request).ConfigureAwait(false);
+
+                var riakObject = new RiakObject(bucket, counter, result.value);
+                long cVal;
+                var parseResult = long.TryParse(riakObject.Value.FromRiakString(), out cVal);
+
+                return new Either<RiakException, RiakCounterResult>(new RiakCounterResult(riakObject, parseResult ? (long?)cVal : null));
+            }
+            catch (RiakException riakException)
+            {
+                return new Either<RiakException, RiakCounterResult>(riakException);
+            }
         }
 
-        public Task<IEnumerable<RiakResult<RiakObject>>> Put(IEnumerable<RiakObject> values, RiakPutOptions options)
+        public IObservable<Either<RiakException, RiakObject>> Put(IEnumerable<RiakObject> values, RiakPutOptions options = null)
         {
-            return Task.Factory.StartNew(() => _client.Put(values, options));
+            var observables = Observable.Create<Either<RiakException, RiakObject>>(async obs =>
+            {
+                try
+                {
+                    options = options ?? new RiakPutOptions();
+
+                    foreach (var v in values)
+                    {
+                        if (!IsValidBucketOrKey(v.Bucket))
+                        {
+                            obs.OnNext(new Either<RiakException, RiakObject>(new RiakException((uint)ResultCode.InvalidRequest, InvalidBucketErrorMessage, false)));
+                            continue;
+                        }
+
+                        if (!IsValidBucketOrKey(v.Key))
+                        {
+                            obs.OnNext(new Either<RiakException, RiakObject>(new RiakException((uint)ResultCode.InvalidRequest, InvalidKeyErrorMessage, false)));
+                            continue;
+                        }
+
+                        var msg = v.ToMessage();
+                        options.Populate(msg);
+
+                        try
+                        {
+                            var result = await
+                                    _connection.PbcWriteRead<RpbPutReq, RpbPutResp>(_endPoint, msg)
+                                        .ConfigureAwait(false);
+
+                            var finalResult = options.ReturnBody
+                                ? new RiakObject(v.Bucket, v.Key, result.content.First(), result.vclock)
+                                : v;
+
+                            if (options.ReturnBody && result.content.Count > 1)
+                            {
+                                finalResult.Siblings = result.content
+                                    .Select(c => new RiakObject(v.Bucket, v.Key, c, result.vclock))
+                                    .ToList();
+                            }
+
+                            obs.OnNext(new Either<RiakException, RiakObject>(finalResult));
+                        }
+                        catch (RiakException riakException)
+                        {
+                            obs.OnNext(new Either<RiakException, RiakObject>(riakException));
+                            continue;
+                        }
+                    }
+                    obs.OnCompleted();
+                }
+                catch (Exception exception)
+                {
+                    obs.OnError(exception);
+                }
+                return Disposable.Empty;
+            });
+
+            return observables;
         }
 
-        public Task<RiakResult<RiakObject>> Put(RiakObject value, RiakPutOptions options)
+        public async Task<Either<RiakException, RiakObject>> Put(RiakObject value, RiakPutOptions options = null)
         {
-            return Task.Factory.StartNew(() => _client.Put(value, options));
+            if (!IsValidBucketOrKey(value.Bucket))
+            {
+                return new Either<RiakException, RiakObject>(new RiakException((uint)ResultCode.InvalidRequest, InvalidBucketErrorMessage, false));
+            }
+
+            if (!IsValidBucketOrKey(value.Key))
+            {
+                return new Either<RiakException, RiakObject>(new RiakException((uint)ResultCode.InvalidRequest, InvalidKeyErrorMessage, false));
+            }
+
+            options = options ?? new RiakPutOptions();
+
+            var request = value.ToMessage();
+            options.Populate(request);
+
+            try
+            {
+                var result =
+                    await _connection.PbcWriteRead<RpbPutReq, RpbPutResp>(_endPoint, request).ConfigureAwait(false);
+
+                var finalResult = options.ReturnBody
+                    ? new RiakObject(value.Bucket, value.Key, result.content.First(), result.vclock)
+                    : value;
+
+                if (options.ReturnBody && result.content.Count > 1)
+                {
+                    finalResult.Siblings = result.content.Select(c =>
+                        new RiakObject(value.Bucket, value.Key, c, result.vclock)).ToList();
+                }
+
+                return new Either<RiakException, RiakObject>(finalResult);
+            }
+            catch (RiakException riakException)
+            {
+                return new Either<RiakException, RiakObject>(riakException);
+
+            }
         }
 
-        public Task<RiakResult> Delete(RiakObject riakObject, RiakDeleteOptions options = null)
+        public Task<Either<RiakException, RiakObjectId>> Delete(RiakObject riakObject, RiakDeleteOptions options = null)
         {
-            return Task.Factory.StartNew(() => _client.Delete(riakObject, options));
+            return Delete(riakObject.Bucket, riakObject.Key, options);
         }
 
-        public Task<RiakResult> Delete(string bucket, string key, RiakDeleteOptions options = null)
+        public async Task<Either<RiakException, RiakObjectId>> Delete(string bucket, string key, RiakDeleteOptions options = null)
         {
-            return Task.Factory.StartNew(() => _client.Delete(bucket, key, options));
+            if (!IsValidBucketOrKey(bucket))
+            {
+                return new Either<RiakException, RiakObjectId>(new RiakException((uint)ResultCode.InvalidRequest, InvalidBucketErrorMessage, false));
+            }
+
+            if (!IsValidBucketOrKey(key))
+            {
+                return new Either<RiakException, RiakObjectId>(new RiakException((uint)ResultCode.InvalidRequest, InvalidKeyErrorMessage, false));
+            }
+
+            options = options ?? new RiakDeleteOptions();
+
+            var request = new RpbDelReq { bucket = bucket.ToRiakString(), key = key.ToRiakString() };
+            options.Populate(request);
+
+            try
+            {
+                await _connection.PbcWriteRead(_endPoint, request, MessageCode.DelResp).ConfigureAwait(false);
+
+                return new Either<RiakException, RiakObjectId>(new RiakObjectId(bucket, key));
+            }
+            catch (RiakException riakException)
+            {
+                return new Either<RiakException, RiakObjectId>(riakException);
+            }
         }
 
-        public Task<RiakResult> Delete(RiakObjectId objectId, RiakDeleteOptions options = null)
+        public Task<Either<RiakException, RiakObjectId>> Delete(RiakObjectId objectId, RiakDeleteOptions options = null)
         {
-            return Task.Factory.StartNew(() => _client.Delete(objectId.Bucket, objectId.Key, options));
+            return Delete(objectId.Bucket, objectId.Key, options);
         }
 
-        public Task<IEnumerable<RiakResult>> Delete(IEnumerable<RiakObjectId> objectIds, RiakDeleteOptions options = null)
+        public IObservable<Either<RiakException, RiakObjectId>> Delete(IEnumerable<RiakObjectId> objectIds, RiakDeleteOptions options = null)
         {
-            return Task.Factory.StartNew(() => _client.Delete(objectIds, options));
+            var observables = Observable.Create<Either<RiakException, RiakObjectId>>(async obs =>
+            {
+                try
+                {
+                    options = options ?? new RiakDeleteOptions();
+
+                    foreach (var id in objectIds)
+                    {
+                        if (!IsValidBucketOrKey(id.Bucket))
+                        {
+                            obs.OnNext(new Either<RiakException, RiakObjectId>(new RiakException((uint)ResultCode.InvalidRequest, InvalidBucketErrorMessage, false)));
+                            continue;
+                        }
+
+                        if (!IsValidBucketOrKey(id.Key))
+                        {
+
+                            obs.OnNext(new Either<RiakException, RiakObjectId>(new RiakException((uint)ResultCode.InvalidRequest, InvalidKeyErrorMessage, false)));
+                            continue;
+                        }
+
+                        var req = new RpbDelReq { bucket = id.Bucket.ToRiakString(), key = id.Key.ToRiakString() };
+                        options.Populate(req);
+
+                        try
+                        {
+                            await _connection.PbcWriteRead(_endPoint, req, MessageCode.DelResp).ConfigureAwait(false);
+                        }
+                        catch (RiakException riakException)
+                        {
+                            obs.OnNext(new Either<RiakException, RiakObjectId>(riakException));
+                            continue;
+                        }
+
+                        obs.OnNext(new Either<RiakException, RiakObjectId>(id));
+                    }
+                    obs.OnCompleted();
+                }
+                catch (Exception exception)
+                {
+                    obs.OnError(exception);
+                }
+                return Disposable.Empty;
+            });
+
+            return observables;
         }
 
-        public Task<IEnumerable<RiakResult>> DeleteBucket(string bucket, uint rwVal = RiakConstants.Defaults.RVal)
+        public IObservable<Either<RiakException, RiakObjectId>> DeleteBucket(string bucket, RiakDeleteOptions deleteOptions = null)
         {
-            return Task.Factory.StartNew(() => _client.DeleteBucket(bucket, rwVal));
+            var objectIds = ListKeys(bucket)
+                .Where(x => !x.IsLeft)
+                .Select(key => new RiakObjectId(bucket, key.Right))
+                .ToEnumerable()
+                .ToList();
+
+            return Delete(objectIds, deleteOptions);
         }
 
-        public Task<RiakResult<RiakSearchResult>> Search(RiakSearchRequest search)
+        public async Task<Either<RiakException, RiakSearchResult>> Search(RiakSearchRequest search)
         {
-            return Task.Factory.StartNew(() => _client.Search(search));
+            var request = search.ToMessage();
+            try
+            {
+                var response = await _connection.PbcWriteRead<RpbSearchQueryReq, RpbSearchQueryResp>(_endPoint, request)
+                    .ConfigureAwait(false);
+
+                return new Either<RiakException, RiakSearchResult>(new RiakSearchResult(response));
+            }
+            catch (RiakException riakException)
+            {
+                return new Either<RiakException, RiakSearchResult>(riakException);
+            }
         }
 
-        public Task<RiakResult<RiakMapReduceResult>> MapReduce(RiakMapReduceQuery query)
+        public Task<RiakMapReduceResult> MapReduce(RiakMapReduceQuery query)
         {
-            return Task.Factory.StartNew(() => _client.MapReduce(query));
+            var request = query.ToMessage();
+            var response = _connection
+                .PbcWriteRead<RpbMapRedReq, RpbMapRedResp>(_endPoint, request, r => !r.done);
+
+            return Task.FromResult(new RiakMapReduceResult(response));
         }
 
-        public Task<RiakResult<RiakStreamedMapReduceResult>> StreamMapReduce(RiakMapReduceQuery query)
+        public Task<RiakStreamedMapReduceResult> StreamMapReduce(RiakMapReduceQuery query)
         {
-            return Task.Factory.StartNew(() => _client.StreamMapReduce(query));
+            var request = query.ToMessage();
+            var response = _connection
+                .PbcWriteStreamRead<RpbMapRedReq, RpbMapRedResp>(_endPoint, request, r => !r.done);
+
+            return Task.FromResult(new RiakStreamedMapReduceResult(response));
         }
 
-        public Task<RiakResult<IEnumerable<string>>> StreamListBuckets()
+        public IObservable<Either<RiakException, string>> StreamListBuckets()
         {
-            return Task.Factory.StartNew(() => _client.StreamListBuckets());
+            var lbReq = new RpbListBucketsReq { stream = true };
+
+            var buckets = _connection
+                .PbcWriteStreamRead<RpbListBucketsReq, RpbListBucketsResp>(_endPoint, lbReq, lbr => !lbr.done)
+                .SelectMany(r => r.buckets)
+                .Select(k => new Either<RiakException, string>(k.FromRiakString()))
+                .Catch<Either<RiakException, string>, RiakException>(exception => Observable.Return(new Either<RiakException, string>(exception)));
+
+            return buckets;
         }
 
-        public Task<RiakResult<IEnumerable<string>>>  ListBuckets()
+        public IObservable<Either<RiakException, string>> ListBuckets()
         {
-            return Task.Factory.StartNew(() => _client.ListBuckets());
+            var observable = Observable.Create<Either<RiakException, string>>(async obs =>
+            {
+                try
+                {
+                    try
+                    {
+                        var result = await _connection.PbcWriteRead<RpbListBucketsResp>(_endPoint, MessageCode.ListBucketsReq)
+                                    .ConfigureAwait(false);
+
+                        var buckets = result.buckets
+                            .Select(b => b.FromRiakString());
+
+                        foreach (var bucket in buckets)
+                        {
+                            obs.OnNext(new Either<RiakException, string>(bucket));
+                        }
+                    }
+                    catch (RiakException riakException)
+                    {
+                        obs.OnNext(new Either<RiakException, string>(riakException));
+                    }
+                    obs.OnCompleted();
+                }
+                catch (Exception exception)
+                {
+                    obs.OnError(exception);
+                }
+                return Disposable.Empty;
+            });
+
+            return observable;
         }
 
-        public Task<RiakResult<IEnumerable<string>>> ListKeys(string bucket)
+        public IObservable<Either<RiakException, string>> ListKeys(string bucket)
         {
-            return Task.Factory.StartNew(() => _client.ListKeys(bucket));
+            System.Diagnostics.Debug.Write(ListKeysWarning);
+            System.Diagnostics.Trace.TraceWarning(ListKeysWarning);
+            Console.WriteLine(ListKeysWarning);
+
+            var lkReq = new RpbListKeysReq { bucket = bucket.ToRiakString() };
+
+            var keys = _connection
+                .PbcWriteRead<RpbListKeysReq, RpbListKeysResp>(_endPoint, lkReq, lkr => !lkr.done)
+                .SelectMany(r => r.keys)
+                .Select(k => new Either<RiakException, string>(k.FromRiakString()))
+                .Catch<Either<RiakException, string>, RiakException>(exception => Observable.Return(new Either<RiakException, string>(exception)));
+
+
+            return keys;
         }
 
-        public Task<RiakResult<IEnumerable<string>>> StreamListKeys(string bucket)
+        public IObservable<Either<RiakException, string>> StreamListKeys(string bucket)
         {
-            return Task.Factory.StartNew(() => _client.StreamListKeys(bucket));
+            System.Diagnostics.Debug.Write(ListKeysWarning);
+            System.Diagnostics.Trace.TraceWarning(ListKeysWarning);
+            Console.WriteLine(ListKeysWarning);
+
+            var lkReq = new RpbListKeysReq { bucket = bucket.ToRiakString() };
+
+            var keys = _connection
+                .PbcWriteStreamRead<RpbListKeysReq, RpbListKeysResp>(_endPoint, lkReq, lkr => !lkr.done)
+                .SelectMany(r => r.keys)
+                .Select(k => new Either<RiakException, string>(k.FromRiakString()))
+                .Catch<Either<RiakException, string>, RiakException>(exception => Observable.Return(new Either<RiakException, string>(exception)));
+
+
+            return keys;
         }
 
-        public Task<RiakResult<RiakBucketProperties>> GetBucketProperties(string bucket)
+        public async Task<RiakBucketProperties> GetBucketProperties(string bucket)
         {
-            return Task.Factory.StartNew(() => _client.GetBucketProperties(bucket));
+            // bucket names cannot have slashes in the names, the REST interface doesn't like it at all
+            if (!IsValidBucketOrKey(bucket))
+            {
+                throw new RiakException((uint)ResultCode.InvalidRequest, InvalidBucketErrorMessage, false);
+            }
+
+            var bpReq = new RpbGetBucketReq { bucket = bucket.ToRiakString() };
+            var result = await _connection.PbcWriteRead<RpbGetBucketReq, RpbGetBucketResp>(_endPoint, bpReq).ConfigureAwait(false);
+
+            var bucketProperties = new RiakBucketProperties(result.props);
+            return bucketProperties;
         }
 
-        public Task<RiakResult> SetBucketProperties(string bucket, RiakBucketProperties properties, bool useHttp = false)
+        public async Task<bool> SetBucketProperties(string bucket, RiakBucketProperties properties, bool useHttp = false)
         {
-            return Task.Factory.StartNew(() => _client.SetBucketProperties(bucket, properties, useHttp));
+            var task = useHttp ? SetHttpBucketProperties(bucket, properties) : SetPbcBucketProperties(bucket, properties);
+            await task;
+            return true;
         }
 
-        public Task<RiakResult> ResetBucketProperties(string bucket, bool useHttp = false)
+        private static string ToBucketUri(string bucket)
         {
-            return Task.Factory.StartNew(() => _client.ResetBucketProperties(bucket, useHttp));
+            return "{0}/{1}".Fmt(RiakConstants.Rest.Uri.RiakRoot, HttpUtility.UrlEncode(bucket));
         }
 
-        public Task<RiakResult<RiakIndexResult>> IndexGet(string bucket, string indexName, int value, RiakIndexGetOptions options = null)
+        private async Task SetHttpBucketProperties(string bucket, RiakBucketProperties properties)
         {
-            return Task.Factory.StartNew(() => _client.IndexGet(bucket, indexName, value, options));
+            var request = new RiakRestRequest(ToBucketUri(bucket), RiakConstants.Rest.HttpMethod.Put)
+            {
+                Body = properties.ToJsonString().ToRiakString(),
+                ContentType = RiakConstants.ContentTypes.ApplicationJson
+            };
+
+            await _connection.RestRequest(_endPoint, request).ConfigureAwait(false);
         }
 
-        public Task<RiakResult<RiakIndexResult>> IndexGet(string bucket, string indexName, string value, RiakIndexGetOptions options = null)
+        private async Task SetPbcBucketProperties(string bucket, RiakBucketProperties properties)
         {
-            return Task.Factory.StartNew(() => _client.IndexGet(bucket, indexName, value, options));
+            if (!IsValidBucketOrKey(bucket))
+            {
+                throw new RiakException((uint)ResultCode.InvalidRequest, InvalidBucketErrorMessage, false);
+            }
+
+            var request = new RpbSetBucketReq { bucket = bucket.ToRiakString(), props = properties.ToMessage() };
+            await _connection.PbcWriteRead(_endPoint, request, MessageCode.SetBucketResp).ConfigureAwait(false);
         }
 
-        public Task<RiakResult<RiakIndexResult>> IndexGet(string bucket, string indexName, int minValue, int maxValue, RiakIndexGetOptions options = null)
+        public async Task<bool> ResetBucketProperties(string bucket, bool useHttp = false)
         {
-            return Task.Factory.StartNew(() => _client.IndexGet(bucket, indexName, minValue, maxValue, options));
+            if (!IsValidBucketOrKey(bucket))
+            {
+                throw new RiakException((uint)ResultCode.InvalidRequest, InvalidBucketErrorMessage, false);
+            }
+
+            var task = useHttp ? ResetHttpBucketProperties(bucket) : ResetPbcBucketProperties(bucket);
+
+            await task.ConfigureAwait(false);
+            return true;
         }
 
-        public Task<RiakResult<RiakIndexResult>> IndexGet(string bucket, string indexName, string minValue, string maxValue, RiakIndexGetOptions options = null)
+        private static string ToBucketPropsUri(string bucket)
         {
-            return Task.Factory.StartNew(() => _client.IndexGet(bucket, indexName, minValue, maxValue, options));
+            return RiakConstants.Rest.Uri.BucketPropsFmt.Fmt(HttpUtility.UrlEncode(bucket));
         }
 
-        public Task<RiakResult<RiakStreamedIndexResult>> StreamIndexGet(string bucket, string indexName, BigInteger value, RiakIndexGetOptions options = null)
+        private async Task ResetPbcBucketProperties(string bucket)
         {
-            return Task.Factory.StartNew(() => _client.StreamIndexGet(bucket, indexName, value, options));
+            var request = new RpbResetBucketReq { bucket = bucket.ToRiakString() };
+            await _connection.PbcWriteRead(_endPoint, request, MessageCode.ResetBucketResp);
         }
 
-        public Task<RiakResult<RiakStreamedIndexResult>> StreamIndexGet(string bucket, string indexName, string value, RiakIndexGetOptions options = null)
+        private async Task ResetHttpBucketProperties(string bucket)
         {
-            return Task.Factory.StartNew(() => _client.StreamIndexGet(bucket, indexName, value, options));
+            var request = new RiakRestRequest(ToBucketPropsUri(bucket), RiakConstants.Rest.HttpMethod.Delete);
+
+            var result = await _connection.RestRequest(_endPoint, request).ConfigureAwait(false);
+
+            switch (result.StatusCode)
+            {
+                case HttpStatusCode.NoContent:
+                    break;
+                case HttpStatusCode.NotFound:
+                    throw new RiakException((uint)ResultCode.NotFound, "Bucket {0} not found.".Fmt(bucket), false);
+                default:
+                    throw new RiakException((uint)ResultCode.InvalidResponse, "Unexpected Status Code: {0} ({1})".Fmt(result.StatusCode, (int)result.StatusCode), false);
+            }
         }
 
-        public Task<RiakResult<RiakStreamedIndexResult>> StreamIndexGet(string bucket, string indexName, BigInteger minValue, BigInteger maxValue, RiakIndexGetOptions options = null)
+        public Task<Either<RiakException, RiakIndexResult>> IndexGet(string bucket, string indexName, BigInteger value, RiakIndexGetOptions options = null)
         {
-            return Task.Factory.StartNew(() => _client.StreamIndexGet(bucket, indexName, minValue, maxValue, options));
+            return IndexGetEquals(bucket, indexName.ToIntegerKey(), value.ToString(), options);
         }
 
-        public Task<RiakResult<RiakStreamedIndexResult>> StreamIndexGet(string bucket, string indexName, string minValue, string maxValue, RiakIndexGetOptions options = null)
+        public Task<Either<RiakException, RiakIndexResult>> IndexGet(string bucket, string indexName, string value, RiakIndexGetOptions options = null)
         {
-            return Task.Factory.StartNew(() => _client.StreamIndexGet(bucket, indexName, minValue, maxValue, options));
+            return IndexGetEquals(bucket, indexName.ToBinaryKey(), value, options);
         }
 
-        public Task<RiakResult<IList<string>>> ListKeysFromIndex(string bucket)
+        public Task<Either<RiakException, RiakIndexResult>> IndexGet(string bucket, string indexName, BigInteger minValue, BigInteger maxValue, RiakIndexGetOptions options = null)
         {
-            return Task.Factory.StartNew(() => _client.ListKeysFromIndex(bucket));
+            return IndexGetRange(bucket, indexName.ToIntegerKey(), minValue.ToString(), maxValue.ToString(), options);
         }
 
-        public Task<RiakResult<IList<RiakObject>>> WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks)
+        public Task<Either<RiakException, RiakIndexResult>> IndexGet(string bucket, string indexName, string minValue, string maxValue, RiakIndexGetOptions options = null)
         {
-            return Task.Factory.StartNew(() => _client.WalkLinks(riakObject, riakLinks));
+            return IndexGetRange(bucket, indexName.ToBinaryKey(), minValue, maxValue, options);
         }
 
-        public Task<RiakResult<RiakServerInfo>>  GetServerInfo()
+        private static bool ReturnTerms(RiakIndexGetOptions options)
         {
-            return Task.Factory.StartNew(() => _client.GetServerInfo());
+            return options.ReturnTerms != null && options.ReturnTerms.Value;
         }
 
-        public Task Batch(Action<IRiakBatchClient> batchAction)
+        private async Task<Either<RiakException, RiakIndexResult>> IndexGetRange(string bucket, string indexName, string minValue, string maxValue, RiakIndexGetOptions options = null)
         {
-            return Task.Factory.StartNew(() => _client.Batch(batchAction));
+            var message = new RpbIndexReq
+            {
+                bucket = bucket.ToRiakString(),
+                index = indexName.ToRiakString(),
+                qtype = RpbIndexReq.IndexQueryType.range,
+                range_min = minValue.ToRiakString(),
+                range_max = maxValue.ToRiakString()
+            };
+
+            options = options ?? new RiakIndexGetOptions();
+            options.Populate(message);
+
+            try
+            {
+                var result = await _connection.PbcWriteRead<RpbIndexReq, RpbIndexResp>(_endPoint, message).ConfigureAwait(false);
+                var includeTerms = ReturnTerms(options);
+                var riakIndexResult = new RiakIndexResult(includeTerms, result);
+                return new Either<RiakException, RiakIndexResult>(riakIndexResult);
+            }
+            catch (RiakException riakException)
+            {
+                return new Either<RiakException, RiakIndexResult>(riakException);
+            }
         }
 
-        public Task<T> Batch<T>(Func<IRiakBatchClient, T> batchFunc)
+        private async Task<Either<RiakException, RiakIndexResult>> IndexGetEquals(string bucket, string indexName, string value, RiakIndexGetOptions options = null)
         {
-            return Task.Factory.StartNew<T>(() => _client.Batch(batchFunc));
+            var message = new RpbIndexReq
+            {
+                bucket = bucket.ToRiakString(),
+                index = indexName.ToRiakString(),
+                key = value.ToRiakString(),
+                qtype = RpbIndexReq.IndexQueryType.eq
+            };
+
+            options = options ?? new RiakIndexGetOptions();
+            options.Populate(message);
+
+            try
+            {
+                var result = await _connection.PbcWriteRead<RpbIndexReq, RpbIndexResp>(_endPoint, message).ConfigureAwait(false);
+                var includeTerms = ReturnTerms(options);
+                var riakIndexResult = new RiakIndexResult(includeTerms, result);
+
+                return new Either<RiakException, RiakIndexResult>(riakIndexResult);
+            }
+            catch (RiakException riakException)
+            {
+                return new Either<RiakException, RiakIndexResult>(riakException);
+            }
         }
 
-
-        // -----------------------------------------------------------------------------------------------------------
-        // All functions below are marked as obsolete
-        // -----------------------------------------------------------------------------------------------------------
-
-        public void Ping(Action<RiakResult> callback)
+        public Task<Either<RiakException, RiakStreamedIndexResult>> StreamIndexGet(string bucket, string indexName, BigInteger value, RiakIndexGetOptions options = null)
         {
-            ExecAsync(() => callback(_client.Ping()));
+            return StreamIndexGetEquals(bucket, indexName.ToIntegerKey(), value.ToString(), options);
         }
 
-        public void Get(string bucket, string key, Action<RiakResult<RiakObject>> callback, RiakGetOptions options = null)
+        public Task<Either<RiakException, RiakStreamedIndexResult>> StreamIndexGet(string bucket, string indexName, string value, RiakIndexGetOptions options = null)
         {
-            options = options ?? RiakClient.DefaultGetOptions();
-            ExecAsync(() => callback(_client.Get(bucket, key, options)));
+            return StreamIndexGetEquals(bucket, indexName.ToBinaryKey(), value, options);
         }
 
-        public void Get(RiakObjectId objectId, Action<RiakResult<RiakObject>> callback, RiakGetOptions options = null)
+        public Task<Either<RiakException, RiakStreamedIndexResult>> StreamIndexGet(string bucket, string indexName, BigInteger minValue, BigInteger maxValue, RiakIndexGetOptions options = null)
         {
-            options = options ?? RiakClient.DefaultGetOptions();
-            ExecAsync(() => callback(_client.Get(objectId.Bucket, objectId.Key, options)));
+            return StreamIndexGetRange(bucket, indexName.ToIntegerKey(), minValue.ToString(), maxValue.ToString(), options);
         }
 
-        public void Get(IEnumerable<RiakObjectId> bucketKeyPairs, Action<IEnumerable<RiakResult<RiakObject>>> callback, RiakGetOptions options = null)
+        public Task<Either<RiakException, RiakStreamedIndexResult>> StreamIndexGet(string bucket, string indexName, string minValue, string maxValue, RiakIndexGetOptions options = null)
         {
-            options = options ?? RiakClient.DefaultGetOptions();
-            ExecAsync(() => callback(_client.Get(bucketKeyPairs, options)));
+            return StreamIndexGetRange(bucket, indexName.ToBinaryKey(), minValue, maxValue, options);
         }
 
-        public void Put(IEnumerable<RiakObject> values, Action<IEnumerable<RiakResult<RiakObject>>> callback, RiakPutOptions options)
+        private Task<Either<RiakException, RiakStreamedIndexResult>> StreamIndexGetEquals(string bucket, string indexName, string value, RiakIndexGetOptions options = null)
         {
-            ExecAsync(() => callback(_client.Put(values, options)));
+            var message = new RpbIndexReq
+            {
+                bucket = bucket.ToRiakString(),
+                index = indexName.ToRiakString(),
+                key = value.ToRiakString(),
+                qtype = RpbIndexReq.IndexQueryType.eq,
+                stream = true
+            };
+
+            options = options ?? new RiakIndexGetOptions();
+            options.Populate(message);
+
+            try
+            {
+                var result = _connection.PbcWriteStreamRead<RpbIndexReq, RpbIndexResp>(_endPoint, message,
+                    lbr => !lbr.done);
+
+                var includeTerms = ReturnTerms(options);
+                var riakStreamedIndexResult = new RiakStreamedIndexResult(includeTerms, result);
+
+
+                return Task.FromResult(new Either<RiakException, RiakStreamedIndexResult>(riakStreamedIndexResult));
+            }
+            catch (RiakException riakException)
+            {
+                return Task.FromResult(new Either<RiakException, RiakStreamedIndexResult>(riakException));
+            }
         }
 
-        public void Put(RiakObject value, Action<RiakResult<RiakObject>> callback, RiakPutOptions options)
+        private Task<Either<RiakException, RiakStreamedIndexResult>> StreamIndexGetRange(string bucket, string indexName, string minValue, string maxValue, RiakIndexGetOptions options = null)
         {
-            ExecAsync(() => callback(_client.Put(value, options)));
+            var message = new RpbIndexReq
+            {
+                bucket = bucket.ToRiakString(),
+                index = indexName.ToRiakString(),
+                qtype = RpbIndexReq.IndexQueryType.range,
+                range_min = minValue.ToRiakString(),
+                range_max = maxValue.ToRiakString(),
+                stream = true
+            };
+
+            options = options ?? new RiakIndexGetOptions();
+            options.Populate(message);
+
+            try
+            {
+                var result = _connection.PbcWriteStreamRead<RpbIndexReq, RpbIndexResp>(_endPoint, message, lbr => !lbr.done);
+                var includeTerms = ReturnTerms(options);
+                var riakStreamedIndexResult = new RiakStreamedIndexResult(includeTerms, result);
+
+                return Task.FromResult(new Either<RiakException, RiakStreamedIndexResult>(riakStreamedIndexResult));
+            }
+            catch (RiakException riakException)
+            {
+                return Task.FromResult(new Either<RiakException, RiakStreamedIndexResult>(riakException));
+            }
         }
 
-        public void Delete(string bucket, string key, Action<RiakResult> callback, RiakDeleteOptions options = null)
+        public IObservable<Either<RiakException, string>> ListKeysFromIndex(string bucket)
         {
-            ExecAsync(() => callback(_client.Delete(bucket, key, options)));
+            var observables = Observable.Create<Either<RiakException, string>>(async obs =>
+            {
+                try
+                {
+                    var result = await IndexGet(bucket, RiakConstants.SystemIndexKeys.RiakBucketIndex, bucket).ConfigureAwait(false);
+
+                    if (result.IsLeft)
+                    {
+                        obs.OnNext(new Either<RiakException, string>(result.Left));
+                    }
+                    else
+                    {
+                        var keys = result.Right.IndexKeyTerms.Select(ikt => ikt.Key);
+
+                        foreach (var key in keys)
+                        {
+                            obs.OnNext(new Either<RiakException, string>(key));
+                        }
+                    }
+                    obs.OnCompleted();
+                }
+                catch (Exception exception)
+                {
+                    obs.OnError(exception);
+                }
+                return Disposable.Empty;
+            });
+
+            return observables;
         }
 
-        public void Delete(RiakObjectId objectId, Action<RiakResult> callback, RiakDeleteOptions options = null)
+        public IObservable<Either<RiakException, RiakObject>> WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks)
         {
-            ExecAsync(() => callback(_client.Delete(objectId.Bucket, objectId.Key, options)));
+            var observables = Observable.Create<Either<RiakException, RiakObject>>(async obs =>
+            {
+                try
+                {
+                    System.Diagnostics.Debug.Assert(riakLinks.Count > 0, "Link walking requires at least one link");
+
+                    var input = new RiakBucketKeyInput()
+                        .Add(riakObject.Bucket, riakObject.Key);
+
+                    var query = new RiakMapReduceQuery()
+                        .Inputs(input);
+
+                    var lastLink = riakLinks.Last();
+
+                    foreach (var riakLink in riakLinks)
+                    {
+                        var link = riakLink;
+                        var keep = ReferenceEquals(link, lastLink);
+
+                        query.Link(l => l.FromRiakLink(link).Keep(keep));
+                    }
+
+                    var result = await MapReduce(query).ConfigureAwait(false);
+
+                    var linkResults = result.PhaseResults
+                        .GroupBy(r => r.Phase)
+                        .Where(g => g.Key == riakLinks.Count - 1);
+
+                    var linkResultStrings = linkResults
+                        .SelectMany(lr => lr.ToList(), (lr, r) => new { lr, r })
+                        .SelectMany(@t => @t.r.Values, (@t, s) => s.FromRiakString());
+
+                    //var linkResultStrings = linkResults.SelectMany(g => g.Select(r => r.Values.Value.FromRiakString()));
+                    var rawLinks = linkResultStrings
+                        .SelectMany(RiakLink.ParseArrayFromJsonString)
+                        .Distinct();
+
+                    var oids = rawLinks
+                        .Select(l => new RiakObjectId(l.Bucket, l.Key))
+                        .ToList();
+
+                    var source = Get(oids, new RiakGetOptions());
+
+                    return source.Subscribe(obs.OnNext,
+                            obs.OnError,
+                            obs.OnCompleted);
+                }
+                catch (Exception exception)
+                {
+                    obs.OnError(exception);
+                }
+                return Disposable.Empty;
+            });
+
+            return observables;
         }
 
-        public void Delete(IEnumerable<RiakObjectId> objectIds, Action<IEnumerable<RiakResult>> callback, RiakDeleteOptions options = null)
+        public async Task<Either<RiakException, RiakServerInfo>> GetServerInfo()
         {
-            ExecAsync(() => callback(_client.Delete(objectIds, options)));
+            try
+            {
+                var result = await _connection.PbcWriteRead<RpbGetServerInfoResp>(_endPoint, MessageCode.GetServerInfoReq)
+                            .ConfigureAwait(false);
+
+                return new Either<RiakException, RiakServerInfo>(new RiakServerInfo(result));
+            }
+            catch (RiakException riakException)
+            {
+                return new Either<RiakException, RiakServerInfo>(riakException);
+            }
         }
 
-        public void DeleteBucket(string bucket, Action<IEnumerable<RiakResult>> callback, uint rwVal = RiakConstants.Defaults.RVal)
+        public void Dispose()
         {
-            ExecAsync(() => callback(_client.DeleteBucket(bucket, rwVal)));
-        }
-
-        public void MapReduce(RiakMapReduceQuery query, Action<RiakResult<RiakMapReduceResult>> callback)
-        {
-            ExecAsync(() => callback(_client.MapReduce(query)));
-        }
-
-        public void StreamMapReduce(RiakMapReduceQuery query, Action<RiakResult<RiakStreamedMapReduceResult>> callback)
-        {
-            ExecAsync(() => callback(_client.StreamMapReduce(query)));
-        }
-
-        public void ListBuckets(Action<RiakResult<IEnumerable<string>>> callback)
-        {
-            ExecAsync(() => callback(_client.ListBuckets()));
-        }
-
-        public void ListKeys(string bucket, Action<RiakResult<IEnumerable<string>>> callback)
-        {
-            ExecAsync(() => callback(_client.ListKeys(bucket)));
-        }
-
-        public void StreamListKeys(string bucket, Action<RiakResult<IEnumerable<string>>> callback)
-        {
-            ExecAsync(() => callback(_client.StreamListKeys(bucket)));
-        }
-
-        public void GetBucketProperties(string bucket, Action<RiakResult<RiakBucketProperties>> callback)
-        {
-            ExecAsync(() => callback(_client.GetBucketProperties(bucket)));
-        }
-
-        public void SetBucketProperties(string bucket, RiakBucketProperties properties, Action<RiakResult> callback)
-        {
-            ExecAsync(() => callback(_client.SetBucketProperties(bucket, properties)));
-        }
-
-        public void WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks, Action<RiakResult<IList<RiakObject>>> callback)
-        {
-            ExecAsync(() => callback(_client.WalkLinks(riakObject, riakLinks)));
-        }
-
-        public void GetServerInfo(Action<RiakResult<RiakServerInfo>> callback)
-        {
-            ExecAsync(() => callback(_client.GetServerInfo()));
-        }
-
-        private static void ExecAsync(Action action)
-        {
-            Task.Factory.StartNew(action);
         }
     }
 }

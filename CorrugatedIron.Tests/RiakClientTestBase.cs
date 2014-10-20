@@ -25,11 +25,10 @@ namespace CorrugatedIron.Tests.RiakClientTests
         where TRequest : class
         where TResult : class, new()
     {
-        protected RiakResult<TResult> Result = null;
+        protected TResult Result = null;
         protected Mock<IRiakConnection> ConnMock;
         protected Mock<IRiakNodeConfiguration> NodeConfigMock;
         protected Mock<IRiakClusterConfiguration> ClusterConfigMock;
-        protected Mock<IRiakConnectionFactory> ConnFactoryMock;
         protected RiakCluster Cluster;
         protected IRiakClient Client;
 
@@ -37,17 +36,16 @@ namespace CorrugatedIron.Tests.RiakClientTests
         {
             ConnMock = new Mock<IRiakConnection>();
             ClusterConfigMock = new Mock<IRiakClusterConfiguration>();
-            ConnFactoryMock = new Mock<IRiakConnectionFactory>();
             NodeConfigMock = new Mock<IRiakNodeConfiguration>();
 
-            ConnMock.Setup(m => m.PbcWriteRead<TRequest, TResult>(It.IsAny<TRequest>())).Returns(() => Result);
-            ConnFactoryMock.Setup(m => m.CreateConnection(It.IsAny<IRiakNodeConfiguration>())).Returns(ConnMock.Object);
+            ConnMock.Setup(m => m.PbcWriteRead<TRequest, TResult>(It.IsAny<IRiakEndPoint>(), It.IsAny<TRequest>()).ConfigureAwait(false).GetAwaiter().GetResult()).Returns(() => Result);
             NodeConfigMock.SetupGet(m => m.PoolSize).Returns(1);
+            NodeConfigMock.SetupGet(m => m.BufferSize).Returns(2097152);
             ClusterConfigMock.SetupGet(m => m.RiakNodes).Returns(new List<IRiakNodeConfiguration> { NodeConfigMock.Object });
             ClusterConfigMock.SetupGet(m => m.DefaultRetryCount).Returns(100);
             ClusterConfigMock.SetupGet(m => m.DefaultRetryWaitTime).Returns(100);
 
-            Cluster = new RiakCluster(ClusterConfigMock.Object, ConnFactoryMock.Object);
+            Cluster = new RiakCluster(ClusterConfigMock.Object);
             Client = Cluster.CreateClient();
         }
     }
