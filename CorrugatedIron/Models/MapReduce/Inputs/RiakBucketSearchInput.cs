@@ -26,7 +26,7 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
         private string _filter;
 
         public RiakBucketSearchInput(RiakFluentSearch query)
-            : this(query.Bucket, query.ToString())
+            : this(query.Index, query.ToString())
         {
         }
 

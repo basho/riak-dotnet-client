@@ -242,6 +242,7 @@
     <Compile Include="Models\Search\RiakSearchResult.cs" />
     <Compile Include="Models\Search\RiakSearchResultDocument.cs" />
     <Compile Include="Models\Search\RiakSearchResultField.cs" />
+    <Compile Include="Models\Search\SearchIndexResult.cs" />
     <Compile Include="Models\Search\Term.cs" />
     <Compile Include="Models\Search\Token.cs" />
     <Compile Include="Models\Search\UnaryTerm.cs" />
