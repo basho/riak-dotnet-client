@@ -42,6 +42,7 @@ namespace CorrugatedIron
         T Batch<T>(Func<IRiakBatchClient, T> batchFunction);
 
         IRiakAsyncClient Async { get; }
+        
     }
 
     public class RiakClient : IRiakClient
@@ -1736,6 +1737,48 @@ namespace CorrugatedIron
                 rmr.Values = result.Value.map_value.Select(mv => new RiakDtMapEntry(mv)).ToList();
 
             return rmr;
+        }
+
+        public RiakResult<SearchIndexResult> GetSearchIndex(string indexName)
+        {
+            var request = new RpbYokozunaIndexGetReq {name = indexName.ToRiakString()};
+            var result =
+                UseConnection(conn => conn.PbcWriteRead<RpbYokozunaIndexGetReq, RpbYokozunaIndexGetResp>(request));
+            
+            if (!result.IsSuccess)
+                return RiakResult<SearchIndexResult>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
+
+            return RiakResult<SearchIndexResult>.Success(new SearchIndexResult(result.Value));
+        }
+
+        public RiakResult PutSearchIndex(SearchIndex searchindex)
+        {
+            var request = new RpbYokozunaIndexPutReq { index = searchindex.ToMessage() };
+            return UseConnection(conn => conn.PbcWriteRead(request, MessageCode.PutResp));
+        }
+
+        public RiakResult DeleteSearchIndex(string indexName)
+        {
+            var request = new RpbYokozunaIndexDeleteReq {name = indexName.ToRiakString()};
+            return UseConnection(conn => conn.PbcWriteRead(request, MessageCode.DelResp));
+        }
+
+        public RiakResult<SearchSchema> GetSearchSchema(string schemaName)
+        {
+            var request = new RpbYokozunaSchemaGetReq {name = schemaName.ToRiakString()};
+            var result =
+                UseConnection(conn => conn.PbcWriteRead<RpbYokozunaSchemaGetReq, RpbYokozunaSchemaGetResp>(request));
+            
+            if (!result.IsSuccess)
+                return RiakResult<SearchSchema>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
+
+            return RiakResult<SearchSchema>.Success(new SearchSchema(result.Value.schema));
+        }
+
+        public RiakResult PutSearchSchema(SearchSchema searchSchema)
+        {
+            var request = new RpbYokozunaSchemaPutReq { schema = searchSchema.ToMessage() };
+            return UseConnection(conn => conn.PbcWriteRead(request, MessageCode.PutResp));
         }
     }
 }

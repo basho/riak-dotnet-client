@@ -17,14 +17,12 @@
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.CommitHook;
-using CorrugatedIron.Models.Search;
 using CorrugatedIron.Tests.Extensions;
 using CorrugatedIron.Tests.Live.LiveRiakConnectionTests;
 using CorrugatedIron.Util;
 using NUnit.Framework;
 using System;
 using System.Linq;
-using System.Threading;
 
 namespace CorrugatedIron.Tests.Live.BucketPropertyTests
 {
@@ -61,46 +59,12 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
             getResult.IsSuccess.ShouldBeTrue(getResult.ErrorMessage);
         }
 
-        [Test()]
-        [Ignore("Riak Search functionality has been deprecated in favor of Yokozuna/Solr.")]
-        public void SettingSearchOnRiakBucketMakesBucketSearchable()
-        {
-            var bucket = Guid.NewGuid().ToString();
-            var key = Guid.NewGuid().ToString();
-            var props = Client.GetBucketProperties(bucket).Value;
-            props.SetSearch(true);
-
-            var setResult = Client.SetBucketProperties(bucket, props);
-            setResult.IsSuccess.ShouldBeTrue(setResult.ErrorMessage);
-
-            var obj = new RiakObject(bucket, key, new { name = "OJ", age = 34 });
-            var putResult = Client.Put(obj);
-            putResult.IsSuccess.ShouldBeTrue(putResult.ErrorMessage);
-
-            var q = new RiakFluentSearch(bucket, "name")
-                .Search("OJ")
-                .And("age", "34")
-                .Build();
-
-            var search = new RiakSearchRequest
-            {
-                Query = q
-            };
-
-            var searchResult = Client.Search(search);
-            searchResult.IsSuccess.ShouldBeTrue(searchResult.ErrorMessage);
-            searchResult.Value.NumFound.ShouldEqual(1u);
-            searchResult.Value.Documents[0].Fields.Count.ShouldEqual(3);
-            searchResult.Value.Documents[0].Fields.First(x => x.Key == "id").Value.ShouldEqual(key);
-        }
-
         [Test]
         public void SettingPropertiesOnNewBucketWorksCorrectly()
         {
             var bucketName = Guid.NewGuid().ToString();
             var props = new RiakBucketProperties()
                 .SetNVal(4)
-                .SetSearch(true)
                 .SetWVal("all")
                 .SetRVal("quorum");
 
@@ -113,8 +77,6 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
             props = getResult.Value;
             props.NVal.HasValue.ShouldBeTrue();
             props.NVal.Value.ShouldEqual(4U);
-            props.Search.ShouldNotEqual(null);
-            props.Search.Value.ShouldBeTrue();
             props.WVal.ShouldEqual(RiakConstants.QuorumOptionsLookup["all"]);
             props.RVal.ShouldEqual(RiakConstants.QuorumOptionsLookup["quorum"]);
         }
@@ -258,7 +220,6 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
         }
 
         [Test]
-        [Ignore("A ring state bug in Riak prevents this from running correctly - https://github.com/basho/riak_kv/issues/660")]
         public void ResettingBucketPropertiesWorksCorrectly()
         {
             const string bucket = "Schmoopy";

@@ -20,19 +20,22 @@ namespace CorrugatedIron.Models.Search
 {
     public class RiakFluentSearch
     {
-        private readonly string _bucket;
+        private readonly string _index;
         private readonly string _field;
         private Term _term;
         private bool _grouped;
 
-        public string Bucket { get { return _bucket; } }
+        [Obsolete("Bucket is deprecated, please use Index instead.", true)]
+        public string Bucket { get { return _index; } }
 
-        public RiakFluentSearch(string bucket, string field)
+        public string Index { get { return _index; } }
+
+        public RiakFluentSearch(string index, string field)
         {
-            if (string.IsNullOrWhiteSpace(bucket)) throw new ArgumentNullException("bucket");
+            if (string.IsNullOrWhiteSpace(index)) throw new ArgumentNullException("index");
             if (string.IsNullOrWhiteSpace(field)) throw new ArgumentNullException("field");
 
-            _bucket = bucket;
+            _index = index;
             _field = field;
         }
 

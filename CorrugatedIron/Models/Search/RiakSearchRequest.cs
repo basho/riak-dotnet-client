@@ -74,7 +74,7 @@ namespace CorrugatedIron.Models.Search
         {
             var msg = new RpbSearchQueryReq
             {
-                index = Query.Bucket.ToRiakString(),
+                index = Query.Index.ToRiakString(),
                 q = Query.ToString().ToRiakString(),
                 rows = Rows,
                 start = Start,

@@ -22,7 +22,7 @@ using CorrugatedIron.Tests.Live.LiveRiakConnectionTests;
 using CorrugatedIron.Util;
 using NUnit.Framework;
 
-namespace CorrugatedIron.Tests.Live
+namespace CorrugatedIron.Tests.Live.Depreciated
 {
     [TestFixture]
     public class WhenQueryingRiakLegacySearchViaPbc : LiveRiakConnectionTestBase
@@ -39,7 +39,7 @@ namespace CorrugatedIron.Tests.Live
             base.SetUp();
             
             var props = Client.GetBucketProperties(Bucket).Value;
-            props.SetSearch(true);
+            props.SetLegacySearch(true);
             Client.SetBucketProperties(Bucket, props);
         }
 

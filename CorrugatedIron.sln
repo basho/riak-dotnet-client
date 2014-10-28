@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
+VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CorrugatedIron", "CorrugatedIron\CorrugatedIron.csproj", "{A2CA0CDC-85BB-489D-99D0-3EE1D135BE17}"
 EndProject
@@ -32,6 +32,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{FD5F81
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CorrugatedIron.Tests.Live.Depreciated", "CorrugatedIron.Tests.Live.Depreciated\CorrugatedIron.Tests.Live.Depreciated.csproj", "{6C0DF9BB-AC8E-40AB-B769-70141E1A6FF2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -50,6 +52,10 @@ Global
 		{5D52E2FA-931C-4E77-BF2B-3A9F0D0CD834}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5D52E2FA-931C-4E77-BF2B-3A9F0D0CD834}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5D52E2FA-931C-4E77-BF2B-3A9F0D0CD834}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C0DF9BB-AC8E-40AB-B769-70141E1A6FF2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C0DF9BB-AC8E-40AB-B769-70141E1A6FF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C0DF9BB-AC8E-40AB-B769-70141E1A6FF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C0DF9BB-AC8E-40AB-B769-70141E1A6FF2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

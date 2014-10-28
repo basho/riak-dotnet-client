@@ -56,7 +56,10 @@ namespace CorrugatedIron.Models
         public bool? HasPrecommit { get; private set; }
         public bool? HasPostcommit { get; private set; }
 
-        public bool? Search { get; private set; }
+        [Obsolete("Search is deprecated, please use LegacySearch instead.", true)]
+        public bool? Search { get { return LegacySearch; } private set { LegacySearch = value; } }
+
+        public bool? LegacySearch { get; private set; }
 
         /// <summary>
         /// The number of replicas that must return before a read is considered a succes.
@@ -98,15 +101,21 @@ namespace CorrugatedIron.Models
 
         public RiakConstants.RiakEnterprise.ReplicationMode? ReplicationMode { get; private set; }
 
-        public string YokozunaIndex { get; private set; }
+        public string SearchIndex { get; private set; }
 
+        [Obsolete("SearchEnabled is deprecated, please use LegacySearchEnabled instead.", true)]
+        public bool SearchEnabled { get { return LegacySearchEnabled; } }
+        
         /// <summary>
-        /// An indicator of whether search indexing is enabled on the bucket.
+        /// An indicator of whether legacy search indexing is enabled on the bucket.
         /// </summary>
-        public bool SearchEnabled
+        public bool LegacySearchEnabled
         {
-            get { return (Search.HasValue && Search.Value) || 
-                         (PreCommitHooks != null && PreCommitHooks.FirstOrDefault(x => Equals(x, RiakErlangCommitHook.RiakSearchCommitHook)) != null); }
+            get
+            {
+                return (LegacySearch.HasValue && LegacySearch.Value) ||
+                       (PreCommitHooks != null && PreCommitHooks.FirstOrDefault(x => Equals(x, RiakErlangCommitHook.RiakLegacySearchCommitHook)) != null);
+            }
         }
 
         public RiakBucketProperties SetBasicQuorum(bool value)
@@ -133,13 +142,19 @@ namespace CorrugatedIron.Models
             return this;
         }
 
+        [Obsolete("SetSearch is deprecated, please use SetLegacySearch instead.", true)]
+        public RiakBucketProperties SetSearch(bool enable, bool addHooks = false)
+        {
+            return SetLegacySearch(enable, addHooks);
+        }
+
         /// <summary>
-        /// Enable or disable search on a bucket.
+        /// Enable or disable legacy search on a bucket.
         /// </summary>
-        /// <param name="value">Set to <i>true</i> to enable search on this bucket, or <i>false</i>
+        /// <param name="enable">Set to <i>true</i> to enable legacy search on this bucket, or <i>false</i>
         /// to disable it.</param>
         /// <returns>A reference to the current properties object.</returns>
-        public RiakBucketProperties SetSearch(bool enable, bool addHooks = false)
+        public RiakBucketProperties SetLegacySearch(bool enable, bool addHooks = false)
         {
             if (addHooks) 
             {
@@ -147,16 +162,16 @@ namespace CorrugatedIron.Models
 
                 if (enable)
                 {
-                    AddPreCommitHook(RiakErlangCommitHook.RiakSearchCommitHook);
+                    AddPreCommitHook(RiakErlangCommitHook.RiakLegacySearchCommitHook);
                 }
                 else
                 {
-                    RemovePreCommitHook(RiakErlangCommitHook.RiakSearchCommitHook);
+                    RemovePreCommitHook(RiakErlangCommitHook.RiakLegacySearchCommitHook);
                 }                  
             } 
             else 
             {
-                Search = enable;
+                LegacySearch = enable;
             }
             return this;
         }
@@ -251,9 +266,9 @@ namespace CorrugatedIron.Models
             return this;
         }
 
-        public RiakBucketProperties SetYokozunaIndex(string yokozunaIndex)
+        public RiakBucketProperties SetSearchIndex(string searchIndex)
         {
-            YokozunaIndex = yokozunaIndex;
+            SearchIndex = searchIndex;
             return this;
         }
 
@@ -291,9 +306,9 @@ namespace CorrugatedIron.Models
         {
             var hooks = PreCommitHooks ?? (PreCommitHooks = new List<IRiakPreCommitHook>());
 
-            if (commitHook != null && (commitHook as RiakErlangCommitHook) == RiakErlangCommitHook.RiakSearchCommitHook)
+            if (commitHook != null && (commitHook as RiakErlangCommitHook) == RiakErlangCommitHook.RiakLegacySearchCommitHook)
             {
-                return SetSearch(true);
+                return SetLegacySearch(true);
             }
 
             if (!hooks.Any(x => Equals(x, commitHook)))
@@ -433,7 +448,7 @@ namespace CorrugatedIron.Models
             PrVal = bucketProps.pr;
             PwVal = bucketProps.pw;
 
-            Search = bucketProps.search;
+            LegacySearch = bucketProps.search;
 
             HasPrecommit = bucketProps.has_precommit;
             HasPostcommit = bucketProps.has_postcommit;
@@ -452,7 +467,7 @@ namespace CorrugatedIron.Models
 
             ReplicationMode = (RiakConstants.RiakEnterprise.ReplicationMode)bucketProps.repl;
 
-            YokozunaIndex = bucketProps.search_index.FromRiakString();
+            SearchIndex = bucketProps.search_index.FromRiakString();
         }
 
         private static IRiakPreCommitHook LoadPreCommitHook(RpbCommitHook hook)
@@ -550,9 +565,9 @@ namespace CorrugatedIron.Models
                 message.pw = PwVal.Value;
             }
 
-            if (Search.HasValue)
+            if (LegacySearch.HasValue)
             {
-                message.search = Search.Value;
+                message.search = LegacySearch.Value;
             }
 
             if (HasPrecommit.HasValue)
@@ -567,11 +582,11 @@ namespace CorrugatedIron.Models
             {
                 if (_addHooks.Value)
                 {
-                    AddPreCommitHook(RiakErlangCommitHook.RiakSearchCommitHook);
+                    AddPreCommitHook(RiakErlangCommitHook.RiakLegacySearchCommitHook);
                 }
                 else
                 {
-                    RemovePreCommitHook(RiakErlangCommitHook.RiakSearchCommitHook);
+                    RemovePreCommitHook(RiakErlangCommitHook.RiakLegacySearchCommitHook);
                 }
             }
 
@@ -600,8 +615,8 @@ namespace CorrugatedIron.Models
                     });
             }
 
-            if (!String.IsNullOrEmpty(YokozunaIndex))
-                message.search_index = YokozunaIndex.ToRiakString();
+            if (!String.IsNullOrEmpty(SearchIndex))
+                message.search_index = SearchIndex.ToRiakString();
 
             return message;
         }
@@ -647,8 +662,8 @@ namespace CorrugatedIron.Models
                     jw.WriteEndArray();
                 }
 
-                if (!String.IsNullOrEmpty(YokozunaIndex))
-                    jw.WriteNonNullProperty("yz_index", YokozunaIndex);
+                if (!String.IsNullOrEmpty(SearchIndex))
+                    jw.WriteNonNullProperty("search_index", SearchIndex);
 
                 jw.WriteEndObject();
                 jw.WriteEndObject();
