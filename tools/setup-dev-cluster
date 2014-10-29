@@ -81,12 +81,19 @@ do
 ring_size = 16
 storage_backend = multi
 multi_backend.default = bitcask_backend
+
 multi_backend.bitcask_backend.storage_backend = bitcask
 multi_backend.bitcask_backend.bitcask.data_root = \$(platform_data_dir)/bitcask
 multi_backend.bitcask_backend.bitcask.io_mode = erlang
+
 multi_backend.leveldb_backend.storage_backend = leveldb
 multi_backend.leveldb_backend.leveldb.data_root = \$(platform_data_dir)/leveldb
 multi_backend.leveldb_backend.leveldb.maximum_memory.percent = 30
+
+multi_backend.mem_backend.storage_backend = memory
+multi_backend.mem_backend.memory_backend.ttl = 10s
+multi_backend.mem_backend.memory_backend.max_memory_per_vnode = 4MB
+
 listener.http.internal = 0.0.0.0:$http_port
 listener.protobuf.internal = 0.0.0.0:$pb_port
 EOT
@@ -129,6 +136,7 @@ $riak_admin bucket-type create sets '{"props":{"datatype":"set"}}'
 $riak_admin bucket-type create counters '{"props":{"datatype":"counter"}}'
 $riak_admin bucket-type create yokozuna '{"props":{}}'
 $riak_admin bucket-type create leveldb_type '{"props":{"backend":"leveldb_backend"}}'
+$riak_admin bucket-type create memory_type '{"props":{"backend":"mem_backend"}}'
 
 $riak_admin bucket-type activate search_type
 $riak_admin bucket-type activate plain
@@ -137,6 +145,7 @@ $riak_admin bucket-type activate sets
 $riak_admin bucket-type activate counters
 $riak_admin bucket-type activate yokozuna
 $riak_admin bucket-type activate leveldb_type
+$riak_admin bucket-type activate memory_type
 
 pinfo "Done!"
 
