@@ -14,6 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Linq;
 using CorrugatedIron.Comms;
 using CorrugatedIron.Config;
 using CorrugatedIron.Extensions;
@@ -23,7 +24,6 @@ using CorrugatedIron.Tests.Extensions;
 using CorrugatedIron.Util;
 using Newtonsoft.Json;
 using NUnit.Framework;
-using System.Linq;
 
 namespace CorrugatedIron.Tests.Live
 {

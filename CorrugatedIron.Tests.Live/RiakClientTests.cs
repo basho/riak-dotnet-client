@@ -199,28 +199,29 @@ namespace CorrugatedIron.Tests.Live
         [Test]
         public void ListKeysFromIndexReturnsAllKeys()
         {
-            var bucket = TestBucket + "_" + Guid.NewGuid().ToString();
+            int keyCount = 10;
             var originalKeyList = new List<string>();
 
-            for (var i = 0; i < 10; i++)
+            for (var i = 0; i < keyCount; i++)
             {
-                var o = new RiakObject(bucket, i.ToString(), "{ value: \"this is an object\" }");
-                originalKeyList.Add(i.ToString());
-
+                string idx = i.ToString();
+                var id = new RiakObjectId(TestBucketType, TestBucket, idx);
+                var o = new RiakObject(id, "{ value: \"this is an object\" }");
+                originalKeyList.Add(idx);
                 Client.Put(o);
             }
 
-            var result = ((RiakClient)Client).ListKeysFromIndex(bucket);
+            var result = Client.ListKeysFromIndex(TestBucketType, TestBucket);
             var keys = result.Value;
 
-            keys.Count.ShouldEqual(10);
+            keys.Count.ShouldEqual(keyCount);
 
             foreach (var key in keys)
             {
                 originalKeyList.ShouldContain(key);
             }
 
-            Client.DeleteBucket(bucket);
+            Client.DeleteBucket(TestBucketType, TestBucket);
         }
 
         [Test]

@@ -14,10 +14,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Collections.Generic;
 using CorrugatedIron.Config;
 using CorrugatedIron.Extensions;
 using NUnit.Framework;
-using System.Collections.Generic;
 
 namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
 {
@@ -27,6 +27,7 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
         protected const string TestHost = "riak-test";
         protected const int TestPbcPort = 8081;
         protected const int TestHttpPort = 8091;
+        protected const string TestBucketType = "leveldb_type";
         protected const string TestBucket = "test_bucket";
         protected const string TestKey = "test_json";
         protected static readonly string TestJson;
