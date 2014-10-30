@@ -69,6 +69,7 @@ pinfo "Configuring riak.conf"
 
 for devdir in dev*
 do
+    adv_conf="$devdir/etc/advanced.config"
     riak_conf="$devdir/etc/riak.conf"
     riak_conf_orig="$devdir/etc/riak.conf.orig"
     if [[ -f $riak_conf_orig ]]
@@ -96,6 +97,14 @@ multi_backend.mem_backend.memory_backend.max_memory_per_vnode = 4MB
 
 listener.http.internal = 0.0.0.0:$http_port
 listener.protobuf.internal = 0.0.0.0:$pb_port
+EOT
+
+    cat > $adv_conf <<'EOT'
+[
+    {riak_kv, [
+        {delete_mode, immediate}
+    ]}
+].
 EOT
     (( pb_port += 10 ))
     (( http_port += 10 ))
@@ -146,6 +155,8 @@ $riak_admin bucket-type activate counters
 $riak_admin bucket-type activate yokozuna
 $riak_admin bucket-type activate leveldb_type
 $riak_admin bucket-type activate memory_type
+
+curl -XPUT -H 'Content-type: application/json' http://localhost:10018/buckets/riak_index_tests/props -d '{"props":{"backend":"leveldb_backend"}}'
 
 pinfo "Done!"
 
