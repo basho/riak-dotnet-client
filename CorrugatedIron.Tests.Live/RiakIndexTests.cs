@@ -31,12 +31,11 @@ namespace CorrugatedIron.Tests.Live
     public class WhenUsingIndexes : RiakMapReduceTests
     {
         private readonly string bucketType = "leveldb_type";
-        private readonly string legacyBucket;
+        private readonly string legacyBucket = "riak_index_tests";
 
         public WhenUsingIndexes()
         {
-            Bucket = "riak_index_tests";
-            legacyBucket = Bucket;
+            Bucket = legacyBucket;
         }
         
         [SetUp]
@@ -50,7 +49,7 @@ namespace CorrugatedIron.Tests.Live
         public void TearDown()
         {
             Client.DeleteBucket(bucketType, Bucket);
-            Client.DeleteBucket(Bucket);
+            Client.DeleteBucket(legacyBucket);
         }
         
         [Test]
@@ -73,6 +72,8 @@ namespace CorrugatedIron.Tests.Live
 
             ro.BinIndex("tacos").Values[0].ShouldEqual("are great!");
             ro.IntIndex("age").Values[0].ShouldEqual(12);
+
+            Client.DeleteBucket(legacyBucket);
         }
 
         [Test]
@@ -142,7 +143,7 @@ namespace CorrugatedIron.Tests.Live
             }
             
             var mr = new RiakMapReduceQuery()
-                .Inputs(RiakIndex.Match(Bucket, "age", 32));
+                .Inputs(RiakIndex.Match(legacyBucket, "age", 32));
             
             var result = Client.MapReduce(mr);
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
@@ -156,6 +157,8 @@ namespace CorrugatedIron.Tests.Live
                 key.Bucket.ShouldNotBeNullOrEmpty();
                 key.Key.ShouldNotBeNullOrEmpty();
             }
+
+            Client.DeleteBucket(legacyBucket);
         }
         
         [Test]
@@ -170,11 +173,12 @@ namespace CorrugatedIron.Tests.Live
                 Client.Put(o);
             }
 
-            var result = Client.IndexGet(Bucket, "age", 27, 30);
+            var result = Client.IndexGet(legacyBucket, "age", 27, 30);
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
             result.Value.IndexKeyTerms.Count().ShouldEqual(4);
 
             // TODO write tests verifying results
+            Client.DeleteBucket(legacyBucket);
         }
 
         [Test]
@@ -212,18 +216,21 @@ namespace CorrugatedIron.Tests.Live
         [Test]
         public void KeysReturnsSelectiveListOfKeys()
         {
+            int keyStart = 10;
             int keyCount = 10;
+            int idxStart = 12;
+            int idxEnd = 16;
             var originalKeys = new List<string>();
 
-            for (var i = 0; i < keyCount; i++)
+            for (var i = keyStart; i < keyStart + keyCount; i++)
             {
-                var o = GetRiakObjectInLegacyBucket();
+                var o = GetRiakObjectInLegacyBucket(i);
                 originalKeys.Add(o.Key);
                 Client.Put(o);
             }
 
             var mr = new RiakMapReduceQuery()
-                .Inputs(RiakIndex.Keys(legacyBucket, "2", "6"))
+                .Inputs(RiakIndex.Keys(legacyBucket, idxStart.ToString(), idxEnd.ToString()))
                 .ReduceErlang(r => r.ModFun("riak_kv_mapreduce", "reduce_identity")
                 .Argument("do_prereduce")
                 .Keep(true));
@@ -298,6 +305,8 @@ namespace CorrugatedIron.Tests.Live
                 keysAndTerms.Keys.ShouldContain(indexResult.Key);
                 keysAndTerms[indexResult.Key].ShouldEqual(int.Parse(indexResult.Term));
             }
+
+            Client.DeleteBucket(legacyBucket);
         }
 
         [Test]
@@ -322,31 +331,40 @@ namespace CorrugatedIron.Tests.Live
             results.Done.ShouldNotEqual(true);
             results.Done.ShouldEqual(null);
             results.Continuation.ShouldNotBeNull();
+
+            Client.DeleteBucket(legacyBucket);
         }
 
         [Test]
         public void StreamingIndexGetReturnsAllData()
         {
-            var bucket = Bucket;
+            int keyCount = 10;
 
-            for (var i = 0; i < 10; i++)
+            for (var i = 0; i < keyCount; i++)
             {
-                var o = new RiakObject(bucket, Guid.NewGuid().ToString(), "{ value: \"this is an object\" }");
+                var o = new RiakObject(Bucket, Guid.NewGuid().ToString(), "{ value: \"this is an object\" }");
                 o.IntIndex("position").Set(i % 2);
-
                 Client.Put(o, new RiakPutOptions().SetW(RiakConstants.QuorumOptions.All)
                                                   .SetDw(RiakConstants.QuorumOptions.All));
             }
 
-            var results = Client.StreamIndexGet(bucket, "position", 0);
+            var results = Client.StreamIndexGet(Bucket, "position", 0);
 
             results.IsSuccess.ShouldBeTrue(results.ErrorMessage);
             results.Value.IndexKeyTerms.Count().ShouldEqual(5);
+
+            Client.DeleteBucket(Bucket);
         }
 
         private RiakObject GetRiakObjectInLegacyBucket()
         {
             var id = new RiakObjectId(legacyBucket, Guid.NewGuid().ToString());
+            return GetRiakObject(id, "{ value: \"this is an object\" }");
+        }
+
+        private RiakObject GetRiakObjectInLegacyBucket(int key)
+        {
+            var id = new RiakObjectId(legacyBucket, key.ToString());
             return GetRiakObject(id, "{ value: \"this is an object\" }");
         }
 
