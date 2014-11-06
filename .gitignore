@@ -33,3 +33,5 @@ test-results
 _NCrunch_*
 TestResult.xml
 *.VisualState.xml
+*.out
+*.err
