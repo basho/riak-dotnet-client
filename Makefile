@@ -11,10 +11,10 @@ proto:
 	rm $<
 
 release:
-	@$(XBUILD) ./CorrugatedIron.sln /property:configuration=Release
+	@$(XBUILD) ./CorrugatedIron.sln /property:Configuration=Release /property:Mono=True
 
 debug:
-	@$(XBUILD) ./CorrugatedIron.sln /property:configuration=Debug
+	@$(XBUILD) ./CorrugatedIron.sln /property:Configuration=Debug /property:Mono=True
 
 clean:
 	rm -rf ./**/bin/
