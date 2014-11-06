@@ -5,6 +5,9 @@ PROTOC = protoc
 
 all: release
 
+fixcerts:
+	mozroots --import --sync
+
 restorepkg:
 	$(MONO) .nuget/NuGet.exe restore -PackagesDirectory ./packages -ConfigFile .nuget/NuGet.Config .nuget/packages.config
 	$(MONO) .nuget/NuGet.exe restore -PackagesDirectory ./packages -ConfigFile .nuget/NuGet.Config CorrugatedIron/packages.config
