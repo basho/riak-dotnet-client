@@ -32,3 +32,4 @@ test-results
 *.ncrunchsolution
 _NCrunch_*
 TestResult.xml
+*.VisualState.xml
