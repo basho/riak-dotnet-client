@@ -5,6 +5,12 @@ PROTOC = protoc
 
 all: release
 
+restorepkg:
+	$(MONO) .nuget/NuGet.exe restore -PackagesDirectory ./packages -ConfigFile .nuget/NuGet.Config .nuget/packages.config
+	$(MONO) .nuget/NuGet.exe restore -PackagesDirectory ./packages -ConfigFile .nuget/NuGet.Config CorrugatedIron/packages.config
+	$(MONO) .nuget/NuGet.exe restore -PackagesDirectory ./packages -ConfigFile .nuget/NuGet.Config CorrugatedIron.Tests/packages.config
+	$(MONO) .nuget/NuGet.exe restore -PackagesDirectory ./packages -ConfigFile .nuget/NuGet.Config CorrugatedIron.Tests.Live/packages.config
+
 proto:
 	cd CorrugatedIron/Messages
 	$(MONO) $(PROTOGEN) -i:$< -o:$@
