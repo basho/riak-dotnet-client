@@ -1,6 +1,6 @@
-XBUILD=`which xbuild`
+XBUILD = xbuild
 MONO = mono
-NUNIT = ./packages/NUnit.Runners.2.6.3/tools/nunit-console.exe 
+NUNIT = ./packages/NUnit.Runners.2.6.3/tools/nunit-console.exe
 PROTOGEN = ~/bin/ProtoGen/protogen.exe
 PROTOC = protoc
 
@@ -21,10 +21,10 @@ proto:
 	rm $<
 
 release: restorepkg
-	@$(XBUILD) ./CorrugatedIron.sln /property:Configuration=Release /property:Mono=True
+	$(XBUILD) ./CorrugatedIron.sln /property:Configuration=Release /property:Mono=True
 
 debug: restorepkg
-	@$(XBUILD) ./CorrugatedIron.sln /property:Configuration=Debug /property:Mono=True
+	$(XBUILD) ./CorrugatedIron.sln /property:Configuration=Debug /property:Mono=True
 
 test: debug
 	$(MONO) $(NUNIT) -config Debug-Mono -nologo -nodots -work=CorrugatedIron.Tests CorrugatedIron.Tests/CorrugatedIron.Tests.nunit
@@ -33,5 +33,6 @@ integration: debug test
 	$(MONO) $(NUNIT) -config Debug-Mono -nologo -nodots -work=CorrugatedIron.Tests.Live CorrugatedIron.Tests.Live/CorrugatedIron.Tests.Live.nunit
 
 clean:
-	rm -rf ./**/bin/
-	rm -rf ./**/obj/
+	$(XBUILD) ./CorrugatedIron.sln /target:clean /property:Configuration=Debug /property:Mono=True
+	$(XBUILD) ./CorrugatedIron.sln /target:clean /property:Configuration=Release /property:Mono=True
+
