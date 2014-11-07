@@ -16,11 +16,11 @@ all: release debug
 install-certs:
 	mozroots --import --sync
 
-# NB: run this target if restorepkg fails on download
+# NB: run this target if package-restore fails on download
 install-mono:
 	$(INSTALL_MONO)
 
-restorepkg:
+package-restore:
 	$(NUGET_RESTORE) $(SLNDIR)/.nuget/packages.config
 	$(NUGET_RESTORE) $(SLNDIR)/CorrugatedIron/packages.config
 	$(NUGET_RESTORE) $(SLNDIR)/CorrugatedIron.Tests/packages.config
@@ -31,10 +31,10 @@ proto:
 	$(MONO) $(PROTOGEN) -i:$< -o:$@
 	rm $<
 
-release: restorepkg
+release: package-restore
 	$(XBUILD) $(SLNDIR)/CorrugatedIron.sln /property:Configuration=Release /property:Mono=True
 
-debug: restorepkg
+debug: package-restore
 	$(XBUILD) $(SLNDIR)/CorrugatedIron.sln /property:Configuration=Debug /property:Mono=True
 
 test-all: unit-test integration-test
