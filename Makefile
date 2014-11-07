@@ -6,7 +6,7 @@ PROTOC = protoc
 
 all: release
 
-fixcerts:
+install-certs:
 	mozroots --import --sync
 
 install-mono:
