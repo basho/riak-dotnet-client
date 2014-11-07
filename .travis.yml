@@ -6,7 +6,7 @@ branches:
 language: c
 
 install:
-  - ./.mono-build-scripts/InstallMono.sh
+    - make install-mono
 
 script:
   - ./.mono-build-scripts/PackageRestore.sh
