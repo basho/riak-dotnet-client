@@ -9,6 +9,5 @@ install:
     - make install-mono
 
 script:
-  - ./.mono-build-scripts/PackageRestore.sh
-  - ./.mono-build-scripts/RunBuild.sh
-  - ./.mono-build-scripts/RunTests.sh
+    - make test
+
