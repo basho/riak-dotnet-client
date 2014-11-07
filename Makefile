@@ -9,6 +9,9 @@ all: release
 fixcerts:
 	mozroots --import --sync
 
+install-mono:
+	./build/mono/install-mono
+
 restorepkg:
 	$(MONO) .nuget/NuGet.exe restore -PackagesDirectory ./packages -ConfigFile .nuget/NuGet.Config .nuget/packages.config
 	$(MONO) .nuget/NuGet.exe restore -PackagesDirectory ./packages -ConfigFile .nuget/NuGet.Config CorrugatedIron/packages.config
