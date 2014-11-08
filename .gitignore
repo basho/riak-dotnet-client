@@ -36,3 +36,4 @@ TestResult.xml
 *.VisualState.xml
 *.out
 *.err
+GlobalAssemblyInfo.cs
