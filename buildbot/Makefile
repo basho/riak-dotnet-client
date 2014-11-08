@@ -1,5 +1,5 @@
 SLNDIR = $(realpath $(CURDIR)/..)
-include $(SLNDIR)/build/mono/mono.mk
+include $(SLNDIR)/build/mono.mk
 
 .PHONY: setup-integration
 

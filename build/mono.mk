@@ -1,4 +1,4 @@
-INSTALL_MONO = $(SLNDIR)/build/mono/install-mono
+INSTALL_MONO = $(SLNDIR)/build/install-mono
 
 NUGET_PKGDIR = $(SLNDIR)/packages
 NUGET_EXE = $(SLNDIR)/.nuget/NuGet.exe
