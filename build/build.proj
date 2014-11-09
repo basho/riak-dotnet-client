@@ -20,13 +20,9 @@
     <InformationalVersion>$(BUILD_NUMBER)</InformationalVersion>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(BuildConfiguration)' == '' ">
-    <BuildConfiguration>Release</BuildConfiguration>
+  <PropertyGroup Condition=" '$(Configuration)' == '' ">
+    <Configuration>Release</Configuration>
   </PropertyGroup>
-
-  <Target Name="Clean">
-    <DeleteTree Directories="**\obj\**;**\bin\**" />
-  </Target>
 
   <Target Name="Version">
     <Time>
@@ -35,31 +31,38 @@
 
     <Message Text="Version: $(Version)"/>
 
-    <Attrib Files="$(SolutionDir)\GlobalAssemblyInfo.cs" ReadOnly="False" />
+    <Attrib Files="$(SolutionDir)\CommonAssemblyInfo.cs" ReadOnly="False" />
 
     <AssemblyInfo CodeLanguage="CS"
-                  OutputFile="$(SolutionDir)\GlobalAssemblyInfo.cs"
+                  OutputFile="$(SolutionDir)\CommonAssemblyInfo.cs"
                   GenerateClass="true"
-                  AssemblyCopyright="Copyright Â© $(Year). All rights reserved."
-                  AssemblyConfiguration="$(BuildConfiguration)"
+                  AssemblyCopyright="Copyright © $(Year). All rights reserved."
+                  AssemblyConfiguration="$(Configuration)"
                   AssemblyVersion="$(Version)"
                   AssemblyFileVersion="$(FileVersion)"
                   AssemblyInformationalVersion="$(InformationalVersion)" />
   </Target>
 
-  <!-- Projects to Build -->
   <ItemGroup>
-    <ProjectFiles Include="$(SolutionDir)\*.sln">
-      <Properties>Configuration=$(BuildConfiguration)</Properties>
-    </ProjectFiles>
+    <ProjectToBuild Include="$(SolutionDir)\CorrugatedIron.sln">
+      <Properties>Configuration=Debug</Properties>
+    </ProjectToBuild>
+    <ProjectToBuild Include="$(SolutionDir)\CorrugatedIron.sln">
+      <Properties>Configuration=Release</Properties>
+    </ProjectToBuild>
   </ItemGroup>
 
-  <Target Name="Compile" DependsOnTargets="Clean;Version">
-    <MSBuild Projects="@(ProjectFiles)" />
+  <Target Name="Compile" DependsOnTargets="Version">
+    <MSBuild Projects="@(ProjectToBuild)" BuildInParallel="True" />
   </Target>
 
   <Target Name="Build">
     <CallTarget Targets="Compile" />
   </Target>
+
+  <Target Name="Clean">
+    <MSBuild Projects="@(ProjectToBuild)" Targets="Clean" BuildInParallel="True" />
+  </Target>
+
 </Project>
 

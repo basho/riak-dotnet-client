@@ -1,4 +1,4 @@
-@echo on
+@echo off
 setlocal EnableExtensions
 
 if (%FrameworkDir%)==() set FrameworkDir=%WINDIR%\Microsoft.NET\Framework\
@@ -12,16 +12,17 @@ if not exist %NUGETEXE% goto ERR_NUGETEXE
 set MSBUILDEXE=%FrameworkDir%%FrameworkVersion%\msbuild.exe
 if not exist %MSBUILDEXE% goto ERR_MSBUILD
 
-set BUILDCONFIG=%1
-if (%BUILDCONFIG%)==() set BUILDCONFIG=Debug
+set TARGET=%1
+if (%TARGET%)==() set TARGET=Build
 
 set VERBOSITY=%2
-if (%VERBOSITY%)==() set VERBOSITY=normal
+if (%VERBOSITY%)==() set VERBOSITY=Normal
 
 %NUGETEXE% restore -PackagesDirectory %CURDIR%\packages .nuget\packages.config
 if errorlevel 1 goto ERR_FAILED
 
-%MSBUILDEXE% /verbosity:%VERBOSITY% /nologo /m /property:SolutionDir=%CURDIR% /property:BuildConfiguration=%BUILDCONFIG% /t:Build %CURDIR%\build\build.proj
+rem NB: this will always do build for Release *and* Debug configuration
+%MSBUILDEXE% /verbosity:%VERBOSITY% /nologo /m /property:SolutionDir=%CURDIR% /t:%TARGET% %CURDIR%\build\build.proj
 if errorlevel 1 goto ERR_FAILED
 
 echo.

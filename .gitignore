@@ -37,3 +37,4 @@ TestResult.xml
 *.out
 *.err
 GlobalAssemblyInfo.cs
+CommonAssemblyInfo.cs
