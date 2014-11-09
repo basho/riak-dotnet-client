@@ -1,15 +1,20 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-PLATFORM=`uname -s`
+PLATFORM=$(uname -s)
 
 set -o nounset
+
+mono=$(which mono 2>/dev/null)
+mcs=$(which mcs 2>/dev/null)
+xbuild=$(which xbuild 2>/dev/null)
+
 set -o errexit
 
-if [ -x /usr/bin/mono ] && [ -x /usr/bin/mcs ]
+if [[ -x $mono && -x $mcs && -x $xbuild ]]
 then
     echo 'mono is installed'
 else
-    if [ "xDarwin" = "x$PLATFORM" ]
+    if [[ $PLATFORM == 'Darwin' ]]
     then
         curl -O http://download.mono-project.com/archive/3.6.0/macos-10-x86/MonoFramework-MDK-3.6.0.macos10.xamarin.x86.pkg
         sudo /usr/sbin/installer -pkg MonoFramework-MDK-3.6.0.macos10.xamarin.x86.pkg -target /
