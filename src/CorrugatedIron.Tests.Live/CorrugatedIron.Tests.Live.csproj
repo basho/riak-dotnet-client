@@ -55,8 +55,8 @@
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\VersionInfo.cs">
-      <Link>Properties\VersionInfo.cs</Link>
+    <Compile Include="..\CommonAssemblyInfo.cs">
+      <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="BucketPropertyTests.cs" />
     <Compile Include="GeneralIntegrationTests.cs" />

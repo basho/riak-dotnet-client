@@ -6,16 +6,14 @@
 
   <Import Project="$(MSBuildCommunityTasksPath)\MSBuild.Community.Tasks.targets"/>
 
-  <!-- Version Number -->
   <PropertyGroup Condition=" '$(BUILD_NUMBER)' == '' ">
-    <Version>1.0.0.0</Version>
-    <FileVersion>1.0.0.0</FileVersion>
-    <InformationalVersion>1.0.0.0</InformationalVersion>
+    <Version>1.4.2.0</Version>
+    <FileVersion>1.4.2.0</FileVersion>
+    <InformationalVersion>1.4.2.0</InformationalVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(BUILD_NUMBER)' != '' ">
-    <!-- Build Server Number -->
-    <Version>1.0.0.0</Version>
+    <Version>1.4.2.0</Version>
     <FileVersion>$(BUILD_NUMBER)</FileVersion>
     <InformationalVersion>$(BUILD_NUMBER)</InformationalVersion>
   </PropertyGroup>
@@ -36,7 +34,10 @@
     <AssemblyInfo CodeLanguage="CS"
                   OutputFile="$(SolutionDir)\src\CommonAssemblyInfo.cs"
                   GenerateClass="true"
+                  AssemblyCompany="Basho Technologies"
                   AssemblyCopyright="Copyright Basho Technologies © $(Year). All rights reserved."
+                  AssemblyTrademark="riak-dotnet-client"
+                  AssemblyCulture=""
                   AssemblyConfiguration="$(Configuration)"
                   AssemblyVersion="$(Version)"
                   AssemblyFileVersion="$(FileVersion)"
