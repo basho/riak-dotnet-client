@@ -1,20 +1,16 @@
-cd CorrugatedIron/Messages;
+#!/usr/bin/env bash
 
-protogen() {
-    local old_path=$PATH;
-    PATH=$PATH:~/bin/ProtoGen;
+pushd ../CorrugatedIron/Messages
 
-    local cipath=pwd;
-    cd ~/bin/ProtoGen;
+PATH=$PATH:$HOME/bin/ProtoGen
 
-    mono protogen.exe -ns:CorrugatedIron.messages -i:$cipath/riak.proto -o:$cipath/riak.cs
+cipath=$(pwd)
+cd $HOME/bin/ProtoGen
+
+mono protogen.exe -ns:CorrugatedIron.messages -i:$cipath/riak.proto -o:$cipath/riak.cs
 #    mono ~/bin/ProtoGen/protogen.exe -ns:CorrugatedIron.messages -i:riak_dt.proto -o:riak_dt.cs
 #    mono ~/bin/ProtoGen/protogen.exe -ns:CorrugatedIron.messages -i:riak_kv.proto -o:riak_kv.cs
 #    mono ~/bin/ProtoGen/protogen.exe -ns:CorrugatedIron.messages -i:riak_search.proto -o:riak_search.cs
 #    mono ~/bin/ProtoGen/protogen.exe -ns:CorrugatedIron.messages -i:riak_yokozuna.proto -o:riak_yokozuna.cs
-    PATH=$old_path;
-}
 
-protogen;
-
-cd ../..
+popd
