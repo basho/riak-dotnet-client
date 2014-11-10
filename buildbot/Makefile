@@ -21,7 +21,7 @@ lint:
 	echo Nope > /dev/null
 
 setup-integration:
-	cp -vf $(CURDIR)/App.config $(SLNDIR)/CorrugatedIron.Tests.Live/bin/Debug/CorrugatedIron.Tests.Live.dll.config
+	cp -vf $(CURDIR)/App.config $(PROJDIR)/CorrugatedIron.Tests.Live/bin/Debug/CorrugatedIron.Tests.Live.dll.config
 
 test: setup-integration test-all
 
