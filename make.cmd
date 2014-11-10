@@ -12,6 +12,11 @@ if not exist %NUGETEXE% goto ERR_NUGETEXE
 set MSBUILDEXE=%FrameworkDir%%FrameworkVersion%\msbuild.exe
 if not exist %MSBUILDEXE% goto ERR_MSBUILD
 
+rem Targets:
+rem Build - Normal build of a Configuration
+rem Clean - Clean everything
+rem PBuild - Parallel build of all Configurations
+rem ProtoGen - Rebuild cs files from proto files
 set TARGET=%1
 if (%TARGET%)==() set TARGET=Build
 
