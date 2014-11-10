@@ -22,7 +22,6 @@ namespace CorrugatedIron.Messages
       get { return _name; }
       set { _name = value; }
     }
-
     private byte[] _schema = null;
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"schema", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(null)]
@@ -41,7 +40,6 @@ namespace CorrugatedIron.Messages
   {
     public RpbYokozunaIndexGetReq() {}
     
-
     private byte[] _name = null;
     [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"name", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(null)]
@@ -118,7 +116,6 @@ namespace CorrugatedIron.Messages
       get { return _name; }
       set { _name = value; }
     }
-
     private byte[] _content = null;
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"content", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(null)]

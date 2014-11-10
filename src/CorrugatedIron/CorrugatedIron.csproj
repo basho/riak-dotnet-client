@@ -85,37 +85,12 @@
     <Compile Include="Exceptions\RiakException.cs" />
     <Compile Include="IRiakBatchClient.cs" />
     <Compile Include="IRiakEndPoint.cs" />
-    <Compile Include="Messages\riak_dt.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>riak_dt.proto</DependentUpon>
-    </Compile>
-    <Compile Include="Messages\riak_yokozuna.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>riak_yokozuna.proto</DependentUpon>
-    </Compile>
+    <Compile Include="Messages\riak.cs" />
+    <Compile Include="Messages\riak_dt.cs" />
+    <Compile Include="Messages\riak_kv.cs" />
+    <Compile Include="Messages\riak_search.cs" />
+    <Compile Include="Messages\riak_yokozuna.cs" />
     <Compile Include="Models\Index\IRiakIndexResult.cs" />
-    <Compile Include="Messages\riak.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>riak.proto</DependentUpon>
-    </Compile>
-    <Compile Include="Messages\riak_kv.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>riak_kv.proto</DependentUpon>
-    </Compile>
-    <Compile Include="Messages\riak_search.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>riak_search.proto</DependentUpon>
-    </Compile>
     <Compile Include="Models\Index\BinIndex.cs" />
     <Compile Include="Models\CommitHook\IRiakPostCommitHook.cs">
       <SubType>Code</SubType>
@@ -283,25 +258,20 @@
     <None Include="..\CorrugatedIron.snk">
       <Link>CorrugatedIron.snk</Link>
     </None>
-    <None Include="Messages\riak.proto">
-      <Generator>ProtoBufTool</Generator>
-      <LastGenOutput>riak.cs</LastGenOutput>
+    <None Include="..\riak_pb\src\riak.proto">
+      <Link>Messages\riak.proto</Link>
     </None>
-    <None Include="Messages\riak_dt.proto">
-      <Generator>ProtoBufTool</Generator>
-      <LastGenOutput>riak_dt.cs</LastGenOutput>
+    <None Include="..\riak_pb\src\riak_dt.proto">
+      <Link>Messages\riak_dt.proto</Link>
     </None>
-    <None Include="Messages\riak_kv.proto">
-      <Generator>ProtoBufTool</Generator>
-      <LastGenOutput>riak_kv.cs</LastGenOutput>
+    <None Include="..\riak_pb\src\riak_kv.proto">
+      <Link>Messages\riak_kv.proto</Link>
     </None>
-    <None Include="Messages\riak_search.proto">
-      <Generator>ProtoBufTool</Generator>
-      <LastGenOutput>riak_search.cs</LastGenOutput>
+    <None Include="..\riak_pb\src\riak_search.proto">
+      <Link>Messages\riak_search.proto</Link>
     </None>
-    <None Include="Messages\riak_yokozuna.proto">
-      <Generator>ProtoBufTool</Generator>
-      <LastGenOutput>riak_yokozuna.cs</LastGenOutput>
+    <None Include="..\riak_pb\src\riak_yokozuna.proto">
+      <Link>Messages\riak_yokozuna.proto</Link>
     </None>
     <None Include="packages.config">
       <SubType>Designer</SubType>
