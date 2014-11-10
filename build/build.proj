@@ -29,10 +29,10 @@
 
     <Message Text="Version: $(Version)"/>
 
-    <Attrib Files="$(SolutionDir)\src\CommonAssemblyInfo.cs" ReadOnly="False" />
+    <Attrib Files="$(SolutionDir)src\CommonAssemblyInfo.cs" ReadOnly="False" />
 
     <AssemblyInfo CodeLanguage="CS"
-                  OutputFile="$(SolutionDir)\src\CommonAssemblyInfo.cs"
+                  OutputFile="$(SolutionDir)src\CommonAssemblyInfo.cs"
                   GenerateClass="true"
                   AssemblyCompany="Basho Technologies"
                   AssemblyCopyright="Copyright Basho Technologies © $(Year). All rights reserved."
@@ -45,7 +45,10 @@
   </Target>
 
   <PropertyGroup>
-    <SolutionFile>$(SolutionDir)\CorrugatedIron.sln</SolutionFile>
+    <SolutionFile>$(SolutionDir)CorrugatedIron.sln</SolutionFile>
+    <ProtoGenExe>$(SolutionDir)tools\protobuf-net\protogen\protogen.exe</ProtoGenExe>
+    <ProtoDir>$(SolutionDir)src\riak_pb\src</ProtoDir>
+    <ProtoMsgDir>$(SolutionDir)src\CorrugatedIron\Messages</ProtoMsgDir>
   </PropertyGroup>
 
   <ItemGroup>
@@ -56,6 +59,15 @@
       <Properties>Configuration=Release</Properties>
     </ProjectToBuild>
   </ItemGroup>
+
+  <ItemGroup>
+    <ProtoFile Include="$(ProtoDir)\*.proto" />
+  </ItemGroup>
+
+  <Target Name="ProtoGen">
+    <Exec WorkingDirectory="$(ProtoDir)"
+          Command="$(ProtoGenExe) -ns:CorrugatedIron.Messages -i:%(ProtoFile.Identity) -o:$(ProtoMsgDir)\@(ProtoFile->'%(filename)').cs" />
+  </Target>
 
   <Target Name="PBuild" DependsOnTargets="Version">
     <MSBuild Projects="@(ProjectToBuild)" BuildInParallel="True" />
