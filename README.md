@@ -61,6 +61,8 @@ To regenerate .proto files
 * recompile CorrugatedIron
 * pray for rain
 
+http://stackoverflow.com/questions/453820/protocol-buffers-in-c-sharp-projects-using-protobuf-net-best-practices-for-cod
+
 # CorrugatedIron Development Roadmap
 
 ## 0.3.0
