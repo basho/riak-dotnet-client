@@ -15,14 +15,17 @@ if not exist %MSBUILDEXE% goto ERR_MSBUILD
 set TARGET=%1
 if (%TARGET%)==() set TARGET=Build
 
-set VERBOSITY=%2
+set CONFIGURATION=%2
+if (%CONFIGURATION%)==() set CONFIGURATION=Release
+
+set VERBOSITY=%3
 if (%VERBOSITY%)==() set VERBOSITY=Normal
 
 %NUGETEXE% restore -PackagesDirectory %CURDIR%\packages .nuget\packages.config
 if errorlevel 1 goto ERR_FAILED
 
 rem NB: this will always do build for Release *and* Debug configuration
-%MSBUILDEXE% /verbosity:%VERBOSITY% /nologo /m /property:SolutionDir=%CURDIR% /t:%TARGET% %CURDIR%\build\build.proj
+%MSBUILDEXE% /verbosity:%VERBOSITY% /nologo /m /property:SolutionDir=%CURDIR% /property:Configuration=%CONFIGURATION% /t:%TARGET% %CURDIR%\build\build.proj
 if errorlevel 1 goto ERR_FAILED
 
 echo.
