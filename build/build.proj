@@ -35,7 +35,7 @@
                   OutputFile="$(SolutionDir)src\CommonAssemblyInfo.cs"
                   GenerateClass="true"
                   AssemblyCompany="Basho Technologies"
-                  AssemblyCopyright="Copyright Basho Technologies © $(Year). All rights reserved."
+                  AssemblyCopyright="Copyright Basho Technologies ÃÂ© $(Year). All rights reserved."
                   AssemblyTrademark="riak-dotnet-client"
                   AssemblyCulture=""
                   AssemblyConfiguration="$(Configuration)"
@@ -46,9 +46,11 @@
 
   <PropertyGroup>
     <SolutionFile>$(SolutionDir)CorrugatedIron.sln</SolutionFile>
+    <ProjDir>$(SolutionDir)src</ProjDir>
     <ProtoGenExe>$(SolutionDir)tools\protobuf-net\protogen\protogen.exe</ProtoGenExe>
     <ProtoDir>$(SolutionDir)src\riak_pb\src</ProtoDir>
     <ProtoMsgDir>$(SolutionDir)src\CorrugatedIron\Messages</ProtoMsgDir>
+    <NUnitConsoleRunner>$(SolutionDir)packages\NUnit.Runners.2.6.3\tools\nunit-console.exe -config Debug -nologo -nodots -labels</NUnitConsoleRunner>
   </PropertyGroup>
 
   <ItemGroup>
@@ -69,12 +71,32 @@
           Command="$(ProtoGenExe) -ns:CorrugatedIron.Messages -i:%(ProtoFile.Identity) -o:$(ProtoMsgDir)\@(ProtoFile->'%(filename)').cs" />
   </Target>
 
-  <Target Name="PBuild" DependsOnTargets="Version">
+  <Target Name="All" DependsOnTargets="Version">
     <MSBuild Projects="@(ProjectToBuild)" BuildInParallel="True" />
   </Target>
 
-  <Target Name="Build" DependsOnTargets="Version">
-    <MSBuild Projects="$(SolutionFile)" Properties="Configuration=$(Configuration)" />
+  <Target Name="Release" DependsOnTargets="Version">
+    <MSBuild Projects="$(SolutionFile)" Properties="Configuration=Release" />
+  </Target>
+
+  <Target Name="Debug">
+    <MSBuild Projects="$(SolutionFile)" Properties="Configuration=Debug" />
+  </Target>
+
+  <Target Name="Test" DependsOnTargets="Debug">
+    <Exec WorkingDirectory="$(SolutionDir)"
+          Command="$(NUnitConsoleRunner) -work=$(ProjDir)\CorrugatedIron.Tests.Live $(ProjDir)\CorrugatedIron.Tests.Live\CorrugatedIron.Tests.Live.nunit" />
+  </Target>
+
+  <Target Name="UnitTest" DependsOnTargets="Debug">
+    <Exec WorkingDirectory="$(SolutionDir)"
+          Command="$(NUnitConsoleRunner) -work=$(ProjDir)\CorrugatedIron.Tests $(ProjDir)\CorrugatedIron.Tests\CorrugatedIron.Tests.nunit" />
+  </Target>
+
+  <Target Name="TestAll" DependsOnTargets="UnitTest;IntegrationTest" />
+
+  <Target Name="Test">
+    <CallTarget Targets="TestAll" />
   </Target>
 
   <Target Name="Clean">
