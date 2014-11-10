@@ -1,6 +1,8 @@
 # Force this repository to use Windows line endings
 * text=crlf
 
+build.proj text eol=crlf encoding=UTF-8
+
 # Custom for Visual Studio
 *.ascx     text
 *.cmd      text

@@ -1,17 +1,16 @@
 PROJDIR = $(SLNDIR)/src
 
 INSTALL_MONO = $(SLNDIR)/build/install-mono
+MONO_EXE = mono --runtime='v4.0.30319'
 
 NUGET_PKGDIR = $(SLNDIR)/packages
 NUGET_EXE = $(SLNDIR)/.nuget/NuGet.exe
 NUGET_CFG = $(SLNDIR)/.nuget/NuGet.Config
-NUGET_RESTORE = $(MONO) $(NUGET_EXE) restore -PackagesDirectory $(NUGET_PKGDIR) -ConfigFile $(NUGET_CFG)
+NUGET_RESTORE = $(MONO_EXE) $(NUGET_EXE) restore -PackagesDirectory $(NUGET_PKGDIR) -ConfigFile $(NUGET_CFG)
 
-XBUILD = xbuild $(SLNDIR)/CorrugatedIron.sln /property:Mono=True
-MONO = mono --runtime='v4.0.30319'
-NUNIT = $(SLNDIR)/packages/NUnit.Runners.2.6.3/tools/nunit-console.exe -config Debug-Mono -nologo -nodots -labels
-PROTOGEN = ~/bin/ProtoGen/protogen.exe
-PROTOC = protoc
+VERBOSITY = normal
+# NB: SolutionDir *must* end in slash here
+XBUILD = xbuild /verbosity:$(VERBOSITY) /nologo /property:SolutionDir=$(SLNDIR)/ /property:Mono=True
 
 .PHONY: all release debug
 all: release debug
@@ -28,22 +27,22 @@ package-restore:
 
 proto:
 	cd CorrugatedIron/Messages
-	$(MONO) $(PROTOGEN) -i:$< -o:$@
+	$(MONO_EXE) $(PROTOGEN) -i:$< -o:$@
 	rm $<
 
 release: package-restore
-	$(XBUILD) /property:Configuration=Release
+	$(XBUILD) /target:Release $(SLNDIR)/build/build.proj
 
 debug: package-restore
-	$(XBUILD) /property:Configuration=Debug
+	$(XBUILD) /target:Debug $(SLNDIR)/build/build.proj
 
 test-all: unit-test integration-test
 
 unit-test: debug
-	$(MONO) $(NUNIT) -work=$(PROJDIR)/CorrugatedIron.Tests $(PROJDIR)/CorrugatedIron.Tests/CorrugatedIron.Tests.nunit
+	$(XBUILD) /target:UnitTest $(SLNDIR)/build/build.proj
 
 integration-test: debug unit-test
-	$(MONO) $(NUNIT) -work=$(PROJDIR)/CorrugatedIron.Tests.Live $(PROJDIR)/CorrugatedIron.Tests.Live/CorrugatedIron.Tests.Live.nunit
+	$(XBUILD) /target:IntegrationTest $(SLNDIR)/build/build.proj
 
 .PHONY: clean-release clean-debug clean
 clean-release:
