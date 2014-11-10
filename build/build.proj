@@ -31,33 +31,37 @@
 
     <Message Text="Version: $(Version)"/>
 
-    <Attrib Files="$(SolutionDir)\CommonAssemblyInfo.cs" ReadOnly="False" />
+    <Attrib Files="$(SolutionDir)\src\CommonAssemblyInfo.cs" ReadOnly="False" />
 
     <AssemblyInfo CodeLanguage="CS"
-                  OutputFile="$(SolutionDir)\CommonAssemblyInfo.cs"
+                  OutputFile="$(SolutionDir)\src\CommonAssemblyInfo.cs"
                   GenerateClass="true"
-                  AssemblyCopyright="Copyright © $(Year). All rights reserved."
+                  AssemblyCopyright="Copyright Basho Technologies © $(Year). All rights reserved."
                   AssemblyConfiguration="$(Configuration)"
                   AssemblyVersion="$(Version)"
                   AssemblyFileVersion="$(FileVersion)"
                   AssemblyInformationalVersion="$(InformationalVersion)" />
   </Target>
 
+  <PropertyGroup>
+    <SolutionFile>$(SolutionDir)\CorrugatedIron.sln</SolutionFile>
+  </PropertyGroup>
+
   <ItemGroup>
-    <ProjectToBuild Include="$(SolutionDir)\CorrugatedIron.sln">
+    <ProjectToBuild Include="$(SolutionFile)">
       <Properties>Configuration=Debug</Properties>
     </ProjectToBuild>
-    <ProjectToBuild Include="$(SolutionDir)\CorrugatedIron.sln">
+    <ProjectToBuild Include="$(SolutionFile)">
       <Properties>Configuration=Release</Properties>
     </ProjectToBuild>
   </ItemGroup>
 
-  <Target Name="Compile" DependsOnTargets="Version">
+  <Target Name="PBuild" DependsOnTargets="Version">
     <MSBuild Projects="@(ProjectToBuild)" BuildInParallel="True" />
   </Target>
 
-  <Target Name="Build">
-    <CallTarget Targets="Compile" />
+  <Target Name="Build" DependsOnTargets="Version">
+    <MSBuild Projects="$(SolutionFile)" Properties="Configuration=$(Configuration)" />
   </Target>
 
   <Target Name="Clean">

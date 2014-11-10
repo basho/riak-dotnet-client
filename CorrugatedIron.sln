@@ -1,26 +1,27 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CorrugatedIron", "CorrugatedIron\CorrugatedIron.csproj", "{A2CA0CDC-85BB-489D-99D0-3EE1D135BE17}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CorrugatedIron", "src\CorrugatedIron\CorrugatedIron.csproj", "{A2CA0CDC-85BB-489D-99D0-3EE1D135BE17}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CorrugatedIron.Tests", "CorrugatedIron.Tests\CorrugatedIron.Tests.csproj", "{E765CC5E-3C83-42CB-9B9A-C8AF400AC0AC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CorrugatedIron.Tests", "src\CorrugatedIron.Tests\CorrugatedIron.Tests.csproj", "{E765CC5E-3C83-42CB-9B9A-C8AF400AC0AC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CorrugatedIron.Tests.Live", "CorrugatedIron.Tests.Live\CorrugatedIron.Tests.Live.csproj", "{5D52E2FA-931C-4E77-BF2B-3A9F0D0CD834}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CorrugatedIron.Tests.Live", "src\CorrugatedIron.Tests.Live\CorrugatedIron.Tests.Live.csproj", "{5D52E2FA-931C-4E77-BF2B-3A9F0D0CD834}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Metadata", "Metadata", "{C6E7CFF8-CC0A-49A4-B235-DDF0F23EB2A6}"
 	ProjectSection(SolutionItems) = preProject
-		Metadata\CorrugatedIron.snk = Metadata\CorrugatedIron.snk
-		Metadata\VersionInfo.cs = Metadata\VersionInfo.cs
+		src\Metadata\CorrugatedIron.snk = src\Metadata\CorrugatedIron.snk
+		src\Metadata\VersionInfo.cs = src\Metadata\VersionInfo.cs
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nuspec", "Nuspec", "{6D31FDF6-D21D-4784-A8BF-CDDFCEDD1091}"
 	ProjectSection(SolutionItems) = preProject
-		NuGet\CorrugatedIron.nuspec = NuGet\CorrugatedIron.nuspec
+		src\NuGet\CorrugatedIron.nuspec = src\NuGet\CorrugatedIron.nuspec
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{439A3CE3-AF1B-477C-896D-8970CF8AD29E}"
 	ProjectSection(SolutionItems) = preProject
-		RELEASE_NOTES.md = RELEASE_NOTES.md
+		README.md = README.md
+		RELNOTES.md = RELNOTES.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{FD5F81AF-F8DA-4A49-BCF9-8CC9BC5BB8BA}"
@@ -55,7 +56,7 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = CorrugatedIron\CorrugatedIron.csproj
+		StartupItem = src\CorrugatedIron\CorrugatedIron.csproj
 		Policies = $0
 		$0.TextStylePolicy = $4
 		$1.FileWidth = 120

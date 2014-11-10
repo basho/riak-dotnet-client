@@ -1,3 +1,5 @@
+PROJDIR = $(SLNDIR)/src
+
 INSTALL_MONO = $(SLNDIR)/build/install-mono
 
 NUGET_PKGDIR = $(SLNDIR)/packages
@@ -38,10 +40,10 @@ debug: package-restore
 test-all: unit-test integration-test
 
 unit-test: debug
-	$(MONO) $(NUNIT) -work=$(SLNDIR)/CorrugatedIron.Tests $(SLNDIR)/CorrugatedIron.Tests/CorrugatedIron.Tests.nunit
+	$(MONO) $(NUNIT) -work=$(PROJDIR)/CorrugatedIron.Tests $(PROJDIR)/CorrugatedIron.Tests/CorrugatedIron.Tests.nunit
 
 integration-test: debug unit-test
-	$(MONO) $(NUNIT) -work=$(SLNDIR)/CorrugatedIron.Tests.Live $(SLNDIR)/CorrugatedIron.Tests.Live/CorrugatedIron.Tests.Live.nunit
+	$(MONO) $(NUNIT) -work=$(PROJDIR)/CorrugatedIron.Tests.Live $(PROJDIR)/CorrugatedIron.Tests.Live/CorrugatedIron.Tests.Live.nunit
 
 .PHONY: clean-release clean-debug clean
 clean-release:
