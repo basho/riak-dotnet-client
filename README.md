@@ -30,8 +30,7 @@ Please see the [Release Notes](RELEASE_NOTES.md) document.
 License
 -------
 
-**CorrugatedIron** is Open Source software released under the Apache 2.0 License.
-Please see the [LICENSE](http://corrugatediron.org/LICENSE.txt) file for full license details.
+**CorrugatedIron** is Open Source software released under the Apache 2.0 License. Please see the [LICENSE](http://corrugatediron.org/LICENSE.txt) file for full license details.
 
 CorrugatedIron Build Process
 ============================
@@ -77,3 +76,15 @@ Create an HTTP interface for [Faceted queries vi the Solr Interface](http://wiki
 
 ### Improved Riak Search API
 [Github Issue 23](url:https://github.com/DistributedNonsense/CorrugatedIron/issues/23) Additional development should be undertaken to make it easier for developers to use this.
+
+### Thanks
+
+The following people have contributed to CorrugatedIron and/or one of the related libraries or applications that make it work:
+
+Jeremiah Peschka
+OJ Reeves
+Matthew Whitfield
+Kevin Pullin
+Tiago Margalho
+Marc Gravell (protobuf-net)
+James Newton-King (Json.NET)
