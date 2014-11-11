@@ -56,6 +56,8 @@
     <ProtoDir>$(SolutionDir)src\riak_pb\src</ProtoDir>
     <ProtoMsgDir>$(SolutionDir)src\CorrugatedIron\Messages</ProtoMsgDir>
 
+    <NuGetExe>$(SolutionDir).nuget\NuGet.exe</NuGetExe>
+
     <NUnitConsoleRunnerExe>$(SolutionDir)packages\NUnit.Runners.2.6.3\tools\nunit-console.exe -nologo -nodots -labels</NUnitConsoleRunnerExe>
     <NUnitConsoleRunnerCommand Condition="'$(OS)' == 'Windows_NT'">$(NUnitConsoleRunnerExe) -config Debug</NUnitConsoleRunnerCommand>
     <NUnitConsoleRunnerCommand Condition="'$(OS)' != 'Windows_NT'">$(MonoExe) $(NUnitConsoleRunnerExe) -config Debug-Mono</NUnitConsoleRunnerCommand>
@@ -78,6 +80,11 @@
   <Target Name="ProtoGen">
     <Exec WorkingDirectory="$(ProtoDir)"
           Command="$(ProtoGenExe) -ns:CorrugatedIron.Messages -i:%(ProtoFile.Identity) -o:$(ProtoMsgDir)\@(ProtoFile->'%(filename)').cs" />
+  </Target>
+
+  <Target Name="NugetRelease" DependsOnTargets="Release">
+    <Exec WorkingDirectory="$(ProjDir)\NuGet"
+          Command="$(NuGetExe) pack -Symbols -Verbosity normal $(ProjDir)\NuGet\CorrugatedIron.nuspec" />
   </Target>
 
   <Target Name="All" DependsOnTargets="Version">
