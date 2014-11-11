@@ -38,10 +38,12 @@ debug: package-restore
 
 test-all: unit-test integration-test
 
-unit-test: debug
+# NB: build.proj has debug as a dependency
+unit-test:
 	$(XBUILD) /target:UnitTest $(SLNDIR)/build/build.proj
 
-integration-test: debug unit-test
+# NB: build.proj has debug as a dependency
+integration-test:
 	$(XBUILD) /target:IntegrationTest $(SLNDIR)/build/build.proj
 
 .PHONY: clean-release clean-debug clean
