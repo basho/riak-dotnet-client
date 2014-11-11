@@ -16,6 +16,8 @@ Authors
 
 * [OJ Reeves](http://buffered.io)
 * [Jeremiah Peschka](http://facility9.com/)
+* [Alex Moore](http://basho.com/)
+* [Luke Bakken](http://bakken.io/)
 
 Documentation
 -------------
