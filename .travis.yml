@@ -9,5 +9,5 @@ install:
     - make install-mono
 
 script:
-    - make test
+    - make unit-test
 
