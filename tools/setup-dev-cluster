@@ -29,7 +29,17 @@ function errexit
   exit 1
 }
 
+function onexit
+{
+    echo Exiting!
+    popd
+}
+
+trap onexit EXIT
+
 dev_cluster_path="${1:-$HOME/Projects/basho/riak/dev}"
+declare -i node_count="${2:-4}"
+declare -i i=0
 
 if [[ -d $dev_cluster_path ]]
 then
@@ -112,13 +122,15 @@ done
 
 pinfo "Starting Riak"
 
-for devdir in dev*
+for ((i = 1; i <= node_count; ++i))
 do
+    devdir="dev$i"
     $devdir/bin/riak start
 done
 
-for devdir in dev[2-4]
+for ((i = 2; i <= node_count; ++i))
 do
+    devdir="dev$i"
     $devdir/bin/riak-admin cluster join dev1@127.0.0.1
 done
 
@@ -160,4 +172,3 @@ curl -XPUT -H 'Content-type: application/json' http://localhost:10018/buckets/ri
 
 pinfo "Done!"
 
-popd > /dev/null
