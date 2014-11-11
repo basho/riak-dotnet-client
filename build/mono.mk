@@ -36,20 +36,20 @@ release: package-restore
 debug: package-restore
 	$(XBUILD) /target:Debug $(SLNDIR)/build/build.proj
 
-test-all: unit-test integration-test
-
 # NB: build.proj has debug as a dependency
-unit-test:
+unit-test: package-restore
 	$(XBUILD) /target:UnitTest $(SLNDIR)/build/build.proj
 
 # NB: build.proj has debug as a dependency
-integration-test:
+integration-test: package-restore
 	$(XBUILD) /target:IntegrationTest $(SLNDIR)/build/build.proj
 
+test-all: unit-test integration-test
+
 .PHONY: clean-release clean-debug clean
-clean-release:
+clean-release: package-restore
 	$(XBUILD) /target:Clean /property:Configuration=Release
-clean-debug:
+clean-debug: package-restore
 	$(XBUILD) /target:Clean /property:Configuration=Debug
 clean: clean-release clean-debug
 
