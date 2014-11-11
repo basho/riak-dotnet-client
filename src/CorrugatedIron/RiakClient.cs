@@ -1708,21 +1708,31 @@ namespace CorrugatedIron
             options.Populate(request);
 
             if (adds != null)
+            {
                 request.op.map_op.adds.AddRange(adds.Select(a => a.ToMapField()));
+            }
 
             if (removes != null)
+            {
                 request.op.map_op.removes.AddRange(removes.Select(a => a.ToMapField()));
+            }
 
             if (updates != null)
+            {
                 request.op.map_op.updates.AddRange(updates);
+            }
 
             if (context != null)
+            {
                 request.context = context;
+            }
 
             var result = UseConnection(conn => conn.PbcWriteRead<DtUpdateReq, DtUpdateResp>(request));
 
             if (!result.IsSuccess)
+            {
                 return new RiakDtMapResult(RiakResult<RiakObject>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline));
+            }
 
             var rmr =
                 new RiakDtMapResult(RiakResult<RiakObject>.Success(new RiakObject(objectId, result.Value.map_value)));

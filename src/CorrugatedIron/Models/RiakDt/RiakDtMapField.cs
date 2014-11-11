@@ -41,7 +41,7 @@ namespace CorrugatedIron.Models.RiakDt
 
         public MapField ToMapField()
         {
-            return new MapField {name = Name.ToRiakString(), type = (MapField.MapFieldType)Type};
+            return new MapField { name = Name.ToRiakString(), type = (MapField.MapFieldType)Type };
         }
     }
 }
