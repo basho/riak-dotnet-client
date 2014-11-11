@@ -1,8 +1,17 @@
 @echo off
 setlocal EnableExtensions
 
-if (%FrameworkDir%)==() set FrameworkDir=%WINDIR%\Microsoft.NET\Framework\
-if (%FrameworkVersion%)==() set FrameworkVersion=v4.0.30319
+if defined ProgramFiles(x86) (
+    if [%FrameworkDir%]==[] (
+        set FrameworkDir=%WINDIR%\Microsoft.NET\Framework64\
+    )
+) else (
+    if [%FrameworkDir%]==[] (
+        set FrameworkDir=%WINDIR%\Microsoft.NET\Framework\
+    )
+)
+
+if [%FrameworkVersion%]==[] set FrameworkVersion=v4.0.30319
 
 rem NB: %~dp0 ends in a backslash
 set CURDIR=%~dp0
