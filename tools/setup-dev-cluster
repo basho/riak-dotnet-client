@@ -130,26 +130,6 @@ done
 set -o errexit
 
 pinfo "Riak started, setting up bucket types"
-
-$riak_admin bucket-type create plain '{"props":{}}'
-$riak_admin bucket-type create search_type '{"props":{}}'
-$riak_admin bucket-type create maps '{"props":{"datatype":"map"}}'
-$riak_admin bucket-type create sets '{"props":{"datatype":"set"}}'
-$riak_admin bucket-type create counters '{"props":{"datatype":"counter"}}'
-$riak_admin bucket-type create yokozuna '{"props":{}}'
-$riak_admin bucket-type create leveldb_type '{"props":{"backend":"leveldb_backend"}}'
-$riak_admin bucket-type create memory_type '{"props":{"backend":"mem_backend"}}'
-
-$riak_admin bucket-type activate search_type
-$riak_admin bucket-type activate plain
-$riak_admin bucket-type activate maps
-$riak_admin bucket-type activate sets
-$riak_admin bucket-type activate counters
-$riak_admin bucket-type activate yokozuna
-$riak_admin bucket-type activate leveldb_type
-$riak_admin bucket-type activate memory_type
-
-curl -XPUT -H 'Content-type: application/json' http://localhost:10018/buckets/riak_index_tests/props -d '{"props":{"backend":"leveldb_backend"}}'
-
+riak-cluster-config "$riak_admin" 10018
 pinfo "Done!"
 
