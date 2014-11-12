@@ -21,7 +21,7 @@ preconfigure:
 	echo 'multi_backend.mem_backend.memory_backend.max_memory_per_vnode = 4MB' >> $(RIAK_CONF)
 	echo 'listener.http.internal = 127.0.0.1:8098' >> $(RIAK_CONF)
 	echo 'listener.protobuf.internal = 127.0.0.1:8087' >> $(RIAK_CONF)
-	curl -XPUT -H 'Content-type: application/json' http://localhost:10018/buckets/riak_index_tests/props -d '{"props":{"backend":"leveldb_backend"}}'
+	curl -XPUT -H 'Content-type: application/json' localhost:8098/buckets/riak_index_tests/props -d '{"props":{"backend":"leveldb_backend"}}'
 
 configure:
 	$(RIAK_ADMIN) bucket-type create yokozuna '{"props":{}}'
