@@ -3,35 +3,17 @@ include $(SLNDIR)/build/mono.mk
 
 .PHONY: setup-integration
 
+TOOLS_DIR = $(SLNDIR)/tools
 RIAK_CONF = $(RIAK_DIR)/etc/riak.conf
 ADV_CONF = $(RIAK_DIR)/etc/advanced.config
 RIAK_ADMIN = $(RIAK_DIR)/bin/riak-admin
 
 preconfigure:
-	echo 'ring_size = 16' >> $(RIAK_CONF)
-	echo 'storage_backend = multi' >> $(RIAK_CONF)
-	echo 'multi_backend.default = bitcask_backend' >> $(RIAK_CONF)
-	echo 'multi_backend.bitcask_backend.storage_backend = bitcask' >> $(RIAK_CONF)
-	echo 'multi_backend.bitcask_backend.bitcask.data_root = $$(platform_data_dir)/bitcask' >> $(RIAK_CONF)
-	echo 'multi_backend.bitcask_backend.bitcask.io_mode = erlang' >> $(RIAK_CONF)
-	echo 'multi_backend.leveldb_backend.storage_backend = leveldb' >> $(RIAK_CONF)
-	echo 'multi_backend.leveldb_backend.leveldb.data_root = $$(platform_data_dir)/leveldb' >> $(RIAK_CONF)
-	echo 'multi_backend.leveldb_backend.leveldb.maximum_memory.percent = 30' >> $(RIAK_CONF)
-	echo 'multi_backend.mem_backend.storage_backend = memory' >> $(RIAK_CONF)
-	echo 'multi_backend.mem_backend.memory_backend.ttl = 10s' >> $(RIAK_CONF)
-	echo 'multi_backend.mem_backend.memory_backend.max_memory_per_vnode = 4MB' >> $(RIAK_CONF)
-	echo 'listener.http.internal = 127.0.0.1:8098' >> $(RIAK_CONF)
-	echo 'listener.protobuf.internal = 127.0.0.1:8087' >> $(RIAK_CONF)
-	echo '[{riak_kv, [{delete_mode, immediate}]}].' > $(ADV_CONF)
+	$(TOOLS_DIR)/gen-riak-conf $(RIAK_CONF) 8098 8087
+	$(TOOLS_DIR)/gen-adv-conf $(ADV_CONF)
 
 configure:
-	$(RIAK_ADMIN) bucket-type create yokozuna '{"props":{}}'
-	$(RIAK_ADMIN) bucket-type activate yokozuna
-	$(RIAK_ADMIN) bucket-type create leveldb_type '{"props":{"backend":"leveldb_backend"}}'
-	$(RIAK_ADMIN) bucket-type create memory_type '{"props":{"backend":"mem_backend"}}'
-	$(RIAK_ADMIN) bucket-type activate leveldb_type
-	$(RIAK_ADMIN) bucket-type activate memory_type
-	curl -XPUT -H 'Content-type: application/json' localhost:8098/buckets/riak_index_tests/props -d '{"props":{"backend":"leveldb_backend"}}'
+	$(TOOLS_DIR)/riak-cluster-config $(RIAK_ADMIN) 8098
 
 compile: install-deps debug
 

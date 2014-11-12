@@ -1,0 +1,27 @@
+#!/bin/sh
+
+out_file=$1
+http_port=$2
+pb_port=$3
+
+cat >> $out_file <<EOT
+ring_size = 16
+storage_backend = multi
+multi_backend.default = bitcask_backend
+
+multi_backend.bitcask_backend.storage_backend = bitcask
+multi_backend.bitcask_backend.bitcask.data_root = \$(platform_data_dir)/bitcask
+multi_backend.bitcask_backend.bitcask.io_mode = erlang
+
+multi_backend.leveldb_backend.storage_backend = leveldb
+multi_backend.leveldb_backend.leveldb.data_root = \$(platform_data_dir)/leveldb
+multi_backend.leveldb_backend.leveldb.maximum_memory.percent = 30
+
+multi_backend.mem_backend.storage_backend = memory
+multi_backend.mem_backend.memory_backend.ttl = 10s
+multi_backend.mem_backend.memory_backend.max_memory_per_vnode = 4MB
+
+listener.http.internal = 0.0.0.0:$http_port
+listener.protobuf.internal = 0.0.0.0:$pb_port
+EOT
+
