@@ -3,6 +3,10 @@
 set -o errexit
 set -o nounset
 
+script_dir="$(dirname $0)"
+script_path="$(realpath $script_dir)"
+PATH="$PATH:$script_path"
+
 function now
 {
   date '+%Y-%m-%d %H:%M:%S'
@@ -31,8 +35,8 @@ function errexit
 
 function onexit
 {
-    echo Exiting!
-    popd
+  echo Exiting!
+  popd
 }
 
 trap onexit EXIT
@@ -43,9 +47,9 @@ declare -i i=0
 
 if [[ -d $dev_cluster_path ]]
 then
-    pinfo "Setting up dev cluster in $dev_cluster_path"
+  pinfo "Setting up dev cluster in $dev_cluster_path"
 else
-    errexit "Dev cluster path $dev_cluster_path does not exist!"
+  errexit "Dev cluster path $dev_cluster_path does not exist!"
 fi
 
 pushd $dev_cluster_path > /dev/null
@@ -55,7 +59,7 @@ pinfo "Stopping Riak"
 set +o errexit
 for devdir in dev*
 do
-    $devdir/bin/riak stop > /dev/null
+  $devdir/bin/riak stop > /dev/null
 done
 set -o errexit
 
@@ -80,59 +84,35 @@ pinfo "Configuring riak.conf"
 
 for devdir in dev*
 do
-    adv_conf="$devdir/etc/advanced.config"
-    riak_conf="$devdir/etc/riak.conf"
-    riak_conf_orig="$devdir/etc/riak.conf.orig"
-    if [[ -f $riak_conf_orig ]]
-    then
-        cp -f $riak_conf_orig $riak_conf
-    else
-        cp -f $riak_conf $riak_conf_orig
-    fi
-    cat >> $riak_conf <<EOT
-ring_size = 16
-storage_backend = multi
-multi_backend.default = bitcask_backend
+  adv_conf="$devdir/etc/advanced.config"
+  riak_conf="$devdir/etc/riak.conf"
+  riak_conf_orig="$devdir/etc/riak.conf.orig"
+  if [[ -f $riak_conf_orig ]]
+  then
+    cp -f $riak_conf_orig $riak_conf
+  else
+    cp -f $riak_conf $riak_conf_orig
+  fi
 
-multi_backend.bitcask_backend.storage_backend = bitcask
-multi_backend.bitcask_backend.bitcask.data_root = \$(platform_data_dir)/bitcask
-multi_backend.bitcask_backend.bitcask.io_mode = erlang
+  gen-riak-conf $riak_conf $http_port $pb_port
+  gen-adv-conf $adv_conf
 
-multi_backend.leveldb_backend.storage_backend = leveldb
-multi_backend.leveldb_backend.leveldb.data_root = \$(platform_data_dir)/leveldb
-multi_backend.leveldb_backend.leveldb.maximum_memory.percent = 30
-
-multi_backend.mem_backend.storage_backend = memory
-multi_backend.mem_backend.memory_backend.ttl = 10s
-multi_backend.mem_backend.memory_backend.max_memory_per_vnode = 4MB
-
-listener.http.internal = 0.0.0.0:$http_port
-listener.protobuf.internal = 0.0.0.0:$pb_port
-EOT
-
-    cat > $adv_conf <<'EOT'
-[
-    {riak_kv, [
-        {delete_mode, immediate}
-    ]}
-].
-EOT
-    (( pb_port += 10 ))
-    (( http_port += 10 ))
+  (( pb_port += 10 ))
+  (( http_port += 10 ))
 done
 
 pinfo "Starting Riak"
 
 for ((i = 1; i <= node_count; ++i))
 do
-    devdir="dev$i"
-    $devdir/bin/riak start
+  devdir="dev$i"
+  $devdir/bin/riak start
 done
 
 for ((i = 2; i <= node_count; ++i))
 do
-    devdir="dev$i"
-    $devdir/bin/riak-admin cluster join dev1@127.0.0.1
+  devdir="dev$i"
+  $devdir/bin/riak-admin cluster join dev1@127.0.0.1
 done
 
 riak_admin=dev1/bin/riak-admin
@@ -144,8 +124,8 @@ $riak_admin transfer-limit 8
 set +o errexit
 while ! $riak_admin transfers | grep -iqF 'No transfers active'
 do
-    pinfo 'Transfers in progress'
-    sleep 5
+  pinfo 'Transfers in progress'
+  sleep 5
 done
 set -o errexit
 
