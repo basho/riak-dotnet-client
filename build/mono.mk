@@ -1,6 +1,5 @@
 PROJDIR = $(SLNDIR)/src
 
-INSTALL_MONO = $(SLNDIR)/build/install-mono
 MONO_EXE = mono --runtime='v4.0.30319'
 
 NUGET_PKGDIR = $(SLNDIR)/packages
@@ -19,8 +18,8 @@ install-certs:
 	mozroots --import --sync
 
 # NB: run this target if package-restore fails on download
-install-mono:
-	$(INSTALL_MONO)
+install-deps:
+	$(SLNDIR)/build/install-deps
 
 package-restore:
 	$(NUGET_RESTORE) $(SLNDIR)/.nuget/packages.config
