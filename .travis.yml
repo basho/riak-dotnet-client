@@ -6,7 +6,7 @@ branches:
 language: c
 
 install:
-    - make install-mono
+    - make install-deps
     - make install-certs
 
 script:
