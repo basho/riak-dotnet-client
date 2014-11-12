@@ -44,7 +44,8 @@ unit-test: package-restore
 integration-test: package-restore
 	$(XBUILD) /target:IntegrationTest $(SLNDIR)/build/build.proj
 
-test-all: unit-test integration-test
+test-all: package-restore
+	$(XBUILD) /target:TestAll $(SLNDIR)/build/build.proj
 
 .PHONY: clean-release clean-debug clean
 clean-release: package-restore
