@@ -1,8 +1,10 @@
 # Force this repository to use Windows line endings
 * text=crlf
 
+# Files that must be CRLF ending
+build/build.proj text eol=crlf encoding=UTF-8
+
 # Files that must be LF ending
-build.proj                text eol=crlf encoding=UTF-8
 Makefile                  text eol=lf
 build/install-deps        text eol=lf
 build/mono.mk             text eol=lf
