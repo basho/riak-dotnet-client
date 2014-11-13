@@ -6,14 +6,7 @@
 
   <Import Project="$(MSBuildCommunityTasksPath)\MSBuild.Community.Tasks.targets"/>
 
-  <PropertyGroup>
-    <VMajor>0</VMajor>
-    <VMinor>0</VMinor>
-    <VPatch>0</VPatch>
-    <VBuildVer>0</VBuildVer>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(OS)' != 'Windows_NT' or '$(MonoExe)' == 'True'">
+  <PropertyGroup Condition="'$(Mono)' == 'True'">
     <MonoExe>mono --runtime=v4.0.30319</MonoExe>
   </PropertyGroup>
 
@@ -31,11 +24,19 @@
       <Output TaskParameter="Tag" PropertyName="GitTag" />
     </GitDescribe>
 
-    <PropertyGroup>
+    <PropertyGroup Condition="'$(Mono)' == 'True'">
+      <VMajor>1</VMajor>
+      <VMinor>4</VMinor>
+      <VPatch>2</VPatch>
+      <VBuildVer>0</VBuildVer>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Mono)' == '' or '$(Mono)' == 'False'">
       <!-- NB: tags are in the form vX.Y.Z -->
       <VMajor>$(GitTag.Split('.')[0].Substring(1))</VMajor>
       <VMinor>$(GitTag.Split('.')[1])</VMinor>
       <VPatch>$(GitTag.Split('.')[2])</VPatch>
+      <VBuildVer>0</VBuildVer>
     </PropertyGroup>
 
     <Message Text="Version: $(Version)"/>
@@ -67,8 +68,8 @@
     <NuGetExe>$(SolutionDir).nuget\NuGet.exe</NuGetExe>
 
     <NUnitConsoleRunnerExe>$(SolutionDir)packages\NUnit.Runners.2.6.3\tools\nunit-console.exe -nologo -nodots -labels</NUnitConsoleRunnerExe>
-    <NUnitConsoleRunnerCommand Condition="'$(OS)' == 'Windows_NT'">$(NUnitConsoleRunnerExe) -config Debug</NUnitConsoleRunnerCommand>
-    <NUnitConsoleRunnerCommand Condition="'$(OS)' != 'Windows_NT'">$(MonoExe) $(NUnitConsoleRunnerExe) -config Debug-Mono</NUnitConsoleRunnerCommand>
+    <NUnitConsoleRunnerCommand Condition="'$(Mono)' == '' or '$(Mono)' == 'False'">$(NUnitConsoleRunnerExe) -config Debug</NUnitConsoleRunnerCommand>
+    <NUnitConsoleRunnerCommand Condition="'$(Mono)' == 'True'">$(MonoExe) $(NUnitConsoleRunnerExe) -config Debug-Mono</NUnitConsoleRunnerCommand>
 
   </PropertyGroup>
 
