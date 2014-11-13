@@ -1,7 +1,15 @@
 # Force this repository to use Windows line endings
 * text=crlf
 
-build.proj text eol=crlf encoding=UTF-8
+# Files that must be LF ending
+build.proj                text eol=crlf encoding=UTF-8
+Makefile                  text eol=lf
+build/install-deps        text eol=lf
+build/mono.mk             text eol=lf
+tools/setup-dev-cluster   text eol=lf
+tools/riak-cluster-config text eol=lf
+tools/gen-*-conf          text eol=lf
+.travis.yml               text eol=lf
 
 # Custom for Visual Studio
 *.ascx     text
