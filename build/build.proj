@@ -18,7 +18,7 @@
     <PropertyGroup>
       <VBuildVer>0</VBuildVer> <!-- TODO -->
     </PropertyGroup>
-    <GitDescribe LocalPath="$(MSBuildProjectDirectory)">
+    <GitDescribe LocalPath="$(SolutionDir)">
       <Output TaskParameter="CommitHash" PropertyName="GitCommitHash" />
       <Output TaskParameter="Tag" PropertyName="GitTag" />
     </GitDescribe>
@@ -51,12 +51,13 @@
                   GenerateClass="true"
                   AssemblyCompany="Basho Technologies"
                   AssemblyCopyright="Copyright Basho Technologies © $(Year). All rights reserved."
+                  AssemblyProduct="riak-dotnet-client"
                   AssemblyTrademark="riak-dotnet-client"
                   AssemblyCulture=""
                   AssemblyConfiguration="$(Configuration)"
                   AssemblyVersion="$(VMajor).$(VMinor).0.0"
                   AssemblyFileVersion="$(VMajor).$(VMinor).$(VPatch).$(VBuildVer)"
-                  AssemblyInformationalVersion="$(VMajor).$(VMinor).$(VPatch)-$(GitCommitHash)" />
+                  AssemblyInformationalVersion="$(GitCommitHash)" />
   </Target>
 
   <PropertyGroup>
