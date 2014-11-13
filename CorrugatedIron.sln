@@ -9,13 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CorrugatedIron.Tests.Live",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Metadata", "Metadata", "{C6E7CFF8-CC0A-49A4-B235-DDF0F23EB2A6}"
 	ProjectSection(SolutionItems) = preProject
+		src\CommonAssemblyInfo.cs = src\CommonAssemblyInfo.cs
 		src\Metadata\CorrugatedIron.snk = src\Metadata\CorrugatedIron.snk
-		src\Metadata\VersionInfo.cs = src\Metadata\VersionInfo.cs
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nuspec", "Nuspec", "{6D31FDF6-D21D-4784-A8BF-CDDFCEDD1091}"
-	ProjectSection(SolutionItems) = preProject
-		src\NuGet\CorrugatedIron.nuspec = src\NuGet\CorrugatedIron.nuspec
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{439A3CE3-AF1B-477C-896D-8970CF8AD29E}"

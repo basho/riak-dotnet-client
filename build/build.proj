@@ -66,6 +66,8 @@
     <ProtoMsgDir>$(SolutionDir)src\CorrugatedIron\Messages</ProtoMsgDir>
 
     <NuGetExe>$(SolutionDir).nuget\NuGet.exe</NuGetExe>
+    <NuGetSpecTemplate>$(ProjDir)\NuGet\CorrugatedIron.nuspec.template</NuGetSpecTemplate>
+    <NuGetSpecFile>$(ProjDir)\NuGet\CorrugatedIron.nuspec</NuGetSpecFile>
 
     <NUnitConsoleRunnerExe>$(SolutionDir)packages\NUnit.Runners.2.6.3\tools\nunit-console.exe -nologo -nodots -labels</NUnitConsoleRunnerExe>
     <NUnitConsoleRunnerCommand Condition="'$(Mono)' == '' or '$(Mono)' == 'False'">$(NUnitConsoleRunnerExe) -config Debug</NUnitConsoleRunnerCommand>
@@ -92,8 +94,14 @@
   </Target>
 
   <Target Name="NugetRelease" DependsOnTargets="Release">
+    <ItemGroup>
+      <Tokens Include="VERSION">
+        <ReplacementValue>$(VMajor).$(VMinor).$(VPatch)</ReplacementValue>
+      </Tokens>
+    </ItemGroup>
+    <TemplateFile Template="$(NuGetSpecTemplate)" OutputFileName="$(NuGetSpecFile)" Tokens="@(Tokens)" />
     <Exec WorkingDirectory="$(ProjDir)\NuGet"
-          Command="$(NuGetExe) pack -Symbols -Verbosity normal $(ProjDir)\NuGet\CorrugatedIron.nuspec" />
+          Command="$(NuGetExe) pack -Symbols -Verbosity normal $(NuGetSpecFile)" />
   </Target>
 
   <Target Name="All" DependsOnTargets="Version">

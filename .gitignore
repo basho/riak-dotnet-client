@@ -27,6 +27,7 @@ _Re*
 test-results/*
 *.dotCover
 *.nupkg
+*.nuspec
 test-results
 
 *.ncrunchproject
