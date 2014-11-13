@@ -75,6 +75,7 @@
     <NUnitConsoleRunnerCommand Condition="'$(Mono)' == '' or '$(Mono)' == 'False'">$(NUnitConsoleRunnerExe) -config Debug</NUnitConsoleRunnerCommand>
     <NUnitConsoleRunnerCommand Condition="'$(Mono)' == 'True'">$(MonoExe) $(NUnitConsoleRunnerExe) -config Debug-Mono</NUnitConsoleRunnerCommand>
 
+    <CorrugatedIronPackagesConfig>$(ProjDir)\CorrugatedIron\packages.config</CorrugatedIronPackagesConfig>
   </PropertyGroup>
 
   <ItemGroup>
@@ -96,9 +97,21 @@
   </Target>
 
   <Target Name="NugetRelease" DependsOnTargets="Release">
+    <XmlQuery XmlFileName="$(CorrugatedIronPackagesConfig)" XPath="/packages/package[@id='Newtonsoft.Json']/@version">
+      <Output TaskParameter="Values" PropertyName="NewtonsoftJsonVersion" />
+    </XmlQuery>
+    <XmlQuery XmlFileName="$(CorrugatedIronPackagesConfig)" XPath="/packages/package[@id='protobuf-net']/@version">
+      <Output TaskParameter="Values" PropertyName="ProtobufNetVersion" />
+    </XmlQuery>
     <ItemGroup>
       <Tokens Include="VERSION">
         <ReplacementValue>$(VMajor).$(VMinor).$(VPatch)</ReplacementValue>
+      </Tokens>
+      <Tokens Include="NEWTONSOFT_JSON_VERSION">
+        <ReplacementValue>$(NewtonsoftJsonVersion)</ReplacementValue>
+      </Tokens>
+      <Tokens Include="PROTOBUF_NET_VERSION">
+        <ReplacementValue>$(ProtobufNetVersion)</ReplacementValue>
       </Tokens>
     </ItemGroup>
     <TemplateFile Template="$(NuGetSpecTemplate)" OutputFileName="$(NuGetSpecFile)" Tokens="@(Tokens)" />
