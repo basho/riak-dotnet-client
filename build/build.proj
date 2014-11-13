@@ -14,32 +14,34 @@
     <Configuration>Release</Configuration>
   </PropertyGroup>
 
-  <Target Name="Version">
-    <Time>
-      <Output TaskParameter="Year" PropertyName="Year" />
-    </Time>
-
+  <Target Name="GitData">
+    <PropertyGroup>
+      <VBuildVer>0</VBuildVer> <!-- TODO -->
+    </PropertyGroup>
     <GitDescribe LocalPath="$(MSBuildProjectDirectory)">
       <Output TaskParameter="CommitHash" PropertyName="GitCommitHash" />
       <Output TaskParameter="Tag" PropertyName="GitTag" />
     </GitDescribe>
+    <!--
+      NB: these regexes are Mono and Windows compatible. "\." to represent literal period
+          does not work on Mono 3.10
+    -->
+    <RegexReplace Input="$(GitTag)" Expression="v([0-9])[.][0-9][.][0-9]" Replacement="$1" Count="1">
+      <Output PropertyName="VMajor" TaskParameter="Output" />
+    </RegexReplace>
+    <RegexReplace Input="$(GitTag)" Expression="v[0-9][.]([0-9])[.][0-9]" Replacement="$1" Count="1">
+      <Output PropertyName="VMinor" TaskParameter="Output" />
+    </RegexReplace>
+    <RegexReplace Input="$(GitTag)" Expression="v[0-9][.][0-9][.]([0-9])" Replacement="$1" Count="1">
+      <Output PropertyName="VPatch" TaskParameter="Output" />
+    </RegexReplace>
+    <Message Text="GitTag: $(GitTag) Version: $(VMajor).$(VMinor).$(VPatch).$(VBuildVer) Commit hash: $(GitCommitHash)"/>
+  </Target>
 
-    <PropertyGroup Condition="'$(Mono)' == 'True'">
-      <VMajor>1</VMajor>
-      <VMinor>4</VMinor>
-      <VPatch>2</VPatch>
-      <VBuildVer>0</VBuildVer>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(Mono)' == '' or '$(Mono)' == 'False'">
-      <!-- NB: tags are in the form vX.Y.Z -->
-      <VMajor>$(GitTag.Split('.')[0].Substring(1))</VMajor>
-      <VMinor>$(GitTag.Split('.')[1])</VMinor>
-      <VPatch>$(GitTag.Split('.')[2])</VPatch>
-      <VBuildVer>0</VBuildVer>
-    </PropertyGroup>
-
-    <Message Text="Version: $(Version)"/>
+  <Target Name="Version" DependsOnTargets="GitData">
+    <Time>
+      <Output TaskParameter="Year" PropertyName="Year" />
+    </Time>
 
     <Attrib Files="$(SolutionDir)src\CommonAssemblyInfo.cs" ReadOnly="False" />
 
