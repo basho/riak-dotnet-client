@@ -70,13 +70,16 @@ exit /b 1
 :SHOW_HELPMSG
 echo.
 echo Targets:
-echo --------------------------------------------
-echo Debug    - Debug build
-echo Release  - Release build with versioning
-echo All      - Parallel build of Debug, Release
-echo Clean    - Clean everything
-echo ProtoGen - Rebuild cs files from proto files
-echo --------------------------------------------
+echo ---------------------------------------------------
+echo Debug           - Debug build
+echo Release         - Release build with versioning
+echo All             - Parallel build of Debug, Release
+echo Clean           - Clean everything
+echo ProtoGen        - Rebuild cs files from proto files
+echo Test            - Run all tests
+echo UnitTest        - Run unit tests
+echo IntegrationTest - Run integration tests
+echo ---------------------------------------------------
 echo.
 exit /b 0
 
