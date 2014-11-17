@@ -24,16 +24,14 @@ install-deps:
 package-restore:
 	$(NUGET_RESTORE) $(SLNDIR)/.nuget/packages.config
 
-proto:
-	cd CorrugatedIron/Messages
-	$(MONO_EXE) $(PROTOGEN) -i:$< -o:$@
-	rm $<
-
 release: package-restore
 	$(XBUILD) /target:Release $(SLNDIR)/build/build.proj
 
 debug: package-restore
 	$(XBUILD) /target:Debug $(SLNDIR)/build/build.proj
+
+protogen:
+	@echo 'protogen is Windows-only'
 
 # NB: build.proj has debug as a dependency
 unit-test: package-restore
@@ -53,3 +51,15 @@ clean-debug: package-restore
 	$(XBUILD) /target:Clean /property:Configuration=Debug
 clean: clean-release clean-debug
 
+.PHONY: help
+
+help:
+	@echo ''
+	@echo ' Targets:'
+	@echo ' --------------------------------------------'
+	@echo ' debug    - Debug build'
+	@echo ' release  - Release build with versioning'
+	@echo ' all      - Debug, then Release build'
+	@echo ' clean    - Clean everything'
+	@echo ' --------------------------------------------'
+	@echo ''
