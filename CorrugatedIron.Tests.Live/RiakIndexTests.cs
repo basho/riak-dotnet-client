@@ -377,12 +377,12 @@ namespace CorrugatedIron.Tests.Live
             for (var i = 0; i < 1000; i++)
             {
                 var o = new RiakObject(bucket, Guid.NewGuid().ToString(), "{ value: \"this is an object\" }");
-                o.IntIndex("position").Set(i);
+                o.IntIndex("positionSorting").Set(i);
 
                 Client.Put(o);
             }
 
-            var results = Client.IndexGet(bucket, "position", 1, 500, new RiakIndexGetOptions().SetPaginationSort(true).SetReturnTerms(true).SetMaxResults(10));
+            var results = Client.IndexGet(bucket, "positionSorting", 1, 500, new RiakIndexGetOptions().SetPaginationSort(true).SetReturnTerms(true).SetMaxResults(10));
 
             results.IsSuccess.ShouldBeTrue(results.ErrorMessage);
             results.Value.ShouldNotBeNull();
@@ -390,7 +390,7 @@ namespace CorrugatedIron.Tests.Live
             var keyTerms = results.Value.IndexKeyTerms.ToList();
             keyTerms[0].Term.ShouldEqual("1");
 
-            var results2 = Client.IndexGet(bucket, "position", 1, 500,
+            var results2 = Client.IndexGet(bucket, "positionSorting", 1, 500,
                 new RiakIndexGetOptions().SetPaginationSort(true)
                     .SetReturnTerms(true)
                     .SetMaxResults(10)
