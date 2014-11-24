@@ -120,7 +120,7 @@ namespace CorrugatedIron
 
         RiakResult<SearchSchema> GetSearchSchema(string schemaName);
         RiakResult PutSearchSchema(SearchSchema schema);
-
+        RiakResult<string> GetServerStatus();
 
     }
 }

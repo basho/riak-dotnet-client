@@ -35,7 +35,7 @@ namespace CorrugatedIron.Tests.Live
         {
             base.SetUp();
             var index = new SearchIndex(Index);
-            var result = Client.PutSearchIndex(index);
+            Client.PutSearchIndex(index);
             var props = Client.GetBucketProperties(BucketType, Bucket).Value;
             props.SetSearchIndex(Index);
             Client.SetBucketProperties(BucketType, Bucket, props);
@@ -74,7 +74,7 @@ namespace CorrugatedIron.Tests.Live
                 RiakConstants.ContentTypes.ApplicationJson, RiakConstants.CharSets.Utf8));
 
             // Let Yokozuna index stuff... *cry*
-            Thread.Sleep(1000);
+            Thread.Sleep(2000);
             
             var req = new RiakSearchRequest
             {

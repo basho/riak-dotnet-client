@@ -462,12 +462,12 @@ namespace CorrugatedIron.Messages
       get { return _search; }
       set { _search = value; }
     }
-    private RpbBucketProps.RpbReplMode? _repl;
+    private RpbBucketProps.RpbReplMode _repl;
     [global::ProtoBuf.ProtoMember(24, IsRequired = false, Name=@"repl", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(RpbBucketProps.RpbReplMode.FALSE)]
     public RpbBucketProps.RpbReplMode repl
     {
-        get { return _repl.HasValue ? _repl.Value : RpbReplMode.FALSE; }
+      get { return _repl; }
       set { _repl = value; }
     }
     private byte[] _search_index = null;
