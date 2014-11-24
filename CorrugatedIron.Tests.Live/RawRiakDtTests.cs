@@ -31,9 +31,6 @@ namespace CorrugatedIron.Tests.Live
     [TestFixture]
     public class RawRiakDtTests : LiveRiakConnectionTestBase
     {
-        private const string SetBucketType = "sets";
-        private const string CounterBucketType = "counters";
-        private const string MapBucketType = "maps";
         private const string Bucket = "riak_dt_bucket";
         private readonly DeserializeObject<string> _deserializer = (b, type) => Encoding.UTF8.GetString(b);
         private readonly SerializeObjectToByteArray<string> _serializer = s => Encoding.UTF8.GetBytes(s);
@@ -45,7 +42,7 @@ namespace CorrugatedIron.Tests.Live
             var key = "TestSetOperations_" + _random.Next();
             Console.WriteLine("Using {0} for TestSetOperations() key", key);
 
-            var id = new RiakObjectId(SetBucketType, Bucket, key);
+            var id = new RiakObjectId(BucketTypeNames.Sets, Bucket, key);
             var initialSet = Client.DtFetchSet(id);
 
             Assert.IsNull(initialSet.Context);
@@ -93,7 +90,7 @@ namespace CorrugatedIron.Tests.Live
             var key = "TestCounterOperations_" + _random.Next();
             Console.WriteLine("Using {0} for TestCounterOperations() key", key);
 
-            var id = new RiakObjectId(CounterBucketType, Bucket, key);
+            var id = new RiakObjectId(BucketTypeNames.Counters, Bucket, key);
 
             // Fetch empty
             var initialCounter = Client.DtFetchCounter(id);
@@ -127,7 +124,7 @@ namespace CorrugatedIron.Tests.Live
             var key = "TestMapOperations_" + _random.Next();
             Console.WriteLine("Using {0} for TestMapOperations() key", key);
 
-            var id = new RiakObjectId(MapBucketType, Bucket, key);
+            var id = new RiakObjectId(BucketTypeNames.Maps, Bucket, key);
 
             // Fetch empty
             // []
@@ -209,7 +206,7 @@ namespace CorrugatedIron.Tests.Live
             var key = "TestRegisterOperations_" + _random.Next();
             Console.WriteLine("Using {0} for TestRegisterOperations() key", key);
 
-            var id = new RiakObjectId(MapBucketType, Bucket, key);
+            var id = new RiakObjectId(BucketTypeNames.Maps, Bucket, key);
             const string registerName = "Name";
 
             var registerMapUpdate = new MapUpdate
@@ -232,7 +229,7 @@ namespace CorrugatedIron.Tests.Live
             var key = "TestFlagOperations_" + _random.Next();
             Console.WriteLine("Using {0} for TestFlagOperations() key", key);
 
-            var id = new RiakObjectId(MapBucketType, Bucket, key);
+            var id = new RiakObjectId(BucketTypeNames.Maps, Bucket, key);
             const string flagName = "Name";
 
             var flagMapUpdate = new MapUpdate
@@ -268,7 +265,7 @@ namespace CorrugatedIron.Tests.Live
             var key = "TestMapSetOperations_" + _random.Next();
             Console.WriteLine("Using {0} for TestMapSetOperations() key", key);
 
-            var id = new RiakObjectId(MapBucketType, Bucket, key);
+            var id = new RiakObjectId(BucketTypeNames.Maps, Bucket, key);
             const string setName = "Name";
 
             var setMapUpdate = new MapUpdate

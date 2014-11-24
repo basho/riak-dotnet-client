@@ -1780,5 +1780,17 @@ namespace CorrugatedIron
             var request = new RpbYokozunaSchemaPutReq { schema = searchSchema.ToMessage() };
             return UseConnection(conn => conn.PbcWriteRead(request, MessageCode.PutResp));
         }
+
+        public RiakResult<String> GetServerStatus()
+        {
+            var request = new RiakRestRequest(RiakConstants.Rest.Uri.StatsRoot, RiakConstants.Rest.HttpMethod.Get);
+            var result = UseConnection(conn => conn.RestRequest(request));
+            if (!result.IsSuccess || result.Value.StatusCode != HttpStatusCode.OK)
+                return RiakResult<string>.Error(ResultCode.InvalidResponse, 
+                                                "Unexpected Status Code: {0} ({1})".Fmt(result.Value.StatusCode, (int) result.Value.StatusCode), 
+                                                result.NodeOffline);
+
+            return RiakResult<string>.Success(result.Value.Body);
+        }
     }
 }

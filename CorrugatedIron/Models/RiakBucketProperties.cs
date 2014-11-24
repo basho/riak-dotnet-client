@@ -99,7 +99,7 @@ namespace CorrugatedIron.Models
         /// <value>The PW value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.</value>
         public uint? PwVal { get; private set; }
 
-        public RiakConstants.RiakEnterprise.ReplicationMode? ReplicationMode { get; private set; }
+        public RiakConstants.RiakEnterprise.ReplicationMode ReplicationMode { get; private set; }
 
         public string SearchIndex { get; private set; }
 
@@ -245,12 +245,6 @@ namespace CorrugatedIron.Models
         public RiakBucketProperties SetBackend(string backend)
         {
             Backend = backend;
-            return this;
-        }
-
-        public RiakBucketProperties SetReplicationMode(RiakConstants.RiakEnterprise.ReplicationMode replicationMode)
-        {
-            ReplicationMode = replicationMode;
             return this;
         }
 

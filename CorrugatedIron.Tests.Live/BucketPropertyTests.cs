@@ -29,6 +29,8 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
     [TestFixture]
     public class WhenDealingWithBucketProperties : LiveRiakConnectionTestBase
     {
+        private readonly Random _random = new Random();
+
         // use the one node configuration here because we might run the risk
         // of hitting different nodes in the configuration before the props
         // are replicated to other nodes.
@@ -246,6 +248,19 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
             resetProps.WVal.ShouldNotEqual(props.WVal);
             resetProps.LastWriteWins.ShouldNotEqual(props.LastWriteWins);
         }
+
+        [Test]
+        public void TestNewBucketGivesReplFlagBack()
+        {
+            var bucket = "replicants" + _random.Next();
+            var getInitialPropsResponse = Client.GetBucketProperties(bucket);
+
+            if (Client.GetServerStatus().Value.Contains("riak_repl_version"))
+                getInitialPropsResponse.Value.ReplicationMode.ShouldEqual(RiakConstants.RiakEnterprise.ReplicationMode.True);
+            else
+                getInitialPropsResponse.Value.ReplicationMode.ShouldEqual(RiakConstants.RiakEnterprise.ReplicationMode.False);
+        }
+
     }
 
 }
