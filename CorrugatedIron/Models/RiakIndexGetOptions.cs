@@ -26,6 +26,9 @@ namespace CorrugatedIron.Models
         public bool? Stream { get; private set; }
         public uint? MaxResults { get; private set; }
         public string Continuation { get; private set; }
+        public uint? Timeout { get; private set; }
+        public bool? PaginationSort { get; private set; }
+        public string TermRegex { get; private set; }
 
         public RiakIndexGetOptions()
         {
@@ -62,6 +65,24 @@ namespace CorrugatedIron.Models
             return this;
         }
 
+        public RiakIndexGetOptions SetTimeout(uint value)
+        {
+            Timeout = value;
+            return this;
+        }
+
+        public RiakIndexGetOptions SetTermRegex(string value)
+        {
+            TermRegex = value;
+            return this;
+        }
+
+        public RiakIndexGetOptions SetPaginationSort(bool value)
+        {
+            PaginationSort = value;
+            return this;
+        }
+
         internal void Populate(RpbIndexReq request)
         {
             if (ReturnTerms.HasValue)
@@ -75,6 +96,17 @@ namespace CorrugatedIron.Models
 
             if (!string.IsNullOrEmpty(Continuation))
                 request.continuation = Continuation.ToRiakString();
+
+            if (Timeout.HasValue)
+                request.timeout = Timeout.Value;
+
+            if (!string.IsNullOrEmpty(TermRegex))
+                request.term_regex = TermRegex.ToRiakString();
+
+            if (PaginationSort.HasValue)
+                request.pagination_sort = PaginationSort.Value;
         }
+
+
     }
 }

@@ -118,6 +118,13 @@ namespace CorrugatedIron.Models
             }
         }
 
+        /// <summary>
+        /// The DataType (if any) associated with this bucket.
+        /// </summary>
+        /// <value>A string representation of the DataType assigned to this bucket. Possible values include 'set', 'map', 'counter', or null for no data type </value>
+        public string DataType { get; private set; }
+
+
         public RiakBucketProperties SetBasicQuorum(bool value)
         {
             BasicQuorum = value;
@@ -462,6 +469,7 @@ namespace CorrugatedIron.Models
             ReplicationMode = (RiakConstants.RiakEnterprise.ReplicationMode)bucketProps.repl;
 
             SearchIndex = bucketProps.search_index.FromRiakString();
+            DataType = bucketProps.datatype.FromRiakString();
         }
 
         private static IRiakPreCommitHook LoadPreCommitHook(RpbCommitHook hook)
