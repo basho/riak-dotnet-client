@@ -261,6 +261,15 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
                 getInitialPropsResponse.Value.ReplicationMode.ShouldEqual(RiakConstants.RiakEnterprise.ReplicationMode.False);
         }
 
+        [Test]
+        public void TestBucketTypesPropertyWorks()
+        {
+            var setsBucketTypeBucketPropsResult = Client.GetBucketProperties(BucketTypeNames.Sets, "Schmoopy");
+            setsBucketTypeBucketPropsResult.Value.DataType.ShouldEqual("set");
+
+            var plainBucketTypeBucketPropsResult = Client.GetBucketProperties("plain", "Schmoopy");
+            plainBucketTypeBucketPropsResult.Value.DataType.ShouldBeNull();
+        }
     }
 
 }
