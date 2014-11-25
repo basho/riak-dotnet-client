@@ -7,6 +7,7 @@ if [ "Darwin" = "$PLATFORM" ]; then
         sudo /usr/sbin/installer -pkg MonoFramework-MDK-3.8.0.macos10.xamarin.x86.pkg -target /
     fi
 else # Assume ubuntu/debian
+	mozroots --import --sync
     sudo apt-get install -y python-software-properties
     sudo apt-add-repository -y ppa:directhex/monoxide
     sudo apt-get update
