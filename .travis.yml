@@ -5,6 +5,9 @@ branches:
 
 language: c
 
+fixcerts:
+  - mozroots --import --sync
+
 install:
   - ./.mono-build-scripts/InstallMono.sh
 
