@@ -41,7 +41,7 @@
     <tags>Riak CorrugatedIron Corrugated Iron NoSQL Client Driver</tags>
     <dependencies>
       <dependency id="Newtonsoft.Json" version="4.5.10" />
-      <dependency id="protobuf-net" version="2.0.0.602" />
+      <dependency id="protobuf-net" version="2.0.0.640" />
     </dependencies>
     <frameworkAssemblies>
       <frameworkAssembly assemblyName="System.configuration" />
