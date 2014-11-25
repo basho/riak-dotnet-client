@@ -66,7 +66,6 @@ namespace CorrugatedIron.Messages
       get { return _field; }
       set { _field = value; }
     }
-
     private long _counter_value = default(long);
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"counter_value", DataFormat = global::ProtoBuf.DataFormat.ZigZag)]
     [global::System.ComponentModel.DefaultValue(default(long))]
@@ -82,7 +81,6 @@ namespace CorrugatedIron.Messages
       get { return _set_value; }
     }
   
-
     private byte[] _register_value = null;
     [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"register_value", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(null)]
@@ -91,7 +89,6 @@ namespace CorrugatedIron.Messages
       get { return _register_value; }
       set { _register_value = value; }
     }
-
     private bool _flag_value = default(bool);
     [global::ProtoBuf.ProtoMember(5, IsRequired = false, Name=@"flag_value", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(default(bool))]
@@ -138,7 +135,6 @@ namespace CorrugatedIron.Messages
       get { return _type; }
       set { _type = value; }
     }
-
     private uint _r = default(uint);
     [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"r", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(uint))]
@@ -147,7 +143,6 @@ namespace CorrugatedIron.Messages
       get { return _r; }
       set { _r = value; }
     }
-
     private uint _pr = default(uint);
     [global::ProtoBuf.ProtoMember(5, IsRequired = false, Name=@"pr", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(uint))]
@@ -156,7 +151,6 @@ namespace CorrugatedIron.Messages
       get { return _pr; }
       set { _pr = value; }
     }
-
     private bool _basic_quorum = default(bool);
     [global::ProtoBuf.ProtoMember(6, IsRequired = false, Name=@"basic_quorum", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(default(bool))]
@@ -165,7 +159,6 @@ namespace CorrugatedIron.Messages
       get { return _basic_quorum; }
       set { _basic_quorum = value; }
     }
-
     private bool _notfound_ok = default(bool);
     [global::ProtoBuf.ProtoMember(7, IsRequired = false, Name=@"notfound_ok", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(default(bool))]
@@ -174,7 +167,6 @@ namespace CorrugatedIron.Messages
       get { return _notfound_ok; }
       set { _notfound_ok = value; }
     }
-
     private uint _timeout = default(uint);
     [global::ProtoBuf.ProtoMember(8, IsRequired = false, Name=@"timeout", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(uint))]
@@ -183,7 +175,6 @@ namespace CorrugatedIron.Messages
       get { return _timeout; }
       set { _timeout = value; }
     }
-
     private bool _sloppy_quorum = default(bool);
     [global::ProtoBuf.ProtoMember(9, IsRequired = false, Name=@"sloppy_quorum", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(default(bool))]
@@ -192,7 +183,6 @@ namespace CorrugatedIron.Messages
       get { return _sloppy_quorum; }
       set { _sloppy_quorum = value; }
     }
-
     private uint _n_val = default(uint);
     [global::ProtoBuf.ProtoMember(10, IsRequired = false, Name=@"n_val", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(uint))]
@@ -201,7 +191,6 @@ namespace CorrugatedIron.Messages
       get { return _n_val; }
       set { _n_val = value; }
     }
-
     private bool _include_context = (bool)true;
     [global::ProtoBuf.ProtoMember(11, IsRequired = false, Name=@"include_context", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue((bool)true)]
@@ -220,7 +209,6 @@ namespace CorrugatedIron.Messages
   {
     public DtValue() {}
     
-
     private long _counter_value = default(long);
     [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"counter_value", DataFormat = global::ProtoBuf.DataFormat.ZigZag)]
     [global::System.ComponentModel.DefaultValue(default(long))]
@@ -253,7 +241,6 @@ namespace CorrugatedIron.Messages
   {
     public DtFetchResp() {}
     
-
     private byte[] _context = null;
     [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"context", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(null)]
@@ -269,7 +256,6 @@ namespace CorrugatedIron.Messages
       get { return _type; }
       set { _type = value; }
     }
-
     private DtValue _value = null;
     [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"value", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(null)]
@@ -302,7 +288,6 @@ namespace CorrugatedIron.Messages
   {
     public CounterOp() {}
     
-
     private long _increment = default(long);
     [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"increment", DataFormat = global::ProtoBuf.DataFormat.ZigZag)]
     [global::System.ComponentModel.DefaultValue(default(long))]
@@ -352,7 +337,6 @@ namespace CorrugatedIron.Messages
       get { return _field; }
       set { _field = value; }
     }
-
     private CounterOp _counter_op = null;
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"counter_op", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(null)]
@@ -361,7 +345,6 @@ namespace CorrugatedIron.Messages
       get { return _counter_op; }
       set { _counter_op = value; }
     }
-
     private SetOp _set_op = null;
     [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"set_op", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(null)]
@@ -370,7 +353,6 @@ namespace CorrugatedIron.Messages
       get { return _set_op; }
       set { _set_op = value; }
     }
-
     private byte[] _register_op = null;
     [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"register_op", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(null)]
@@ -379,15 +361,15 @@ namespace CorrugatedIron.Messages
       get { return _register_op; }
       set { _register_op = value; }
     }
-
-    private MapUpdate.FlagOp _flag_op;
+    private MapUpdate.FlagOp _flag_op = MapUpdate.FlagOp.ENABLE;
     [global::ProtoBuf.ProtoMember(5, IsRequired = false, Name=@"flag_op", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    // @alexmoore - if the next line is uncommented, protobuf-net will not include the field if it's set to ENABLE, causing problems on Riak's side.
+    //[global::System.ComponentModel.DefaultValue(MapUpdate.FlagOp.ENABLE)]
     public MapUpdate.FlagOp flag_op
     {
       get { return _flag_op; }
       set { _flag_op = value; }
     }
-
     private MapOp _map_op = null;
     [global::ProtoBuf.ProtoMember(6, IsRequired = false, Name=@"map_op", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(null)]
@@ -417,22 +399,15 @@ namespace CorrugatedIron.Messages
   {
     public MapOp() {}
     
-    private readonly global::System.Collections.Generic.List<MapField> _adds = new global::System.Collections.Generic.List<MapField>();
-    [global::ProtoBuf.ProtoMember(1, Name=@"adds", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public global::System.Collections.Generic.List<MapField> adds
-    {
-      get { return _adds; }
-    }
-  
     private readonly global::System.Collections.Generic.List<MapField> _removes = new global::System.Collections.Generic.List<MapField>();
-    [global::ProtoBuf.ProtoMember(2, Name=@"removes", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::ProtoBuf.ProtoMember(1, Name=@"removes", DataFormat = global::ProtoBuf.DataFormat.Default)]
     public global::System.Collections.Generic.List<MapField> removes
     {
       get { return _removes; }
     }
   
     private readonly global::System.Collections.Generic.List<MapUpdate> _updates = new global::System.Collections.Generic.List<MapUpdate>();
-    [global::ProtoBuf.ProtoMember(3, Name=@"updates", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::ProtoBuf.ProtoMember(2, Name=@"updates", DataFormat = global::ProtoBuf.DataFormat.Default)]
     public global::System.Collections.Generic.List<MapUpdate> updates
     {
       get { return _updates; }
@@ -448,7 +423,6 @@ namespace CorrugatedIron.Messages
   {
     public DtOp() {}
     
-
     private CounterOp _counter_op = null;
     [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"counter_op", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(null)]
@@ -457,7 +431,6 @@ namespace CorrugatedIron.Messages
       get { return _counter_op; }
       set { _counter_op = value; }
     }
-
     private SetOp _set_op = null;
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"set_op", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(null)]
@@ -466,7 +439,6 @@ namespace CorrugatedIron.Messages
       get { return _set_op; }
       set { _set_op = value; }
     }
-
     private MapOp _map_op = null;
     [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"map_op", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(null)]
@@ -492,7 +464,6 @@ namespace CorrugatedIron.Messages
       get { return _bucket; }
       set { _bucket = value; }
     }
-
     private byte[] _key = null;
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"key", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(null)]
@@ -508,7 +479,6 @@ namespace CorrugatedIron.Messages
       get { return _type; }
       set { _type = value; }
     }
-
     private byte[] _context = null;
     [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"context", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(null)]
@@ -524,7 +494,6 @@ namespace CorrugatedIron.Messages
       get { return _op; }
       set { _op = value; }
     }
-
     private uint _w = default(uint);
     [global::ProtoBuf.ProtoMember(6, IsRequired = false, Name=@"w", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(uint))]
@@ -533,7 +502,6 @@ namespace CorrugatedIron.Messages
       get { return _w; }
       set { _w = value; }
     }
-
     private uint _dw = default(uint);
     [global::ProtoBuf.ProtoMember(7, IsRequired = false, Name=@"dw", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(uint))]
@@ -542,7 +510,6 @@ namespace CorrugatedIron.Messages
       get { return _dw; }
       set { _dw = value; }
     }
-
     private uint _pw = default(uint);
     [global::ProtoBuf.ProtoMember(8, IsRequired = false, Name=@"pw", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(uint))]
@@ -551,7 +518,6 @@ namespace CorrugatedIron.Messages
       get { return _pw; }
       set { _pw = value; }
     }
-
     private bool _return_body = (bool)false;
     [global::ProtoBuf.ProtoMember(9, IsRequired = false, Name=@"return_body", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue((bool)false)]
@@ -560,7 +526,6 @@ namespace CorrugatedIron.Messages
       get { return _return_body; }
       set { _return_body = value; }
     }
-
     private uint _timeout = default(uint);
     [global::ProtoBuf.ProtoMember(10, IsRequired = false, Name=@"timeout", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(uint))]
@@ -569,7 +534,6 @@ namespace CorrugatedIron.Messages
       get { return _timeout; }
       set { _timeout = value; }
     }
-
     private bool _sloppy_quorum = default(bool);
     [global::ProtoBuf.ProtoMember(11, IsRequired = false, Name=@"sloppy_quorum", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(default(bool))]
@@ -578,7 +542,6 @@ namespace CorrugatedIron.Messages
       get { return _sloppy_quorum; }
       set { _sloppy_quorum = value; }
     }
-
     private uint _n_val = default(uint);
     [global::ProtoBuf.ProtoMember(12, IsRequired = false, Name=@"n_val", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(default(uint))]
@@ -587,7 +550,6 @@ namespace CorrugatedIron.Messages
       get { return _n_val; }
       set { _n_val = value; }
     }
-
     private bool _include_context = (bool)true;
     [global::ProtoBuf.ProtoMember(13, IsRequired = false, Name=@"include_context", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue((bool)true)]
@@ -606,7 +568,6 @@ namespace CorrugatedIron.Messages
   {
     public DtUpdateResp() {}
     
-
     private byte[] _key = null;
     [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"key", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(null)]
@@ -615,7 +576,6 @@ namespace CorrugatedIron.Messages
       get { return _key; }
       set { _key = value; }
     }
-
     private byte[] _context = null;
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"context", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(null)]
@@ -624,7 +584,6 @@ namespace CorrugatedIron.Messages
       get { return _context; }
       set { _context = value; }
     }
-
     private long _counter_value = default(long);
     [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"counter_value", DataFormat = global::ProtoBuf.DataFormat.ZigZag)]
     [global::System.ComponentModel.DefaultValue(default(long))]

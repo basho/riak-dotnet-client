@@ -14,7 +14,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using CorrugatedIron.Messages;
@@ -41,13 +40,13 @@ namespace CorrugatedIron.Models.RiakDt
                 FlagValue = entry.flag_value;
 
             if (Field.Type == RiakDtMapField.RiakDtMapFieldType.Map)
-                MapValue.AddRange(entry.map_value.Select(mv => new RiakDtMapEntry(mv)));
+                MapValue = entry.map_value.Select(mv => new RiakDtMapEntry(mv)).ToList();
 
             if (Field.Type == RiakDtMapField.RiakDtMapFieldType.Register)
                 RegisterValue = entry.register_value;
 
             if (Field.Type == RiakDtMapField.RiakDtMapFieldType.Set)
-                SetValue.AddRange(entry.set_value);
+                SetValue = entry.set_value;
         }
     }
 }

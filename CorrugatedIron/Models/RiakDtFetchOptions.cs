@@ -79,7 +79,7 @@ namespace CorrugatedIron.Models
         /// <summary>
         /// Determines whether or not the context will be returned. For read-only requests or context-free operations, you can set this to false to reduce the size of the response payload.
         /// </summary>
-        public bool? IncludeContext { get; private set; }
+        public bool IncludeContext { get; private set; }
 
         public RiakDtFetchOptions SetR(uint value)
         {
@@ -131,10 +131,17 @@ namespace CorrugatedIron.Models
             return this;
         }
 
+        public RiakDtFetchOptions SetIncludeContext(bool value)
+        {
+            IncludeContext = value;
+            return this;
+        }
+
         public RiakDtFetchOptions()
         {
             R = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
             Pr = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
+            IncludeContext = true;
         }
 
         internal void Populate(DtFetchReq request)
@@ -166,6 +173,8 @@ namespace CorrugatedIron.Models
             {
                 request.n_val = NVal.Value;
             }
+
+            request.include_context = IncludeContext;
         }
 
         private RiakDtFetchOptions WriteQuorum(string value, Action<Either<uint, string>> setter)
