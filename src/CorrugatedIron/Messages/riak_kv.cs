@@ -744,6 +744,22 @@ namespace CorrugatedIron.Messages
       get { return _type; }
       set { _type = value; }
     }
+    private byte[] _term_regex = null;
+    [global::ProtoBuf.ProtoMember(13, IsRequired = false, Name=@"term_regex", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(null)]
+    public byte[] term_regex
+    {
+      get { return _term_regex; }
+      set { _term_regex = value; }
+    }
+    private bool _pagination_sort = default(bool);
+    [global::ProtoBuf.ProtoMember(14, IsRequired = false, Name=@"pagination_sort", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(default(bool))]
+    public bool pagination_sort
+    {
+      get { return _pagination_sort; }
+      set { _pagination_sort = value; }
+    }
     [global::ProtoBuf.ProtoContract(Name=@"IndexQueryType")]
     public enum IndexQueryType
     {

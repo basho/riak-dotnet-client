@@ -14,6 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
 using Newtonsoft.Json;
@@ -22,14 +23,16 @@ namespace CorrugatedIron.Models.CommitHook
 {
     public class RiakErlangCommitHook : RiakCommitHook, IRiakPreCommitHook, IRiakPostCommitHook
     {
+        [Obsolete("RiakSearchCommitHook is deprecated, please use RiakLegacySearchCommitHook instead.", true)]
         internal static RiakErlangCommitHook RiakSearchCommitHook;
+        internal static RiakErlangCommitHook RiakLegacySearchCommitHook;
 
         public string Module { get; private set; }
         public string Function { get; private set; }
 
         static RiakErlangCommitHook()
         {
-            RiakSearchCommitHook = new RiakErlangCommitHook("riak_search_kv_hook", "precommit");
+            RiakLegacySearchCommitHook = new RiakErlangCommitHook("riak_search_kv_hook", "precommit");
         }
 
         public RiakErlangCommitHook(string module, string function)

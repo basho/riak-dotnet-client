@@ -30,6 +30,14 @@ namespace CorrugatedIron.Messages
       get { return _schema; }
       set { _schema = value; }
     }
+    private uint _n_val = default(uint);
+    [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"n_val", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(uint))]
+    public uint n_val
+    {
+      get { return _n_val; }
+      set { _n_val = value; }
+    }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }

@@ -196,6 +196,7 @@
     <Compile Include="Models\RiakDt\RiakDtSetResult.cs" />
     <Compile Include="Models\RiakDtUpdateOptions.cs" />
     <Compile Include="Models\RiakDt\RiakDtCounter.cs" />
+    <Compile Include="Models\RiakDt\SetOperation.cs" />
     <Compile Include="Models\RiakIndexGetOptions.cs" />
     <Compile Include="Models\RiakObjectId.cs" />
     <Compile Include="Models\RiakBucketProperties.cs">
@@ -222,6 +223,7 @@
     <Compile Include="Models\Search\RiakSearchResult.cs" />
     <Compile Include="Models\Search\RiakSearchResultDocument.cs" />
     <Compile Include="Models\Search\RiakSearchResultField.cs" />
+    <Compile Include="Models\Search\SearchIndexResult.cs" />
     <Compile Include="Models\Search\Term.cs" />
     <Compile Include="Models\Search\Token.cs" />
     <Compile Include="Models\Search\UnaryTerm.cs" />

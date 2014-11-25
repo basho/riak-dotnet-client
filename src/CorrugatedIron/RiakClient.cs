@@ -42,6 +42,7 @@ namespace CorrugatedIron
         T Batch<T>(Func<IRiakBatchClient, T> batchFunction);
 
         IRiakAsyncClient Async { get; }
+        
     }
 
     public class RiakClient : IRiakClient
@@ -1508,35 +1509,31 @@ namespace CorrugatedIron
 
             var rcr = new RiakCounterResult(RiakResult<RiakObject>.Success(o));
 
-            if (options.IncludeContext.HasValue && options.IncludeContext.Value)
-                rcr.Context = result.Value.context;
+            if (result.Value.value != null)
+                rcr.Value = result.Value.value.counter_value;
 
             return rcr;
         }
 
         public RiakCounterResult DtUpdateCounter(string bucketType, string bucket, string key,
-                                                 long amount,
-                                                 byte[] context,
-                                                 RiakDtUpdateOptions options = null)
+                                                 long amount, RiakDtUpdateOptions options = null)
         {
-            return DtUpdateCounter(new RiakObjectId(bucketType, bucket, key), amount, context, options);
+            return DtUpdateCounter(new RiakObjectId(bucketType, bucket, key), amount, options);
         }
 
         public RiakCounterResult DtUpdateCounter(RiakObjectId objectId, long amount, 
-                                                 byte[] context, RiakDtUpdateOptions options = null)
+                                                 RiakDtUpdateOptions options = null)
         {
             var request = new DtUpdateReq
             {
                 type = objectId.BucketType.ToRiakString(),
                 bucket = objectId.Bucket.ToRiakString(), 
-                key = objectId.Key.ToRiakString()
+                key = objectId.Key.ToRiakString(),
+                op = new CounterOperation(amount).ToDtOp()
             };
 
             options = options ?? new RiakDtUpdateOptions();
             options.Populate(request);
-
-            if (context != null)
-                request.context = context;
 
             var result = UseConnection(conn => conn.PbcWriteRead<DtUpdateReq, DtUpdateResp>(request));
 
@@ -1548,9 +1545,6 @@ namespace CorrugatedIron
             var o = new RiakObject(objectId, result.Value.counter_value);
 
             var rcr = new RiakCounterResult(RiakResult<RiakObject>.Success(o));
-
-            if (options.IncludeContext)
-                rcr.Context = result.Value.context;
 
             if (options.ReturnBody)
                 rcr.Value = result.Value.counter_value;
@@ -1581,10 +1575,13 @@ namespace CorrugatedIron
                 return new RiakDtSetResult(RiakResult<RiakObject>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline));
 
             var rsr =
-                new RiakDtSetResult(RiakResult<RiakObject>.Success(new RiakObject(objectId, result.Value.value)));
+                new RiakDtSetResult(RiakResult<RiakObject>.Success(new RiakObject(objectId, result.Value)));
 
-            if (options.IncludeContext.HasValue && options.IncludeContext.Value)
+            if (options.IncludeContext)
                 rsr.Context = result.Value.context;
+
+            if (result.Value.value != null)
+                rsr.Values = result.Value.value.set_value;
 
             return rsr;
         }
@@ -1593,7 +1590,7 @@ namespace CorrugatedIron
                                               string bucket,
                                               string key,
                                               SerializeObjectToByteArray<T> serialize,
-                                              byte[] context = null,
+                                              byte[] context,
                                               List<T> adds = null,
                                               List<T> removes = null,
                                               RiakDtUpdateOptions options = null)
@@ -1603,7 +1600,7 @@ namespace CorrugatedIron
 
         public RiakDtSetResult DtUpdateSet<T>(RiakObjectId objectId,
                                               SerializeObjectToByteArray<T> serialize,
-                                              byte[] context = null,
+                                              byte[] context,
                                               List<T> adds = null,
                                               List<T> removes = null,
                                               RiakDtUpdateOptions options = null)
@@ -1613,7 +1610,8 @@ namespace CorrugatedIron
                 type = objectId.BucketType.ToRiakString(),
                 bucket = objectId.Bucket.ToRiakString(),
                 key = objectId.Key.ToRiakString(),
-                context = context
+                context = context,
+                op = new SetOperation().ToDtOp()
             };
 
             options = options ?? new RiakDtUpdateOptions();
@@ -1628,7 +1626,7 @@ namespace CorrugatedIron
             var response = UseConnection(conn => conn.PbcWriteRead<DtUpdateReq, DtUpdateResp>(request));
 
             var rdsr =
-                new RiakDtSetResult(RiakResult<RiakObject>.Success(new RiakObject(objectId, response.Value.set_value)));
+                new RiakDtSetResult(RiakResult<RiakObject>.Success(new RiakObject(objectId, response.Value)));
 
             if (options.IncludeContext)
                 rdsr.Context = response.Value.context;
@@ -1640,15 +1638,21 @@ namespace CorrugatedIron
         }
 
         public RiakDtMapResult DtFetchMap(string bucket,
-                                          string key,
-                                          string bucketType = null,
+            string key,
+            string bucketType = null,
+            RiakDtFetchOptions options = null)
+        {
+            return DtFetchMap(new RiakObjectId(bucketType, bucket, key), options);
+        }
+
+        public RiakDtMapResult DtFetchMap(RiakObjectId objectId,
                                           RiakDtFetchOptions options = null)
         {
             var message = new DtFetchReq
             {
-                bucket = bucket.ToRiakString(),
-                type = bucketType.ToRiakString(),
-                key = key.ToRiakString()
+                bucket = objectId.Bucket.ToRiakString(),
+                type = objectId.BucketType.ToRiakString(),
+                key = objectId.Key.ToRiakString()
             };
 
             options = options ?? new RiakDtFetchOptions();
@@ -1661,10 +1665,13 @@ namespace CorrugatedIron
                 return new RiakDtMapResult(RiakResult<RiakObject>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline));
 
             var rmr =
-                new RiakDtMapResult(RiakResult<RiakObject>.Success(new RiakObject(bucket, key, result.Value.value)));
+                new RiakDtMapResult(RiakResult<RiakObject>.Success(new RiakObject(objectId.Bucket, objectId.Key, result.Value.value)));
 
-            if (options.IncludeContext.HasValue && options.IncludeContext.Value)
+            if (options.IncludeContext)
                 rmr.Context = result.Value.context;
+
+            if (result.Value.value != null)
+                rmr.Values = result.Value.value.map_value.Select(mapEntry => new RiakDtMapEntry(mapEntry)).ToList();
 
             return rmr;
         }
@@ -1673,8 +1680,7 @@ namespace CorrugatedIron
                                               string bucket,
                                               string key,
                                               SerializeObjectToByteArray<T> serialize,
-                                              byte[] context = null,
-                                              List<RiakDtMapField> adds = null,
+                                              byte[] context,
                                               List<RiakDtMapField> removes = null,
                                               /* Is this the right way to represent updates?
                                                * It seems like there should be something better, but it requires data
@@ -1686,13 +1692,12 @@ namespace CorrugatedIron
             )
         {
             return DtUpdateMap(new RiakObjectId(bucketType, bucket, key),
-                               serialize, context, adds, removes, updates, options);
+                               serialize, context, removes, updates, options);
         }
 
         public RiakDtMapResult DtUpdateMap<T>(RiakObjectId objectId,
                                               SerializeObjectToByteArray<T> serialize,
-                                              byte[] context = null,
-                                              List<RiakDtMapField> adds = null,
+                                              byte[] context,
                                               List<RiakDtMapField> removes = null,
                                               List<MapUpdate> updates = null,
                                               RiakDtUpdateOptions options = null)
@@ -1701,38 +1706,26 @@ namespace CorrugatedIron
             {
                 type = objectId.BucketType.ToRiakString(),
                 bucket = objectId.Bucket.ToRiakString(),
-                key = objectId.Key.ToRiakString()
+                key = objectId.Key.ToRiakString(),
+                op = new MapOperation().ToDtOp(),
             };
 
             options = options ?? new RiakDtUpdateOptions();
             options.Populate(request);
 
-            if (adds != null)
-            {
-                request.op.map_op.adds.AddRange(adds.Select(a => a.ToMapField()));
-            }
-
             if (removes != null)
-            {
                 request.op.map_op.removes.AddRange(removes.Select(a => a.ToMapField()));
-            }
 
             if (updates != null)
-            {
                 request.op.map_op.updates.AddRange(updates);
-            }
 
             if (context != null)
-            {
                 request.context = context;
-            }
 
             var result = UseConnection(conn => conn.PbcWriteRead<DtUpdateReq, DtUpdateResp>(request));
 
             if (!result.IsSuccess)
-            {
                 return new RiakDtMapResult(RiakResult<RiakObject>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline));
-            }
 
             var rmr =
                 new RiakDtMapResult(RiakResult<RiakObject>.Success(new RiakObject(objectId, result.Value.map_value)));
@@ -1741,9 +1734,63 @@ namespace CorrugatedIron
                 rmr.Context = result.Value.context;
 
             if (options.ReturnBody)
-                rmr.Values.AddRange(result.Value.map_value.Select(mv => new RiakDtMapEntry(mv)));
+                rmr.Values = result.Value.map_value.Select(mv => new RiakDtMapEntry(mv)).ToList();
 
             return rmr;
+        }
+
+        public RiakResult<SearchIndexResult> GetSearchIndex(string indexName)
+        {
+            var request = new RpbYokozunaIndexGetReq {name = indexName.ToRiakString()};
+            var result =
+                UseConnection(conn => conn.PbcWriteRead<RpbYokozunaIndexGetReq, RpbYokozunaIndexGetResp>(request));
+            
+            if (!result.IsSuccess)
+                return RiakResult<SearchIndexResult>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
+
+            return RiakResult<SearchIndexResult>.Success(new SearchIndexResult(result.Value));
+        }
+
+        public RiakResult PutSearchIndex(SearchIndex searchindex)
+        {
+            var request = new RpbYokozunaIndexPutReq { index = searchindex.ToMessage() };
+            return UseConnection(conn => conn.PbcWriteRead(request, MessageCode.PutResp));
+        }
+
+        public RiakResult DeleteSearchIndex(string indexName)
+        {
+            var request = new RpbYokozunaIndexDeleteReq {name = indexName.ToRiakString()};
+            return UseConnection(conn => conn.PbcWriteRead(request, MessageCode.DelResp));
+        }
+
+        public RiakResult<SearchSchema> GetSearchSchema(string schemaName)
+        {
+            var request = new RpbYokozunaSchemaGetReq {name = schemaName.ToRiakString()};
+            var result =
+                UseConnection(conn => conn.PbcWriteRead<RpbYokozunaSchemaGetReq, RpbYokozunaSchemaGetResp>(request));
+            
+            if (!result.IsSuccess)
+                return RiakResult<SearchSchema>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
+
+            return RiakResult<SearchSchema>.Success(new SearchSchema(result.Value.schema));
+        }
+
+        public RiakResult PutSearchSchema(SearchSchema searchSchema)
+        {
+            var request = new RpbYokozunaSchemaPutReq { schema = searchSchema.ToMessage() };
+            return UseConnection(conn => conn.PbcWriteRead(request, MessageCode.PutResp));
+        }
+
+        public RiakResult<String> GetServerStatus()
+        {
+            var request = new RiakRestRequest(RiakConstants.Rest.Uri.StatsRoot, RiakConstants.Rest.HttpMethod.Get);
+            var result = UseConnection(conn => conn.RestRequest(request));
+            if (!result.IsSuccess || result.Value.StatusCode != HttpStatusCode.OK)
+                return RiakResult<string>.Error(ResultCode.InvalidResponse, 
+                                                "Unexpected Status Code: {0} ({1})".Fmt(result.Value.StatusCode, (int) result.Value.StatusCode), 
+                                                result.NodeOffline);
+
+            return RiakResult<string>.Success(result.Value.Body);
         }
     }
 }

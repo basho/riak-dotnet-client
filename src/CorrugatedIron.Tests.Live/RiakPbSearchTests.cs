@@ -39,7 +39,7 @@ namespace CorrugatedIron.Tests.Live
             base.SetUp();
             
             var props = Client.GetBucketProperties(Bucket).Value;
-            props.SetSearch(true);
+            props.SetLegacySearch(true);
             Client.SetBucketProperties(Bucket, props);
         }
 

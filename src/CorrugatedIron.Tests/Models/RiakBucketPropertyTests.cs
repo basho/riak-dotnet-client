@@ -30,10 +30,10 @@ namespace CorrugatedIron.Tests.Models
         {
             var props = new RiakBucketProperties()
                 .AddPreCommitHook(new RiakErlangCommitHook("foo", "bar"))
-                .SetSearch(true);
+                .SetLegacySearch(true);
 
             props.PreCommitHooks.Count.ShouldEqual(1);
-            props.Search.ShouldEqual(true);
+            props.LegacySearch.ShouldEqual(true);
         }
 
         [Test]
@@ -41,13 +41,13 @@ namespace CorrugatedIron.Tests.Models
         {
             var props = new RiakBucketProperties()
                 .AddPreCommitHook(new RiakErlangCommitHook("foo", "bar"))
-                .SetSearch(true);
+                .SetLegacySearch(true);
 
             props.PreCommitHooks.Count.ShouldEqual(1);
-            props.Search.ShouldEqual(true);
+            props.LegacySearch.ShouldEqual(true);
 
-            props.SetSearch(false);
-            props.Search.ShouldNotEqual(true);
+            props.SetLegacySearch(false);
+            props.LegacySearch.ShouldNotEqual(true);
             ((RiakErlangCommitHook)props.PreCommitHooks[0]).Function.ShouldEqual("bar");
         }
 
@@ -56,7 +56,7 @@ namespace CorrugatedIron.Tests.Models
         {
             var props = new RiakBucketProperties()
                 .AddPreCommitHook(new RiakErlangCommitHook("foo", "bar"))
-                .SetSearch(false);
+                .SetLegacySearch(false);
 
             props.PreCommitHooks.Count.ShouldEqual(1);
         }
@@ -71,7 +71,7 @@ namespace CorrugatedIron.Tests.Models
                 .AddPreCommitHook(new RiakErlangCommitHook("mod", "fun"))
                 .AddPreCommitHook(new RiakErlangCommitHook("riak_search_kv_hook", "precommit"))
                 .AddPreCommitHook(new RiakErlangCommitHook("riak_search_kv_hook", "precommit"))
-                .AddPreCommitHook(RiakErlangCommitHook.RiakSearchCommitHook)
+                .AddPreCommitHook(RiakErlangCommitHook.RiakLegacySearchCommitHook)
                 .AddPostCommitHook(new RiakErlangCommitHook("mod", "fun"))
                 .AddPostCommitHook(new RiakErlangCommitHook("mod", "fun"));
 
@@ -79,18 +79,18 @@ namespace CorrugatedIron.Tests.Models
             props.PostCommitHooks.Count.ShouldEqual(1);
 
             // setting search should not change commit hook count
-            props.SetSearch(true);
+            props.SetLegacySearch(true);
             props.PreCommitHooks.Count.ShouldEqual(2);
             props.PostCommitHooks.Count.ShouldEqual(1);
 
             // setting search should not change commit hook count
-            props.SetSearch(false);
+            props.SetLegacySearch(false);
             props.PreCommitHooks.Count.ShouldEqual(2);
             props.PostCommitHooks.Count.ShouldEqual(1);
 
             props.PreCommitHooks.Where(x => x is RiakErlangCommitHook).Cast<RiakErlangCommitHook>()
-                .Any(x => x.Function == RiakErlangCommitHook.RiakSearchCommitHook.Function
-                    && x.Function == RiakErlangCommitHook.RiakSearchCommitHook.Function)
+                .Any(x => x.Function == RiakErlangCommitHook.RiakLegacySearchCommitHook.Function
+                    && x.Function == RiakErlangCommitHook.RiakLegacySearchCommitHook.Function)
                 .ShouldBeFalse();
         }
 
