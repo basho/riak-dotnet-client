@@ -68,7 +68,7 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
             var bucket = Guid.NewGuid().ToString();
             var key = Guid.NewGuid().ToString();
             var props = Client.GetBucketProperties(bucket).Value;
-            props.SetSearch(true);
+            props.SetLegacySearch(true);
 
             var setResult = Client.SetBucketProperties(bucket, props);
             setResult.IsSuccess.ShouldBeTrue(setResult.ErrorMessage);
@@ -100,7 +100,7 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
             var bucketName = Guid.NewGuid().ToString();
             var props = new RiakBucketProperties()
                 .SetNVal(4)
-                .SetSearch(true)
+                .SetLegacySearch(true)
                 .SetWVal("all")
                 .SetRVal("quorum");
 
@@ -113,8 +113,8 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
             props = getResult.Value;
             props.NVal.HasValue.ShouldBeTrue();
             props.NVal.Value.ShouldEqual(4U);
-            props.Search.ShouldNotEqual(null);
-            props.Search.Value.ShouldBeTrue();
+            props.LegacySearch.ShouldNotEqual(null);
+            props.LegacySearch.Value.ShouldBeTrue();
             props.WVal.ShouldEqual(RiakConstants.QuorumOptionsLookup["all"]);
             props.RVal.ShouldEqual(RiakConstants.QuorumOptionsLookup["quorum"]);
         }

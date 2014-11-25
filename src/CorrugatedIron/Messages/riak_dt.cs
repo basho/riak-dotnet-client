@@ -363,7 +363,8 @@ namespace CorrugatedIron.Messages
     }
     private MapUpdate.FlagOp _flag_op = MapUpdate.FlagOp.ENABLE;
     [global::ProtoBuf.ProtoMember(5, IsRequired = false, Name=@"flag_op", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(MapUpdate.FlagOp.ENABLE)]
+    // @alexmoore - if the next line is uncommented, protobuf-net will not include the field if it's set to ENABLE, causing problems on Riak's side.
+    //[global::System.ComponentModel.DefaultValue(MapUpdate.FlagOp.ENABLE)]
     public MapUpdate.FlagOp flag_op
     {
       get { return _flag_op; }
@@ -398,22 +399,15 @@ namespace CorrugatedIron.Messages
   {
     public MapOp() {}
     
-    private readonly global::System.Collections.Generic.List<MapField> _adds = new global::System.Collections.Generic.List<MapField>();
-    [global::ProtoBuf.ProtoMember(1, Name=@"adds", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public global::System.Collections.Generic.List<MapField> adds
-    {
-      get { return _adds; }
-    }
-  
     private readonly global::System.Collections.Generic.List<MapField> _removes = new global::System.Collections.Generic.List<MapField>();
-    [global::ProtoBuf.ProtoMember(2, Name=@"removes", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::ProtoBuf.ProtoMember(1, Name=@"removes", DataFormat = global::ProtoBuf.DataFormat.Default)]
     public global::System.Collections.Generic.List<MapField> removes
     {
       get { return _removes; }
     }
   
     private readonly global::System.Collections.Generic.List<MapUpdate> _updates = new global::System.Collections.Generic.List<MapUpdate>();
-    [global::ProtoBuf.ProtoMember(3, Name=@"updates", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::ProtoBuf.ProtoMember(2, Name=@"updates", DataFormat = global::ProtoBuf.DataFormat.Default)]
     public global::System.Collections.Generic.List<MapUpdate> updates
     {
       get { return _updates; }

@@ -225,23 +225,6 @@ namespace CorrugatedIron.Messages
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
   }
   
-  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"RpbResetBucketTypeReq")]
-  public partial class RpbResetBucketTypeReq : global::ProtoBuf.IExtensible
-  {
-    public RpbResetBucketTypeReq() {}
-    
-    private byte[] _type;
-    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"type", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public byte[] type
-    {
-      get { return _type; }
-      set { _type = value; }
-    }
-    private global::ProtoBuf.IExtension extensionObject;
-    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
-  }
-  
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"RpbModFun")]
   public partial class RpbModFun : global::ProtoBuf.IExtensible
   {
@@ -479,7 +462,7 @@ namespace CorrugatedIron.Messages
       get { return _search; }
       set { _search = value; }
     }
-    private RpbBucketProps.RpbReplMode _repl = RpbBucketProps.RpbReplMode.FALSE;
+    private RpbBucketProps.RpbReplMode _repl;
     [global::ProtoBuf.ProtoMember(24, IsRequired = false, Name=@"repl", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
     [global::System.ComponentModel.DefaultValue(RpbBucketProps.RpbReplMode.FALSE)]
     public RpbBucketProps.RpbReplMode repl
@@ -487,13 +470,29 @@ namespace CorrugatedIron.Messages
       get { return _repl; }
       set { _repl = value; }
     }
-    private byte[] _yz_index = null;
-    [global::ProtoBuf.ProtoMember(25, IsRequired = false, Name=@"yz_index", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    private byte[] _search_index = null;
+    [global::ProtoBuf.ProtoMember(25, IsRequired = false, Name=@"search_index", DataFormat = global::ProtoBuf.DataFormat.Default)]
     [global::System.ComponentModel.DefaultValue(null)]
-    public byte[] yz_index
+    public byte[] search_index
     {
-      get { return _yz_index; }
-      set { _yz_index = value; }
+      get { return _search_index; }
+      set { _search_index = value; }
+    }
+    private byte[] _datatype = null;
+    [global::ProtoBuf.ProtoMember(26, IsRequired = false, Name=@"datatype", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(null)]
+    public byte[] datatype
+    {
+      get { return _datatype; }
+      set { _datatype = value; }
+    }
+    private bool _consistent = default(bool);
+    [global::ProtoBuf.ProtoMember(27, IsRequired = false, Name=@"consistent", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(default(bool))]
+    public bool consistent
+    {
+      get { return _consistent; }
+      set { _consistent = value; }
     }
     [global::ProtoBuf.ProtoContract(Name=@"RpbReplMode")]
     public enum RpbReplMode
