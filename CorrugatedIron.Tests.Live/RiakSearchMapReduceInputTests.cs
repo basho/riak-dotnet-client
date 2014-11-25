@@ -47,7 +47,7 @@ namespace CorrugatedIron.Tests.Live
             Client = Cluster.CreateClient();
             
             var props = Client.GetBucketProperties(Bucket).Value;
-            props.SetSearch(true);
+            props.SetLegacySearch(true);
             Client.SetBucketProperties(Bucket, props);
         }
         

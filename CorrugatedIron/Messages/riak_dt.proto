@@ -189,13 +189,12 @@ message MapUpdate {
  */
 message MapOp {
     /*
-     * ADD creates a new, "empty" value under a field. REMOVE removes
-     * a field and value from the Map. UPDATE applies type-specific
+     *  REMOVE removes a field and value from the Map.
+     * UPDATE applies type-specific
      * operations to the values stored in the Map.
      */
-    repeated MapField  adds    = 1;
-    repeated MapField  removes = 2;
-    repeated MapUpdate updates = 3;
+    repeated MapField  removes = 1;
+    repeated MapUpdate updates = 2;
 }
 
 /*

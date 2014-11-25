@@ -49,6 +49,8 @@ namespace CorrugatedIron.Messages
         SearchQueryResp = 28,
         ResetBucketReq = 29,
         ResetBucketResp = 30,
+        GetBucketTypeReq = 31,
+        SetBucketTypeReq = 32,
         CsBucketReq = 40,
         CsBucketResp = 41,
         CounterUpdateReq = 50,
@@ -59,12 +61,15 @@ namespace CorrugatedIron.Messages
         YokozunaIndexGetResp = 55,
         YokozunaIndexPutReq = 56,
         YokozunaIndexDeleteReq = 57,
-        YokozunaIndexSchemaGetReq = 58,
-        YokozunaIndexSchemaGetResp = 59,
-        YokozunaIndexSchemaPutReq = 60,
+        YokozunaSchemaGetReq = 58,
+        YokozunaSchemaGetResp = 59,
+        YokozunaSchemaPutReq = 60,
         DtFetchReq = 80,
         DtFetchResp = 81,
         DtUpdateReq = 82,
-        DtUpdateResp = 83
+        DtUpdateResp = 83,
+        AuthReq = 253,
+        AuthResp = 254,
+        StartTls = 255
     }
 }

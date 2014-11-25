@@ -1,15 +1,28 @@
 RIAK_CONF = ${RIAK_DIR}/etc/riak.conf
+ADVANCED_CONF = ${RIAK_DIR}/etc/advanced.config
 RIAK_ADMIN = ${RIAK_DIR}/bin/riak-admin
 
 preconfigure:
 	echo "storage_backend = leveldb" >> ${RIAK_CONF}
 	echo "search = on" >> ${RIAK_CONF}
 	echo "listener.protobuf.internal = 127.0.0.1:8087" >> ${RIAK_CONF}
+	cp ${ADVANCED_CONF} "${ADVANCED_CONF}.old"
+	sed -i '' -e '$$ d' ${ADVANCED_CONF}
+	sed -i '' -e '$$ d' ${ADVANCED_CONF}
+	cat advanced_config_append >> ${ADVANCED_CONF}
 
 
 configure:
-	@${RIAK_ADMIN} bucket-type create yokozuna '{"props":{}}'
-	@${RIAK_ADMIN} bucket-type activate yokozuna
+	@${RIAK_ADMIN} bucket-type create plain '{"props":{}}'
+	@${RIAK_ADMIN} bucket-type create search_type '{"props":{}}'
+	@${RIAK_ADMIN} bucket-type create maps '{"props":{"datatype":"map"}}'
+	@${RIAK_ADMIN} bucket-type create sets '{"props":{"datatype":"set"}}'
+	@${RIAK_ADMIN} bucket-type create counters '{"props":{"datatype":"counter"}}'
+	@${RIAK_ADMIN} bucket-type activate plain
+	@${RIAK_ADMIN} bucket-type activate search_type
+	@${RIAK_ADMIN} bucket-type activate maps
+	@${RIAK_ADMIN} bucket-type activate sets
+	@${RIAK_ADMIN} bucket-type activate counters
 
 compile:
 	../.mono-build-scripts/InstallMono.sh

@@ -88,13 +88,19 @@ namespace CorrugatedIron.Models
             return this;
         }
 
+        public RiakDtUpdateOptions SetIncludeContext(bool value)
+        {
+            IncludeContext = value;
+            return this;
+        }
+
         public RiakDtUpdateOptions()
         {
-            IncludeContext = true;
-            ReturnBody = false;
             W = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
             Dw = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
             Pw = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
+            ReturnBody = true;
+            IncludeContext = true;
         }
 
         internal void Populate(DtUpdateReq request)
