@@ -8,13 +8,14 @@ The easiest way to get hold of it is to install the [Nuget package](http://www.n
 Building From Source
 ----------------------
 
-*Note:* some required packages and a generated file must be present before opening `CorrugatedIron.sln`. Please use one of the following processes to set up your local development environment.
+### GUI
+Open `CorrugatedIron.sln` and build. All necessary files will be downloaded and generated for you.
 
-### Windows
-Execute `make.cmd` either via double-click in the file explorer, or by opening a shell in your cloned repository and running `.\make.cmd`
-
-### Mono
-Execute `make` (GNU Make required)
+### Command Line
+* Windows
+ * Execute `make.cmd` either via double-click in the file explorer, or by opening a shell in your cloned repository and running `.\make.cmd`
+* Mono
+ * Execute `make` (GNU Make required)
 
 Travis-CI Build Status
 ----------------------

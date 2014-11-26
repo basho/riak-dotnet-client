@@ -13,8 +13,8 @@
     <RestorePackages>true</RestorePackages>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <NoWarn Condition="$(Mono) == '' or $(Mono) == 'False'">0419;1570;1572;1573;1591;1710;1734</NoWarn>
-    <NoWarn Condition="$(Mono) == 'True'">0419;1570;1572;1573;1591</NoWarn>
+    <NoWarn Condition="$(OS) == 'Windows_NT'">0419;1570;1572;1573;1591;1710;1734</NoWarn>
+    <NoWarn Condition="$(OS) != 'Windows_NT'">0419;1570;1572;1573;1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>True</DebugSymbols>

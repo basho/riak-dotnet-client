@@ -10,7 +10,7 @@
 
   <Import Project="$(MSBuildCommunityTasksPath)\MSBuild.Community.Tasks.targets"/>
 
-  <PropertyGroup Condition="'$(Mono)' == 'True'">
+  <PropertyGroup Condition=" '$(OS)' != 'Windows_NT'">
     <MonoExe>mono --runtime=v4.0.30319</MonoExe>
   </PropertyGroup>
 
@@ -77,8 +77,8 @@
     <NuGetSpecFile>$(ProjDir)\NuGet\CorrugatedIron.nuspec</NuGetSpecFile>
 
     <NUnitConsoleRunnerExe>$(SolutionDir)packages\NUnit.Runners.2.6.3\tools\nunit-console.exe -nologo -nodots -labels</NUnitConsoleRunnerExe>
-    <NUnitConsoleRunnerCommand Condition="'$(Mono)' == '' or '$(Mono)' == 'False'">$(NUnitConsoleRunnerExe) -config Debug</NUnitConsoleRunnerCommand>
-    <NUnitConsoleRunnerCommand Condition="'$(Mono)' == 'True'">$(MonoExe) $(NUnitConsoleRunnerExe) -config Debug-Mono</NUnitConsoleRunnerCommand>
+    <NUnitConsoleRunnerCommand Condition="'$(OS)' == 'Windows_NT'">$(NUnitConsoleRunnerExe) -config Debug</NUnitConsoleRunnerCommand>
+    <NUnitConsoleRunnerCommand Condition="'$(OS)' != 'Windows_NT'">$(MonoExe) $(NUnitConsoleRunnerExe) -config Debug-Mono</NUnitConsoleRunnerCommand>
 
     <CorrugatedIronPackagesConfig>$(ProjDir)\CorrugatedIron\packages.config</CorrugatedIronPackagesConfig>
   </PropertyGroup>
