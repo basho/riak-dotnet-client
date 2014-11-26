@@ -8,6 +8,8 @@ The easiest way to get hold of it is to install the [Nuget package](http://www.n
 Building From Source
 ----------------------
 
+*Note*: `git` must be in your `PATH`
+
 ### GUI
 Open `CorrugatedIron.sln` and build. All necessary files will be downloaded and generated for you.
 
