@@ -1,6 +1,0 @@
-<?xml version="1.0" standalone="yes"?>
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Target Name="Publish">
-    <Exec Command="..\.nuget\NuGet.exe pack CorrugatedIron.nuspec -Symbols" />
-  </Target>
-</Project>

@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+PLATFORM=$(uname -s)
+
+set -o nounset
+
+mono=$(which mono 2>/dev/null)
+mcs=$(which mcs 2>/dev/null)
+xbuild=$(which xbuild 2>/dev/null)
+curl=$(which curl 2>/dev/null)
+
+set -o errexit
+
+if [[ -x $mono && -x $mcs && -x $xbuild && -x $curl ]]
+then
+    echo 'dependencies are installed'
+else
+    if [[ $PLATFORM == 'Darwin' ]]
+    then
+        curl -O http://download.mono-project.com/archive/3.6.0/macos-10-x86/MonoFramework-MDK-3.6.0.macos10.xamarin.x86.pkg
+        sudo /usr/sbin/installer -pkg MonoFramework-MDK-3.6.0.macos10.xamarin.x86.pkg -target /
+    else
+        # http://www.mono-project.com/docs/getting-started/install/linux/#debian-ubuntu-and-derivatives
+        export DEBIAN_FRONTEND=noninteractive
+        sudo apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' update
+        sudo apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install curl python-software-properties
+        sudo apt-key adv --keyserver pgp.mit.edu --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
+        sudo apt-add-repository --yes 'deb http://download.mono-project.com/repo/debian wheezy main'
+        sudo apt-add-repository --yes 'deb http://download.mono-project.com/repo/debian wheezy-libtiff-compat main'
+        sudo apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' update
+        sudo apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install mono-devel mono-tools-devel
+    fi
+fi
+

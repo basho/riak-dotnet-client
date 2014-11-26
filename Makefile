@@ -1,21 +1,5 @@
-XBUILD=`which xbuild`
-MONO = mono
-PROTOGEN = ~/bin/ProtoGen/protogen.exe
-PROTOC = protoc
+SLNDIR = $(realpath $(CURDIR))
+include $(SLNDIR)/build/mono.mk
 
-all: release
+test: test-all
 
-proto:
-	cd CorrugatedIron/Messages
-	$(MONO) $(PROTOGEN) -i:$< -o:$@
-	rm $<
-
-release:
-	@$(XBUILD) ./CorrugatedIron.sln /property:configuration=Release
-
-debug:
-	@$(XBUILD) ./CorrugatedIron.sln /property:configuration=Debug
-
-clean:
-	rm -rf ./**/bin/
-	rm -rf ./**/obj/

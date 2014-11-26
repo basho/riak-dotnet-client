@@ -1,0 +1,135 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o nounset
+
+script_dir="$(dirname $0)"
+script_path="$(realpath $script_dir)"
+PATH="$PATH:$script_path"
+
+function now
+{
+  date '+%Y-%m-%d %H:%M:%S'
+}
+
+function pwarn
+{
+  echo "$(now) [warning]: $@" 1>&2
+}
+
+function perr
+{
+  echo "$(now) [error]: $@" 1>&2
+}
+
+function pinfo
+{
+  echo "$(now) [info]: $@"
+}
+
+function errexit
+{
+  perr "$@"
+  exit 1
+}
+
+function onexit
+{
+  echo Exiting!
+  popd
+}
+
+trap onexit EXIT
+
+dev_cluster_path="${1:-$HOME/Projects/basho/riak/dev}"
+declare -i node_count="${2:-4}"
+declare -i i=0
+
+if [[ -d $dev_cluster_path ]]
+then
+  pinfo "Setting up dev cluster in $dev_cluster_path"
+else
+  errexit "Dev cluster path $dev_cluster_path does not exist!"
+fi
+
+pushd $dev_cluster_path > /dev/null
+
+pinfo "Stopping Riak"
+
+set +o errexit
+for devdir in dev*
+do
+  $devdir/bin/riak stop > /dev/null
+done
+set -o errexit
+
+pinfo "Removing Riak data"
+
+rm -rf dev*/log/* \
+       dev*/data/ring/* \
+       dev*/data/bitcask/* \
+       dev*/data/leveldb/* \
+       dev*/data/kv_vnode/* \
+       dev*/data/leveldb/* \
+       dev*/data/anti_entropy/* \
+       dev*/data/yz/* \
+       dev*/data/yz_anti_entropy/* \
+       dev*/data/cluster_meta/* \
+       dev*/data/generated.configs/*
+
+declare -i pb_port=10017
+declare -i http_port=10018
+
+pinfo "Configuring riak.conf"
+
+for devdir in dev*
+do
+  adv_conf="$devdir/etc/advanced.config"
+  riak_conf="$devdir/etc/riak.conf"
+  riak_conf_orig="$devdir/etc/riak.conf.orig"
+  if [[ -f $riak_conf_orig ]]
+  then
+    cp -f $riak_conf_orig $riak_conf
+  else
+    cp -f $riak_conf $riak_conf_orig
+  fi
+
+  gen-riak-conf $riak_conf $http_port $pb_port
+  gen-adv-conf $adv_conf
+
+  (( pb_port += 10 ))
+  (( http_port += 10 ))
+done
+
+pinfo "Starting Riak"
+
+for ((i = 1; i <= node_count; ++i))
+do
+  devdir="dev$i"
+  $devdir/bin/riak start
+done
+
+for ((i = 2; i <= node_count; ++i))
+do
+  devdir="dev$i"
+  $devdir/bin/riak-admin cluster join dev1@127.0.0.1
+done
+
+riak_admin=dev1/bin/riak-admin
+
+$riak_admin cluster plan
+$riak_admin cluster commit
+$riak_admin transfer-limit 8
+
+set +o errexit
+while ! $riak_admin transfers | grep -iqF 'No transfers active'
+do
+  pinfo 'Transfers in progress'
+  sleep 5
+done
+set -o errexit
+
+pinfo "Riak started, setting up bucket types"
+riak-cluster-config "$riak_admin" 10018
+pinfo "Done!"
+

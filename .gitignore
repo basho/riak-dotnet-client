@@ -10,6 +10,7 @@ DEBUG
 release
 Release
 RELEASE
+packages/
 
 *.orig
 *.ncb
@@ -26,9 +27,15 @@ _Re*
 test-results/*
 *.dotCover
 *.nupkg
+*.nuspec
 test-results
 
 *.ncrunchproject
 *.ncrunchsolution
 _NCrunch_*
 TestResult.xml
+*.VisualState.xml
+*.out
+*.err
+GlobalAssemblyInfo.cs
+CommonAssemblyInfo.cs
