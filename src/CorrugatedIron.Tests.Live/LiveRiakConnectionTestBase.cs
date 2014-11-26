@@ -23,6 +23,13 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
 {
     public class LiveRiakConnectionTestBase
     {
+        public static class BucketTypeNames
+        {
+            public const string Sets = "sets";
+            public const string Counters = "counters";
+            public const string Maps = "maps";
+        }
+        
         protected const int TestClientId = 42;
         protected const string TestHost = "riak-test";
         protected const int TestPbcPort = 8081;
