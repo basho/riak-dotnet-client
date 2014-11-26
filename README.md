@@ -5,6 +5,17 @@ CorrugatedIron - a .NET client for Riak
 
 The easiest way to get hold of it is to install the [Nuget package](http://www.nuget.org/Packages/CorrugatedIron/).
 
+Building From Source
+----------------------
+
+*Note:* some required packages and a generated file must be present before opening `CorrugatedIron.sln`. Please use one of the following processes to set up your local development environment.
+
+### Windows
+Execute `make.cmd` either via double-click in the file explorer, or by opening a shell in your cloned repository and running `.\make.cmd`
+
+### Mono
+Execute `make` (GNU Make required)
+
 Travis-CI Build Status
 ----------------------
 
@@ -33,15 +44,6 @@ License
 -------
 
 **CorrugatedIron** is Open Source software released under the Apache 2.0 License. Please see the [LICENSE](LICENSE) file for full license details.
-
-Building CorrugatedIron
-=======================
-
-### Windows
-`.\make.cmd`
-
-### Mono
-`make` (GNU Make required)
 
 Regenerating .proto files
 =========================
