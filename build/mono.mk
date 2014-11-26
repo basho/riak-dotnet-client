@@ -9,7 +9,7 @@ NUGET_RESTORE = $(MONO_EXE) $(NUGET_EXE) restore -PackagesDirectory $(NUGET_PKGD
 
 VERBOSITY = normal
 # NB: SolutionDir *must* end in slash here
-XBUILD = xbuild /verbosity:$(VERBOSITY) /nologo /property:SolutionDir=$(SLNDIR)/ /property:Mono=True
+XBUILD = xbuild /verbosity:$(VERBOSITY) /nologo /property:SolutionDir=$(SLNDIR)/
 
 .PHONY: all release debug
 all: release debug
