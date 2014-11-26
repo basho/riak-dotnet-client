@@ -17,20 +17,20 @@
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.CommitHook;
-using CorrugatedIron.Models.Search;
 using CorrugatedIron.Tests.Extensions;
 using CorrugatedIron.Tests.Live.LiveRiakConnectionTests;
 using CorrugatedIron.Util;
 using NUnit.Framework;
 using System;
 using System.Linq;
-using System.Threading;
 
 namespace CorrugatedIron.Tests.Live.BucketPropertyTests
 {
     [TestFixture]
     public class WhenDealingWithBucketProperties : LiveRiakConnectionTestBase
     {
+        private readonly Random _random = new Random();
+
         // use the one node configuration here because we might run the risk
         // of hitting different nodes in the configuration before the props
         // are replicated to other nodes.
@@ -59,39 +59,6 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
 
             var getResult = Client.GetBucketProperties(bucketName);
             getResult.IsSuccess.ShouldBeTrue(getResult.ErrorMessage);
-        }
-
-        [Test()]
-        [Ignore("Riak Search functionality has been deprecated in favor of Yokozuna/Solr.")]
-        public void SettingSearchOnRiakBucketMakesBucketSearchable()
-        {
-            var bucket = Guid.NewGuid().ToString();
-            var key = Guid.NewGuid().ToString();
-            var props = Client.GetBucketProperties(bucket).Value;
-            props.SetLegacySearch(true);
-
-            var setResult = Client.SetBucketProperties(bucket, props);
-            setResult.IsSuccess.ShouldBeTrue(setResult.ErrorMessage);
-
-            var obj = new RiakObject(bucket, key, new { name = "OJ", age = 34 });
-            var putResult = Client.Put(obj);
-            putResult.IsSuccess.ShouldBeTrue(putResult.ErrorMessage);
-
-            var q = new RiakFluentSearch(bucket, "name")
-                .Search("OJ")
-                .And("age", "34")
-                .Build();
-
-            var search = new RiakSearchRequest
-            {
-                Query = q
-            };
-
-            var searchResult = Client.Search(search);
-            searchResult.IsSuccess.ShouldBeTrue(searchResult.ErrorMessage);
-            searchResult.Value.NumFound.ShouldEqual(1u);
-            searchResult.Value.Documents[0].Fields.Count.ShouldEqual(3);
-            searchResult.Value.Documents[0].Fields.First(x => x.Key == "id").Value.ShouldEqual(key);
         }
 
         [Test]
@@ -258,7 +225,6 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
         }
 
         [Test]
-        [Ignore("A ring state bug in Riak prevents this from running correctly - https://github.com/basho/riak_kv/issues/660")]
         public void ResettingBucketPropertiesWorksCorrectly()
         {
             const string bucket = "Schmoopy";
@@ -284,6 +250,28 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
             resetProps.DwVal.ShouldNotEqual(props.DwVal);
             resetProps.WVal.ShouldNotEqual(props.WVal);
             resetProps.LastWriteWins.ShouldNotEqual(props.LastWriteWins);
+        }
+
+        [Test]
+        public void TestNewBucketGivesReplFlagBack()
+        {
+            var bucket = "replicants" + _random.Next();
+            var getInitialPropsResponse = Client.GetBucketProperties(bucket);
+
+            if (Client.GetServerStatus().Value.Contains("riak_repl_version"))
+                getInitialPropsResponse.Value.ReplicationMode.ShouldEqual(RiakConstants.RiakEnterprise.ReplicationMode.True);
+            else
+                getInitialPropsResponse.Value.ReplicationMode.ShouldEqual(RiakConstants.RiakEnterprise.ReplicationMode.False);
+        }
+
+        [Test]
+        public void TestBucketTypesPropertyWorks()
+        {
+            var setsBucketTypeBucketPropsResult = Client.GetBucketProperties(BucketTypeNames.Sets, "Schmoopy");
+            setsBucketTypeBucketPropsResult.Value.DataType.ShouldEqual("set");
+
+            var plainBucketTypeBucketPropsResult = Client.GetBucketProperties("plain", "Schmoopy");
+            plainBucketTypeBucketPropsResult.Value.DataType.ShouldBeNull();
         }
     }
 

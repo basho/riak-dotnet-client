@@ -14,7 +14,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
 using System.Linq;
+using CorrugatedIron.Extensions;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.CommitHook;
 using CorrugatedIron.Tests.Extensions;
@@ -26,7 +28,7 @@ namespace CorrugatedIron.Tests.Models
     public class RiakBucketPropertyTests
     {
         [Test]
-        public void WhenEnablingRiakSearchOnBucketPreCommitHookIsAdded()
+        public void WhenEnablingRiakLegacySearchOnBucketPreCommitHookIsAdded()
         {
             var props = new RiakBucketProperties()
                 .AddPreCommitHook(new RiakErlangCommitHook("foo", "bar"))
@@ -37,7 +39,7 @@ namespace CorrugatedIron.Tests.Models
         }
 
         [Test]
-        public void WhenDisablingRiakSearchOnBucketPreCommitHookIsRemoved()
+        public void WhenDisablingRiakLegacySearchOnBucketPreCommitHookIsRemoved()
         {
             var props = new RiakBucketProperties()
                 .AddPreCommitHook(new RiakErlangCommitHook("foo", "bar"))
@@ -52,7 +54,7 @@ namespace CorrugatedIron.Tests.Models
         }
 
         [Test]
-        public void WhenDisablingRiakSearchOnBucketWithoutSearchEnabledPreCommitHooksAreLeftAlone()
+        public void WhenDisablingRiakLegacySearchOnBucketWithoutLegacySearchEnabledPreCommitHooksAreLeftAlone()
         {
             var props = new RiakBucketProperties()
                 .AddPreCommitHook(new RiakErlangCommitHook("foo", "bar"))
@@ -96,5 +98,18 @@ namespace CorrugatedIron.Tests.Models
 
         // TODO: perhaps add some tests to make sure that pre and post commit hooks, along with other
         // TODO: properties don't end up in the payload when they aren't explicitly set/added/removed
+
+
+        [Test]
+        public void WhenEnablingSearchOnABucketItSetsPropertiesCorrectly()
+        {
+            var props = new RiakBucketProperties().SetSearchIndex("foo");
+            Assert.AreEqual("foo", props.SearchIndex);
+
+            var jsonProps = props.ToJsonString();
+            var rpbMessageProps = props.ToMessage();
+            Assert.IsTrue(jsonProps.Contains("\"search_index\":\"foo\""));
+            Assert.AreEqual("foo", rpbMessageProps.search_index.FromRiakString());
+        }
     }
 }
