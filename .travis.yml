@@ -6,9 +6,9 @@ branches:
 language: c
 
 install:
-  - ./.mono-build-scripts/InstallMono.sh
+    - make install-deps
+    - make install-certs
 
 script:
-  - ./.mono-build-scripts/PackageRestore.sh
-  - ./.mono-build-scripts/RunBuild.sh
-  - ./.mono-build-scripts/RunTests.sh
+    - make unit-test
+
