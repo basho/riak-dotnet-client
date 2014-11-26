@@ -10,14 +10,12 @@ Building From Source
 
 *Note*: `git` must be in your `PATH`
 
-### GUI
-Open `CorrugatedIron.sln` and build. All necessary files will be downloaded and generated for you.
-
-### Command Line
 * Windows
  * Execute `make.cmd` either via double-click in the file explorer, or by opening a shell in your cloned repository and running `.\make.cmd`
 * Mono
  * Execute `make` (GNU Make required)
+
+After executing one of the command-line build options to restore files and generate the `CommonAssemblyInfo.cs` file, open `CorrugatedIron.sln` and build.
 
 Travis-CI Build Status
 ----------------------
