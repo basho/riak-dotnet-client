@@ -2,7 +2,7 @@
 * text=crlf
 
 # Files that must be CRLF ending
-build/build.proj text eol=crlf encoding=UTF-8
+build/build.targets text eol=crlf encoding=UTF-8
 
 # Files that must be LF ending
 Makefile                  text eol=lf
