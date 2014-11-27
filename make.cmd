@@ -74,7 +74,7 @@ echo ---------------------------------------------------
 echo Debug           - Debug build
 echo Release         - Release build with versioning
 echo All             - Parallel build of Debug, Release
-echo Clean           - Clean everything
+echo CleanAll        - Parallel clean everything
 echo ProtoGen        - Rebuild cs files from proto files
 echo Test            - Run all tests
 echo UnitTest        - Run unit tests

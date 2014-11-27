@@ -8,14 +8,20 @@ The easiest way to get hold of it is to install the [Nuget package](http://www.n
 Building From Source
 ----------------------
 
-*Note*: `git` must be in your `PATH`
+### GUI
+
+*Note*: `git` must be in your `PATH` when doing a `Release`-configuration build.
+
+Open `CorrugatedIron.sln` and build. This will generate the required `src/CommonAssemblyInfo.cs` file.
+
+### Command Line
+
+*Note*: `git` must be in your `PATH` when doing a `Release`-configuration build.
 
 * Windows
  * Execute `make.cmd` either via double-click in the file explorer, or by opening a shell in your cloned repository and running `.\make.cmd`
 * Mono
  * Execute `make` (GNU Make required)
-
-After executing one of the command-line build options to restore files and generate the `CommonAssemblyInfo.cs` file, open `CorrugatedIron.sln` and build.
 
 Travis-CI Build Status
 ----------------------
