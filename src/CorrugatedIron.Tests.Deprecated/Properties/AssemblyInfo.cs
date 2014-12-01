@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("CorrugatedIron.Tests.Live.Depreciated")]
+[assembly: AssemblyTitle("CorrugatedIron.Tests.Deprecated")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("CorrugatedIron.Tests.Live.Depreciated")]
+[assembly: AssemblyProduct("CorrugatedIron.Tests.Deprecated")]
 [assembly: AssemblyCopyright("Copyright ©  2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("9b1210a6-bb08-4101-968e-75c4f231691e")]
+[assembly: Guid("2a12c0cd-5648-447d-9f6d-29d44242a9ba")]
 
 // Version information for an assembly consists of the following four values:
 //

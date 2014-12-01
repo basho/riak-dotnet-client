@@ -1,12 +1,21 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <MSBuildCommunityTasksPath>$(SolutionDir)packages\MSBuildTasks.1.4.0.78\tools</MSBuildCommunityTasksPath>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">$(MSBuildProjectDirectory)\..\</SolutionDir>
+    <MSBuildCommunityTasksPath>$(SolutionDir)build</MSBuildCommunityTasksPath>
   </PropertyGroup>
 
   <Import Project="$(MSBuildCommunityTasksPath)\MSBuild.Community.Tasks.targets"/>
 
-  <PropertyGroup Condition="'$(Mono)' == 'True'">
+  <PropertyGroup>
+    <CommonAssemblyInfoFile>$(SolutionDir)src\CommonAssemblyInfo.cs</CommonAssemblyInfoFile>
+    <!-- TODO: enabling this causes Clean to hang in Visual Studio
+    <BuildDependsOn>GenerateCommonAssemblyInfo;$(BuildDependsOn);</BuildDependsOn>
+    <CleanDependsOn>CleanCommonAssemblyInfo;$(CleanDependsOn);</CleanDependsOn>
+    -->
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(OS)' != 'Windows_NT'">
     <MonoExe>mono --runtime=v4.0.30319</MonoExe>
   </PropertyGroup>
 
@@ -14,37 +23,46 @@
     <Configuration>Release</Configuration>
   </PropertyGroup>
 
-  <Target Name="GitData">
-    <PropertyGroup>
-      <VBuildVer>0</VBuildVer> <!-- TODO -->
-    </PropertyGroup>
-    <GitDescribe LocalPath="$(SolutionDir)">
-      <Output TaskParameter="CommitHash" PropertyName="GitCommitHash" />
-      <Output TaskParameter="Tag" PropertyName="GitTag" />
-    </GitDescribe>
-    <!--
-      NB: these regexes are Mono and Windows compatible. "\." to represent literal period
-          does not work on Mono 3.10
-    -->
-    <RegexReplace Input="$(GitTag)" Expression="v([0-9])[.][0-9][.][0-9]" Replacement="$1" Count="1">
-      <Output PropertyName="VMajor" TaskParameter="Output" />
-    </RegexReplace>
-    <RegexReplace Input="$(GitTag)" Expression="v[0-9][.]([0-9])[.][0-9]" Replacement="$1" Count="1">
-      <Output PropertyName="VMinor" TaskParameter="Output" />
-    </RegexReplace>
-    <RegexReplace Input="$(GitTag)" Expression="v[0-9][.][0-9][.]([0-9])" Replacement="$1" Count="1">
-      <Output PropertyName="VPatch" TaskParameter="Output" />
-    </RegexReplace>
-    <Message Text="GitTag: $(GitTag) Version: $(VMajor).$(VMinor).$(VPatch).$(VBuildVer) Commit hash: $(GitCommitHash)"/>
+  <Target Name="CleanCommonAssemblyInfo">
+    <Delete Files="$(CommonAssemblyInfoFile)" />
   </Target>
 
-  <Target Name="Version" DependsOnTargets="GitData">
+  <Target Name="GenerateCommonAssemblyInfo">
+
+    <PropertyGroup>
+      <VMajor>0</VMajor>
+      <VMinor>0</VMinor>
+      <VPatch>0</VPatch>
+      <VBuildVer>0</VBuildVer>
+      <GitCommitHash>unknown</GitCommitHash>
+    </PropertyGroup>
+
     <Time>
       <Output TaskParameter="Year" PropertyName="Year" />
     </Time>
 
-    <Attrib Files="$(SolutionDir)src\CommonAssemblyInfo.cs" ReadOnly="False" />
+    <GitDescribe LocalPath="$(SolutionDir)" Condition="'$(Configuration)' == 'Release'">
+      <Output TaskParameter="CommitHash" PropertyName="GitCommitHash" />
+      <Output TaskParameter="Tag" PropertyName="GitTag" />
+    </GitDescribe>
 
+    <!--
+      NB: these regexes are Mono and Windows compatible. "\." to represent literal period
+          does not work on Mono 3.10
+    -->
+    <RegexReplace Input="$(GitTag)" Expression="v([0-9])[.][0-9][.][0-9]" Replacement="$1" Count="1" Condition="'$(Configuration)' == 'Release'">
+      <Output PropertyName="VMajor" TaskParameter="Output" />
+    </RegexReplace>
+    <RegexReplace Input="$(GitTag)" Expression="v[0-9][.]([0-9])[.][0-9]" Replacement="$1" Count="1" Condition="'$(Configuration)' == 'Release'">
+      <Output PropertyName="VMinor" TaskParameter="Output" />
+    </RegexReplace>
+    <RegexReplace Input="$(GitTag)" Expression="v[0-9][.][0-9][.]([0-9])" Replacement="$1" Count="1" Condition="'$(Configuration)' == 'Release'">
+      <Output PropertyName="VPatch" TaskParameter="Output" />
+    </RegexReplace>
+
+    <Message Text="GitTag: $(GitTag) Version: $(VMajor).$(VMinor).$(VPatch).$(VBuildVer) Commit hash: $(GitCommitHash)"/>
+
+    <Attrib Files="$(CommonAssemblyInfoFile)" ReadOnly="False" />
     <!-- http://stackoverflow.com/questions/64602/what-are-differences-between-assemblyversion-assemblyfileversion-and-assemblyin -->
     <AssemblyInfo CodeLanguage="CS"
                   OutputFile="$(SolutionDir)src\CommonAssemblyInfo.cs"
@@ -73,8 +91,8 @@
     <NuGetSpecFile>$(ProjDir)\NuGet\CorrugatedIron.nuspec</NuGetSpecFile>
 
     <NUnitConsoleRunnerExe>$(SolutionDir)packages\NUnit.Runners.2.6.3\tools\nunit-console.exe -nologo -nodots -labels</NUnitConsoleRunnerExe>
-    <NUnitConsoleRunnerCommand Condition="'$(Mono)' == '' or '$(Mono)' == 'False'">$(NUnitConsoleRunnerExe) -config Debug</NUnitConsoleRunnerCommand>
-    <NUnitConsoleRunnerCommand Condition="'$(Mono)' == 'True'">$(MonoExe) $(NUnitConsoleRunnerExe) -config Debug-Mono</NUnitConsoleRunnerCommand>
+    <NUnitConsoleRunnerCommand Condition="'$(OS)' == 'Windows_NT'">$(NUnitConsoleRunnerExe) -config Debug</NUnitConsoleRunnerCommand>
+    <NUnitConsoleRunnerCommand Condition="'$(OS)' != 'Windows_NT'">$(MonoExe) $(NUnitConsoleRunnerExe) -config Debug-Mono</NUnitConsoleRunnerCommand>
 
     <CorrugatedIronPackagesConfig>$(ProjDir)\CorrugatedIron\packages.config</CorrugatedIronPackagesConfig>
   </PropertyGroup>
@@ -97,7 +115,7 @@
           Command="$(ProtoGenExe) -ns:CorrugatedIron.Messages -i:%(ProtoFile.Identity) -o:$(ProtoMsgDir)\@(ProtoFile->'%(filename)').cs" />
   </Target>
 
-  <Target Name="NugetRelease" DependsOnTargets="Release">
+  <Target Name="NuGetRelease" DependsOnTargets="Release">
     <XmlQuery XmlFileName="$(CorrugatedIronPackagesConfig)" XPath="/packages/package[@id='Newtonsoft.Json']/@version">
       <Output TaskParameter="Values" PropertyName="NewtonsoftJsonVersion" />
     </XmlQuery>
@@ -120,15 +138,19 @@
           Command="$(NuGetExe) pack -Symbols -Verbosity normal $(NuGetSpecFile)" />
   </Target>
 
-  <Target Name="All" DependsOnTargets="Version">
+  <Target Name="All" DependsOnTargets="GenerateCommonAssemblyInfo">
     <MSBuild Projects="@(ProjectToBuild)" BuildInParallel="True" />
   </Target>
 
-  <Target Name="Release" DependsOnTargets="Version">
+  <Target Name="CleanAll">
+    <MSBuild Projects="@(ProjectToBuild)" Targets="Clean" BuildInParallel="True" />
+  </Target>
+
+  <Target Name="Release" DependsOnTargets="GenerateCommonAssemblyInfo">
     <MSBuild Projects="$(SolutionFile)" Properties="Configuration=Release" />
   </Target>
 
-  <Target Name="Debug" DependsOnTargets="Version">
+  <Target Name="Debug" DependsOnTargets="GenerateCommonAssemblyInfo">
     <MSBuild Projects="$(SolutionFile)" Properties="Configuration=Debug" />
   </Target>
 
@@ -146,10 +168,6 @@
 
   <Target Name="Test">
     <CallTarget Targets="TestAll" />
-  </Target>
-
-  <Target Name="Clean">
-    <MSBuild Projects="@(ProjectToBuild)" Targets="Clean" BuildInParallel="True" />
   </Target>
 
 </Project>

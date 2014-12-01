@@ -37,7 +37,7 @@ if (%VERBOSITY%)==() set VERBOSITY=Normal
 if errorlevel 1 goto ERR_FAILED
 
 rem NB: this will always do build for Release *and* Debug configuration
-%MSBUILDEXE% /verbosity:%VERBOSITY% /nologo /m /property:SolutionDir=%CURDIR% /target:%TARGET% %CURDIR%\build\build.proj
+%MSBUILDEXE% /verbosity:%VERBOSITY% /nologo /m /property:SolutionDir=%CURDIR% /target:%TARGET% %CURDIR%\build\build.targets
 if errorlevel 1 goto ERR_FAILED
 
 echo.
@@ -74,7 +74,7 @@ echo ---------------------------------------------------
 echo Debug           - Debug build
 echo Release         - Release build with versioning
 echo All             - Parallel build of Debug, Release
-echo Clean           - Clean everything
+echo CleanAll        - Parallel clean everything
 echo ProtoGen        - Rebuild cs files from proto files
 echo Test            - Run all tests
 echo UnitTest        - Run unit tests

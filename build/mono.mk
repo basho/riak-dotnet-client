@@ -9,7 +9,7 @@ NUGET_RESTORE = $(MONO_EXE) $(NUGET_EXE) restore -PackagesDirectory $(NUGET_PKGD
 
 VERBOSITY = normal
 # NB: SolutionDir *must* end in slash here
-XBUILD = xbuild /verbosity:$(VERBOSITY) /nologo /property:SolutionDir=$(SLNDIR)/ /property:Mono=True
+XBUILD = xbuild /verbosity:$(VERBOSITY) /nologo /property:SolutionDir=$(SLNDIR)/
 
 .PHONY: all release debug
 all: release debug
@@ -25,24 +25,24 @@ package-restore:
 	$(NUGET_RESTORE) $(SLNDIR)/.nuget/packages.config
 
 release: package-restore
-	$(XBUILD) /target:Release $(SLNDIR)/build/build.proj
+	$(XBUILD) /target:Release $(SLNDIR)/build/build.targets
 
 debug: package-restore
-	$(XBUILD) /target:Debug $(SLNDIR)/build/build.proj
+	$(XBUILD) /target:Debug $(SLNDIR)/build/build.targets
 
 protogen:
 	@echo 'protogen is Windows-only'
 
-# NB: build.proj has debug as a dependency
+# NB: build.targets has debug as a dependency
 unit-test: package-restore
-	$(XBUILD) /target:UnitTest $(SLNDIR)/build/build.proj
+	$(XBUILD) /target:UnitTest $(SLNDIR)/build/build.targets
 
-# NB: build.proj has debug as a dependency
+# NB: build.targets has debug as a dependency
 integration-test: package-restore
-	$(XBUILD) /target:IntegrationTest $(SLNDIR)/build/build.proj
+	$(XBUILD) /target:IntegrationTest $(SLNDIR)/build/build.targets
 
 test-all: package-restore
-	$(XBUILD) /target:TestAll $(SLNDIR)/build/build.proj
+	$(XBUILD) /target:TestAll $(SLNDIR)/build/build.targets
 
 .PHONY: clean-release clean-debug clean
 clean-release: package-restore

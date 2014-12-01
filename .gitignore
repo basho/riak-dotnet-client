@@ -18,6 +18,7 @@ packages/
 *.suo
 *.user
 *.swp
+*.log
 *.*~
 _Re*
 \.DS_Store

@@ -22,7 +22,7 @@ using CorrugatedIron.Tests.Live.LiveRiakConnectionTests;
 using CorrugatedIron.Util;
 using NUnit.Framework;
 
-namespace CorrugatedIron.Tests.Live.Depreciated
+namespace CorrugatedIron.Tests.Live.Deprecated
 {
     [TestFixture]
     public class WhenQueryingRiakLegacySearchViaPbc : LiveRiakConnectionTestBase
