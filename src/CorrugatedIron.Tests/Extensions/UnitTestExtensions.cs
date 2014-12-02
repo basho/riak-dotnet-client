@@ -14,6 +14,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
+using System.Threading;
+using CorrugatedIron.Extensions;
 using NUnit.Framework;
 using System.Collections;
 using System.Collections.Generic;
@@ -160,6 +163,37 @@ namespace CorrugatedIron.Tests.Extensions
             }
 
             return sb.ToString();
+        }
+
+        private static readonly Func<RiakResult, bool> DefaultSuccessFunc = result => result.IsSuccess;
+
+        public static T WaitUntil<T>(this Func<T> action, int attempts = 10) where T : RiakResult
+        {
+            return WaitUntil<T>(action, DefaultSuccessFunc, attempts); 
+        }
+
+        public static T WaitUntil<T>(this Func<T> action, Func<T, bool> successCriteriaFunc, int attempts = 10) where T : RiakResult
+        {
+            T result = null;
+            for (var i = 0; i < attempts; i++)
+            {
+                result = null;
+                try
+                {
+                    result = action.Invoke();
+                }
+                catch (Exception)
+                {
+                    // Do nothing, try again
+                }
+
+                if (result != null && successCriteriaFunc.Invoke(result))
+                    return result;
+
+                Thread.Sleep(i * 1000);
+            }
+            // return last result if all failed the success check
+            return result;
         }
     }
 }

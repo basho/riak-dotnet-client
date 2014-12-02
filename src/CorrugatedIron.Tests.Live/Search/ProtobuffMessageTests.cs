@@ -73,20 +73,29 @@ namespace CorrugatedIron.Tests.Live.Search
             Client.Put(new RiakObject(BucketType, Bucket, alanKey, alanDoc.ToRiakString(),
                 RiakConstants.ContentTypes.ApplicationJson, RiakConstants.CharSets.Utf8));
 
-            // Let Yokozuna index stuff... *cry*
-            Thread.Sleep(2000);
             
             var req = new RiakSearchRequest
             {
-                Query = new RiakFluentSearch(Index, "name_s").Search("Alyssa" + randomId + "*").Build()
+                Query = new RiakFluentSearch(Index, "name_s")
+                                .Search("Alyssa" + randomId + "*")
+                                .Build()
             };
 
-            RiakResult<RiakSearchResult> result = Client.Search(req);
-            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
-            result.Value.NumFound.ShouldEqual(1u);
-            result.Value.Documents.Count.ShouldEqual(1);
-            result.Value.Documents[0].Fields.Count.ShouldEqual(11);
-            result.Value.Documents[0].Fields.Single(f => f.Key == "_yz_rk").Value.ShouldEqual(alyssaKey);
+            Func<RiakResult<RiakSearchResult>, bool> successCriteria =
+                result => result.IsSuccess && 
+                          result.Value != null && 
+                          result.Value.NumFound > 0;
+
+            Func<RiakResult<RiakSearchResult>> func = 
+                () => Client.Search(req);
+
+            var searchResult = func.WaitUntil(successCriteria);
+
+            searchResult.IsSuccess.ShouldBeTrue(searchResult.ErrorMessage);
+            searchResult.Value.NumFound.ShouldEqual(1u);
+            searchResult.Value.Documents.Count.ShouldEqual(1);
+            searchResult.Value.Documents[0].Fields.Count.ShouldEqual(11);
+            searchResult.Value.Documents[0].Fields.Single(f => f.Key == "_yz_rk").Value.ShouldEqual(alyssaKey);
         }
     }
 }
