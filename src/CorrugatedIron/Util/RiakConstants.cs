@@ -102,6 +102,12 @@ namespace CorrugatedIron.Util
             public const uint RVal = QuorumOptions.Default;
             public const string ContentType = ContentTypes.ApplicationJson;
             public const string CharSet = CharSets.Utf8;
+
+            public static class YokozunaIndex
+            {
+                public const string IndexName = "_yz_default";
+                public const int NVal = 3;
+            }
         }
 
         public static class KeyFilterTransforms

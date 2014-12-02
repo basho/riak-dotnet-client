@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Linq;
+using System.Threading;
 using CorrugatedIron.Models.Search;
 using CorrugatedIron.Tests.Extensions;
 using CorrugatedIron.Tests.Live.LiveRiakConnectionTests;
+using CorrugatedIron.Util;
 using NUnit.Framework;
 
 namespace CorrugatedIron.Tests.Live.Search
@@ -56,6 +59,42 @@ namespace CorrugatedIron.Tests.Live.Search
             Assert.AreNotEqual(defaultSchema.Content, fetchedNewSchema.Content); // Should differ by the added comment
             Assert.AreEqual(newSchemaContent, fetchedNewSchema.Content);
             Assert.IsTrue(fetchedNewSchema.Content.Contains(randomComment));
+        }
+
+        [Test]
+        public void TestStoreAndFetchIndex()
+        {
+            var indexName = "index" + _random.Next();
+            var index = new SearchIndex(indexName, RiakConstants.Defaults.YokozunaIndex.IndexName, 2);
+
+            var putIndexResult = Client.PutSearchIndex(index);
+
+            Assert.True(putIndexResult.IsSuccess, "Index Not Created: {0}", putIndexResult.ErrorMessage);
+            Thread.Sleep(3000);
+            var getIndexResult = Client.GetSearchIndex(indexName);
+
+            Assert.True(getIndexResult.IsSuccess, "Index Not Fetched: {0}", getIndexResult.ErrorMessage);
+            Assert.AreEqual(1, getIndexResult.Value.Indices.Count);
+            var fetchedIndex = getIndexResult.Value.Indices.First();
+            Assert.AreEqual(indexName, fetchedIndex.Name);
+            Assert.AreEqual(2, fetchedIndex.NVal);
+        }
+
+
+        [Test]
+        public void TestDeleteIndex()
+        {
+            var indexName = "index" + _random.Next();
+            var index = new SearchIndex(indexName);
+            var putIndexResult = Client.PutSearchIndex(index);
+
+            Assert.True(putIndexResult.IsSuccess, "Index Not Created: {0}", putIndexResult.ErrorMessage);
+            Thread.Sleep(2000);
+
+            var deleteIndexResult = Client.DeleteSearchIndex(indexName);
+
+            Assert.True(deleteIndexResult.IsSuccess, "Index Not Deleted: {0}", deleteIndexResult.ErrorMessage);
+
         }
     }
 }

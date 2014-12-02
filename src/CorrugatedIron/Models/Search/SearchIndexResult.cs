@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
+using CorrugatedIron.Util;
 
 namespace CorrugatedIron.Models.Search
 {
@@ -19,19 +20,17 @@ namespace CorrugatedIron.Models.Search
 
     public class SearchIndex
     {
-        private const string DefaultSchema = "_yz_default";
-        private const uint DefaultNVal = 3;
-
         public String Name { get; private set; }
         public String SchemaName { get; private set; }
         public uint NVal { get; private set; }
 
-        public SearchIndex(string name) : this(name, DefaultSchema, DefaultNVal) { }
+        public SearchIndex(string name) : this(name, RiakConstants.Defaults.YokozunaIndex.IndexName, RiakConstants.Defaults.YokozunaIndex.NVal) { }
 
         public SearchIndex(string name, string schemaName, uint nVal)
         {
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Index Name cannot be null, zero length, or whitespace");
             if (string.IsNullOrWhiteSpace(schemaName)) throw new ArgumentException("Schema Name cannot be null, zero length, or whitespace");
+            if (nVal == 0) throw new ArgumentException("NVal must be greater than 0");
 
             Name = name;
             NVal = nVal;
