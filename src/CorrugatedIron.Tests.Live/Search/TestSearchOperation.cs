@@ -28,7 +28,7 @@ using NUnit.Framework;
 namespace CorrugatedIron.Tests.Live.Search
 {
     [TestFixture]
-    public class ProtobuffMessageTests : LiveRiakConnectionTestBase
+    public class TestSearchOperation : LiveRiakConnectionTestBase
     {
         [SetUp]
         public new void SetUp()
@@ -94,8 +94,8 @@ namespace CorrugatedIron.Tests.Live.Search
             searchResult.IsSuccess.ShouldBeTrue(searchResult.ErrorMessage);
             searchResult.Value.NumFound.ShouldEqual(1u);
             searchResult.Value.Documents.Count.ShouldEqual(1);
-            searchResult.Value.Documents[0].Fields.Count.ShouldEqual(11);
-            searchResult.Value.Documents[0].Fields.Single(f => f.Key == "_yz_rk").Value.ShouldEqual(alyssaKey);
+            searchResult.Value.Documents[0].Fields.Count.ShouldEqual(11); // [ score, _yz_rb, _yz_rt, _yz_rk, _yz_id, name_s, age_i, leader_b, bio_s favorites_s.book_s, favorites_s.album_s ]
+            searchResult.Value.Documents[0].Key.ShouldEqual(alyssaKey);
         }
     }
 }

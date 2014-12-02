@@ -10,7 +10,7 @@ using NUnit.Framework;
 namespace CorrugatedIron.Tests.Live.Search
 {
     [TestFixture]
-    public class TestYzAdminOperations : LiveRiakConnectionTestBase
+    public class TestSearchAdminOperations : LiveRiakConnectionTestBase
     {
         [SetUp]
         public new void SetUp()
