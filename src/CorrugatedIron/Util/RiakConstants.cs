@@ -14,6 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
 using System.Collections.Generic;
 using CorrugatedIron.Models;
 using CorrugatedIron.Messages;
@@ -77,7 +78,7 @@ namespace CorrugatedIron.Util
 
         public static class QuorumOptions
         {
-            private const uint UintMax = uint.MaxValue;
+            private const uint UintMax = UInt32.MaxValue;
             public const uint One = UintMax - 1;
             public const uint Quorum = UintMax - 2;
             public const uint All = UintMax - 3;
@@ -170,6 +171,16 @@ namespace CorrugatedIron.Util
                 public const string Put = "PUT";
                 public const string Delete = "DELETE";
             }
+        }
+
+        public static class SearchFieldKeys
+        {
+                public const string BucketType = "_yz_rt";
+                public const string Bucket = "_yz_rb";
+                public const string Key = "_yz_rk";
+
+                public const string Id = "_yz_id";
+                public const string Score = "score";
         }
     }
 }
