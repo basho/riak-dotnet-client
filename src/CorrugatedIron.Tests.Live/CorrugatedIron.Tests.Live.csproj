@@ -62,7 +62,7 @@
     <Compile Include="LiveRiakConnectionTestBase.cs" />
     <Compile Include="LoadTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RiakPbYokoSearchTests.cs" />
+    <Compile Include="Search\ProtobuffMessageTests.cs" />
     <Compile Include="RawRiakDtTests.cs" />
     <Compile Include="RiakClientTests.cs" />
     <Compile Include="RiakConfigurationTests.cs" />
@@ -70,6 +70,7 @@
     <Compile Include="RiakObjectTests.cs" />
     <Compile Include="RiakSearchMapReduceInputTests.cs" />
     <Compile Include="RiakIndexTests.cs" />
+    <Compile Include="Search\TestYZAdminOperations.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CorrugatedIron.Tests\CorrugatedIron.Tests.csproj">

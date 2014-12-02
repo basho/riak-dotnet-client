@@ -25,10 +25,10 @@ using CorrugatedIron.Tests.Live.LiveRiakConnectionTests;
 using CorrugatedIron.Util;
 using NUnit.Framework;
 
-namespace CorrugatedIron.Tests.Live
+namespace CorrugatedIron.Tests.Live.Search
 {
     [TestFixture]
-    public class QueryingRiakSearchViaPbc : LiveRiakConnectionTestBase
+    public class ProtobuffMessageTests : LiveRiakConnectionTestBase
     {
         [SetUp]
         public new void SetUp()
