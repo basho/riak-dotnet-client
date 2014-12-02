@@ -70,8 +70,8 @@ namespace CorrugatedIron.Tests.Live.Search
             var putIndexResult = Client.PutSearchIndex(index);
 
             Assert.True(putIndexResult.IsSuccess, "Index Not Created: {0}", putIndexResult.ErrorMessage);
-            Thread.Sleep(3000);
-            var getIndexResult = Client.GetSearchIndex(indexName);
+            Func<RiakResult<SearchIndexResult>> func = () => Client.GetSearchIndex(indexName);
+            var getIndexResult = func.WaitUntil();
 
             Assert.True(getIndexResult.IsSuccess, "Index Not Fetched: {0}", getIndexResult.ErrorMessage);
             Assert.AreEqual(1, getIndexResult.Value.Indices.Count);
@@ -89,10 +89,10 @@ namespace CorrugatedIron.Tests.Live.Search
             var putIndexResult = Client.PutSearchIndex(index);
 
             Assert.True(putIndexResult.IsSuccess, "Index Not Created: {0}", putIndexResult.ErrorMessage);
-            Thread.Sleep(2000);
 
-            var deleteIndexResult = Client.DeleteSearchIndex(indexName);
-
+            Func<RiakResult> func = () => Client.DeleteSearchIndex(indexName);
+            var deleteIndexResult = func.WaitUntil();
+            
             Assert.True(deleteIndexResult.IsSuccess, "Index Not Deleted: {0}", deleteIndexResult.ErrorMessage);
 
         }
