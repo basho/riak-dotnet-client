@@ -24,23 +24,33 @@ namespace CorrugatedIron.Models.Search
 {
     public class RiakSearchResultDocument
     {
+        private RiakObjectId _riakObjectId = null;
+
         public String Id { get; private set; }
         public String Score { get; private set; }
         public String BucketType { get; private set; }
         public String Bucket { get; private set; }
         public String Key { get; private set; }
 
+        public RiakObjectId RiakObjectId
+        {
+            get
+            {
+                if (_riakObjectId == null)
+                    _riakObjectId = new RiakObjectId(BucketType, Bucket, Key);
+
+                return _riakObjectId;
+            }
+        }
+
         public List<RiakSearchResultField> Fields { get; private set; }
         
-
         internal RiakSearchResultDocument(RpbSearchDoc doc)
         {
             Fields = new List<RiakSearchResultField>();
 
             foreach (var field in doc.fields.Select(f => new RiakSearchResultField(f)))
             {
-                Fields.Add(field);
-
                 switch (field.Key)
                 {
                     case RiakConstants.SearchFieldKeys.Id:
@@ -57,6 +67,9 @@ namespace CorrugatedIron.Models.Search
                         break;
                     case RiakConstants.SearchFieldKeys.Key:
                         Key = field.Value;
+                        break;
+                    default:
+                        Fields.Add(field);
                         break;
                 }
             }

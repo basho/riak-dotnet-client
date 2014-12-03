@@ -59,18 +59,21 @@ namespace CorrugatedIron.Tests.Live.Search
         public void SearchingWithSimpleFluentQueryWorksCorrectly()
         {
             var randomId = _random.Next();
+            
             var alyssaKey = RiakSearchKey + randomId;
-            var alanKey = RiakSearchKey2 + randomId;
+            var alyssaRiakId = new RiakObjectId(BucketType, Bucket, alyssaKey);
             var alyssaDoc = String.Format(RiakSearchDoc, randomId);
+
+            var alanKey = RiakSearchKey2 + randomId;
+            var alanRiakId = new RiakObjectId(BucketType, Bucket, alanKey);
             var alanDoc = String.Format(RiakSearchDoc2, randomId);
-
-
+            
             Console.WriteLine("Using {0}, {1} for SearchingWithSimpleFluentQueryWorksCorrectly() key", alyssaKey, alanKey);
 
-            Client.Put(new RiakObject(BucketType, Bucket, alyssaKey , alyssaDoc.ToRiakString(),
+            Client.Put(new RiakObject(alyssaRiakId, alyssaDoc.ToRiakString(),
                 RiakConstants.ContentTypes.ApplicationJson, RiakConstants.CharSets.Utf8));
 
-            Client.Put(new RiakObject(BucketType, Bucket, alanKey, alanDoc.ToRiakString(),
+            Client.Put(new RiakObject(alanRiakId, alanDoc.ToRiakString(),
                 RiakConstants.ContentTypes.ApplicationJson, RiakConstants.CharSets.Utf8));
 
             
@@ -94,8 +97,8 @@ namespace CorrugatedIron.Tests.Live.Search
             searchResult.IsSuccess.ShouldBeTrue(searchResult.ErrorMessage);
             searchResult.Value.NumFound.ShouldEqual(1u);
             searchResult.Value.Documents.Count.ShouldEqual(1);
-            searchResult.Value.Documents[0].Fields.Count.ShouldEqual(11); // [ score, _yz_rb, _yz_rt, _yz_rk, _yz_id, name_s, age_i, leader_b, bio_s favorites_s.book_s, favorites_s.album_s ]
-            searchResult.Value.Documents[0].Key.ShouldEqual(alyssaKey);
+            searchResult.Value.Documents[0].Fields.Count.ShouldEqual(6); // [ name_s, age_i, leader_b, bio_s favorites_s.book_s, favorites_s.album_s ]
+            searchResult.Value.Documents[0].RiakObjectId.ShouldEqual(alyssaRiakId);
         }
     }
 }
