@@ -15,7 +15,6 @@
 // under the License.
 
 using System;
-using System.Linq;
 using System.Threading;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Models;
@@ -30,16 +29,32 @@ namespace CorrugatedIron.Tests.Live.Search
     [TestFixture]
     public class TestSearchOperation : LiveRiakConnectionTestBase
     {
+        public TestSearchOperation()
+            : base("riak1NodeConfiguration") { }
+
         [SetUp]
         public new void SetUp()
         {
             base.SetUp();
+
             var index = new SearchIndex(Index);
             Client.PutSearchIndex(index);
-            var props = Client.GetBucketProperties(BucketType, Bucket).Value;
-            props.SetSearchIndex(Index);
-            Client.SetBucketProperties(BucketType, Bucket, props);
 
+            Func<RiakResult<RiakBucketProperties>, bool> indexIsSet =
+                result => result.IsSuccess &&
+                          result.Value != null &&
+                          !string.IsNullOrEmpty(result.Value.SearchIndex);
+
+            Func<RiakResult<RiakBucketProperties>> setBucketProperties =
+                () =>
+                {
+                    var props = Client.GetBucketProperties(BucketType, Bucket).Value;
+                    props.SetSearchIndex(Index);
+                    Client.SetBucketProperties(BucketType, Bucket, props);
+                    return Client.GetBucketProperties(BucketType, Bucket);
+                };
+
+            setBucketProperties.WaitUntil(indexIsSet);
         }
 
         private const string BucketType = "search_type";
@@ -51,7 +66,7 @@ namespace CorrugatedIron.Tests.Live.Search
 
         private string RiakSearchDoc =
             "{{\"name_s\":\"Alyssa{0}P. Hacker\", \"age_i\":35, \"leader_b\":true, \"bio_s\":\"I'm an engineer, making awesome things.\", \"favorites_s\":{{\"book_s\":\"The Moon is a Harsh Mistress\",\"album_s\":\"Magical Mystery Tour\", }}}}";
-        
+
         private string RiakSearchDoc2 =
             "{{\"name_s\":\"Alan{0} Q. Public\", \"age_i\":38, \"bio_s\":\"I'm an exciting awesome mathematician\", \"favorites_s\":{{\"book_s\":\"Prelude to Mathematics\",\"album_s\":\"The Fame Monster\"}}}}";
 
@@ -59,7 +74,6 @@ namespace CorrugatedIron.Tests.Live.Search
         public void SearchingWithSimpleFluentQueryWorksCorrectly()
         {
             var randomId = _random.Next();
-            
             var alyssaKey = RiakSearchKey + randomId;
             var alyssaRiakId = new RiakObjectId(BucketType, Bucket, alyssaKey);
             var alyssaDoc = String.Format(RiakSearchDoc, randomId);
@@ -67,16 +81,18 @@ namespace CorrugatedIron.Tests.Live.Search
             var alanKey = RiakSearchKey2 + randomId;
             var alanRiakId = new RiakObjectId(BucketType, Bucket, alanKey);
             var alanDoc = String.Format(RiakSearchDoc2, randomId);
-            
+
             Console.WriteLine("Using {0}, {1} for SearchingWithSimpleFluentQueryWorksCorrectly() key", alyssaKey, alanKey);
 
-            Client.Put(new RiakObject(alyssaRiakId, alyssaDoc.ToRiakString(),
+            var put1Result = Client.Put(new RiakObject(alyssaRiakId, alyssaDoc.ToRiakString(),
                 RiakConstants.ContentTypes.ApplicationJson, RiakConstants.CharSets.Utf8));
 
-            Client.Put(new RiakObject(alanRiakId, alanDoc.ToRiakString(),
+            var put2Result = Client.Put(new RiakObject(alanRiakId, alanDoc.ToRiakString(),
                 RiakConstants.ContentTypes.ApplicationJson, RiakConstants.CharSets.Utf8));
 
-            
+            put1Result.IsSuccess.ShouldBeTrue(put1Result.ErrorMessage);
+            put2Result.IsSuccess.ShouldBeTrue(put2Result.ErrorMessage);
+
             var req = new RiakSearchRequest
             {
                 Query = new RiakFluentSearch(Index, "name_s")
@@ -84,15 +100,15 @@ namespace CorrugatedIron.Tests.Live.Search
                                 .Build()
             };
 
-            Func<RiakResult<RiakSearchResult>, bool> successCriteria =
-                result => result.IsSuccess && 
-                          result.Value != null && 
+            Func<RiakResult<RiakSearchResult>, bool> matchIsFound =
+                result => result.IsSuccess &&
+                          result.Value != null &&
                           result.Value.NumFound > 0;
 
-            Func<RiakResult<RiakSearchResult>> func = 
+            Func<RiakResult<RiakSearchResult>> runSolrQuery =
                 () => Client.Search(req);
 
-            var searchResult = func.WaitUntil(successCriteria);
+            var searchResult = runSolrQuery.WaitUntil(matchIsFound);
 
             searchResult.IsSuccess.ShouldBeTrue(searchResult.ErrorMessage);
             searchResult.Value.NumFound.ShouldEqual(1u);
