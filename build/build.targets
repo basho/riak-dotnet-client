@@ -104,6 +104,9 @@
     <ProjectToBuild Include="$(SolutionFile)">
       <Properties>Configuration=Release</Properties>
     </ProjectToBuild>
+    <ProjectToBuild Include="$(SolutionFile)">
+      <Properties>Configuration=DeprecatedTests</Properties>
+    </ProjectToBuild>
   </ItemGroup>
 
   <ItemGroup>
@@ -154,6 +157,10 @@
     <MSBuild Projects="$(SolutionFile)" Properties="Configuration=Debug" />
   </Target>
 
+  <Target Name="DeprecatedDebug" DependsOnTargets="GenerateCommonAssemblyInfo">
+    <MSBuild Projects="$(SolutionFile)" Properties="Configuration=DeprecatedTests" />
+  </Target>
+
   <Target Name="IntegrationTest" DependsOnTargets="Debug">
     <Exec WorkingDirectory="$(SolutionDir)"
           Command="$(NUnitConsoleRunnerCommand) -work=$(ProjDir)\CorrugatedIron.Tests.Live $(ProjDir)\CorrugatedIron.Tests.Live\CorrugatedIron.Tests.Live.nunit" />
@@ -168,6 +175,11 @@
 
   <Target Name="Test">
     <CallTarget Targets="TestAll" />
+  </Target>
+
+  <Target Name="DeprecatedTest" DependsOnTargets="DeprecatedDebug">
+    <Exec WorkingDirectory="$(SolutionDir)"
+          Command="$(NUnitConsoleRunnerCommand) -work=$(ProjDir)\CorrugatedIron.Tests.Deprecated $(ProjDir)\CorrugatedIron.Tests.Deprecated\CorrugatedIron.Tests.Deprecated.nunit" />
   </Target>
 
 </Project>
