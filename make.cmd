@@ -79,6 +79,7 @@ echo ProtoGen        - Rebuild cs files from proto files
 echo Test            - Run all tests
 echo UnitTest        - Run unit tests
 echo IntegrationTest - Run integration tests
+echo DeprecatedTest  - Run deprecated tests
 echo ---------------------------------------------------
 echo.
 exit /b 0
