@@ -40,6 +40,7 @@ namespace CorrugatedIron.Tests.Live
 
         public RiakMapReduceTests(string section = "riak1NodeConfiguration")
         {
+            RiakClient.DisableListKeysWarning = true;
             ClusterConfig = RiakClusterConfiguration.LoadFromConfig(section);
         }
     }

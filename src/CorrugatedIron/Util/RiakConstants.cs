@@ -16,7 +16,6 @@
 
 using System;
 using System.Collections.Generic;
-using CorrugatedIron.Models;
 using CorrugatedIron.Messages;
 
 namespace CorrugatedIron.Util

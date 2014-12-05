@@ -47,11 +47,13 @@ namespace CorrugatedIron
 
     public class RiakClient : IRiakClient
     {
-        private const string ListKeysWarning = "*** [CI] -> ListKeys is an expensive operation and should not be used in Production scenarios. ***";
+        internal static bool DisableListKeysWarning = false;
+
+        private const string ListKeysWarning = "*** [CI] -> ListKeys has serious performance implications and should not be used in production applications. ***";
         private const string InvalidBucketErrorMessage = "Bucket cannot be blank or contain forward-slashes";
         private const string InvalidKeyErrorMessage = "Key cannot be blank or contain forward-slashes";
         private const string InvalidBucketTypeErrorMessage = "Bucket type cannot be blank or contain forward-slashes";
-
+        
         private readonly IRiakEndPoint _endPoint;
         private readonly IRiakConnection _batchConnection;
 
@@ -777,9 +779,7 @@ namespace CorrugatedIron
 
         private static RiakResult<IEnumerable<string>> ListKeys(IRiakConnection conn, string bucketType, string bucket)
         {
-            System.Diagnostics.Debug.Write(ListKeysWarning);
-            System.Diagnostics.Trace.TraceWarning(ListKeysWarning);
-            Console.WriteLine(ListKeysWarning);
+            WarnAboutListKeys();
 
             var lkReq = new RpbListKeysReq { 
                 type = bucketType.ToRiakString(),
@@ -793,6 +793,14 @@ namespace CorrugatedIron
                 return RiakResult<IEnumerable<string>>.Success(keys);
             }
             return RiakResult<IEnumerable<string>>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
+        }
+
+        private static void WarnAboutListKeys()
+        {
+            if (DisableListKeysWarning) return;
+            System.Diagnostics.Debug.Write(ListKeysWarning);
+            System.Diagnostics.Trace.TraceWarning(ListKeysWarning);
+            Console.WriteLine(ListKeysWarning);
         }
 
         /// <summary>
@@ -810,9 +818,7 @@ namespace CorrugatedIron
 
         public RiakResult<IEnumerable<string>> StreamListKeys(string bucketType, string bucket)
         {
-            System.Diagnostics.Debug.Write(ListKeysWarning);
-            System.Diagnostics.Trace.TraceWarning(ListKeysWarning);
-            Console.WriteLine(ListKeysWarning);
+            WarnAboutListKeys();
 
             var lkReq = new RpbListKeysReq { 
                 type = bucketType.ToRiakString(),
