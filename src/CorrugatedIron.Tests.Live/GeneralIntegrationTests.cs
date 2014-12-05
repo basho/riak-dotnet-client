@@ -163,12 +163,12 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             var doc = new RiakObject(TestBucket, TestKey, TestJson, RiakConstants.ContentTypes.ApplicationJson);
             var writeResult = Client.Put(doc);
 
-            writeResult.IsSuccess.ShouldBeTrue();
-            writeResult.Value.ShouldNotBeNull();
+            writeResult.IsSuccess.ShouldBeTrue(writeResult.ErrorMessage);
+            writeResult.Value.ShouldNotBeNull(writeResult.ErrorMessage);
 
             var readResult = Client.Get(TestBucket, TestKey);
-            readResult.IsSuccess.ShouldBeTrue();
-            readResult.Value.ShouldNotBeNull();
+            readResult.IsSuccess.ShouldBeTrue(readResult.ErrorMessage);
+            readResult.Value.ShouldNotBeNull(readResult.ErrorMessage);
 
             var otherDoc = readResult.Value;
             otherDoc.Bucket.ShouldEqual(TestBucket);
