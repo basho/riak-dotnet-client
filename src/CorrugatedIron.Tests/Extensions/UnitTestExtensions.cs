@@ -16,7 +16,6 @@
 
 using System;
 using System.Threading;
-using CorrugatedIron.Extensions;
 using NUnit.Framework;
 using System.Collections;
 using System.Collections.Generic;
@@ -28,98 +27,84 @@ namespace CorrugatedIron.Tests.Extensions
     [System.Diagnostics.DebuggerNonUserCode]
     public static class UnitTestExtensions
     {
-        public static void ShouldEqual<T>(this T actual, T expected)
+        public static void ShouldEqual<T>(this T actual, T expected, string message = null)
         {
-            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected, actual, message);
         }
 
-        public static void ShouldNotEqual<T>(this T actual, T expected)
+        public static void ShouldNotEqual<T>(this T actual, T expected, string message = null)
         {
-            Assert.AreNotEqual(expected, actual);
+            Assert.AreNotEqual(expected, actual, message);
         }
 
-        public static void ShouldBe<T>(this object actual)
+        public static void ShouldBe<T>(this object actual, string message = null)
         {
-            Assert.IsInstanceOf<T>(actual);
+            Assert.IsInstanceOf<T>(actual, message);
         }
 
-        public static void ShouldBeGreaterThan(this long? actual, long? expected)
+        public static void ShouldBeGreaterThan(this long? actual, long? expected, string message = null)
         {
-            Assert.GreaterOrEqual(actual, expected);
+            Assert.GreaterOrEqual(actual, expected, message);
         }
 
-        public static void ShouldBeLessThan(this long? actual, long? expected)
+        public static void ShouldBeLessThan(this long? actual, long? expected, string message = null)
         {
-            Assert.LessOrEqual(actual, expected);
+            Assert.LessOrEqual(actual, expected, message);
         }
 
-        public static void ShouldBeGreaterThan(this long actual, long expected)
+        public static void ShouldBeGreaterThan(this long actual, long expected, string message = null)
         {
-            Assert.GreaterOrEqual(actual, expected);
+            Assert.GreaterOrEqual(actual, expected, message);
         }
 
-        public static void ShouldBeLessThan(this long actual, long expected)
+        public static void ShouldBeLessThan(this long actual, long expected, string message = null)
         {
-            Assert.LessOrEqual(actual, expected);
+            Assert.LessOrEqual(actual, expected, message);
         }
-        
-        public static void ShouldBeGreaterThan(this int actual, int expected)
+
+        public static void ShouldBeGreaterThan(this int actual, int expected, string message = null)
         {
-            Assert.GreaterOrEqual(actual, expected);
+            Assert.GreaterOrEqual(actual, expected, message);
         }
-        
-        public static void ShouldBeLessThan(this int actual, int expected)
+
+        public static void ShouldBeLessThan(this int actual, int expected, string message = null)
         {
-            Assert.LessOrEqual(actual, expected);
+            Assert.LessOrEqual(actual, expected, message);
         }
 
         public static void ShouldBeFalse(this bool value, string message = null)
         {
-            if (string.IsNullOrEmpty(message))
-            {
-                Assert.IsFalse(value);
-            }
-            else
-            {
-                Assert.IsFalse(value, message);
-            }
+            Assert.IsFalse(value, message);
         }
 
         public static void ShouldBeTrue(this bool value, string message = null)
         {
-            if (string.IsNullOrEmpty(message))
-            {
-                Assert.IsTrue(value);
-            }
-            else
-            {
-                Assert.IsTrue(value, message);
-            }
+            Assert.IsTrue(value, message);
         }
 
-        public static void ShouldBeNullOrEmpty(this string value)
+        public static void ShouldBeNullOrEmpty(this string value, string message = null)
         {
-            Assert.IsNullOrEmpty(value);
+            Assert.IsNullOrEmpty(value, message);
         }
 
-        public static void ShouldNotBeNullOrEmpty(this string value)
+        public static void ShouldNotBeNullOrEmpty(this string value, string message = null)
         {
-            Assert.IsNotNullOrEmpty(value);
+            Assert.IsNotNullOrEmpty(value, message);
         }
 
-        public static void ShouldNotBeNull<T>(this T obj) where T : class
+        public static void ShouldNotBeNull<T>(this T obj, string message = null) where T : class
         {
-            Assert.IsNotNull(obj);
+            Assert.IsNotNull(obj, message);
         }
 
-        public static void ShouldBeNull<T>(this T obj) where T : class
+        public static void ShouldBeNull<T>(this T obj, string message = null) where T : class
         {
-            Assert.IsNull(obj);
+            Assert.IsNull(obj, message);
         }
 
-        public static void IsAtLeast(this int val, int min)
+        public static void IsAtLeast(this int val, int min, string message = null)
         {
-            Assert.Less(min - 1, val);
+            Assert.Less(min - 1, val, message);
         }
 
         public static void ContentsShouldEqual<T>(this T actual, T expected) where T : IEnumerable
@@ -141,14 +126,14 @@ namespace CorrugatedIron.Tests.Extensions
             }
         }
 
-        public static void ShouldContain<T>(this IEnumerable<T> items, T value)
+        public static void ShouldContain<T>(this IEnumerable<T> items, T value, string message = null)
         {
-            items.Contains(value).ShouldBeTrue();
+            items.Contains(value).ShouldBeTrue(message);
         }
 
-        public static void ShouldNotContain<T>(this IEnumerable<T> items, T value)
+        public static void ShouldNotContain<T>(this IEnumerable<T> items, T value, string message = null)
         {
-            items.Contains(value).ShouldBeFalse();
+            items.Contains(value).ShouldBeFalse(message);
         }
 
         public static string DisplayString<T>(this T items) where T : IEnumerable
