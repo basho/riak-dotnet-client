@@ -68,10 +68,8 @@ namespace CorrugatedIron.Models.Search
                     case RiakConstants.SearchFieldKeys.Key:
                         Key = field.Value;
                         break;
-                    default:
-                        Fields.Add(field);
-                        break;
                 }
+                Fields.Add(field);
             }
         }
     }
