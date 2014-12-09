@@ -6,6 +6,7 @@ pb_port=$3
 
 cat >> $out_file <<EOT
 ring_size = 16
+search = on
 storage_backend = multi
 multi_backend.default = bitcask_backend
 
