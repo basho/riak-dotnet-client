@@ -3,8 +3,15 @@
 set -o errexit
 set -o nounset
 
-script_dir="$(dirname $0)"
-script_path="$(realpath $script_dir)"
+script_dir=''
+script_path=''
+if hash realpath 2>/dev/null
+then
+  script_dir="$(dirname $0)"
+  script_path="$(realpath $script_dir)"
+else
+  script_path="$(perl -e 'use File::Basename;use Cwd q(abs_path);print dirname(abs_path(shift))' $0)"
+fi
 PATH="$PATH:$script_path"
 
 function now
