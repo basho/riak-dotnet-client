@@ -95,7 +95,7 @@ namespace CorrugatedIron.Tests.Live.Search
                     .Build()
             };
             
-            var searchResult = RunSolrQuery(req).WaitUntil(MatchIsFound);
+            var searchResult = RunSolrQuery(req).WaitUntil(AnyMatchIsFound);
 
             searchResult.IsSuccess.ShouldBeTrue(searchResult.ErrorMessage);
             searchResult.Value.NumFound.ShouldEqual(1u);
@@ -115,7 +115,7 @@ namespace CorrugatedIron.Tests.Live.Search
                 Query = new RiakFluentSearch(Index, "name_s").Search(Token.StartsWith(_randomId + "Al")).Build()
             };
 
-            var searchResult = RunSolrQuery(req).WaitUntil(MatchIsFound);
+            var searchResult = RunSolrQuery(req).WaitUntil(TwoMatchesFound);
             searchResult.IsSuccess.ShouldBeTrue(searchResult.ErrorMessage);
             searchResult.Value.NumFound.ShouldEqual(2u);
             searchResult.Value.Documents.Count.ShouldEqual(2);
@@ -136,8 +136,8 @@ namespace CorrugatedIron.Tests.Live.Search
                 .And("mathematician", s => s.Or("favorites.album_tsd", "Fame"));
 
             Console.WriteLine(req.Query.ToString());
-            
-            var result = RunSolrQuery(req).WaitUntil(MatchIsFound);
+
+            var result = RunSolrQuery(req).WaitUntil(AnyMatchIsFound);
 
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
             result.Value.NumFound.ShouldEqual(1u);
@@ -176,7 +176,7 @@ namespace CorrugatedIron.Tests.Live.Search
 
             Console.WriteLine(req.Query.ToString());
 
-            var result = RunSolrQuery(req).WaitUntil(MatchIsFound);
+            var result = RunSolrQuery(req).WaitUntil(AnyMatchIsFound);
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
             result.Value.NumFound.ShouldEqual(1u);
             result.Value.Documents.Count.ShouldEqual(1);
@@ -192,7 +192,7 @@ namespace CorrugatedIron.Tests.Live.Search
             return runSolrQuery;
         }
         
-        private static Func<RiakResult<RiakSearchResult>, bool> MatchIsFound
+        private static Func<RiakResult<RiakSearchResult>, bool> AnyMatchIsFound
         {
             get
             {
@@ -201,6 +201,18 @@ namespace CorrugatedIron.Tests.Live.Search
                               result.Value != null &&
                               result.Value.NumFound > 0;
                 return matchIsFound;
+            }
+        }
+
+        private static Func<RiakResult<RiakSearchResult>, bool> TwoMatchesFound
+        {
+            get
+            {
+                Func<RiakResult<RiakSearchResult>, bool> twoMatchesFound =
+                    result => result.IsSuccess &&
+                              result.Value != null &&
+                              result.Value.NumFound == 2;
+                return twoMatchesFound;
             }
         }
     }

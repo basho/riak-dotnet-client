@@ -90,7 +90,7 @@
     <NuGetSpecTemplate>$(ProjDir)\NuGet\CorrugatedIron.nuspec.template</NuGetSpecTemplate>
     <NuGetSpecFile>$(ProjDir)\NuGet\CorrugatedIron.nuspec</NuGetSpecFile>
 
-    <NUnitConsoleRunnerExe>$(SolutionDir)packages\NUnit.Runners.2.6.3\tools\nunit-console.exe -nologo -nodots -labels</NUnitConsoleRunnerExe>
+    <NUnitConsoleRunnerExe>$(SolutionDir)packages\NUnit.Runners.2.6.3\tools\nunit-console.exe -nologo -nodots</NUnitConsoleRunnerExe>
     <NUnitConsoleRunnerCommand Condition="'$(OS)' == 'Windows_NT'">$(NUnitConsoleRunnerExe) -config Debug</NUnitConsoleRunnerCommand>
     <NUnitConsoleRunnerCommand Condition="'$(OS)' != 'Windows_NT'">$(MonoExe) $(NUnitConsoleRunnerExe) -config Debug-Mono</NUnitConsoleRunnerCommand>
 
