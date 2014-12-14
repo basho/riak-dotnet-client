@@ -220,7 +220,6 @@ namespace CorrugatedIron.Comms
         {
             try
             {
-				log.Info("proto buffer write");
                 _socket.Write(messageCode);
                 return RiakResult.Success();
             }
@@ -244,8 +243,7 @@ namespace CorrugatedIron.Comms
             where TResult : class, new()
         {
 
-			log.Debug(new { request }, "protoproto buffer writeread");
-			log.Info("proto buffer writeread");
+			log.Debug(new { request }, "protocol buffer WriteRead");
             var writeResult = PbcWrite(request);
             if(writeResult.IsSuccess)
             {
@@ -257,8 +255,7 @@ namespace CorrugatedIron.Comms
         public RiakResult PbcWriteRead<TRequest>(TRequest request, MessageCode expectedMessageCode)
             where TRequest : class
         {
-			log.Debug(new { request, expectedMessageCode }, "protoproto buffer writeread");
-			log.Info("proto buffer writeread");
+			log.Debug(new { request, expectedMessageCode }, "protocol buffer WriteRead");
 			var writeResult = PbcWrite(request);
             if(writeResult.IsSuccess)
             {
@@ -270,8 +267,7 @@ namespace CorrugatedIron.Comms
         public RiakResult<TResult> PbcWriteRead<TResult>(MessageCode messageCode)
             where TResult : class, new()
         {
-			log.Debug(new { messageCode }, "protoproto buffer writeread");
-			log.Info("proto buffer writeread");
+			log.Debug(new { messageCode }, "protocol buffer WriteRead");
 			var writeResult = PbcWrite(messageCode);
             if(writeResult.IsSuccess)
             {
@@ -282,8 +278,7 @@ namespace CorrugatedIron.Comms
 
         public RiakResult PbcWriteRead(MessageCode messageCode, MessageCode expectedMessageCode)
         {
-			log.Debug(new { messageCode, expectedMessageCode }, "protoproto buffer writeread");
-			log.Info("proto buffer writeread");
+			log.Debug(new { messageCode, expectedMessageCode }, "protocol buffer WriteRead");
 			var writeResult = PbcWrite(messageCode);
             if(writeResult.IsSuccess)
             {
@@ -297,8 +292,7 @@ namespace CorrugatedIron.Comms
             where TRequest : class
             where TResult : class, new()
         {
-			log.Debug(new { request }, "protoproto buffer writeread");
-			log.Info("proto buffer writeread");
+			log.Debug(new { request }, "protocol buffer WriteRead");
             var writeResult = PbcWrite(request);
             if(writeResult.IsSuccess)
             {
@@ -311,8 +305,7 @@ namespace CorrugatedIron.Comms
             Func<RiakResult<TResult>, bool> repeatRead)
             where TResult : class, new()
         {
-			log.Debug(new { messageCode }, "protoproto buffer writeread");
-			log.Info("proto buffer writeread");
+			log.Debug(new { messageCode }, "protocol buffer WriteRead");
             var writeResult = PbcWrite(messageCode);
             if(writeResult.IsSuccess)
             {
@@ -352,8 +345,7 @@ namespace CorrugatedIron.Comms
             where TRequest : class
             where TResult : class, new()
         {
-			log.Debug(new { request }, "protoproto buffer writestreamread");
-			log.Info("proto buffer writestreamread");
+			log.Debug(new { request }, "protocol buffer WriteStreamRead");
             var streamer = PbcWriteStreamReadIterator(request, repeatRead, onFinish);
             return RiakResult<IEnumerable<RiakResult<TResult>>>.Success(streamer);
         }
@@ -394,9 +386,8 @@ namespace CorrugatedIron.Comms
         }
 
         public RiakResult<RiakRestResponse> RestRequest(RiakRestRequest request)
-        {
-			log.Debug(new { request }, "protoproto buffer rest request");
-			log.Info("proto buffer restrequest");
+		{
+			log.Debug(new { request }, "REST request");
 			var baseUri = new StringBuilder(_restRootUrl).Append(request.Uri);
             if(request.QueryParams.Count > 0)
             {
