@@ -42,7 +42,7 @@ namespace CorrugatedIron
         T Batch<T>(Func<IRiakBatchClient, T> batchFunction);
 
         IRiakAsyncClient Async { get; }
-        
+		    
     }
 
     public class RiakClient : IRiakClient

@@ -253,6 +253,9 @@
     <Compile Include="Models\MapReduce\Inputs\RiakBinIndexRangeInput.cs" />
     <Compile Include="Models\RiakGetOptions.cs" />
     <Compile Include="Models\RiakIndexId.cs" />
+    <Compile Include="RiakLogData.cs" />
+    <Compile Include="RiakLogLevel.cs" />
+    <Compile Include="RiakLogger.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\CorrugatedIron.snk">
