@@ -87,8 +87,12 @@ namespace CorrugatedIron.Tests.Live.Search
             var indexName = "index" + _random.Next();
             var index = new SearchIndex(indexName);
             var putIndexResult = Client.PutSearchIndex(index);
-
             Assert.True(putIndexResult.IsSuccess, "Index Not Created: {0}", putIndexResult.ErrorMessage);
+
+            // Wait until index can be fetched, or else you can run into a race condition where the index is not found on another node. 
+            Func<RiakResult<SearchIndexResult>> fetchIndex = () => Client.GetSearchIndex(indexName);
+            var fetchIndexResult = fetchIndex.WaitUntil();
+            Assert.True(fetchIndexResult.IsSuccess, "Index Not Found After Creation: {0}", fetchIndexResult.ErrorMessage);
 
             Func<RiakResult> deleteIndex = () => Client.DeleteSearchIndex(indexName);
             var deleteIndexResult = deleteIndex.WaitUntil();
