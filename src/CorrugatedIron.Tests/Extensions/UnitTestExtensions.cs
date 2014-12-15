@@ -21,6 +21,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Reflection;
 
 namespace CorrugatedIron.Tests.Extensions
 {
@@ -159,6 +160,9 @@ namespace CorrugatedIron.Tests.Extensions
 
         public static T WaitUntil<T>(this Func<T> action, Func<T, bool> successCriteriaFunc, int attempts = 10) where T : RiakResult
         {
+            var invalidResults = new List<T>();
+            var exceptions = new List<Exception>();
+
             T result = null;
             for (var i = 0; i < attempts; i++)
             {
@@ -167,18 +171,68 @@ namespace CorrugatedIron.Tests.Extensions
                 {
                     result = action.Invoke();
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    exceptions.Add(ex);
                     // Do nothing, try again
                 }
 
                 if (result != null && successCriteriaFunc.Invoke(result))
                     return result;
 
+                invalidResults.Add(result);
+
                 Thread.Sleep(i * 1000);
             }
+            // print retry "trace" and
             // return last result if all failed the success check
+
+            PrintFailedRetries(invalidResults, exceptions);
+
             return result;
+        }
+
+        private static void PrintFailedRetries<T>(IList<T> invalidResults, IList<Exception> exceptions) where T : RiakResult
+        {
+            var stackTrace = new System.Diagnostics.StackTrace();
+            var testMethod = stackTrace.GetFrame(2).GetMethod();
+            var testClass = testMethod.ReflectedType;
+
+
+            Console.WriteLine("Could not reach success criteria while running {0}.{1}\n", testClass.FullName, testMethod.Name);
+
+            for (var i = 0; i < 10; i++)
+            {
+                var result = invalidResults[i];
+                var exception = exceptions[i];
+
+                Console.WriteLine("Iteration {0}:", i);
+                Console.WriteLine("----------------------------------------\n");
+
+                if (result != null)
+                {
+                    Console.WriteLine(
+                        "RiakResult:\nSuccess: {0}\nNodeOffline: {1}\nResultCode: {2}\nError Message: {3}\n",
+                        result.IsSuccess,
+                        result.NodeOffline,
+                        result.ResultCode,
+                        result.ErrorMessage);
+                }
+                else
+                {
+                    Console.WriteLine("RiakResult: No RiakResult Recorded\n");
+                }
+
+                if (exception != null)
+                {
+                    Console.WriteLine("Exception: {0}\n", exception);
+                }
+                else
+                {
+                    Console.WriteLine("Exception: No Exception Recorded\n");
+                }
+            }
+            Console.WriteLine("----------------------------------------\n");
         }
     }
 }
