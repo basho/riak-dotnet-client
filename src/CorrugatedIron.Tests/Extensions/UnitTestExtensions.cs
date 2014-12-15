@@ -159,8 +159,8 @@ namespace CorrugatedIron.Tests.Extensions
 
         public static T WaitUntil<T>(this Func<T> action, Func<T, bool> successCriteriaFunc, int attempts = 10) where T : RiakResult
         {
-            var invalidResults = new List<T>();
-            var exceptions = new List<Exception>();
+            var invalidResults = new List<T>(attempts);
+            var exceptions = new List<Exception>(attempts);
 
             T result = null;
             for (var i = 0; i < attempts; i++)
