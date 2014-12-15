@@ -90,8 +90,8 @@ namespace CorrugatedIron.Tests.Live.Search
 
             Assert.True(putIndexResult.IsSuccess, "Index Not Created: {0}", putIndexResult.ErrorMessage);
 
-            Func<RiakResult> func = () => Client.DeleteSearchIndex(indexName);
-            var deleteIndexResult = func.WaitUntil();
+            Func<RiakResult> deleteIndex = () => Client.DeleteSearchIndex(indexName);
+            var deleteIndexResult = deleteIndex.WaitUntil();
             
             Assert.True(deleteIndexResult.IsSuccess, "Index Not Deleted: {0}", deleteIndexResult.ErrorMessage);
 
