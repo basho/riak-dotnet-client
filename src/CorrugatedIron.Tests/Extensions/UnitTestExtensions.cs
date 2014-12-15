@@ -172,35 +172,34 @@ namespace CorrugatedIron.Tests.Extensions
                 }
                 catch (Exception ex)
                 {
-                    exceptions.Add(ex);
+                    exceptions.Insert(i, ex);
                     // Do nothing, try again
                 }
 
                 if (result != null && successCriteriaFunc.Invoke(result))
                     return result;
 
-                invalidResults.Add(result);
+                invalidResults.Insert(i, result);
 
                 Thread.Sleep(i * 1000);
             }
             // print retry "trace" and
             // return last result if all failed the success check
 
-            PrintFailedRetries(invalidResults, exceptions);
+            PrintFailedRetries(invalidResults, exceptions, attempts);
 
             return result;
         }
 
-        private static void PrintFailedRetries<T>(IList<T> invalidResults, IList<Exception> exceptions) where T : RiakResult
+        private static void PrintFailedRetries<T>(IList<T> invalidResults, IList<Exception> exceptions, int attempts) where T : RiakResult
         {
             var stackTrace = new System.Diagnostics.StackTrace();
             var testMethod = stackTrace.GetFrame(2).GetMethod();
             var testClass = testMethod.ReflectedType;
 
-
             Console.WriteLine("Could not reach success criteria while running {0}.{1}\n", testClass.FullName, testMethod.Name);
 
-            for (var i = 0; i < 10; i++)
+            for (var i = 0; i < attempts; i++)
             {
                 var result = invalidResults[i];
                 var exception = exceptions[i];
