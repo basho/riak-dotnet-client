@@ -75,11 +75,15 @@ namespace CorrugatedIron.Tests.Live.Search
 
             Console.WriteLine("Using {0}, {1} for Yokozuna search keys", alyssaKey, alanKey);
 
-            var put1Result = Client.Put(new RiakObject(_alyssaRiakId, alyssaDoc.ToRiakString(),
+            Func<RiakResult<RiakObject>> put1 = () => Client.Put(new RiakObject(_alyssaRiakId, alyssaDoc.ToRiakString(),
                 RiakConstants.ContentTypes.ApplicationJson, RiakConstants.CharSets.Utf8));
 
-            var put2Result = Client.Put(new RiakObject(alanRiakId, alanDoc.ToRiakString(),
-                RiakConstants.ContentTypes.ApplicationJson, RiakConstants.CharSets.Utf8));
+            var put1Result = put1.WaitUntil();
+
+            Func<RiakResult<RiakObject>> put2 = () => Client.Put(new RiakObject(alanRiakId, alanDoc.ToRiakString(),
+                                                      RiakConstants.ContentTypes.ApplicationJson, RiakConstants.CharSets.Utf8));
+
+            var put2Result = put2.WaitUntil();
 
             put1Result.IsSuccess.ShouldBeTrue(put1Result.ErrorMessage);
             put2Result.IsSuccess.ShouldBeTrue(put2Result.ErrorMessage);

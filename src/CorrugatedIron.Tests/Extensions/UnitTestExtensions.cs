@@ -193,11 +193,9 @@ namespace CorrugatedIron.Tests.Extensions
 
         private static void PrintFailedRetries<T>(T[] invalidResults, Exception[] exceptions, int attempts) where T : RiakResult
         {
-            var stackTrace = new System.Diagnostics.StackTrace();
-            var testMethod = stackTrace.GetFrame(2).GetMethod();
-            var testClass = testMethod.ReflectedType;
+            var testName = TestContext.CurrentContext.Test.FullName;
 
-            Console.WriteLine("Could not reach success criteria while running {0}.{1}\n", testClass.FullName, testMethod.Name);
+            Console.WriteLine("{0}: Could not reach success criteria\r\n", testName);
 
             for (var i = 0; i < attempts; i++)
             {
@@ -205,12 +203,12 @@ namespace CorrugatedIron.Tests.Extensions
                 var exception = exceptions[i];
 
                 Console.WriteLine("Iteration {0}:", i);
-                Console.WriteLine("----------------------------------------\n");
+                Console.WriteLine("----------------------------------------");
 
                 if (result != null)
                 {
                     Console.WriteLine(
-                        "RiakResult:\nSuccess: {0}\nNodeOffline: {1}\nResultCode: {2}\nError Message: {3}\n",
+                        "RiakResult:\r\n\tSuccess:       {0}\r\n\tNodeOffline:   {1}\r\n\tResultCode:    {2}\r\n\tError Message: {3}\r\n",
                         result.IsSuccess,
                         result.NodeOffline,
                         result.ResultCode,
@@ -218,19 +216,19 @@ namespace CorrugatedIron.Tests.Extensions
                 }
                 else
                 {
-                    Console.WriteLine("RiakResult: No RiakResult Recorded\n");
+                    Console.WriteLine("RiakResult: No RiakResult Recorded\r\n");
                 }
 
                 if (exception != null)
                 {
-                    Console.WriteLine("Exception: {0}\n", exception);
+                    Console.WriteLine("Exception: {0}\r\n", exception);
                 }
                 else
                 {
-                    Console.WriteLine("Exception: No Exception Recorded\n");
+                    Console.WriteLine("Exception: No Exception Recorded\r\n");
                 }
             }
-            Console.WriteLine("----------------------------------------\n");
+            Console.WriteLine("----------------------------------------");
         }
     }
 }
