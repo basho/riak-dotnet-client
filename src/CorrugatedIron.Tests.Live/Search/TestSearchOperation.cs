@@ -36,7 +36,7 @@ namespace CorrugatedIron.Tests.Live.Search
                 };
 
             setBucketProperties.WaitUntil(indexIsSet);
-
+            System.Threading.Thread.Sleep(5000); // Wait for Yoko to start up
             PrepSearch();
         }
 
