@@ -159,8 +159,8 @@ namespace CorrugatedIron.Tests.Extensions
 
         public static T WaitUntil<T>(this Func<T> action, Func<T, bool> successCriteriaFunc, int attempts = 10) where T : RiakResult
         {
-            var invalidResults = new List<T>(attempts);
-            var exceptions = new List<Exception>(attempts);
+            var invalidResults = new T[attempts];
+            var exceptions = new Exception[attempts];
 
             T result = null;
             for (var i = 0; i < attempts; i++)
@@ -172,14 +172,14 @@ namespace CorrugatedIron.Tests.Extensions
                 }
                 catch (Exception ex)
                 {
-                    exceptions.Insert(i, ex);
+                    exceptions[i] = ex;
                     // Do nothing, try again
                 }
 
                 if (result != null && successCriteriaFunc.Invoke(result))
                     return result;
 
-                invalidResults.Insert(i, result);
+                invalidResults[i] = result;
 
                 Thread.Sleep(i * 1000);
             }
@@ -191,7 +191,7 @@ namespace CorrugatedIron.Tests.Extensions
             return result;
         }
 
-        private static void PrintFailedRetries<T>(IList<T> invalidResults, IList<Exception> exceptions, int attempts) where T : RiakResult
+        private static void PrintFailedRetries<T>(T[] invalidResults, Exception[] exceptions, int attempts) where T : RiakResult
         {
             var stackTrace = new System.Diagnostics.StackTrace();
             var testMethod = stackTrace.GetFrame(2).GetMethod();
