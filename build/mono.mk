@@ -44,6 +44,9 @@ integration-test: package-restore
 test-all: package-restore
 	$(XBUILD) /target:TestAll $(SLNDIR)/build/build.targets
 
+deprecated-test: package-restore
+	$(XBUILD) /target:DeprecatedTest $(SLNDIR)/build/build.targets
+
 .PHONY: clean-release clean-debug clean
 clean-release: package-restore
 	$(XBUILD) /target:Clean /property:Configuration=Release
@@ -56,13 +59,14 @@ clean: clean-release clean-debug
 help:
 	@echo ''
 	@echo ' Targets:'
-	@echo ' ------------------------------------------------'
-	@echo ' debug            - Debug build                  '
-	@echo ' release          - Release build with versioning'
-	@echo ' all              - Debug, then Release build    '
-	@echo ' clean            - Clean everything             '
-	@echo ' test             - Run all tests                '
-	@echo ' unit-test        - Run unit tests               '
-	@echo ' integration-test - Run integration tests        '
-	@echo ' ------------------------------------------------'
+	@echo ' ----------------------------------------------------'
+	@echo ' debug            - Debug build                      '
+	@echo ' release          - Release build with versioning    '
+	@echo ' all              - Debug, then Release build        '
+	@echo ' clean            - Clean everything                 '
+	@echo ' test             - Run all tests (except deprecated)'
+	@echo ' unit-test        - Run unit tests                   '
+	@echo ' integration-test - Run integration tests            '
+	@echo ' deprecated-test  - Run deprecated tests             '
+	@echo ' ----------------------------------------------------'
 	@echo ''

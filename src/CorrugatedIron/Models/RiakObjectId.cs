@@ -14,13 +14,14 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
 using CorrugatedIron.Converters;
 using Newtonsoft.Json;
 
 namespace CorrugatedIron.Models
 {
     [JsonConverter(typeof(RiakObjectIdConverter))]
-    public class RiakObjectId
+    public class RiakObjectId : IEquatable<RiakObjectId>
     {
         public string Bucket { get; set; }
         public string BucketType { get; set; }
@@ -53,47 +54,40 @@ namespace CorrugatedIron.Models
             return new RiakLink(Bucket, Key, tag);
         }
 
-        public override bool Equals(object obj)
-        {
-            if(ReferenceEquals(null, obj))
-            {
-                return false;
-            }
-            if(obj.GetType() != typeof(RiakObjectId))
-            {
-                return false;
-            }
-            if(ReferenceEquals(this, obj))
-            {
-                return true;
-            }
-
-            return Equals((RiakObjectId)obj);
-        }
-
         public bool Equals(RiakObjectId other)
         {
-            if(ReferenceEquals(null, other))
-            {
-                return false;
-            }
-            if(ReferenceEquals(this, other))
-            {
-                return true;
-            }
-            return Equals(other.Bucket, Bucket) && Equals(other.Key, Key);
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return string.Equals(Bucket, other.Bucket) && string.Equals(BucketType, other.BucketType) && string.Equals(Key, other.Key);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((RiakObjectId) obj);
         }
 
         public override int GetHashCode()
         {
             unchecked
             {
-                int result = (Bucket != null ? Bucket.GetHashCode() : 0);
-                result = (result * 397) ^ (BucketType != null ? BucketType.GetHashCode() : 0);
-                result = (result * 397) ^ (Key != null ? Key.GetHashCode() : 0);
-
-                return result;
+                int hashCode = (Bucket != null ? Bucket.GetHashCode() : 0);
+                hashCode = (hashCode*397) ^ (BucketType != null ? BucketType.GetHashCode() : 0);
+                hashCode = (hashCode*397) ^ (Key != null ? Key.GetHashCode() : 0);
+                return hashCode;
             }
+        }
+
+        public static bool operator ==(RiakObjectId left, RiakObjectId right)
+        {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(RiakObjectId left, RiakObjectId right)
+        {
+            return !Equals(left, right);
         }
     }
 }

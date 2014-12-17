@@ -51,6 +51,7 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
 
         static LiveRiakConnectionTestBase()
         {
+            RiakClient.DisableListKeysWarning = true;
             TestJson = new { @string = "value", @int = 100, @float = 2.34, array = new[] { 1, 2, 3 }, dict = new Dictionary<string, string> { { "foo", "bar" } } }.ToJson();
         }
 

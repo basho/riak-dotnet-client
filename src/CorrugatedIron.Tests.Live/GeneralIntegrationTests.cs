@@ -15,6 +15,7 @@
 // under the License.
 
 using System.Collections.Generic;
+using System.Reflection.Emit;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Tests.Extensions;
@@ -163,12 +164,14 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             var doc = new RiakObject(TestBucket, TestKey, TestJson, RiakConstants.ContentTypes.ApplicationJson);
             var writeResult = Client.Put(doc);
 
-            writeResult.IsSuccess.ShouldBeTrue();
-            writeResult.Value.ShouldNotBeNull();
+            writeResult.IsSuccess.ShouldBeTrue(writeResult.ErrorMessage);
+            writeResult.Value.ShouldNotBeNull(writeResult.ErrorMessage);
 
-            var readResult = Client.Get(TestBucket, TestKey);
-            readResult.IsSuccess.ShouldBeTrue();
-            readResult.Value.ShouldNotBeNull();
+            Func<RiakResult<RiakObject>> getObject = () => Client.Get(TestBucket, TestKey);
+
+            var readResult = getObject.WaitUntil();
+            readResult.IsSuccess.ShouldBeTrue(readResult.ErrorMessage);
+            readResult.Value.ShouldNotBeNull(readResult.ErrorMessage);
 
             var otherDoc = readResult.Value;
             otherDoc.Bucket.ShouldEqual(TestBucket);
@@ -187,7 +190,9 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             writeResult.Value.ShouldNotBeNull();
 
             var riakObjectId = new RiakObjectId(TestBucket, TestKey);
-            var readResult = Client.Get(riakObjectId);
+            Func<RiakResult<RiakObject>> getObject = () => Client.Get(riakObjectId);
+
+            var readResult = getObject.WaitUntil();
 
             var otherDoc = readResult.Value;
             otherDoc.Bucket.ShouldEqual(TestBucket);
@@ -204,7 +209,9 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             var writeResult = Client.Put(doc);
             writeResult.IsSuccess.ShouldBeTrue(writeResult.ErrorMessage);
 
-            var readResult = Client.Get(TestBucket, TestKey);
+            Func<RiakResult<RiakObject>> getObject = () => Client.Get(TestBucket, TestKey);
+
+            var readResult = getObject.WaitUntil();
             readResult.IsSuccess.ShouldBeTrue(readResult.ErrorMessage);
 
             var loadedDoc = readResult.Value;
@@ -280,7 +287,11 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
                     batch.Put(doc).IsSuccess.ShouldBeTrue();
 
                     // yup, just to be sure the data is there on the next node
-                    var result = batch.Get(TestBucket, TestKey);
+                    Func<RiakResult<RiakObject>> getObject =
+                        () => batch.Get(TestBucket, TestKey);
+
+                    var result = getObject.WaitUntil();
+
                     result.IsSuccess.ShouldBeTrue();
 
                     batch.Delete(doc.Bucket, doc.Key).IsSuccess.ShouldBeTrue();
@@ -507,16 +518,23 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
                     keyList.Value.Count().ShouldEqual(10);
 
                     batch.DeleteBucket(bucket);
-
-                    // This might fail if you check straight away
-                    // because deleting takes time behind the scenes.
-                    // So wait in case (yup, you can shoot me if you like!)
-                    Thread.Sleep(4000);
-
-                    keyList = batch.ListKeys(bucket);
+                    
+                    keyList = RunListKeys(batch, bucket).WaitUntil(NoKeysListed);
                     keyList.Value.Count().ShouldEqual(0);
                     batch.ListBuckets().Value.Contains(bucket).ShouldBeFalse();
                 });
+        }
+
+        private Func<RiakResult<IEnumerable<String>>> RunListKeys(IRiakBatchClient client, string bucket)
+        {
+            Func<RiakResult<IEnumerable<String>>> runListKeys =
+                () => client.ListKeys(bucket);
+            return runListKeys;
+        }
+
+        private static Func<RiakResult<IEnumerable<string>>, bool> NoKeysListed
+        {
+            get { return result => result.IsSuccess && !result.Value.Any(); }
         }
 
         [Test]
@@ -537,12 +555,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
 
             Client.DeleteBucket(bucket);
 
-            // This might fail if you check straight away
-            // because deleting takes time behind the scenes.
-            // So wait in case (yup, you can shoot me if you like!)
-            Thread.Sleep(4000);
-
-            keyList = Client.ListKeys(bucket);
+            keyList = RunListKeys(Client, bucket).WaitUntil(NoKeysListed);
             keyList.Value.Count().ShouldEqual(0);
             Client.ListBuckets().Value.Contains(bucket).ShouldBeFalse();
         }
@@ -565,13 +578,8 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
 
             var result = Client.Async.DeleteBucket(bucket).Result.ToList();
             result.ForEach(x => x.IsSuccess.ShouldBeTrue(x.ErrorMessage));
-            
-            // This might fail if you check straight away
-            // because deleting takes time behind the scenes.
-            // So wait in case (yup, you can shoot me if you like!)
-            Thread.Sleep(4000);
 
-            keyList = Client.ListKeys(bucket);
+            keyList = RunListKeys(Client, bucket).WaitUntil(NoKeysListed);
             keyList.Value.Count().ShouldEqual(0);
             Client.ListBuckets().Value.Contains(bucket).ShouldBeFalse();
         }
