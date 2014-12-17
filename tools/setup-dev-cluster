@@ -3,6 +3,8 @@
 set -o errexit
 set -o nounset
 
+riak_admin=dev1/bin/riak-admin
+
 script_dir=''
 script_path=''
 if hash realpath 2>/dev/null
@@ -13,6 +15,34 @@ else
   script_path="$(perl -e 'use File::Basename;use Cwd q(abs_path);print dirname(abs_path(shift))' $0)"
 fi
 PATH="$PATH:$script_path"
+
+function make_temp_file
+{
+  local template="$1"
+  if [[ ! $template == *XXXXXX ]]
+  then
+    template="$template.XXXXXX"
+  fi
+  mktemp -t "$template"
+}
+
+function transfers_in_progress
+{
+  local -i retval=0
+  local transfers_out=$(make_temp_file riak-admin-transfers)
+
+  set +o errexit
+  $riak_admin transfers > $transfers_out 2>&1
+  if grep -iqF 'No transfers active' $transfers_out
+  then
+    retval=1 # No longer in progress, return false
+  else
+    retval=0
+  fi
+  # rm -vf $transfers_out
+  set -o errexit
+  return $retval
+}
 
 function now
 {
@@ -44,6 +74,16 @@ function onexit
 {
   echo Exiting!
   popd
+}
+
+function wait_for_transfers
+{
+  sleep 5
+  while transfers_in_progress
+  do
+    pinfo 'Transfers in progress'
+    sleep 5
+  done
 }
 
 trap onexit EXIT
@@ -122,19 +162,11 @@ do
   $devdir/bin/riak-admin cluster join dev1@127.0.0.1
 done
 
-riak_admin=dev1/bin/riak-admin
-
 $riak_admin cluster plan
 $riak_admin cluster commit
 $riak_admin transfer-limit 8
 
-set +o errexit
-while ! $riak_admin transfers | grep -iqF 'No transfers active'
-do
-  pinfo 'Transfers in progress'
-  sleep 5
-done
-set -o errexit
+wait_for_transfers
 
 pinfo "Riak started, setting up bucket types"
 riak-cluster-config "$riak_admin" 10018

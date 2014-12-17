@@ -161,13 +161,15 @@ namespace CorrugatedIron.Tests.Live
 
             Client.Put(riakObject);
 
-            var result = Client.Async.Get(riakObjectId).Result;
+            Func<RiakResult<RiakObject>> asyncGet = () => Client.Async.Get(riakObjectId).Result;
 
-            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
-            result.Value.ShouldNotBeNull();
-            result.Value.Bucket.ShouldEqual(TestBucket);
-            result.Value.Key.ShouldEqual(TestKey);
-            result.Value.Value.FromRiakString().ShouldEqual(TestJson);
+            var asyncGetResult = asyncGet.WaitUntil();
+
+            asyncGetResult.IsSuccess.ShouldBeTrue(asyncGetResult.ErrorMessage);
+            asyncGetResult.Value.ShouldNotBeNull();
+            asyncGetResult.Value.Bucket.ShouldEqual(TestBucket);
+            asyncGetResult.Value.Key.ShouldEqual(TestKey);
+            asyncGetResult.Value.Value.FromRiakString().ShouldEqual(TestJson);
         }
 
         [Test]

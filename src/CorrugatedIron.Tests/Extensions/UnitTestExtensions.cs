@@ -14,6 +14,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
+using System.Threading;
 using NUnit.Framework;
 using System.Collections;
 using System.Collections.Generic;
@@ -25,98 +27,84 @@ namespace CorrugatedIron.Tests.Extensions
     [System.Diagnostics.DebuggerNonUserCode]
     public static class UnitTestExtensions
     {
-        public static void ShouldEqual<T>(this T actual, T expected)
+        public static void ShouldEqual<T>(this T actual, T expected, string message = null)
         {
-            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected, actual, message);
         }
 
-        public static void ShouldNotEqual<T>(this T actual, T expected)
+        public static void ShouldNotEqual<T>(this T actual, T expected, string message = null)
         {
-            Assert.AreNotEqual(expected, actual);
+            Assert.AreNotEqual(expected, actual, message);
         }
 
-        public static void ShouldBe<T>(this object actual)
+        public static void ShouldBe<T>(this object actual, string message = null)
         {
-            Assert.IsInstanceOf<T>(actual);
+            Assert.IsInstanceOf<T>(actual, message);
         }
 
-        public static void ShouldBeGreaterThan(this long? actual, long? expected)
+        public static void ShouldBeGreaterThan(this long? actual, long? expected, string message = null)
         {
-            Assert.GreaterOrEqual(actual, expected);
+            Assert.GreaterOrEqual(actual, expected, message);
         }
 
-        public static void ShouldBeLessThan(this long? actual, long? expected)
+        public static void ShouldBeLessThan(this long? actual, long? expected, string message = null)
         {
-            Assert.LessOrEqual(actual, expected);
+            Assert.LessOrEqual(actual, expected, message);
         }
 
-        public static void ShouldBeGreaterThan(this long actual, long expected)
+        public static void ShouldBeGreaterThan(this long actual, long expected, string message = null)
         {
-            Assert.GreaterOrEqual(actual, expected);
+            Assert.GreaterOrEqual(actual, expected, message);
         }
 
-        public static void ShouldBeLessThan(this long actual, long expected)
+        public static void ShouldBeLessThan(this long actual, long expected, string message = null)
         {
-            Assert.LessOrEqual(actual, expected);
+            Assert.LessOrEqual(actual, expected, message);
         }
-        
-        public static void ShouldBeGreaterThan(this int actual, int expected)
+
+        public static void ShouldBeGreaterThan(this int actual, int expected, string message = null)
         {
-            Assert.GreaterOrEqual(actual, expected);
+            Assert.GreaterOrEqual(actual, expected, message);
         }
-        
-        public static void ShouldBeLessThan(this int actual, int expected)
+
+        public static void ShouldBeLessThan(this int actual, int expected, string message = null)
         {
-            Assert.LessOrEqual(actual, expected);
+            Assert.LessOrEqual(actual, expected, message);
         }
 
         public static void ShouldBeFalse(this bool value, string message = null)
         {
-            if (string.IsNullOrEmpty(message))
-            {
-                Assert.IsFalse(value);
-            }
-            else
-            {
-                Assert.IsFalse(value, message);
-            }
+            Assert.IsFalse(value, message);
         }
 
         public static void ShouldBeTrue(this bool value, string message = null)
         {
-            if (string.IsNullOrEmpty(message))
-            {
-                Assert.IsTrue(value);
-            }
-            else
-            {
-                Assert.IsTrue(value, message);
-            }
+            Assert.IsTrue(value, message);
         }
 
-        public static void ShouldBeNullOrEmpty(this string value)
+        public static void ShouldBeNullOrEmpty(this string value, string message = null)
         {
-            Assert.IsNullOrEmpty(value);
+            Assert.IsNullOrEmpty(value, message);
         }
 
-        public static void ShouldNotBeNullOrEmpty(this string value)
+        public static void ShouldNotBeNullOrEmpty(this string value, string message = null)
         {
-            Assert.IsNotNullOrEmpty(value);
+            Assert.IsNotNullOrEmpty(value, message);
         }
 
-        public static void ShouldNotBeNull<T>(this T obj) where T : class
+        public static void ShouldNotBeNull<T>(this T obj, string message = null) where T : class
         {
-            Assert.IsNotNull(obj);
+            Assert.IsNotNull(obj, message);
         }
 
-        public static void ShouldBeNull<T>(this T obj) where T : class
+        public static void ShouldBeNull<T>(this T obj, string message = null) where T : class
         {
-            Assert.IsNull(obj);
+            Assert.IsNull(obj, message);
         }
 
-        public static void IsAtLeast(this int val, int min)
+        public static void IsAtLeast(this int val, int min, string message = null)
         {
-            Assert.Less(min - 1, val);
+            Assert.Less(min - 1, val, message);
         }
 
         public static void ContentsShouldEqual<T>(this T actual, T expected) where T : IEnumerable
@@ -138,14 +126,14 @@ namespace CorrugatedIron.Tests.Extensions
             }
         }
 
-        public static void ShouldContain<T>(this IEnumerable<T> items, T value)
+        public static void ShouldContain<T>(this IEnumerable<T> items, T value, string message = null)
         {
-            items.Contains(value).ShouldBeTrue();
+            items.Contains(value).ShouldBeTrue(message);
         }
 
-        public static void ShouldNotContain<T>(this IEnumerable<T> items, T value)
+        public static void ShouldNotContain<T>(this IEnumerable<T> items, T value, string message = null)
         {
-            items.Contains(value).ShouldBeFalse();
+            items.Contains(value).ShouldBeFalse(message);
         }
 
         public static string DisplayString<T>(this T items) where T : IEnumerable
@@ -160,6 +148,87 @@ namespace CorrugatedIron.Tests.Extensions
             }
 
             return sb.ToString();
+        }
+
+        private static readonly Func<RiakResult, bool> DefaultSuccessFunc = result => result.IsSuccess;
+
+        public static T WaitUntil<T>(this Func<T> action, int attempts = 10) where T : RiakResult
+        {
+            return WaitUntil<T>(action, DefaultSuccessFunc, attempts); 
+        }
+
+        public static T WaitUntil<T>(this Func<T> action, Func<T, bool> successCriteriaFunc, int attempts = 10) where T : RiakResult
+        {
+            var invalidResults = new T[attempts];
+            var exceptions = new Exception[attempts];
+
+            T result = null;
+            for (var i = 0; i < attempts; i++)
+            {
+                result = null;
+                try
+                {
+                    result = action.Invoke();
+                }
+                catch (Exception ex)
+                {
+                    exceptions[i] = ex;
+                    // Do nothing, try again
+                }
+
+                if (result != null && successCriteriaFunc.Invoke(result))
+                    return result;
+
+                invalidResults[i] = result;
+
+                Thread.Sleep(i * 1000);
+            }
+            // print retry "trace" and
+            // return last result if all failed the success check
+
+            PrintFailedRetries(invalidResults, exceptions, attempts);
+
+            return result;
+        }
+
+        private static void PrintFailedRetries<T>(T[] invalidResults, Exception[] exceptions, int attempts) where T : RiakResult
+        {
+            var testName = TestContext.CurrentContext.Test.FullName;
+
+            Console.WriteLine("{0}: Could not reach success criteria\r\n", testName);
+
+            for (var i = 0; i < attempts; i++)
+            {
+                var result = invalidResults[i];
+                var exception = exceptions[i];
+
+                Console.WriteLine("Iteration {0}:", i);
+                Console.WriteLine("----------------------------------------");
+
+                if (result != null)
+                {
+                    Console.WriteLine(
+                        "RiakResult:\r\n\tSuccess:       {0}\r\n\tNodeOffline:   {1}\r\n\tResultCode:    {2}\r\n\tError Message: {3}\r\n",
+                        result.IsSuccess,
+                        result.NodeOffline,
+                        result.ResultCode,
+                        result.ErrorMessage);
+                }
+                else
+                {
+                    Console.WriteLine("RiakResult: No RiakResult Recorded\r\n");
+                }
+
+                if (exception != null)
+                {
+                    Console.WriteLine("Exception: {0}\r\n", exception);
+                }
+                else
+                {
+                    Console.WriteLine("Exception: No Exception Recorded\r\n");
+                }
+            }
+            Console.WriteLine("----------------------------------------");
         }
     }
 }

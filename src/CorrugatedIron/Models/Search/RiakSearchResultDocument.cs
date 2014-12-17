@@ -14,29 +14,62 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
 using CorrugatedIron.Messages;
 using System.Collections.Generic;
 using System.Linq;
+using CorrugatedIron.Util;
 
 namespace CorrugatedIron.Models.Search
 {
     public class RiakSearchResultDocument
     {
-        public RiakSearchResultField Id { get; private set; }
-        public List<RiakSearchResultField> Fields { get; private set; }
+        private RiakObjectId _riakObjectId = null;
 
+        public String Id { get; private set; }
+        public String Score { get; private set; }
+        public String BucketType { get; private set; }
+        public String Bucket { get; private set; }
+        public String Key { get; private set; }
+
+        public RiakObjectId RiakObjectId
+        {
+            get
+            {
+                if (_riakObjectId == null)
+                    _riakObjectId = new RiakObjectId(BucketType, Bucket, Key);
+
+                return _riakObjectId;
+            }
+        }
+
+        public List<RiakSearchResultField> Fields { get; private set; }
+        
         internal RiakSearchResultDocument(RpbSearchDoc doc)
         {
             Fields = new List<RiakSearchResultField>();
 
             foreach (var field in doc.fields.Select(f => new RiakSearchResultField(f)))
             {
-                Fields.Add(field);
-
-                if (field.Key == "id")
+                switch (field.Key)
                 {
-                    Id = field;
+                    case RiakConstants.SearchFieldKeys.Id:
+                        Id = field.Value;
+                        break;
+                    case RiakConstants.SearchFieldKeys.Score:
+                        Score = field.Value;
+                        break;
+                    case RiakConstants.SearchFieldKeys.BucketType:
+                        BucketType = field.Value;
+                        break;
+                    case RiakConstants.SearchFieldKeys.Bucket:
+                        Bucket = field.Value;
+                        break;
+                    case RiakConstants.SearchFieldKeys.Key:
+                        Key = field.Value;
+                        break;
                 }
+                Fields.Add(field);
             }
         }
     }

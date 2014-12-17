@@ -58,7 +58,7 @@ namespace CorrugatedIron.Tests.Live.Deprecated
             result.Value.NumFound.ShouldEqual(1u);
             result.Value.Documents.Count.ShouldEqual(1);
             result.Value.Documents[0].Fields.Count.ShouldEqual(5);
-            result.Value.Documents[0].Id.Value.ShouldEqual("a.hacker");
+            result.Value.Documents[0].Id.ShouldEqual("a.hacker");
         }
 
         [Test]
@@ -98,7 +98,7 @@ namespace CorrugatedIron.Tests.Live.Deprecated
             result.Value.NumFound.ShouldEqual(1u);
             result.Value.Documents.Count.ShouldEqual(1);
             result.Value.Documents[0].Fields.Count.ShouldEqual(5);
-            result.Value.Documents[0].Id.Value.ShouldEqual("a.public");
+            result.Value.Documents[0].Id.ShouldEqual("a.public");
         }
 
         [Test]
