@@ -14,7 +14,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.Net.NetworkInformation;
 using CorrugatedIron.Comms;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
@@ -484,150 +483,6 @@ namespace CorrugatedIron
             return results.Value;
         }
 
-        /// <summary>
-        /// Deletes the contents of the specified <paramref name="bucket"/>.
-        /// </summary>
-        /// <returns>
-        /// A <see cref="System.Collections.Generic.IEnumerable&lt;T&gt;"/> of <see cref="CorrugatedIron.RiakResult"/> listing the success of all deletes
-        /// </returns>
-        /// <param name='bucket'>
-        /// The bucket to be deleted.
-        /// </param>
-        /// <param name='rwVal'>
-        /// The number of nodes that must respond successfully to a delete request.
-        /// </param>
-        /// <remarks>
-        /// /// <para>
-        /// Because of the <see cref="CorrugatedIron.RiakClient.ListKeys"/> operation, this may be a time consuming operation on
-        /// production systems and may cause memory problems for the client. This should be used either in testing or on small buckets with 
-        /// known amounts of data.
-        /// </para>
-        /// <para>
-        /// A delete bucket operation actually deletes all keys in the bucket individually. 
-        /// A <see cref="CorrugatedIron.RiakClient.ListKeys"/> operation is performed to retrieve a list of keys
-        /// The keys retrieved from the <see cref="CorrugatedIron.RiakClient.ListKeys"/> are then deleted through
-        /// <see cref="CorrugatedIron.RiakClient.Delete"/>. 
-        /// </para>
-        /// </remarks>
-        public IEnumerable<RiakResult> DeleteBucket(string bucket, uint rwVal)
-        {
-            return DeleteBucket(null, bucket, new RiakDeleteOptions().SetRw(rwVal));
-        }
-
-        /// <summary>
-        /// Deletes the contents of the specified <paramref name="bucket"/>.
-        /// </summary>
-        /// <returns>
-        /// A <see cref="System.Collections.Generic.IEnumerable&lt;T&gt;"/> of <see cref="CorrugatedIron.RiakResult"/> listing the success of all deletes
-        /// </returns>
-        /// <param name="bucketType">The bucket type</param>
-        /// <param name='bucket'>
-        /// The bucket to be deleted.
-        /// </param>
-        /// <param name='rwVal'>
-        /// The number of nodes that must respond successfully to a delete request.
-        /// </param>
-        /// <remarks>
-        /// /// <para>
-        /// Because of the <see cref="CorrugatedIron.RiakClient.ListKeys"/> operation, this may be a time consuming operation on
-        /// production systems and may cause memory problems for the client. This should be used either in testing or on small buckets with 
-        /// known amounts of data.
-        /// </para>
-        /// <para>
-        /// A delete bucket operation actually deletes all keys in the bucket individually. 
-        /// A <see cref="CorrugatedIron.RiakClient.ListKeys"/> operation is performed to retrieve a list of keys
-        /// The keys retrieved from the <see cref="CorrugatedIron.RiakClient.ListKeys"/> are then deleted through
-        /// <see cref="CorrugatedIron.RiakClient.Delete"/>. 
-        /// </para>
-        /// </remarks>
-        public IEnumerable<RiakResult> DeleteBucket(string bucketType, string bucket, uint rwVal)
-        {
-            return DeleteBucket(bucketType, bucket, new RiakDeleteOptions().SetRw(rwVal));
-        }
-
-        /// <summary>
-        /// Deletes the contents of the specified <paramref name="bucket"/>.
-        /// </summary>
-        /// <returns>
-        /// A <see cref="System.Collections.Generic.IEnumerable&lt;T&gt;"/> of <see cref="CorrugatedIron.RiakResult"/> listing the success of all deletes
-        /// </returns>
-        /// <param name='bucket'>
-        /// The bucket to be deleted.
-        /// </param>
-        /// <param name='deleteOptions'>
-        /// Options for Riak delete operation <see cref="CorrugatedIron.Models.RiakDeleteOptions"/>
-        /// </param>
-        /// <remarks>
-        /// <para>
-        /// A delete bucket operation actually deletes all keys in the bucket individually. 
-        /// A <see cref="CorrugatedIron.RiakClient.ListKeys"/> operation is performed to retrieve a list of keys
-        /// The keys retrieved from the <see cref="CorrugatedIron.RiakClient.ListKeys"/> are then deleted through
-        /// <see cref="CorrugatedIron.RiakClient.Delete"/>. 
-        /// </para>
-        /// <para>
-        /// Because of the <see cref="CorrugatedIron.RiakClient.ListKeys"/> operation, this may be a time consuming operation on
-        /// production systems and may cause memory problems for the client. This should be used either in testing or on small buckets with 
-        /// known amounts of data.
-        /// </para>
-        /// </remarks>
-        public IEnumerable<RiakResult> DeleteBucket(string bucket, RiakDeleteOptions deleteOptions)
-        {
-            var results = UseConnection(conn =>
-                {
-                    var keyResults = ListKeys(conn, null, bucket);
-                    if (keyResults.IsSuccess)
-                    {
-                        var objectIds = keyResults.Value.Select(key => new RiakObjectId(bucket, key)).ToList();
-                        return Delete(conn, objectIds, deleteOptions);
-                    }
-                    return RiakResult<IEnumerable<RiakResult>>.Error(keyResults.ResultCode, keyResults.ErrorMessage, keyResults.NodeOffline);
-                });
-
-            return results.Value;
-        }
-
-        /// <summary>
-        /// Deletes the contents of the specified <paramref name="bucket"/>.
-        /// </summary>
-        /// <returns>
-        /// A <see cref="System.Collections.Generic.IEnumerable&lt;T&gt;"/> of <see cref="CorrugatedIron.RiakResult"/> listing the success of all deletes
-        /// </returns>
-        /// <param name="bucketType">The bucket type.</param>
-        /// <param name='bucket'>
-        /// The bucket to be deleted.
-        /// </param>
-        /// <param name='deleteOptions'>
-        /// Options for Riak delete operation <see cref="CorrugatedIron.Models.RiakDeleteOptions"/>
-        /// </param>
-        /// <remarks>
-        /// <para>
-        /// A delete bucket operation actually deletes all keys in the bucket individually. 
-        /// A <see cref="CorrugatedIron.RiakClient.ListKeys"/> operation is performed to retrieve a list of keys
-        /// The keys retrieved from the <see cref="CorrugatedIron.RiakClient.ListKeys"/> are then deleted through
-        /// <see cref="CorrugatedIron.RiakClient.Delete"/>. 
-        /// </para>
-        /// <para>
-        /// Because of the <see cref="CorrugatedIron.RiakClient.ListKeys"/> operation, this may be a time consuming operation on
-        /// production systems and may cause memory problems for the client. This should be used either in testing or on small buckets with 
-        /// known amounts of data.
-        /// </para>
-        /// </remarks>
-        public IEnumerable<RiakResult> DeleteBucket(string bucketType, string bucket, RiakDeleteOptions deleteOptions)
-        {
-            var results = UseConnection(conn => {
-                var keyResults = ListKeys(conn, bucketType, bucket);
-                if (keyResults.IsSuccess)
-                {
-                    var objectIds = keyResults.Value.Select(key => new RiakObjectId(bucketType, bucket, key)).ToList();
-                    return Delete(conn, objectIds, deleteOptions);
-                }
-
-                return RiakResult<IEnumerable<RiakResult>>.Error(keyResults.ResultCode, keyResults.ErrorMessage, keyResults.NodeOffline);
-            });
-
-            return results.Value;
-        }
-
         private static RiakResult<IEnumerable<RiakResult>> Delete(IRiakConnection conn,
             IEnumerable<RiakObjectId> objectIds, RiakDeleteOptions options = null)
         {
@@ -1060,44 +915,6 @@ namespace CorrugatedIron
             return RiakResult<RiakServerInfo>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
 
-        /// <summary>
-        /// Retrieve index results using the streaming interface.
-        /// </summary>
-        /// <param name="bucket">The bucket</param>
-        /// <param name="indexName">The index</param>
-        /// <param name="value">The indexed value to search for</param>
-        /// <param name="options">The <see cref="RiakIndexGetOptions"/></param>
-        /// <returns>A <see cref="RiakResult{T}"/> of <see cref="RiakStreamedIndexResult"/> containing an <see cref="IEnumerable{T}"/>
-        /// of <see cref="RiakIndexKeyTerm"/></returns>
-        /// <remarks>Make sure to fully enumerate the <see cref="IEnumerable{T}"/> of <see cref="RiakIndexKeyTerm"/>.</remarks>
-        [Obsolete("Use StreamGetSecondaryIndex(RiakIndexId, BigInteger, RiakIndexGetOptions) instead")] 
-        public RiakResult<RiakStreamedIndexResult> StreamIndexGet(string bucket, string indexName, BigInteger value, RiakIndexGetOptions options = null)
-        {
-            return StreamIndexGetEquals(bucket, indexName.ToIntegerKey(), value.ToString(), options);
-        }
-
-        /// <summary>
-        /// Retrieve index results using the streaming interface.
-        /// </summary>
-        /// <param name="bucket">The bucket</param>
-        /// <param name="indexName">The index</param>
-        /// <param name="value">The indexed value to search for</param>
-        /// <param name="options">The <see cref="RiakIndexGetOptions"/></param>
-        /// <returns>A <see cref="RiakResult{T}"/> of <see cref="RiakStreamedIndexResult"/> containing an <see cref="IEnumerable{T}"/>
-        /// of <see cref="RiakIndexKeyTerm"/></returns>
-        /// <remarks>Make sure to fully enumerate the <see cref="IEnumerable{T}"/> of <see cref="RiakIndexKeyTerm"/>.</remarks>
-        [Obsolete("Use StreamGetSecondaryIndex(RiakIndexId, string, RiakIndexGetOptions) instead")] 
-        public RiakResult<RiakStreamedIndexResult> StreamIndexGet(string bucket, string indexName, string value, RiakIndexGetOptions options = null)
-        {
-            return StreamIndexGetEquals(bucket, indexName.ToBinaryKey(), value, options);
-        }
-
-        private RiakResult<RiakStreamedIndexResult> StreamIndexGetEquals(string bucket, string indexName, string value,
-                                                                        RiakIndexGetOptions options = null)
-        {
-            return StreamGetSecondaryIndexEquals(new RiakIndexId(bucket, indexName), value, options);
-        }
-
         public RiakResult<RiakStreamedIndexResult> StreamGetSecondaryIndex(RiakIndexId index, BigInteger value, RiakIndexGetOptions options = null)
         {
             index.SetIndexName(index.IndexName.ToIntegerKey());
@@ -1123,49 +940,6 @@ namespace CorrugatedIron
 
             return StreamingIndexRead(message, options);
         }
-
-
-        /// <summary>
-        /// Retrieve index results using the streaming interface.
-        /// </summary>
-        /// <param name="bucket">The bucket</param>
-        /// <param name="indexName">The index</param>
-        /// <param name="minValue">The start of the indexed range to search for</param>
-        /// <param name="maxValue">The end of the indexed range to search for</param>
-        /// <param name="options">The <see cref="RiakIndexGetOptions"/></param>
-        /// <returns>A <see cref="RiakResult{T}"/> of <see cref="RiakStreamedIndexResult"/> containing an <see cref="IEnumerable{T}"/>
-        /// of <see cref="RiakIndexKeyTerm"/></returns>
-        /// <remarks>Make sure to fully enumerate the <see cref="IEnumerable{T}"/> of <see cref="RiakIndexKeyTerm"/>.</remarks>
-        [Obsolete("Use StreamGetSecondaryIndex(RiakIndexId, BigInteger, BigInteger, RiakIndexGetOptions) instead")]
-        public RiakResult<RiakStreamedIndexResult> StreamIndexGet(string bucket, string indexName, BigInteger minValue, BigInteger maxValue, RiakIndexGetOptions options = null)
-        {
-            return StreamIndexGetRange(bucket, indexName.ToIntegerKey(), minValue.ToString(), maxValue.ToString(), options);
-        }
-
-        /// <summary>
-        /// Retrieve index results using the streaming interface.
-        /// </summary>
-        /// <param name="bucket">The bucket</param>
-        /// <param name="indexName">The index</param>
-        /// <param name="minValue">The start of the indexed range to search for</param>
-        /// <param name="maxValue">The end of the indexed range to search for</param>
-        /// <param name="options">The <see cref="RiakIndexGetOptions"/></param>
-        /// <returns>A <see cref="RiakResult{T}"/> of <see cref="RiakStreamedIndexResult"/> containing an <see cref="IEnumerable{T}"/>
-        /// of <see cref="RiakIndexKeyTerm"/></returns>
-        /// <remarks>Make sure to fully enumerate the <see cref="IEnumerable{T}"/> of <see cref="RiakIndexKeyTerm"/>.</remarks>
-        [Obsolete("Use StreamGetSecondaryIndex(RiakIndexId, string, string, RiakIndexGetOptions) instead")]
-        public RiakResult<RiakStreamedIndexResult> StreamIndexGet(string bucket, string indexName, string minValue, string maxValue, RiakIndexGetOptions options = null)
-        {
-            return StreamIndexGetRange(bucket, indexName.ToBinaryKey(), minValue, maxValue, options);
-        }
-
-        private RiakResult<RiakStreamedIndexResult> StreamIndexGetRange(string bucket, string indexName, string minValue, string maxValue,
-                                         RiakIndexGetOptions options = null)
-        {
-            return StreamGetSecondaryIndexRange(new RiakIndexId(bucket, indexName), minValue, maxValue, options);
-        }
-
-
 
         public RiakResult<RiakStreamedIndexResult> StreamGetSecondaryIndex(RiakIndexId index, BigInteger min, BigInteger max, RiakIndexGetOptions options = null)
         {
@@ -1212,49 +986,15 @@ namespace CorrugatedIron
             return options.ReturnTerms != null && options.ReturnTerms.Value;
         }
 
-        /// <summary>
-        /// Retrieve a range of indexed values.
-        /// </summary>
-        /// <param name="bucket">The bucket</param>
-        /// <param name="indexName">The index</param>
-        /// <param name="minValue">The start of the indexed range to search for</param>
-        /// <param name="maxValue">The end of the indexed range to search for</param>
-        /// <param name="options">The <see cref="RiakIndexGetOptions"/></param>
-        /// <returns>A <see cref="RiakResult{T}"/> of <see cref="RiakIndexResult"/></returns>
-        [Obsolete("Use GetSecondaryIndex instead")]
-        public RiakResult<RiakIndexResult> IndexGet(string bucket, string indexName, string minValue, string maxValue, RiakIndexGetOptions options = null)
-        {
-            return IndexGetRange(bucket, indexName.ToBinaryKey(), minValue, maxValue, options);
-        }
-
-        /// <summary>
-        /// Retrieve a range of indexed values.
-        /// </summary>
-        /// <param name="bucket">The bucket</param>
-        /// <param name="indexName">The index</param>
-        /// <param name="minValue">The start of the indexed range to search for</param>
-        /// <param name="maxValue">The end of the indexed range to search for</param>
-        /// <param name="options">The <see cref="RiakIndexGetOptions"/></param>
-        /// <returns>A <see cref="RiakResult{T}"/> of <see cref="RiakIndexResult"/></returns>
-        [Obsolete("Use GetSecondaryIndex instead")]
-        public RiakResult<RiakIndexResult> IndexGet(string bucket, string indexName, BigInteger minValue, BigInteger maxValue, RiakIndexGetOptions options = null)
-        {
-            return IndexGetRange(bucket, indexName.ToIntegerKey(), minValue.ToString(), maxValue.ToString(), options);
-        }
-
-        [Obsolete("Use GetSecondaryIndex instead")]
-        private RiakResult<RiakIndexResult> IndexGetRange(string bucket, string indexName, string minValue, string maxValue, RiakIndexGetOptions options = null)
-        {
-            return GetSecondaryIndexRange(new RiakIndexId(bucket, indexName), minValue, maxValue, options);
-        }
-
         public RiakResult<RiakIndexResult> GetSecondaryIndex(RiakIndexId index, BigInteger minValue, BigInteger maxValue, RiakIndexGetOptions options = null)
         {
+            index.SetIndexName(index.IndexName.ToIntegerKey());
             return GetSecondaryIndexRange(index, minValue.ToString(), maxValue.ToString(), options);
         }
 
         public RiakResult<RiakIndexResult> GetSecondaryIndex(RiakIndexId index, string minValue, string maxValue, RiakIndexGetOptions options = null)
         {
+            index.SetIndexName(index.IndexName.ToBinaryKey());
             return GetSecondaryIndexRange(index, minValue, maxValue, options);
         }
 
@@ -1296,39 +1036,7 @@ namespace CorrugatedIron
             return RiakResult<RiakIndexResult>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
 
-        /// <summary>
-        /// Retrieve a indexed values
-        /// </summary>
-        /// <param name="bucket">The bucket</param>
-        /// <param name="indexName">The index</param>
-        /// <param name="value">The indexed value to search for</param>
-        /// <param name="options">The <see cref="RiakIndexGetOptions"/></param>
-        /// <returns>A <see cref="RiakResult{T}"/> of <see cref="RiakIndexResult"/></returns>
-        [Obsolete("Use GetSecondaryIndex instead")]
-        public RiakResult<RiakIndexResult> IndexGet(string bucket, string indexName, string value, RiakIndexGetOptions options = null)
-        {
-            return IndexGetEquals(bucket, indexName.ToBinaryKey(), value, options);
-        }
 
-        /// <summary>
-        /// Retrieve an indexed values
-        /// </summary>
-        /// <param name="bucket">The bucket</param>
-        /// <param name="indexName">The index</param>
-        /// <param name="value">The indexed value to search for</param>
-        /// <param name="options">The <see cref="RiakIndexGetOptions"/></param>
-        /// <returns>A <see cref="RiakResult{T}"/> of <see cref="RiakIndexResult"/></returns>
-        [Obsolete("Use GetSecondaryIndex instead")]
-        public RiakResult<RiakIndexResult> IndexGet(string bucket, string indexName, BigInteger value, RiakIndexGetOptions options = null)
-        {
-            return IndexGetEquals(bucket, indexName.ToIntegerKey(), value.ToString(), options);
-        }
-
-        [Obsolete("Use GetSecondaryIndex instead")]
-        private RiakResult<RiakIndexResult> IndexGetEquals(string bucket, string indexName, string value, RiakIndexGetOptions options = null)
-        {
-            return GetSecondaryIndex(new RiakIndexId(bucket, indexName), value, options);
-        }
 
         /// <summary>
         /// Retrieve an indexed values
@@ -1339,6 +1047,7 @@ namespace CorrugatedIron
         /// <returns>A <see cref="RiakResult{T}"/> of <see cref="RiakIndexResult"/></returns>
         public RiakResult<RiakIndexResult> GetSecondaryIndex(RiakIndexId index, BigInteger value, RiakIndexGetOptions options = null)
         {
+            index.SetIndexName(index.IndexName.ToIntegerKey());
             return GetSecondaryIndexEquals(index, value.ToString(), options);
         }
 
@@ -1351,6 +1060,7 @@ namespace CorrugatedIron
         /// <returns>A <see cref="RiakResult{T}"/> of <see cref="RiakIndexResult"/></returns>
         public RiakResult<RiakIndexResult> GetSecondaryIndex(RiakIndexId index, string value, RiakIndexGetOptions options = null)
         {
+            index.SetIndexName(index.IndexName.ToBinaryKey());
             return GetSecondaryIndexEquals(index, value, options);
         }
 

@@ -14,9 +14,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using CorrugatedIron.Config;
 using CorrugatedIron.Extensions;
+using CorrugatedIron.Models;
+using CorrugatedIron.Models.Search;
+using CorrugatedIron.Tests.Extensions;
 using NUnit.Framework;
 
 namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
@@ -44,10 +50,12 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
         protected const string MultiBodyOne = @"{""dishes"": 9}";
         protected const string MultiBodyTwo = @"{""dishes"": 11}";
         protected const string PropertiesTestBucket = @"propertiestestbucket";
+        protected readonly Random Random = new Random();
 
         protected IRiakEndPoint Cluster;
         protected IRiakClient Client;
         protected IRiakClusterConfiguration ClusterConfig;
+        
 
         static LiveRiakConnectionTestBase()
         {

@@ -57,6 +57,8 @@
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="BucketPropertyTests.cs" />
+    <Compile Include="Extensions\IntegrationTestExtensions.cs" />
+    <Compile Include="Extensions\IntegrationTestExtensionsTest.cs" />
     <Compile Include="GeneralIntegrationTests.cs" />
     <Compile Include="IdleTests.cs" />
     <Compile Include="LiveRiakConnectionTestBase.cs" />

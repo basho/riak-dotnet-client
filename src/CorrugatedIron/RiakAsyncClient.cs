@@ -44,7 +44,6 @@ namespace CorrugatedIron
         Task<RiakResult> Delete(string bucket, string key, RiakDeleteOptions options = null);
         Task<RiakResult> Delete(RiakObjectId objectId, RiakDeleteOptions options = null);
         Task<IEnumerable<RiakResult>> Delete(IEnumerable<RiakObjectId> objectIds, RiakDeleteOptions options = null);
-        Task<IEnumerable<RiakResult>> DeleteBucket(string bucket, uint rwVal = RiakConstants.Defaults.RVal);
 
         Task<RiakResult<RiakSearchResult>> Search(RiakSearchRequest search);
 
@@ -64,15 +63,15 @@ namespace CorrugatedIron
 
         Task<RiakResult<RiakServerInfo>> GetServerInfo();
 
-        Task<RiakResult<RiakIndexResult>> IndexGet(string bucket, string indexName, int value, RiakIndexGetOptions options = null);
-        Task<RiakResult<RiakIndexResult>> IndexGet(string bucket, string indexName, string value, RiakIndexGetOptions options = null);
-        Task<RiakResult<RiakIndexResult>> IndexGet(string bucket, string indexName, int minValue, int maxValue, RiakIndexGetOptions options = null);
-        Task<RiakResult<RiakIndexResult>> IndexGet(string bucket, string indexName, string minValue, string maxValue, RiakIndexGetOptions options = null);
+        //Task<RiakResult<RiakIndexResult>> IndexGet(string bucket, string indexName, int value, RiakIndexGetOptions options = null);
+        //Task<RiakResult<RiakIndexResult>> IndexGet(string bucket, string indexName, string value, RiakIndexGetOptions options = null);
+        //Task<RiakResult<RiakIndexResult>> IndexGet(string bucket, string indexName, int minValue, int maxValue, RiakIndexGetOptions options = null);
+        //Task<RiakResult<RiakIndexResult>> IndexGet(string bucket, string indexName, string minValue, string maxValue, RiakIndexGetOptions options = null);
 
-        Task<RiakResult<RiakStreamedIndexResult>> StreamIndexGet(string bucket, string indexName, BigInteger value, RiakIndexGetOptions options = null);
-        Task<RiakResult<RiakStreamedIndexResult>> StreamIndexGet(string bucket, string indexName, string value, RiakIndexGetOptions options = null);
-        Task<RiakResult<RiakStreamedIndexResult>> StreamIndexGet(string bucket, string indexName, BigInteger minValue, BigInteger maxValue, RiakIndexGetOptions options = null);
-        Task<RiakResult<RiakStreamedIndexResult>> StreamIndexGet(string bucket, string indexName, string minValue, string maxValue, RiakIndexGetOptions options = null);
+        //Task<RiakResult<RiakStreamedIndexResult>> StreamIndexGet(string bucket, string indexName, BigInteger value, RiakIndexGetOptions options = null);
+        //Task<RiakResult<RiakStreamedIndexResult>> StreamIndexGet(string bucket, string indexName, string value, RiakIndexGetOptions options = null);
+        //Task<RiakResult<RiakStreamedIndexResult>> StreamIndexGet(string bucket, string indexName, BigInteger minValue, BigInteger maxValue, RiakIndexGetOptions options = null);
+        //Task<RiakResult<RiakStreamedIndexResult>> StreamIndexGet(string bucket, string indexName, string minValue, string maxValue, RiakIndexGetOptions options = null);
 
         Task<RiakResult<IList<string>>> ListKeysFromIndex(string bucket);
 
@@ -151,11 +150,6 @@ namespace CorrugatedIron
             return Task.Factory.StartNew(() => _client.Delete(objectIds, options));
         }
 
-        public Task<IEnumerable<RiakResult>> DeleteBucket(string bucket, uint rwVal = RiakConstants.Defaults.RVal)
-        {
-            return Task.Factory.StartNew(() => _client.DeleteBucket(bucket, rwVal));
-        }
-
         public Task<RiakResult<RiakSearchResult>> Search(RiakSearchRequest search)
         {
             return Task.Factory.StartNew(() => _client.Search(search));
@@ -204,46 +198,6 @@ namespace CorrugatedIron
         public Task<RiakResult> ResetBucketProperties(string bucket, bool useHttp = false)
         {
             return Task.Factory.StartNew(() => _client.ResetBucketProperties(bucket, useHttp));
-        }
-
-        public Task<RiakResult<RiakIndexResult>> IndexGet(string bucket, string indexName, int value, RiakIndexGetOptions options = null)
-        {
-            return Task.Factory.StartNew(() => _client.IndexGet(bucket, indexName, value, options));
-        }
-
-        public Task<RiakResult<RiakIndexResult>> IndexGet(string bucket, string indexName, string value, RiakIndexGetOptions options = null)
-        {
-            return Task.Factory.StartNew(() => _client.IndexGet(bucket, indexName, value, options));
-        }
-
-        public Task<RiakResult<RiakIndexResult>> IndexGet(string bucket, string indexName, int minValue, int maxValue, RiakIndexGetOptions options = null)
-        {
-            return Task.Factory.StartNew(() => _client.IndexGet(bucket, indexName, minValue, maxValue, options));
-        }
-
-        public Task<RiakResult<RiakIndexResult>> IndexGet(string bucket, string indexName, string minValue, string maxValue, RiakIndexGetOptions options = null)
-        {
-            return Task.Factory.StartNew(() => _client.IndexGet(bucket, indexName, minValue, maxValue, options));
-        }
-
-        public Task<RiakResult<RiakStreamedIndexResult>> StreamIndexGet(string bucket, string indexName, BigInteger value, RiakIndexGetOptions options = null)
-        {
-            return Task.Factory.StartNew(() => _client.StreamIndexGet(bucket, indexName, value, options));
-        }
-
-        public Task<RiakResult<RiakStreamedIndexResult>> StreamIndexGet(string bucket, string indexName, string value, RiakIndexGetOptions options = null)
-        {
-            return Task.Factory.StartNew(() => _client.StreamIndexGet(bucket, indexName, value, options));
-        }
-
-        public Task<RiakResult<RiakStreamedIndexResult>> StreamIndexGet(string bucket, string indexName, BigInteger minValue, BigInteger maxValue, RiakIndexGetOptions options = null)
-        {
-            return Task.Factory.StartNew(() => _client.StreamIndexGet(bucket, indexName, minValue, maxValue, options));
-        }
-
-        public Task<RiakResult<RiakStreamedIndexResult>> StreamIndexGet(string bucket, string indexName, string minValue, string maxValue, RiakIndexGetOptions options = null)
-        {
-            return Task.Factory.StartNew(() => _client.StreamIndexGet(bucket, indexName, minValue, maxValue, options));
         }
 
         public Task<RiakResult<IList<string>>> ListKeysFromIndex(string bucket)
@@ -322,11 +276,6 @@ namespace CorrugatedIron
         public void Delete(IEnumerable<RiakObjectId> objectIds, Action<IEnumerable<RiakResult>> callback, RiakDeleteOptions options = null)
         {
             ExecAsync(() => callback(_client.Delete(objectIds, options)));
-        }
-
-        public void DeleteBucket(string bucket, Action<IEnumerable<RiakResult>> callback, uint rwVal = RiakConstants.Defaults.RVal)
-        {
-            ExecAsync(() => callback(_client.DeleteBucket(bucket, rwVal)));
         }
 
         public void MapReduce(RiakMapReduceQuery query, Action<RiakResult<RiakMapReduceResult>> callback)

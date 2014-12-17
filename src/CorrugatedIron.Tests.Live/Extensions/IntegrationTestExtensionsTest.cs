@@ -1,11 +1,11 @@
 ﻿using System;
-using NUnit.Framework;
 using CorrugatedIron.Tests.Extensions;
+using NUnit.Framework;
 
-namespace CorrugatedIron.Tests
+namespace CorrugatedIron.Tests.Live.Extensions
 {
     [TestFixture]
-    public class UnitTestExtensionsTest
+    public class IntegrationTestExtensionsTest
     {
         [Ignore("Run this to test the WaitUntil test helper's output")]
         [Test]
