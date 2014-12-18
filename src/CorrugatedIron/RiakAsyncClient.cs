@@ -19,7 +19,6 @@ using CorrugatedIron.Models;
 using CorrugatedIron.Models.Index;
 using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Models.Search;
-using CorrugatedIron.Util;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -63,15 +62,15 @@ namespace CorrugatedIron
 
         Task<RiakResult<RiakServerInfo>> GetServerInfo();
 
-        //Task<RiakResult<RiakIndexResult>> IndexGet(string bucket, string indexName, int value, RiakIndexGetOptions options = null);
-        //Task<RiakResult<RiakIndexResult>> IndexGet(string bucket, string indexName, string value, RiakIndexGetOptions options = null);
-        //Task<RiakResult<RiakIndexResult>> IndexGet(string bucket, string indexName, int minValue, int maxValue, RiakIndexGetOptions options = null);
-        //Task<RiakResult<RiakIndexResult>> IndexGet(string bucket, string indexName, string minValue, string maxValue, RiakIndexGetOptions options = null);
+        Task<RiakResult<RiakIndexResult>> GetSecondaryIndex(RiakIndexId index, BigInteger value, RiakIndexGetOptions options = null);
+        Task<RiakResult<RiakIndexResult>> GetSecondaryIndex(RiakIndexId index, string value, RiakIndexGetOptions options = null);
+        Task<RiakResult<RiakIndexResult>> GetSecondaryIndex(RiakIndexId index, BigInteger min, BigInteger max, RiakIndexGetOptions options = null);
+        Task<RiakResult<RiakIndexResult>> GetSecondaryIndex(RiakIndexId index, string min, string max, RiakIndexGetOptions options = null);
 
-        //Task<RiakResult<RiakStreamedIndexResult>> StreamIndexGet(string bucket, string indexName, BigInteger value, RiakIndexGetOptions options = null);
-        //Task<RiakResult<RiakStreamedIndexResult>> StreamIndexGet(string bucket, string indexName, string value, RiakIndexGetOptions options = null);
-        //Task<RiakResult<RiakStreamedIndexResult>> StreamIndexGet(string bucket, string indexName, BigInteger minValue, BigInteger maxValue, RiakIndexGetOptions options = null);
-        //Task<RiakResult<RiakStreamedIndexResult>> StreamIndexGet(string bucket, string indexName, string minValue, string maxValue, RiakIndexGetOptions options = null);
+        Task<RiakResult<RiakStreamedIndexResult>> StreamGetSecondaryIndex(RiakIndexId index, BigInteger value, RiakIndexGetOptions options = null);
+        Task<RiakResult<RiakStreamedIndexResult>> StreamGetSecondaryIndex(RiakIndexId index, string value, RiakIndexGetOptions options = null);
+        Task<RiakResult<RiakStreamedIndexResult>> StreamGetSecondaryIndex(RiakIndexId index, BigInteger min, BigInteger max, RiakIndexGetOptions options = null);
+        Task<RiakResult<RiakStreamedIndexResult>> StreamGetSecondaryIndex(RiakIndexId index, string min, string max, RiakIndexGetOptions options = null);
 
         Task<RiakResult<IList<string>>> ListKeysFromIndex(string bucket);
 
@@ -213,6 +212,46 @@ namespace CorrugatedIron
         public Task<RiakResult<RiakServerInfo>>  GetServerInfo()
         {
             return Task.Factory.StartNew(() => _client.GetServerInfo());
+        }
+
+        public Task<RiakResult<RiakIndexResult>> GetSecondaryIndex(RiakIndexId index, BigInteger value, RiakIndexGetOptions options = null)
+        {
+            return Task.Factory.StartNew(() => _client.GetSecondaryIndex(index, value, options));
+        }
+
+        public Task<RiakResult<RiakIndexResult>> GetSecondaryIndex(RiakIndexId index, string value, RiakIndexGetOptions options = null)
+        {
+            return Task.Factory.StartNew(() => _client.GetSecondaryIndex(index, value, options));
+        }
+
+        public Task<RiakResult<RiakIndexResult>> GetSecondaryIndex(RiakIndexId index, BigInteger min, BigInteger max, RiakIndexGetOptions options = null)
+        {
+            return Task.Factory.StartNew(() => _client.GetSecondaryIndex(index, min, max, options));
+        }
+
+        public Task<RiakResult<RiakIndexResult>> GetSecondaryIndex(RiakIndexId index, string min, string max, RiakIndexGetOptions options = null)
+        {
+            return Task.Factory.StartNew(() => _client.GetSecondaryIndex(index, min, max, options));
+        }
+
+        public Task<RiakResult<RiakStreamedIndexResult>> StreamGetSecondaryIndex(RiakIndexId index, BigInteger value, RiakIndexGetOptions options = null)
+        {
+            return Task.Factory.StartNew(() => _client.StreamGetSecondaryIndex(index, value, options));
+        }
+
+        public Task<RiakResult<RiakStreamedIndexResult>> StreamGetSecondaryIndex(RiakIndexId index, string value, RiakIndexGetOptions options = null)
+        {
+            return Task.Factory.StartNew(() => _client.StreamGetSecondaryIndex(index, value, options));
+        }
+
+        public Task<RiakResult<RiakStreamedIndexResult>> StreamGetSecondaryIndex(RiakIndexId index, BigInteger min, BigInteger max, RiakIndexGetOptions options = null)
+        {
+            return Task.Factory.StartNew(() => _client.StreamGetSecondaryIndex(index, min, max, options));
+        }
+
+        public Task<RiakResult<RiakStreamedIndexResult>> StreamGetSecondaryIndex(RiakIndexId index, string min, string max, RiakIndexGetOptions options = null)
+        {
+            return Task.Factory.StartNew(() => _client.StreamGetSecondaryIndex(index, min, max, options));
         }
 
         public Task Batch(Action<IRiakBatchClient> batchAction)
