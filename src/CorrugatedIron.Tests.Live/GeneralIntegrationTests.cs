@@ -15,16 +15,15 @@
 // under the License.
 
 using System.Collections.Generic;
-using System.Reflection.Emit;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Tests.Extensions;
+using CorrugatedIron.Tests.Live.Extensions;
 using CorrugatedIron.Tests.Live.LiveRiakConnectionTests;
 using CorrugatedIron.Util;
 using NUnit.Framework;
 using System;
 using System.Linq;
-using System.Threading;
 
 namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
 {
@@ -499,33 +498,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
                 });
         }
 
-        [Test]
-        public void DeleteBucketDeletesAllKeysInABucketInBatch()
-        {
-            // add multiple keys
-            var bucket = Guid.NewGuid().ToString();
-
-            Client.Batch(batch =>
-                {
-                    for (var i = 1; i < 11; i++)
-                    {
-                        var doc = new RiakObject(bucket, i.ToString(), new { value = i });
-
-                        batch.Put(doc);
-                    }
-
-                    var keyList = batch.ListKeys(bucket);
-                    keyList.Value.Count().ShouldEqual(10);
-
-                    batch.DeleteBucket(bucket);
-                    
-                    keyList = RunListKeys(batch, bucket).WaitUntil(NoKeysListed);
-                    keyList.Value.Count().ShouldEqual(0);
-                    batch.ListBuckets().Value.Contains(bucket).ShouldBeFalse();
-                });
-        }
-
-        private Func<RiakResult<IEnumerable<String>>> RunListKeys(IRiakBatchClient client, string bucket)
+       private Func<RiakResult<IEnumerable<String>>> RunListKeys(IRiakBatchClient client, string bucket)
         {
             Func<RiakResult<IEnumerable<String>>> runListKeys =
                 () => client.ListKeys(bucket);
@@ -537,54 +510,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             get { return result => result.IsSuccess && !result.Value.Any(); }
         }
 
-        [Test]
-        public void DeleteBucketDeletesAllKeysInABucket()
-        {
-            // add multiple keys
-            var bucket = Guid.NewGuid().ToString();
-
-            for (var i = 1; i < 11; i++)
-            {
-                var doc = new RiakObject(bucket, i.ToString(), new { value = i });
-
-                Client.Put(doc);
-            }
-
-            var keyList = Client.ListKeys(bucket);
-            keyList.Value.Count().ShouldEqual(10);
-
-            Client.DeleteBucket(bucket);
-
-            keyList = RunListKeys(Client, bucket).WaitUntil(NoKeysListed);
-            keyList.Value.Count().ShouldEqual(0);
-            Client.ListBuckets().Value.Contains(bucket).ShouldBeFalse();
-        }
-
-        [Test]
-        public void DeleteBucketDeletesAllKeysInABucketAsynchronously()
-        {
-            // add multiple keys
-            var bucket = Guid.NewGuid().ToString();
-
-            for (var i = 1; i < 11; i++)
-            {
-                var doc = new RiakObject(bucket, i.ToString(), new { value = i });
-
-                Client.Put(doc);
-            }
-
-            var keyList = Client.ListKeys(bucket);
-            keyList.Value.Count().ShouldEqual(10);
-
-            var result = Client.Async.DeleteBucket(bucket).Result.ToList();
-            result.ForEach(x => x.IsSuccess.ShouldBeTrue(x.ErrorMessage));
-
-            keyList = RunListKeys(Client, bucket).WaitUntil(NoKeysListed);
-            keyList.Value.Count().ShouldEqual(0);
-            Client.ListBuckets().Value.Contains(bucket).ShouldBeFalse();
-        }
-
-        [Test]
+       [Test]
         public void DeletingAnObjectDeletesAnObject()
         {
             var doc = new RiakObject(TestBucket, TestKey, TestJson, RiakConstants.ContentTypes.ApplicationJson);

@@ -20,6 +20,7 @@ using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Models.MapReduce.Inputs;
 using CorrugatedIron.Models.Search;
 using CorrugatedIron.Tests.Extensions;
+using CorrugatedIron.Tests.Live.Extensions;
 using CorrugatedIron.Util;
 using NUnit.Framework;
 using System.Linq;

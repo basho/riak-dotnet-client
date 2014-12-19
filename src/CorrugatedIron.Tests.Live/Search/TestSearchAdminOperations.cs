@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using CorrugatedIron.Models.Search;
 using CorrugatedIron.Tests.Extensions;
+using CorrugatedIron.Tests.Live.Extensions;
 using CorrugatedIron.Tests.Live.LiveRiakConnectionTests;
 using CorrugatedIron.Util;
 using NUnit.Framework;
@@ -16,21 +17,7 @@ namespace CorrugatedIron.Tests.Live.Search
         public new void SetUp()
         {
             base.SetUp();
-            //var index = new SearchIndex(Index);
-            //Client.PutSearchIndex(index);
-            //var props = Client.GetBucketProperties(BucketType, Bucket).Value;
-            //props.SetSearchIndex(Index);
-            //Client.SetBucketProperties(BucketType, Bucket, props);
-
         }
-
-        private const string BucketType = "search_type";
-        private const string Bucket = "yoko_bucket";
-        private const string Index = "yoko_index";
-        private const string RiakSearchKey = "a.hacker";
-        private const string RiakSearchKey2 = "a.public";
-        private readonly Random _random = new Random();
-
 
         [Test]
         public void TestFetchAndStoreDefaultSchema()
@@ -43,7 +30,7 @@ namespace CorrugatedIron.Tests.Live.Search
             defaultSchema.Content.ShouldNotBeNull();
 
             // Store as new schema
-            var newSchemaName = "test_schema" + _random.Next();
+            var newSchemaName = "test_schema" + Random.Next();
             const string randomComment = "<!-- Random Comment -->";
             var newSchemaContent = defaultSchema.Content + randomComment;
             var newSchema = new SearchSchema(newSchemaName, newSchemaContent);
@@ -64,7 +51,7 @@ namespace CorrugatedIron.Tests.Live.Search
         [Test]
         public void TestStoreAndFetchIndex()
         {
-            var indexName = "index" + _random.Next();
+            var indexName = "index" + Random.Next();
             var index = new SearchIndex(indexName, RiakConstants.Defaults.YokozunaIndex.IndexName, 2);
 
             var putIndexResult = Client.PutSearchIndex(index);
@@ -84,7 +71,7 @@ namespace CorrugatedIron.Tests.Live.Search
         [Test]
         public void TestDeleteIndex()
         {
-            var indexName = "index" + _random.Next();
+            var indexName = "index" + Random.Next();
             var index = new SearchIndex(indexName);
             var putIndexResult = Client.PutSearchIndex(index);
             Assert.True(putIndexResult.IsSuccess, "Index Not Created: {0}", putIndexResult.ErrorMessage);
