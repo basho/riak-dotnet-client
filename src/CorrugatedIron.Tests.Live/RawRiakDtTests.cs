@@ -22,6 +22,7 @@ using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.RiakDt;
+using CorrugatedIron.Tests.Live.Extensions;
 using CorrugatedIron.Tests.Live.LiveRiakConnectionTests;
 using NUnit.Framework;
 
