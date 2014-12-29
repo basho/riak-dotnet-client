@@ -2,6 +2,7 @@
 
 riak_admin=$1
 http_port=$2
+strong_consistency=$3
 
 $riak_admin bucket-type create plain '{"props":{}}'
 $riak_admin bucket-type create search_type '{"props":{}}'
@@ -20,6 +21,12 @@ $riak_admin bucket-type activate counters
 $riak_admin bucket-type activate yokozuna
 $riak_admin bucket-type activate leveldb_type
 $riak_admin bucket-type activate memory_type
+
+if [[ "$strong_consistency" = true ]]
+then
+  $riak_admin bucket-type create consistent '{"props":{"consistent":true}}'
+  $riak_admin bucket-type activate consistent
+fi
 
 curl -4 -XPUT -H 'Content-type: application/json' localhost:$http_port/buckets/riak_index_tests/props -d '{"props":{"backend":"leveldb_backend"}}'
 
