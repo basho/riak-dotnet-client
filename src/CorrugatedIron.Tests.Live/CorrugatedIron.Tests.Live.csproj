@@ -59,6 +59,7 @@
     <Compile Include="BucketPropertyTests.cs" />
     <Compile Include="Extensions\IntegrationTestExtensions.cs" />
     <Compile Include="Extensions\IntegrationTestExtensionsTest.cs" />
+    <Compile Include="Extensions\SearchTestHelpers.cs" />
     <Compile Include="GeneralIntegrationTests.cs" />
     <Compile Include="IdleTests.cs" />
     <Compile Include="LiveRiakConnectionTestBase.cs" />
@@ -70,7 +71,6 @@
     <Compile Include="RiakConfigurationTests.cs" />
     <Compile Include="RiakMapReduceTests.cs" />
     <Compile Include="RiakObjectTests.cs" />
-    <Compile Include="RiakSearchMapReduceInputTests.cs" />
     <Compile Include="RiakIndexTests.cs" />
     <Compile Include="Search\TestSearchAdminOperations.cs" />
   </ItemGroup>

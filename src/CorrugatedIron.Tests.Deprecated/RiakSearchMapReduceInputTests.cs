@@ -14,18 +14,19 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Linq;
 using CorrugatedIron.Comms;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Models.MapReduce.Inputs;
 using CorrugatedIron.Models.Search;
 using CorrugatedIron.Tests.Extensions;
+using CorrugatedIron.Tests.Live;
 using CorrugatedIron.Tests.Live.Extensions;
 using CorrugatedIron.Util;
 using NUnit.Framework;
-using System.Linq;
 
-namespace CorrugatedIron.Tests.Live
+namespace CorrugatedIron.Tests.Deprecated
 {
     [TestFixture(Ignore = true, IgnoreReason = "Riak Search functionality has been deprecated in favor of Yokozuna/Solr.")]
     public class RiakSearchMapReduceInputTests : RiakMapReduceTests
