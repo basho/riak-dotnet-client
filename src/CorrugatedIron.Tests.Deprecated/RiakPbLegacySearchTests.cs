@@ -16,7 +16,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.Search;
@@ -73,7 +72,7 @@ namespace CorrugatedIron.Tests.Live.Deprecated
                 Query = new RiakFluentSearch("riak_search_bucket", "name").Search("Alyssa").Build()
             };
 
-            var result = RunSolrQuery(req).WaitUntil(AnyMatchIsFound);
+            var result = Client.RunSolrQuery(req).WaitUntil(SearchTestHelpers.AnyMatchIsFound);
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
             result.Value.NumFound.ShouldEqual(1u);
             result.Value.Documents.Count.ShouldEqual(1);
@@ -90,7 +89,7 @@ namespace CorrugatedIron.Tests.Live.Deprecated
             };
 
 
-            var result = RunSolrQuery(req).WaitUntil(TwoMatchesFound);
+            var result = Client.RunSolrQuery(req).WaitUntil(SearchTestHelpers.TwoMatchesFound);
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
             result.Value.NumFound.ShouldEqual(2u);
             result.Value.Documents.Count.ShouldEqual(2);
@@ -108,7 +107,7 @@ namespace CorrugatedIron.Tests.Live.Deprecated
                 .And("an")
                 .And("mathematician", t => t.Or("favorites_ablum", "Fame"));
 
-            var result = RunSolrQuery(req).WaitUntil(AnyMatchIsFound);
+            var result = Client.RunSolrQuery(req).WaitUntil(SearchTestHelpers.AnyMatchIsFound);
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
             result.Value.NumFound.ShouldEqual(1u);
             result.Value.Documents.Count.ShouldEqual(1);
@@ -134,7 +133,7 @@ namespace CorrugatedIron.Tests.Live.Deprecated
                 .And("an")
                 .And("mathematician", t => t.Or("favorites_ablum", "Fame"));
 
-            var result = RunSolrQuery(req).WaitUntil(AnyMatchIsFound);
+            var result = Client.RunSolrQuery(req).WaitUntil(SearchTestHelpers.AnyMatchIsFound);
 
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
             result.Value.NumFound.ShouldEqual(1u);
@@ -144,35 +143,6 @@ namespace CorrugatedIron.Tests.Live.Deprecated
             result.Value.Documents[0].Id.ShouldNotBeNull();
         }
 
-        private Func<RiakResult<RiakSearchResult>> RunSolrQuery(RiakSearchRequest req)
-        {
-            Func<RiakResult<RiakSearchResult>> runSolrQuery =
-                () => Client.Search(req);
-            return runSolrQuery;
-        }
 
-        private static Func<RiakResult<RiakSearchResult>, bool> AnyMatchIsFound
-        {
-            get
-            {
-                Func<RiakResult<RiakSearchResult>, bool> matchIsFound =
-                    result => result.IsSuccess &&
-                              result.Value != null &&
-                              result.Value.NumFound > 0;
-                return matchIsFound;
-            }
-        }
-
-        private static Func<RiakResult<RiakSearchResult>, bool> TwoMatchesFound
-        {
-            get
-            {
-                Func<RiakResult<RiakSearchResult>, bool> twoMatchesFound =
-                    result => result.IsSuccess &&
-                              result.Value != null &&
-                              result.Value.NumFound == 2;
-                return twoMatchesFound;
-            }
-        }
     }
 }
