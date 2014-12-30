@@ -44,9 +44,10 @@ namespace CorrugatedIron.Models.Search
         }
 
         public List<RiakSearchResultField> Fields { get; private set; }
-        
+
         internal RiakSearchResultDocument(RpbSearchDoc doc)
         {
+            string legacyId = null;
             Fields = new List<RiakSearchResultField>();
 
             foreach (var field in doc.fields.Select(f => new RiakSearchResultField(f)))
@@ -68,9 +69,22 @@ namespace CorrugatedIron.Models.Search
                     case RiakConstants.SearchFieldKeys.Key:
                         Key = field.Value;
                         break;
+                    case RiakConstants.SearchFieldKeys.LegacySearchId:
+                        legacyId = field.Value;
+                        break;
                 }
                 Fields.Add(field);
             }
+
+            if (CanUseLegacyId(legacyId))
+            {
+                Id = legacyId;
+            }
+        }
+
+        private bool CanUseLegacyId(string legacyId)
+        {
+            return Id == null && legacyId != null;
         }
     }
 }
