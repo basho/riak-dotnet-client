@@ -48,6 +48,12 @@ namespace CorrugatedIron.Tests.Live.Deprecated
             PrepSearchData();
         }
 
+        [TestFixtureTearDown]
+        public void TearDown()
+        {
+            Client.DeleteBucket(Bucket);
+        }
+
         private void PrepSearchData()
         {
             Func<RiakResult<RiakObject>> put1 = () => Client.Put(new RiakObject(Bucket, RiakSearchKey, RiakSearchDoc.ToRiakString(),
@@ -63,6 +69,7 @@ namespace CorrugatedIron.Tests.Live.Deprecated
             put1Result.IsSuccess.ShouldBeTrue(put1Result.ErrorMessage);
             put2Result.IsSuccess.ShouldBeTrue(put2Result.ErrorMessage);
         }
+
 
         [Test]
         public void SearchingWithSimpleFluentQueryWorksCorrectly()
