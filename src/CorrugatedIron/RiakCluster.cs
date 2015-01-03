@@ -29,7 +29,7 @@ namespace CorrugatedIron
 {
     public class RiakCluster : RiakEndPoint
     {
-        private readonly RoundRobinStrategy _loadBalancer;
+        private readonly ILoadBalancingStrategy _loadBalancer;
         private readonly List<IRiakNode> _nodes;
         private readonly ConcurrentQueue<IRiakNode> _offlineNodes;
         private readonly int _nodePollTime;
@@ -41,11 +41,11 @@ namespace CorrugatedIron
             get { return _defaultRetryCount; }
         }
 
-        public RiakCluster(IRiakClusterConfiguration clusterConfiguration, IRiakConnectionFactory connectionFactory)
+        public RiakCluster(IRiakClusterConfiguration clusterConfiguration, IRiakConnectionFactory connectionFactory, ILoadBalancingStrategy loadBalancingStrategy = null)
         {
             _nodePollTime = clusterConfiguration.NodePollTime;
             _nodes = clusterConfiguration.RiakNodes.Select(rn => new RiakNode(rn, connectionFactory)).Cast<IRiakNode>().ToList();
-            _loadBalancer = new RoundRobinStrategy();
+			_loadBalancer = loadBalancingStrategy ?? new RoundRobinStrategy();
             _loadBalancer.Initialise(_nodes);
             _offlineNodes = new ConcurrentQueue<IRiakNode>();
             _defaultRetryCount = clusterConfiguration.DefaultRetryCount;

@@ -25,11 +25,11 @@ using System.Threading.Tasks;
 
 namespace CorrugatedIron.Tests.Comms.RoundRobinStrategyTests
 {
-    public class RoundRobinStrategyTests : WhenAddingAndRemovingNodesConstantlyOnDifferentThreads
-    {
-        protected override ILoadBalancingStrategy CreateStrategy ()
+	public class FisherYatesStrategyTests : WhenAddingAndRemovingNodesConstantlyOnDifferentThreads
+	{
+		protected override ILoadBalancingStrategy CreateStrategy ()
 		{
-			return new RoundRobinStrategy ();
+			return new FisherYatesStrategy ();
 		}
-    }
+	}
 }
