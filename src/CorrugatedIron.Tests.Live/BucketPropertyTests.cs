@@ -70,7 +70,8 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
                 .SetNVal(4)
                 .SetLegacySearch(true)
                 .SetWVal("all")
-                .SetRVal("quorum");
+                .SetRVal("quorum")
+                .SetConsistent(true);
 
             var setResult = Client.SetBucketProperties(bucketName, props);
             setResult.IsSuccess.ShouldBeTrue(setResult.ErrorMessage);
@@ -85,6 +86,7 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
             props.LegacySearch.Value.ShouldBeTrue();
             props.WVal.ShouldEqual(RiakConstants.QuorumOptionsLookup["all"]);
             props.RVal.ShouldEqual(RiakConstants.QuorumOptionsLookup["quorum"]);
+            props.Consistent.Value.ShouldBeTrue();
         }
 
         [Test]
