@@ -124,6 +124,10 @@ namespace CorrugatedIron.Models
         /// <value>A string representation of the DataType assigned to this bucket. Possible values include 'set', 'map', 'counter', or null for no data type </value>
         public string DataType { get; private set; }
 
+        /// <summary>
+        /// If true applies strong consistency http://docs.basho.com/riak/latest/dev/advanced/strong-consistency/
+        /// </summary>
+        public bool? Consistent { get; private set; }
 
         public RiakBucketProperties SetBasicQuorum(bool value)
         {
@@ -454,6 +458,8 @@ namespace CorrugatedIron.Models
             HasPrecommit = bucketProps.has_precommit;
             HasPostcommit = bucketProps.has_postcommit;
 
+            Consistent = bucketProps.consistent;
+
             var preCommitHooks = bucketProps.precommit;
             if (preCommitHooks.Count > 0)
             {
@@ -634,21 +640,21 @@ namespace CorrugatedIron.Models
                 jw.WritePropertyName("props");
                 jw.WriteStartObject();
                 jw.WriteNullableProperty("n_val", NVal)
-                  .WriteNullableProperty("allow_mult", AllowMultiple)
-                  .WriteNullableProperty("last_write_wins", LastWriteWins)
-                  .WriteNullableProperty("r", RVal)
-                  .WriteNullableProperty("rw", RwVal)
-                  .WriteNullableProperty("dw", DwVal)
-                  .WriteNullableProperty("w", WVal)
-                  .WriteNullableProperty("pr", PrVal)
-                  .WriteNullableProperty("pw", PwVal)
-                  .WriteNonNullProperty("backend", Backend)
-                  .WriteNullableProperty("notfound_ok", NotFoundOk)
-                  .WriteNullableProperty("basic_quorum", BasicQuorum)
-                  .WriteNullableProperty("has_precommit", HasPrecommit)
-                  .WriteNullableProperty("has_postcommit", HasPostcommit);
+                    .WriteNullableProperty("allow_mult", AllowMultiple)
+                    .WriteNullableProperty("last_write_wins", LastWriteWins)
+                    .WriteNullableProperty("r", RVal)
+                    .WriteNullableProperty("rw", RwVal)
+                    .WriteNullableProperty("dw", DwVal)
+                    .WriteNullableProperty("w", WVal)
+                    .WriteNullableProperty("pr", PrVal)
+                    .WriteNullableProperty("pw", PwVal)
+                    .WriteNonNullProperty("backend", Backend)
+                    .WriteNullableProperty("notfound_ok", NotFoundOk)
+                    .WriteNullableProperty("basic_quorum", BasicQuorum)
+                    .WriteNullableProperty("has_precommit", HasPrecommit)
+                    .WriteNullableProperty("has_postcommit", HasPostcommit);
 
-                if(PreCommitHooks != null)
+                if (PreCommitHooks != null)
                 {
                     jw.WritePropertyName("precommit");
                     jw.WriteStartArray();
