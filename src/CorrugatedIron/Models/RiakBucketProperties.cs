@@ -99,6 +99,8 @@ namespace CorrugatedIron.Models
         /// <value>The PW value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.</value>
         public uint? PwVal { get; private set; }
 
+        public bool? Consistent { get; private set; }
+
         public RiakConstants.RiakEnterprise.ReplicationMode ReplicationMode { get; private set; }
 
         public string SearchIndex { get; private set; }
@@ -404,6 +406,7 @@ namespace CorrugatedIron.Models
             Backend = props.Value<string>("backend");
             NotFoundOk = props.Value<bool?>("notfound_ok");
             BasicQuorum = props.Value<bool?>("basic_quorum");
+            Consistent = props.Value<bool?>("consistent");
 
             ReadQuorum(props, "r", v => RVal = v);
             ReadQuorum(props, "rw", v => RwVal = v);
@@ -470,6 +473,8 @@ namespace CorrugatedIron.Models
 
             SearchIndex = bucketProps.search_index.FromRiakString();
             DataType = bucketProps.datatype.FromRiakString();
+
+            Consistent = bucketProps.consistent;
         }
 
         private static IRiakPreCommitHook LoadPreCommitHook(RpbCommitHook hook)
