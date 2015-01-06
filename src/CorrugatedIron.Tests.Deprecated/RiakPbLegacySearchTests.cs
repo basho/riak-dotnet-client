@@ -14,10 +14,13 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
 using System.Collections.Generic;
+using CorrugatedIron.Extensions;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.Search;
 using CorrugatedIron.Tests.Extensions;
+using CorrugatedIron.Tests.Live.Extensions;
 using CorrugatedIron.Tests.Live.LiveRiakConnectionTests;
 using CorrugatedIron.Util;
 using NUnit.Framework;
@@ -33,27 +36,50 @@ namespace CorrugatedIron.Tests.Live.Deprecated
         private const string RiakSearchDoc = "{\"name\":\"Alyssa P. Hacker\", \"bio\":\"I'm an engineer, making awesome things.\", \"favorites\":{\"book\":\"The Moon is a Harsh Mistress\",\"album\":\"Magical Mystery Tour\", }}";
         private const string RiakSearchDoc2 = "{\"name\":\"Alan Q. Public\", \"bio\":\"I'm an exciting awesome mathematician\", \"favorites\":{\"book\":\"Prelude to Mathematics\",\"album\":\"The Fame Monster\"}}";
 
-        [SetUp]
-        public new void SetUp() 
+        [TestFixtureSetUp]
+        public new void SetUp()
         {
             base.SetUp();
-            
+
             var props = Client.GetBucketProperties(Bucket).Value;
             props.SetLegacySearch(true);
             Client.SetBucketProperties(Bucket, props);
+
+            PrepSearchData();
         }
+
+        [TestFixtureTearDown]
+        public void TearDown()
+        {
+            Client.DeleteBucket(Bucket);
+        }
+
+        private void PrepSearchData()
+        {
+            Func<RiakResult<RiakObject>> put1 = () => Client.Put(new RiakObject(Bucket, RiakSearchKey, RiakSearchDoc.ToRiakString(),
+                                                      RiakConstants.ContentTypes.ApplicationJson, RiakConstants.CharSets.Utf8));
+
+            var put1Result = put1.WaitUntil();
+
+            Func<RiakResult<RiakObject>> put2 = () => Client.Put(new RiakObject(Bucket, RiakSearchKey2, RiakSearchDoc2.ToRiakString(),
+                                                      RiakConstants.ContentTypes.ApplicationJson, RiakConstants.CharSets.Utf8));
+
+            var put2Result = put2.WaitUntil();
+
+            put1Result.IsSuccess.ShouldBeTrue(put1Result.ErrorMessage);
+            put2Result.IsSuccess.ShouldBeTrue(put2Result.ErrorMessage);
+        }
+
 
         [Test]
         public void SearchingWithSimpleFluentQueryWorksCorrectly()
         {
-            Client.Put(new RiakObject(Bucket, RiakSearchKey, RiakSearchDoc, RiakConstants.ContentTypes.ApplicationJson));
-
             var req = new RiakSearchRequest
             {
                 Query = new RiakFluentSearch("riak_search_bucket", "name").Search("Alyssa").Build()
             };
 
-            var result = Client.Search(req);
+            var result = Client.RunSolrQuery(req).WaitUntil(SearchTestHelpers.AnyMatchIsFound);
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
             result.Value.NumFound.ShouldEqual(1u);
             result.Value.Documents.Count.ShouldEqual(1);
@@ -64,15 +90,13 @@ namespace CorrugatedIron.Tests.Live.Deprecated
         [Test]
         public void SearchingWithWildcardFluentQueryWorksCorrectly()
         {
-            Client.Put(new RiakObject(Bucket, RiakSearchKey, RiakSearchDoc, RiakConstants.ContentTypes.ApplicationJson));
-            Client.Put(new RiakObject(Bucket, RiakSearchKey2, RiakSearchDoc2, RiakConstants.ContentTypes.ApplicationJson));
-
             var req = new RiakSearchRequest
             {
                 Query = new RiakFluentSearch("riak_search_bucket", "name").Search(Token.StartsWith("Al")).Build()
             };
 
-            var result = Client.Search(req);
+
+            var result = Client.RunSolrQuery(req).WaitUntil(SearchTestHelpers.TwoMatchesFound);
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
             result.Value.NumFound.ShouldEqual(2u);
             result.Value.Documents.Count.ShouldEqual(2);
@@ -81,9 +105,6 @@ namespace CorrugatedIron.Tests.Live.Deprecated
         [Test]
         public void SearchingWithMoreComplexFluentQueryWorksCorrectly()
         {
-            Client.Put(new RiakObject(Bucket, RiakSearchKey, RiakSearchDoc, RiakConstants.ContentTypes.ApplicationJson));
-            Client.Put(new RiakObject(Bucket, RiakSearchKey2, RiakSearchDoc2, RiakConstants.ContentTypes.ApplicationJson));
-
             var req = new RiakSearchRequest
             {
                 Query = new RiakFluentSearch("riak_search_bucket", "bio")
@@ -93,7 +114,7 @@ namespace CorrugatedIron.Tests.Live.Deprecated
                 .And("an")
                 .And("mathematician", t => t.Or("favorites_ablum", "Fame"));
 
-            var result = Client.Search(req);
+            var result = Client.RunSolrQuery(req).WaitUntil(SearchTestHelpers.AnyMatchIsFound);
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
             result.Value.NumFound.ShouldEqual(1u);
             result.Value.Documents.Count.ShouldEqual(1);
@@ -104,9 +125,6 @@ namespace CorrugatedIron.Tests.Live.Deprecated
         [Test]
         public void SettingFieldListReturnsOnlyFieldsSpecified()
         {
-            Client.Put(new RiakObject(Bucket, RiakSearchKey, RiakSearchDoc, RiakConstants.ContentTypes.ApplicationJson));
-            Client.Put(new RiakObject(Bucket, RiakSearchKey2, RiakSearchDoc2, RiakConstants.ContentTypes.ApplicationJson));
-
             var req = new RiakSearchRequest
             {
                 Query = new RiakFluentSearch("riak_search_bucket", "bio"),
@@ -122,7 +140,8 @@ namespace CorrugatedIron.Tests.Live.Deprecated
                 .And("an")
                 .And("mathematician", t => t.Or("favorites_ablum", "Fame"));
 
-            var result = Client.Search(req);
+            var result = Client.RunSolrQuery(req).WaitUntil(SearchTestHelpers.AnyMatchIsFound);
+
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
             result.Value.NumFound.ShouldEqual(1u);
             result.Value.Documents.Count.ShouldEqual(1);
@@ -130,5 +149,7 @@ namespace CorrugatedIron.Tests.Live.Deprecated
             result.Value.Documents[0].Fields.Count.ShouldEqual(3);
             result.Value.Documents[0].Id.ShouldNotBeNull();
         }
+
+
     }
 }

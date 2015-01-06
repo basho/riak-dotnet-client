@@ -1,0 +1,8 @@
+#!/bin/sh
+
+out_file=$1
+
+cat >> $out_file <<'EOT'
+strong_consistency = on
+EOT
+

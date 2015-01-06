@@ -6,9 +6,9 @@ using CorrugatedIron.Tests.Extensions;
 using CorrugatedIron.Tests.Live.LiveRiakConnectionTests;
 using NUnit.Framework;
 
-namespace CorrugatedIron.Tests.Live.Deprecated
+namespace CorrugatedIron.Tests.Deprecated
 {
-    [TestFixture()]
+    [TestFixture]
     public class WhenDealingWithBucketProperties : LiveRiakConnectionTestBase
     {
         // use the one node configuration here because we might run the risk

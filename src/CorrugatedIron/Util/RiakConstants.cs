@@ -174,12 +174,14 @@ namespace CorrugatedIron.Util
 
         public static class SearchFieldKeys
         {
-                public const string BucketType = "_yz_rt";
-                public const string Bucket = "_yz_rb";
-                public const string Key = "_yz_rk";
+            public const string BucketType = "_yz_rt";
+            public const string Bucket = "_yz_rb";
+            public const string Key = "_yz_rk";
 
-                public const string Id = "_yz_id";
-                public const string Score = "score";
+            public const string Id = "_yz_id";
+            public const string Score = "score";
+
+            public const string LegacySearchId = "id";
         }
     }
 }
