@@ -1,22 +1,5 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
-//
-// This file is provided to you under the Apache License,
-// Version 2.0 (the "License"); you may not use this file
-// except in compliance with the License.  You may obtain
-// a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
 using System.Linq;
 using CorrugatedIron.Comms;
-using CorrugatedIron.Config;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
@@ -26,28 +9,10 @@ using CorrugatedIron.Util;
 using Newtonsoft.Json;
 using NUnit.Framework;
 
-namespace CorrugatedIron.Tests.Live
+namespace CorrugatedIron.Tests.Live.MapReduce
 {
-
-    public class RiakMapReduceTests
-    {
-        protected IRiakEndPoint Cluster;
-        protected IRiakClient Client;
-        protected IRiakClusterConfiguration ClusterConfig;
-
-        protected const string MrContentType = RiakConstants.ContentTypes.ApplicationJson;
-        protected string Bucket = "fluent_key_bucket";
-        protected const string EmptyBody = "{}";
-
-        public RiakMapReduceTests(string section = "riak1NodeConfiguration")
-        {
-            RiakClient.DisableListKeysWarning = true;
-            ClusterConfig = RiakClusterConfiguration.LoadFromConfig(section);
-        }
-    }
-
     [TestFixture]
-    public class WhenUsingFluentKeyFilters : RiakMapReduceTests
+    public class WhenUsingFluentKeyFilters : RiakMapReduceTestBase
     {
 
         [SetUp]
@@ -141,9 +106,9 @@ namespace CorrugatedIron.Tests.Live
 
             mr.Inputs(Bucket)
                 .Filter(f => f.And(l => l.StartsWith("time"),
-                                   r => r.Tokenize("_", 2)
-                                            .StringToInt()
-                                            .Between(3, 7, true)))
+                    r => r.Tokenize("_", 2)
+                        .StringToInt()
+                        .Between(3, 7, true)))
                 .MapJs(m => m.Source("function (o) { return [1]; }").Keep(false))
                 .ReduceJs(r => r.Name("Riak.reduceSum").Keep(true));
 

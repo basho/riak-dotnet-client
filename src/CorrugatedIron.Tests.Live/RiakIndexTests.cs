@@ -23,13 +23,14 @@ using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Models.MapReduce.Inputs;
 using CorrugatedIron.Tests.Extensions;
 using CorrugatedIron.Tests.Live.Extensions;
+using CorrugatedIron.Tests.Live.MapReduce;
 using CorrugatedIron.Util;
 using NUnit.Framework;
 
 namespace CorrugatedIron.Tests.Live
 {
     [TestFixture]
-    public class WhenUsingIndexes : RiakMapReduceTests
+    public class WhenUsingIndexes : RiakMapReduceTestBase
     {
         private const string BucketType = "leveldb_type";
         private const string LegacyBucket = "riak_index_tests";
