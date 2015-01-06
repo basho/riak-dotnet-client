@@ -16,10 +16,16 @@ else
 fi
 PATH="$PATH:$script_path"
 
+default_dev_path="$HOME/Projects/basho/riak/dev"
+declare -i default_node_count=4
+
+old_search=false
+strong_consistency=false
+
 function make_temp_file
 {
   local template="$1"
-  if [[ ! $template == *XXXXXX ]]
+  if [[ $template != *XXXXXX ]]
   then
     template="$template.XXXXXX"
   fi
@@ -86,17 +92,63 @@ function wait_for_transfers
   done
 }
 
+function usage
+{
+    echo "
+setup-dev-cluster: Quickly setup a dev Riak cluster.
+
+Usage: setup-dev-cluster [-p <riak dev path>] [-l <node count>] [-s] [-c]
+
+-p      Riak dev path, defaults to \"$default_dev_path\"
+-n      Node count, defaults to $default_node_count
+-s      Setup cluster to use Legacy Search instead of Yokozuna Search.
+-c      Setup cluster for Strong Consistency.
+        Note: overrides -n setting and uses 8 nodes
+"
+    exit 0
+}
+
+while getopts "sp:n:ch" opt; do
+  case $opt in
+    s)
+      old_search=true;;
+    p)
+      dev_cluster_path=$OPTARG;;
+    n)
+      opt_node_count=$OPTARG;;
+    c)
+      strong_consistency=true;;
+    *)
+      usage;;
+  esac
+done
+
+if [[ $strong_consistency == 'true' ]]
+then
+  opt_node_count=8
+fi
+
 trap onexit EXIT
 
-dev_cluster_path="${1:-$HOME/Projects/basho/riak/dev}"
-declare -i node_count="${2:-4}"
+dev_cluster_path="${dev_cluster_path:-$default_dev_path}"
+declare -i node_count="${opt_node_count:-$default_node_count}"
 declare -i i=0
 
 if [[ -d $dev_cluster_path ]]
 then
-  pinfo "Setting up dev cluster in $dev_cluster_path"
+  pinfo "Setting up dev cluster in $dev_cluster_path with $node_count nodes"
 else
   errexit "Dev cluster path $dev_cluster_path does not exist!"
+fi
+
+if [[ $old_search == 'true' ]]
+then
+  pinfo "Setting up dev cluster with Legacy Search"
+fi
+
+if [[ $strong_consistency == 'true' ]]
+then
+  pinfo "Setting up dev cluster with Strong Consistency"
 fi
 
 pushd $dev_cluster_path > /dev/null
@@ -144,6 +196,16 @@ do
   gen-riak-conf $riak_conf $http_port $pb_port
   gen-adv-conf $adv_conf
 
+  if [[ $old_search == 'true' ]]
+  then
+    legacy-search-conf $riak_conf $adv_conf
+  fi
+
+  if [[ $strong_consistency == 'true' ]]
+  then
+    strong-consistency-conf $riak_conf
+  fi
+
   (( pb_port += 10 ))
   (( http_port += 10 ))
 done
@@ -169,6 +231,6 @@ $riak_admin transfer-limit 8
 wait_for_transfers
 
 pinfo "Riak started, setting up bucket types"
-riak-cluster-config "$riak_admin" 10018
+riak-cluster-config "$riak_admin" 10018 $strong_consistency
 pinfo "Done!"
 

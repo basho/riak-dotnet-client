@@ -14,6 +14,27 @@ namespace CorrugatedIron.Tests.Live.Search
     [TestFixture]
     public class TestSearchOperation : LiveRiakConnectionTestBase
     {
+        public TestSearchOperation()
+            : base("riak1NodeConfiguration")
+        {
+        }
+
+        private const string BucketType = "search_type";
+        private const string Bucket = "yoko_bucket";
+        private const string Index = "yoko_index";
+        private const string RiakSearchKey = "a.hacker";
+        private const string RiakSearchKey2 = "a.public";
+        private readonly Random _random = new Random();
+        private int _randomId;
+        private RiakObjectId _alyssaRiakId;
+
+        // See https://raw.githubusercontent.com/basho/yokozuna/develop/priv/default_schema.xml for dynamic field suffix meanings.
+        private const string RiakSearchDoc =
+            "{{\"name_s\":\"{0}Alyssa P. Hacker\", \"age_i\":35, \"leader_b\":true, \"bio_tsd\":\"I'm an engineer, making awesome things.\", \"favorites\":{{\"book_tsd\":\"The Moon is a Harsh Mistress\",\"album_tsd\":\"Magical Mystery Tour\" }}}}";
+
+        private const string RiakSearchDoc2 =
+            "{{\"name_s\":\"{0}Alan Q. Public\", \"age_i\":38, \"bio_tsd\":\"I'm an exciting awesome mathematician\", \"favorites\":{{\"book_tsd\":\"Prelude to Mathematics\",\"album_tsd\":\"The Fame Monster\"}}}}";
+
         [TestFixtureSetUp]
         public void Init()
         {
@@ -41,27 +62,11 @@ namespace CorrugatedIron.Tests.Live.Search
             PrepSearch();
         }
 
-        public TestSearchOperation()
-            : base("riak1NodeConfiguration")
+        [TestFixtureTearDown]
+        public void TearDown()
         {
+            Client.DeleteBucket(BucketType, Bucket);
         }
-
-        private const string BucketType = "search_type";
-        private const string Bucket = "yoko_bucket";
-        private const string Index = "yoko_index";
-        private const string RiakSearchKey = "a.hacker";
-        private const string RiakSearchKey2 = "a.public";
-        private readonly Random _random = new Random();
-        private int _randomId;
-        private RiakObjectId _alyssaRiakId;
-
-        // See https://raw.githubusercontent.com/basho/yokozuna/develop/priv/default_schema.xml for dynamic field suffix meanings.
-        private const string RiakSearchDoc =
-            "{{\"name_s\":\"{0}Alyssa P. Hacker\", \"age_i\":35, \"leader_b\":true, \"bio_tsd\":\"I'm an engineer, making awesome things.\", \"favorites\":{{\"book_tsd\":\"The Moon is a Harsh Mistress\",\"album_tsd\":\"Magical Mystery Tour\" }}}}";
-
-        private const string RiakSearchDoc2 =
-            "{{\"name_s\":\"{0}Alan Q. Public\", \"age_i\":38, \"bio_tsd\":\"I'm an exciting awesome mathematician\", \"favorites\":{{\"book_tsd\":\"Prelude to Mathematics\",\"album_tsd\":\"The Fame Monster\"}}}}";
-
 
         private void PrepSearch()
         {
@@ -99,8 +104,8 @@ namespace CorrugatedIron.Tests.Live.Search
                     .Search(_randomId + "Alyssa P. Hacker")
                     .Build()
             };
-            
-            var searchResult = RunSolrQuery(req).WaitUntil(AnyMatchIsFound);
+
+            var searchResult = Client.RunSolrQuery(req).WaitUntil(SearchTestHelpers.AnyMatchIsFound);
 
             searchResult.IsSuccess.ShouldBeTrue(searchResult.ErrorMessage);
             searchResult.Value.NumFound.ShouldEqual(1u);
@@ -120,7 +125,7 @@ namespace CorrugatedIron.Tests.Live.Search
                 Query = new RiakFluentSearch(Index, "name_s").Search(Token.StartsWith(_randomId + "Al")).Build()
             };
 
-            var searchResult = RunSolrQuery(req).WaitUntil(TwoMatchesFound);
+            var searchResult = Client.RunSolrQuery(req).WaitUntil(SearchTestHelpers.TwoMatchesFound);
             searchResult.IsSuccess.ShouldBeTrue(searchResult.ErrorMessage);
             searchResult.Value.NumFound.ShouldEqual(2u);
             searchResult.Value.Documents.Count.ShouldEqual(2);
@@ -142,7 +147,7 @@ namespace CorrugatedIron.Tests.Live.Search
 
             Console.WriteLine(req.Query.ToString());
 
-            var result = RunSolrQuery(req).WaitUntil(AnyMatchIsFound);
+            var result = Client.RunSolrQuery(req).WaitUntil(SearchTestHelpers.AnyMatchIsFound);
 
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
             result.Value.NumFound.ShouldEqual(1u);
@@ -181,44 +186,12 @@ namespace CorrugatedIron.Tests.Live.Search
 
             Console.WriteLine(req.Query.ToString());
 
-            var result = RunSolrQuery(req).WaitUntil(AnyMatchIsFound);
+            var result = Client.RunSolrQuery(req).WaitUntil(SearchTestHelpers.AnyMatchIsFound);
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
             result.Value.NumFound.ShouldEqual(1u);
             result.Value.Documents.Count.ShouldEqual(1);
             result.Value.Documents[0].Fields.Count.ShouldEqual(3);
             result.Value.Documents[0].Id.ShouldNotBeNull();
-        }
-
-
-        private Func<RiakResult<RiakSearchResult>> RunSolrQuery(RiakSearchRequest req)
-        {
-            Func<RiakResult<RiakSearchResult>> runSolrQuery =
-                () => Client.Search(req);
-            return runSolrQuery;
-        }
-        
-        private static Func<RiakResult<RiakSearchResult>, bool> AnyMatchIsFound
-        {
-            get
-            {
-                Func<RiakResult<RiakSearchResult>, bool> matchIsFound =
-                    result => result.IsSuccess &&
-                              result.Value != null &&
-                              result.Value.NumFound > 0;
-                return matchIsFound;
-            }
-        }
-
-        private static Func<RiakResult<RiakSearchResult>, bool> TwoMatchesFound
-        {
-            get
-            {
-                Func<RiakResult<RiakSearchResult>, bool> twoMatchesFound =
-                    result => result.IsSuccess &&
-                              result.Value != null &&
-                              result.Value.NumFound == 2;
-                return twoMatchesFound;
-            }
         }
     }
 }

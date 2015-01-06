@@ -14,87 +14,111 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
+using System.Linq;
 using CorrugatedIron.Comms;
+using CorrugatedIron.Extensions;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Models.MapReduce.Inputs;
 using CorrugatedIron.Models.Search;
 using CorrugatedIron.Tests.Extensions;
+using CorrugatedIron.Tests.Live;
 using CorrugatedIron.Tests.Live.Extensions;
 using CorrugatedIron.Util;
 using NUnit.Framework;
-using System.Linq;
 
-namespace CorrugatedIron.Tests.Live
+namespace CorrugatedIron.Tests.Deprecated
 {
-    [TestFixture(Ignore = true, IgnoreReason = "Riak Search functionality has been deprecated in favor of Yokozuna/Solr.")]
+    [TestFixture]
     public class RiakSearchMapReduceInputTests : RiakMapReduceTests
     {
-        // N.B. You need to install the search hooks on the riak_search_bucket first via `bin/search-cmd install riak_search_bucket`
+        private new const string Bucket = "riak_search_bucket";
         private const string RiakSearchKey = "a.hacker";
         private const string RiakSearchKey2 = "a.public";
         private const string RiakSearchDoc = "{\"name\":\"Alyssa P. Hacker\", \"bio\":\"I'm an engineer, making awesome things.\", \"favorites\":{\"book\":\"The Moon is a Harsh Mistress\",\"album\":\"Magical Mystery Tour\", }}";
         private const string RiakSearchDoc2 = "{\"name\":\"Alan Q. Public\", \"bio\":\"I'm an exciting mathematician\", \"favorites\":{\"book\":\"Prelude to Mathematics\",\"album\":\"The Fame Monster\"}}";
 
-        public RiakSearchMapReduceInputTests ()
-        {
-            Bucket = "riak_search_bucket";
-        }
-        
-        [SetUp]
+        [TestFixtureSetUp]
         public void SetUp() 
         {
             Cluster = new RiakCluster(ClusterConfig, new RiakConnectionFactory());
             Client = Cluster.CreateClient();
-            
+
             var props = Client.GetBucketProperties(Bucket).Value;
             props.SetLegacySearch(true);
             Client.SetBucketProperties(Bucket, props);
+
+            PrepSearchData();
         }
-        
-        [TearDown]
+
+        [TestFixtureTearDown]
         public void TearDown()
         {
             Client.DeleteBucket(Bucket);
         }
+
+        private void PrepSearchData()
+        {
+            Func<RiakResult<RiakObject>> put1 = () => Client.Put(new RiakObject(Bucket, RiakSearchKey, RiakSearchDoc.ToRiakString(),
+                                                      RiakConstants.ContentTypes.ApplicationJson, RiakConstants.CharSets.Utf8));
+
+            var put1Result = put1.WaitUntil();
+
+            Func<RiakResult<RiakObject>> put2 = () => Client.Put(new RiakObject(Bucket, RiakSearchKey2, RiakSearchDoc2.ToRiakString(),
+                                                      RiakConstants.ContentTypes.ApplicationJson, RiakConstants.CharSets.Utf8));
+
+            var put2Result = put2.WaitUntil();
+
+            put1Result.IsSuccess.ShouldBeTrue(put1Result.ErrorMessage);
+            put2Result.IsSuccess.ShouldBeTrue(put2Result.ErrorMessage);
+        }
         
+       
         [Test]
         public void SearchingByNameReturnsTheObjectId()
         {
-            Client.Put(new RiakObject(Bucket, RiakSearchKey, RiakSearchDoc, RiakConstants.ContentTypes.ApplicationJson));
-            Client.Put(new RiakObject(Bucket, RiakSearchKey2, RiakSearchDoc2, RiakConstants.ContentTypes.ApplicationJson));
-
             var mr = new RiakMapReduceQuery()
-                .Inputs(new RiakBucketSearchInput(Bucket, "name:A1*"));
+                .Inputs(new RiakBucketSearchInput(Bucket, "name:Al*"));
 
             var result = Client.MapReduce(mr);
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
             
-            var mrResult = result.Value;
-            mrResult.PhaseResults.Count().ShouldEqual(1);
-            
-            mrResult.PhaseResults.ElementAt(0).Values.ShouldNotBeNull();
-            // TODO Add data introspection to test - need to verify the results, after all.
+            var phaseResults = result.Value.PhaseResults.ToList();
+            phaseResults.Count.ShouldEqual(1);
+
+            CheckThatResultContainAllKeys(result);
         }
         
         [Test]
         public void SearchingViaFluentSearchObjectWorks()
         {
-            Client.Put(new RiakObject(Bucket, RiakSearchKey, RiakSearchDoc, RiakConstants.ContentTypes.ApplicationJson));
-            Client.Put(new RiakObject(Bucket, RiakSearchKey2, RiakSearchDoc2, RiakConstants.ContentTypes.ApplicationJson));
-
-            var search = new RiakFluentSearch(Bucket, "name").Search(Token.StartsWith("A1")).Build();
+            var search = new RiakFluentSearch(Bucket, "name").Search(Token.StartsWith("Al")).Build();
             var mr = new RiakMapReduceQuery()
                 .Inputs(new RiakBucketSearchInput(search));
 
             var result = Client.MapReduce(mr);
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
-            
-            var mrResult = result.Value;
-            mrResult.PhaseResults.Count().ShouldEqual(1);
-            
-            mrResult.PhaseResults.ElementAt(0).Values.ShouldNotBeNull();
-            // TODO Add data introspection to test - need to verify the results, after all.
+
+            CheckThatResultContainAllKeys(result);
+        }
+
+        private static void CheckThatResultContainAllKeys(RiakResult<RiakMapReduceResult> result)
+        {
+            var phaseResults = result.Value.PhaseResults.ToList();
+            phaseResults.Count.ShouldEqual(1);
+
+            var searchResults = phaseResults[0];
+            searchResults.Values.ShouldNotBeNull();
+            searchResults.Values.Count.ShouldEqual(2);
+
+            foreach (var searchResult in searchResults.Values)
+            {
+                var s = searchResult.FromRiakString();
+                if (!(s.Contains(RiakSearchKey) || s.Contains(RiakSearchKey2)))
+                    Assert.Fail("Results did not contain either \"{0}\" or \"{1}\". \r\nResult was:\"{2}\"", RiakSearchKey,
+                        RiakSearchKey2, s);
+            }
         }
     }
 }
