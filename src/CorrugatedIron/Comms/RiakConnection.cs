@@ -33,7 +33,7 @@ namespace CorrugatedIron.Comms
 {
     public interface IRiakConnection : IDisposable
     {
-        bool IsIdle { get; }
+		bool IsIdle { get; }
 
         void Disconnect();
 
@@ -91,6 +91,8 @@ namespace CorrugatedIron.Comms
         private readonly string _restRootUrl;
         private readonly RiakPbcSocket _socket;
 
+		private RiakLogger log = RiakLogger.Instance;
+
         public bool IsIdle
         {
             get { return _socket.IsConnected; }
@@ -98,6 +100,7 @@ namespace CorrugatedIron.Comms
 
         static RiakConnection()
         {
+			//TODO
             ServicePointManager.ServerCertificateValidationCallback += ServerValidationCallback;
         }
 
@@ -239,6 +242,8 @@ namespace CorrugatedIron.Comms
             where TRequest : class
             where TResult : class, new()
         {
+
+			log.Debug(new { request }, "protocol buffer WriteRead");
             var writeResult = PbcWrite(request);
             if(writeResult.IsSuccess)
             {
@@ -250,7 +255,8 @@ namespace CorrugatedIron.Comms
         public RiakResult PbcWriteRead<TRequest>(TRequest request, MessageCode expectedMessageCode)
             where TRequest : class
         {
-            var writeResult = PbcWrite(request);
+			log.Debug(new { request, expectedMessageCode }, "protocol buffer WriteRead");
+			var writeResult = PbcWrite(request);
             if(writeResult.IsSuccess)
             {
                 return PbcRead(expectedMessageCode);
@@ -261,7 +267,8 @@ namespace CorrugatedIron.Comms
         public RiakResult<TResult> PbcWriteRead<TResult>(MessageCode messageCode)
             where TResult : class, new()
         {
-            var writeResult = PbcWrite(messageCode);
+			log.Debug(new { messageCode }, "protocol buffer WriteRead");
+			var writeResult = PbcWrite(messageCode);
             if(writeResult.IsSuccess)
             {
                 return PbcRead<TResult>();
@@ -271,7 +278,8 @@ namespace CorrugatedIron.Comms
 
         public RiakResult PbcWriteRead(MessageCode messageCode, MessageCode expectedMessageCode)
         {
-            var writeResult = PbcWrite(messageCode);
+			log.Debug(new { messageCode, expectedMessageCode }, "protocol buffer WriteRead");
+			var writeResult = PbcWrite(messageCode);
             if(writeResult.IsSuccess)
             {
                 return PbcRead(expectedMessageCode);
@@ -284,6 +292,7 @@ namespace CorrugatedIron.Comms
             where TRequest : class
             where TResult : class, new()
         {
+			log.Debug(new { request }, "protocol buffer WriteRead");
             var writeResult = PbcWrite(request);
             if(writeResult.IsSuccess)
             {
@@ -296,6 +305,7 @@ namespace CorrugatedIron.Comms
             Func<RiakResult<TResult>, bool> repeatRead)
             where TResult : class, new()
         {
+			log.Debug(new { messageCode }, "protocol buffer WriteRead");
             var writeResult = PbcWrite(messageCode);
             if(writeResult.IsSuccess)
             {
@@ -335,6 +345,7 @@ namespace CorrugatedIron.Comms
             where TRequest : class
             where TResult : class, new()
         {
+			log.Debug(new { request }, "protocol buffer WriteStreamRead");
             var streamer = PbcWriteStreamReadIterator(request, repeatRead, onFinish);
             return RiakResult<IEnumerable<RiakResult<TResult>>>.Success(streamer);
         }
@@ -375,8 +386,9 @@ namespace CorrugatedIron.Comms
         }
 
         public RiakResult<RiakRestResponse> RestRequest(RiakRestRequest request)
-        {
-            var baseUri = new StringBuilder(_restRootUrl).Append(request.Uri);
+		{
+			log.Debug(new { request }, "REST request");
+			var baseUri = new StringBuilder(_restRootUrl).Append(request.Uri);
             if(request.QueryParams.Count > 0)
             {
                 baseUri.Append("?");
@@ -466,9 +478,17 @@ namespace CorrugatedIron.Comms
             }
         }
 
+		/// <summary>
+		/// TODO
+		/// </summary>
+		/// <returns><c>true</c>, if validation callback was servered, <c>false</c> otherwise.</returns>
+		/// <param name="sender">Sender.</param>
+		/// <param name="certificate">Certificate.</param>
+		/// <param name="chain">Chain.</param>
+		/// <param name="sslPolicyErrors">Ssl policy errors.</param>
         private static bool ServerValidationCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
         {
-            return true;
+			return true;
         }
 
         public void Dispose()
