@@ -16,8 +16,8 @@ else
 fi
 PATH="$PATH:$script_path"
 
-default_dev_path=$HOME/Projects/basho/riak/dev
-default_node_count=4
+default_dev_path="$HOME/Projects/basho/riak/dev"
+declare -i default_node_count=4
 
 old_search=false
 strong_consistency=false
@@ -25,7 +25,7 @@ strong_consistency=false
 function make_temp_file
 {
   local template="$1"
-  if [[ ! $template == *XXXXXX ]]
+  if [[ $template != *XXXXXX ]]
   then
     template="$template.XXXXXX"
   fi
@@ -92,19 +92,20 @@ function wait_for_transfers
   done
 }
 
-usage () {
-cat << 'EOF'
+function usage
+{
+    echo "
 setup-dev-cluster: Quickly setup a dev Riak cluster.
 
 Usage: setup-dev-cluster [-p <riak dev path>] [-l <node count>] [-s] [-c]
 
--p      Riak dev path, defaults to "$default_dev_path"
--n      Node count, defaults to "$default_node_count"
+-p      Riak dev path, defaults to \"$default_dev_path\"
+-n      Node count, defaults to $default_node_count
 -s      Setup cluster to use Legacy Search instead of Yokozuna Search.
--c      Setup cluster for Strong Consistency, overrides -n setting.
-
-EOF
-exit
+-c      Setup cluster for Strong Consistency.
+        Note: overrides -n setting and uses 8 nodes
+"
+    exit 0
 }
 
 while getopts "sp:n:ch" opt; do
@@ -114,27 +115,23 @@ while getopts "sp:n:ch" opt; do
     p)
       dev_cluster_path=$OPTARG;;
     n)
-      node_count=$OPTARG;;
+      opt_node_count=$OPTARG;;
     c)
       strong_consistency=true;;
-    h)
+    *)
       usage;;
-    \?) 
-      exit 1;;
-    :) 
-      exit 1;;
   esac
 done
 
-if [[ "$strong_consistency" = true ]]
+if [[ $strong_consistency == 'true' ]]
 then
-  node_count=8
+  opt_node_count=8
 fi
 
 trap onexit EXIT
 
 dev_cluster_path="${dev_cluster_path:-$default_dev_path}"
-declare -i node_count="${node_count:-$default_node_count}"
+declare -i node_count="${opt_node_count:-$default_node_count}"
 declare -i i=0
 
 if [[ -d $dev_cluster_path ]]
@@ -144,12 +141,12 @@ else
   errexit "Dev cluster path $dev_cluster_path does not exist!"
 fi
 
-if [[ "$old_search" = true ]]
+if [[ $old_search == 'true' ]]
 then
   pinfo "Setting up dev cluster with Legacy Search"
 fi
 
-if [[ "$strong_consistency" = true ]]
+if [[ $strong_consistency == 'true' ]]
 then
   pinfo "Setting up dev cluster with Strong Consistency"
 fi
@@ -199,12 +196,12 @@ do
   gen-riak-conf $riak_conf $http_port $pb_port
   gen-adv-conf $adv_conf
 
-  if [[ "$old_search" = true ]]
+  if [[ $old_search == 'true' ]]
   then
     legacy-search-conf $riak_conf $adv_conf
   fi
 
-  if [[ "$strong_consistency" = true ]]
+  if [[ $strong_consistency == 'true' ]]
   then
     strong-consistency-conf $riak_conf
   fi

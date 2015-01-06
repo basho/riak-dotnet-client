@@ -1,8 +1,8 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 riak_admin=$1
 http_port=$2
-strong_consistency=$3
+strong_consistency="${3:-false}"
 
 $riak_admin bucket-type create plain '{"props":{}}'
 $riak_admin bucket-type create search_type '{"props":{}}'
@@ -22,7 +22,7 @@ $riak_admin bucket-type activate yokozuna
 $riak_admin bucket-type activate leveldb_type
 $riak_admin bucket-type activate memory_type
 
-if [[ "$strong_consistency" = true ]]
+if [[ $strong_consistency == 'true' ]]
 then
   $riak_admin bucket-type create consistent '{"props":{"consistent":true}}'
   $riak_admin bucket-type activate consistent
