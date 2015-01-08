@@ -36,12 +36,21 @@ openssl ca -verbose -batch \
 openssl req -new -config conf/openssl.conf -nodes \
     -out req/riak-test.pem \
     -keyout private/riak-test-key.pem \
-    -subj '/C=US/ST=WA/O=Basho Technologies/OU=CliServ/CN=riak-test/emailAddress=riakuser@basho.com'
+    -subj '/C=US/ST=WA/O=Basho Technologies/OU=Development/CN=riak-test/emailAddress=riakuser@basho.com'
 ```
 
 ```
 openssl ca -batch -config conf/openssl.conf \
     -in req/riak-test.pem \
     -out certs/riak-test-cert.pem
+```
+
+### Testing
+
+Ensure that `riak-test` is an alias for `127.0.0.1` (or the appropriate
+IP address) in your `hosts` file.
+
+```
+curl -vvv4 --cacert ~/Projects/basho/CorrugatedIron/tools/test-ca/certs/cacert.pem https://riak-test:10418/stats
 ```
 
