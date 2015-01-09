@@ -35,8 +35,8 @@ then
     $riak_admin security add-group test
     $riak_admin security add-user riakuser 'groups=test'
     $riak_admin security add-user riakpass 'password=Test1234' 'groups=test'
-    $riak_admin security add-source riakuser 0.0.0.0/32 certificate
-    $riak_admin security add-source riakpass 0.0.0.0/32 password
+    $riak_admin security add-source riakuser 0.0.0.0/0 certificate
+    $riak_admin security add-source riakpass 0.0.0.0/0 password
     $riak_admin security grant riak_kv.get,riak_kv.put,riak_kv.delete on any to all
 fi
 

@@ -3,6 +3,11 @@ Test SSL CA
 
 ### Creating Root CA cert
 
+*NB:* password `basho`
+
+All of these `openssl` commands should be run from the `test-ca`
+directory and should use the `-config conf/openssl.conf` argument.
+
 ```
 openssl req -new -x509 -days 3650 \
     -extensions v3_ca \
@@ -45,6 +50,15 @@ openssl ca -batch -config conf/openssl.conf \
     -out certs/riak-test-cert.pem
 ```
 
+### Generate revocation list
+
+```
+openssl ca -config conf/openssl.conf \
+    -keyfile private/cakey.pem \
+    -cert certs/cacert.pem \
+    -gencrl -out crl/crl.pem
+```
+
 ### Testing
 
 Ensure that `riak-test` is an alias for `127.0.0.1` (or the appropriate
@@ -54,3 +68,8 @@ IP address) in your `hosts` file.
 curl -vvv4 --cacert ~/Projects/basho/CorrugatedIron/tools/test-ca/certs/cacert.pem https://riak-test:10418/stats
 ```
 
+### Resources
+
+https://gist.github.com/lukebakken/ab4db1efa3e1847c7731
+
+https://jamielinux.com/articles/2013/08/generate-certificate-revocation-list-revoke-certificates/

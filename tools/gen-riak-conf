@@ -26,6 +26,12 @@ multi_backend.mem_backend.storage_backend = memory
 multi_backend.mem_backend.memory_backend.ttl = 10s
 multi_backend.mem_backend.memory_backend.max_memory_per_vnode = 4MB
 
+tls_protocols.sslv3 = off
+tls_protocols.tlsv1 = off
+tls_protocols.tlsv1.1 = off
+tls_protocols.tlsv1.2 = on
+check_crl = off
+
 listener.http.internal = 0.0.0.0:$http_port
 listener.protobuf.internal = 0.0.0.0:$pb_port
 EOT
