@@ -1,8 +1,12 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-out_file=$1
-http_port=$2
-pb_port=$3
+declare -r out_file="$1"
+declare -ir http_port="$2"
+declare -ir pb_port="$3"
+declare -ir https_port="${4:-0}"
+declare -r security_cacert_file="$5"
+declare -r security_cert_file="$6"
+declare -r security_key_file="$7"
 
 cat >> $out_file <<EOT
 ring_size = 16
@@ -22,7 +26,23 @@ multi_backend.mem_backend.storage_backend = memory
 multi_backend.mem_backend.memory_backend.ttl = 10s
 multi_backend.mem_backend.memory_backend.max_memory_per_vnode = 4MB
 
+tls_protocols.sslv3 = off
+tls_protocols.tlsv1 = off
+tls_protocols.tlsv1.1 = off
+tls_protocols.tlsv1.2 = on
+check_crl = off
+
 listener.http.internal = 0.0.0.0:$http_port
 listener.protobuf.internal = 0.0.0.0:$pb_port
 EOT
+
+if (( https_port > 0 ))
+then
+    cat >> $out_file <<EOT
+listener.https.internal = 0.0.0.0:$https_port
+ssl.cacertfile = $security_cacert_file
+ssl.certfile = $security_cert_file
+ssl.keyfile = $security_key_file
+EOT
+fi
 

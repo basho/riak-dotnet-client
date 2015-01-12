@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
-riak_admin=$1
-http_port=$2
-strong_consistency="${3:-false}"
+declare -r riak_admin="$1"
+declare -ir http_port="$2"
+declare -r strong_consistency="${3:-false}"
+declare -r use_security="${4:-false}"
 
 $riak_admin bucket-type create plain '{"props":{}}'
 $riak_admin bucket-type create search_type '{"props":{}}'
@@ -28,5 +29,18 @@ then
   $riak_admin bucket-type activate consistent
 fi
 
-curl -4 -XPUT -H 'Content-type: application/json' localhost:$http_port/buckets/riak_index_tests/props -d '{"props":{"backend":"leveldb_backend"}}'
+echo 'Setting backend to leveldb_backend for riak_index_tests bucket... HTTP CODE:'
+curl -4so /dev/null -w "%{http_code}" -XPUT -H 'Content-type: application/json' localhost:$http_port/buckets/riak_index_tests/props -d '{"props":{"backend":"leveldb_backend"}}'
+echo ' ...DONE'
+
+if [[ $use_security == 'true' ]]
+then
+    $riak_admin security enable
+    $riak_admin security add-group test
+    $riak_admin security add-user riakuser 'groups=test'
+    $riak_admin security add-user riakpass 'password=Test1234' 'groups=test'
+    $riak_admin security add-source riakuser 0.0.0.0/0 certificate
+    $riak_admin security add-source riakpass 0.0.0.0/0 password
+    $riak_admin security grant riak_kv.get,riak_kv.put,riak_kv.delete on any to all
+fi
 
