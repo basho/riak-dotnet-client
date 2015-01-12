@@ -22,7 +22,7 @@ using System.Collections.Generic;
 namespace CorrugatedIron.Tests.RiakClientTests
 {
     internal abstract class RiakClientTestBase<TRequest, TResult>
-        where TRequest : class
+        where TRequest : class, ProtoBuf.IExtensible
         where TResult : class, new()
     {
         protected RiakResult<TResult> Result = null;
