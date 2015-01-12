@@ -26,13 +26,15 @@ using System.Net.Sockets;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Authentication;
+using System.Text;
+using System.Diagnostics;
 
 namespace CorrugatedIron.Comms
 {
     internal class RiakPbcSocket : IDisposable
     {
         private static readonly EncryptionPolicy encryptionPolicy = EncryptionPolicy.RequireEncryption;
-        private static readonly bool checkCertificateRevocation = true ;
+        // TODO private static readonly bool checkCertificateRevocation = true ;
 
         private readonly string server;
         private readonly int port;
@@ -65,57 +67,45 @@ namespace CorrugatedIron.Comms
                     socket.SendTimeout = sendTimeout;
                     networkStream = new NetworkStream(socket, true);
 
-                    /*
-                    # Return the SSLSocket that has a TLS session running. (TLS is a
-                    # better and safer SSL).
-                    #
-                    # @return [OpenSSL::SSL::SSLSocket]
-                    def tls_socket
-                      configure_context
-                      start_tls
-                      validate_session
-                      send_authentication
-                      validate_connection
-                      return @tls
-                    end
-                     * 
-                    # Attempt to exchange the TCP socket for a TLS socket.
-                    def start_tls
-                      write_message :StartTls
-                      expect_message :StartTls
-                      # Swap the tls socket in for the tcp socket, so write_message and
-                      # read_message continue working
-                      @sock = @tls = OpenSSL::SSL::SSLSocket.new @tcp, @context
-                      @tls.connect
-                    end
-                     */
-
                     Write(MessageCode.StartTls);
+                    // TODO: error if the following is not read i.e. "expect_message"
                     Read(MessageCode.StartTls);
 
-                    //create the SSL stream starting from the NetworkStream associated
-                    //with the TcpClient instance
- 
-                    var validationCallback = new RemoteCertificateValidationCallback(ServerValidationCallback);
-                    var selectionCallback = new LocalCertificateSelectionCallback(ClientCertificateSelectionCallback);
-
-                    // http://stackoverflow.com/questions/9934975/does-sslstream-dispose-disposes-its-inner-stream
-                    var sslStream = new SslStream(networkStream, false, validationCallback, selectionCallback, encryptionPolicy);
-
-                    networkStream = sslStream;
+                    // TODO: validate_sessions
+                    // validates hostname, and CRL
 
                     // TODO select client certs
-                    // TODO private key file?
+                    // TODO private key file vs pfx?
                     // http://stackoverflow.com/questions/18462064/associate-a-private-key-with-the-x509certificate2-class-in-net
                     var cert = new X509Certificate2(@"C:\Users\lbakken\Projects\basho\CorrugatedIron\tools\test-ca\certs\riakuser-client-cert.pfx");
                     var clientCertificates = new X509CertificateCollection();
                     clientCertificates.Add(cert);
                      
-                    string targetHost = "127.0.0.1"; // TODO
-                    var sslProtocol = SslProtocols.Tls; // TODO - selectable?
+                    //create the SSL stream starting from the NetworkStream associated
+                    //with the TcpClient instance
+                    var serverCertificateValidationCallback = new RemoteCertificateValidationCallback(ServerValidationCallback);
+                    var clientCertificateSelectionCallback = new LocalCertificateSelectionCallback(ClientCertificateSelectionCallback);
 
-                    // TODO - only use this if client cert auth requested
-                    sslStream.AuthenticateAsClient(targetHost, clientCertificates, sslProtocol, checkCertificateRevocation);
+                    // http://stackoverflow.com/questions/9934975/does-sslstream-dispose-disposes-its-inner-stream
+                    var sslStream = new SslStream(networkStream, false,
+                        serverCertificateValidationCallback,
+                        clientCertificateSelectionCallback,
+                        encryptionPolicy);
+
+                    // TODO - only use this if client cert auth provided via configuration
+                    string targetHost = "riak-test"; // TODO
+                    var sslProtocol = SslProtocols.Default;
+                    sslStream.AuthenticateAsClient(targetHost, clientCertificates, sslProtocol, false);
+
+                    networkStream = sslStream;
+ 
+                    // TODO credentials stored elsewhere
+                    var userBytes = Encoding.ASCII.GetBytes("riakuser");
+                    var passwordBytes = Encoding.ASCII.GetBytes(String.Empty);
+                    var authRequest = new RpbAuthReq { user = userBytes, password = passwordBytes };
+                    Write(authRequest);
+                    // TODO: expect_message here
+                    Read(MessageCode.AuthResp);
                 }
 
                 return networkStream;
@@ -125,12 +115,22 @@ namespace CorrugatedIron.Comms
         private X509Certificate ClientCertificateSelectionCallback(object sender, string targetHost,
             X509CertificateCollection localCertificates, X509Certificate remoteCertificate, string[] acceptableIssuers)
         {
-            return localCertificates[0];
+            if (localCertificates.Count > 0)
+            {
+                return localCertificates[0];
+            }
+            else
+            {
+                return new X509Certificate2(@"C:\Users\lbakken\Projects\basho\CorrugatedIron\tools\test-ca\certs\riakuser-client-cert.pfx");
+            }
         }
 
         private bool ServerValidationCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
         {
-            throw new NotImplementedException();
+            // TODO
+            bool rv = sslPolicyErrors == SslPolicyErrors.None;
+            Debug.WriteLine("SslPolicyErrors: {0}", sslPolicyErrors);
+            return rv;
         }
 
         public bool IsConnected
@@ -233,7 +233,7 @@ namespace CorrugatedIron.Comms
              */
         }
 
-        public void Write<T>(T message) where T : class
+        public void Write<T>(T message) where T : class, ProtoBuf.IExtensible
         {
             const int sizeSize = sizeof(int);
             const int codeSize = sizeof(byte);
