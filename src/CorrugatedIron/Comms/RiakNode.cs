@@ -61,10 +61,10 @@ namespace CorrugatedIron.Comms
         private TRiakResult UseConnection<TRiakResult>(Func<IRiakConnection, TRiakResult> useFun, Func<ResultCode, string, bool, TRiakResult> onError)
             where TRiakResult : RiakResult
         {
-            if(_disposing) return onError(ResultCode.ShuttingDown, "Connection is shutting down", true);
+            if (_disposing) return onError(ResultCode.ShuttingDown, "Connection is shutting down", true);
 
             var response = _connections.Consume(useFun);
-            if(response.Item1)
+            if (response.Item1)
             {
                 return response.Item2;
             }
@@ -74,10 +74,10 @@ namespace CorrugatedIron.Comms
         public RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun)
             where TResult : RiakResult
         {
-            if(_disposing) return RiakResult<IEnumerable<TResult>>.Error(ResultCode.ShuttingDown, "Connection is shutting down", true);
+            if (_disposing) return RiakResult<IEnumerable<TResult>>.Error(ResultCode.ShuttingDown, "Connection is shutting down", true);
 
             var response = _connections.DelayedConsume(useFun);
-            if(response.Item1)
+            if (response.Item1)
             {
                 return response.Item2;
             }

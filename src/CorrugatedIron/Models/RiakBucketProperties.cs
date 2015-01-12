@@ -413,13 +413,13 @@ namespace CorrugatedIron.Models
             ReadQuorum(props, "pw", v => PwVal = v);
 
             var preCommitHooks = props.Value<JArray>("precommit");
-            if(preCommitHooks.Count > 0)
+            if (preCommitHooks.Count > 0)
             {
                 PreCommitHooks = preCommitHooks.Cast<JObject>().Select(LoadPreCommitHook).ToList();
             }
 
             var postCommitHooks = props.Value<JArray>("postcommit");
-            if(postCommitHooks.Count > 0)
+            if (postCommitHooks.Count > 0)
             {
                 PostCommitHooks = postCommitHooks.Cast<JObject>().Select(LoadPostCommitHook).ToList();
             }
@@ -486,7 +486,7 @@ namespace CorrugatedIron.Models
         private static IRiakPreCommitHook LoadPreCommitHook(JObject hook)
         {
             JToken token;
-            if(hook.TryGetValue("name", out token))
+            if (hook.TryGetValue("name", out token))
             {
                 // must be a javascript hook
                 return new RiakJavascriptCommitHook(token.Value<string>());
@@ -522,12 +522,12 @@ namespace CorrugatedIron.Models
         {
             var message = new RpbBucketProps();
             
-            if(AllowMultiple.HasValue)
+            if (AllowMultiple.HasValue)
             {
                 message.allow_mult = AllowMultiple.Value;
             }
             
-            if(NVal.HasValue)
+            if (NVal.HasValue)
             {
                 message.n_val = NVal.Value;
             }
@@ -648,7 +648,7 @@ namespace CorrugatedIron.Models
                   .WriteNullableProperty("has_precommit", HasPrecommit)
                   .WriteNullableProperty("has_postcommit", HasPostcommit);
 
-                if(PreCommitHooks != null)
+                if (PreCommitHooks != null)
                 {
                     jw.WritePropertyName("precommit");
                     jw.WriteStartArray();
@@ -656,7 +656,7 @@ namespace CorrugatedIron.Models
                     jw.WriteEndArray();
                 }
 
-                if(PostCommitHooks != null)
+                if (PostCommitHooks != null)
                 {
                     jw.WritePropertyName("postcommit");
                     jw.WriteStartArray();

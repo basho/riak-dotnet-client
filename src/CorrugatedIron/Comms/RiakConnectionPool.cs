@@ -43,12 +43,12 @@ namespace CorrugatedIron.Comms
 
         public Tuple<bool, TResult> Consume<TResult>(Func<IRiakConnection, TResult> consumer)
         {
-            if(_disposing) return Tuple.Create(false, default(TResult));
+            if (_disposing) return Tuple.Create(false, default(TResult));
 
             IRiakConnection instance = null;
             try
             {
-                if(_resources.TryPop(out instance))
+                if (_resources.TryPop(out instance))
                 {
                     var result = consumer(instance);
                     return Tuple.Create(true, result);
@@ -60,7 +60,7 @@ namespace CorrugatedIron.Comms
             }
             finally
             {
-                if(instance != null)
+                if (instance != null)
                 {
                     _resources.Push(instance);
                 }
@@ -71,12 +71,12 @@ namespace CorrugatedIron.Comms
 
         public Tuple<bool, TResult> DelayedConsume<TResult>(Func<IRiakConnection, Action, TResult> consumer)
         {
-            if(_disposing) return Tuple.Create(false, default(TResult));
+            if (_disposing) return Tuple.Create(false, default(TResult));
 
             IRiakConnection instance = null;
             try
             {
-                if(_resources.TryPop(out instance))
+                if (_resources.TryPop(out instance))
                 {
                     Action cleanup = () =>
                     {
@@ -91,7 +91,7 @@ namespace CorrugatedIron.Comms
             }
             catch(Exception)
             {
-                if(instance != null)
+                if (instance != null)
                 {
                     _resources.Push(instance);
                 }
@@ -103,7 +103,7 @@ namespace CorrugatedIron.Comms
 
         public void Dispose()
         {
-            if(_disposing) return;
+            if (_disposing) return;
 
             _disposing = true;
 

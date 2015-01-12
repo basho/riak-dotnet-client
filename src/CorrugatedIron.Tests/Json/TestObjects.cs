@@ -29,15 +29,15 @@ namespace CorrugatedIron.Tests.Json
 
         public override bool Equals(object obj)
         {
-            if(ReferenceEquals(null, obj))
+            if (ReferenceEquals(null, obj))
             {
                 return false;
             }
-            if(ReferenceEquals(this, obj))
+            if (ReferenceEquals(this, obj))
             {
                 return true;
             }
-            if(obj.GetType() != typeof(Person))
+            if (obj.GetType() != typeof(Person))
             {
                 return false;
             }
@@ -46,11 +46,11 @@ namespace CorrugatedIron.Tests.Json
 
         public bool Equals(Person other)
         {
-            if(ReferenceEquals(null, other))
+            if (ReferenceEquals(null, other))
             {
                 return false;
             }
-            if(ReferenceEquals(this, other))
+            if (ReferenceEquals(this, other))
             {
                 return true;
             }
@@ -77,15 +77,15 @@ namespace CorrugatedIron.Tests.Json
 
         public override bool Equals(object obj)
         {
-            if(ReferenceEquals(null, obj))
+            if (ReferenceEquals(null, obj))
             {
                 return false;
             }
-            if(ReferenceEquals(this, obj))
+            if (ReferenceEquals(this, obj))
             {
                 return true;
             }
-            if(obj.GetType() != typeof(Name))
+            if (obj.GetType() != typeof(Name))
             {
                 return false;
             }
@@ -94,11 +94,11 @@ namespace CorrugatedIron.Tests.Json
 
         public bool Equals(Name other)
         {
-            if(ReferenceEquals(null, other))
+            if (ReferenceEquals(null, other))
             {
                 return false;
             }
-            if(ReferenceEquals(this, other))
+            if (ReferenceEquals(this, other))
             {
                 return true;
             }
@@ -128,15 +128,15 @@ namespace CorrugatedIron.Tests.Json
 
         public override bool Equals(object obj)
         {
-            if(ReferenceEquals(null, obj))
+            if (ReferenceEquals(null, obj))
             {
                 return false;
             }
-            if(ReferenceEquals(this, obj))
+            if (ReferenceEquals(this, obj))
             {
                 return true;
             }
-            if(obj.GetType() != typeof(PhoneNumber))
+            if (obj.GetType() != typeof(PhoneNumber))
             {
                 return false;
             }
@@ -145,11 +145,11 @@ namespace CorrugatedIron.Tests.Json
 
         public bool Equals(PhoneNumber other)
         {
-            if(ReferenceEquals(null, other))
+            if (ReferenceEquals(null, other))
             {
                 return false;
             }
-            if(ReferenceEquals(this, other))
+            if (ReferenceEquals(this, other))
             {
                 return true;
             }

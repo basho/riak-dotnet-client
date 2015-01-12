@@ -40,13 +40,13 @@ namespace CorrugatedIron.Comms
         {
             get
             {
-                if(_pbcSocket == null)
+                if (_pbcSocket == null)
                 {
                     var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                     socket.NoDelay = true;
                     socket.Connect(_server, _port);
 
-                    if(!socket.Connected)
+                    if (!socket.Connected)
                     {
                         throw new RiakException("Unable to connect to remote server: {0}:{1}".Fmt(_server, _port));
                     }
@@ -147,7 +147,7 @@ namespace CorrugatedIron.Comms
             Array.Copy(size, messageBody, sizeSize);
             messageBody[sizeSize] = (byte)messageCode;
 
-            if(PbcSocket.Send(messageBody, headerSize, SocketFlags.None) == 0)
+            if (PbcSocket.Send(messageBody, headerSize, SocketFlags.None) == 0)
             {
                 throw new RiakException("Failed to send data to server - Timed Out: {0}:{1}".Fmt(_server, _port));
             }
@@ -172,7 +172,7 @@ namespace CorrugatedIron.Comms
             }
 
             // check to make sure something was written, otherwise we'll have to create a new array
-            if(messageLength == headerSize)
+            if (messageLength == headerSize)
             {
                 messageBody = new byte[headerSize];
             }
@@ -203,7 +203,7 @@ namespace CorrugatedIron.Comms
             var size = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(header, 0));
             var messageCode = (MessageCode)header[sizeof(int)];
 
-            if(messageCode == MessageCode.ErrorResp)
+            if (messageCode == MessageCode.ErrorResp)
             {
                 var error = DeserializeInstance<RpbErrorResp>(size);
                 throw new RiakException(error.errcode, error.errmsg.FromRiakString(), false);
@@ -224,13 +224,13 @@ namespace CorrugatedIron.Comms
             var size = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(header, 0));
 
             var messageCode = (MessageCode)header[sizeof(int)];
-            if(messageCode == MessageCode.ErrorResp)
+            if (messageCode == MessageCode.ErrorResp)
             {
                 var error = DeserializeInstance<RpbErrorResp>(size);
                 throw new RiakException(error.errcode, error.errmsg.FromRiakString());
             }
 
-            if(!MessageCodeToTypeMap.ContainsKey(messageCode))
+            if (!MessageCodeToTypeMap.ContainsKey(messageCode))
             {
                 throw new RiakInvalidDataException((byte)messageCode);
             }
@@ -238,7 +238,7 @@ namespace CorrugatedIron.Comms
             // This message code validation is here to make sure that the caller
             // is getting exactly what they expect. This "could" be removed from
             // production code, but it's a good thing to have in here for dev.
-            if(MessageCodeToTypeMap[messageCode] != typeof(T))
+            if (MessageCodeToTypeMap[messageCode] != typeof(T))
             {
                 throw new InvalidOperationException(string.Format("Attempt to decode message to type '{0}' when received type '{1}'.", typeof(T).Name, MessageCodeToTypeMap[messageCode].Name));
             }
@@ -253,7 +253,7 @@ namespace CorrugatedIron.Comms
             while(lengthToReceive > 0)
             {
                 int bytesReceived = PbcSocket.Receive(resultBuffer, totalBytesReceived, lengthToReceive, 0);
-                if(bytesReceived == 0)
+                if (bytesReceived == 0)
                 {
                     throw new RiakException("Unable to read data from the source stream - Timed Out.");
                 }
@@ -266,7 +266,7 @@ namespace CorrugatedIron.Comms
         private T DeserializeInstance<T>(int size)
             where T : new()
         {
-            if(size <= 1)
+            if (size <= 1)
             {
                 return new T();
             }
@@ -281,7 +281,7 @@ namespace CorrugatedIron.Comms
 
         public void Disconnect()
         {
-            if(_pbcSocket != null)
+            if (_pbcSocket != null)
             {
                 _pbcSocket.Disconnect(false);
                 _pbcSocket.Dispose();

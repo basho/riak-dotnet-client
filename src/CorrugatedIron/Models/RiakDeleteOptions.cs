@@ -175,7 +175,7 @@ namespace CorrugatedIron.Models
             if (Timeout.HasValue)
                 request.timeout = Timeout.Value;
 
-            if(Vclock != null)
+            if (Vclock != null)
             {
                 request.vclock = Vclock;
             }
