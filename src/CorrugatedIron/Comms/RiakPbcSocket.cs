@@ -23,46 +23,124 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
+using System.Security.Authentication;
 
 namespace CorrugatedIron.Comms
 {
     internal class RiakPbcSocket : IDisposable
     {
-        private readonly string _server;
-        private readonly int _port;
-        private readonly int _receiveTimeout;
-        private readonly int _sendTimeout;
+        private static readonly EncryptionPolicy encryptionPolicy = EncryptionPolicy.RequireEncryption;
+        private static readonly bool checkCertificateRevocation = true ;
+
+        private readonly string server;
+        private readonly int port;
+        private readonly int receiveTimeout;
+        private readonly int sendTimeout;
         private static readonly Dictionary<MessageCode, Type> MessageCodeToTypeMap;
         private static readonly Dictionary<Type, MessageCode> TypeToMessageCodeMap;
-        private Socket _pbcSocket;
 
-        private Socket PbcSocket
+        // TODO socket should either be TcpClient and not exposed past initial connection
+        private Socket socket;
+
+        private Stream networkStream = null;
+        // TODO private bool authenticated = false ;
+
+        private Stream PbcStream
         {
             get
             {
-                if (_pbcSocket == null)
+                if (networkStream == null)
                 {
-                    var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                    socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                     socket.NoDelay = true;
-                    socket.Connect(_server, _port);
+                    socket.Connect(server, port);
 
-                    if (!socket.Connected)
+                    if (socket.Connected == false)
                     {
-                        throw new RiakException("Unable to connect to remote server: {0}:{1}".Fmt(_server, _port));
+                        throw new RiakException("Unable to connect to remote server: {0}:{1}".Fmt(server, port));
                     }
-                    socket.ReceiveTimeout = _receiveTimeout;
-                    socket.SendTimeout = _sendTimeout;
+                    socket.ReceiveTimeout = receiveTimeout;
+                    socket.SendTimeout = sendTimeout;
+                    networkStream = new NetworkStream(socket, true);
 
-                    _pbcSocket = socket;
+                    /*
+                    # Return the SSLSocket that has a TLS session running. (TLS is a
+                    # better and safer SSL).
+                    #
+                    # @return [OpenSSL::SSL::SSLSocket]
+                    def tls_socket
+                      configure_context
+                      start_tls
+                      validate_session
+                      send_authentication
+                      validate_connection
+                      return @tls
+                    end
+                     * 
+                    # Attempt to exchange the TCP socket for a TLS socket.
+                    def start_tls
+                      write_message :StartTls
+                      expect_message :StartTls
+                      # Swap the tls socket in for the tcp socket, so write_message and
+                      # read_message continue working
+                      @sock = @tls = OpenSSL::SSL::SSLSocket.new @tcp, @context
+                      @tls.connect
+                    end
+                     */
 
+                    Write(MessageCode.StartTls);
+                    Read(MessageCode.StartTls);
+
+                    //create the SSL stream starting from the NetworkStream associated
+                    //with the TcpClient instance
+ 
+                    var validationCallback = new RemoteCertificateValidationCallback(ServerValidationCallback);
+                    var selectionCallback = new LocalCertificateSelectionCallback(ClientCertificateSelectionCallback);
+
+                    // http://stackoverflow.com/questions/9934975/does-sslstream-dispose-disposes-its-inner-stream
+                    var sslStream = new SslStream(networkStream, false, validationCallback, selectionCallback, encryptionPolicy);
+
+                    networkStream = sslStream;
+
+                    // TODO select client certs
+                    // TODO private key file?
+                    // http://stackoverflow.com/questions/18462064/associate-a-private-key-with-the-x509certificate2-class-in-net
+                    var cert = new X509Certificate2(@"C:\Users\lbakken\Projects\basho\CorrugatedIron\tools\test-ca\certs\riakuser-client-cert.pfx");
+                    var clientCertificates = new X509CertificateCollection();
+                    clientCertificates.Add(cert);
+                     
+                    string targetHost = "127.0.0.1"; // TODO
+                    var sslProtocol = SslProtocols.Tls; // TODO - selectable?
+
+                    // TODO - only use this if client cert auth requested
+                    sslStream.AuthenticateAsClient(targetHost, clientCertificates, sslProtocol, checkCertificateRevocation);
                 }
-                return _pbcSocket;
+
+                return networkStream;
             }
+        }
+        
+        private X509Certificate ClientCertificateSelectionCallback(object sender, string targetHost,
+            X509CertificateCollection localCertificates, X509Certificate remoteCertificate, string[] acceptableIssuers)
+        {
+            return localCertificates[0];
+        }
+
+        private bool ServerValidationCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+        {
+            throw new NotImplementedException();
         }
 
         public bool IsConnected
         {
-            get { return _pbcSocket != null && _pbcSocket.Connected; }
+            get
+            {
+                // TODO: replace with this?
+                // http://stackoverflow.com/questions/1387459/how-to-check-if-tcpclient-connection-is-closed
+                return socket != null && socket.Connected;
+            }
         }
 
         static RiakPbcSocket()
@@ -114,9 +192,7 @@ namespace CorrugatedIron.Comms
 
                 { MessageCode.GetBucketTypeReq, typeof(RpbGetBucketTypeReq) },
                 { MessageCode.SetBucketTypeReq, typeof(RpbSetBucketTypeReq) },
-                { MessageCode.AuthReq, typeof(RpbAuthReq) },
-
-
+                { MessageCode.AuthReq, typeof(RpbAuthReq) }
             };
 
             TypeToMessageCodeMap = new Dictionary<Type, MessageCode>();
@@ -129,10 +205,10 @@ namespace CorrugatedIron.Comms
 
         public RiakPbcSocket(string server, int port, int receiveTimeout, int sendTimeout)
         {
-            _server = server;
-            _port = port;
-            _receiveTimeout = receiveTimeout;
-            _sendTimeout = sendTimeout;
+            this.server = server;
+            this.port = port;
+            this.receiveTimeout = receiveTimeout;
+            this.sendTimeout = sendTimeout;
         }
 
         public void Write(MessageCode messageCode)
@@ -147,10 +223,14 @@ namespace CorrugatedIron.Comms
             Array.Copy(size, messageBody, sizeSize);
             messageBody[sizeSize] = (byte)messageCode;
 
-            if (PbcSocket.Send(messageBody, headerSize, SocketFlags.None) == 0)
+            PbcStream.Write(messageBody, 0, headerSize);
+
+            /*
+            if (PbcStream.Send(messageBody, headerSize, SocketFlags.None) == 0)
             {
-                throw new RiakException("Failed to send data to server - Timed Out: {0}:{1}".Fmt(_server, _port));
+                throw new RiakException("Failed to send data to server - Timed Out: {0}:{1}".Fmt(server, port));
             }
+             */
         }
 
         public void Write<T>(T message) where T : class
@@ -162,7 +242,7 @@ namespace CorrugatedIron.Comms
             byte[] messageBody;
             long messageLength = 0;
 
-            using(var memStream = new MemoryStream())
+            using (var memStream = new MemoryStream())
             {
                 // add a buffer to the start of the array to put the size and message code
                 memStream.Position += headerSize;
@@ -182,19 +262,22 @@ namespace CorrugatedIron.Comms
             Array.Copy(size, messageBody, sizeSize);
             messageBody[sizeSize] = (byte)messageCode;
 
-            var bytesToSend = (int)messageLength;
-            var position = 0;
+            int bytesToSend = (int)Math.Min(messageLength, sendBufferSize);
 
+            PbcStream.Write(messageBody, 0, bytesToSend);
+
+            /*
             while (bytesToSend > 0)
             {
-                var sent = PbcSocket.Send(messageBody, position, Math.Min(bytesToSend, sendBufferSize), SocketFlags.None);
+                // var sent = socket.Send(messageBody, 0, bytesToSend, SocketFlags.None);
                 if (sent == 0)
                 {
-                    throw new RiakException("Failed to send data to server - Timed Out: {0}:{1}".Fmt(_server, _port));
+                    throw new RiakException("Failed to send data to server - Timed Out: {0}:{1}".Fmt(server, port));
                 }
                 position += sent;
                 bytesToSend -= sent;
             }
+             */
         }
 
         public MessageCode Read(MessageCode expectedCode)
@@ -248,11 +331,15 @@ namespace CorrugatedIron.Comms
 
         private byte[] ReceiveAll(byte[] resultBuffer)
         {
+            PbcStream.Read(resultBuffer, 0, resultBuffer.Length);
+            return resultBuffer;
+
+            /* TODO - SSL
             int totalBytesReceived = 0;
             int lengthToReceive = resultBuffer.Length;
             while(lengthToReceive > 0)
             {
-                int bytesReceived = PbcSocket.Receive(resultBuffer, totalBytesReceived, lengthToReceive, 0);
+                int bytesReceived = PbcStream.Receive(resultBuffer, totalBytesReceived, lengthToReceive, 0);
                 if (bytesReceived == 0)
                 {
                     throw new RiakException("Unable to read data from the source stream - Timed Out.");
@@ -261,6 +348,7 @@ namespace CorrugatedIron.Comms
                 lengthToReceive -= bytesReceived;
             }
             return resultBuffer;
+             */
         }
 
         private T DeserializeInstance<T>(int size)
@@ -281,12 +369,20 @@ namespace CorrugatedIron.Comms
 
         public void Disconnect()
         {
-            if (_pbcSocket != null)
+            if (networkStream != null)
             {
-                _pbcSocket.Disconnect(false);
-                _pbcSocket.Dispose();
-                _pbcSocket = null;
+                networkStream.Close();
+                networkStream.Dispose();
             }
+            /*
+             * TODO: since networkStream owns socket, this is most likely not necessary
+            if (socket != null)
+            {
+                socket.Disconnect(false);
+                socket.Dispose();
+                socket = null;
+            }
+             */
         }
 
         public void Dispose()
