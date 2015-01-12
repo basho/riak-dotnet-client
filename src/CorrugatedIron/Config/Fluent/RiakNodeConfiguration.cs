@@ -98,7 +98,7 @@ namespace CorrugatedIron.Config.Fluent
         {
             _restScheme = restScheme.ToLower();
 
-            if(_restScheme != "http" && _restScheme != "https")
+            if (_restScheme != "http" && _restScheme != "https")
             {
                 throw new NotSupportedException("Riak's REST interface doesn't support the scheme '{0}'. Please specify 'http' or 'https'.".Fmt(restScheme));
             }

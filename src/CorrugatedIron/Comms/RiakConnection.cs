@@ -240,7 +240,7 @@ namespace CorrugatedIron.Comms
             where TResult : class, new()
         {
             var writeResult = PbcWrite(request);
-            if(writeResult.IsSuccess)
+            if (writeResult.IsSuccess)
             {
                 return PbcRead<TResult>();
             }
@@ -251,7 +251,7 @@ namespace CorrugatedIron.Comms
             where TRequest : class
         {
             var writeResult = PbcWrite(request);
-            if(writeResult.IsSuccess)
+            if (writeResult.IsSuccess)
             {
                 return PbcRead(expectedMessageCode);
             }
@@ -262,7 +262,7 @@ namespace CorrugatedIron.Comms
             where TResult : class, new()
         {
             var writeResult = PbcWrite(messageCode);
-            if(writeResult.IsSuccess)
+            if (writeResult.IsSuccess)
             {
                 return PbcRead<TResult>();
             }
@@ -272,7 +272,7 @@ namespace CorrugatedIron.Comms
         public RiakResult PbcWriteRead(MessageCode messageCode, MessageCode expectedMessageCode)
         {
             var writeResult = PbcWrite(messageCode);
-            if(writeResult.IsSuccess)
+            if (writeResult.IsSuccess)
             {
                 return PbcRead(expectedMessageCode);
             }
@@ -285,7 +285,7 @@ namespace CorrugatedIron.Comms
             where TResult : class, new()
         {
             var writeResult = PbcWrite(request);
-            if(writeResult.IsSuccess)
+            if (writeResult.IsSuccess)
             {
                 return PbcRepeatRead(repeatRead);
             }
@@ -297,7 +297,7 @@ namespace CorrugatedIron.Comms
             where TResult : class, new()
         {
             var writeResult = PbcWrite(messageCode);
-            if(writeResult.IsSuccess)
+            if (writeResult.IsSuccess)
             {
                 return PbcRepeatRead(repeatRead);
             }
@@ -319,7 +319,7 @@ namespace CorrugatedIron.Comms
             do
             {
                 result = PbcRead<TResult>();
-                if(!result.IsSuccess) break;
+                if (!result.IsSuccess) break;
                 yield return result;
             } while(repeatRead(result));
 
@@ -353,7 +353,7 @@ namespace CorrugatedIron.Comms
             where TResult : class, new()
         {
             var writeResult = PbcWrite(request);
-            if(writeResult.IsSuccess)
+            if (writeResult.IsSuccess)
             {
                 return PbcStreamReadIterator(repeatRead, onFinish);
             }
@@ -366,7 +366,7 @@ namespace CorrugatedIron.Comms
             where TResult : class, new()
         {
             var writeResult = PbcWrite(messageCode);
-            if(writeResult.IsSuccess)
+            if (writeResult.IsSuccess)
             {
                 return PbcStreamReadIterator(repeatRead, onFinish);
             }
@@ -377,7 +377,7 @@ namespace CorrugatedIron.Comms
         public RiakResult<RiakRestResponse> RestRequest(RiakRestRequest request)
         {
             var baseUri = new StringBuilder(_restRootUrl).Append(request.Uri);
-            if(request.QueryParams.Count > 0)
+            if (request.QueryParams.Count > 0)
             {
                 baseUri.Append("?");
                 var first = request.QueryParams.First();
@@ -391,19 +391,19 @@ namespace CorrugatedIron.Comms
             req.Method = request.Method;
             req.Credentials = CredentialCache.DefaultCredentials;
 
-            if(!string.IsNullOrWhiteSpace(request.ContentType))
+            if (!string.IsNullOrWhiteSpace(request.ContentType))
             {
                 req.ContentType = request.ContentType;
             }
 
-            if(!request.Cache)
+            if (!request.Cache)
             {
                 req.Headers.Set(RiakConstants.Rest.HttpHeaders.DisableCacheKey, RiakConstants.Rest.HttpHeaders.DisableCacheValue);
             }
 
             request.Headers.ForEach(h => req.Headers.Set(h.Key, h.Value));
 
-            if(request.Body != null && request.Body.Length > 0)
+            if (request.Body != null && request.Body.Length > 0)
             {
                 req.ContentLength = request.Body.Length;
                 using(var writer = req.GetRequestStream())
