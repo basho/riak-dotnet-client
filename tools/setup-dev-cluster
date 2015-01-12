@@ -131,6 +131,7 @@ done
 
 if [[ $opt_use_security == 'true' ]]
 then
+    pinfo 'NOTE: using Riak Security. This will require HTTPS and TLS connections.'
     security_cacert_file="$script_path/test-ca/certs/cacert.pem"
     security_cert_file="$script_path/test-ca/certs/riak-test-cert.pem"
     security_key_file="$script_path/test-ca/private/riak-test-key.pem"
