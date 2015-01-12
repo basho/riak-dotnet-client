@@ -29,6 +29,10 @@ then
   $riak_admin bucket-type activate consistent
 fi
 
+echo 'Setting backend to leveldb_backend for riak_index_tests bucket... HTTP CODE:'
+curl -4so /dev/null -w "%{http_code}" -XPUT -H 'Content-type: application/json' localhost:$http_port/buckets/riak_index_tests/props -d '{"props":{"backend":"leveldb_backend"}}'
+echo ' ...DONE'
+
 if [[ $use_security == 'true' ]]
 then
     $riak_admin security enable
@@ -39,6 +43,4 @@ then
     $riak_admin security add-source riakpass 0.0.0.0/0 password
     $riak_admin security grant riak_kv.get,riak_kv.put,riak_kv.delete on any to all
 fi
-
-curl -4 -XPUT -H 'Content-type: application/json' localhost:$http_port/buckets/riak_index_tests/props -d '{"props":{"backend":"leveldb_backend"}}'
 
