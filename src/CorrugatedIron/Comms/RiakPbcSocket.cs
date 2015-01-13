@@ -33,7 +33,6 @@ namespace CorrugatedIron.Comms
     internal class RiakPbcSocket : IDisposable
     {
         private static readonly byte[] emptyBytes = new byte[0];
-        private static readonly EncryptionPolicy encryptionPolicy = EncryptionPolicy.RequireEncryption;
         // TODO private static readonly bool checkCertificateRevocation = true ;
 
         private readonly string server;
@@ -240,8 +239,7 @@ namespace CorrugatedIron.Comms
                     // http://stackoverflow.com/questions/9934975/does-sslstream-dispose-disposes-its-inner-stream
                     var sslStream = new SslStream(networkStream, false,
                         serverCertificateValidationCallback,
-                        clientCertificateSelectionCallback,
-                        encryptionPolicy);
+                        clientCertificateSelectionCallback);
 
                     // TODO - only use this if client cert auth provided via configuration
                     string targetHost = "riak-test"; // TODO
