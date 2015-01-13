@@ -35,8 +35,7 @@ namespace CorrugatedIron.Tests.Messages
 
             var currentDir = Environment.CurrentDirectory;
             string riak_pb_messages_file =
-                Path.Combine(Environment.CurrentDirectory,
-                    "..", "..", "..", "riak_pb", "src", "riak_pb_messages.csv");
+                Path.Combine(currentDir, "..", "..", "..", "riak_pb", "src", "riak_pb_messages.csv");
 
             string[] msg_csv = File.ReadAllLines(riak_pb_messages_file);
             foreach (string line in msg_csv)
