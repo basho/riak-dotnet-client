@@ -23,7 +23,7 @@ namespace CorrugatedIron.Tests.RiakClientTests
 {
     internal abstract class RiakClientTestBase<TRequest, TResult>
         where TRequest : class, ProtoBuf.IExtensible
-        where TResult : class, new()
+        where TResult : class, ProtoBuf.IExtensible, new()
     {
         protected RiakResult<TResult> Result = null;
         protected Mock<IRiakConnection> ConnMock;
