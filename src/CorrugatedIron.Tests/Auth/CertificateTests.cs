@@ -14,17 +14,40 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
+using System.IO;
+using System.Security.Cryptography.X509Certificates;
+using CorrugatedIron.Config;
+using CorrugatedIron.Util;
+using NUnit.Framework;
+
 namespace CorrugatedIron.Tests.X509
 {
-    using System;
-    using System.IO;
-    using System.Security.Cryptography.X509Certificates;
-    using CorrugatedIron.Util;
-    using NUnit.Framework;
-
     [TestFixture]
     public class CertificateTests
     {
+        private static readonly string testCertsDir;
+        private static readonly string rootCaCertFile;
+        private static readonly string riakUserClientCertFileRelativePath;
+        private static readonly string riakUserClientCertFile;
+        private const string riakUserClientCertSubject =
+            @"E=riakuser@myorg.com, CN=riakuser, OU=Development, O=Basho Technologies, S=WA, C=US";
+
+        static CertificateTests()
+        {
+            var currentDir = Environment.CurrentDirectory;
+            string[] testCertsDirRelativePathAry = new string[] {
+                "..", "..", "..", "..", "tools", "test-ca", "certs"
+            };
+            string testCertsDirRelativePath = Path.Combine(testCertsDirRelativePathAry);
+            testCertsDir = Path.Combine(currentDir, testCertsDirRelativePath);
+
+            rootCaCertFile = Path.Combine(testCertsDir, "cacert.pem");
+
+            riakUserClientCertFileRelativePath = Path.Combine(testCertsDirRelativePath, "riakuser-client-cert.pfx");
+            riakUserClientCertFile = Path.Combine(currentDir, riakUserClientCertFileRelativePath);
+        }
+
         [TestFixtureSetUp]
         public void ImportTestCertificates()
         {
@@ -33,19 +56,15 @@ namespace CorrugatedIron.Tests.X509
                 Assert.Ignore("Running on Mono, X509 Certificate tests will be skipped.");
             }
 
-            var currentDir = Environment.CurrentDirectory;
-            string testCertsDir = Path.Combine(currentDir, "..", "..", "..", "..", "tools", "test-ca", "certs");
             Assert.True(Directory.Exists(testCertsDir));
 
             /*
              * NB: the first time this is run, the user WILL get a popup asking if they should import the root
              *     cert. There is no way around this if the user is running as a normal user.
              */
-            string rootCaCertFile = Path.Combine(testCertsDir, "cacert.pem");
             Assert.True(File.Exists(rootCaCertFile));
             var rootCaCert = new X509Certificate2(rootCaCertFile);
 
-            string riakUserClientCertFile = Path.Combine(testCertsDir, "riakuser-client-cert.pfx");
             Assert.True(File.Exists(riakUserClientCertFile));
             var riakUserClientCert = new X509Certificate2(riakUserClientCertFile);
 
@@ -56,6 +75,16 @@ namespace CorrugatedIron.Tests.X509
         [Test]
         public void RiakConfigurationCanSpecifyX509Certificates()
         {
+            var config = RiakClusterConfiguration.LoadFromConfig("riakConfiguration");
+            Assert.IsNotNull(config);
+
+            var authConfig = config.Authentication;
+            Assert.IsNotNull(authConfig);
+
+            Assert.AreEqual("riakpass", authConfig.Username);
+            Assert.AreEqual("Test1234", authConfig.Password);
+            Assert.AreEqual(riakUserClientCertFileRelativePath, authConfig.ClientCertificateFile);
+            Assert.AreEqual(riakUserClientCertSubject, authConfig.ClientCertificateSubject);
         }
 
         private static void SaveToStore(X509Certificate2 cert, StoreName storeName)

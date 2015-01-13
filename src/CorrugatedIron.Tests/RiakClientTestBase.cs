@@ -14,10 +14,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Collections.Generic;
 using CorrugatedIron.Comms;
 using CorrugatedIron.Config;
 using Moq;
-using System.Collections.Generic;
 
 namespace CorrugatedIron.Tests.RiakClientTests
 {

@@ -77,11 +77,14 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="KeyFilters\KeyFilterTests.cs" />
     <Compile Include="RiakSearchTests.cs" />
-    <Compile Include="X509\CertificateTests.cs" />
+    <Compile Include="Auth\CertificateTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\CorrugatedIron.snk">
       <Link>CorrugatedIron.snk</Link>
+    </None>
+    <None Include="App.config">
+      <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />
   </ItemGroup>

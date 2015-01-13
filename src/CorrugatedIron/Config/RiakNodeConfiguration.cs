@@ -62,13 +62,13 @@ namespace CorrugatedIron.Config
             set { this["poolSize"] = value; }
         }
 
-        // -- TODO: put this back in when we've got the idling stuff figured out
-        //[ConfigurationProperty("idleTimeout", DefaultValue = 15000, IsRequired = false)]
-        //public int IdleTimeout
-        //{
-        //    get { return (int)this["idleTimeout"]; }
-        //    set { this["idleTimeout"] = value; }
-        //}
+        // TODO: put this back in when we've got the idling stuff figured out
+        // [ConfigurationProperty("idleTimeout", DefaultValue = 15000, IsRequired = false)]
+        // public int IdleTimeout
+        // {
+        //     get { return (int)this["idleTimeout"]; }
+        //     set { this["idleTimeout"] = value; }
+        // }
 
         [ConfigurationProperty("networkReadTimeout", DefaultValue = 4000, IsRequired = false)]
         public int NetworkReadTimeout

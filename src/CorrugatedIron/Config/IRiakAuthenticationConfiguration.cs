@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015 Basho Technologies, Inc.
+// Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -14,25 +14,13 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
-
-namespace CorrugatedIron.Util
+namespace CorrugatedIron.Config
 {
-    internal static class MonoUtil
+    public interface IRiakAuthenticationConfiguration
     {
-        private static readonly bool isRunningOnMono = false;
-
-        static MonoUtil()
-        {
-            isRunningOnMono = (null != Type.GetType("Mono.Runtime"));
-        }
-
-        internal static bool IsRunningOnMono
-        {
-            get
-            {
-                return isRunningOnMono;
-            }
-        }
+        string Username { get; }
+        string Password { get; }
+        string ClientCertificateFile { get; }
+        string ClientCertificateSubject { get; }
     }
 }
