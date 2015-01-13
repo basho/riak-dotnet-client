@@ -14,22 +14,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Net;
-using System.Net.Security;
-using System.Net.Sockets;
-using System.Security.Authentication;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using CorrugatedIron.Exceptions;
-using CorrugatedIron.Extensions;
-using CorrugatedIron.Messages;
-using ProtoBuf;
-
 namespace CorrugatedIron.Comms
 {
+    using System;
+    using System.Diagnostics;
+    using System.IO;
+    using System.Linq;
+    using System.Net;
+    using System.Net.Security;
+    using System.Net.Sockets;
+    using System.Security.Authentication;
+    using System.Security.Cryptography.X509Certificates;
+    using System.Text;
+    using CorrugatedIron.Exceptions;
+    using CorrugatedIron.Extensions;
+    using CorrugatedIron.Messages;
+    using ProtoBuf;
+
     internal class RiakPbcSocket : IDisposable
     {
         private static readonly byte[] emptyBytes = new byte[0];
@@ -241,19 +242,30 @@ namespace CorrugatedIron.Comms
                         serverCertificateValidationCallback,
                         clientCertificateSelectionCallback);
 
-                    // TODO - only use this if client cert auth provided via configuration
                     string targetHost = "riak-test"; // TODO
-                    var sslProtocol = SslProtocols.Tls;
-                    sslStream.AuthenticateAsClient(targetHost, clientCertificates, sslProtocol, false);
+                    if (clientCertificates.Count > 0)
+                    {
+                        var sslProtocol = SslProtocols.Tls;
+                        sslStream.AuthenticateAsClient(targetHost, clientCertificates, sslProtocol, false);
+                    }
+                    else
+                    {
+                        sslStream.AuthenticateAsClient(targetHost);
+                    }
 
                     networkStream = sslStream;
 
                     // TODO credentials stored elsewhere
                     var userBytes = Encoding.ASCII.GetBytes("riakuser");
+                    var passBytes = emptyBytes;
+                    /*
+                    var userBytes = Encoding.ASCII.GetBytes("riakpass");
+                    var passBytes = Encoding.ASCII.GetBytes("Test1234");
+                     */
                     var authRequest = new RpbAuthReq
                     {
                         user = userBytes,
-                        password = emptyBytes
+                        password = passBytes
                     };
                     Write(authRequest);
                     // TODO: expect_message here
@@ -267,14 +279,36 @@ namespace CorrugatedIron.Comms
         private X509Certificate ClientCertificateSelectionCallback(object sender, string targetHost,
             X509CertificateCollection localCertificates, X509Certificate remoteCertificate, string[] acceptableIssuers)
         {
-            if (localCertificates.Count > 0)
+            X509Certificate clientCertToPresent = null;
+
+            /*
+             * NB:
+             * 1st time in here, targetHost == "riak-test" and acceptableIssuers is empty
+             * 2nd time in here, targetHost == "riak-test" and acceptableIssues is one element in array:
+             *     OU=Development, O=Basho Technologies, L=Bellevue, S=WA, C=US
+             */
+            if (false == localCertificates.IsNullOrEmpty())
             {
-                return localCertificates[0];
+                if (false == acceptableIssuers.IsNullOrEmpty())
+                {
+                    foreach (X509Certificate cert in localCertificates)
+                    {
+                        if (acceptableIssuers.Any(issuer => cert.Issuer.Contains(issuer)))
+                        {
+                            clientCertToPresent = cert;
+                            break;
+                        }
+                    }
+                }
+
+                if (clientCertToPresent == null)
+                {
+                    // Hope that this cert is the right one
+                    clientCertToPresent = localCertificates[0];
+                }
             }
-            else
-            {
-                return new X509Certificate2(@"C:\Users\lbakken\Projects\basho\CorrugatedIron\tools\test-ca\certs\riakuser-client-cert.pfx");
-            }
+
+            return clientCertToPresent;
         }
 
         private bool ServerValidationCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)

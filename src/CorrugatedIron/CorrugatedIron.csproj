@@ -242,6 +242,7 @@
     <Compile Include="Config\RiakNodeConfigurationCollection.cs" />
     <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="Extensions\JsonExtensions.cs" />
+    <Compile Include="Util\MonoUtil.cs" />
     <Compile Include="Util\RiakConstants.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Messages\MessageCode.cs" />
@@ -294,4 +295,3 @@
     <CallTarget Targets="CleanCommonAssemblyInfo" />
   </Target>
 </Project>
-
