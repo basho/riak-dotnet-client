@@ -1,4 +1,5 @@
 ﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -16,60 +17,150 @@
 
 namespace CorrugatedIron.Messages
 {
+    using System;
+    using System.Collections.Generic;
+
     public enum MessageCode : byte
     {
-        ErrorResp = 0,
-        PingReq = 1,
-        PingResp = 2,
-        GetClientIdReq = 3,     // Not used any more
-        GetClientIdResp = 4,    // Not used any more
-        SetClientIdReq = 5,     // Not used any more
-        SetClientIdResp = 6,    // Not used any more
-        GetServerInfoReq = 7,
-        GetServerInfoResp = 8,
-        GetReq = 9,
-        GetResp = 10,
-        PutReq = 11,
-        PutResp = 12,
-        DelReq = 13,
-        DelResp = 14,
-        ListBucketsReq = 15,
-        ListBucketsResp = 16,
-        ListKeysReq = 17,
-        ListKeysResp = 18,
-        GetBucketReq = 19,
-        GetBucketResp = 20,
-        SetBucketReq = 21,
-        SetBucketResp = 22,
-        MapRedReq = 23,
-        MapRedResp = 24,
-        IndexReq = 25,
-        IndexResp = 26,
-        SearchQueryReq = 27,
-        SearchQueryResp = 28,
-        ResetBucketReq = 29,
-        ResetBucketResp = 30,
-        GetBucketTypeReq = 31,
-        SetBucketTypeReq = 32,
-        CsBucketReq = 40,
-        CsBucketResp = 41,
-        CounterUpdateReq = 50,
-        CounterUpdateResp = 51,
-        CounterGetReq = 52,
-        CounterGetResp = 53,
-        YokozunaIndexGetReq = 54,
-        YokozunaIndexGetResp = 55,
-        YokozunaIndexPutReq = 56,
-        YokozunaIndexDeleteReq = 57,
-        YokozunaSchemaGetReq = 58,
-        YokozunaSchemaGetResp = 59,
-        YokozunaSchemaPutReq = 60,
+        RpbErrorResp = 0,
+        RpbPingReq = 1,
+        RpbPingResp = 2,
+        RpbGetClientIdReq = 3,     // Not used any more
+        RpbGetClientIdResp = 4,    // Not used any more
+        RpbSetClientIdReq = 5,     // Not used any more
+        RpbSetClientIdResp = 6,    // Not used any more
+        RpbGetServerInfoReq = 7,
+        RpbGetServerInfoResp = 8,
+        RpbGetReq = 9,
+        RpbGetResp = 10,
+        RpbPutReq = 11,
+        RpbPutResp = 12,
+        RpbDelReq = 13,
+        RpbDelResp = 14,
+        RpbListBucketsReq = 15,
+        RpbListBucketsResp = 16,
+        RpbListKeysReq = 17,
+        RpbListKeysResp = 18,
+        RpbGetBucketReq = 19,
+        RpbGetBucketResp = 20,
+        RpbSetBucketReq = 21,
+        RpbSetBucketResp = 22,
+        RpbMapRedReq = 23,
+        RpbMapRedResp = 24,
+        RpbIndexReq = 25,
+        RpbIndexResp = 26,
+        RpbSearchQueryReq = 27,
+        RpbSearchQueryResp = 28,
+        RpbResetBucketReq = 29,
+        RpbResetBucketResp = 30,
+        RpbGetBucketTypeReq = 31,
+        RpbSetBucketTypeReq = 32,
+        RpbCSBucketReq = 40,
+        RpbCSBucketResp = 41,
+        RpbCounterUpdateReq = 50,
+        RpbCounterUpdateResp = 51,
+        RpbCounterGetReq = 52,
+        RpbCounterGetResp = 53,
+        RpbYokozunaIndexGetReq = 54,
+        RpbYokozunaIndexGetResp = 55,
+        RpbYokozunaIndexPutReq = 56,
+        RpbYokozunaIndexDeleteReq = 57,
+        RpbYokozunaSchemaGetReq = 58,
+        RpbYokozunaSchemaGetResp = 59,
+        RpbYokozunaSchemaPutReq = 60,
         DtFetchReq = 80,
         DtFetchResp = 81,
         DtUpdateReq = 82,
         DtUpdateResp = 83,
-        AuthReq = 253,
-        AuthResp = 254,
-        StartTls = 255
+        RpbAuthReq = 253,
+        RpbAuthResp = 254,
+        RpbStartTls = 255
+    }
+
+    internal static class MessageCodeTypeMapBuilder
+    {
+        private static readonly Dictionary<MessageCode, Type> MessageCodeToTypeMap;
+        private static readonly Dictionary<Type, MessageCode> TypeToMessageCodeMap;
+
+        static MessageCodeTypeMapBuilder()
+        {
+            MessageCodeToTypeMap = new Dictionary<MessageCode, Type>
+            {
+                { MessageCode.RpbErrorResp, typeof(RpbErrorResp) },
+                { MessageCode.RpbGetClientIdResp, typeof(RpbGetClientIdResp) },
+                { MessageCode.RpbSetClientIdReq, typeof(RpbSetClientIdReq) },
+                { MessageCode.RpbGetServerInfoResp, typeof(RpbGetServerInfoResp) },
+                { MessageCode.RpbGetReq, typeof(RpbGetReq) },
+                { MessageCode.RpbGetResp, typeof(RpbGetResp) },
+                { MessageCode.RpbPutReq, typeof(RpbPutReq) },
+                { MessageCode.RpbPutResp, typeof(RpbPutResp) },
+                { MessageCode.RpbDelReq, typeof(RpbDelReq) },
+                { MessageCode.RpbListBucketsReq, typeof(RpbListBucketsReq) },
+                { MessageCode.RpbListBucketsResp, typeof(RpbListBucketsResp) },
+                { MessageCode.RpbListKeysReq, typeof(RpbListKeysReq) },
+                { MessageCode.RpbListKeysResp, typeof(RpbListKeysResp) },
+                { MessageCode.RpbGetBucketReq, typeof(RpbGetBucketReq) },
+                { MessageCode.RpbGetBucketResp, typeof(RpbGetBucketResp) },
+                { MessageCode.RpbSetBucketReq, typeof(RpbSetBucketReq) },
+                { MessageCode.RpbMapRedReq, typeof(RpbMapRedReq) },
+                { MessageCode.RpbMapRedResp, typeof(RpbMapRedResp) },
+                { MessageCode.RpbIndexReq, typeof(RpbIndexReq) },
+                { MessageCode.RpbIndexResp, typeof(RpbIndexResp) },
+                { MessageCode.RpbSearchQueryReq, typeof(RpbSearchQueryReq) },
+                { MessageCode.RpbSearchQueryResp, typeof(RpbSearchQueryResp) },
+                { MessageCode.RpbResetBucketReq, typeof(RpbResetBucketReq) },
+                { MessageCode.RpbCSBucketReq, typeof(RpbCSBucketReq) },
+                { MessageCode.RpbCSBucketResp, typeof(RpbCSBucketResp) },
+                { MessageCode.RpbCounterUpdateReq, typeof(RpbCounterUpdateReq) },
+                { MessageCode.RpbCounterUpdateResp, typeof(RpbCounterUpdateResp) },
+                { MessageCode.RpbCounterGetReq, typeof(RpbCounterGetReq) },
+                { MessageCode.RpbCounterGetResp, typeof(RpbCounterGetResp) },
+
+                { MessageCode.RpbYokozunaIndexGetReq, typeof(RpbYokozunaIndexGetReq) },
+                { MessageCode.RpbYokozunaIndexGetResp , typeof(RpbYokozunaIndexGetResp) },
+                { MessageCode.RpbYokozunaIndexPutReq , typeof(RpbYokozunaIndexPutReq) },
+                { MessageCode.RpbYokozunaIndexDeleteReq , typeof(RpbYokozunaIndexDeleteReq) },
+                { MessageCode.RpbYokozunaSchemaGetReq , typeof(RpbYokozunaSchemaGetReq) },
+                { MessageCode.RpbYokozunaSchemaGetResp , typeof(RpbYokozunaSchemaGetResp) },
+                { MessageCode.RpbYokozunaSchemaPutReq , typeof(RpbYokozunaSchemaPutReq) },
+
+                { MessageCode.DtFetchReq, typeof(DtFetchReq) },
+                { MessageCode.DtFetchResp, typeof(DtFetchResp) },
+                { MessageCode.DtUpdateReq, typeof(DtUpdateReq) },
+                { MessageCode.DtUpdateResp, typeof(DtUpdateResp) },
+
+                { MessageCode.RpbGetBucketTypeReq, typeof(RpbGetBucketTypeReq) },
+                { MessageCode.RpbSetBucketTypeReq, typeof(RpbSetBucketTypeReq) },
+                { MessageCode.RpbAuthReq, typeof(RpbAuthReq) }
+            };
+
+            TypeToMessageCodeMap = new Dictionary<Type, MessageCode>();
+
+            foreach (var item in MessageCodeToTypeMap)
+            {
+                TypeToMessageCodeMap.Add(item.Value, item.Key);
+            }
+        }
+
+        internal static byte GetMessageCodeFor(Type type)
+        {
+            MessageCode messageCode = TypeToMessageCodeMap[type];
+            return (byte)messageCode;
+        }
+
+        internal static Type GetTypeFor(MessageCode messageCode)
+        {
+            return MessageCodeToTypeMap[messageCode];
+        }
+
+        internal static bool Contains(MessageCode messageCode)
+        {
+            return MessageCodeToTypeMap.ContainsKey(messageCode);
+        }
+
+        internal static string GetTypeNameFor(MessageCode messageCode)
+        {
+            return MessageCodeToTypeMap[messageCode].Name;
+        }
     }
 }

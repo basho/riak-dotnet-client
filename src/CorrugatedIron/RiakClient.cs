@@ -83,7 +83,7 @@ namespace CorrugatedIron
         /// Returns false if Riak is unavailable or returns a 'pang' response. </returns>
         public RiakResult Ping()
         {
-            return UseConnection(conn => conn.PbcWriteRead(MessageCode.PingReq, MessageCode.PingResp));
+            return UseConnection(conn => conn.PbcWriteRead(MessageCode.RpbPingReq, MessageCode.RpbPingResp));
         }
 
         /// <summary>
@@ -463,7 +463,7 @@ namespace CorrugatedIron
             };
 
             options.Populate(request);
-            var result = UseConnection(conn => conn.PbcWriteRead(request, MessageCode.DelResp));
+            var result = UseConnection(conn => conn.PbcWriteRead(request, MessageCode.RpbDelResp));
 
             return result;
         }
@@ -492,7 +492,7 @@ namespace CorrugatedIron
                 {
                     var req = new RpbDelReq { bucket = id.Bucket.ToRiakString(), key = id.Key.ToRiakString() };
                     options.Populate(req);
-                    return conn.PbcWriteRead(req, MessageCode.DelResp);
+                    return conn.PbcWriteRead(req, MessageCode.RpbDelResp);
                 }).ToList();
 
             return RiakResult<IEnumerable<RiakResult>>.Success(responses);
@@ -564,7 +564,7 @@ namespace CorrugatedIron
         /// physical I/O and can take a long time.</remarks>
         public RiakResult<IEnumerable<string>> ListBuckets()
         {
-            var result = UseConnection(conn => conn.PbcWriteRead<RpbListBucketsResp>(MessageCode.ListBucketsReq));
+            var result = UseConnection(conn => conn.PbcWriteRead<RpbListBucketsResp>(MessageCode.RpbListBucketsReq));
 
             if (result.IsSuccess)
             {
@@ -783,7 +783,7 @@ namespace CorrugatedIron
                 bucket = bucket.ToRiakString(), 
                 props = properties.ToMessage() 
             };
-            var result = UseConnection(conn => conn.PbcWriteRead(request, MessageCode.SetBucketResp));
+            var result = UseConnection(conn => conn.PbcWriteRead(request, MessageCode.RpbSetBucketResp));
 
             return result;
         }
@@ -817,7 +817,7 @@ namespace CorrugatedIron
                 type = bucketType.ToRiakString(),
                 bucket = bucket.ToRiakString() 
             };
-            var result = UseConnection(conn => conn.PbcWriteRead(request, MessageCode.ResetBucketResp));
+            var result = UseConnection(conn => conn.PbcWriteRead(request, MessageCode.RpbResetBucketResp));
             return result;
         }
 
@@ -906,7 +906,7 @@ namespace CorrugatedIron
         /// run on the same version of Riak.</remarks>
         public RiakResult<RiakServerInfo> GetServerInfo()
         {
-            var result = UseConnection(conn => conn.PbcWriteRead<RpbGetServerInfoResp>(MessageCode.GetServerInfoReq));
+            var result = UseConnection(conn => conn.PbcWriteRead<RpbGetServerInfoResp>(MessageCode.RpbGetServerInfoReq));
 
             if (result.IsSuccess)
             {
@@ -1470,13 +1470,13 @@ namespace CorrugatedIron
         public RiakResult PutSearchIndex(SearchIndex searchindex)
         {
             var request = new RpbYokozunaIndexPutReq { index = searchindex.ToMessage() };
-            return UseConnection(conn => conn.PbcWriteRead(request, MessageCode.PutResp));
+            return UseConnection(conn => conn.PbcWriteRead(request, MessageCode.RpbPutResp));
         }
 
         public RiakResult DeleteSearchIndex(string indexName)
         {
             var request = new RpbYokozunaIndexDeleteReq {name = indexName.ToRiakString()};
-            return UseConnection(conn => conn.PbcWriteRead(request, MessageCode.DelResp));
+            return UseConnection(conn => conn.PbcWriteRead(request, MessageCode.RpbDelResp));
         }
 
         public RiakResult<SearchSchema> GetSearchSchema(string schemaName)
@@ -1494,7 +1494,7 @@ namespace CorrugatedIron
         public RiakResult PutSearchSchema(SearchSchema searchSchema)
         {
             var request = new RpbYokozunaSchemaPutReq { schema = searchSchema.ToMessage() };
-            return UseConnection(conn => conn.PbcWriteRead(request, MessageCode.PutResp));
+            return UseConnection(conn => conn.PbcWriteRead(request, MessageCode.RpbPutResp));
         }
 
         public RiakResult<String> GetServerStatus()
