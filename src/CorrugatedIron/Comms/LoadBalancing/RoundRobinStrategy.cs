@@ -74,13 +74,13 @@ namespace CorrugatedIron.Comms.LoadBalancing
 
         private IEnumerable<IRiakNode> RoundRobin()
         {
-            while(true)
+            while (true)
             {
                 var list = _generator().ToList();
                 if (list.Count > 0)
                 {
                     var nodes = list.GetEnumerator();
-                    while(nodes.MoveNext() && nodes.Current != null)
+                    while (nodes.MoveNext() && nodes.Current != null)
                     {
                         yield return nodes.Current;
                     }

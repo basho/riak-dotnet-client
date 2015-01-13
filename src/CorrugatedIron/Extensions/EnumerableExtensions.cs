@@ -32,7 +32,7 @@ namespace CorrugatedIron.Extensions
 
         public static IEnumerable<T> Replicate<T>(this T obj, int count)
         {
-            while(count-- > 0)
+            while (count-- > 0)
             {
                 yield return obj;
             }
@@ -40,7 +40,7 @@ namespace CorrugatedIron.Extensions
 
         public static IEnumerable<T> Cycle<T>(this IEnumerable<T> items)
         {
-            while(true)
+            while (true)
             {
                 foreach(var item in items)
                 {
@@ -51,7 +51,7 @@ namespace CorrugatedIron.Extensions
 
         public static void Times(this int count, Action action)
         {
-            while(count-- > 0)
+            while (count-- > 0)
             {
                 action();
             }
@@ -59,7 +59,7 @@ namespace CorrugatedIron.Extensions
 
         public static IEnumerable<T> Times<T>(this int count, Func<T> generator)
         {
-            while(count-- > 0)
+            while (count-- > 0)
             {
                 yield return generator();
             }
