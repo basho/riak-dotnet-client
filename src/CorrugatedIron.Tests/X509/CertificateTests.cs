@@ -25,8 +25,6 @@ namespace CorrugatedIron.Tests.X509
     [TestFixture]
     public class CertificateTests
     {
-        private static readonly char[] csv_split = new char[] { ',' };
-
         [TestFixtureSetUp]
         public void ImportTestCertificates()
         {
@@ -39,6 +37,10 @@ namespace CorrugatedIron.Tests.X509
             string testCertsDir = Path.Combine(currentDir, "..", "..", "..", "..", "tools", "test-ca", "certs");
             Assert.True(Directory.Exists(testCertsDir));
 
+            /*
+             * NB: the first time this is run, the user WILL get a popup asking if they should import the root
+             *     cert. There is no way around this if the user is running as a normal user.
+             */
             string rootCaCertFile = Path.Combine(testCertsDir, "cacert.pem");
             Assert.True(File.Exists(rootCaCertFile));
             var rootCaCert = new X509Certificate2(rootCaCertFile);
