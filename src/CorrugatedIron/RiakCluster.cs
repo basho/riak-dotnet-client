@@ -51,7 +51,7 @@ namespace CorrugatedIron
             _defaultRetryCount = clusterConfiguration.DefaultRetryCount;
             RetryWaitTime = clusterConfiguration.DefaultRetryWaitTime;
 
-            Task.Factory.StartNew(NodeMonitor);
+            // TODO: must happen after TLS start Task.Factory.StartNew(NodeMonitor);
         }
 
         /// <summary>

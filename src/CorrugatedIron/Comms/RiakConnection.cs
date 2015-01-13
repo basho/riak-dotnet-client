@@ -171,7 +171,7 @@ namespace CorrugatedIron.Comms
                 {
                     result = RiakResult<TResult>.Success(_socket.Read<TResult>());
                     results.Add(result);
-                } while(repeatRead(result));
+                } while (repeatRead(result));
 
                 return RiakResult<IEnumerable<RiakResult<TResult>>>.Success(results);
             }
@@ -321,7 +321,7 @@ namespace CorrugatedIron.Comms
                 result = PbcRead<TResult>();
                 if (!result.IsSuccess) break;
                 yield return result;
-            } while(repeatRead(result));
+            } while (repeatRead(result));
 
             // clean up first..
             onFinish();

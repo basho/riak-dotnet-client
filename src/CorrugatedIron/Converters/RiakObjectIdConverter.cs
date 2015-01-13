@@ -27,7 +27,7 @@ namespace CorrugatedIron.Converters
             var pos = 0;
             var objectIdParts = new string[2];
 
-            while(reader.Read())
+            while (reader.Read())
             {
                 if (pos < 2 && (reader.TokenType == JsonToken.String || reader.TokenType == JsonToken.PropertyName))
                 {

@@ -33,6 +33,7 @@ namespace CorrugatedIron.Comms
 {
     internal class RiakPbcSocket : IDisposable
     {
+        private static readonly byte[] emptyBytes = new byte[0];
         private static readonly EncryptionPolicy encryptionPolicy = EncryptionPolicy.RequireEncryption;
         // TODO private static readonly bool checkCertificateRevocation = true ;
 
@@ -43,11 +44,8 @@ namespace CorrugatedIron.Comms
         private static readonly Dictionary<MessageCode, Type> MessageCodeToTypeMap;
         private static readonly Dictionary<Type, MessageCode> TypeToMessageCodeMap;
 
-        // TODO socket should either be TcpClient and not exposed past initial connection
-        private Socket socket;
-
         private Stream networkStream = null;
-        // TODO private bool authenticated = false ;
+        private bool isConnected = false;
 
         private Stream PbcStream
         {
@@ -55,11 +53,14 @@ namespace CorrugatedIron.Comms
             {
                 if (networkStream == null)
                 {
-                    socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                    var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                     socket.NoDelay = true;
                     socket.Connect(server, port);
-
-                    if (socket.Connected == false)
+                    if (socket.Connected)
+                    {
+                        isConnected = true;
+                    }
+                    else
                     {
                         throw new RiakException("Unable to connect to remote server: {0}:{1}".Fmt(server, port));
                     }
@@ -94,15 +95,14 @@ namespace CorrugatedIron.Comms
 
                     // TODO - only use this if client cert auth provided via configuration
                     string targetHost = "riak-test"; // TODO
-                    var sslProtocol = SslProtocols.Default;
+                    var sslProtocol = SslProtocols.Tls;
                     sslStream.AuthenticateAsClient(targetHost, clientCertificates, sslProtocol, false);
 
                     networkStream = sslStream;
  
                     // TODO credentials stored elsewhere
                     var userBytes = Encoding.ASCII.GetBytes("riakuser");
-                    var passwordBytes = Encoding.ASCII.GetBytes(String.Empty);
-                    var authRequest = new RpbAuthReq { user = userBytes, password = passwordBytes };
+                    var authRequest = new RpbAuthReq { user = userBytes, password = emptyBytes };
                     Write(authRequest);
                     // TODO: expect_message here
                     Read(MessageCode.AuthResp);
@@ -137,12 +137,195 @@ namespace CorrugatedIron.Comms
         {
             get
             {
-                // TODO: replace with this?
+                // TODO: replace with something else?
                 // http://stackoverflow.com/questions/1387459/how-to-check-if-tcpclient-connection-is-closed
-                return socket != null && socket.Connected;
+                // http://msdn.microsoft.com/en-us/library/system.net.sockets.socket.connected%28v=vs.110%29.aspx
+                // TODO: every Read/Write to the stream should catch exceptions and set this to false
+                return isConnected;
             }
         }
 
+        public RiakPbcSocket(string server, int port, int receiveTimeout, int sendTimeout)
+        {
+            this.server = server;
+            this.port = port;
+            this.receiveTimeout = receiveTimeout;
+            this.sendTimeout = sendTimeout;
+        }
+
+        public void Write(MessageCode messageCode)
+        {
+            const int sizeSize = sizeof(int);
+            const int codeSize = sizeof(byte);
+            const int headerSize = sizeSize + codeSize;
+
+            var messageBody = new byte[headerSize];
+
+            var size = BitConverter.GetBytes(IPAddress.HostToNetworkOrder(1));
+            Array.Copy(size, messageBody, sizeSize);
+            messageBody[sizeSize] = (byte)messageCode;
+
+            PbcStream.Write(messageBody, 0, headerSize);
+        }
+
+        public void Write<T>(T message) where T : class, ProtoBuf.IExtensible
+        {
+            const int sizeSize = sizeof(int);
+            const int codeSize = sizeof(byte);
+            const int headerSize = sizeSize + codeSize;
+            const int sendBufferSize = 1024 * 4;
+            byte[] messageBody;
+            long messageLength = 0;
+
+            using (var memStream = new MemoryStream())
+            {
+                // add a buffer to the start of the array to put the size and message code
+                memStream.Position += headerSize;
+                Serializer.Serialize(memStream, message);
+                messageBody = memStream.GetBuffer();
+                messageLength = memStream.Position;
+            }
+
+            // check to make sure something was written, otherwise we'll have to create a new array
+            if (messageLength == headerSize)
+            {
+                messageBody = new byte[headerSize];
+            }
+
+            var messageCode = TypeToMessageCodeMap[typeof(T)];
+            var size = BitConverter.GetBytes(IPAddress.HostToNetworkOrder((int)messageLength - headerSize + 1));
+            Array.Copy(size, messageBody, sizeSize);
+            messageBody[sizeSize] = (byte)messageCode;
+
+            int bytesToSend = (int)Math.Min(messageLength, sendBufferSize);
+            if (PbcStream.CanWrite)
+            {
+                PbcStream.Write(messageBody, 0, bytesToSend);
+            }
+            else
+            {
+                throw new RiakException("Failed to send data to server - Can't write: {0}:{1}".Fmt(server, port));
+            }
+        }
+
+        public MessageCode Read(MessageCode expectedCode)
+        {
+            var header = ReceiveAll(new byte[5]);
+            var size = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(header, 0));
+            var messageCode = (MessageCode)header[sizeof(int)];
+
+            if (messageCode == MessageCode.ErrorResp)
+            {
+                var error = DeserializeInstance<RpbErrorResp>(size);
+                throw new RiakException(error.errcode, error.errmsg.FromRiakString(), false);
+            }
+
+            if (expectedCode != messageCode)
+            {
+                throw new RiakException("Expected return code {0} received {1}".Fmt(expectedCode, messageCode));
+            }
+
+            return messageCode;
+        }
+
+        public T Read<T>() where T : new()
+        {
+            var header = ReceiveAll(new byte[5]);
+
+            var size = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(header, 0));
+
+            var messageCode = (MessageCode)header[sizeof(int)];
+            if (messageCode == MessageCode.ErrorResp)
+            {
+                var error = DeserializeInstance<RpbErrorResp>(size);
+                throw new RiakException(error.errcode, error.errmsg.FromRiakString());
+            }
+
+            if (!MessageCodeToTypeMap.ContainsKey(messageCode))
+            {
+                throw new RiakInvalidDataException((byte)messageCode);
+            }
+
+            // TODO: removed #if DEBUG because this seems like a good check
+            // This message code validation is here to make sure that the caller
+            // is getting exactly what they expect. This "could" be removed from
+            // production code, but it's a good thing to have in here for dev.
+            var t_type = typeof(T);
+            if (MessageCodeToTypeMap[messageCode] != t_type)
+            {
+                throw new InvalidOperationException(
+                    String.Format("Attempt to decode message to type '{0}' when received type '{1}'.",
+                    t_type.Name, MessageCodeToTypeMap[messageCode].Name));
+            }
+
+            return DeserializeInstance<T>(size);
+        }
+
+        private T DeserializeInstance<T>(int size) where T : new()
+        {
+            if (size <= 1)
+            {
+                return new T();
+            }
+
+            var resultBuffer = ReceiveAll(new byte[size - 1]);
+
+            using(var memStream = new MemoryStream(resultBuffer))
+            {
+                return Serializer.Deserialize<T>(memStream);
+            }
+        }
+
+        private byte[] ReceiveAll(byte[] resultBuffer)
+        {
+            int totalBytesReceived = 0;
+            int lengthToReceive = resultBuffer.Length;
+            if (PbcStream.CanRead)
+            {
+                while (lengthToReceive > 0)
+                {
+                    int bytesReceived = PbcStream.Read(resultBuffer, totalBytesReceived, lengthToReceive);
+                    if (bytesReceived == 0)
+                    {
+                        // TODO: Based on the docs, this isn't necessarily an exception
+                        // http://msdn.microsoft.com/en-us/library/system.net.sockets.networkstream.read(v=vs.110).aspx
+                        break;
+                    }
+                    totalBytesReceived += bytesReceived;
+                    lengthToReceive -= bytesReceived;
+                }
+                return resultBuffer;
+            }
+            else
+            {
+                throw new RiakException("Unable to read data from the source stream - Can't read.");
+            }
+        }
+
+        public void Disconnect()
+        {
+            if (networkStream != null)
+            {
+                networkStream.Close();
+                networkStream.Dispose();
+            }
+            /*
+             * TODO: since networkStream owns socket, this is most likely not necessary
+            if (socket != null)
+            {
+                socket.Disconnect(false);
+                socket.Dispose();
+                socket = null;
+            }
+             */
+        }
+
+        public void Dispose()
+        {
+            Disconnect();
+        }
+
+        // TODO this should go somewhere else
         static RiakPbcSocket()
         {
             MessageCodeToTypeMap = new Dictionary<MessageCode, Type>
@@ -201,193 +384,6 @@ namespace CorrugatedIron.Comms
             {
                 TypeToMessageCodeMap.Add(item.Value, item.Key);
             }
-        }
-
-        public RiakPbcSocket(string server, int port, int receiveTimeout, int sendTimeout)
-        {
-            this.server = server;
-            this.port = port;
-            this.receiveTimeout = receiveTimeout;
-            this.sendTimeout = sendTimeout;
-        }
-
-        public void Write(MessageCode messageCode)
-        {
-            const int sizeSize = sizeof(int);
-            const int codeSize = sizeof(byte);
-            const int headerSize = sizeSize + codeSize;
-
-            var messageBody = new byte[headerSize];
-
-            var size = BitConverter.GetBytes(IPAddress.HostToNetworkOrder(1));
-            Array.Copy(size, messageBody, sizeSize);
-            messageBody[sizeSize] = (byte)messageCode;
-
-            PbcStream.Write(messageBody, 0, headerSize);
-
-            /*
-            if (PbcStream.Send(messageBody, headerSize, SocketFlags.None) == 0)
-            {
-                throw new RiakException("Failed to send data to server - Timed Out: {0}:{1}".Fmt(server, port));
-            }
-             */
-        }
-
-        public void Write<T>(T message) where T : class, ProtoBuf.IExtensible
-        {
-            const int sizeSize = sizeof(int);
-            const int codeSize = sizeof(byte);
-            const int headerSize = sizeSize + codeSize;
-            const int sendBufferSize = 1024 * 4;
-            byte[] messageBody;
-            long messageLength = 0;
-
-            using (var memStream = new MemoryStream())
-            {
-                // add a buffer to the start of the array to put the size and message code
-                memStream.Position += headerSize;
-                Serializer.Serialize(memStream, message);
-                messageBody = memStream.GetBuffer();
-                messageLength = memStream.Position;
-            }
-
-            // check to make sure something was written, otherwise we'll have to create a new array
-            if (messageLength == headerSize)
-            {
-                messageBody = new byte[headerSize];
-            }
-
-            var messageCode = TypeToMessageCodeMap[typeof(T)];
-            var size = BitConverter.GetBytes(IPAddress.HostToNetworkOrder((int)messageLength - headerSize + 1));
-            Array.Copy(size, messageBody, sizeSize);
-            messageBody[sizeSize] = (byte)messageCode;
-
-            int bytesToSend = (int)Math.Min(messageLength, sendBufferSize);
-
-            PbcStream.Write(messageBody, 0, bytesToSend);
-
-            /*
-            while (bytesToSend > 0)
-            {
-                // var sent = socket.Send(messageBody, 0, bytesToSend, SocketFlags.None);
-                if (sent == 0)
-                {
-                    throw new RiakException("Failed to send data to server - Timed Out: {0}:{1}".Fmt(server, port));
-                }
-                position += sent;
-                bytesToSend -= sent;
-            }
-             */
-        }
-
-        public MessageCode Read(MessageCode expectedCode)
-        {
-            var header = ReceiveAll(new byte[5]);
-            var size = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(header, 0));
-            var messageCode = (MessageCode)header[sizeof(int)];
-
-            if (messageCode == MessageCode.ErrorResp)
-            {
-                var error = DeserializeInstance<RpbErrorResp>(size);
-                throw new RiakException(error.errcode, error.errmsg.FromRiakString(), false);
-            }
-
-            if (expectedCode != messageCode)
-            {
-                throw new RiakException("Expected return code {0} received {1}".Fmt(expectedCode, messageCode));
-            }
-
-            return messageCode;
-        }
-
-        public T Read<T>() where T : new()
-        {
-            var header = ReceiveAll(new byte[5]);
-
-            var size = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(header, 0));
-
-            var messageCode = (MessageCode)header[sizeof(int)];
-            if (messageCode == MessageCode.ErrorResp)
-            {
-                var error = DeserializeInstance<RpbErrorResp>(size);
-                throw new RiakException(error.errcode, error.errmsg.FromRiakString());
-            }
-
-            if (!MessageCodeToTypeMap.ContainsKey(messageCode))
-            {
-                throw new RiakInvalidDataException((byte)messageCode);
-            }
-#if DEBUG
-            // This message code validation is here to make sure that the caller
-            // is getting exactly what they expect. This "could" be removed from
-            // production code, but it's a good thing to have in here for dev.
-            if (MessageCodeToTypeMap[messageCode] != typeof(T))
-            {
-                throw new InvalidOperationException(string.Format("Attempt to decode message to type '{0}' when received type '{1}'.", typeof(T).Name, MessageCodeToTypeMap[messageCode].Name));
-            }
-#endif
-            return DeserializeInstance<T>(size);
-        }
-
-        private byte[] ReceiveAll(byte[] resultBuffer)
-        {
-            PbcStream.Read(resultBuffer, 0, resultBuffer.Length);
-            return resultBuffer;
-
-            /* TODO - SSL
-            int totalBytesReceived = 0;
-            int lengthToReceive = resultBuffer.Length;
-            while(lengthToReceive > 0)
-            {
-                int bytesReceived = PbcStream.Receive(resultBuffer, totalBytesReceived, lengthToReceive, 0);
-                if (bytesReceived == 0)
-                {
-                    throw new RiakException("Unable to read data from the source stream - Timed Out.");
-                }
-                totalBytesReceived += bytesReceived;
-                lengthToReceive -= bytesReceived;
-            }
-            return resultBuffer;
-             */
-        }
-
-        private T DeserializeInstance<T>(int size)
-            where T : new()
-        {
-            if (size <= 1)
-            {
-                return new T();
-            }
-
-            var resultBuffer = ReceiveAll(new byte[size - 1]);
-
-            using(var memStream = new MemoryStream(resultBuffer))
-            {
-                return Serializer.Deserialize<T>(memStream);
-            }
-        }
-
-        public void Disconnect()
-        {
-            if (networkStream != null)
-            {
-                networkStream.Close();
-                networkStream.Dispose();
-            }
-            /*
-             * TODO: since networkStream owns socket, this is most likely not necessary
-            if (socket != null)
-            {
-                socket.Disconnect(false);
-                socket.Dispose();
-                socket = null;
-            }
-             */
-        }
-
-        public void Dispose()
-        {
-            Disconnect();
         }
     }
 }
