@@ -69,12 +69,11 @@
     <Compile Include="Comms\LoadBalancing\RoundRobinStrategy.cs" />
     <Compile Include="Comms\RiakOnTheFlyConnection.cs" />
     <Compile Include="Comms\RiakPbcSocket.cs" />
-    <Compile Include="Config\Fluent\RiakClusterConfiguration.cs" />
-    <Compile Include="Config\Fluent\RiakExternalLoadBalancerConfiguration.cs" />
-    <Compile Include="Config\Fluent\RiakNodeConfiguration.cs" />
+    <Compile Include="Config\IRiakAuthenticationConfiguration.cs" />
     <Compile Include="Config\IRiakClusterConfiguration.cs" />
     <Compile Include="Config\IRiakExternalLoadBalancerConfiguration.cs" />
     <Compile Include="Config\IRiakNodeConfiguration.cs" />
+    <Compile Include="Config\RiakAuthenticationConfiguration.cs" />
     <Compile Include="Config\RiakExternalLoadBalancerConfiguration.cs" />
     <Compile Include="Containers\ConcurrentEnumerable.cs" />
     <Compile Include="Containers\ConcurrentEnumerator.cs" />

@@ -14,10 +14,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Containers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using CorrugatedIron.Containers;
 
 namespace CorrugatedIron.Comms.LoadBalancing
 {
@@ -48,7 +48,7 @@ namespace CorrugatedIron.Comms.LoadBalancing
 
         public void RemoveNode(IRiakNode node)
         {
-            lock(_nodesLock)
+            lock (_nodesLock)
             {
                 if (_nodes.Contains(node))
                 {
@@ -61,7 +61,7 @@ namespace CorrugatedIron.Comms.LoadBalancing
 
         public void AddNode(IRiakNode node)
         {
-            lock(_nodesLock)
+            lock (_nodesLock)
             {
                 if (!_nodes.Contains(node))
                 {

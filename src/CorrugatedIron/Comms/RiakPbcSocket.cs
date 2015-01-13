@@ -14,23 +14,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Net.Security;
+using System.Net.Sockets;
+using System.Security.Authentication;
+using System.Security.Cryptography.X509Certificates;
+using System.Text;
+using CorrugatedIron.Exceptions;
+using CorrugatedIron.Extensions;
+using CorrugatedIron.Messages;
+using ProtoBuf;
+
 namespace CorrugatedIron.Comms
 {
-    using System;
-    using System.Diagnostics;
-    using System.IO;
-    using System.Linq;
-    using System.Net;
-    using System.Net.Security;
-    using System.Net.Sockets;
-    using System.Security.Authentication;
-    using System.Security.Cryptography.X509Certificates;
-    using System.Text;
-    using CorrugatedIron.Exceptions;
-    using CorrugatedIron.Extensions;
-    using CorrugatedIron.Messages;
-    using ProtoBuf;
-
     internal class RiakPbcSocket : IDisposable
     {
         private static readonly byte[] emptyBytes = new byte[0];

@@ -15,11 +15,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
+using System.Collections.Generic;
+
 namespace CorrugatedIron.Messages
 {
-    using System;
-    using System.Collections.Generic;
-
     public enum MessageCode : byte
     {
         RpbErrorResp = 0,

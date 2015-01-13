@@ -14,15 +14,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using CorrugatedIron.Messages;
+using NUnit.Framework;
+
 namespace CorrugatedIron.Tests.Messages
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using CorrugatedIron.Messages;
-    using NUnit.Framework;
-
     [TestFixture]
     public class MessageCodeTests
     {
