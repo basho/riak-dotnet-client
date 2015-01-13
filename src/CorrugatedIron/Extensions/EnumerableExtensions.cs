@@ -1,4 +1,5 @@
 ﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -14,17 +15,28 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 namespace CorrugatedIron.Extensions
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Linq;
+
     public static class EnumerableExtensions
     {
+        public static bool IsNullOrEmpty(this IEnumerable items)
+        {
+            return ((items == null) || (false == items.GetEnumerator().MoveNext()));
+        }
+
+        public static bool IsNullOrEmpty<T>(this IEnumerable<T> items)
+        {
+            return ((items == null) || (false == items.GetEnumerator().MoveNext()));
+        }
+
         public static void ForEach<T>(this IEnumerable<T> items, Action<T> action)
         {
-            foreach(var item in items)
+            foreach (var item in items)
             {
                 action(item);
             }
@@ -42,7 +54,7 @@ namespace CorrugatedIron.Extensions
         {
             while (true)
             {
-                foreach(var item in items)
+                foreach (var item in items)
                 {
                     yield return item;
                 }
