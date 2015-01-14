@@ -79,7 +79,8 @@ namespace CorrugatedIron
             return new RiakCluster(RiakClusterConfiguration.LoadFromConfig(configSectionName, configFileName), new RiakConnectionFactory());
         }
 
-        protected override TRiakResult UseConnection<TRiakResult>(Func<IRiakConnection, TRiakResult> useFun, Func<ResultCode, string, bool, TRiakResult> onError, int retryAttempts)
+        protected override TRiakResult UseConnection<TRiakResult>(Func<IRiakConnection, TRiakResult> useFun,
+            Func<ResultCode, string, bool, TRiakResult> onError, int retryAttempts)
         {
             if (retryAttempts < 0)
                 return onError(ResultCode.NoRetries, "Unable to access a connection on the cluster.", false);
@@ -87,7 +88,6 @@ namespace CorrugatedIron
                 return onError(ResultCode.ShuttingDown, "System currently shutting down", true);
 
             var node = _loadBalancer.SelectNode();
-
             if (node != null)
             {
                 var result = node.UseConnection(useFun);

@@ -120,7 +120,8 @@ namespace CorrugatedIron.Comms
             }
             else
             {
-                throw new RiakException("Failed to send data to server - Can't write: {0}:{1}".Fmt(server, port));
+                string errorMessage = "Failed to send data to server - Can't write: {0}:{1}".Fmt(server, port);
+                throw new RiakException(errorMessage, true);
             }
         }
 
@@ -133,14 +134,15 @@ namespace CorrugatedIron.Comms
             if (messageCode == MessageCode.RpbErrorResp)
             {
                 var error = DeserializeInstance<RpbErrorResp>(size);
-                // NB: the caller Disconnects
-                throw new RiakException(error.errcode, error.errmsg.FromRiakString(), false);
+                string errorMessage = error.errmsg.FromRiakString();
+                throw new RiakException(error.errcode, errorMessage, false);
             }
 
             if (expectedCode != messageCode)
             {
-                // NB: the caller Disconnects
-                throw new RiakException("Expected return code {0} received {1}".Fmt(expectedCode, messageCode));
+                string errorMessage = "Expected return code {0} received {1}".Fmt(expectedCode, messageCode);
+                // TODO should this really mark the node offline?
+                throw new RiakException(errorMessage, true);
             }
 
             return messageCode;
@@ -156,7 +158,8 @@ namespace CorrugatedIron.Comms
             if (messageCode == MessageCode.RpbErrorResp)
             {
                 var error = DeserializeInstance<RpbErrorResp>(size);
-                throw new RiakException(error.errcode, error.errmsg.FromRiakString());
+                string errorMessage = error.errmsg.FromRiakString();
+                throw new RiakException(error.errcode, errorMessage, false);
             }
 
             if (false == MessageCodeTypeMapBuilder.Contains(messageCode))
@@ -220,7 +223,8 @@ namespace CorrugatedIron.Comms
             }
             else
             {
-                throw new RiakException("Unable to connect to remote server: {0}:{1}".Fmt(server, port));
+                string errorMessage = "Unable to connect to remote server: {0}:{1}".Fmt(server, port);
+                throw new RiakException(errorMessage, true);
             }
             socket.ReceiveTimeout = receiveTimeout;
             socket.SendTimeout = sendTimeout;
@@ -302,7 +306,8 @@ namespace CorrugatedIron.Comms
             }
             else
             {
-                throw new RiakException("Unable to read data from the source stream - Can't read.");
+                string errorMessage = "Unable to read data from the source stream - Can't read.";
+                throw new RiakException(errorMessage, true);
             }
         }
     }
