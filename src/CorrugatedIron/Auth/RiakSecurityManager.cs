@@ -15,23 +15,27 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
 using CorrugatedIron.Config;
+using CorrugatedIron.Extensions;
 
-namespace CorrugatedIron.Comms
+namespace CorrugatedIron.Auth
 {
-    public interface IRiakConnectionFactory
+    public class RiakSecurityManager
     {
-        IRiakConnection CreateConnection(IRiakNodeConfiguration nodeConfig, IRiakAuthenticationConfiguration authConfig);
-    }
+        private readonly IRiakAuthenticationConfiguration authConfig;
 
-    public class RiakConnectionFactory : IRiakConnectionFactory
-    {
-        public IRiakConnection CreateConnection(IRiakNodeConfiguration nodeConfig, IRiakAuthenticationConfiguration authConfig)
+        public RiakSecurityManager(IRiakAuthenticationConfiguration authConfig)
         {
-            // As pointless as this seems, it serves the purpose of decoupling the
-            // creation of the connections to the node itself. Also means we can
-            // pull it apart to test it
-            return new RiakConnection(nodeConfig, authConfig);
+            this.authConfig = authConfig;
+        }
+
+        public bool IsSecurityEnabled
+        {
+            get
+            {
+                return (authConfig != null && (false == authConfig.Username.IsNullOrEmpty()));
+            }
         }
     }
 }

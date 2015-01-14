@@ -1,4 +1,5 @@
 ﻿// Copyright (c) 2013 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -14,10 +15,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Config;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using CorrugatedIron.Config;
 
 namespace CorrugatedIron.Comms
 {
@@ -27,15 +28,17 @@ namespace CorrugatedIron.Comms
         private readonly ConcurrentStack<IRiakConnection> _resources;
         private bool _disposing;
 
-        public RiakConnectionPool(IRiakNodeConfiguration nodeConfig, IRiakConnectionFactory connFactory)
+        public RiakConnectionPool(IRiakNodeConfiguration nodeConfig,
+            IRiakAuthenticationConfiguration authConfig,
+            IRiakConnectionFactory connFactory)
         {
             var poolSize = nodeConfig.PoolSize;
             _allResources = new List<IRiakConnection>();
             _resources = new ConcurrentStack<IRiakConnection>();
 
-            for(var i = 0; i < poolSize; ++i)
+            for (var i = 0; i < poolSize; ++i)
             {
-                var conn = connFactory.CreateConnection(nodeConfig);
+                var conn = connFactory.CreateConnection(nodeConfig, authConfig);
                 _allResources.Add(conn);
                 _resources.Push(conn);
             }
@@ -43,7 +46,8 @@ namespace CorrugatedIron.Comms
 
         public Tuple<bool, TResult> Consume<TResult>(Func<IRiakConnection, TResult> consumer)
         {
-            if (_disposing) return Tuple.Create(false, default(TResult));
+            if (_disposing)
+                return Tuple.Create(false, default(TResult));
 
             IRiakConnection instance = null;
             try
@@ -54,7 +58,7 @@ namespace CorrugatedIron.Comms
                     return Tuple.Create(true, result);
                 }
             }
-            catch(Exception)
+            catch (Exception)
             {
                 return Tuple.Create(false, default(TResult));
             }
@@ -71,7 +75,8 @@ namespace CorrugatedIron.Comms
 
         public Tuple<bool, TResult> DelayedConsume<TResult>(Func<IRiakConnection, Action, TResult> consumer)
         {
-            if (_disposing) return Tuple.Create(false, default(TResult));
+            if (_disposing)
+                return Tuple.Create(false, default(TResult));
 
             IRiakConnection instance = null;
             try
@@ -89,7 +94,7 @@ namespace CorrugatedIron.Comms
                     return Tuple.Create(true, result);
                 }
             }
-            catch(Exception)
+            catch (Exception)
             {
                 if (instance != null)
                 {
@@ -103,11 +108,12 @@ namespace CorrugatedIron.Comms
 
         public void Dispose()
         {
-            if (_disposing) return;
+            if (_disposing)
+                return;
 
             _disposing = true;
 
-            foreach(var conn in _allResources)
+            foreach (var conn in _allResources)
             {
                 conn.Dispose();
             }
