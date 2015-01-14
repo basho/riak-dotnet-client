@@ -29,6 +29,8 @@ namespace CorrugatedIron.Auth
 {
     internal class RiakSecurityManager
     {
+        private static readonly StoreLocation[] storeLocations =
+            new StoreLocation[] { StoreLocation.CurrentUser, StoreLocation.LocalMachine };
         private static readonly byte[] emptyBytes = new byte[0];
         private readonly IRiakAuthenticationConfiguration authConfig;
         private readonly X509CertificateCollection clientCertificates;
@@ -130,7 +132,26 @@ namespace CorrugatedIron.Auth
 
             if (false == authConfig.ClientCertificateSubject.IsNullOrEmpty())
             {
-                // TODO: load from LocalComputer and User's "My" store based on given subject
+                foreach (var storeLocation in storeLocations)
+                {
+                    X509Store x509Store = null;
+                    try
+                    {
+                        x509Store = new X509Store(StoreName.My, storeLocation);
+                        x509Store.Open(OpenFlags.OpenExistingOnly | OpenFlags.ReadOnly);
+                        foreach (var cert in x509Store.Certificates)
+                        {
+                            if (cert.Subject == authConfig.ClientCertificateSubject)
+                            {
+                                clientCertificates.Add(cert);
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        x509Store.Close();
+                    }
+                }
             }
 
             return clientCertificates;
