@@ -16,15 +16,11 @@
 // under the License.
 
 using System;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Authentication;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using CorrugatedIron.Auth;
 using CorrugatedIron.Config;
 using CorrugatedIron.Exceptions;
@@ -36,7 +32,6 @@ namespace CorrugatedIron.Comms
 {
     internal class RiakPbcSocket : IDisposable
     {
-        private static readonly byte[] emptyBytes = new byte[0];
         // TODO private static readonly bool checkCertificateRevocation = true ;
 
         private readonly string server;
@@ -49,7 +44,6 @@ namespace CorrugatedIron.Comms
         private bool isConnected = false;
 
         public RiakPbcSocket(IRiakNodeConfiguration nodeConfig, IRiakAuthenticationConfiguration authConfig)
-        // public RiakPbcSocket(string server, int port, int receiveTimeout, int sendTimeout)
         {
             this.server = nodeConfig.HostAddress;
             this.port = nodeConfig.PbcPort;
@@ -70,6 +64,11 @@ namespace CorrugatedIron.Comms
             }
         }
 
+        /*
+         * TODO: future
+         * Read/Write in this class should *only* deal with byte[]
+         * Serialization/Deserialization should be other class
+         */
         public void Write(MessageCode messageCode)
         {
             const int sizeSize = sizeof(int);
@@ -82,7 +81,7 @@ namespace CorrugatedIron.Comms
             Array.Copy(size, messageBody, sizeSize);
             messageBody[sizeSize] = (byte)messageCode;
 
-            PbcStream.Write(messageBody, 0, headerSize);
+            NetworkStream.Write(messageBody, 0, headerSize);
         }
 
         public void Write<T>(T message) where T : class, ProtoBuf.IExtensible
@@ -115,9 +114,9 @@ namespace CorrugatedIron.Comms
             messageBody[sizeSize] = (byte)messageCode;
 
             int bytesToSend = (int)Math.Min(messageLength, sendBufferSize);
-            if (PbcStream.CanWrite)
+            if (NetworkStream.CanWrite)
             {
-                PbcStream.Write(messageBody, 0, bytesToSend);
+                NetworkStream.Write(messageBody, 0, bytesToSend);
             }
             else
             {
@@ -134,11 +133,13 @@ namespace CorrugatedIron.Comms
             if (messageCode == MessageCode.RpbErrorResp)
             {
                 var error = DeserializeInstance<RpbErrorResp>(size);
+                // NB: the caller Disconnects
                 throw new RiakException(error.errcode, error.errmsg.FromRiakString(), false);
             }
 
             if (expectedCode != messageCode)
             {
+                // NB: the caller Disconnects
                 throw new RiakException("Expected return code {0} received {1}".Fmt(expectedCode, messageCode));
             }
 
@@ -180,152 +181,88 @@ namespace CorrugatedIron.Comms
             return DeserializeInstance<T>(size);
         }
 
-        public void Disconnect()
-        {
-            if (networkStream != null)
-            {
-                networkStream.Close();
-                networkStream.Dispose();
-            }
-            /*
-             * TODO: since networkStream owns socket, this is most likely not necessary
-            if (socket != null)
-            {
-                socket.Disconnect(false);
-                socket.Dispose();
-                socket = null;
-            }
-             */
-        }
-
         public void Dispose()
         {
             Disconnect();
         }
 
-        private Stream PbcStream
+        public void Disconnect()
+        {
+            isConnected = false;
+            // NB: since networkStream owns the underlying socket there is no need to close socket as well
+            if (networkStream != null)
+            {
+                networkStream.Close();
+                networkStream.Dispose();
+            }
+        }
+
+        private Stream NetworkStream
         {
             get
             {
                 if (networkStream == null)
                 {
-                    var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                    socket.NoDelay = true;
-                    socket.Connect(server, port);
-                    if (socket.Connected)
-                    {
-                        isConnected = true;
-                    }
-                    else
-                    {
-                        throw new RiakException("Unable to connect to remote server: {0}:{1}".Fmt(server, port));
-                    }
-                    socket.ReceiveTimeout = receiveTimeout;
-                    socket.SendTimeout = sendTimeout;
-                    networkStream = new NetworkStream(socket, true);
-
-                    if (securityManager.IsSecurityEnabled)
-                    {
-                        Write(MessageCode.RpbStartTls);
-                        // TODO: error if the following is not read i.e. "expect_message"
-                        Read(MessageCode.RpbStartTls);
-
-                        // TODO: validate_sessions
-                        // validates hostname, and CRL
-
-                        // TODO select client certs
-                        // TODO private key file vs pfx?
-                        // http://stackoverflow.com/questions/18462064/associate-a-private-key-with-the-x509certificate2-class-in-net
-                        var cert = new X509Certificate2(@"C:\Users\lbakken\Projects\basho\CorrugatedIron\tools\test-ca\certs\riakuser-client-cert.pfx");
-                        var clientCertificates = new X509CertificateCollection();
-                        clientCertificates.Add(cert);
-
-                        //create the SSL stream starting from the NetworkStream associated
-                        //with the TcpClient instance
-                        var serverCertificateValidationCallback = new RemoteCertificateValidationCallback(ServerValidationCallback);
-                        var clientCertificateSelectionCallback = new LocalCertificateSelectionCallback(ClientCertificateSelectionCallback);
-
-                        // http://stackoverflow.com/questions/9934975/does-sslstream-dispose-disposes-its-inner-stream
-                        var sslStream = new SslStream(networkStream, false,
-                            serverCertificateValidationCallback,
-                            clientCertificateSelectionCallback);
-
-                        string targetHost = "riak-test"; // TODO
-                        if (clientCertificates.Count > 0)
-                        {
-                            var sslProtocol = SslProtocols.Tls;
-                            sslStream.AuthenticateAsClient(targetHost, clientCertificates, sslProtocol, false);
-                        }
-                        else
-                        {
-                            sslStream.AuthenticateAsClient(targetHost);
-                        }
-
-                        networkStream = sslStream;
-
-                        // TODO credentials stored elsewhere
-                        var userBytes = Encoding.ASCII.GetBytes("riakuser");
-                        var passBytes = emptyBytes;
-                        /*
-                        var userBytes = Encoding.ASCII.GetBytes("riakpass");
-                        var passBytes = Encoding.ASCII.GetBytes("Test1234");
-                        */
-                        var authRequest = new RpbAuthReq
-                        {
-                            user = userBytes,
-                            password = passBytes
-                        };
-                        Write(authRequest);
-                        // TODO: expect_message here
-                        Read(MessageCode.RpbAuthResp);
-                    }
+                    SetUpNetworkStream();
                 }
-
                 return networkStream;
             }
         }
 
-        private X509Certificate ClientCertificateSelectionCallback(object sender, string targetHost,
-            X509CertificateCollection localCertificates, X509Certificate remoteCertificate, string[] acceptableIssuers)
+        private void SetUpNetworkStream()
         {
-            X509Certificate clientCertToPresent = null;
-
-            /*
-             * NB:
-             * 1st time in here, targetHost == "riak-test" and acceptableIssuers is empty
-             * 2nd time in here, targetHost == "riak-test" and acceptableIssues is one element in array:
-             *     OU=Development, O=Basho Technologies, L=Bellevue, S=WA, C=US
-             */
-            if (false == localCertificates.IsNullOrEmpty())
+            var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            socket.NoDelay = true;
+            socket.Connect(server, port);
+            if (socket.Connected)
             {
-                if (false == acceptableIssuers.IsNullOrEmpty())
-                {
-                    foreach (X509Certificate cert in localCertificates)
-                    {
-                        if (acceptableIssuers.Any(issuer => cert.Issuer.Contains(issuer)))
-                        {
-                            clientCertToPresent = cert;
-                            break;
-                        }
-                    }
-                }
-
-                if (clientCertToPresent == null)
-                {
-                    // Hope that this cert is the right one
-                    clientCertToPresent = localCertificates[0];
-                }
+                isConnected = true;
             }
-
-            return clientCertToPresent;
+            else
+            {
+                throw new RiakException("Unable to connect to remote server: {0}:{1}".Fmt(server, port));
+            }
+            socket.ReceiveTimeout = receiveTimeout;
+            socket.SendTimeout = sendTimeout;
+            this.networkStream = new NetworkStream(socket, true);
+            SetUpSslStream(this.networkStream);
         }
 
-        private bool ServerValidationCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+        private void SetUpSslStream(Stream networkStream)
         {
-            // TODO
-            bool rv = sslPolicyErrors == SslPolicyErrors.None;
-            Debug.WriteLine("SslPolicyErrors: {0}", sslPolicyErrors);
-            return rv;
+            if (securityManager.IsSecurityEnabled)
+            {
+                Write(MessageCode.RpbStartTls);
+                // NB: the following will throw an exception if the returned code is not the expected code
+                // TODO: should throw a RiakSslException
+                Read(MessageCode.RpbStartTls);
+
+                // TODO: validate_sessions
+                // validates hostname, and CRL
+
+                // http://stackoverflow.com/questions/9934975/does-sslstream-dispose-disposes-its-inner-stream
+                var sslStream = new SslStream(networkStream, false,
+                    securityManager.ServerCertificateValidationCallback,
+                    securityManager.ClientCertificateSelectionCallback);
+
+                if (securityManager.ClientCertificatesConfigured)
+                {
+                    var sslProtocol = SslProtocols.Tls;
+                    sslStream.AuthenticateAsClient(server,
+                        securityManager.ClientCertificates, sslProtocol, false);
+                }
+                else
+                {
+                    sslStream.AuthenticateAsClient(server);
+                }
+
+                // NB: very important! Must make the Stream being using going forward the SSL Stream!
+                this.networkStream = sslStream;
+
+                RpbAuthReq authRequest = securityManager.GetAuthRequest();
+                Write(authRequest);
+                Read(MessageCode.RpbAuthResp);
+            }
         }
 
         private T DeserializeInstance<T>(int size) where T : new()
@@ -347,11 +284,11 @@ namespace CorrugatedIron.Comms
         {
             int totalBytesReceived = 0;
             int lengthToReceive = resultBuffer.Length;
-            if (PbcStream.CanRead)
+            if (NetworkStream.CanRead)
             {
                 while (lengthToReceive > 0)
                 {
-                    int bytesReceived = PbcStream.Read(resultBuffer, totalBytesReceived, lengthToReceive);
+                    int bytesReceived = NetworkStream.Read(resultBuffer, totalBytesReceived, lengthToReceive);
                     if (bytesReceived == 0)
                     {
                         // TODO: Based on the docs, this isn't necessarily an exception
@@ -367,11 +304,6 @@ namespace CorrugatedIron.Comms
             {
                 throw new RiakException("Unable to read data from the source stream - Can't read.");
             }
-        }
-
-        // TODO this should go somewhere else
-        static RiakPbcSocket()
-        {
         }
     }
 }

@@ -27,17 +27,20 @@ namespace CorrugatedIron.Tests.Auth
     [TestFixture]
     public class RiakSecurityManagerTests
     {
-        private IRiakClusterConfiguration clusterConfig;
-        private IRiakClusterConfiguration noAuthClusterConfig;
+        private readonly IRiakClusterConfiguration clusterConfig;
+        private readonly IRiakClusterConfiguration noAuthClusterConfig;
 
-        [TestFixtureSetUp]
-        public void RiakSecurityManagerTestFixtureSetUp()
+        public RiakSecurityManagerTests()
         {
             clusterConfig = RiakClusterConfiguration.LoadFromConfig("riakConfiguration");
             Assert.IsNotNull(clusterConfig, "riakConfiguration is not present?");
+            Assert.IsNotNull(clusterConfig.Authentication, "Authentication should NOT be null");
+
             noAuthClusterConfig = RiakClusterConfiguration.LoadFromConfig("riakNoAuthConfiguration");
             Assert.IsNotNull(noAuthClusterConfig, "riakNoAuthConfiguration is not present?");
+            Assert.IsNotNull(noAuthClusterConfig.Authentication, "Authentication should NOT be null");
         }
+
 
         [Test]
         public void WhenSecurityNotConfiguredInAppConfig_SecurityManagerIndicatesIt()
@@ -51,9 +54,19 @@ namespace CorrugatedIron.Tests.Auth
         public void WhenSecurityConfiguredInAppConfig_SecurityManagerIndicatesIt()
         {
             var authConfig = clusterConfig.Authentication;
-            Assert.IsNotNull(authConfig);
             var securityManager = new RiakSecurityManager(authConfig);
             Assert.IsTrue(securityManager.IsSecurityEnabled);
+        }
+
+        [Test]
+        public void WhenClientCertificateFileIsConfigured_ItIsPartOfCertificatesCollection()
+        {
+            var authConfig = clusterConfig.Authentication;
+            var securityManager = new RiakSecurityManager(authConfig);
+            Assert.True(securityManager.ClientCertificatesConfigured);
+
+            var certFromFile = new X509Certificate2(authConfig.ClientCertificateFile);
+            Assert.Contains(certFromFile, securityManager.ClientCertificates);
         }
     }
 }
