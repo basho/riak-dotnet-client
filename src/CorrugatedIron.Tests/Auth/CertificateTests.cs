@@ -21,7 +21,7 @@ using CorrugatedIron.Config;
 using CorrugatedIron.Util;
 using NUnit.Framework;
 
-namespace CorrugatedIron.Tests.X509
+namespace CorrugatedIron.Tests.Auth
 {
     [TestFixture]
     public class CertificateTests

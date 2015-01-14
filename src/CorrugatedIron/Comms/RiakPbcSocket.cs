@@ -224,58 +224,61 @@ namespace CorrugatedIron.Comms
                     socket.SendTimeout = sendTimeout;
                     networkStream = new NetworkStream(socket, true);
 
-                    Write(MessageCode.RpbStartTls);
-                    // TODO: error if the following is not read i.e. "expect_message"
-                    Read(MessageCode.RpbStartTls);
-
-                    // TODO: validate_sessions
-                    // validates hostname, and CRL
-
-                    // TODO select client certs
-                    // TODO private key file vs pfx?
-                    // http://stackoverflow.com/questions/18462064/associate-a-private-key-with-the-x509certificate2-class-in-net
-                    var cert = new X509Certificate2(@"C:\Users\lbakken\Projects\basho\CorrugatedIron\tools\test-ca\certs\riakuser-client-cert.pfx");
-                    var clientCertificates = new X509CertificateCollection();
-                    clientCertificates.Add(cert);
-
-                    //create the SSL stream starting from the NetworkStream associated
-                    //with the TcpClient instance
-                    var serverCertificateValidationCallback = new RemoteCertificateValidationCallback(ServerValidationCallback);
-                    var clientCertificateSelectionCallback = new LocalCertificateSelectionCallback(ClientCertificateSelectionCallback);
-
-                    // http://stackoverflow.com/questions/9934975/does-sslstream-dispose-disposes-its-inner-stream
-                    var sslStream = new SslStream(networkStream, false,
-                        serverCertificateValidationCallback,
-                        clientCertificateSelectionCallback);
-
-                    string targetHost = "riak-test"; // TODO
-                    if (clientCertificates.Count > 0)
+                    if (securityManager.IsSecurityEnabled)
                     {
-                        var sslProtocol = SslProtocols.Tls;
-                        sslStream.AuthenticateAsClient(targetHost, clientCertificates, sslProtocol, false);
+                        Write(MessageCode.RpbStartTls);
+                        // TODO: error if the following is not read i.e. "expect_message"
+                        Read(MessageCode.RpbStartTls);
+
+                        // TODO: validate_sessions
+                        // validates hostname, and CRL
+
+                        // TODO select client certs
+                        // TODO private key file vs pfx?
+                        // http://stackoverflow.com/questions/18462064/associate-a-private-key-with-the-x509certificate2-class-in-net
+                        var cert = new X509Certificate2(@"C:\Users\lbakken\Projects\basho\CorrugatedIron\tools\test-ca\certs\riakuser-client-cert.pfx");
+                        var clientCertificates = new X509CertificateCollection();
+                        clientCertificates.Add(cert);
+
+                        //create the SSL stream starting from the NetworkStream associated
+                        //with the TcpClient instance
+                        var serverCertificateValidationCallback = new RemoteCertificateValidationCallback(ServerValidationCallback);
+                        var clientCertificateSelectionCallback = new LocalCertificateSelectionCallback(ClientCertificateSelectionCallback);
+
+                        // http://stackoverflow.com/questions/9934975/does-sslstream-dispose-disposes-its-inner-stream
+                        var sslStream = new SslStream(networkStream, false,
+                            serverCertificateValidationCallback,
+                            clientCertificateSelectionCallback);
+
+                        string targetHost = "riak-test"; // TODO
+                        if (clientCertificates.Count > 0)
+                        {
+                            var sslProtocol = SslProtocols.Tls;
+                            sslStream.AuthenticateAsClient(targetHost, clientCertificates, sslProtocol, false);
+                        }
+                        else
+                        {
+                            sslStream.AuthenticateAsClient(targetHost);
+                        }
+
+                        networkStream = sslStream;
+
+                        // TODO credentials stored elsewhere
+                        var userBytes = Encoding.ASCII.GetBytes("riakuser");
+                        var passBytes = emptyBytes;
+                        /*
+                        var userBytes = Encoding.ASCII.GetBytes("riakpass");
+                        var passBytes = Encoding.ASCII.GetBytes("Test1234");
+                        */
+                        var authRequest = new RpbAuthReq
+                        {
+                            user = userBytes,
+                            password = passBytes
+                        };
+                        Write(authRequest);
+                        // TODO: expect_message here
+                        Read(MessageCode.RpbAuthResp);
                     }
-                    else
-                    {
-                        sslStream.AuthenticateAsClient(targetHost);
-                    }
-
-                    networkStream = sslStream;
-
-                    // TODO credentials stored elsewhere
-                    var userBytes = Encoding.ASCII.GetBytes("riakuser");
-                    var passBytes = emptyBytes;
-                    /*
-                    var userBytes = Encoding.ASCII.GetBytes("riakpass");
-                    var passBytes = Encoding.ASCII.GetBytes("Test1234");
-                     */
-                    var authRequest = new RpbAuthReq
-                    {
-                        user = userBytes,
-                        password = passBytes
-                    };
-                    Write(authRequest);
-                    // TODO: expect_message here
-                    Read(MessageCode.RpbAuthResp);
                 }
 
                 return networkStream;
