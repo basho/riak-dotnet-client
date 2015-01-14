@@ -26,6 +26,7 @@ namespace CorrugatedIron.Tests.Auth
     {
         protected static readonly string testCertsDir;
         protected static readonly string rootCaCertFile;
+        protected static readonly string rootCaCertFileRelativePath;
         protected static readonly string riakUserClientCertFileRelativePath;
         protected static readonly string riakUserClientCertFile;
         protected const string riakUserClientCertSubject =
@@ -41,6 +42,7 @@ namespace CorrugatedIron.Tests.Auth
             testCertsDir = Path.Combine(currentDir, testCertsDirRelativePath);
 
             rootCaCertFile = Path.Combine(testCertsDir, "cacert.pem");
+            rootCaCertFileRelativePath = Path.Combine(testCertsDirRelativePath, "cacert.pem");
 
             riakUserClientCertFileRelativePath = Path.Combine(testCertsDirRelativePath, "riakuser-client-cert.pfx");
             riakUserClientCertFile = Path.Combine(currentDir, riakUserClientCertFileRelativePath);

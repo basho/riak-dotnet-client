@@ -23,7 +23,7 @@ namespace CorrugatedIron.Tests.Auth
     public class CertificateTests : AuthTestBase
     {
         [Test]
-        public void RiakConfigurationCanSpecifyX509Certificates()
+        public void Configuration_CanSpecifyX509Certificates()
         {
             var config = RiakClusterConfiguration.LoadFromConfig("riakConfiguration");
             Assert.IsNotNull(config);
@@ -31,10 +31,25 @@ namespace CorrugatedIron.Tests.Auth
             var authConfig = config.Authentication;
             Assert.IsNotNull(authConfig);
 
-            Assert.AreEqual("riakpass", authConfig.Username);
-            Assert.AreEqual("Test1234", authConfig.Password);
+            Assert.AreEqual("riakuser", authConfig.Username);
+            Assert.IsNullOrEmpty(authConfig.Password);
             Assert.AreEqual(riakUserClientCertFileRelativePath, authConfig.ClientCertificateFile);
             Assert.AreEqual(riakUserClientCertSubject, authConfig.ClientCertificateSubject);
+        }
+
+        [Test]
+        public void Configuration_CanSpecifyX509CertificateAndRootCA()
+        {
+            var config = RiakClusterConfiguration.LoadFromConfig("riakCAConfiguration");
+            Assert.IsNotNull(config);
+
+            var authConfig = config.Authentication;
+            Assert.IsNotNull(authConfig);
+
+            Assert.AreEqual("riakuser", authConfig.Username);
+            Assert.IsNullOrEmpty(authConfig.Password);
+            Assert.AreEqual(riakUserClientCertSubject, authConfig.ClientCertificateSubject);
+            Assert.AreEqual(rootCaCertFileRelativePath, authConfig.CertificateAuthorityFile);
         }
     }
 }

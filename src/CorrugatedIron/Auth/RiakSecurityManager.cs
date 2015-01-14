@@ -15,7 +15,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Security;
@@ -33,6 +32,7 @@ namespace CorrugatedIron.Auth
             new StoreLocation[] { StoreLocation.CurrentUser, StoreLocation.LocalMachine };
         private readonly IRiakAuthenticationConfiguration authConfig;
         private readonly X509CertificateCollection clientCertificates;
+        private readonly X509Certificate2 certificateAuthorityCert;
 
         // Interesting discussion:
         // http://stackoverflow.com/questions/3780801/whats-the-difference-between-a-public-constructor-in-an-internal-class-and-an-i
@@ -41,6 +41,7 @@ namespace CorrugatedIron.Auth
         {
             this.authConfig = authConfig;
             this.clientCertificates = GetClientCertificates();
+            this.certificateAuthorityCert = GetCertificateAuthorityCert();
         }
 
         public bool IsSecurityEnabled
@@ -64,10 +65,58 @@ namespace CorrugatedIron.Auth
         public bool ServerCertificateValidationCallback(object sender, X509Certificate certificate,
             X509Chain chain, SslPolicyErrors sslPolicyErrors)
         {
-            // TODO
-            bool rv = sslPolicyErrors == SslPolicyErrors.None;
-            Debug.WriteLine("SslPolicyErrors: {0}", sslPolicyErrors);
-            return rv;
+            if (sslPolicyErrors == SslPolicyErrors.None)
+            {
+                return true;
+            }
+
+            /*
+             * Inspired by the following:
+             * http://msdn.microsoft.com/en-us/library/office/dd633677%28v=exchg.80%29.aspx
+             * http://stackoverflow.com/questions/22076184/how-to-validate-a-certificate
+             * 
+             * First, ensure we've got a cert authority file
+             */
+            if (certificateAuthorityCert != null)
+            {
+                if ((sslPolicyErrors & SslPolicyErrors.RemoteCertificateChainErrors) != 0)
+                {
+                    if (chain != null && chain.ChainStatus != null)
+                    {
+                        foreach (X509ChainStatus status in chain.ChainStatus)
+                        {
+                            if ((status.Status == X509ChainStatusFlags.UntrustedRoot) &&
+                                (false == chain.ChainElements.IsNullOrEmpty()))
+                            {
+                                // The root cert must not be installed but we provided a file
+                                // See if anything in the chain matches our root cert
+                                foreach (X509ChainElement chainElement in chain.ChainElements)
+                                {
+                                    if (chainElement.Certificate.Equals(certificateAuthorityCert))
+                                    {
+                                        return true;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if (status.Status != X509ChainStatusFlags.NoError)
+                                {
+                                    // If there are any other errors in the certificate chain, the certificate is invalid,
+                                    // so immediately returns false.
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                    /*
+                     * When processing reaches this point, the only errors in the certificate chain are 
+                     * untrusted root errors for self-signed certificates.
+                     */
+                }
+            }
+
+            return false;
         }
 
         public X509Certificate ClientCertificateSelectionCallback(object sender, string targetHost,
@@ -114,6 +163,19 @@ namespace CorrugatedIron.Auth
                     user = userBytes,
                     password = passBytes
                 };
+        }
+
+        private X509Certificate2 GetCertificateAuthorityCert()
+        {
+            X509Certificate2 certificateAuthorityCert = null;
+
+            if ((false == authConfig.CertificateAuthorityFile.IsNullOrEmpty()) &&
+                (File.Exists(authConfig.CertificateAuthorityFile)))
+            {
+                certificateAuthorityCert = new X509Certificate2(authConfig.CertificateAuthorityFile);
+            }
+
+            return certificateAuthorityCert;
         }
 
         private X509CertificateCollection GetClientCertificates()
