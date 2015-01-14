@@ -22,7 +22,7 @@ using CorrugatedIron.Config;
 using CorrugatedIron.Util;
 using NUnit.Framework;
 
-namespace CorrugatedIron.Tests.X509
+namespace CorrugatedIron.Tests.Auth
 {
     [TestFixture]
     public class RiakSecurityManagerTests
@@ -34,9 +34,9 @@ namespace CorrugatedIron.Tests.X509
         public void RiakSecurityManagerTestFixtureSetUp()
         {
             clusterConfig = RiakClusterConfiguration.LoadFromConfig("riakConfiguration");
-            Assert.IsNotNull(clusterConfig);
+            Assert.IsNotNull(clusterConfig, "riakConfiguration is not present?");
             noAuthClusterConfig = RiakClusterConfiguration.LoadFromConfig("riakNoAuthConfiguration");
-            Assert.IsNotNull(noAuthClusterConfig);
+            Assert.IsNotNull(noAuthClusterConfig, "riakNoAuthConfiguration is not present?");
         }
 
         [Test]
