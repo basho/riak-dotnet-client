@@ -14,21 +14,20 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
-using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using CorrugatedIron.Auth;
 using CorrugatedIron.Config;
-using CorrugatedIron.Util;
+using CorrugatedIron.Extensions;
 using NUnit.Framework;
 
 namespace CorrugatedIron.Tests.Auth
 {
     [TestFixture]
-    public class RiakSecurityManagerTests
+    public class RiakSecurityManagerTests : AuthTestBase
     {
         private readonly IRiakClusterConfiguration clusterConfig;
         private readonly IRiakClusterConfiguration noAuthClusterConfig;
+        private readonly IRiakClusterConfiguration certSubjectOnlyClusterConfig;
 
         public RiakSecurityManagerTests()
         {
@@ -39,6 +38,10 @@ namespace CorrugatedIron.Tests.Auth
             noAuthClusterConfig = RiakClusterConfiguration.LoadFromConfig("riakNoAuthConfiguration");
             Assert.IsNotNull(noAuthClusterConfig, "riakNoAuthConfiguration is not present?");
             Assert.IsNotNull(noAuthClusterConfig.Authentication, "Authentication should NOT be null");
+
+            certSubjectOnlyClusterConfig = RiakClusterConfiguration.LoadFromConfig("riakCertSubjectOnlyConfiguration");
+            Assert.IsNotNull(certSubjectOnlyClusterConfig, "riakCertSubjectOnlyConfiguration is not present?");
+            Assert.IsNotNull(certSubjectOnlyClusterConfig.Authentication, "Authentication should NOT be null");
         }
 
 
@@ -67,6 +70,43 @@ namespace CorrugatedIron.Tests.Auth
 
             var certFromFile = new X509Certificate2(authConfig.ClientCertificateFile);
             Assert.Contains(certFromFile, securityManager.ClientCertificates);
+        }
+
+        [Test]
+        public void WhenClientCertificateSubjectIsConfigured_ItIsPartOfCertificatesCollection()
+        {
+            /*
+             * Note: the AuthTestBase class ensures that the test client cert is installed
+             * to the current user's "My" store
+             */
+            var authConfig = certSubjectOnlyClusterConfig.Authentication;
+            var securityManager = new RiakSecurityManager(authConfig);
+            Assert.True(securityManager.ClientCertificatesConfigured);
+            Assert.False(authConfig.ClientCertificateSubject.IsNullOrEmpty());
+
+            X509Store x509Store = null;
+            try
+            {
+                x509Store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
+                x509Store.Open(OpenFlags.OpenExistingOnly | OpenFlags.ReadOnly);
+                bool found = false;
+                foreach (var cert in x509Store.Certificates)
+                {
+                    if (cert.Subject == authConfig.ClientCertificateSubject &&
+                        securityManager.ClientCertificates.Contains(cert))
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+                Assert.IsTrue(found,
+                    "Could not find cert with subject '{0}' in CurrentUser/My store!",
+                    authConfig.ClientCertificateSubject);
+            }
+            finally
+            {
+                x509Store.Close();
+            }
         }
     }
 }
