@@ -1,4 +1,5 @@
 ﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -24,6 +25,8 @@ using System.Net.Sockets;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using CorrugatedIron.Auth;
+using CorrugatedIron.Config;
 using CorrugatedIron.Exceptions;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
@@ -40,16 +43,19 @@ namespace CorrugatedIron.Comms
         private readonly int port;
         private readonly int receiveTimeout;
         private readonly int sendTimeout;
+        private readonly RiakSecurityManager securityManager;
 
         private Stream networkStream = null;
         private bool isConnected = false;
 
-        public RiakPbcSocket(string server, int port, int receiveTimeout, int sendTimeout)
+        public RiakPbcSocket(IRiakNodeConfiguration nodeConfig, IRiakAuthenticationConfiguration authConfig)
+        // public RiakPbcSocket(string server, int port, int receiveTimeout, int sendTimeout)
         {
-            this.server = server;
-            this.port = port;
-            this.receiveTimeout = receiveTimeout;
-            this.sendTimeout = sendTimeout;
+            this.server = nodeConfig.HostAddress;
+            this.port = nodeConfig.PbcPort;
+            this.receiveTimeout = nodeConfig.NetworkReadTimeout;
+            this.sendTimeout = nodeConfig.NetworkWriteTimeout;
+            this.securityManager = new RiakSecurityManager(authConfig);
         }
 
         public bool IsConnected

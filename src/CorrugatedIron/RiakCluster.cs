@@ -1,4 +1,5 @@
 ﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -14,16 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Comms;
-using CorrugatedIron.Comms.LoadBalancing;
-using CorrugatedIron.Config;
-using CorrugatedIron.Messages;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
+using CorrugatedIron.Comms;
+using CorrugatedIron.Comms.LoadBalancing;
+using CorrugatedIron.Config;
+using CorrugatedIron.Messages;
 
 namespace CorrugatedIron
 {
@@ -41,15 +41,17 @@ namespace CorrugatedIron
             get { return _defaultRetryCount; }
         }
 
-        public RiakCluster(IRiakClusterConfiguration clusterConfiguration, IRiakConnectionFactory connectionFactory)
+        public RiakCluster(IRiakClusterConfiguration clusterConfig,
+            IRiakConnectionFactory connectionFactory)
         {
-            _nodePollTime = clusterConfiguration.NodePollTime;
-            _nodes = clusterConfiguration.RiakNodes.Select(rn => new RiakNode(rn, connectionFactory)).Cast<IRiakNode>().ToList();
+            _nodePollTime = clusterConfig.NodePollTime;
+            _nodes = clusterConfig.RiakNodes.Select(rn =>
+                new RiakNode(rn, clusterConfig.Authentication, connectionFactory)).Cast<IRiakNode>().ToList();
             _loadBalancer = new RoundRobinStrategy();
             _loadBalancer.Initialise(_nodes);
             _offlineNodes = new ConcurrentQueue<IRiakNode>();
-            _defaultRetryCount = clusterConfiguration.DefaultRetryCount;
-            RetryWaitTime = clusterConfiguration.DefaultRetryWaitTime;
+            _defaultRetryCount = clusterConfig.DefaultRetryCount;
+            RetryWaitTime = clusterConfig.DefaultRetryWaitTime;
 
             // TODO: must happen after TLS start Task.Factory.StartNew(NodeMonitor);
         }
@@ -79,8 +81,10 @@ namespace CorrugatedIron
 
         protected override TRiakResult UseConnection<TRiakResult>(Func<IRiakConnection, TRiakResult> useFun, Func<ResultCode, string, bool, TRiakResult> onError, int retryAttempts)
         {
-            if (retryAttempts < 0) return onError(ResultCode.NoRetries, "Unable to access a connection on the cluster.", false);
-            if (_disposing) return onError(ResultCode.ShuttingDown, "System currently shutting down", true);
+            if (retryAttempts < 0)
+                return onError(ResultCode.NoRetries, "Unable to access a connection on the cluster.", false);
+            if (_disposing)
+                return onError(ResultCode.ShuttingDown, "System currently shutting down", true);
 
             var node = _loadBalancer.SelectNode();
 
@@ -123,8 +127,10 @@ namespace CorrugatedIron
 
         public override RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun, int retryAttempts)
         {
-            if (retryAttempts < 0) return RiakResult<IEnumerable<TResult>>.Error(ResultCode.NoRetries, "Unable to access a connection on the cluster.", false);
-            if (_disposing) return RiakResult<IEnumerable<TResult>>.Error(ResultCode.ShuttingDown, "System currently shutting down", true);
+            if (retryAttempts < 0)
+                return RiakResult<IEnumerable<TResult>>.Error(ResultCode.NoRetries, "Unable to access a connection on the cluster.", false);
+            if (_disposing)
+                return RiakResult<IEnumerable<TResult>>.Error(ResultCode.ShuttingDown, "System currently shutting down", true);
 
             var node = _loadBalancer.SelectNode();
 

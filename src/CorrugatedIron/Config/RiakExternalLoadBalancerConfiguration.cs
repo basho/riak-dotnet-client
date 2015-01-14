@@ -64,5 +64,17 @@ namespace CorrugatedIron.Config
             get { return (int)this["defaultRetryCount"]; }
             set { this["defaultRetryCount"] = value; }
         }
+
+        // TODO TODO TODO TEST THIS
+        [ConfigurationProperty("authentication", IsRequired = false)]
+        public RiakAuthenticationConfiguration Authentication
+        {
+            get { return (RiakAuthenticationConfiguration)this["authentication"]; }
+        }
+
+        IRiakAuthenticationConfiguration IRiakExternalLoadBalancerConfiguration.Authentication
+        {
+            get { throw new System.NotImplementedException(); }
+        }
     }
 }

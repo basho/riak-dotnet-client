@@ -14,24 +14,26 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Comms;
-using CorrugatedIron.Config;
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using CorrugatedIron.Comms;
+using CorrugatedIron.Config;
 
 namespace CorrugatedIron
 {
     public class RiakExternalLoadBalancer : RiakEndPoint
     {
-        private readonly IRiakExternalLoadBalancerConfiguration _lbConfiguration;
-        private readonly RiakNode _node;
-        private bool _disposing;
+        private readonly IRiakExternalLoadBalancerConfiguration lbConfiguration;
+        private readonly RiakNode node;
+        private bool disposing;
 
         public RiakExternalLoadBalancer(IRiakExternalLoadBalancerConfiguration lbConfiguration, IRiakConnectionFactory connectionFactory)
         {
-            _lbConfiguration = lbConfiguration;
-            _node = new RiakNode(_lbConfiguration.Target, connectionFactory);
+            this.lbConfiguration = lbConfiguration;
+            this.node = new RiakNode(this.lbConfiguration.Target,
+                this.lbConfiguration.Authentication,
+                connectionFactory);
         }
 
         public static IRiakEndPoint FromConfig(string configSectionName)
@@ -46,7 +48,7 @@ namespace CorrugatedIron
 
         protected override int DefaultRetryCount
         {
-            get { return _lbConfiguration.DefaultRetryCount; }
+            get { return lbConfiguration.DefaultRetryCount; }
         }
 
         protected override TRiakResult UseConnection<TRiakResult>(Func<IRiakConnection, TRiakResult> useFun, Func<ResultCode, string, bool, TRiakResult> onError, int retryAttempts)
@@ -55,16 +57,16 @@ namespace CorrugatedIron
             {
                 return onError(ResultCode.NoRetries, "Unable to access a connection on the cluster.", true);
             }
-            if (_disposing)
+            if (disposing)
             {
                 return onError(ResultCode.ShuttingDown, "System currently shutting down", true);
             }
 
-            var node = _node;
+            RiakNode localNode = this.node;
 
-            if (node != null)
+            if (localNode != null)
             {
-                var result = node.UseConnection(useFun);
+                var result = localNode.UseConnection(useFun);
                 if (!result.IsSuccess)
                 {
                     Thread.Sleep(RetryWaitTime);
@@ -72,6 +74,7 @@ namespace CorrugatedIron
                 }
                 return (TRiakResult)result;
             }
+
             return onError(ResultCode.ClusterOffline, "Unable to access functioning Riak node", true);
         }
 
@@ -81,16 +84,16 @@ namespace CorrugatedIron
             {
                 return RiakResult<IEnumerable<TResult>>.Error(ResultCode.NoRetries, "Unable to access a connection on the cluster.", true);
             }
-            if (_disposing)
+            if (disposing)
             {
                 return RiakResult<IEnumerable<TResult>>.Error(ResultCode.ShuttingDown, "System currently shutting down", true);
             }
 
-            var node = _node;
+            RiakNode localNode = this.node;
 
-            if (node != null)
+            if (localNode != null)
             {
-                var result = node.UseDelayedConnection(useFun);
+                var result = localNode.UseDelayedConnection(useFun);
                 if (!result.IsSuccess)
                 {
                     Thread.Sleep(RetryWaitTime);
@@ -98,14 +101,15 @@ namespace CorrugatedIron
                 }
                 return result;
             }
+
             return RiakResult<IEnumerable<TResult>>.Error(ResultCode.ClusterOffline, "Unable to access functioning Riak node", true);
         }
 
         public override void Dispose()
         {
-            _disposing = true;
+            disposing = true;
 
-            _node.Dispose();
+            node.Dispose();
         }
     }
 }

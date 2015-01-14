@@ -1,4 +1,5 @@
 ﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -14,20 +15,18 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Text;
 using CorrugatedIron.Config;
 using CorrugatedIron.Exceptions;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
 using CorrugatedIron.Models.Rest;
 using CorrugatedIron.Util;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
 
 namespace CorrugatedIron.Comms
 {
@@ -88,24 +87,22 @@ namespace CorrugatedIron.Comms
 
     internal class RiakConnection : IRiakConnection
     {
-        private readonly string _restRootUrl;
-        private readonly RiakPbcSocket _socket;
+        private readonly string restRootUrl;
+        private readonly RiakPbcSocket socket;
 
         public bool IsIdle
         {
-            get { return _socket.IsConnected; }
+            // TODO: is this the correct meaning of IsIdle?
+            get { return socket.IsConnected; }
         }
 
-        static RiakConnection()
+        public RiakConnection(IRiakNodeConfiguration nodeConfiguration, IRiakAuthenticationConfiguration authConfiguration)
         {
-            ServicePointManager.ServerCertificateValidationCallback += ServerValidationCallback;
-        }
+            restRootUrl = @"{0}://{1}:{2}".Fmt(nodeConfiguration.RestScheme,
+                nodeConfiguration.HostAddress,
+                nodeConfiguration.RestPort);
 
-        public RiakConnection(IRiakNodeConfiguration nodeConfiguration)
-        {
-            _restRootUrl = @"{0}://{1}:{2}".Fmt(nodeConfiguration.RestScheme, nodeConfiguration.HostAddress, nodeConfiguration.RestPort);
-            _socket = new RiakPbcSocket(nodeConfiguration.HostAddress, nodeConfiguration.PbcPort, nodeConfiguration.NetworkReadTimeout,
-                nodeConfiguration.NetworkWriteTimeout);
+            socket = new RiakPbcSocket(nodeConfiguration, authConfiguration);
         }
 
         public RiakResult<TResult> PbcRead<TResult>()
@@ -113,7 +110,7 @@ namespace CorrugatedIron.Comms
         {
             try
             {
-                var result = _socket.Read<TResult>();
+                var result = socket.Read<TResult>();
                 return RiakResult<TResult>.Success(result);
             }
             catch (RiakException ex)
@@ -142,7 +139,7 @@ namespace CorrugatedIron.Comms
         {
             try
             {
-                _socket.Read(expectedMessageCode);
+                socket.Read(expectedMessageCode);
                 return RiakResult.Success();
             }
             catch (RiakException ex)
@@ -153,7 +150,7 @@ namespace CorrugatedIron.Comms
                 }
                 return RiakResult.Error(ResultCode.CommunicationError, ex.Message, ex.NodeOffline);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Disconnect();
                 return RiakResult.Error(ResultCode.CommunicationError, ex.Message, true);
@@ -169,7 +166,7 @@ namespace CorrugatedIron.Comms
                 RiakResult<TResult> result;
                 do
                 {
-                    result = RiakResult<TResult>.Success(_socket.Read<TResult>());
+                    result = RiakResult<TResult>.Success(socket.Read<TResult>());
                     results.Add(result);
                 } while (repeatRead(result));
 
@@ -183,7 +180,7 @@ namespace CorrugatedIron.Comms
                 }
                 return RiakResult<IEnumerable<RiakResult<TResult>>>.Error(ResultCode.CommunicationError, ex.Message, ex.NodeOffline);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Disconnect();
                 return RiakResult<IEnumerable<RiakResult<TResult>>>.Error(ResultCode.CommunicationError, ex.Message, true);
@@ -195,7 +192,7 @@ namespace CorrugatedIron.Comms
         {
             try
             {
-                _socket.Write(request);
+                socket.Write(request);
                 return RiakResult.Success();
             }
             catch (RiakException ex)
@@ -206,7 +203,7 @@ namespace CorrugatedIron.Comms
                 }
                 return RiakResult.Error(ResultCode.CommunicationError, ex.Message, ex.NodeOffline);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Disconnect();
                 return RiakResult.Error(ResultCode.CommunicationError, ex.Message, true);
@@ -217,7 +214,7 @@ namespace CorrugatedIron.Comms
         {
             try
             {
-                _socket.Write(messageCode);
+                socket.Write(messageCode);
                 return RiakResult.Success();
             }
             catch (RiakException ex)
@@ -228,7 +225,7 @@ namespace CorrugatedIron.Comms
                 }
                 return RiakResult.Error(ResultCode.CommunicationError, ex.Message, ex.NodeOffline);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Disconnect();
                 return RiakResult.Error(ResultCode.CommunicationError, ex.Message, true);
@@ -319,7 +316,8 @@ namespace CorrugatedIron.Comms
             do
             {
                 result = PbcRead<TResult>();
-                if (!result.IsSuccess) break;
+                if (!result.IsSuccess)
+                    break;
                 yield return result;
             } while (repeatRead(result));
 
@@ -376,7 +374,7 @@ namespace CorrugatedIron.Comms
 
         public RiakResult<RiakRestResponse> RestRequest(RiakRestRequest request)
         {
-            var baseUri = new StringBuilder(_restRootUrl).Append(request.Uri);
+            var baseUri = new StringBuilder(restRootUrl).Append(request.Uri);
             if (request.QueryParams.Count > 0)
             {
                 baseUri.Append("?");
@@ -406,7 +404,7 @@ namespace CorrugatedIron.Comms
             if (request.Body != null && request.Body.Length > 0)
             {
                 req.ContentLength = request.Body.Length;
-                using(var writer = req.GetRequestStream())
+                using (var writer = req.GetRequestStream())
                 {
                     writer.Write(request.Body, 0, request.Body.Length);
                 }
@@ -466,20 +464,15 @@ namespace CorrugatedIron.Comms
             }
         }
 
-        private static bool ServerValidationCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
-        {
-            return true;
-        }
-
         public void Dispose()
         {
-            _socket.Dispose();
+            socket.Dispose();
             Disconnect();
         }
 
         public void Disconnect()
         {
-            _socket.Disconnect();
+            socket.Disconnect();
         }
     }
 }
