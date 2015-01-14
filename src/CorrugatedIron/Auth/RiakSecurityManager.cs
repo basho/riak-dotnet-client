@@ -31,7 +31,6 @@ namespace CorrugatedIron.Auth
     {
         private static readonly StoreLocation[] storeLocations =
             new StoreLocation[] { StoreLocation.CurrentUser, StoreLocation.LocalMachine };
-        private static readonly byte[] emptyBytes = new byte[0];
         private readonly IRiakAuthenticationConfiguration authConfig;
         private readonly X509CertificateCollection clientCertificates;
 
