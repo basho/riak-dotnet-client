@@ -47,5 +47,12 @@ namespace CorrugatedIron.Config
             get { return (string)this["clientCertificateSubject"]; }
             set { this["clientCertificateSubject"] = value; }
         }
+
+        [ConfigurationProperty("certificateAuthorityFile", DefaultValue = "", IsRequired = false)]
+        public string CertificateAuthorityFile
+        {
+            get { return (string)this["certificateAuthorityFile"]; }
+            set { this["certificateAuthorityFile"] = value; }
+        }
     }
 }

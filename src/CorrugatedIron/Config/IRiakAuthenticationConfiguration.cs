@@ -22,5 +22,6 @@ namespace CorrugatedIron.Config
         string Password { get; }
         string ClientCertificateFile { get; }
         string ClientCertificateSubject { get; }
+        string CertificateAuthorityFile { get; }
     }
 }

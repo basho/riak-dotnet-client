@@ -237,7 +237,7 @@ namespace CorrugatedIron.Comms
                 // TODO: should throw a RiakSslException
                 Read(MessageCode.RpbStartTls);
 
-                // TODO: validate_sessions
+                // TODO: validate_sessions from Ruby client
                 // validates hostname, and CRL
 
                 // http://stackoverflow.com/questions/9934975/does-sslstream-dispose-disposes-its-inner-stream
