@@ -1,4 +1,5 @@
 ﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -14,7 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Tests.Extensions;
@@ -22,8 +25,6 @@ using CorrugatedIron.Tests.Live.Extensions;
 using CorrugatedIron.Tests.Live.LiveRiakConnectionTests;
 using CorrugatedIron.Util;
 using NUnit.Framework;
-using System;
-using System.Linq;
 
 namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
 {
@@ -45,7 +46,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         }
 
         [Test]
-        public void PingRequstResultsInPingResponse()
+        public void PingRequestResultsInPingResponse()
         {
             var result = Client.Ping();
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
@@ -99,7 +100,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             writeResult.IsSuccess.ShouldBeTrue();
             writeResult.Value.ShouldNotBeNull();
 
-            var getResults = Client.Get(new List<RiakObjectId>
+            var getResults = Client.Get(new[]
             {
                 new RiakObjectId(null, "key"),
                 new RiakObjectId("", "key"),
@@ -328,12 +329,12 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             mrRes.PhaseResults.ElementAt(1).Phase.ShouldEqual(1u);
 
             //mrRes.PhaseResults.ElementAt(0).Values.ShouldBeNull();
-            foreach(var v in mrRes.PhaseResults.ElementAt(0).Values)
+            foreach (var v in mrRes.PhaseResults.ElementAt(0).Values)
             {
                 v.ShouldBeNull();
             }
             mrRes.PhaseResults.ElementAt(1).Values.ShouldNotBeNull();
-   
+
             var values = result.Value.PhaseResults.ElementAt(1).GetObjects<int[]>().First();
             //var values = Newtonsoft.Json.JsonConvert.DeserializeObject<int[]>(result.Value.PhaseResults.ElementAt(1).Values.First().FromRiakString());
             values[0].ShouldEqual(10);
@@ -368,12 +369,12 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
                     mrRes.PhaseResults.ElementAt(1).Phase.ShouldEqual(1u);
 
                     //mrRes.PhaseResults.ElementAt(0).Values.ShouldBeNull();
-                    foreach(var v in mrRes.PhaseResults.ElementAt(0).Values)
+                    foreach (var v in mrRes.PhaseResults.ElementAt(0).Values)
                     {
                         v.ShouldBeNull();
                     }
                     mrRes.PhaseResults.ElementAt(1).Values.ShouldNotBeNull();
-    
+
                     var values = result.Value.PhaseResults.ElementAt(1).GetObjects<int[]>().First();
                     values[0].ShouldEqual(10);
                 });
@@ -498,7 +499,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
                 });
         }
 
-       private Func<RiakResult<IEnumerable<String>>> RunListKeys(IRiakBatchClient client, string bucket)
+        private Func<RiakResult<IEnumerable<String>>> RunListKeys(IRiakBatchClient client, string bucket)
         {
             Func<RiakResult<IEnumerable<String>>> runListKeys =
                 () => client.ListKeys(bucket);
@@ -510,7 +511,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             get { return result => result.IsSuccess && !result.Value.Any(); }
         }
 
-       [Test]
+        [Test]
         public void DeletingAnObjectDeletesAnObject()
         {
             var doc = new RiakObject(TestBucket, TestKey, TestJson, RiakConstants.ContentTypes.ApplicationJson);
@@ -547,7 +548,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         public void AsyncListKeysReturnsTheCorrectNumberOfResults()
         {
             var bucket = Guid.NewGuid().ToString();
-            
+
             for (var i = 1; i < 11; i++)
             {
                 var doc = new RiakObject(bucket, i.ToString(), new { value = i });
