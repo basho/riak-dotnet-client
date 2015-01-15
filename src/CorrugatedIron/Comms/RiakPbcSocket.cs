@@ -36,8 +36,8 @@ namespace CorrugatedIron.Comms
 
         private readonly string server;
         private readonly int port;
-        private readonly int receiveTimeout;
-        private readonly int sendTimeout;
+        private readonly int readTimeout;
+        private readonly int writeTimeout;
         private readonly RiakSecurityManager securityManager;
 
         private Stream networkStream = null;
@@ -47,8 +47,8 @@ namespace CorrugatedIron.Comms
         {
             this.server = nodeConfig.HostAddress;
             this.port = nodeConfig.PbcPort;
-            this.receiveTimeout = nodeConfig.NetworkReadTimeout;
-            this.sendTimeout = nodeConfig.NetworkWriteTimeout;
+            this.readTimeout = nodeConfig.NetworkReadTimeout;
+            this.writeTimeout = nodeConfig.NetworkWriteTimeout;
             this.securityManager = new RiakSecurityManager(authConfig);
         }
 
@@ -226,8 +226,8 @@ namespace CorrugatedIron.Comms
                 string errorMessage = "Unable to connect to remote server: {0}:{1}".Fmt(server, port);
                 throw new RiakException(errorMessage, true);
             }
-            socket.ReceiveTimeout = receiveTimeout;
-            socket.SendTimeout = sendTimeout;
+            socket.ReceiveTimeout = readTimeout;
+            socket.SendTimeout = writeTimeout;
             this.networkStream = new NetworkStream(socket, true);
             SetUpSslStream(this.networkStream);
         }
@@ -248,6 +248,9 @@ namespace CorrugatedIron.Comms
                 var sslStream = new SslStream(networkStream, false,
                     securityManager.ServerCertificateValidationCallback,
                     securityManager.ClientCertificateSelectionCallback);
+
+                sslStream.ReadTimeout = readTimeout;
+                sslStream.WriteTimeout = writeTimeout;
 
                 if (securityManager.ClientCertificatesConfigured)
                 {
