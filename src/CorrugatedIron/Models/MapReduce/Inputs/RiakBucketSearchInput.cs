@@ -52,6 +52,7 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
             writer.WritePropertyName("inputs");
             writer.WriteStartObject();
 
+            // TODO: Check validity of this parameter
             writer.WritePropertyName("bucket");
             writer.WriteValue(_bucket);
 

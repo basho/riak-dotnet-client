@@ -15,6 +15,7 @@
 // under the License.
 
 using CorrugatedIron.Extensions;
+using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Models.MapReduce.Inputs;
 using CorrugatedIron.Tests.Extensions;
@@ -119,7 +120,7 @@ namespace CorrugatedIron.Tests.Models.MapReduce
                 {
                     ContentType = MrContentType
                 }
-                .Inputs(RiakIndex.Range("animals", "$key", "0", "zzzzz"));
+                .Inputs(RiakIndex.Range(new RiakIndexId("animals", "$key"), "0", "zzzzz"));
 
             var request = query.ToMessage();
             var requestString = request.request.FromRiakString();

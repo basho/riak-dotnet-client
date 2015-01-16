@@ -14,6 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
 using CorrugatedIron.Extensions;
 using Newtonsoft.Json;
 
@@ -21,29 +22,43 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
 {
     public class RiakBinIndexRangeInput : RiakIndexInput
     {
-        public string Bucket { get; set; }
-        public string Index { get; set; }
+        [Obsolete("Use IndexId.BucketName instead. This will be revoved in the next version.")]
+        public string Bucket
+        {
+            get
+            {
+                return IndexId != null ? IndexId.BucketName : null;
+            }
+        }
+
+        [Obsolete("Use IndexId.IndexName instead. This will be revoved in the next version.")]
+        public string Index
+        {
+            get
+            {
+                return IndexId != null ? IndexId.IndexName : null;
+            }
+        }
+
         public string Start { get; set; }
         public string End { get; set; }
 
+        [Obsolete("Use the constructor that accepts a RiakIndexId instead. This will be revoved in the next version.")]
         public RiakBinIndexRangeInput(string bucket, string index, string start, string end)
+            : this(new RiakIndexId(bucket, index), start, end)
         {
-            Bucket = bucket;
-            Index = index.ToBinaryKey();
+        }
+
+        public RiakBinIndexRangeInput(RiakIndexId indexId, string start, string end)
+        {
+            IndexId = new RiakIndexId(indexId.BucketType, indexId.BucketName, indexId.IndexName.ToBinaryKey());
             Start = start;
             End = end;
         }
 
         public override JsonWriter WriteJson(JsonWriter writer)
         {
-            writer.WritePropertyName("inputs");
-
-            writer.WriteStartObject();
-            writer.WritePropertyName("bucket");
-            writer.WriteValue(Bucket);
-
-            writer.WritePropertyName("index");
-            writer.WriteValue(Index);
+            WriteIndexHeaderJson(writer);
 
             writer.WritePropertyName("start");
             writer.WriteValue(Start);

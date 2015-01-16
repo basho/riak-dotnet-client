@@ -124,7 +124,7 @@ namespace CorrugatedIron.Tests.Live
             GenerateGuidKeyObjects((o, i) => o.IntIndex("age").Set(32, 20));
 
             var mr = new RiakMapReduceQuery()
-                .Inputs(RiakIndex.Match(LegacyBucket, "age", 32));
+                .Inputs(RiakIndex.Match(new RiakIndexId(LegacyBucket, "age"), 32));
 
             var result = Client.MapReduce(mr);
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);

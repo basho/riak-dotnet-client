@@ -84,12 +84,9 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
         private static void WriteRiakObjectIdToWriter(JsonWriter writer, RiakObjectId id)
         {
             writer.WriteStartArray();
-            if (!string.IsNullOrEmpty(id.BucketType))
-            {
-                writer.WriteValue(id.BucketType);
-            }
             writer.WriteValue(id.Bucket);
             writer.WriteValue(id.Key);
+            writer.WriteValue(id.BucketType ?? string.Empty);
             writer.WriteEndArray();
         }
 

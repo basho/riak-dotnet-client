@@ -49,7 +49,7 @@ namespace CorrugatedIron.Tests.Models.MapReduce
 
             var s = Serialize(input.WriteJson);
 
-            Assert.AreEqual(s, "\"inputs\":[[\"foo\",\"bar\"],[\"foo\",\"baz\"],[\"dooby\",\"scooby\"]]");
+            Assert.AreEqual(s, "\"inputs\":[[\"foo\",\"bar\",\"\"],[\"foo\",\"baz\",\"\"],[\"dooby\",\"scooby\",\"\"]]");
         }
 
         [Test]
