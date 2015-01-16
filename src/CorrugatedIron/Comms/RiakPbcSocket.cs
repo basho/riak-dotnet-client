@@ -89,9 +89,8 @@ namespace CorrugatedIron.Comms
             const int sizeSize = sizeof(int);
             const int codeSize = sizeof(byte);
             const int headerSize = sizeSize + codeSize;
-            const int sendBufferSize = 1024 * 4;
             byte[] messageBody;
-            long messageLength = 0;
+            int messageLength = 0;
 
             using (var memStream = new MemoryStream())
             {
@@ -99,7 +98,7 @@ namespace CorrugatedIron.Comms
                 memStream.Position += headerSize;
                 Serializer.Serialize(memStream, message);
                 messageBody = memStream.GetBuffer();
-                messageLength = memStream.Position;
+                messageLength = (int)memStream.Position;
             }
 
             // check to make sure something was written, otherwise we'll have to create a new array
@@ -113,10 +112,9 @@ namespace CorrugatedIron.Comms
             Array.Copy(size, messageBody, sizeSize);
             messageBody[sizeSize] = (byte)messageCode;
 
-            int bytesToSend = (int)Math.Min(messageLength, sendBufferSize);
             if (NetworkStream.CanWrite)
             {
-                NetworkStream.Write(messageBody, 0, bytesToSend);
+                NetworkStream.Write(messageBody, 0, messageLength);
             }
             else
             {
