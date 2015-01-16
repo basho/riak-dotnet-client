@@ -25,10 +25,6 @@ namespace CorrugatedIron.Models
     [JsonConverter(typeof(RiakObjectIdConverter))]
     public class RiakObjectId : IEquatable<RiakObjectId>
     {
-        public string Bucket { get; private set; }
-        public string BucketType { get; private set; }
-        public string Key { get; private set; }
-
         protected RiakObjectId()
         {
         }
@@ -54,6 +50,10 @@ namespace CorrugatedIron.Models
         {
             return new RiakLink(Bucket, Key, tag);
         }
+
+        public string Bucket { get; private set; }
+        public string BucketType { get; private set; }
+        public string Key { get; private set; }
 
         public bool Equals(RiakObjectId other)
         {

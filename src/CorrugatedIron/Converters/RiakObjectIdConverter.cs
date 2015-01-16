@@ -21,6 +21,9 @@ using Newtonsoft.Json;
 
 namespace CorrugatedIron.Converters
 {
+    /*
+     * TODO: I have no idea why this exists
+     */
     public class RiakObjectIdConverter : JsonConverter
     {
         public override object ReadJson(JsonReader reader, Type objectType, Object existingValue, JsonSerializer serializer)
