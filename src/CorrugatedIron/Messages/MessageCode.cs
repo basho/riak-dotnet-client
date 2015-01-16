@@ -142,23 +142,23 @@ namespace CorrugatedIron.Messages
             }
         }
 
-        internal static byte GetMessageCodeFor(Type type)
+        public static byte GetMessageCodeFor(Type type)
         {
             MessageCode messageCode = TypeToMessageCodeMap[type];
             return (byte)messageCode;
         }
 
-        internal static Type GetTypeFor(MessageCode messageCode)
+        public static Type GetTypeFor(MessageCode messageCode)
         {
             return MessageCodeToTypeMap[messageCode];
         }
 
-        internal static bool Contains(MessageCode messageCode)
+        public static bool Contains(MessageCode messageCode)
         {
             return MessageCodeToTypeMap.ContainsKey(messageCode);
         }
 
-        internal static string GetTypeNameFor(MessageCode messageCode)
+        public static string GetTypeNameFor(MessageCode messageCode)
         {
             return MessageCodeToTypeMap[messageCode].Name;
         }
