@@ -110,6 +110,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
                     new RiakObjectId("foo/bar", "key"),
                     new RiakObjectId(TestBucket, TestKey)
                 }).ToList();
+                Assert.IsNotNull(getResults);
             });
         }
 
