@@ -1,4 +1,5 @@
 // Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,6 +14,7 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
+
 
 using CorrugatedIron.Comms;
 using CorrugatedIron.Extensions;
@@ -859,7 +861,7 @@ namespace CorrugatedIron
             System.Diagnostics.Debug.Assert(riakLinks.Count > 0, "Link walking requires at least one link");
 
             var input = new RiakBucketKeyInput()
-                .Add(riakObject.Bucket, riakObject.Key);
+                .Add(riakObject.ToRiakObjectId());
 
             var query = new RiakMapReduceQuery()
                 .Inputs(input);

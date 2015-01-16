@@ -1,4 +1,5 @@
 ﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -167,7 +168,7 @@ namespace CorrugatedIron.Tests.Live
             var jLinks = jeremiah.Links;
 
             var input = new RiakBucketKeyInput()
-                .Add(TestBucket, Jeremiah);
+                .Add(new RiakObjectId(TestBucket, Jeremiah));
 
             var query = new RiakMapReduceQuery()
                 .Inputs(input)

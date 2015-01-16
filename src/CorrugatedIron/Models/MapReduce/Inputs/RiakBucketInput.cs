@@ -1,4 +1,5 @@
 ﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -39,14 +40,7 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
                 writer.WritePropertyName("inputs");
                 writer.WriteStartObject();
 
-                writer.WritePropertyName("bucket");
-                writer.WriteValue(_bucket);
-
-                if (!string.IsNullOrEmpty(_type))
-                {
-                    writer.WritePropertyName("bucket_type");
-                    writer.WriteValue(_type);
-                }
+                WriteBucketKeyBucketJson(writer, _type, _bucket);
 
                 writer.WritePropertyName("key_filters");
                 writer.WriteStartArray();
@@ -65,6 +59,7 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
             return writer;
         }
 
+        // TODO: Why do we have this operator?
         public static implicit operator RiakBucketInput(string bucket)
         {
             return new RiakBucketInput(bucket, null);

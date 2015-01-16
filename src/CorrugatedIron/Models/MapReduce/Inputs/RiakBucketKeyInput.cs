@@ -1,4 +1,5 @@
 ﻿// Copyright (c) 2013 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -30,6 +31,7 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
             RiakObjectIdList = new List<RiakObjectId>();
         }
 
+        [Obsolete("Use the Add() that accepts a RiakIndexId instead. This will be removed in the next version.")]
         public RiakBucketKeyInput Add(string bucket, string key)
         {
             RiakObjectIdList.Add(new RiakObjectId(bucket, key));
@@ -54,12 +56,14 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
             return this;
         }
 
+        [Obsolete("Use the Add() that accepts RiakIndexId[] instead. This will be removed in the next version.")]
         public RiakBucketKeyInput Add(params Tuple<string, string>[] pairs)
         {
             RiakObjectIdList.AddRange(pairs.Select(p => new RiakObjectId(p.Item1, p.Item2)));
             return this;
         }
 
+        [Obsolete("Use the Add() that accepts an IEnumerable<RiakIndexId> instead. This will be removed in the next version.")]
         public RiakBucketKeyInput Add(IEnumerable<Tuple<string, string>> pairs)
         {
             RiakObjectIdList.AddRange(pairs.Select(p => new RiakObjectId(p.Item1, p.Item2)));
