@@ -53,12 +53,6 @@ namespace CorrugatedIron.Tests.Models
         }
 
         [Test]
-        public void TODO_RiakObjectIdConverter_Why()
-        {
-            Assert.Fail("TODO: figure out why the RiakObjectIdConverter class exists and decorates RiakObjectId");
-        }
-
-        [Test]
         public void ToRiakObjectIdProducesAValidRiakObjectId()
         {
             var riakObject = new RiakObject(Bucket, Key, "value");
