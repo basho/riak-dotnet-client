@@ -1,4 +1,5 @@
 ﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -39,6 +40,9 @@ namespace CorrugatedIron.Tests.Models.MapReduce
         private const string ComplexMrJobWithFilterText =
             @"{""inputs"":{""bucket"":""animals"",""key_filters"":[[""matches"",""spider""]]},""query"":[{""map"":{""language"":""javascript"",""source"":""function(o) { return [1]; }"",""keep"":false}},{""reduce"":{""language"":""javascript"",""name"":""Riak.reduceSum"",""keep"":true}}]}";
 
+        private const string ComplexMrJobWithTypeAndFilterText =
+            @"{""inputs"":{""bucket"":[""zoo"",""animals""],""key_filters"":[[""matches"",""spider""]]},""query"":[{""map"":{""language"":""javascript"",""source"":""function(o) { return [1]; }"",""keep"":false}},{""reduce"":{""language"":""javascript"",""name"":""Riak.reduceSum"",""keep"":true}}]}";
+        
         private const string MrJobWithArgumentsArray =
             @"{""inputs"":""animals"",""query"":[{""reduce"":{""language"":""javascript"",""name"":""Riak.reduceSlice"",""arg"":[1,10],""keep"":true}}]}";
 
@@ -111,6 +115,23 @@ namespace CorrugatedIron.Tests.Models.MapReduce
 
             var request = query.ToMessage();
             request.request.ShouldEqual(ComplexMrJobWithFilterText.ToRiakString());
+        }
+
+        [Test]
+        public void BuildingComplexMapReduceJobsWithFiltersAndTypesProducesTheCorrectCommand()
+        {
+            var query = new RiakMapReduceQuery
+            {
+                ContentType = MrContentType
+            }
+                .Inputs("animals", "zoo")
+                //.Filter(new Matches<string>("spider"))
+                .Filter(f => f.Matches("spider"))
+                .MapJs(m => m.Source("function(o) { return [1]; }"))
+                .ReduceJs(r => r.Name("Riak.reduceSum").Keep(true));
+
+            var request = query.ToMessage();
+            request.request.ShouldEqual(ComplexMrJobWithTypeAndFilterText.ToRiakString());
         }
 
         [Test]

@@ -1,4 +1,5 @@
 ﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -61,7 +62,7 @@ namespace CorrugatedIron.Tests.Live.LoadTests
             }
 
             var input = new RiakBucketKeyInput();
-            keys.ForEach(k => input.Add(MapReduceBucket, k));
+            keys.ForEach(k => input.Add(new RiakObjectId(MapReduceBucket, k)));
 
             var query = new RiakMapReduceQuery()
                 .Inputs(input)
@@ -120,7 +121,7 @@ namespace CorrugatedIron.Tests.Live.LoadTests
             }
 
             var input = new RiakBucketKeyInput();
-            keys.ForEach(k => input.Add(MapReduceBucket, k));
+            keys.ForEach(k => input.Add(new RiakObjectId(MapReduceBucket, k)));
 
             var query = new RiakMapReduceQuery()
                 .Inputs(input)
