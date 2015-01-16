@@ -1,4 +1,5 @@
 ﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -14,12 +15,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
+using System.Collections.Generic;
+using System.Linq;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
 using Newtonsoft.Json;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace CorrugatedIron.Models.MapReduce
 {
@@ -64,11 +64,6 @@ namespace CorrugatedIron.Models.MapReduce
             var rVal = Values.SelectMany(v => JsonConvert.DeserializeObject<string[][]>(v.FromRiakString()).Select(
                 a => new RiakObjectId(a[0], a[1]))).ToList();
             return rVal;
-        }
-
-        public IEnumerable<dynamic> GetObjects()
-        {
-            return GetObjects<dynamic>();
         }
     }
 }

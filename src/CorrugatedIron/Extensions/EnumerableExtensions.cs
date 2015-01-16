@@ -26,12 +26,34 @@ namespace CorrugatedIron.Extensions
     {
         public static bool IsNullOrEmpty(this IEnumerable items)
         {
-            return ((items == null) || (false == items.GetEnumerator().MoveNext()));
+            if (items == null)
+            {
+                return true;
+            }
+
+            var collection = items as ICollection;
+            if (collection != null)
+            {
+                return collection.Count == 0;
+            }
+
+            return false == items.GetEnumerator().MoveNext();
         }
 
         public static bool IsNullOrEmpty<T>(this IEnumerable<T> items)
         {
-            return ((items == null) || (false == items.GetEnumerator().MoveNext()));
+            if (items == null)
+            {
+                return true;
+            }
+
+            var collection = items as ICollection<T>;
+            if (collection != null)
+            {
+                return collection.Count == 0;
+            }
+
+            return ((IEnumerable)items).IsNullOrEmpty();
         }
 
         public static void ForEach<T>(this IEnumerable<T> items, Action<T> action)
