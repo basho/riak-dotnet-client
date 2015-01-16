@@ -25,6 +25,10 @@ namespace CorrugatedIron.Models
     [JsonConverter(typeof(RiakObjectIdConverter))]
     public class RiakObjectId : IEquatable<RiakObjectId>
     {
+        private readonly string bucket;
+        private readonly string bucketType;
+        private readonly string key;
+
         protected RiakObjectId()
         {
         }
@@ -36,24 +40,35 @@ namespace CorrugatedIron.Models
                 throw new ArgumentNullException("bucket");
             }
 
-            this.Bucket = bucket;
-            this.Key = key;
+            this.bucket = bucket;
+            this.key = key;
         }
 
         public RiakObjectId(string bucketType, string bucket, string key)
             : this(bucket, key)
         {
-            this.BucketType = bucketType;
+            this.bucketType = bucketType;
         }
 
         internal RiakLink ToRiakLink(string tag)
         {
-            return new RiakLink(Bucket, Key, tag);
+            return new RiakLink(bucket, key, tag);
         }
 
-        public string Bucket { get; private set; }
-        public string BucketType { get; private set; }
-        public string Key { get; private set; }
+        public string Bucket
+        {
+            get { return bucket; }
+        }
+
+        public string BucketType
+        {
+            get { return bucketType; }
+        }
+
+        public string Key
+        {
+            get { return key; }
+        }
 
         public bool Equals(RiakObjectId other)
         {
@@ -65,9 +80,9 @@ namespace CorrugatedIron.Models
             {
                 return true;
             }
-            return String.Equals(Bucket, other.Bucket) &&
-                String.Equals(BucketType, other.BucketType) &&
-                String.Equals(Key, other.Key);
+            return String.Equals(bucket, other.Bucket) &&
+                String.Equals(bucketType, other.BucketType) &&
+                String.Equals(key, other.key);
         }
 
         public override bool Equals(object obj)
@@ -79,9 +94,9 @@ namespace CorrugatedIron.Models
         {
             unchecked
             {
-                int hashCode = (Bucket != null ? Bucket.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (BucketType != null ? BucketType.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (Key != null ? Key.GetHashCode() : 0);
+                int hashCode = (bucket != null ? bucket.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (bucketType != null ? bucketType.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (key != null ? key.GetHashCode() : 0);
                 return hashCode;
             }
         }

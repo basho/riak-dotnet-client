@@ -22,7 +22,7 @@ using Newtonsoft.Json;
 namespace CorrugatedIron.Converters
 {
     /*
-     * TODO: I have no idea why this exists
+     * TODO: Figure out if this is still needed
      */
     public class RiakObjectIdConverter : JsonConverter
     {
@@ -45,13 +45,10 @@ namespace CorrugatedIron.Converters
                         key = reader.Value.ToString();
                     }
                 }
-                /*
-                 * TODO: can we break early?
                 if (pos > 1)
                 {
                     break;
                 }
-                 */
                 pos++;
             }
 
