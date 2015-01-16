@@ -54,6 +54,7 @@ namespace CorrugatedIron.Models.MapReduce
             return this;
         }
 
+        // TODO: Replace the backwardsness of these parameters when we get a Namespace class.
         public RiakMapReduceQuery Inputs(string bucket, string bucketType)
         {
             _inputs = new RiakBucketInput(bucket, bucketType);
