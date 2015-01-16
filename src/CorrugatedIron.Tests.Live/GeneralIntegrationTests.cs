@@ -76,11 +76,13 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         [Test]
         public void GetWithInvalidBucketReturnsInvalidRequest()
         {
-            var getResult = Client.Get("", "key");
-            getResult.ResultCode.ShouldEqual(ResultCode.InvalidRequest);
-            // TODO: confirm that this is an invalid behavior and either trap or submit a Riak bug
-            //getResult = Client.Get(null, "key");
-            //getResult.ResultCode.ShouldEqual(ResultCode.InvalidRequest);
+            Assert.Throws<ArgumentNullException>(() => Client.Get("", "key"));
+
+            Assert.Throws<ArgumentNullException>(() => Client.Get(null, "key"));
+            Assert.Throws<ArgumentNullException>(() => Client.Get(String.Empty, "key"));
+
+            Assert.Throws<ArgumentNullException>(() => Client.Get(null, null, "key"));
+            Assert.Throws<ArgumentNullException>(() => Client.Get(null, String.Empty, "key"));
         }
 
         [Test]
@@ -95,20 +97,20 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         {
             var doc = new RiakObject(TestBucket, TestKey, TestJson, RiakConstants.ContentTypes.ApplicationJson);
             var writeResult = Client.Put(doc);
-
             writeResult.IsSuccess.ShouldBeTrue();
             writeResult.Value.ShouldNotBeNull();
 
-            var getResults = Client.Get(new List<RiakObjectId>
+            Assert.Throws<ArgumentNullException>(() =>
             {
-                new RiakObjectId(null, "key"),
-                new RiakObjectId("", "key"),
-                new RiakObjectId("  ", "key"),
-                new RiakObjectId("foo/bar", "key"),
-                new RiakObjectId(TestBucket, TestKey)
-            }).ToList();
-
-            getResults.Count(r => r.IsSuccess).ShouldEqual(1);
+                var getResults = Client.Get(new List<RiakObjectId>
+                {
+                    new RiakObjectId(null, "key"),
+                    new RiakObjectId("", "key"),
+                    new RiakObjectId("  ", "key"),
+                    new RiakObjectId("foo/bar", "key"),
+                    new RiakObjectId(TestBucket, TestKey)
+                }).ToList();
+            });
         }
 
         [Test]
