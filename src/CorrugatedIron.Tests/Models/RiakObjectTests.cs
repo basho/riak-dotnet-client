@@ -14,6 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
 using System.Linq;
 using CorrugatedIron.Models;
 using CorrugatedIron.Tests.Extensions;
@@ -26,6 +27,36 @@ namespace CorrugatedIron.Tests.Models
     {
         private const string Bucket = "bucket";
         private const string Key = "key";
+
+        [Test]
+        public void RiakObject_RequiresNonNullNonEmptyBucketName()
+        {
+            Assert.Catch<ArgumentNullException>(
+                () => new RiakObject((string)null, Key, "value"),
+                "Expected ArgumentNullException");
+        }
+
+        [Test]
+        public void RiakObjectId_RequiresNonNullNonEmptyBucketName()
+        {
+            Assert.Catch<ArgumentNullException>(
+                () => new RiakObjectId((string)null, Key),
+                "Expected ArgumentNullException");
+        }
+
+        [Test]
+        public void RiakObject_RequiresNonNullObjectId()
+        {
+            Assert.Catch<ArgumentNullException>(
+                () => new RiakObject((RiakObjectId)null, Key, "value"),
+                "Expected ArgumentNullException");
+        }
+
+        [Test]
+        public void TODO_RiakObjectIdConverter_TestFromJson()
+        {
+            Assert.Fail("TODO");
+        }
 
         [Test]
         public void ToRiakObjectIdProducesAValidRiakObjectId()

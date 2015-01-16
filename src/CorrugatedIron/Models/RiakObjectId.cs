@@ -1,4 +1,5 @@
 ﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -16,6 +17,7 @@
 
 using System;
 using CorrugatedIron.Converters;
+using CorrugatedIron.Extensions;
 using Newtonsoft.Json;
 
 namespace CorrugatedIron.Models
@@ -23,30 +25,29 @@ namespace CorrugatedIron.Models
     [JsonConverter(typeof(RiakObjectIdConverter))]
     public class RiakObjectId : IEquatable<RiakObjectId>
     {
-        public string Bucket { get; set; }
-        public string BucketType { get; set; }
-        public string Key { get; set; }
+        public string Bucket { get; private set; }
+        public string BucketType { get; private set; }
+        public string Key { get; private set; }
 
-        public RiakObjectId()
+        protected RiakObjectId()
         {
         }
-
-        public RiakObjectId(string[] objectId)
-        {
-            Bucket = objectId[0];
-            Key = objectId[1];
-        }
-
 
         public RiakObjectId(string bucket, string key)
         {
-            Bucket = bucket;
-            Key = key;
+            if (bucket.IsNullOrEmpty())
+            {
+                throw new ArgumentNullException("bucket");
+            }
+
+            this.Bucket = bucket;
+            this.Key = key;
         }
 
-        public RiakObjectId(string bucketType, string bucket, string key) : this (bucket, key)
+        public RiakObjectId(string bucketType, string bucket, string key)
+            : this(bucket, key)
         {
-            BucketType = bucketType;
+            this.BucketType = bucketType;
         }
 
         internal RiakLink ToRiakLink(string tag)
@@ -56,17 +57,22 @@ namespace CorrugatedIron.Models
 
         public bool Equals(RiakObjectId other)
         {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return string.Equals(Bucket, other.Bucket) && string.Equals(BucketType, other.BucketType) && string.Equals(Key, other.Key);
+            if (ReferenceEquals(null, other))
+            {
+                return false;
+            }
+            if (ReferenceEquals(this, other))
+            {
+                return true;
+            }
+            return String.Equals(Bucket, other.Bucket) &&
+                String.Equals(BucketType, other.BucketType) &&
+                String.Equals(Key, other.Key);
         }
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((RiakObjectId) obj);
+            return Equals(obj as RiakObjectId);
         }
 
         public override int GetHashCode()
@@ -74,8 +80,8 @@ namespace CorrugatedIron.Models
             unchecked
             {
                 int hashCode = (Bucket != null ? Bucket.GetHashCode() : 0);
-                hashCode = (hashCode*397) ^ (BucketType != null ? BucketType.GetHashCode() : 0);
-                hashCode = (hashCode*397) ^ (Key != null ? Key.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (BucketType != null ? BucketType.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (Key != null ? Key.GetHashCode() : 0);
                 return hashCode;
             }
         }
