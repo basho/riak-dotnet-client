@@ -64,6 +64,7 @@
     <Compile Include="Auth\AuthTestBase.cs" />
     <Compile Include="Auth\RiakSecurityManagerTests.cs" />
     <Compile Include="Comms\RoundRobinStrategyTests.cs" />
+    <Compile Include="ExtensionMethodTests.cs" />
     <Compile Include="Json\RiakObjectConversionTests.cs" />
     <Compile Include="Json\TestObjects.cs" />
     <Compile Include="Messages\MessageCodeTests.cs" />
@@ -97,6 +98,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <!-- https://connect.microsoft.com/VisualStudio/feedback/details/800245/vs2013rc-adds-to-vs2012-c-project-section-itemgroup -->
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
