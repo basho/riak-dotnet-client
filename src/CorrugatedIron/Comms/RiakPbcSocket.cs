@@ -32,13 +32,12 @@ namespace CorrugatedIron.Comms
 {
     internal class RiakPbcSocket : IDisposable
     {
-        // TODO private static readonly bool checkCertificateRevocation = true ;
-
         private readonly string server;
         private readonly int port;
         private readonly int readTimeout;
         private readonly int writeTimeout;
         private readonly RiakSecurityManager securityManager;
+        private readonly bool checkCertificateRevocation = false;
 
         private Stream networkStream = null;
         private bool isConnected = false;
@@ -50,6 +49,7 @@ namespace CorrugatedIron.Comms
             this.readTimeout = nodeConfig.NetworkReadTimeout;
             this.writeTimeout = nodeConfig.NetworkWriteTimeout;
             this.securityManager = new RiakSecurityManager(authConfig);
+            this.checkCertificateRevocation = authConfig.CheckCertificateRevocation;
         }
 
         public bool IsConnected
@@ -252,9 +252,11 @@ namespace CorrugatedIron.Comms
 
                 if (securityManager.ClientCertificatesConfigured)
                 {
-                    var sslProtocol = SslProtocols.Tls;
-                    sslStream.AuthenticateAsClient(server,
-                        securityManager.ClientCertificates, sslProtocol, false);
+                    sslStream.AuthenticateAsClient(
+                        targetHost: server,
+                        clientCertificates: securityManager.ClientCertificates,
+                        enabledSslProtocols: SslProtocols.Default,
+                        checkCertificateRevocation: checkCertificateRevocation);
                 }
                 else
                 {

@@ -1,4 +1,5 @@
 ﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -25,11 +26,6 @@ namespace CorrugatedIron.Tests.Live.IdleTests
     [Ignore("Idling is undergoing rework, so these tests are currently invalid")]
     public class WhenConnectionGoesIdle : LiveRiakConnectionTestBase
     {
-        public WhenConnectionGoesIdle()
-            : base("riak1NodeConfiguration")
-        {
-        }
-
         private IRiakConnection GetIdleConnection()
         {
             var result = Cluster.UseConnection(RiakResult<IRiakConnection>.Success, 1);

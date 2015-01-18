@@ -23,5 +23,6 @@ namespace CorrugatedIron.Config
         string ClientCertificateFile { get; }
         string ClientCertificateSubject { get; }
         string CertificateAuthorityFile { get; }
+        bool CheckCertificateRevocation { get; }
     }
 }

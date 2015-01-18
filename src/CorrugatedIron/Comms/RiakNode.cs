@@ -15,9 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Config;
 using System;
 using System.Collections.Generic;
+using CorrugatedIron.Config;
 
 namespace CorrugatedIron.Comms
 {
@@ -64,7 +64,10 @@ namespace CorrugatedIron.Comms
         private TRiakResult UseConnection<TRiakResult>(Func<IRiakConnection, TRiakResult> useFun, Func<ResultCode, string, bool, TRiakResult> onError)
             where TRiakResult : RiakResult
         {
-            if (disposing) return onError(ResultCode.ShuttingDown, "Connection is shutting down", true);
+            if (disposing)
+            {
+                return onError(ResultCode.ShuttingDown, "Connection is shutting down", true);
+            }
 
             var response = connections.Consume(useFun);
             if (response.Item1)
@@ -77,7 +80,10 @@ namespace CorrugatedIron.Comms
         public RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun)
             where TResult : RiakResult
         {
-            if (disposing) return RiakResult<IEnumerable<TResult>>.Error(ResultCode.ShuttingDown, "Connection is shutting down", true);
+            if (disposing)
+            {
+                return RiakResult<IEnumerable<TResult>>.Error(ResultCode.ShuttingDown, "Connection is shutting down", true);
+            }
 
             var response = connections.DelayedConsume(useFun);
             if (response.Item1)

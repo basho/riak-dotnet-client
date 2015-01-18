@@ -54,5 +54,12 @@ namespace CorrugatedIron.Config
             get { return (string)this["certificateAuthorityFile"]; }
             set { this["certificateAuthorityFile"] = value; }
         }
+
+        [ConfigurationProperty("checkCertificateRevocation", DefaultValue = false, IsRequired = false)]
+        public bool CheckCertificateRevocation
+        {
+            get { return (bool)this["checkCertificateRevocation"]; }
+            set { this["checkCertificateRevocation"] = value; }
+        }
     }
 }
