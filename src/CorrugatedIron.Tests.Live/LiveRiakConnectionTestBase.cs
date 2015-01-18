@@ -63,13 +63,17 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
             }.ToJson();
         }
 
-        public LiveRiakConnectionTestBase(string section = "riak1NodeConfiguration")
+        public LiveRiakConnectionTestBase()
         {
             // TODO: do something smarter with this
             // switch between cluster and load balancer configuration "easily" by changing the following
             // two lines around
-            //Cluster = RiakExternalLoadBalancer.FromConfig("riakHaproxyConfiguration");
-            Cluster = RiakCluster.FromConfig(section);
+            // Cluster = RiakExternalLoadBalancer.FromConfig("riakHaproxyConfiguration");
+#if NOAUTH
+            Cluster = RiakCluster.FromConfig("riak1NodeNoAuthConfiguration");
+#else
+            Cluster = RiakCluster.FromConfig("riak1NodeConfiguration");
+#endif
         }
 
         [SetUp]
