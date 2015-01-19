@@ -160,7 +160,7 @@ namespace CorrugatedIron.Tests.Live
             jeremiah.Links.Count.IsAtLeast(4);
         }
 
-        [Test]
+        [Test, Ignore("Link walking is deprecated in Riak 2.0 and incompatible with Security")]
         public void RiakObjectLinksAreTheSameAsLinksRetrievedViaMapReduce()
         {
             var jeremiah = Client.Get(TestBucket, Jeremiah).Value;
@@ -191,7 +191,7 @@ namespace CorrugatedIron.Tests.Live
             }
         }
 
-        [Test]
+        [Test, Ignore("Link walking is deprecated in Riak 2.0 and incompatible with Security")]
         public void LinksAreRetrievedWithAMapReducePhase()
         {
             var query = new RiakMapReduceQuery()
@@ -252,7 +252,7 @@ namespace CorrugatedIron.Tests.Live
             ojLinks.ForEach(l => jeremiah.Links.ShouldContain(l));
         }
 
-        [Test]
+        [Test, Ignore("Link walking is deprecated in Riak 2.0 and incompatible with Security")]
         public void LinkWalkingSuccessfullyRetrievesNLevels()
         {
             var oj = Client.Get(TestBucket, OJ).Value;
