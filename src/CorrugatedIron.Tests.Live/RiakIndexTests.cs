@@ -164,9 +164,7 @@ namespace CorrugatedIron.Tests.Live
             var queriedKeys = result.Value.PhaseResults.SelectMany(x => x.GetObjectIds()).ToList();
 
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
-            // TODO:
-            // Changed to GreaterOrEqual since multiple test runs leave keys behind.
-            Assert.GreaterOrEqual(queriedKeys.Count, DefaultKeyCount);
+            Assert.AreEqual(queriedKeys.Count, DefaultKeyCount);
 
             foreach (var key in queriedKeys)
             {

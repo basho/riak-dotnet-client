@@ -93,8 +93,7 @@ namespace CorrugatedIron.Tests.Live
 
             CreateLinkedObjects(Bucket);
 
-            var props = new RiakBucketProperties()
-                .SetAllowMultiple(true);
+            var props = new RiakBucketProperties().SetAllowMultiple(true);
             Client.SetBucketProperties(Bucket, props);
         }
 
@@ -140,9 +139,7 @@ namespace CorrugatedIron.Tests.Live
             base.SetUp();
             CreateLinkedObjects(TestBucket);
 
-            var props = new RiakBucketProperties()
-                .SetAllowMultiple(false);
-
+            var props = new RiakBucketProperties().SetAllowMultiple(false);
             Client.SetBucketProperties(TestBucket, props);
         }
 
@@ -176,7 +173,7 @@ namespace CorrugatedIron.Tests.Live
             var mrResult = Client.MapReduce(query);
             mrResult.IsSuccess.ShouldBeTrue();
 
-            // TODO Is *this* chunk of code acceptable?
+            // TODO: FUTURE - Is *this* chunk of code acceptable?
             // This should probably be taken care of in the RiakClient.WalkLinks
             var listOfLinks = mrResult.Value.PhaseResults.OrderBy(pr => pr.Phase)
                 .ElementAt(0).Values
@@ -307,9 +304,9 @@ namespace CorrugatedIron.Tests.Live
             //    }
             //};
             const string bucketName = "test";
-            var ojPerson = new Person() {Name = "oj", CurrentlyDrinking = "tea"};
+            var ojPerson = new Person() { Name = "oj", CurrentlyDrinking = "tea" };
 
-            var oj = new RiakObject(bucketName, OJ) {ContentType = RiakConstants.ContentTypes.ProtocolBuffers};
+            var oj = new RiakObject(bucketName, OJ) { ContentType = RiakConstants.ContentTypes.ProtocolBuffers };
             oj.SetObject(ojPerson);
 
             // Don't capture result to avoid compiler warning

@@ -37,7 +37,10 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
         protected const string TestKey = "test_json";
         protected static readonly string TestJson;
         protected const string MapReduceBucket = "map_reduce_bucket";
+
+        // NB: allow_mult/last_write_wins set in devrel setup script
         protected const string MultiBucket = "test_multi_bucket";
+
         protected const string MultiKey = "test_multi_key";
         protected const string MultiBodyOne = @"{""dishes"": 9}";
         protected const string MultiBodyTwo = @"{""dishes"": 11}";
@@ -65,10 +68,6 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
 
         public LiveRiakConnectionTestBase()
         {
-            // TODO: do something smarter with this
-            // switch between cluster and load balancer configuration "easily" by changing the following
-            // two lines around
-            // Cluster = RiakExternalLoadBalancer.FromConfig("riakHaproxyConfiguration");
 #if NOAUTH
             Cluster = RiakCluster.FromConfig("riak1NodeNoAuthConfiguration");
 #else

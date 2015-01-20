@@ -248,7 +248,7 @@ namespace CorrugatedIron.Models
                 throw new ArgumentNullException("objectId.Bucket");
             }
 
-            // TODO: should Key be required?
+            // TODO: FUTURE - should Key be required?
             Key = objectId.Key;
 
             Value = value;

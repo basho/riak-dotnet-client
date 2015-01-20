@@ -52,7 +52,7 @@ namespace CorrugatedIron.Comms
         }
 
         /*
-         * TODO: future
+         * TODO: FUTURE
          * Read/Write in this class should *only* deal with byte[]
          * Serialization/Deserialization should be other class
          */
@@ -126,8 +126,7 @@ namespace CorrugatedIron.Comms
             if (expectedCode != messageCode)
             {
                 string errorMessage = "Expected return code {0} received {1}".Fmt(expectedCode, messageCode);
-                // TODO should this really mark the node offline?
-                throw new RiakException(errorMessage, true);
+                throw new RiakException(errorMessage, false);
             }
 
             return messageCode;
@@ -152,10 +151,12 @@ namespace CorrugatedIron.Comms
                 throw new RiakInvalidDataException((byte)messageCode);
             }
 
-            // TODO: removed #if DEBUG because this seems like a good check
-            // This message code validation is here to make sure that the caller
-            // is getting exactly what they expect. This "could" be removed from
-            // production code, but it's a good thing to have in here for dev.
+            /*
+             * Removed #if DEBUG because this seems like a good check
+             * This message code validation is here to make sure that the caller
+             * is getting exactly what they expect.
+             * TODO: FUTURE - does this check impact performance?
+             */
             var t_type = typeof(T);
             Type type_for_message_code = MessageCodeTypeMapBuilder.GetTypeFor(messageCode);
             if (type_for_message_code != t_type)
@@ -221,11 +222,8 @@ namespace CorrugatedIron.Comms
 
             Write(MessageCode.RpbStartTls);
             // NB: the following will throw an exception if the returned code is not the expected code
-            // TODO: should throw a RiakSslException
+            // TODO: FUTURE -> should throw a RiakSslException
             Read(MessageCode.RpbStartTls);
-
-            // TODO: validate_sessions from Ruby client
-            // validates hostname, and CRL
 
             // http://stackoverflow.com/questions/9934975/does-sslstream-dispose-disposes-its-inner-stream
             var sslStream = new SslStream(networkStream, false,
@@ -287,7 +285,7 @@ namespace CorrugatedIron.Comms
                 int bytesReceived = NetworkStream.Read(resultBuffer, totalBytesReceived, lengthToReceive);
                 if (bytesReceived == 0)
                 {
-                    // TODO: Based on the docs, this isn't necessarily an exception
+                    // NB: Based on the docs, this isn't necessarily an exception
                     // http://msdn.microsoft.com/en-us/library/system.net.sockets.networkstream.read(v=vs.110).aspx
                     break;
                 }
