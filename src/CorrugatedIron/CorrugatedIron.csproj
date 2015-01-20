@@ -72,10 +72,8 @@
     <Compile Include="Comms\RiakPbcSocket.cs" />
     <Compile Include="Config\IRiakAuthenticationConfiguration.cs" />
     <Compile Include="Config\IRiakClusterConfiguration.cs" />
-    <Compile Include="Config\IRiakExternalLoadBalancerConfiguration.cs" />
     <Compile Include="Config\IRiakNodeConfiguration.cs" />
     <Compile Include="Config\RiakAuthenticationConfiguration.cs" />
-    <Compile Include="Config\RiakExternalLoadBalancerConfiguration.cs" />
     <Compile Include="Containers\ConcurrentEnumerable.cs" />
     <Compile Include="Containers\ConcurrentEnumerator.cs" />
     <Compile Include="Comms\RiakConnectionPool.cs" />
@@ -235,7 +233,6 @@
     <Compile Include="Comms\RiakNode.cs" />
     <Compile Include="Models\MapReduce\RiakMapReduceResult.cs" />
     <Compile Include="RiakEndPoint.cs" />
-    <Compile Include="RiakExternalLoadBalancer.cs" />
     <Compile Include="RiakResult.cs" />
     <Compile Include="Config\RiakClusterConfiguration.cs" />
     <Compile Include="Config\RiakNodeConfiguration.cs" />
