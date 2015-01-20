@@ -18,6 +18,7 @@
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce.Inputs;
 using CorrugatedIron.Tests.Extensions;
+using CorrugatedIron.Util;
 using NUnit.Framework;
 
 namespace CorrugatedIron.Tests.Models.MapReduce.Inputs
@@ -29,7 +30,7 @@ namespace CorrugatedIron.Tests.Models.MapReduce.Inputs
         public void TestIndexSuffixIsSetCorrectly()
         {
             var input = new RiakBinIndexEqualityInput(new RiakIndexId("bucket", "index"), "dave");
-            input.IndexId.IndexName.EndsWith("_bin").ShouldBeTrue();
+            input.IndexId.IndexName.EndsWith(RiakConstants.IndexSuffix.Binary).ShouldBeTrue();
         }
 
         [Test]
@@ -79,7 +80,7 @@ namespace CorrugatedIron.Tests.Models.MapReduce.Inputs
         public void TestIndexSuffixIsSetCorrectly()
         {
             var input = new RiakBinIndexRangeInput(new RiakIndexId("bucket", "index"), "dave", "ed");
-            input.IndexId.IndexName.EndsWith("_bin").ShouldBeTrue();
+            input.IndexId.IndexName.EndsWith(RiakConstants.IndexSuffix.Binary).ShouldBeTrue();
         }
 
         [Test]
@@ -122,7 +123,7 @@ namespace CorrugatedIron.Tests.Models.MapReduce.Inputs
         public void TestIndexSuffixIsSetCorrectly()
         {
             var input = new RiakIntIndexEqualityInput(new RiakIndexId("bucket", "index"), 42);
-            input.IndexId.IndexName.EndsWith("_int").ShouldBeTrue();
+            input.IndexId.IndexName.EndsWith(RiakConstants.IndexSuffix.Integer).ShouldBeTrue();
         }
 
         [Test]
@@ -162,7 +163,7 @@ namespace CorrugatedIron.Tests.Models.MapReduce.Inputs
         public void TestIndexSuffixIsSetCorrectly()
         {
             var input = new RiakIntIndexRangeInput(new RiakIndexId("bucket", "index"), 42, 100);
-            input.IndexId.IndexName.EndsWith("_int").ShouldBeTrue();
+            input.IndexId.IndexName.EndsWith(RiakConstants.IndexSuffix.Integer).ShouldBeTrue();
         }
 
         [Test]
