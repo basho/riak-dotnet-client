@@ -61,9 +61,16 @@ namespace CorrugatedIron.Models.MapReduce
             return this;
         }
 
+        [Obsolete("Using Legacy Search as input for MapReduce is depreciated. Please move to Riak 2.0 Search, and use the RiakSearchInput class instead.")]
         public RiakMapReduceQuery Inputs(RiakBucketSearchInput riakBucketSearchInput)
         {
             _inputs = riakBucketSearchInput;
+            return this;
+        }
+
+        public RiakMapReduceQuery Inputs(RiakSearchInput riakSearchInput)
+        {
+            _inputs = riakSearchInput;
             return this;
         }
 

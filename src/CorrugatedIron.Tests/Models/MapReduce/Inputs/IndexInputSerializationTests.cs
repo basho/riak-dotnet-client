@@ -17,6 +17,7 @@
 
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce.Inputs;
+using CorrugatedIron.Tests.Extensions;
 using NUnit.Framework;
 
 namespace CorrugatedIron.Tests.Models.MapReduce.Inputs
@@ -24,6 +25,13 @@ namespace CorrugatedIron.Tests.Models.MapReduce.Inputs
     [TestFixture]
     public class BinEqualityIndexSerializationTests : MapReduceSerializationTestsBase
     {
+        [Test]
+        public void TestIndexSuffixIsSetCorrectly()
+        {
+            var input = new RiakBinIndexEqualityInput(new RiakIndexId("bucket", "index"), "dave");
+            input.IndexId.IndexName.EndsWith("_bin").ShouldBeTrue();
+        }
+
         [Test]
         public void TestBinIndexEqualitySerializationOldInterface()
         {
@@ -64,10 +72,16 @@ namespace CorrugatedIron.Tests.Models.MapReduce.Inputs
         }
     }
 
-
     [TestFixture]
     public class BinRangeIndexSerializationTests : MapReduceSerializationTestsBase
     {
+        [Test]
+        public void TestIndexSuffixIsSetCorrectly()
+        {
+            var input = new RiakBinIndexRangeInput(new RiakIndexId("bucket", "index"), "dave", "ed");
+            input.IndexId.IndexName.EndsWith("_bin").ShouldBeTrue();
+        }
+
         [Test]
         public void TestBinIndexRangeSerializationOldInterface()
         {
@@ -105,6 +119,13 @@ namespace CorrugatedIron.Tests.Models.MapReduce.Inputs
     public class IntIndexEqualitySerializationTests : MapReduceSerializationTestsBase
     {
         [Test]
+        public void TestIndexSuffixIsSetCorrectly()
+        {
+            var input = new RiakIntIndexEqualityInput(new RiakIndexId("bucket", "index"), 42);
+            input.IndexId.IndexName.EndsWith("_int").ShouldBeTrue();
+        }
+
+        [Test]
         public void TestIntIndexEqualitySerializationOldInterface()
         {
 #pragma warning disable 612, 618
@@ -137,6 +158,13 @@ namespace CorrugatedIron.Tests.Models.MapReduce.Inputs
     [TestFixture]
     public class IntIndexRangeSerializationTests : MapReduceSerializationTestsBase
     {
+        [Test]
+        public void TestIndexSuffixIsSetCorrectly()
+        {
+            var input = new RiakIntIndexRangeInput(new RiakIndexId("bucket", "index"), 42, 100);
+            input.IndexId.IndexName.EndsWith("_int").ShouldBeTrue();
+        }
+
         [Test]
         public void TestIntIndexRangeSerializationOldInterface()
         {

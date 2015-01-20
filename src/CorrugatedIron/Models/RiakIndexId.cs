@@ -20,7 +20,7 @@ using CorrugatedIron.Extensions;
 
 namespace CorrugatedIron.Models
 {
-    public class RiakIndexId
+    public class RiakIndexId : IEquatable<RiakIndexId>
     {
         private readonly string _bucketName;
         private readonly string _bucketType;
@@ -69,6 +69,42 @@ namespace CorrugatedIron.Models
         internal RiakIntIndexId ToIntIndexId()
         {
             return new RiakIntIndexId(BucketType, BucketName, IndexName);
+        }
+
+        public bool Equals(RiakIndexId other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return string.Equals(_bucketName, other._bucketName) && string.Equals(_bucketType, other._bucketType) && string.Equals(_indexName, other._indexName);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((RiakIndexId) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = (_bucketName != null ? _bucketName.GetHashCode() : 0);
+                hashCode = (hashCode*397) ^ (_bucketType != null ? _bucketType.GetHashCode() : 0);
+                hashCode = (hashCode*397) ^ (_indexName != null ? _indexName.GetHashCode() : 0);
+                return hashCode;
+            }
+        }
+
+        public static bool operator ==(RiakIndexId left, RiakIndexId right)
+        {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(RiakIndexId left, RiakIndexId right)
+        {
+            return !Equals(left, right);
         }
     }
 
