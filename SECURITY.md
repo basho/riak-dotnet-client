@@ -75,7 +75,7 @@ Riak Security:
     <section name="riakConfiguration" type="CorrugatedIron.Config.RiakClusterConfiguration, CorrugatedIron" />
   </configSections>
   <riakConfiguration nodePollTime="5000" defaultRetryWaitTime="200" defaultRetryCount="3">
-    <authentication username="riakuser"
+    <authentication username="riakuser" password="Test1234"
        certificateAuthorityFile="full_or_relative_path_to\cacert.pem"
        clientCertificateFile="full_or_relative_path_to\riakuser-client-cert.pfx"
        clientCertificateSubject="E=riakuser@myorg.com, CN=riakuser, OU=Development, O=Basho Technologies, S=WA, C=US"
@@ -97,13 +97,21 @@ Riak Security:
 
 ### `authentication` element
 
+* `username` - this is a required attribute that will be used to
+authenticate the client. It must exactly match the user name configured
+via the `riak-admin security` command on your Riak cluster.
+
+* `password` - this is an optional attribute that is used when client
+certificates are not configured.
+
 * `clientCertificateAuthorityFile` - this attribute provides a full or
 relative path to the certificate containing the public key portion of
 your certificate authority's root cert. If you are using a commercial CA
 this attribute can be removed.
 
 * `clientCertificateFile` - this attribute provides a full or relative
-path to the client certificate you are using.
+path to the client certificate you are using. If this attribute is used
+the `password` attribute can be removed.
 
 * `clientCertificateSubject` - this attribute is used to load client
 certificates from the Windows certificate store. It must *exactly* match
