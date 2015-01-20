@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
-// Copyright (c) 2015 - Basho Technologies, Inc.
+﻿// Copyright (c) 2011 - 2014 OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -44,12 +44,12 @@ namespace CorrugatedIron.Comms
 
         public RiakPbcSocket(IRiakNodeConfiguration nodeConfig, IRiakAuthenticationConfiguration authConfig)
         {
-            this.server = nodeConfig.HostAddress;
-            this.port = nodeConfig.PbcPort;
-            this.readTimeout = nodeConfig.NetworkReadTimeout;
-            this.writeTimeout = nodeConfig.NetworkWriteTimeout;
-            this.securityManager = new RiakSecurityManager(server, authConfig);
-            this.checkCertificateRevocation = authConfig.CheckCertificateRevocation;
+            server = nodeConfig.HostAddress;
+            port = nodeConfig.PbcPort;
+            readTimeout = nodeConfig.NetworkReadTimeout;
+            writeTimeout = nodeConfig.NetworkWriteTimeout;
+            securityManager = new RiakSecurityManager(server, authConfig);
+            checkCertificateRevocation = authConfig.CheckCertificateRevocation;
         }
 
         public bool IsConnected
@@ -232,44 +232,43 @@ namespace CorrugatedIron.Comms
 
         private void SetUpSslStream(Stream networkStream)
         {
-            if (securityManager.IsSecurityEnabled)
+            if (!securityManager.IsSecurityEnabled) return;
+            
+            Write(MessageCode.RpbStartTls);
+            // NB: the following will throw an exception if the returned code is not the expected code
+            // TODO: should throw a RiakSslException
+            Read(MessageCode.RpbStartTls);
+
+            // TODO: validate_sessions from Ruby client
+            // validates hostname, and CRL
+
+            // http://stackoverflow.com/questions/9934975/does-sslstream-dispose-disposes-its-inner-stream
+            var sslStream = new SslStream(networkStream, false,
+                securityManager.ServerCertificateValidationCallback,
+                securityManager.ClientCertificateSelectionCallback);
+
+            sslStream.ReadTimeout = readTimeout;
+            sslStream.WriteTimeout = writeTimeout;
+
+            if (securityManager.ClientCertificatesConfigured)
             {
-                Write(MessageCode.RpbStartTls);
-                // NB: the following will throw an exception if the returned code is not the expected code
-                // TODO: should throw a RiakSslException
-                Read(MessageCode.RpbStartTls);
-
-                // TODO: validate_sessions from Ruby client
-                // validates hostname, and CRL
-
-                // http://stackoverflow.com/questions/9934975/does-sslstream-dispose-disposes-its-inner-stream
-                var sslStream = new SslStream(networkStream, false,
-                    securityManager.ServerCertificateValidationCallback,
-                    securityManager.ClientCertificateSelectionCallback);
-
-                sslStream.ReadTimeout = readTimeout;
-                sslStream.WriteTimeout = writeTimeout;
-
-                if (securityManager.ClientCertificatesConfigured)
-                {
-                    sslStream.AuthenticateAsClient(
-                        targetHost: server,
-                        clientCertificates: securityManager.ClientCertificates,
-                        enabledSslProtocols: SslProtocols.Default,
-                        checkCertificateRevocation: checkCertificateRevocation);
-                }
-                else
-                {
-                    sslStream.AuthenticateAsClient(server);
-                }
-
-                // NB: very important! Must make the Stream being using going forward the SSL Stream!
-                this.networkStream = sslStream;
-
-                RpbAuthReq authRequest = securityManager.GetAuthRequest();
-                Write(authRequest);
-                Read(MessageCode.RpbAuthResp);
+                sslStream.AuthenticateAsClient(
+                    targetHost: server,
+                    clientCertificates: securityManager.ClientCertificates,
+                    enabledSslProtocols: SslProtocols.Default,
+                    checkCertificateRevocation: checkCertificateRevocation);
             }
+            else
+            {
+                sslStream.AuthenticateAsClient(server);
+            }
+
+            // NB: very important! Must make the Stream being using going forward the SSL Stream!
+            this.networkStream = sslStream;
+
+            RpbAuthReq authRequest = securityManager.GetAuthRequest();
+            Write(authRequest);
+            Read(MessageCode.RpbAuthResp);
         }
 
         private T DeserializeInstance<T>(int size) where T : new()
@@ -291,27 +290,26 @@ namespace CorrugatedIron.Comms
         {
             int totalBytesReceived = 0;
             int lengthToReceive = resultBuffer.Length;
-            if (NetworkStream.CanRead)
-            {
-                while (lengthToReceive > 0)
-                {
-                    int bytesReceived = NetworkStream.Read(resultBuffer, totalBytesReceived, lengthToReceive);
-                    if (bytesReceived == 0)
-                    {
-                        // TODO: Based on the docs, this isn't necessarily an exception
-                        // http://msdn.microsoft.com/en-us/library/system.net.sockets.networkstream.read(v=vs.110).aspx
-                        break;
-                    }
-                    totalBytesReceived += bytesReceived;
-                    lengthToReceive -= bytesReceived;
-                }
-                return resultBuffer;
-            }
-            else
+            
+            if (!NetworkStream.CanRead)
             {
                 string errorMessage = "Unable to read data from the source stream - Can't read.";
                 throw new RiakException(errorMessage, true);
             }
+            
+            while (lengthToReceive > 0)
+            {
+                int bytesReceived = NetworkStream.Read(resultBuffer, totalBytesReceived, lengthToReceive);
+                if (bytesReceived == 0)
+                {
+                    // TODO: Based on the docs, this isn't necessarily an exception
+                    // http://msdn.microsoft.com/en-us/library/system.net.sockets.networkstream.read(v=vs.110).aspx
+                    break;
+                }
+                totalBytesReceived += bytesReceived;
+                lengthToReceive -= bytesReceived;
+            }
+            return resultBuffer;
         }
     }
 }
