@@ -29,7 +29,11 @@ then
   $riak_admin bucket-type activate consistent
 fi
 
-echo 'Setting backend to leveldb_backend for riak_index_tests bucket... HTTP CODE:'
+echo -n 'Setting properties on test_multi_bucket HTTP CODE:'
+curl -4so /dev/null -w "%{http_code}" -XPUT -H 'Content-type: application/json' localhost:$http_port/buckets/test_multi_bucket/props -d '{"props":{"allow_mult":true,"last_write_wins":false}}'
+echo ' ...DONE'
+
+echo -n 'Setting backend to leveldb_backend for riak_index_tests bucket... HTTP CODE:'
 curl -4so /dev/null -w "%{http_code}" -XPUT -H 'Content-type: application/json' localhost:$http_port/buckets/riak_index_tests/props -d '{"props":{"backend":"leveldb_backend"}}'
 echo ' ...DONE'
 
