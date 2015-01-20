@@ -37,7 +37,7 @@ namespace CorrugatedIron.Extensions
                 return collection.Count == 0;
             }
 
-            return false == items.GetEnumerator().MoveNext();
+            return !items.GetEnumerator().MoveNext();
         }
 
         public static bool IsNullOrEmpty<T>(this IEnumerable<T> items)

@@ -56,7 +56,7 @@ namespace CorrugatedIron.Auth
         {
             get
             {
-                return (authConfig != null && (false == authConfig.Username.IsNullOrEmpty()));
+                return (authConfig != null && (!authConfig.Username.IsNullOrEmpty()));
             }
         }
 
@@ -97,7 +97,7 @@ namespace CorrugatedIron.Auth
                             foreach (X509ChainStatus status in chain.ChainStatus)
                             {
                                 if ((status.Status == X509ChainStatusFlags.UntrustedRoot) &&
-                                    (false == chain.ChainElements.IsNullOrEmpty()))
+                                    (!chain.ChainElements.IsNullOrEmpty()))
                                 {
                                     // The root cert must not be installed but we provided a file
                                     // See if anything in the chain matches our root cert
@@ -146,9 +146,9 @@ namespace CorrugatedIron.Auth
              * 2nd time in here, targetHost == "riak-test" and acceptableIssues is one element in array:
              *     OU=Development, O=Basho Technologies, L=Bellevue, S=WA, C=US
              */
-            if (false == localCertificates.IsNullOrEmpty())
+            if (!localCertificates.IsNullOrEmpty())
             {
-                if (false == acceptableIssuers.IsNullOrEmpty())
+                if (!acceptableIssuers.IsNullOrEmpty())
                 {
                     foreach (X509Certificate cert in localCertificates)
                     {
@@ -185,7 +185,7 @@ namespace CorrugatedIron.Auth
         {
             X509Certificate2 certificateAuthorityCert = null;
 
-            if ((false == authConfig.CertificateAuthorityFile.IsNullOrEmpty()) &&
+            if ((!authConfig.CertificateAuthorityFile.IsNullOrEmpty()) &&
                 (File.Exists(authConfig.CertificateAuthorityFile)))
             {
                 certificateAuthorityCert = new X509Certificate2(authConfig.CertificateAuthorityFile);
@@ -199,14 +199,14 @@ namespace CorrugatedIron.Auth
             var clientCertificates = new X509CertificateCollection();
 
             // http://stackoverflow.com/questions/18462064/associate-a-private-key-with-the-x509certificate2-class-in-net
-            if ((false == authConfig.ClientCertificateFile.IsNullOrEmpty()) &&
+            if ((!authConfig.ClientCertificateFile.IsNullOrEmpty()) &&
                 (File.Exists(authConfig.ClientCertificateFile)))
             {
                 var cert = new X509Certificate2(authConfig.ClientCertificateFile);
                 clientCertificates.Add(cert);
             }
 
-            if (false == authConfig.ClientCertificateSubject.IsNullOrEmpty())
+            if (!authConfig.ClientCertificateSubject.IsNullOrEmpty())
             {
                 foreach (var storeLocation in storeLocations)
                 {

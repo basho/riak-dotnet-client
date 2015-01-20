@@ -40,7 +40,6 @@ namespace CorrugatedIron.Comms
         private readonly bool checkCertificateRevocation = false;
 
         private Stream networkStream = null;
-        private bool isConnected = false;
 
         public RiakPbcSocket(IRiakNodeConfiguration nodeConfig, IRiakAuthenticationConfiguration authConfig)
         {
@@ -50,18 +49,6 @@ namespace CorrugatedIron.Comms
             writeTimeout = nodeConfig.NetworkWriteTimeout;
             securityManager = new RiakSecurityManager(server, authConfig);
             checkCertificateRevocation = authConfig.CheckCertificateRevocation;
-        }
-
-        public bool IsConnected
-        {
-            get
-            {
-                // TODO: replace with something else?
-                // http://stackoverflow.com/questions/1387459/how-to-check-if-tcpclient-connection-is-closed
-                // http://msdn.microsoft.com/en-us/library/system.net.sockets.socket.connected%28v=vs.110%29.aspx
-                // TODO: every Read/Write to the stream should catch exceptions and set this to false
-                return isConnected;
-            }
         }
 
         /*
@@ -160,7 +147,7 @@ namespace CorrugatedIron.Comms
                 throw new RiakException(error.errcode, errorMessage, false);
             }
 
-            if (false == MessageCodeTypeMapBuilder.Contains(messageCode))
+            if (!MessageCodeTypeMapBuilder.Contains(messageCode))
             {
                 throw new RiakInvalidDataException((byte)messageCode);
             }
@@ -189,7 +176,6 @@ namespace CorrugatedIron.Comms
 
         public void Disconnect()
         {
-            isConnected = false;
             // NB: since networkStream owns the underlying socket there is no need to close socket as well
             if (networkStream != null)
             {
@@ -215,11 +201,7 @@ namespace CorrugatedIron.Comms
             var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             socket.NoDelay = true;
             socket.Connect(server, port);
-            if (socket.Connected)
-            {
-                isConnected = true;
-            }
-            else
+            if (!socket.Connected)
             {
                 string errorMessage = "Unable to connect to remote server: {0}:{1}".Fmt(server, port);
                 throw new RiakException(errorMessage, true);
@@ -232,8 +214,11 @@ namespace CorrugatedIron.Comms
 
         private void SetUpSslStream(Stream networkStream)
         {
-            if (!securityManager.IsSecurityEnabled) return;
-            
+            if (!securityManager.IsSecurityEnabled)
+            {
+                return;
+            }
+
             Write(MessageCode.RpbStartTls);
             // NB: the following will throw an exception if the returned code is not the expected code
             // TODO: should throw a RiakSslException
@@ -290,13 +275,13 @@ namespace CorrugatedIron.Comms
         {
             int totalBytesReceived = 0;
             int lengthToReceive = resultBuffer.Length;
-            
+
             if (!NetworkStream.CanRead)
             {
                 string errorMessage = "Unable to read data from the source stream - Can't read.";
                 throw new RiakException(errorMessage, true);
             }
-            
+
             while (lengthToReceive > 0)
             {
                 int bytesReceived = NetworkStream.Read(resultBuffer, totalBytesReceived, lengthToReceive);

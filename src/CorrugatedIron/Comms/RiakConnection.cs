@@ -32,8 +32,6 @@ namespace CorrugatedIron.Comms
 {
     public interface IRiakConnection : IDisposable
     {
-        bool IsIdle { get; }
-
         void Disconnect();
 
         // PBC interface
@@ -89,12 +87,6 @@ namespace CorrugatedIron.Comms
     {
         private readonly string restRootUrl;
         private readonly RiakPbcSocket socket;
-
-        public bool IsIdle
-        {
-            // TODO: is this the correct meaning of IsIdle?
-            get { return socket.IsConnected; }
-        }
 
         public RiakConnection(IRiakNodeConfiguration nodeConfiguration, IRiakAuthenticationConfiguration authConfiguration)
         {
