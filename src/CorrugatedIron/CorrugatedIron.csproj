@@ -133,6 +133,7 @@
     <Compile Include="Models\MapReduce\Inputs\RiakIndexInput.cs" />
     <Compile Include="Models\MapReduce\Inputs\RiakIntIndexEqualityInput.cs" />
     <Compile Include="Models\MapReduce\Inputs\RiakIntIndexRangeInput.cs" />
+    <Compile Include="Models\MapReduce\Inputs\RiakSearchInput.cs" />
     <Compile Include="Models\MapReduce\IRiakMapReduceResult.cs" />
     <Compile Include="Models\MapReduce\KeyFilters\And.cs" />
     <Compile Include="Models\MapReduce\KeyFilters\Between.cs" />

@@ -15,36 +15,34 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
 using CorrugatedIron.Models.Search;
 using Newtonsoft.Json;
 
 namespace CorrugatedIron.Models.MapReduce.Inputs
 {
-    [Obsolete("Using Legacy Search as input for MapReduce is depreciated. Please move to Riak 2.0 Search, and use the RiakSearchInput class instead.")]
-    public class RiakBucketSearchInput : RiakPhaseInput
+    public class RiakSearchInput : RiakPhaseInput
     {
-        private readonly string _bucket;
+        private readonly string _index;
         private readonly string _query;
         private string _filter;
 
-        public RiakBucketSearchInput(RiakFluentSearch query)
+        public RiakSearchInput(RiakFluentSearch query)
             : this(query.Index, query.ToString())
         {
         }
 
-        public RiakBucketSearchInput(string bucket, string query)
+        public RiakSearchInput(string index, string query)
         {
-            _bucket = bucket;
+            _index = index;
             _query = query;
         }
 
-        public RiakBucketSearchInput Filter(RiakFluentSearch filter)
+        public RiakSearchInput Filter(RiakFluentSearch filter)
         {
             return Filter(filter.ToString());
         }
 
-        public RiakBucketSearchInput Filter(string filter)
+        public RiakSearchInput Filter(string filter)
         {
             _filter = filter;
             return this;
@@ -55,10 +53,16 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
             writer.WritePropertyName("inputs");
             writer.WriteStartObject();
 
-            writer.WritePropertyName("bucket");
-            writer.WriteValue(_bucket);
+            writer.WritePropertyName("module");
+            writer.WriteValue("yokozuna");
 
-            writer.WritePropertyName("query");
+            writer.WritePropertyName("function");
+            writer.WriteValue("mapred_search");
+
+            writer.WritePropertyName("arg");
+            writer.WriteStartArray();
+
+            writer.WriteValue(_index);
             writer.WriteValue(_query);
 
             if (!string.IsNullOrEmpty(_filter))
@@ -66,6 +70,8 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
                 writer.WritePropertyName("filter");
                 writer.WriteValue(_filter);
             }
+
+            writer.WriteEndArray();
 
             writer.WriteEndObject();
 

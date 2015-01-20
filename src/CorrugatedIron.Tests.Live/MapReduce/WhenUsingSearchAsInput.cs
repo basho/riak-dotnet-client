@@ -112,7 +112,9 @@ namespace CorrugatedIron.Tests.Live.MapReduce
         public void SearchingByNameReturnsTheObjectId()
         {
             var mr = new RiakMapReduceQuery()
+#pragma warning disable 618
                 .Inputs(new RiakBucketSearchInput(Index, "name_s:" + _randomId + "Al*"));
+#pragma warning restore 618
 
 
             Func<RiakResult<RiakMapReduceResult>> doMapReduce = () => Client.MapReduce(mr);
@@ -146,7 +148,9 @@ namespace CorrugatedIron.Tests.Live.MapReduce
         {
             var search = new RiakFluentSearch(Index, "name_s").Search(Token.StartsWith(_randomId + "Al")).Build();
             var mr = new RiakMapReduceQuery()
+#pragma warning disable 618
                 .Inputs(new RiakBucketSearchInput(search));
+#pragma warning restore 618
 
 
             Func<RiakResult<RiakMapReduceResult>> doMapReduce = () => Client.MapReduce(mr);
