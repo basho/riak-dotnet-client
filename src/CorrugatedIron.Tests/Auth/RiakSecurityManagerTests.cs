@@ -49,7 +49,7 @@ namespace CorrugatedIron.Tests.Auth
         public void WhenSecurityNotConfiguredInAppConfig_SecurityManagerIndicatesIt()
         {
             var authConfig = noAuthClusterConfig.Authentication;
-            var securityManager = new RiakSecurityManager(authConfig);
+            var securityManager = new RiakSecurityManager("riak-test", authConfig);
             Assert.IsFalse(securityManager.IsSecurityEnabled);
         }
 
@@ -57,7 +57,7 @@ namespace CorrugatedIron.Tests.Auth
         public void WhenSecurityConfiguredInAppConfig_SecurityManagerIndicatesIt()
         {
             var authConfig = clusterConfig.Authentication;
-            var securityManager = new RiakSecurityManager(authConfig);
+            var securityManager = new RiakSecurityManager("riak-test", authConfig);
             Assert.IsTrue(securityManager.IsSecurityEnabled);
         }
 
@@ -65,7 +65,7 @@ namespace CorrugatedIron.Tests.Auth
         public void WhenClientCertificateFileIsConfigured_ItIsPartOfCertificatesCollection()
         {
             var authConfig = clusterConfig.Authentication;
-            var securityManager = new RiakSecurityManager(authConfig);
+            var securityManager = new RiakSecurityManager("riak-test", authConfig);
             Assert.True(securityManager.ClientCertificatesConfigured);
 
             var certFromFile = new X509Certificate2(authConfig.ClientCertificateFile);
@@ -80,7 +80,7 @@ namespace CorrugatedIron.Tests.Auth
              * to the current user's "My" store
              */
             var authConfig = certSubjectOnlyClusterConfig.Authentication;
-            var securityManager = new RiakSecurityManager(authConfig);
+            var securityManager = new RiakSecurityManager("riak-test", authConfig);
             Assert.True(securityManager.ClientCertificatesConfigured);
             Assert.False(authConfig.ClientCertificateSubject.IsNullOrEmpty());
 

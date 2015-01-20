@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
 using System.IO;
 using System.Linq;
 using System.Net.Security;
@@ -30,6 +31,8 @@ namespace CorrugatedIron.Auth
     {
         private static readonly StoreLocation[] storeLocations =
             new StoreLocation[] { StoreLocation.CurrentUser, StoreLocation.LocalMachine };
+        private static readonly string[] subjectSplit = new[] { ", " };
+        private readonly string targetHostCommonName;
         private readonly IRiakAuthenticationConfiguration authConfig;
         private readonly X509CertificateCollection clientCertificates;
         private readonly X509Certificate2 certificateAuthorityCert;
@@ -37,8 +40,13 @@ namespace CorrugatedIron.Auth
         // Interesting discussion:
         // http://stackoverflow.com/questions/3780801/whats-the-difference-between-a-public-constructor-in-an-internal-class-and-an-i
         // http://stackoverflow.com/questions/9302236/why-use-a-public-method-in-an-internal-class
-        internal RiakSecurityManager(IRiakAuthenticationConfiguration authConfig)
+        internal RiakSecurityManager(string targetHost, IRiakAuthenticationConfiguration authConfig)
         {
+            if (targetHost.IsNullOrEmpty())
+            {
+                throw new ArgumentNullException("targetHost");
+            }
+            this.targetHostCommonName = String.Format("CN={0}", targetHost);
             this.authConfig = authConfig;
             this.clientCertificates = GetClientCertificates();
             this.certificateAuthorityCert = GetCertificateAuthorityCert();
@@ -81,42 +89,50 @@ namespace CorrugatedIron.Auth
             {
                 if ((sslPolicyErrors & SslPolicyErrors.RemoteCertificateChainErrors) != 0)
                 {
-                    if (chain != null && chain.ChainStatus != null)
+                    // This ensures the presented cert is for the current host
+                    if (EnsureServerCertificateSubject(certificate.Subject))
                     {
-                        foreach (X509ChainStatus status in chain.ChainStatus)
+                        if (chain != null && chain.ChainStatus != null)
                         {
-                            if ((status.Status == X509ChainStatusFlags.UntrustedRoot) &&
-                                (false == chain.ChainElements.IsNullOrEmpty()))
+                            foreach (X509ChainStatus status in chain.ChainStatus)
                             {
-                                // The root cert must not be installed but we provided a file
-                                // See if anything in the chain matches our root cert
-                                foreach (X509ChainElement chainElement in chain.ChainElements)
+                                if ((status.Status == X509ChainStatusFlags.UntrustedRoot) &&
+                                    (false == chain.ChainElements.IsNullOrEmpty()))
                                 {
-                                    if (chainElement.Certificate.Equals(certificateAuthorityCert))
+                                    // The root cert must not be installed but we provided a file
+                                    // See if anything in the chain matches our root cert
+                                    foreach (X509ChainElement chainElement in chain.ChainElements)
                                     {
-                                        return true;
+                                        if (chainElement.Certificate.Equals(certificateAuthorityCert))
+                                        {
+                                            return true;
+                                        }
                                     }
                                 }
-                            }
-                            else
-                            {
-                                if (status.Status != X509ChainStatusFlags.NoError)
+                                else
                                 {
-                                    // If there are any other errors in the certificate chain, the certificate is invalid,
-                                    // so immediately returns false.
-                                    return false;
+                                    if (status.Status != X509ChainStatusFlags.NoError)
+                                    {
+                                        // If there are any other errors in the certificate chain, the certificate is invalid,
+                                        // so immediately returns false.
+                                        return false;
+                                    }
                                 }
                             }
                         }
                     }
-                    /*
-                     * When processing reaches this point, the only errors in the certificate chain are 
-                     * untrusted root errors for self-signed certificates.
-                     */
                 }
             }
 
             return false;
+        }
+
+        private bool EnsureServerCertificateSubject(string serverCertificateSubject)
+        {
+            string serverCommonName =
+                serverCertificateSubject.Split(subjectSplit, StringSplitOptions.RemoveEmptyEntries)
+                    .FirstOrDefault(s => s.StartsWith("CN="));
+            return targetHostCommonName.Equals(serverCommonName);
         }
 
         public X509Certificate ClientCertificateSelectionCallback(object sender, string targetHost,
@@ -182,7 +198,6 @@ namespace CorrugatedIron.Auth
         {
             var clientCertificates = new X509CertificateCollection();
 
-            // TODO private key file vs pfx? Check for .pfx extension?
             // http://stackoverflow.com/questions/18462064/associate-a-private-key-with-the-x509certificate2-class-in-net
             if ((false == authConfig.ClientCertificateFile.IsNullOrEmpty()) &&
                 (File.Exists(authConfig.ClientCertificateFile)))
