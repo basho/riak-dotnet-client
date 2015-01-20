@@ -65,6 +65,7 @@
     <Compile Include="Json\RiakObjectConversionTests.cs" />
     <Compile Include="Json\TestObjects.cs" />
     <Compile Include="Models\MapReduce\Inputs\BucketKeyKeyDataInputSerializationTests.cs" />
+    <Compile Include="Models\MapReduce\Inputs\IndexInputSerializationTests.cs" />
     <Compile Include="Models\MapReduce\Inputs\MapReduceSerializationTestsBase.cs" />
     <Compile Include="Models\MapReduce\Inputs\BucketKeyInputSerializationTests.cs" />
     <Compile Include="Models\RiakBucketPropertyTests.cs" />

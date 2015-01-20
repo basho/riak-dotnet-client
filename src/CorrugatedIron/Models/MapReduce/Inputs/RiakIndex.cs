@@ -1,12 +1,13 @@
 ﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
-//
+// Copyright (c) 2015 - Basho Technologies, Inc.
+// 
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
 // except in compliance with the License.  You may obtain
 // a copy of the License at
-//
+// 
 //   http://www.apache.org/licenses/LICENSE-2.0
-//
+// 
 // Unless required by applicable law or agreed to in writing,
 // software distributed under the License is distributed on an
 // "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -22,7 +23,6 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
 {
     public static class RiakIndex
     {
-
         [Obsolete("Use Match(RiakIndexId, key) instead. This will be revoved in the next version.")]
         public static RiakIndexInput Match(string bucket, string index, string key)
         {
@@ -113,7 +113,7 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
         /// <remarks>This is a wrapper around a range query on the $key index
         /// in Riak. Working with secondary indices requires that users enable
         /// the LevelDB backend and restart their cluster.</remarks>
-        public static RiakIndexInput Keys(string bucket, string start, string end) 
+        public static RiakIndexInput Keys(string bucket, string start, string end)
         {
             return Keys(null, bucket, start, end);
         }
