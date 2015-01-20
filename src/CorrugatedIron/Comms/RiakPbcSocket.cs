@@ -48,7 +48,7 @@ namespace CorrugatedIron.Comms
             this.port = nodeConfig.PbcPort;
             this.readTimeout = nodeConfig.NetworkReadTimeout;
             this.writeTimeout = nodeConfig.NetworkWriteTimeout;
-            this.securityManager = new RiakSecurityManager(authConfig);
+            this.securityManager = new RiakSecurityManager(server, authConfig);
             this.checkCertificateRevocation = authConfig.CheckCertificateRevocation;
         }
 
