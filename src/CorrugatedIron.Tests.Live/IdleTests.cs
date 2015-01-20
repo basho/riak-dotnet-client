@@ -34,26 +34,11 @@ namespace CorrugatedIron.Tests.Live.IdleTests
         }
 
         [Test]
-        public void IsIdleFlagIsSet()
-        {
-            var conn = GetIdleConnection();
-            conn.IsIdle.ShouldBeTrue();
-        }
-
-        [Test]
         public void ConnectionIsRestoredOnNextUse()
         {
             GetIdleConnection();
             var result = Client.Ping();
             result.IsSuccess.ShouldBeTrue();
-        }
-
-        [Test]
-        public void IdleFlagIsUnsetOnNextUse()
-        {
-            var conn = GetIdleConnection();
-            Client.Ping();
-            conn.IsIdle.ShouldBeFalse();
         }
     }
 }
