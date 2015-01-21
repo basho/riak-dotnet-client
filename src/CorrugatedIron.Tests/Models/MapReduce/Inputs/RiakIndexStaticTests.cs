@@ -85,6 +85,33 @@ namespace CorrugatedIron.Tests.Models.MapReduce.Inputs
             json.Contains(BinEndKey).ShouldBeTrue();
             json.Contains(BinEndKey).ShouldBeTrue();
         }
+
+        [Test]
+        public void TestAllKeysWorks()
+        {
+            var indexInput = RiakIndex.AllKeys(BucketType, Bucket);
+            
+            var json = Serialize(indexInput.WriteJson);
+            Assert.AreEqual("\"inputs\":{\"bucket\":[\"my_bucket_type\",\"my_bucket\"],\"index\":\"$bucket\",\"key\":\"my_bucket\"}", json);
+
+            indexInput = RiakIndex.AllKeys(Bucket);
+            json = Serialize(indexInput.WriteJson);
+            Assert.AreEqual("\"inputs\":{\"bucket\":\"my_bucket\",\"index\":\"$bucket\",\"key\":\"my_bucket\"}", json);
+        }
+
+        [Test]
+        public void TestKeysWorks()
+        {
+            var indexInput = RiakIndex.Keys(BucketType, Bucket, BinKey, BinEndKey);
+
+            var json = Serialize(indexInput.WriteJson);
+            Assert.AreEqual("\"inputs\":{\"bucket\":[\"my_bucket_type\",\"my_bucket\"],\"index\":\"$key\",\"start\":\"dave\",\"end\":\"ed\"}", json);
+
+            indexInput = RiakIndex.Keys(Bucket, BinKey, BinEndKey);
+            json = Serialize(indexInput.WriteJson);
+            Assert.AreEqual("\"inputs\":{\"bucket\":\"my_bucket\",\"index\":\"$key\",\"start\":\"dave\",\"end\":\"ed\"}", json);
+        }
+
 #pragma warning disable 612, 618
 
         [Test]
