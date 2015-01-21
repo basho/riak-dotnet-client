@@ -69,6 +69,7 @@
     <Compile Include="Models\MapReduce\Inputs\MapReduceSerializationTestsBase.cs" />
     <Compile Include="Models\MapReduce\Inputs\BucketKeyInputSerializationTests.cs" />
     <Compile Include="Models\MapReduce\Inputs\RiakIndexStaticTests.cs" />
+    <Compile Include="Models\MapReduce\Inputs\RiakModuleFunctionArgInputSerializationTest.cs" />
     <Compile Include="Models\MapReduce\Inputs\SearchInputSerializationTests.cs" />
     <Compile Include="Models\RiakBucketPropertyTests.cs" />
     <Compile Include="RiakAsyncClientTests.cs" />
