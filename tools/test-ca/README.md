@@ -35,6 +35,20 @@ openssl ca -verbose -batch \
     -infiles req/riakuser-client-cert.pem
 ```
 
+### Export `riakuser` client cert in `PFX` format
+
+This will create a file with the public *and* private key. Useful for importing
+into the Windows certificate store or as a standalone file for client
+certificate use. When exporting do *NOT* set an export password, or you will have
+to supply it when importing into the Win cert store.
+
+```
+openssl pkcs12 -export \
+    -in certs/riakuser-client-cert.pem \
+    -inkey private/riakuser-client-cert-key.pem \
+    -out certs/riakuser-client-cert.pfx
+```
+
 ### Create cert request and cert for `riak-test` server
 
 ```

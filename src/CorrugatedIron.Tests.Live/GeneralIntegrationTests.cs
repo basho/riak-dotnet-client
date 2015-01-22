@@ -1,4 +1,5 @@
 ﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -45,7 +46,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         }
 
         [Test]
-        public void PingRequstResultsInPingResponse()
+        public void PingRequestResultsInPingResponse()
         {
             var result = Client.Ping();
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
@@ -438,35 +439,9 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             Client.Batch(DoAllowMultProducesMultipleTest);
         }
 
-        private static void DoAllowMultProducesMultipleTest(IRiakBatchClient client)
-        {
-            // delete first if something does exist
-            client.Delete(MultiBucket, MultiKey);
-
-            // Do this via the REST interface - will be substantially slower than PBC
-            var props = new RiakBucketProperties().SetAllowMultiple(true).SetLastWriteWins(false);
-            client.SetBucketProperties(MultiBucket, props).IsSuccess.ShouldBeTrue();
-
-            var doc = new RiakObject(MultiBucket, MultiKey, MultiBodyOne, RiakConstants.ContentTypes.ApplicationJson);
-            var writeResult1 = client.Put(doc);
-            writeResult1.IsSuccess.ShouldBeTrue();
-
-            doc = new RiakObject(MultiBucket, MultiKey, MultiBodyTwo, RiakConstants.ContentTypes.ApplicationJson);
-            var writeResult2 = client.Put(doc);
-            writeResult2.IsSuccess.ShouldBeTrue();
-            writeResult2.Value.Siblings.Count.ShouldBeGreaterThan(2);
-
-            var result = client.Get(MultiBucket, MultiKey);
-            result.Value.Siblings.Count.ShouldBeGreaterThan(2);
-        }
-
         [Test]
         public void WritesWithAllowMultProducesMultipleVTags()
         {
-            // Do this via the PBC - noticable quicker than REST
-            var props = new RiakBucketProperties().SetAllowMultiple(true);
-            Client.SetBucketProperties(MultiBucket, props).IsSuccess.ShouldBeTrue();
-
             var doc = new RiakObject(MultiBucket, MultiKey, MultiBodyOne, RiakConstants.ContentTypes.ApplicationJson);
             Client.Put(doc).IsSuccess.ShouldBeTrue();
 
@@ -484,10 +459,6 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         {
             Client.Batch(batch =>
                 {
-                    // Do this via the PBC - noticable quicker than REST
-                    var props = new RiakBucketProperties().SetAllowMultiple(true);
-                    batch.SetBucketProperties(MultiBucket, props).IsSuccess.ShouldBeTrue();
-
                     var doc = new RiakObject(MultiBucket, MultiKey, MultiBodyOne, RiakConstants.ContentTypes.ApplicationJson);
                     batch.Put(doc).IsSuccess.ShouldBeTrue();
 
@@ -499,18 +470,6 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
                     result.Value.VTags.ShouldNotBeNull();
                     result.Value.VTags.Count.IsAtLeast(2);
                 });
-        }
-
-        private Func<RiakResult<IEnumerable<String>>> RunListKeys(IRiakBatchClient client, string bucket)
-        {
-            Func<RiakResult<IEnumerable<String>>> runListKeys =
-                () => client.ListKeys(bucket);
-            return runListKeys;
-        }
-
-        private static Func<RiakResult<IEnumerable<string>>, bool> NoKeysListed
-        {
-            get { return result => result.IsSuccess && !result.Value.Any(); }
         }
 
         [Test]
@@ -564,6 +523,36 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             result.IsSuccess.ShouldBeTrue();
             result.Value.ShouldNotBeNull();
             result.Value.Count().ShouldEqual(10);
+        }
+
+        private static void DoAllowMultProducesMultipleTest(IRiakBatchClient client)
+        {
+            // delete first if something does exist
+            client.Delete(MultiBucket, MultiKey);
+
+            var doc = new RiakObject(MultiBucket, MultiKey, MultiBodyOne, RiakConstants.ContentTypes.ApplicationJson);
+            var writeResult1 = client.Put(doc);
+            writeResult1.IsSuccess.ShouldBeTrue();
+
+            doc = new RiakObject(MultiBucket, MultiKey, MultiBodyTwo, RiakConstants.ContentTypes.ApplicationJson);
+            var writeResult2 = client.Put(doc);
+            writeResult2.IsSuccess.ShouldBeTrue();
+            writeResult2.Value.Siblings.Count.ShouldBeGreaterThan(2);
+
+            var result = client.Get(MultiBucket, MultiKey);
+            result.Value.Siblings.Count.ShouldBeGreaterThan(2);
+        }
+
+        private Func<RiakResult<IEnumerable<String>>> RunListKeys(IRiakBatchClient client, string bucket)
+        {
+            Func<RiakResult<IEnumerable<String>>> runListKeys =
+                () => client.ListKeys(bucket);
+            return runListKeys;
+        }
+
+        private static Func<RiakResult<IEnumerable<string>>, bool> NoKeysListed
+        {
+            get { return result => result.IsSuccess && !result.Value.Any(); }
         }
     }
 }

@@ -14,16 +14,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Collections.Generic;
 using CorrugatedIron.Comms;
 using CorrugatedIron.Config;
 using Moq;
-using System.Collections.Generic;
 
 namespace CorrugatedIron.Tests.RiakClientTests
 {
     internal abstract class RiakClientTestBase<TRequest, TResult>
-        where TRequest : class
-        where TResult : class, new()
+        where TRequest : class, ProtoBuf.IExtensible
+        where TResult : class, ProtoBuf.IExtensible, new()
     {
         protected RiakResult<TResult> Result = null;
         protected Mock<IRiakConnection> ConnMock;
@@ -41,7 +41,11 @@ namespace CorrugatedIron.Tests.RiakClientTests
             NodeConfigMock = new Mock<IRiakNodeConfiguration>();
 
             ConnMock.Setup(m => m.PbcWriteRead<TRequest, TResult>(It.IsAny<TRequest>())).Returns(() => Result);
-            ConnFactoryMock.Setup(m => m.CreateConnection(It.IsAny<IRiakNodeConfiguration>())).Returns(ConnMock.Object);
+            ConnFactoryMock.Setup(m =>
+                m.CreateConnection(
+                    It.IsAny<IRiakNodeConfiguration>(),
+                    It.IsAny<IRiakAuthenticationConfiguration>())
+                ).Returns(ConnMock.Object);
             NodeConfigMock.SetupGet(m => m.PoolSize).Returns(1);
             ClusterConfigMock.SetupGet(m => m.RiakNodes).Returns(new List<IRiakNodeConfiguration> { NodeConfigMock.Object });
             ClusterConfigMock.SetupGet(m => m.DefaultRetryCount).Returns(100);

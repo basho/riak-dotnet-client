@@ -22,7 +22,7 @@ using Newtonsoft.Json;
 namespace CorrugatedIron.Converters
 {
     /*
-     * TODO: Figure out if this is still needed
+     * TODO: FUTURE - Figure out if this is still needed
      */
     public class RiakObjectIdConverter : JsonConverter
     {

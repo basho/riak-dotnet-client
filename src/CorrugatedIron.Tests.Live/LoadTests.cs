@@ -1,4 +1,5 @@
 ﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -14,6 +15,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
@@ -22,14 +27,10 @@ using CorrugatedIron.Tests.Extensions;
 using CorrugatedIron.Tests.Live.LiveRiakConnectionTests;
 using Newtonsoft.Json;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace CorrugatedIron.Tests.Live.LoadTests
 {
-    [TestFixture("riakLoadTestConfiguration")]
+    [TestFixture]
     public class WhenUnderLoad : LiveRiakConnectionTestBase
     {
         // thread count is currently set to the same
@@ -43,8 +44,6 @@ namespace CorrugatedIron.Tests.Live.LoadTests
         //private const int ThreadCount = 1;
         //private const int ActionCount = 1;
 
-        public WhenUnderLoad(string configSection) : base(configSection) { }
-      
         [Test]
         public void LotsOfConcurrentMapRedRequestsShouldWork()
         {
@@ -170,11 +169,5 @@ namespace CorrugatedIron.Tests.Live.LoadTests
 
             return results.ToList();
         }
-    }
-
-    [TestFixture("riakOnTheFlyLoadTestConfiguration")]
-    public class WhenUnderLoadWithOnTheFlyConnections : WhenUnderLoad
-    {
-        public WhenUnderLoadWithOnTheFlyConnections(string configSection) : base(configSection) { }
     }
 }
