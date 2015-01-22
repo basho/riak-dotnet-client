@@ -1,4 +1,5 @@
-// Copyright (c) 2015 - Basho Technologies, Inc.
+// Copyright (c) 2011 - 2014 OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 // 
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -113,9 +114,7 @@ namespace CorrugatedIron.Tests.Live.MapReduce
         public void SearchingByNameReturnsTheObjectId()
         {
             var mr = new RiakMapReduceQuery()
-#pragma warning disable 618
-                .Inputs(new RiakBucketSearchInput(Index, "name_s:" + _randomId + "Al*"));
-#pragma warning restore 618
+                .Inputs(new RiakSearchInput(Index, "name_s:" + _randomId + "Al*"));
 
 
             Func<RiakResult<RiakMapReduceResult>> doMapReduce = () => Client.MapReduce(mr);
@@ -127,10 +126,20 @@ namespace CorrugatedIron.Tests.Live.MapReduce
             var phaseResults = result.Value.PhaseResults.ToList();
             phaseResults.Count.ShouldEqual(1);
 
-            CheckThatResultContainAllKeys(result);
+            CheckThatResultContainsAllKeys(result);
+        }
+
+        private bool OnePhaseWithOneResultFound(RiakResult<RiakMapReduceResult> result)
+        {
+            return OnePhaseWithNResultsFound(result, 1);
         }
 
         private bool OnePhaseWithTwoResultsFound(RiakResult<RiakMapReduceResult> result)
+        {
+            return OnePhaseWithNResultsFound(result, 2);
+        }
+
+        private bool OnePhaseWithNResultsFound(RiakResult<RiakMapReduceResult> result, int numResults)
         {
             if (!result.IsSuccess || result.Value == null)
             {
@@ -146,11 +155,11 @@ namespace CorrugatedIron.Tests.Live.MapReduce
 
             var phase1Results = phaseResults[0].Values;
 
-            return phase1Results.Count == 2;
+            return phase1Results.Count == numResults;
         }
 
         [Test]
-        public void SearchingViaFluentSearchObjectWorks()
+        public void SearchingViaOldInterfaceFluentSearchObjectWorks()
         {
             var search = new RiakFluentSearch(Index, "name_s").Search(Token.StartsWith(_randomId + "Al")).Build();
             var mr = new RiakMapReduceQuery()
@@ -158,6 +167,20 @@ namespace CorrugatedIron.Tests.Live.MapReduce
                 .Inputs(new RiakBucketSearchInput(search));
 #pragma warning restore 618
 
+            Func<RiakResult<RiakMapReduceResult>> doMapReduce = () => Client.MapReduce(mr);
+
+            var result = doMapReduce.WaitUntil(OnePhaseWithTwoResultsFound);
+
+            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
+
+            CheckThatResultContainsAllKeys(result);
+        }
+
+        [Test]
+        public void SearchingViaFluentSearchObjectWorks()
+        {
+            var search = new RiakFluentSearch(Index, "name_s").Search(Token.StartsWith(_randomId + "Al")).Build();
+            var mr = new RiakMapReduceQuery().Inputs(new RiakSearchInput(search));
 
             Func<RiakResult<RiakMapReduceResult>> doMapReduce = () => Client.MapReduce(mr);
 
@@ -165,10 +188,34 @@ namespace CorrugatedIron.Tests.Live.MapReduce
 
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
 
-            CheckThatResultContainAllKeys(result);
+            CheckThatResultContainsAllKeys(result);
         }
 
-        private static void CheckThatResultContainAllKeys(RiakResult<RiakMapReduceResult> result)
+        [Test]
+        public void SearchingComplexQueryWorks()
+        {
+            var search = new RiakFluentSearch(Index, "name_s");
+
+            // name_s:{integer}Al* AND bio_tsd:awesome AND bio_tsd:an AND (bio_tsd:mathematician OR favorites.album_tsd:Fame)
+            search.Search(Token.StartsWith(_randomId + "Al"))
+                .And("bio_tsd", "awesome")
+                .And("an")
+                .And("mathematician", s => s.Or("favorites.album_tsd", "Fame"));
+
+            var mr = new RiakMapReduceQuery().Inputs(new RiakSearchInput(search));
+
+            Func<RiakResult<RiakMapReduceResult>> doMapReduce = () => Client.MapReduce(mr);
+
+            var result = doMapReduce.WaitUntil(OnePhaseWithOneResultFound);
+
+            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
+            var singleResult = result.Value.PhaseResults.First().Values[0].FromRiakString();
+            var failureMessage = string.Format("Results did not contain \"{0}\". \r\nResult was:\"{1}\"",
+                RiakSearchKey, singleResult);
+            singleResult.Contains(RiakSearchKey).ShouldBeTrue(failureMessage);
+        }
+
+        private static void CheckThatResultContainsAllKeys(RiakResult<RiakMapReduceResult> result)
         {
             var phaseResults = result.Value.PhaseResults.ToList();
             phaseResults.Count.ShouldEqual(1);
