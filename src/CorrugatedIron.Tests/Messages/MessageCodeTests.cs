@@ -35,7 +35,12 @@ namespace CorrugatedIron.Tests.Messages
 
             var currentDir = Environment.CurrentDirectory;
             string riak_pb_messages_file =
-                Path.Combine(currentDir, "..", "..", "..", "riak_pb", "src", "riak_pb_messages.csv");
+                Path.GetFullPath(Path.Combine(currentDir, "..", "..", "..", "riak_pb", "src", "riak_pb_messages.csv"));
+
+            if (!File.Exists(riak_pb_messages_file))
+            {
+                Assert.Ignore("Please run 'git submodule update --init' before running this test. Required file is missing: '{0}'", riak_pb_messages_file);
+            }
 
             string[] msg_csv = File.ReadAllLines(riak_pb_messages_file);
             foreach (string line in msg_csv)

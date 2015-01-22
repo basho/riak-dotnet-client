@@ -24,11 +24,12 @@ namespace CorrugatedIron.Tests.Auth
 {
     public abstract class AuthTestBase
     {
-        protected static readonly string testCertsDir;
-        protected static readonly string rootCaCertFile;
+        private static readonly string testCertsDir;
+        private static readonly string rootCaCertFile;
+        private static readonly string riakUserClientCertFile;
+
         protected static readonly string rootCaCertFileRelativePath;
         protected static readonly string riakUserClientCertFileRelativePath;
-        protected static readonly string riakUserClientCertFile;
         protected const string riakUserClientCertSubject =
             @"E=riakuser@myorg.com, CN=riakuser, OU=Development, O=Basho Technologies, S=WA, C=US";
 
@@ -39,13 +40,13 @@ namespace CorrugatedIron.Tests.Auth
                 "..", "..", "..", "..", "tools", "test-ca", "certs"
             };
             string testCertsDirRelativePath = Path.Combine(testCertsDirRelativePathAry);
-            testCertsDir = Path.Combine(currentDir, testCertsDirRelativePath);
+            testCertsDir = Path.GetFullPath(Path.Combine(currentDir, testCertsDirRelativePath));
 
-            rootCaCertFile = Path.Combine(testCertsDir, "cacert.pem");
+            rootCaCertFile = Path.GetFullPath(Path.Combine(testCertsDir, "cacert.pem"));
             rootCaCertFileRelativePath = Path.Combine(testCertsDirRelativePath, "cacert.pem");
 
             riakUserClientCertFileRelativePath = Path.Combine(testCertsDirRelativePath, "riakuser-client-cert.pfx");
-            riakUserClientCertFile = Path.Combine(currentDir, riakUserClientCertFileRelativePath);
+            riakUserClientCertFile = Path.GetFullPath(Path.Combine(currentDir, riakUserClientCertFileRelativePath));
         }
 
         [TestFixtureSetUp]
