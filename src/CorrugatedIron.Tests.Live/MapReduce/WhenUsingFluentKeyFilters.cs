@@ -1,3 +1,20 @@
+// Copyright (c) 2011 - 2014 OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
+// 
+// This file is provided to you under the Apache License,
+// Version 2.0 (the "License"); you may not use this file
+// except in compliance with the License.  You may obtain
+// a copy of the License at
+// 
+//   http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 using System.Linq;
 using CorrugatedIron.Comms;
 using CorrugatedIron.Extensions;
@@ -14,7 +31,6 @@ namespace CorrugatedIron.Tests.Live.MapReduce
     [TestFixture]
     public class WhenUsingFluentKeyFilters : RiakMapReduceTestBase
     {
-
         [SetUp]
         public void SetUp()
         {
@@ -33,7 +49,8 @@ namespace CorrugatedIron.Tests.Live.MapReduce
         {
             for (int i = 0; i < 10; i++)
             {
-                Client.Put(new RiakObject(Bucket, string.Format("time_{0}", i), EmptyBody, RiakConstants.ContentTypes.ApplicationJson));
+                Client.Put(new RiakObject(Bucket, string.Format("time_{0}", i), EmptyBody,
+                    RiakConstants.ContentTypes.ApplicationJson));
             }
 
             var mr = new RiakMapReduceQuery {ContentType = MrContentType};
@@ -55,9 +72,14 @@ namespace CorrugatedIron.Tests.Live.MapReduce
 
             mrResult.PhaseResults.ElementAt(0).Values.Count().ShouldEqual(0);
             mrResult.PhaseResults.ElementAt(1).Values.Count().ShouldNotEqual(0);
-            
-            
-            var values = JsonConvert.DeserializeObject<int[]>(mrResult.PhaseResults.ElementAt(1).Values.First().FromRiakString());
+
+
+            var values = JsonConvert.DeserializeObject<int[]>(mrResult.PhaseResults
+                                                                      .ElementAt(1)
+                                                                      .Values
+                                                                      .First()
+                                                                      .FromRiakString());
+
             values[0].ShouldEqual(1);
         }
 
@@ -66,10 +88,11 @@ namespace CorrugatedIron.Tests.Live.MapReduce
         {
             for (int i = 0; i < 10; i++)
             {
-                Client.Put(new RiakObject(Bucket, string.Format("time_{0}", i), EmptyBody, RiakConstants.ContentTypes.ApplicationJson));
+                Client.Put(new RiakObject(Bucket, string.Format("time_{0}", i), EmptyBody,
+                    RiakConstants.ContentTypes.ApplicationJson));
             }
 
-            var mr = new RiakMapReduceQuery { ContentType = MrContentType };
+            var mr = new RiakMapReduceQuery {ContentType = MrContentType};
 
             mr.Inputs(Bucket)
                 .Filter(f => f.StartsWith("time"))
@@ -88,8 +111,8 @@ namespace CorrugatedIron.Tests.Live.MapReduce
 
             mrResult.PhaseResults.ElementAt(0).Values.Count().ShouldEqual(0);
             mrResult.PhaseResults.ElementAt(1).Values.Count().ShouldNotEqual(0);
-   
-            
+
+
             var values = result.Value.PhaseResults.ElementAt(1).GetObjects<int[]>().First();
             values[0].ShouldEqual(10);
         }
@@ -99,10 +122,11 @@ namespace CorrugatedIron.Tests.Live.MapReduce
         {
             for (var i = 0; i < 10; i++)
             {
-                Client.Put(new RiakObject(Bucket, string.Format("time_{0}", i), EmptyBody, RiakConstants.ContentTypes.ApplicationJson));
+                Client.Put(new RiakObject(Bucket, string.Format("time_{0}", i), EmptyBody,
+                    RiakConstants.ContentTypes.ApplicationJson));
             }
 
-            var mr = new RiakMapReduceQuery { ContentType = MrContentType };
+            var mr = new RiakMapReduceQuery {ContentType = MrContentType};
 
             mr.Inputs(Bucket)
                 .Filter(f => f.And(l => l.StartsWith("time"),

@@ -1,5 +1,4 @@
-// Copyright (c) 2011 - 2014 OJ Reeves & Jeremiah Peschka
-// Copyright (c) 2014 - Basho Technologies, Inc.
+// Copyright (c) 2015 - Basho Technologies, Inc.
 // 
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -35,7 +34,7 @@ namespace CorrugatedIron.Tests.Models.MapReduce.Inputs
             "[\"dooby\",\"scooby\",{\"la\":\"ding\",\"ray\":\"me\",\"wit\":0}]]";
 
         [Test]
-        public void RiakBucketKeyKeyDataInputSeralisesCorrectlyOldInterface()
+        public void RiakBucketKeyKeyDataInputSerializesCorrectlyOldInterface()
         {
             var inputs = new List<Tuple<string, string, object>>
             {
@@ -56,7 +55,7 @@ namespace CorrugatedIron.Tests.Models.MapReduce.Inputs
         }
 
         [Test]
-        public void RiakBucketKeyKeyDataInputSeralisesCorrectly()
+        public void RiakBucketKeyKeyDataInputSerializesCorrectly()
         {
             var inputs = new List<Tuple<RiakObjectId, object>>
             {
@@ -77,7 +76,7 @@ namespace CorrugatedIron.Tests.Models.MapReduce.Inputs
         }
 
         [Test]
-        public void RiakBucketKeyKeyDataInputWithTypeSeralisesCorrectly()
+        public void RiakBucketKeyKeyDataInputWithTypeSerializesCorrectly()
         {
             var inputs = new List<Tuple<RiakObjectId, object>>
             {
