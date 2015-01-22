@@ -24,7 +24,6 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
     {
         private readonly string _index;
         private readonly string _query;
-        private string _filter;
 
         public RiakSearchInput(RiakFluentSearch query)
             : this(query.Index, query.ToString())
@@ -35,17 +34,6 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
         {
             _index = index;
             _query = query;
-        }
-
-        public RiakSearchInput Filter(RiakFluentSearch filter)
-        {
-            return Filter(filter.ToString());
-        }
-
-        public RiakSearchInput Filter(string filter)
-        {
-            _filter = filter;
-            return this;
         }
 
         public override JsonWriter WriteJson(JsonWriter writer)
@@ -64,12 +52,6 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
 
             writer.WriteValue(_index);
             writer.WriteValue(_query);
-
-            if (!string.IsNullOrEmpty(_filter))
-            {
-                writer.WritePropertyName("filter");
-                writer.WriteValue(_filter);
-            }
 
             writer.WriteEndArray();
 
