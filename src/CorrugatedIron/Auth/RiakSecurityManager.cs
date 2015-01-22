@@ -1,5 +1,4 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
-// Copyright (c) 2015 - Basho Technologies, Inc.
+﻿// Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -20,7 +19,6 @@ using System.IO;
 using System.Linq;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using CorrugatedIron.Config;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Messages;
@@ -172,12 +170,10 @@ namespace CorrugatedIron.Auth
 
         public RpbAuthReq GetAuthRequest()
         {
-            var userBytes = Encoding.ASCII.GetBytes(authConfig.Username);
-            var passBytes = Encoding.ASCII.GetBytes(authConfig.Password);
             return new RpbAuthReq
                 {
-                    user = userBytes,
-                    password = passBytes
+                    user = authConfig.Username.ToRiakString(),
+                    password = authConfig.Password.ToRiakString()
                 };
         }
 
