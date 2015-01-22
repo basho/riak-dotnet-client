@@ -1,12 +1,12 @@
-// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
-//
+// Copyright (c) 2015 - Basho Technologies, Inc.
+// 
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
 // except in compliance with the License.  You may obtain
 // a copy of the License at
-//
+// 
 //   http://www.apache.org/licenses/LICENSE-2.0
-//
+// 
 // Unless required by applicable law or agreed to in writing,
 // software distributed under the License is distributed on an
 // "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -16,6 +16,7 @@
 
 using System;
 using System.Linq;
+using System.Threading;
 using CorrugatedIron.Comms;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Models;
@@ -37,16 +38,16 @@ namespace CorrugatedIron.Tests.Live.MapReduce
         private const string Index = "yoko_index";
         private const string RiakSearchKey = "a.hacker";
         private const string RiakSearchKey2 = "a.public";
-        private readonly Random _random = new Random();
-        private int _randomId;
-        private RiakObjectId _alyssaRiakId;
-
         // See https://raw.githubusercontent.com/basho/yokozuna/develop/priv/default_schema.xml for dynamic field suffix meanings.
         private const string RiakSearchDoc =
             "{{\"name_s\":\"{0}Alyssa P. Hacker\", \"age_i\":35, \"leader_b\":true, \"bio_tsd\":\"I'm an engineer, making awesome things.\", \"favorites\":{{\"book_tsd\":\"The Moon is a Harsh Mistress\",\"album_tsd\":\"Magical Mystery Tour\" }}}}";
 
         private const string RiakSearchDoc2 =
             "{{\"name_s\":\"{0}Alan Q. Public\", \"age_i\":38, \"bio_tsd\":\"I'm an exciting awesome mathematician\", \"favorites\":{{\"book_tsd\":\"Prelude to Mathematics\",\"album_tsd\":\"The Fame Monster\"}}}}";
+
+        private readonly Random _random = new Random();
+        private RiakObjectId _alyssaRiakId;
+        private int _randomId;
 
         [TestFixtureSetUp]
         public void SetUp()
@@ -71,7 +72,7 @@ namespace CorrugatedIron.Tests.Live.MapReduce
                 };
 
             setBucketProperties.WaitUntil(indexIsSet);
-            System.Threading.Thread.Sleep(5000); // Wait for Yoko to start up
+            Thread.Sleep(5000); // Wait for Yoko to start up
             PrepSearch();
         }
 
@@ -100,7 +101,7 @@ namespace CorrugatedIron.Tests.Live.MapReduce
             var put1Result = put1.WaitUntil();
 
             Func<RiakResult<RiakObject>> put2 = () => Client.Put(new RiakObject(alanRiakId, alanDoc.ToRiakString(),
-                                                      RiakConstants.ContentTypes.ApplicationJson, RiakConstants.CharSets.Utf8));
+                RiakConstants.ContentTypes.ApplicationJson, RiakConstants.CharSets.Utf8));
 
             var put2Result = put2.WaitUntil();
 
@@ -131,16 +132,21 @@ namespace CorrugatedIron.Tests.Live.MapReduce
 
         private bool OnePhaseWithTwoResultsFound(RiakResult<RiakMapReduceResult> result)
         {
-            if (!result.IsSuccess || result.Value == null) return false;
+            if (!result.IsSuccess || result.Value == null)
+            {
+                return false;
+            }
 
             var phaseResults = result.Value.PhaseResults.ToList();
 
-            if (phaseResults.Count != 1) return false;
+            if (phaseResults.Count != 1)
+            {
+                return false;
+            }
 
             var phase1Results = phaseResults[0].Values;
 
             return phase1Results.Count == 2;
-
         }
 
         [Test]
@@ -175,10 +181,12 @@ namespace CorrugatedIron.Tests.Live.MapReduce
             {
                 var s = searchResult.FromRiakString();
                 if (!(s.Contains(RiakSearchKey) || s.Contains(RiakSearchKey2)))
-                    Assert.Fail("Results did not contain either \"{0}\" or \"{1}\". \r\nResult was:\"{2}\"", RiakSearchKey,
+                {
+                    Assert.Fail("Results did not contain either \"{0}\" or \"{1}\". \r\nResult was:\"{2}\"",
+                        RiakSearchKey,
                         RiakSearchKey2, s);
+                }
             }
         }
-
     }
 }
