@@ -1,4 +1,5 @@
 ﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -14,32 +15,29 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Containers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using CorrugatedIron.Containers;
 
 namespace CorrugatedIron.Comms.LoadBalancing
 {
     public class RoundRobinStrategy : ILoadBalancingStrategy
     {
-        private readonly object _nodesLock = new object();
-        private List<IRiakNode> _nodes;
-        private IConcurrentEnumerator<IRiakNode> _roundRobin;
-        private Func<IEnumerable<IRiakNode>> _generator;
+        private readonly object nodesLock = new object();
+        private IList<IRiakNode> nodes;
+        private IConcurrentEnumerator<IRiakNode> roundRobin;
 
         public void Initialise(IEnumerable<IRiakNode> nodes)
         {
-            _nodes = nodes.ToList();
-            var list = _nodes.ToList();
-            _generator = () => list;
-            _roundRobin = new ConcurrentEnumerable<IRiakNode>(RoundRobin()).GetEnumerator();
+            this.nodes = nodes.ToList();
+            this.roundRobin = new ConcurrentEnumerable<IRiakNode>(RoundRobin()).GetEnumerator();
         }
 
         public IRiakNode SelectNode()
         {
             IRiakNode node = null;
-            if (_roundRobin.TryMoveNext(out node))
+            if (roundRobin.TryMoveNext(out node))
             {
                 return node;
             }
@@ -48,39 +46,39 @@ namespace CorrugatedIron.Comms.LoadBalancing
 
         public void RemoveNode(IRiakNode node)
         {
-            lock(_nodesLock)
+            lock (nodesLock)
             {
-                if (_nodes.Contains(node))
+                if (nodes.Contains(node))
                 {
-                    _nodes.Remove(node);
-                    var list = _nodes.ToList();
-                    _generator = () => list;
+                    nodes.Remove(node);
                 }
             }
         }
 
         public void AddNode(IRiakNode node)
         {
-            lock(_nodesLock)
+            lock (nodesLock)
             {
-                if (!_nodes.Contains(node))
+                if (!nodes.Contains(node))
                 {
-                    _nodes.Add(node);
-                    var list = _nodes.ToList();
-                    _generator = () => list;
+                    nodes.Add(node);
                 }
             }
         }
 
         private IEnumerable<IRiakNode> RoundRobin()
         {
-            while(true)
+            while (true)
             {
-                var list = _generator().ToList();
+                IList<IRiakNode> list;
+                lock (nodesLock)
+                {
+                    list = new List<IRiakNode>(nodes);
+                }
                 if (list.Count > 0)
                 {
                     var nodes = list.GetEnumerator();
-                    while(nodes.MoveNext() && nodes.Current != null)
+                    while (nodes.MoveNext() && nodes.Current != null)
                     {
                         yield return nodes.Current;
                     }

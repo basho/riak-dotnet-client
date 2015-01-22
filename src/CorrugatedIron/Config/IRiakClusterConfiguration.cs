@@ -1,4 +1,5 @@
 // Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -24,5 +25,6 @@ namespace CorrugatedIron.Config
         int NodePollTime { get; }
         int DefaultRetryWaitTime { get; }
         int DefaultRetryCount { get; }
+        IRiakAuthenticationConfiguration Authentication { get; }
     }
 }

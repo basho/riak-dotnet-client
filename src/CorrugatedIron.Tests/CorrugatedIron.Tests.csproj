@@ -61,10 +61,13 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Auth\AuthTestBase.cs" />
+    <Compile Include="Auth\RiakSecurityManagerTests.cs" />
     <Compile Include="Comms\RoundRobinStrategyTests.cs" />
     <Compile Include="ExtensionMethodTests.cs" />
     <Compile Include="Json\RiakObjectConversionTests.cs" />
     <Compile Include="Json\TestObjects.cs" />
+    <Compile Include="Messages\MessageCodeTests.cs" />
     <Compile Include="Models\MapReduce\RiakMapReduceInputSerialisationTests.cs" />
     <Compile Include="Models\RiakBucketPropertyTests.cs" />
     <Compile Include="RiakAsyncClientTests.cs" />
@@ -77,10 +80,14 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="KeyFilters\KeyFilterTests.cs" />
     <Compile Include="RiakSearchTests.cs" />
+    <Compile Include="Auth\CertificateTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\CorrugatedIron.snk">
       <Link>CorrugatedIron.snk</Link>
+    </None>
+    <None Include="App.config">
+      <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />
   </ItemGroup>

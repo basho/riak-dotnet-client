@@ -1,4 +1,5 @@
 // Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -144,7 +145,7 @@ namespace CorrugatedIron.Tests.Live
         [Test]
         public void IntRangeQueriesReturnMultipleKeys()
         {
-            GenerateGuidKeyObjects((o,i) => o.IntIndex("age").Set(25 + i));
+            GenerateGuidKeyObjects((o, i) => o.IntIndex("age").Set(25 + i));
 
             var result = Client.GetSecondaryIndex(new RiakIndexId(LegacyBucket, "age"), 27, 30);
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
@@ -163,7 +164,7 @@ namespace CorrugatedIron.Tests.Live
             var queriedKeys = result.Value.PhaseResults.SelectMany(x => x.GetObjectIds()).ToList();
 
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
-            queriedKeys.Count.ShouldEqual(DefaultKeyCount);
+            Assert.AreEqual(queriedKeys.Count, DefaultKeyCount);
 
             foreach (var key in queriedKeys)
             {
@@ -171,11 +172,12 @@ namespace CorrugatedIron.Tests.Live
                 key.Key.ShouldNotBeNullOrEmpty();
                 insertedKeys.Contains(key.Key).ShouldBeTrue();
             }
+
             Client.DeleteBucket(Bucket);
         }
 
 
-       [Test]
+        [Test]
         public void KeysReturnsSelectiveListOfKeys()
         {
             int keyStart = 10;
@@ -216,7 +218,7 @@ namespace CorrugatedIron.Tests.Live
         public void ListKeysUsingIndexReturnsAllKeys()
         {
             int keyCount = 10;
-            
+
             var generatedKeys = GenerateGuidKeyObjects();
             var originalKeys = new HashSet<string>(generatedKeys);
 
@@ -327,8 +329,8 @@ namespace CorrugatedIron.Tests.Live
         {
             var keyCount = 750;
 
-            GenerateGuidKeyObjects((o,i) => o.BinIndex("lessthan500").Set(i < 500 ? "less" : "more"), keyCount);
-            
+            GenerateGuidKeyObjects((o, i) => o.BinIndex("lessthan500").Set(i < 500 ? "less" : "more"), keyCount);
+
             var results = Client.GetSecondaryIndex(new RiakIndexId(Bucket, "lessthan500"), "a", "z", new RiakIndexGetOptions().SetTermRegex("^less"));
 
             results.IsSuccess.ShouldBeTrue(results.ErrorMessage);
@@ -342,7 +344,7 @@ namespace CorrugatedIron.Tests.Live
         {
             var keyCount = 1000;
 
-            GenerateGuidKeyObjects((o,i) => o.IntIndex("positionSorting").Set(i), keyCount);
+            GenerateGuidKeyObjects((o, i) => o.IntIndex("positionSorting").Set(i), keyCount);
 
             var results = Client.GetSecondaryIndex(new RiakIndexId(Bucket, "positionSorting"), 1, 500, new RiakIndexGetOptions().SetPaginationSort(true).SetReturnTerms(true).SetMaxResults(10));
 
@@ -362,14 +364,14 @@ namespace CorrugatedIron.Tests.Live
             keyTerms2[0].Term.ShouldEqual("11");
 
         }
-        
+
         [Test]
         public void AsyncStreamingKeysReturnsListOfKeys()
         {
             var keyCount = 100;
             var insertedKeys = GenerateGuidKeyObjects((o, i) => o.IntIndex("position").Set(i), keyCount);
 
-            var asyncTask = Client.Async.StreamGetSecondaryIndex(new RiakIndexId(Bucket, "position"), 0, keyCount );
+            var asyncTask = Client.Async.StreamGetSecondaryIndex(new RiakIndexId(Bucket, "position"), 0, keyCount);
             asyncTask.Wait();
 
             var result = asyncTask.Result;
@@ -379,7 +381,7 @@ namespace CorrugatedIron.Tests.Live
             result.Value.IndexKeyTerms.ShouldNotBeNull(result.ErrorMessage);
 
             var keyTerms = result.Value.IndexKeyTerms.ToList();
-            
+
             keyTerms.Count.ShouldEqual(insertedKeys.Count);
             var resultKeys = keyTerms.Select(kt => kt.Key).ToList();
 
@@ -442,13 +444,13 @@ namespace CorrugatedIron.Tests.Live
             var id = new RiakObjectId(BucketType, Bucket, Guid.NewGuid().ToString());
             return CreateRiakObject(id, "{ value: \"this is an object\" }");
         }
-        
+
         private RiakObject CreateRiakObject(int key)
         {
             var id = new RiakObjectId(BucketType, Bucket, key.ToString());
             return CreateRiakObject(id, "{ value: \"this is an object\" }");
         }
-        
+
         private RiakObject CreateRiakObject(RiakObjectId objectId, string value)
         {
             return new RiakObject(objectId, value);

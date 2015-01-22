@@ -1,14 +1,31 @@
-﻿using System;
+﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
+//
+// This file is provided to you under the Apache License,
+// Version 2.0 (the "License"); you may not use this file
+// except in compliance with the License.  You may obtain
+// a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using CorrugatedIron.Extensions;
 using CorrugatedIron.Models;
-using CorrugatedIron.Models.MapReduce.KeyFilters;
 using NUnit.Framework;
 
 namespace CorrugatedIron.Tests.Live.Extensions
 {
-    public static class IntegrationTestExtensions
+    internal static class IntegrationTestExtensions
     {
         // TESTING PURPOSES ONLY
         public static void DeleteBucket(this IRiakBatchClient client, string bucket)
@@ -20,10 +37,15 @@ namespace CorrugatedIron.Tests.Live.Extensions
         public static void DeleteBucket(this IRiakBatchClient client, string bucketType, string bucket)
         {
             var keylistResult = client.ListKeys(bucketType, bucket);
-            var keys = keylistResult.Value != null ? keylistResult.Value.ToList() : new List<string>();
-            if (!keys.Any()) return;
-            var objectIds = keys.Select(key => new RiakObjectId(bucketType, bucket, key));
-            client.Delete(objectIds);
+            if (keylistResult.Value.IsNullOrEmpty())
+            {
+                return;
+            }
+            else
+            {
+                var objectIds = keylistResult.Value.Select(key => new RiakObjectId(bucketType, bucket, key));
+                client.Delete(objectIds);
+            }
         }
 
         private static readonly Func<RiakResult, bool> DefaultSuccessFunc = result => result.IsSuccess;

@@ -1,4 +1,4 @@
-// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+﻿// Copyright (c) 2015 Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -14,13 +14,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CorrugatedIron.Config
+using System;
+
+namespace CorrugatedIron.Util
 {
-    public interface IRiakExternalLoadBalancerConfiguration
+    internal static class MonoUtil
     {
-        IRiakNodeConfiguration Target { get; }
-        int NodePollTime { get; }
-        int DefaultRetryWaitTime { get; }
-        int DefaultRetryCount { get; }
+        private static readonly bool isRunningOnMono = false;
+
+        static MonoUtil()
+        {
+            isRunningOnMono = (null != Type.GetType("Mono.Runtime"));
+        }
+
+        internal static bool IsRunningOnMono
+        {
+            get
+            {
+                return isRunningOnMono;
+            }
+        }
     }
 }

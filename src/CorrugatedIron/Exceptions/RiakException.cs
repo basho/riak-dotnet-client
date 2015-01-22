@@ -1,4 +1,5 @@
 ﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -14,10 +15,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Extensions;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using CorrugatedIron.Extensions;
 
 namespace CorrugatedIron.Exceptions
 {
@@ -34,14 +35,14 @@ namespace CorrugatedIron.Exceptions
             get { return _errorMessage; }
         }
 
-        internal RiakException(uint errorCode, string errorMessage, bool nodeOffline = true)
+        internal RiakException(uint errorCode, string errorMessage, bool nodeOffline)
         {
             NodeOffline = nodeOffline;
             ErrorCode = errorCode;
             _errorMessage = "Riak returned an error. Code '{0}'. Message: {1}".Fmt(ErrorCode, errorMessage);
         }
 
-        internal RiakException(string errorMessage, bool nodeOffline = true)
+        internal RiakException(string errorMessage, bool nodeOffline)
         {
             NodeOffline = nodeOffline;
             _errorMessage = errorMessage;
