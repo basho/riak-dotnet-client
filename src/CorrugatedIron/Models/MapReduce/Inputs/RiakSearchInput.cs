@@ -41,19 +41,11 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
             writer.WritePropertyName("inputs");
             writer.WriteStartObject();
 
-            writer.WritePropertyName("module");
-            writer.WriteValue("yokozuna");
-
-            writer.WritePropertyName("function");
-            writer.WriteValue("mapred_search");
-
-            writer.WritePropertyName("arg");
-            writer.WriteStartArray();
-
+            writer.WritePropertyName("index");
             writer.WriteValue(_index);
-            writer.WriteValue(_query);
 
-            writer.WriteEndArray();
+            writer.WritePropertyName("query");
+            writer.WriteValue(_query);
 
             writer.WriteEndObject();
 

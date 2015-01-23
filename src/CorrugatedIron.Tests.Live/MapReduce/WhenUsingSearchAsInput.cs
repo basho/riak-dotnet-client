@@ -16,7 +16,9 @@
 // under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using CorrugatedIron.Comms;
 using CorrugatedIron.Extensions;
@@ -37,13 +39,13 @@ namespace CorrugatedIron.Tests.Live.MapReduce
         private const string BucketType = "search_type";
         private new const string Bucket = "yoko_bucket";
         private const string Index = "yoko_index";
-        private const string RiakSearchKey = "a.hacker";
-        private const string RiakSearchKey2 = "a.public";
+        private const string HackerKey = "a.hacker";
+        private const string PublicKey = "a.public";
         // See https://raw.githubusercontent.com/basho/yokozuna/develop/priv/default_schema.xml for dynamic field suffix meanings.
-        private const string RiakSearchDoc =
+        private const string HackerDoc =
             "{{\"name_s\":\"{0}Alyssa P. Hacker\", \"age_i\":35, \"leader_b\":true, \"bio_tsd\":\"I'm an engineer, making awesome things.\", \"favorites\":{{\"book_tsd\":\"The Moon is a Harsh Mistress\",\"album_tsd\":\"Magical Mystery Tour\" }}}}";
 
-        private const string RiakSearchDoc2 =
+        private const string PublicDoc =
             "{{\"name_s\":\"{0}Alan Q. Public\", \"age_i\":38, \"bio_tsd\":\"I'm an exciting awesome mathematician\", \"favorites\":{{\"book_tsd\":\"Prelude to Mathematics\",\"album_tsd\":\"The Fame Monster\"}}}}";
 
         private readonly Random _random = new Random();
@@ -86,13 +88,13 @@ namespace CorrugatedIron.Tests.Live.MapReduce
         private void PrepSearch()
         {
             _randomId = _random.Next();
-            var alyssaKey = _randomId + RiakSearchKey;
+            var alyssaKey = _randomId + HackerKey;
             _alyssaRiakId = new RiakObjectId(BucketType, Bucket, alyssaKey);
-            var alyssaDoc = String.Format(RiakSearchDoc, _randomId);
+            var alyssaDoc = String.Format(HackerDoc, _randomId);
 
-            var alanKey = _randomId + RiakSearchKey2;
+            var alanKey = _randomId + PublicKey;
             var alanRiakId = new RiakObjectId(BucketType, Bucket, alanKey);
-            var alanDoc = String.Format(RiakSearchDoc2, _randomId);
+            var alanDoc = String.Format(PublicDoc, _randomId);
 
             Console.WriteLine("Using {0}, {1} for Yokozuna/MapReduce search keys", alyssaKey, alanKey);
 
@@ -126,7 +128,7 @@ namespace CorrugatedIron.Tests.Live.MapReduce
             var phaseResults = result.Value.PhaseResults.ToList();
             phaseResults.Count.ShouldEqual(1);
 
-            CheckThatResultContainsAllKeys(result);
+            AssertThatResultContainsAllKeys(result);
         }
 
         [Test]
@@ -144,7 +146,7 @@ namespace CorrugatedIron.Tests.Live.MapReduce
 
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
 
-            CheckThatResultContainsAllKeys(result);
+            AssertThatResultContainsAllKeys(result);
         }
 
         [Test]
@@ -159,7 +161,7 @@ namespace CorrugatedIron.Tests.Live.MapReduce
 
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
 
-            CheckThatResultContainsAllKeys(result);
+            AssertThatResultContainsAllKeys(result);
         }
 
         [Test]
@@ -182,8 +184,8 @@ namespace CorrugatedIron.Tests.Live.MapReduce
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
             var singleResult = result.Value.PhaseResults.First().Values[0].FromRiakString();
             var failureMessage = string.Format("Results did not contain \"{0}\". \r\nResult was:\"{1}\"",
-                RiakSearchKey, singleResult);
-            singleResult.Contains(RiakSearchKey).ShouldBeTrue(failureMessage);
+                PublicKey, singleResult);
+            singleResult.Contains(PublicKey).ShouldBeTrue(failureMessage);
         }
 
         private bool OnePhaseWithOneResultFound(RiakResult<RiakMapReduceResult> result)
@@ -215,25 +217,22 @@ namespace CorrugatedIron.Tests.Live.MapReduce
             return phase1Results.Count == numResults;
         }
 
-        private static void CheckThatResultContainsAllKeys(RiakResult<RiakMapReduceResult> result)
+        private static void AssertThatResultContainsAllKeys(RiakResult<RiakMapReduceResult> mapReduceResult)
         {
-            var phaseResults = result.Value.PhaseResults.ToList();
+            var phaseResults = mapReduceResult.Value.PhaseResults.ToList();
             phaseResults.Count.ShouldEqual(1);
 
             var searchResults = phaseResults[0];
             searchResults.Values.ShouldNotBeNull();
             searchResults.Values.Count.ShouldEqual(2);
+            
+            var allKeys = new List<string> {HackerKey, PublicKey};
+            var solrResults = searchResults.Values.Select(searchResult => searchResult.FromRiakString());
 
-            foreach (var searchResult in searchResults.Values)
-            {
-                var s = searchResult.FromRiakString();
-                if (!(s.Contains(RiakSearchKey) || s.Contains(RiakSearchKey2)))
-                {
-                    Assert.Fail("Results did not contain either \"{0}\" or \"{1}\". \r\nResult was:\"{2}\"",
-                        RiakSearchKey,
-                        RiakSearchKey2, s);
-                }
-            }
+            var usedKeys = solrResults.SelectMany(result => allKeys.Where(result.Contains));
+            var unusedKeys = allKeys.Except(usedKeys).ToList();
+
+            Assert.AreEqual(0, unusedKeys.Count, "Results did not contain the following keys: {0}", string.Join(", ", allKeys));
         }
     }
 }
