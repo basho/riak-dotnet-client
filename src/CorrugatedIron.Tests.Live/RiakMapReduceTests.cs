@@ -29,34 +29,16 @@ using NUnit.Framework;
 namespace CorrugatedIron.Tests.Live
 {
 
-    public class RiakMapReduceTests
+    public class RiakMapReduceTests : LiveRiakConnectionTestBase
     {
-        protected IRiakEndPoint Cluster;
-        protected IRiakClient Client;
-        protected IRiakClusterConfiguration ClusterConfig;
-
         protected const string MrContentType = RiakConstants.ContentTypes.ApplicationJson;
         protected string Bucket = "fluent_key_bucket";
         protected const string EmptyBody = "{}";
-
-        public RiakMapReduceTests(string section = "riak1NodeConfiguration")
-        {
-            RiakClient.DisableListKeysWarning = true;
-            ClusterConfig = RiakClusterConfiguration.LoadFromConfig(section);
-        }
     }
 
     [TestFixture]
     public class WhenUsingFluentKeyFilters : RiakMapReduceTests
     {
-
-        [SetUp]
-        public void SetUp()
-        {
-            Cluster = new RiakCluster(ClusterConfig, new RiakConnectionFactory());
-            Client = Cluster.CreateClient();
-        }
-
         [TearDown]
         public void TearDown()
         {
