@@ -38,7 +38,7 @@ namespace CorrugatedIron.Tests.Models.MapReduce.Inputs
         {
             var input = new RiakSearchInput("my_index", "my_query");
             var json = Serialize(input.WriteJson);
-            Assert.AreEqual("\"inputs\":{\"module\":\"yokozuna\",\"function\":\"mapred_search\",\"arg\":[\"my_index\",\"my_query\"]}", json);
+            Assert.AreEqual("\"inputs\":{\"index\":\"my_index\",\"query\":\"my_query\"}", json);
         }
     }
 }
