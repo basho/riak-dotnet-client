@@ -129,35 +129,6 @@ namespace CorrugatedIron.Tests.Live.MapReduce
             CheckThatResultContainsAllKeys(result);
         }
 
-        private bool OnePhaseWithOneResultFound(RiakResult<RiakMapReduceResult> result)
-        {
-            return OnePhaseWithNResultsFound(result, 1);
-        }
-
-        private bool OnePhaseWithTwoResultsFound(RiakResult<RiakMapReduceResult> result)
-        {
-            return OnePhaseWithNResultsFound(result, 2);
-        }
-
-        private bool OnePhaseWithNResultsFound(RiakResult<RiakMapReduceResult> result, int numResults)
-        {
-            if (!result.IsSuccess || result.Value == null)
-            {
-                return false;
-            }
-
-            var phaseResults = result.Value.PhaseResults.ToList();
-
-            if (phaseResults.Count != 1)
-            {
-                return false;
-            }
-
-            var phase1Results = phaseResults[0].Values;
-
-            return phase1Results.Count == numResults;
-        }
-
         [Test]
         public void SearchingViaOldInterfaceFluentSearchObjectWorks()
         {
@@ -213,6 +184,35 @@ namespace CorrugatedIron.Tests.Live.MapReduce
             var failureMessage = string.Format("Results did not contain \"{0}\". \r\nResult was:\"{1}\"",
                 RiakSearchKey, singleResult);
             singleResult.Contains(RiakSearchKey).ShouldBeTrue(failureMessage);
+        }
+
+        private bool OnePhaseWithOneResultFound(RiakResult<RiakMapReduceResult> result)
+        {
+            return OnePhaseWithNResultsFound(result, 1);
+        }
+
+        private bool OnePhaseWithTwoResultsFound(RiakResult<RiakMapReduceResult> result)
+        {
+            return OnePhaseWithNResultsFound(result, 2);
+        }
+
+        private bool OnePhaseWithNResultsFound(RiakResult<RiakMapReduceResult> result, int numResults)
+        {
+            if (!result.IsSuccess || result.Value == null)
+            {
+                return false;
+            }
+
+            var phaseResults = result.Value.PhaseResults.ToList();
+
+            if (phaseResults.Count != 1)
+            {
+                return false;
+            }
+
+            var phase1Results = phaseResults[0].Values;
+
+            return phase1Results.Count == numResults;
         }
 
         private static void CheckThatResultContainsAllKeys(RiakResult<RiakMapReduceResult> result)
