@@ -1,4 +1,5 @@
 ﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -15,14 +16,9 @@
 // under the License.
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using CorrugatedIron.Config;
 using CorrugatedIron.Extensions;
-using CorrugatedIron.Models;
-using CorrugatedIron.Models.Search;
-using CorrugatedIron.Tests.Extensions;
 using NUnit.Framework;
 
 namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
@@ -35,17 +31,16 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
             public const string Counters = "counters";
             public const string Maps = "maps";
         }
-        
-        protected const int TestClientId = 42;
-        protected const string TestHost = "riak-test";
-        protected const int TestPbcPort = 8081;
-        protected const int TestHttpPort = 8091;
+
         protected const string TestBucketType = "leveldb_type";
         protected const string TestBucket = "test_bucket";
         protected const string TestKey = "test_json";
         protected static readonly string TestJson;
         protected const string MapReduceBucket = "map_reduce_bucket";
+
+        // NB: allow_mult/last_write_wins set in devrel setup script
         protected const string MultiBucket = "test_multi_bucket";
+
         protected const string MultiKey = "test_multi_key";
         protected const string MultiBodyOne = @"{""dishes"": 9}";
         protected const string MultiBodyTwo = @"{""dishes"": 11}";
@@ -55,21 +50,29 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
         protected IRiakEndPoint Cluster;
         protected IRiakClient Client;
         protected IRiakClusterConfiguration ClusterConfig;
-        
 
         static LiveRiakConnectionTestBase()
         {
             RiakClient.DisableListKeysWarning = true;
-            TestJson = new { @string = "value", @int = 100, @float = 2.34, array = new[] { 1, 2, 3 }, dict = new Dictionary<string, string> { { "foo", "bar" } } }.ToJson();
+            TestJson = new
+            {
+                @string = "value",
+                @int = 100,
+                @float = 2.34,
+                array = new[] { 1, 2, 3 },
+                dict = new Dictionary<string, string> {
+                    { "foo", "bar" }
+                }
+            }.ToJson();
         }
 
-        public LiveRiakConnectionTestBase(string section = "riak1NodeConfiguration")
+        public LiveRiakConnectionTestBase()
         {
-            // TODO: do something smarter with this
-            // switch between cluster and load balancer configuration "easily" by changing the following
-            // two lines around
-            //Cluster = RiakExternalLoadBalancer.FromConfig("riakHaproxyConfiguration");
-            Cluster = RiakCluster.FromConfig(section);
+#if NOAUTH
+            Cluster = RiakCluster.FromConfig("riak1NodeNoAuthConfiguration");
+#else
+            Cluster = RiakCluster.FromConfig("riak1NodeConfiguration");
+#endif
         }
 
         [SetUp]

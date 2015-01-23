@@ -1,4 +1,5 @@
 ﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -15,6 +16,7 @@
 // under the License.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -22,6 +24,38 @@ namespace CorrugatedIron.Extensions
 {
     public static class EnumerableExtensions
     {
+        public static bool IsNullOrEmpty(this IEnumerable items)
+        {
+            if (items == null)
+            {
+                return true;
+            }
+
+            var collection = items as ICollection;
+            if (collection != null)
+            {
+                return collection.Count == 0;
+            }
+
+            return !items.GetEnumerator().MoveNext();
+        }
+
+        public static bool IsNullOrEmpty<T>(this IEnumerable<T> items)
+        {
+            if (items == null)
+            {
+                return true;
+            }
+
+            var collection = items as ICollection<T>;
+            if (collection != null)
+            {
+                return collection.Count == 0;
+            }
+
+            return ((IEnumerable)items).IsNullOrEmpty();
+        }
+
         public static void ForEach<T>(this IEnumerable<T> items, Action<T> action)
         {
             foreach (var item in items)

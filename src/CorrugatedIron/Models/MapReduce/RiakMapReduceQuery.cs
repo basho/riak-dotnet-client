@@ -157,7 +157,7 @@ namespace CorrugatedIron.Models.MapReduce
         public void Compile()
         {
             System.Diagnostics.Debug.Assert(_inputs != null);
-            if(!string.IsNullOrWhiteSpace(_query))
+            if (!string.IsNullOrWhiteSpace(_query))
             {
                 return;
             }
@@ -169,7 +169,7 @@ namespace CorrugatedIron.Models.MapReduce
             {
                 writer.WriteStartObject();
 
-                if(_inputs != null)
+                if (_inputs != null)
                 {
                     _inputs.WriteJson(writer);
                 }

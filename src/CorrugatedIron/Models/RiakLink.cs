@@ -84,15 +84,15 @@ namespace CorrugatedIron.Models
 
         public override bool Equals(object obj)
         {
-            if(ReferenceEquals(null, obj))
+            if (ReferenceEquals(null, obj))
             {
                 return false;
             }
-            if(ReferenceEquals(this, obj))
+            if (ReferenceEquals(this, obj))
             {
                 return true;
             }
-            if(obj.GetType() != typeof(RiakLink))
+            if (obj.GetType() != typeof(RiakLink))
             {
                 return false;
             }
@@ -101,11 +101,11 @@ namespace CorrugatedIron.Models
 
         public bool Equals(RiakLink other)
         {
-            if(ReferenceEquals(null, other))
+            if (ReferenceEquals(null, other))
             {
                 return false;
             }
-            if(ReferenceEquals(this, other))
+            if (ReferenceEquals(this, other))
             {
                 return true;
             }

@@ -9,17 +9,13 @@
 
   <PropertyGroup>
     <CommonAssemblyInfoFile>$(SolutionDir)src\CommonAssemblyInfo.cs</CommonAssemblyInfoFile>
-    <!-- TODO: enabling this causes Clean to hang in Visual Studio
-    <BuildDependsOn>GenerateCommonAssemblyInfo;$(BuildDependsOn);</BuildDependsOn>
-    <CleanDependsOn>CleanCommonAssemblyInfo;$(CleanDependsOn);</CleanDependsOn>
-    -->
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(OS)' != 'Windows_NT'">
+  <PropertyGroup Condition="'$(OS)' != 'Windows_NT'">
     <MonoExe>mono --runtime=v4.0.30319</MonoExe>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)' == '' ">
+  <PropertyGroup Condition="'$(Configuration)' == ''">
     <Configuration>Release</Configuration>
   </PropertyGroup>
 
@@ -85,7 +81,7 @@
     <ProtoGenExe>$(SolutionDir)tools\protobuf-net\protogen\protogen.exe</ProtoGenExe>
     <ProtoDir>$(SolutionDir)src\riak_pb\src</ProtoDir>
     <ProtoMsgDir>$(SolutionDir)src\CorrugatedIron\Messages</ProtoMsgDir>
-
+    <ProtoMsgCsvFile>$(ProtoDir)\riak_pb_messages.csv</ProtoMsgCsvFile>
     <NuGetExe>$(SolutionDir).nuget\NuGet.exe</NuGetExe>
     <NuGetSpecTemplate>$(ProjDir)\NuGet\CorrugatedIron.nuspec.template</NuGetSpecTemplate>
     <NuGetSpecFile>$(ProjDir)\NuGet\CorrugatedIron.nuspec</NuGetSpecFile>
@@ -141,6 +137,10 @@
           Command="$(NuGetExe) pack -Symbols -Verbosity normal $(NuGetSpecFile)" />
   </Target>
 
+  <Target Name="GitSubmodule" Condition="!Exists('$(ProtoMsgCsvFile)')">
+    <GitClient Command="submodule" Arguments="update --init" LocalPath="$(SolutionDir)" />
+  </Target>
+
   <Target Name="All" DependsOnTargets="GenerateCommonAssemblyInfo">
     <MSBuild Projects="@(ProjectToBuild)" BuildInParallel="True" />
   </Target>
@@ -166,7 +166,7 @@
           Command="$(NUnitConsoleRunnerCommand) -work=$(ProjDir)\CorrugatedIron.Tests.Live $(ProjDir)\CorrugatedIron.Tests.Live\CorrugatedIron.Tests.Live.nunit" />
   </Target>
 
-  <Target Name="UnitTest" DependsOnTargets="Debug">
+  <Target Name="UnitTest" DependsOnTargets="GitSubmodule;Debug">
     <Exec WorkingDirectory="$(SolutionDir)"
           Command="$(NUnitConsoleRunnerCommand) -work=$(ProjDir)\CorrugatedIron.Tests $(ProjDir)\CorrugatedIron.Tests\CorrugatedIron.Tests.nunit" />
   </Target>

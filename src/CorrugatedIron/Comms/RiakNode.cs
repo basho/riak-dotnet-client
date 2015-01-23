@@ -1,4 +1,5 @@
 ﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -14,9 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Config;
 using System;
 using System.Collections.Generic;
+using CorrugatedIron.Config;
 
 namespace CorrugatedIron.Comms
 {
@@ -31,20 +32,22 @@ namespace CorrugatedIron.Comms
 
     public class RiakNode : IRiakNode
     {
-        private readonly IRiakConnectionManager _connections;
-        private bool _disposing;
+        private readonly IRiakConnectionManager connections;
+        private bool disposing;
 
-        public RiakNode(IRiakNodeConfiguration nodeConfiguration, IRiakConnectionFactory connectionFactory)
+        public RiakNode(IRiakNodeConfiguration nodeConfig,
+            IRiakAuthenticationConfiguration authConfig,
+            IRiakConnectionFactory connectionFactory)
         {
             // assume that if the node has a pool size of 0 then the intent is to have the connections
             // made on the fly
-            if (nodeConfiguration.PoolSize == 0)
+            if (nodeConfig.PoolSize == 0)
             {
-                _connections = new RiakOnTheFlyConnection(nodeConfiguration, connectionFactory);
+                connections = new RiakOnTheFlyConnection(nodeConfig, authConfig, connectionFactory);
             }
             else
             {
-                _connections = new RiakConnectionPool(nodeConfiguration, connectionFactory);
+                connections = new RiakConnectionPool(nodeConfig, authConfig, connectionFactory);
             }
         }
 
@@ -61,10 +64,13 @@ namespace CorrugatedIron.Comms
         private TRiakResult UseConnection<TRiakResult>(Func<IRiakConnection, TRiakResult> useFun, Func<ResultCode, string, bool, TRiakResult> onError)
             where TRiakResult : RiakResult
         {
-            if(_disposing) return onError(ResultCode.ShuttingDown, "Connection is shutting down", true);
+            if (disposing)
+            {
+                return onError(ResultCode.ShuttingDown, "Connection is shutting down", true);
+            }
 
-            var response = _connections.Consume(useFun);
-            if(response.Item1)
+            var response = connections.Consume(useFun);
+            if (response.Item1)
             {
                 return response.Item2;
             }
@@ -74,10 +80,13 @@ namespace CorrugatedIron.Comms
         public RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun)
             where TResult : RiakResult
         {
-            if(_disposing) return RiakResult<IEnumerable<TResult>>.Error(ResultCode.ShuttingDown, "Connection is shutting down", true);
+            if (disposing)
+            {
+                return RiakResult<IEnumerable<TResult>>.Error(ResultCode.ShuttingDown, "Connection is shutting down", true);
+            }
 
-            var response = _connections.DelayedConsume(useFun);
-            if(response.Item1)
+            var response = connections.DelayedConsume(useFun);
+            if (response.Item1)
             {
                 return response.Item2;
             }
@@ -86,8 +95,8 @@ namespace CorrugatedIron.Comms
 
         public void Dispose()
         {
-            _disposing = true;
-            _connections.Dispose();
+            disposing = true;
+            connections.Dispose();
         }
     }
 }

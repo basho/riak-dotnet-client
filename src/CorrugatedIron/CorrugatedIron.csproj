@@ -64,18 +64,16 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Auth\RiakSecurityManager.cs" />
     <Compile Include="Comms\IRiakConnectionManager.cs" />
     <Compile Include="Comms\LoadBalancing\ILoadBalancingStrategy.cs" />
     <Compile Include="Comms\LoadBalancing\RoundRobinStrategy.cs" />
     <Compile Include="Comms\RiakOnTheFlyConnection.cs" />
     <Compile Include="Comms\RiakPbcSocket.cs" />
-    <Compile Include="Config\Fluent\RiakClusterConfiguration.cs" />
-    <Compile Include="Config\Fluent\RiakExternalLoadBalancerConfiguration.cs" />
-    <Compile Include="Config\Fluent\RiakNodeConfiguration.cs" />
+    <Compile Include="Config\IRiakAuthenticationConfiguration.cs" />
     <Compile Include="Config\IRiakClusterConfiguration.cs" />
-    <Compile Include="Config\IRiakExternalLoadBalancerConfiguration.cs" />
     <Compile Include="Config\IRiakNodeConfiguration.cs" />
-    <Compile Include="Config\RiakExternalLoadBalancerConfiguration.cs" />
+    <Compile Include="Config\RiakAuthenticationConfiguration.cs" />
     <Compile Include="Containers\ConcurrentEnumerable.cs" />
     <Compile Include="Containers\ConcurrentEnumerator.cs" />
     <Compile Include="Comms\RiakConnectionPool.cs" />
@@ -241,13 +239,13 @@
     <Compile Include="Comms\RiakNode.cs" />
     <Compile Include="Models\MapReduce\RiakMapReduceResult.cs" />
     <Compile Include="RiakEndPoint.cs" />
-    <Compile Include="RiakExternalLoadBalancer.cs" />
     <Compile Include="RiakResult.cs" />
     <Compile Include="Config\RiakClusterConfiguration.cs" />
     <Compile Include="Config\RiakNodeConfiguration.cs" />
     <Compile Include="Config\RiakNodeConfigurationCollection.cs" />
     <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="Extensions\JsonExtensions.cs" />
+    <Compile Include="Util\MonoUtil.cs" />
     <Compile Include="Util\RiakConstants.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Messages\MessageCode.cs" />

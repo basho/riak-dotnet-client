@@ -121,15 +121,15 @@ namespace CorrugatedIron
 
         public override bool Equals(object obj)
         {
-            if(ReferenceEquals(null, obj))
+            if (ReferenceEquals(null, obj))
             {
                 return false;
             }
-            if(ReferenceEquals(this, obj))
+            if (ReferenceEquals(this, obj))
             {
                 return true;
             }
-            if(obj.GetType() != typeof(RiakResult<TResult>))
+            if (obj.GetType() != typeof(RiakResult<TResult>))
             {
                 return false;
             }
@@ -138,11 +138,11 @@ namespace CorrugatedIron
 
         public bool Equals(RiakResult<TResult> other)
         {
-            if(ReferenceEquals(null, other))
+            if (ReferenceEquals(null, other))
             {
                 return false;
             }
-            if(ReferenceEquals(this, other))
+            if (ReferenceEquals(this, other))
             {
                 return true;
             }
