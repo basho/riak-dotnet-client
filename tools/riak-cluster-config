@@ -1,8 +1,9 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-riak_admin=$1
-http_port=$2
-strong_consistency=$3
+declare -r riak_admin="$1"
+declare -ir http_port="$2"
+declare -r strong_consistency="${3:-false}"
+declare -r use_security="${4:-false}"
 
 $riak_admin bucket-type create plain '{"props":{}}'
 $riak_admin bucket-type create search_type '{"props":{}}'
@@ -22,11 +23,28 @@ $riak_admin bucket-type activate yokozuna
 $riak_admin bucket-type activate leveldb_type
 $riak_admin bucket-type activate memory_type
 
-if [[ "$strong_consistency" = true ]]
+if [[ $strong_consistency == 'true' ]]
 then
   $riak_admin bucket-type create consistent '{"props":{"consistent":true}}'
   $riak_admin bucket-type activate consistent
 fi
 
-curl -4 -XPUT -H 'Content-type: application/json' localhost:$http_port/buckets/riak_index_tests/props -d '{"props":{"backend":"leveldb_backend"}}'
+echo -n 'Setting properties on test_multi_bucket HTTP CODE:'
+curl -4so /dev/null -w "%{http_code}" -XPUT -H 'Content-type: application/json' localhost:$http_port/buckets/test_multi_bucket/props -d '{"props":{"allow_mult":true,"last_write_wins":false}}'
+echo ' ...DONE'
+
+echo -n 'Setting backend to leveldb_backend for riak_index_tests bucket... HTTP CODE:'
+curl -4so /dev/null -w "%{http_code}" -XPUT -H 'Content-type: application/json' localhost:$http_port/buckets/riak_index_tests/props -d '{"props":{"backend":"leveldb_backend"}}'
+echo ' ...DONE'
+
+if [[ $use_security == 'true' ]]
+then
+    $riak_admin security enable
+    $riak_admin security add-group test
+    $riak_admin security add-user riakuser 'groups=test'
+    $riak_admin security add-user riakpass 'password=Test1234' 'groups=test'
+    $riak_admin security add-source riakuser 0.0.0.0/0 certificate
+    $riak_admin security add-source riakpass 0.0.0.0/0 password
+    $riak_admin security grant riak_kv.get,riak_kv.put,riak_kv.delete,riak_kv.index,riak_kv.list_keys,riak_kv.list_buckets,riak_kv.mapreduce,riak_core.get_bucket,riak_core.set_bucket,riak_core.get_bucket_type,riak_core.set_bucket_type,search.admin,search.query on any to all
+fi
 

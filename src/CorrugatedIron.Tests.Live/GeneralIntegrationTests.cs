@@ -1,4 +1,5 @@
 ﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -14,7 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Tests.Extensions;
@@ -22,8 +25,6 @@ using CorrugatedIron.Tests.Live.Extensions;
 using CorrugatedIron.Tests.Live.LiveRiakConnectionTests;
 using CorrugatedIron.Util;
 using NUnit.Framework;
-using System;
-using System.Linq;
 
 namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
 {
@@ -45,7 +46,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         }
 
         [Test]
-        public void PingRequstResultsInPingResponse()
+        public void PingRequestResultsInPingResponse()
         {
             var result = Client.Ping();
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
@@ -76,11 +77,13 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         [Test]
         public void GetWithInvalidBucketReturnsInvalidRequest()
         {
-            var getResult = Client.Get("", "key");
-            getResult.ResultCode.ShouldEqual(ResultCode.InvalidRequest);
-            // TODO: confirm that this is an invalid behavior and either trap or submit a Riak bug
-            //getResult = Client.Get(null, "key");
-            //getResult.ResultCode.ShouldEqual(ResultCode.InvalidRequest);
+            Assert.Throws<ArgumentNullException>(() => Client.Get("", "key"));
+
+            Assert.Throws<ArgumentNullException>(() => Client.Get(null, "key"));
+            Assert.Throws<ArgumentNullException>(() => Client.Get(String.Empty, "key"));
+
+            Assert.Throws<ArgumentNullException>(() => Client.Get(null, null, "key"));
+            Assert.Throws<ArgumentNullException>(() => Client.Get(null, String.Empty, "key"));
         }
 
         [Test]
@@ -95,20 +98,21 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         {
             var doc = new RiakObject(TestBucket, TestKey, TestJson, RiakConstants.ContentTypes.ApplicationJson);
             var writeResult = Client.Put(doc);
-
             writeResult.IsSuccess.ShouldBeTrue();
             writeResult.Value.ShouldNotBeNull();
 
-            var getResults = Client.Get(new List<RiakObjectId>
+            Assert.Throws<ArgumentNullException>(() =>
             {
-                new RiakObjectId(null, "key"),
-                new RiakObjectId("", "key"),
-                new RiakObjectId("  ", "key"),
-                new RiakObjectId("foo/bar", "key"),
-                new RiakObjectId(TestBucket, TestKey)
-            }).ToList();
-
-            getResults.Count(r => r.IsSuccess).ShouldEqual(1);
+                var getResults = Client.Get(new List<RiakObjectId>
+                {
+                    new RiakObjectId(null, "key"),
+                    new RiakObjectId("", "key"),
+                    new RiakObjectId("  ", "key"),
+                    new RiakObjectId("foo/bar", "key"),
+                    new RiakObjectId(TestBucket, TestKey)
+                }).ToList();
+                Assert.IsNotNull(getResults);
+            });
         }
 
         [Test]
@@ -328,12 +332,12 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             mrRes.PhaseResults.ElementAt(1).Phase.ShouldEqual(1u);
 
             //mrRes.PhaseResults.ElementAt(0).Values.ShouldBeNull();
-            foreach(var v in mrRes.PhaseResults.ElementAt(0).Values)
+            foreach (var v in mrRes.PhaseResults.ElementAt(0).Values)
             {
                 v.ShouldBeNull();
             }
             mrRes.PhaseResults.ElementAt(1).Values.ShouldNotBeNull();
-   
+
             var values = result.Value.PhaseResults.ElementAt(1).GetObjects<int[]>().First();
             //var values = Newtonsoft.Json.JsonConvert.DeserializeObject<int[]>(result.Value.PhaseResults.ElementAt(1).Values.First().FromRiakString());
             values[0].ShouldEqual(10);
@@ -368,12 +372,12 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
                     mrRes.PhaseResults.ElementAt(1).Phase.ShouldEqual(1u);
 
                     //mrRes.PhaseResults.ElementAt(0).Values.ShouldBeNull();
-                    foreach(var v in mrRes.PhaseResults.ElementAt(0).Values)
+                    foreach (var v in mrRes.PhaseResults.ElementAt(0).Values)
                     {
                         v.ShouldBeNull();
                     }
                     mrRes.PhaseResults.ElementAt(1).Values.ShouldNotBeNull();
-    
+
                     var values = result.Value.PhaseResults.ElementAt(1).GetObjects<int[]>().First();
                     values[0].ShouldEqual(10);
                 });
@@ -435,35 +439,9 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             Client.Batch(DoAllowMultProducesMultipleTest);
         }
 
-        private static void DoAllowMultProducesMultipleTest(IRiakBatchClient client)
-        {
-            // delete first if something does exist
-            client.Delete(MultiBucket, MultiKey);
-
-            // Do this via the REST interface - will be substantially slower than PBC
-            var props = new RiakBucketProperties().SetAllowMultiple(true).SetLastWriteWins(false);
-            client.SetBucketProperties(MultiBucket, props).IsSuccess.ShouldBeTrue();
-
-            var doc = new RiakObject(MultiBucket, MultiKey, MultiBodyOne, RiakConstants.ContentTypes.ApplicationJson);
-            var writeResult1 = client.Put(doc);
-            writeResult1.IsSuccess.ShouldBeTrue();
-
-            doc = new RiakObject(MultiBucket, MultiKey, MultiBodyTwo, RiakConstants.ContentTypes.ApplicationJson);
-            var writeResult2 = client.Put(doc);
-            writeResult2.IsSuccess.ShouldBeTrue();
-            writeResult2.Value.Siblings.Count.ShouldBeGreaterThan(2);
-
-            var result = client.Get(MultiBucket, MultiKey);
-            result.Value.Siblings.Count.ShouldBeGreaterThan(2);
-        }
-
         [Test]
         public void WritesWithAllowMultProducesMultipleVTags()
         {
-            // Do this via the PBC - noticable quicker than REST
-            var props = new RiakBucketProperties().SetAllowMultiple(true);
-            Client.SetBucketProperties(MultiBucket, props).IsSuccess.ShouldBeTrue();
-
             var doc = new RiakObject(MultiBucket, MultiKey, MultiBodyOne, RiakConstants.ContentTypes.ApplicationJson);
             Client.Put(doc).IsSuccess.ShouldBeTrue();
 
@@ -481,10 +459,6 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         {
             Client.Batch(batch =>
                 {
-                    // Do this via the PBC - noticable quicker than REST
-                    var props = new RiakBucketProperties().SetAllowMultiple(true);
-                    batch.SetBucketProperties(MultiBucket, props).IsSuccess.ShouldBeTrue();
-
                     var doc = new RiakObject(MultiBucket, MultiKey, MultiBodyOne, RiakConstants.ContentTypes.ApplicationJson);
                     batch.Put(doc).IsSuccess.ShouldBeTrue();
 
@@ -498,19 +472,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
                 });
         }
 
-       private Func<RiakResult<IEnumerable<String>>> RunListKeys(IRiakBatchClient client, string bucket)
-        {
-            Func<RiakResult<IEnumerable<String>>> runListKeys =
-                () => client.ListKeys(bucket);
-            return runListKeys;
-        }
-
-        private static Func<RiakResult<IEnumerable<string>>, bool> NoKeysListed
-        {
-            get { return result => result.IsSuccess && !result.Value.Any(); }
-        }
-
-       [Test]
+        [Test]
         public void DeletingAnObjectDeletesAnObject()
         {
             var doc = new RiakObject(TestBucket, TestKey, TestJson, RiakConstants.ContentTypes.ApplicationJson);
@@ -547,7 +509,7 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
         public void AsyncListKeysReturnsTheCorrectNumberOfResults()
         {
             var bucket = Guid.NewGuid().ToString();
-            
+
             for (var i = 1; i < 11; i++)
             {
                 var doc = new RiakObject(bucket, i.ToString(), new { value = i });
@@ -561,6 +523,36 @@ namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
             result.IsSuccess.ShouldBeTrue();
             result.Value.ShouldNotBeNull();
             result.Value.Count().ShouldEqual(10);
+        }
+
+        private static void DoAllowMultProducesMultipleTest(IRiakBatchClient client)
+        {
+            // delete first if something does exist
+            client.Delete(MultiBucket, MultiKey);
+
+            var doc = new RiakObject(MultiBucket, MultiKey, MultiBodyOne, RiakConstants.ContentTypes.ApplicationJson);
+            var writeResult1 = client.Put(doc);
+            writeResult1.IsSuccess.ShouldBeTrue();
+
+            doc = new RiakObject(MultiBucket, MultiKey, MultiBodyTwo, RiakConstants.ContentTypes.ApplicationJson);
+            var writeResult2 = client.Put(doc);
+            writeResult2.IsSuccess.ShouldBeTrue();
+            writeResult2.Value.Siblings.Count.ShouldBeGreaterThan(2);
+
+            var result = client.Get(MultiBucket, MultiKey);
+            result.Value.Siblings.Count.ShouldBeGreaterThan(2);
+        }
+
+        private Func<RiakResult<IEnumerable<String>>> RunListKeys(IRiakBatchClient client, string bucket)
+        {
+            Func<RiakResult<IEnumerable<String>>> runListKeys =
+                () => client.ListKeys(bucket);
+            return runListKeys;
+        }
+
+        private static Func<RiakResult<IEnumerable<string>>, bool> NoKeysListed
+        {
+            get { return result => result.IsSuccess && !result.Value.Any(); }
         }
     }
 }

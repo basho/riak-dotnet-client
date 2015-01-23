@@ -94,8 +94,7 @@ namespace CorrugatedIron.Tests.Live
 
             CreateLinkedObjects(Bucket);
 
-            var props = new RiakBucketProperties()
-                .SetAllowMultiple(true);
+            var props = new RiakBucketProperties().SetAllowMultiple(true);
             Client.SetBucketProperties(Bucket, props);
         }
 
@@ -141,9 +140,7 @@ namespace CorrugatedIron.Tests.Live
             base.SetUp();
             CreateLinkedObjects(TestBucket);
 
-            var props = new RiakBucketProperties()
-                .SetAllowMultiple(false);
-
+            var props = new RiakBucketProperties().SetAllowMultiple(false);
             Client.SetBucketProperties(TestBucket, props);
         }
 
@@ -161,7 +158,7 @@ namespace CorrugatedIron.Tests.Live
             jeremiah.Links.Count.IsAtLeast(4);
         }
 
-        [Test]
+        [Test, Ignore("Link walking is deprecated in Riak 2.0 and incompatible with Security")]
         public void RiakObjectLinksAreTheSameAsLinksRetrievedViaMapReduce()
         {
             var jeremiah = Client.Get(TestBucket, Jeremiah).Value;
@@ -177,7 +174,7 @@ namespace CorrugatedIron.Tests.Live
             var mrResult = Client.MapReduce(query);
             mrResult.IsSuccess.ShouldBeTrue();
 
-            // TODO Is *this* chunk of code acceptable?
+            // TODO: FUTURE - Is *this* chunk of code acceptable?
             // This should probably be taken care of in the RiakClient.WalkLinks
             var listOfLinks = mrResult.Value.PhaseResults.OrderBy(pr => pr.Phase)
                 .ElementAt(0).Values
@@ -192,7 +189,7 @@ namespace CorrugatedIron.Tests.Live
             }
         }
 
-        [Test]
+        [Test, Ignore("Link walking is deprecated in Riak 2.0 and incompatible with Security")]
         public void LinksAreRetrievedWithAMapReducePhase()
         {
             var query = new RiakMapReduceQuery()
@@ -253,7 +250,7 @@ namespace CorrugatedIron.Tests.Live
             ojLinks.ForEach(l => jeremiah.Links.ShouldContain(l));
         }
 
-        [Test]
+        [Test, Ignore("Link walking is deprecated in Riak 2.0 and incompatible with Security")]
         public void LinkWalkingSuccessfullyRetrievesNLevels()
         {
             var oj = Client.Get(TestBucket, OJ).Value;
@@ -308,9 +305,9 @@ namespace CorrugatedIron.Tests.Live
             //    }
             //};
             const string bucketName = "test";
-            var ojPerson = new Person() {Name = "oj", CurrentlyDrinking = "tea"};
+            var ojPerson = new Person() { Name = "oj", CurrentlyDrinking = "tea" };
 
-            var oj = new RiakObject(bucketName, OJ) {ContentType = RiakConstants.ContentTypes.ProtocolBuffers};
+            var oj = new RiakObject(bucketName, OJ) { ContentType = RiakConstants.ContentTypes.ProtocolBuffers };
             oj.SetObject(ojPerson);
 
             // Don't capture result to avoid compiler warning

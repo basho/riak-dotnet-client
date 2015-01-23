@@ -30,7 +30,7 @@ namespace CorrugatedIron.Models.MapReduce.Phases
 
         public RiakLinkPhase(RiakLink riakLink)
         {
-            if(string.IsNullOrWhiteSpace(riakLink.Bucket)
+            if (string.IsNullOrWhiteSpace(riakLink.Bucket)
                 && string.IsNullOrWhiteSpace(riakLink.Key)
                 && string.IsNullOrWhiteSpace(riakLink.Tag))
             {
@@ -45,7 +45,7 @@ namespace CorrugatedIron.Models.MapReduce.Phases
 
         public RiakLinkPhase FromRiakLink(RiakLink riakLink)
         {
-            if(string.IsNullOrWhiteSpace(riakLink.Bucket)
+            if (string.IsNullOrWhiteSpace(riakLink.Bucket)
                 && string.IsNullOrWhiteSpace(riakLink.Key)
                 && string.IsNullOrWhiteSpace(riakLink.Tag))
             {

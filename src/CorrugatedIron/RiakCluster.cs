@@ -1,4 +1,5 @@
 ﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -14,44 +15,45 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Comms;
-using CorrugatedIron.Comms.LoadBalancing;
-using CorrugatedIron.Config;
-using CorrugatedIron.Messages;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using CorrugatedIron.Comms;
+using CorrugatedIron.Comms.LoadBalancing;
+using CorrugatedIron.Config;
+using CorrugatedIron.Messages;
 
 namespace CorrugatedIron
 {
     public class RiakCluster : RiakEndPoint
     {
-        private readonly RoundRobinStrategy _loadBalancer;
-        private readonly List<IRiakNode> _nodes;
-        private readonly ConcurrentQueue<IRiakNode> _offlineNodes;
-        private readonly int _nodePollTime;
-        private readonly int _defaultRetryCount;
-        private bool _disposing;
+        private readonly RoundRobinStrategy loadBalancer;
+        private readonly List<IRiakNode> nodes;
+        private readonly ConcurrentQueue<IRiakNode> offlineNodes;
+        private readonly int nodePollTime;
+        private readonly int defaultRetryCount;
+        private bool disposing;
+
+        public RiakCluster(IRiakClusterConfiguration clusterConfig, IRiakConnectionFactory connectionFactory)
+        {
+            nodePollTime = clusterConfig.NodePollTime;
+            nodes = clusterConfig.RiakNodes.Select(rn =>
+                new RiakNode(rn, clusterConfig.Authentication, connectionFactory)).Cast<IRiakNode>().ToList();
+            loadBalancer = new RoundRobinStrategy();
+            loadBalancer.Initialise(nodes);
+            offlineNodes = new ConcurrentQueue<IRiakNode>();
+            defaultRetryCount = clusterConfig.DefaultRetryCount;
+            RetryWaitTime = clusterConfig.DefaultRetryWaitTime;
+
+            // Task.Factory.StartNew(NodeMonitor);
+        }
 
         protected override int DefaultRetryCount
         {
-            get { return _defaultRetryCount; }
-        }
-
-        public RiakCluster(IRiakClusterConfiguration clusterConfiguration, IRiakConnectionFactory connectionFactory)
-        {
-            _nodePollTime = clusterConfiguration.NodePollTime;
-            _nodes = clusterConfiguration.RiakNodes.Select(rn => new RiakNode(rn, connectionFactory)).Cast<IRiakNode>().ToList();
-            _loadBalancer = new RoundRobinStrategy();
-            _loadBalancer.Initialise(_nodes);
-            _offlineNodes = new ConcurrentQueue<IRiakNode>();
-            _defaultRetryCount = clusterConfiguration.DefaultRetryCount;
-            RetryWaitTime = clusterConfiguration.DefaultRetryWaitTime;
-
-            Task.Factory.StartNew(NodeMonitor);
+            get { return defaultRetryCount; }
         }
 
         /// <summary>
@@ -77,13 +79,20 @@ namespace CorrugatedIron
             return new RiakCluster(RiakClusterConfiguration.LoadFromConfig(configSectionName, configFileName), new RiakConnectionFactory());
         }
 
-        protected override TRiakResult UseConnection<TRiakResult>(Func<IRiakConnection, TRiakResult> useFun, Func<ResultCode, string, bool, TRiakResult> onError, int retryAttempts)
+        protected override TRiakResult UseConnection<TRiakResult>(Func<IRiakConnection, TRiakResult> useFun,
+            Func<ResultCode, string, bool, TRiakResult> onError, int retryAttempts)
         {
-            if(retryAttempts < 0) return onError(ResultCode.NoRetries, "Unable to access a connection on the cluster.", false);
-            if (_disposing) return onError(ResultCode.ShuttingDown, "System currently shutting down", true);
+            if (retryAttempts < 0)
+            {
+                return onError(ResultCode.NoRetries, "Unable to access a connection on the cluster.", false);
+            }
 
-            var node = _loadBalancer.SelectNode();
+            if (disposing)
+            {
+                return onError(ResultCode.ShuttingDown, "System currently shutting down", true);
+            }
 
+            var node = loadBalancer.SelectNode();
             if (node != null)
             {
                 var result = node.UseConnection(useFun);
@@ -123,10 +132,17 @@ namespace CorrugatedIron
 
         public override RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun, int retryAttempts)
         {
-            if(retryAttempts < 0) return RiakResult<IEnumerable<TResult>>.Error(ResultCode.NoRetries, "Unable to access a connection on the cluster.", false);
-            if (_disposing) return RiakResult<IEnumerable<TResult>>.Error(ResultCode.ShuttingDown, "System currently shutting down", true);
+            if (retryAttempts < 0)
+            {
+                return RiakResult<IEnumerable<TResult>>.Error(ResultCode.NoRetries, "Unable to access a connection on the cluster.", false);
+            }
 
-            var node = _loadBalancer.SelectNode();
+            if (disposing)
+            {
+                return RiakResult<IEnumerable<TResult>>.Error(ResultCode.ShuttingDown, "System currently shutting down", true);
+            }
+
+            var node = loadBalancer.SelectNode();
 
             if (node != null)
             {
@@ -159,27 +175,27 @@ namespace CorrugatedIron
         {
             lock (node)
             {
-                if (!_offlineNodes.Contains(node))
+                if (!offlineNodes.Contains(node))
                 {
-                    _loadBalancer.RemoveNode(node);
-                    _offlineNodes.Enqueue(node);
+                    loadBalancer.RemoveNode(node);
+                    offlineNodes.Enqueue(node);
                 }
             }
         }
 
         private void NodeMonitor()
         {
-            while (!_disposing)
+            while (!disposing)
             {
                 var deadNodes = new List<IRiakNode>();
                 IRiakNode node = null;
-                while (_offlineNodes.TryDequeue(out node) && !_disposing)
+                while (offlineNodes.TryDequeue(out node) && !disposing)
                 {
-                    var result = node.UseConnection(c => c.PbcWriteRead(MessageCode.PingReq, MessageCode.PingResp));
+                    var result = node.UseConnection(c => c.PbcWriteRead(MessageCode.RpbPingReq, MessageCode.RpbPingResp));
 
                     if (result.IsSuccess)
                     {
-                        _loadBalancer.AddNode(node);
+                        loadBalancer.AddNode(node);
                     }
                     else
                     {
@@ -187,23 +203,23 @@ namespace CorrugatedIron
                     }
                 }
 
-                if (!_disposing)
+                if (!disposing)
                 {
                     foreach (var deadNode in deadNodes)
                     {
-                        _offlineNodes.Enqueue(deadNode);
+                        offlineNodes.Enqueue(deadNode);
                     }
 
-                    Thread.Sleep(_nodePollTime);
+                    Thread.Sleep(nodePollTime);
                 }
             }
         }
 
         public override void Dispose()
         {
-            _disposing = true;
+            disposing = true;
 
-            _nodes.ForEach(n => n.Dispose());
+            nodes.ForEach(n => n.Dispose());
         }
     }
 }

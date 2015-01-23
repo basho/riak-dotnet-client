@@ -44,7 +44,7 @@ namespace CorrugatedIron.Config
 
         IList<IRiakNodeConfiguration> IRiakClusterConfiguration.RiakNodes
         {
-            get { return Nodes.Cast<IRiakNodeConfiguration>().ToList(); }
+            get { return this.Nodes.Cast<IRiakNodeConfiguration>().ToList(); }
         }
 
         [ConfigurationProperty("nodePollTime", DefaultValue = 5000, IsRequired = false)]
@@ -66,6 +66,17 @@ namespace CorrugatedIron.Config
         {
             get { return (int)this["defaultRetryCount"]; }
             set { this["defaultRetryCount"] = value; }
+        }
+
+        [ConfigurationProperty("authentication", IsRequired = false)]
+        public RiakAuthenticationConfiguration Authentication
+        {
+            get { return (RiakAuthenticationConfiguration)this["authentication"]; }
+        }
+
+        IRiakAuthenticationConfiguration IRiakClusterConfiguration.Authentication
+        {
+            get { return this.Authentication; }
         }
     }
 }

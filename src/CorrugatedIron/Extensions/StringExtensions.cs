@@ -1,4 +1,5 @@
 ﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -14,11 +15,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Util;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
+using CorrugatedIron.Util;
 
 namespace CorrugatedIron.Extensions
 {
@@ -43,7 +45,7 @@ namespace CorrugatedIron.Extensions
 
         public static string Fmt(this string formatter, params object[] args)
         {
-            return string.Format(formatter, args);
+            return String.Format(formatter, args);
         }
 
         public static string UrlEncoded(this string value)
@@ -53,13 +55,13 @@ namespace CorrugatedIron.Extensions
 
         public static bool IsUserIntegerKey(this string value)
         {
-            return RiakConstants.SystemIndexKeys.SystemIntKeys.Contains(value) 
+            return RiakConstants.SystemIndexKeys.SystemIntKeys.Contains(value)
                 || value.EndsWith(RiakConstants.IndexSuffix.Integer);
         }
 
         public static bool IsUserBinaryKey(this string value)
         {
-            return RiakConstants.SystemIndexKeys.SystemBinKeys.Contains(value) 
+            return RiakConstants.SystemIndexKeys.SystemBinKeys.Contains(value)
                 || value.EndsWith(RiakConstants.IndexSuffix.Binary);
         }
 
@@ -88,8 +90,8 @@ namespace CorrugatedIron.Extensions
         {
             return value.IsSystemBinaryKey() ? value : value + RiakConstants.IndexSuffix.Binary;
         }
-        
-        public static string ToRiakSearchTerm(this string value) 
+
+        public static string ToRiakSearchTerm(this string value)
         {
             var result = SearchTermRegex.Replace(value, SearchTermReplacement);
 
@@ -106,7 +108,7 @@ namespace CorrugatedIron.Extensions
             {
                 result = string.Format("\"{0}\"", result);
             }
-            
+
             return result;
         }
 

@@ -1,4 +1,5 @@
 ﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -20,17 +21,17 @@ namespace CorrugatedIron.Comms
 {
     public interface IRiakConnectionFactory
     {
-        IRiakConnection CreateConnection(IRiakNodeConfiguration nodeConfiguration);
+        IRiakConnection CreateConnection(IRiakNodeConfiguration nodeConfig, IRiakAuthenticationConfiguration authConfig);
     }
 
     public class RiakConnectionFactory : IRiakConnectionFactory
     {
-        public IRiakConnection CreateConnection(IRiakNodeConfiguration nodeConfiguration)
+        public IRiakConnection CreateConnection(IRiakNodeConfiguration nodeConfig, IRiakAuthenticationConfiguration authConfig)
         {
             // As pointless as this seems, it serves the purpose of decoupling the
             // creation of the connections to the node itself. Also means we can
             // pull it apart to test it
-            return new RiakConnection(nodeConfiguration);
+            return new RiakConnection(nodeConfig, authConfig);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -233,9 +234,23 @@ namespace CorrugatedIron.Models
 
         public RiakObject(RiakObjectId objectId, byte[] value, string contentType, string charSet)
         {
+            if (objectId == null)
+            {
+                throw new ArgumentNullException("objectId");
+            }
+
+            // NB: BucketType is *not* required due to legacy bucket.
             BucketType = objectId.BucketType;
+
             Bucket = objectId.Bucket;
+            if (Bucket.IsNullOrEmpty())
+            {
+                throw new ArgumentNullException("objectId.Bucket");
+            }
+
+            // TODO: FUTURE - should Key be required?
             Key = objectId.Key;
+
             Value = value;
             ContentType = contentType;
             CharSet = charSet;
@@ -391,7 +406,7 @@ namespace CorrugatedIron.Models
         {
             var message = new RpbPutReq
             {
-                type = BucketType.ToRiakString(),   
+                type = BucketType.ToRiakString(),
                 bucket = Bucket.ToRiakString(),
                 key = Key.ToRiakString(),
                 vclock = VectorClock,
@@ -578,7 +593,7 @@ namespace CorrugatedIron.Models
                         Serializer.Serialize(ms, value);
                         return ms.ToArray();
                     }
-                    
+
                 });
                 SetObject(value, ContentType, soba);
                 return;

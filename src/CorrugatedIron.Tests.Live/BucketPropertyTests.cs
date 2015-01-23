@@ -1,4 +1,5 @@
 ﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -14,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
+using System.Linq;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.CommitHook;
@@ -22,8 +25,6 @@ using CorrugatedIron.Tests.Live.Extensions;
 using CorrugatedIron.Tests.Live.LiveRiakConnectionTests;
 using CorrugatedIron.Util;
 using NUnit.Framework;
-using System;
-using System.Linq;
 
 namespace CorrugatedIron.Tests.Live.BucketPropertyTests
 {
@@ -35,10 +36,6 @@ namespace CorrugatedIron.Tests.Live.BucketPropertyTests
         // use the one node configuration here because we might run the risk
         // of hitting different nodes in the configuration before the props
         // are replicated to other nodes.
-        public WhenDealingWithBucketProperties()
-            :base("riak1NodeConfiguration")
-        {
-        }
 
         [Test]
         public void ListKeysReturnsAllkeys()
