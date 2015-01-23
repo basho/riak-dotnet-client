@@ -44,10 +44,14 @@ namespace CorrugatedIron.Auth
             {
                 throw new ArgumentNullException("targetHost");
             }
-            this.targetHostCommonName = String.Format("CN={0}", targetHost);
+            targetHostCommonName = String.Format("CN={0}", targetHost);
             this.authConfig = authConfig;
-            this.clientCertificates = GetClientCertificates();
-            this.certificateAuthorityCert = GetCertificateAuthorityCert();
+
+            if (IsSecurityEnabled)
+            {
+                clientCertificates = GetClientCertificates();
+                certificateAuthorityCert = GetCertificateAuthorityCert();
+            }
         }
 
         public bool IsSecurityEnabled
