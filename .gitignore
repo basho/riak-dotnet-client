@@ -40,5 +40,5 @@ TestResult.xml
 *.err
 GlobalAssemblyInfo.cs
 CommonAssemblyInfo.cs
+*.DotSettings
 *.dcvr.settings
-CorrugatedIron.sln.DotSettings
