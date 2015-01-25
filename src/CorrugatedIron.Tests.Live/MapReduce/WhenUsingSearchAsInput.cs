@@ -1,5 +1,5 @@
 // Copyright (c) 2011 - 2014 OJ Reeves & Jeremiah Peschka
-// Copyright (c) 2014 - Basho Technologies, Inc.
+// Copyright (c) 2015 - Basho Technologies, Inc.
 // 
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -18,9 +18,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading;
-using CorrugatedIron.Comms;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
@@ -137,7 +135,7 @@ namespace CorrugatedIron.Tests.Live.MapReduce
             var search = new RiakFluentSearch(Index, "name_s").Search(Token.StartsWith(_randomId + "Al")).Build();
             var mr = new RiakMapReduceQuery()
 #pragma warning disable 618
-                .Inputs(new RiakBucketSearchInput(search));
+.Inputs(new RiakBucketSearchInput(search));
 #pragma warning restore 618
 
             Func<RiakResult<RiakMapReduceResult>> doMapReduce = () => Client.MapReduce(mr);
@@ -225,8 +223,8 @@ namespace CorrugatedIron.Tests.Live.MapReduce
             var searchResults = phaseResults[0];
             searchResults.Values.ShouldNotBeNull();
             searchResults.Values.Count.ShouldEqual(2);
-            
-            var allKeys = new List<string> {HackerKey, PublicKey};
+
+            var allKeys = new List<string> { HackerKey, PublicKey };
             var solrResults = searchResults.Values.Select(searchResult => searchResult.FromRiakString());
 
             var usedKeys = solrResults.SelectMany(result => allKeys.Where(result.Contains));
@@ -236,3 +234,4 @@ namespace CorrugatedIron.Tests.Live.MapReduce
         }
     }
 }
+

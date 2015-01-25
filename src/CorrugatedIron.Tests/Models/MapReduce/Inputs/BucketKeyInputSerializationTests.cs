@@ -117,3 +117,4 @@ namespace CorrugatedIron.Tests.Models.MapReduce.Inputs
         }
     }
 }
+

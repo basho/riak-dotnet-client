@@ -29,12 +29,15 @@ namespace CorrugatedIron.Tests.Models.MapReduce.Inputs
             var sb = new StringBuilder();
 
             using (var sw = new StringWriter(sb))
-            using (JsonWriter writer = new JsonTextWriter(sw))
             {
-                doWrite(writer);
+                using (JsonWriter writer = new JsonTextWriter(sw))
+                {
+                    doWrite(writer);
+                }
             }
 
             return sb.ToString();
         }
     }
 }
+

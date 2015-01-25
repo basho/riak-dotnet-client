@@ -1,5 +1,5 @@
 ﻿// Copyright (c) 2011 - 2014 OJ Reeves & Jeremiah Peschka
-// Copyright (c) 2014 - Basho Technologies, Inc.
+// Copyright (c) 2015 - Basho Technologies, Inc.
 // 
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -32,7 +32,7 @@ namespace CorrugatedIron.Tests.Models.MapReduce.Inputs
             var json = Serialize(input.WriteJson);
             Assert.AreEqual("\"inputs\":{\"bucket\":\"my_bucket\",\"query\":\"my_query\"}", json);
         }
-        
+
         [Test]
         public void TestYokozunaSerialization()
         {
@@ -42,3 +42,4 @@ namespace CorrugatedIron.Tests.Models.MapReduce.Inputs
         }
     }
 }
+

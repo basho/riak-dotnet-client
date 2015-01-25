@@ -1,5 +1,5 @@
 ﻿// Copyright (c) 2011 - 2014 OJ Reeves & Jeremiah Peschka
-// Copyright (c) 2014 - Basho Technologies, Inc.
+// Copyright (c) 2015 - Basho Technologies, Inc.
 // 
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -153,9 +153,9 @@ namespace CorrugatedIron.Tests.Models.MapReduce
         [Test]
         public void BuildingMapReducePhaseWithArgumentsArrayProducesCorrectResult()
         {
-            var query = new RiakMapReduceQuery {ContentType = MrContentType}
+            var query = new RiakMapReduceQuery { ContentType = MrContentType }
                 .Inputs("animals")
-                .ReduceJs(c => c.Name("Riak.reduceSlice").Keep(true).Argument(new[] {1, 10}));
+                .ReduceJs(c => c.Name("Riak.reduceSlice").Keep(true).Argument(new[] { 1, 10 }));
 
             var request = query.ToMessage();
             request.request.ShouldEqual(MrJobWithArgumentsArray.ToRiakString());
@@ -164,9 +164,9 @@ namespace CorrugatedIron.Tests.Models.MapReduce
         [Test]
         public void BuildingMapReducePhaseWithObjectArgumentProducesCorrectResult()
         {
-            var query = new RiakMapReduceQuery {ContentType = MrContentType}
+            var query = new RiakMapReduceQuery { ContentType = MrContentType }
                 .Inputs("animals")
-                .ReduceJs(c => c.Name("Riak.reduceSlice").Keep(true).Argument(new {reduce_phase_only_1 = true}));
+                .ReduceJs(c => c.Name("Riak.reduceSlice").Keep(true).Argument(new { reduce_phase_only_1 = true }));
 
             var request = query.ToMessage();
             request.request.ShouldEqual(MrJobWithObjectArgument.ToRiakString());
@@ -175,7 +175,7 @@ namespace CorrugatedIron.Tests.Models.MapReduce
         [Test]
         public void BuildingMapReducePhaseWithVaueTypeArgumentProducesCorrectResult()
         {
-            var query = new RiakMapReduceQuery {ContentType = MrContentType}
+            var query = new RiakMapReduceQuery { ContentType = MrContentType }
                 .Inputs("animals")
                 .ReduceJs(c => c.Name("Riak.reduceSlice").Keep(true).Argument("slartibartfast"));
 
@@ -184,3 +184,4 @@ namespace CorrugatedIron.Tests.Models.MapReduce
         }
     }
 }
+

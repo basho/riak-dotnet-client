@@ -18,7 +18,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using CorrugatedIron.Comms;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Models.MapReduce.Inputs;
@@ -451,3 +450,4 @@ namespace CorrugatedIron.Tests.Live
         }
     }
 }
+
