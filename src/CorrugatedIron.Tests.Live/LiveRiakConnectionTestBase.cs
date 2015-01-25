@@ -19,9 +19,10 @@ using System;
 using System.Collections.Generic;
 using CorrugatedIron.Config;
 using CorrugatedIron.Extensions;
+using CorrugatedIron.Util;
 using NUnit.Framework;
 
-namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
+namespace CorrugatedIron.Tests.Live
 {
     public class LiveRiakConnectionTestBase
     {
@@ -71,14 +72,22 @@ namespace CorrugatedIron.Tests.Live.LiveRiakConnectionTests
 #if NOAUTH
             Cluster = RiakCluster.FromConfig("riak1NodeNoAuthConfiguration");
 #else
-            Cluster = RiakCluster.FromConfig("riak1NodeConfiguration");
+            if (MonoUtil.IsRunningOnMono)
+            {
+                Cluster = RiakCluster.FromConfig("riak1NodeNoAuthConfiguration");
+            }
+            else
+            {
+                Cluster = RiakCluster.FromConfig("riak1NodeConfiguration");
+            }
 #endif
         }
 
         [SetUp]
-        public void SetUp()
+        public virtual void SetUp()
         {
             Client = Cluster.CreateClient();
         }
     }
 }
+

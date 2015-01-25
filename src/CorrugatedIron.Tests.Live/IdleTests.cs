@@ -17,7 +17,7 @@
 
 using CorrugatedIron.Comms;
 using CorrugatedIron.Tests.Extensions;
-using CorrugatedIron.Tests.Live.LiveRiakConnectionTests;
+using CorrugatedIron.Tests.Live;
 using NUnit.Framework;
 
 namespace CorrugatedIron.Tests.Live.IdleTests

@@ -42,13 +42,6 @@ namespace CorrugatedIron.Tests.Live
             Bucket = LegacyBucket;
         }
 
-        [SetUp]
-        public void SetUp()
-        {
-            Cluster = new RiakCluster(ClusterConfig, new RiakConnectionFactory());
-            Client = Cluster.CreateClient();
-        }
-
         [TearDown]
         public void TearDown()
         {

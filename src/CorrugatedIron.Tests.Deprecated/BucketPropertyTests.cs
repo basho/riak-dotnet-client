@@ -3,7 +3,7 @@ using System.Linq;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.Search;
 using CorrugatedIron.Tests.Extensions;
-using CorrugatedIron.Tests.Live.LiveRiakConnectionTests;
+using CorrugatedIron.Tests.Live;
 using NUnit.Framework;
 
 namespace CorrugatedIron.Tests.Deprecated

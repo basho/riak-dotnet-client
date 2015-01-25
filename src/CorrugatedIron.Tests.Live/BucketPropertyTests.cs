@@ -22,7 +22,7 @@ using CorrugatedIron.Models;
 using CorrugatedIron.Models.CommitHook;
 using CorrugatedIron.Tests.Extensions;
 using CorrugatedIron.Tests.Live.Extensions;
-using CorrugatedIron.Tests.Live.LiveRiakConnectionTests;
+using CorrugatedIron.Tests.Live;
 using CorrugatedIron.Util;
 using NUnit.Framework;
 

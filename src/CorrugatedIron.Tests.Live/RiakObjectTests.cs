@@ -23,7 +23,7 @@ using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Models.MapReduce.Inputs;
 using CorrugatedIron.Tests.Extensions;
 using CorrugatedIron.Tests.Live.Extensions;
-using CorrugatedIron.Tests.Live.LiveRiakConnectionTests;
+using CorrugatedIron.Tests.Live;
 using CorrugatedIron.Util;
 using NUnit.Framework;
 using ProtoBuf;
