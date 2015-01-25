@@ -16,7 +16,6 @@
 // under the License.
 
 using System.Linq;
-using CorrugatedIron.Comms;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
@@ -28,12 +27,6 @@ using NUnit.Framework;
 
 namespace CorrugatedIron.Tests.Live.MapReduce
 {
-    public class RiakMapReduceTests : LiveRiakConnectionTestBase
-    {
-        protected const string MrContentType = RiakConstants.ContentTypes.ApplicationJson;
-        protected string Bucket = "fluent_key_bucket";
-        protected const string EmptyBody = "{}";
-        
     [TestFixture]
     public class WhenUsingFluentKeyFilters : RiakMapReduceTestBase
     {
@@ -52,7 +45,7 @@ namespace CorrugatedIron.Tests.Live.MapReduce
                     RiakConstants.ContentTypes.ApplicationJson));
             }
 
-            var mr = new RiakMapReduceQuery {ContentType = MrContentType};
+            var mr = new RiakMapReduceQuery { ContentType = MrContentType };
 
             mr.Inputs(Bucket)
                 .Filter(f => f.Equal("time_8"))
@@ -91,7 +84,7 @@ namespace CorrugatedIron.Tests.Live.MapReduce
                     RiakConstants.ContentTypes.ApplicationJson));
             }
 
-            var mr = new RiakMapReduceQuery {ContentType = MrContentType};
+            var mr = new RiakMapReduceQuery { ContentType = MrContentType };
 
             mr.Inputs(Bucket)
                 .Filter(f => f.StartsWith("time"))
@@ -125,7 +118,7 @@ namespace CorrugatedIron.Tests.Live.MapReduce
                     RiakConstants.ContentTypes.ApplicationJson));
             }
 
-            var mr = new RiakMapReduceQuery {ContentType = MrContentType};
+            var mr = new RiakMapReduceQuery { ContentType = MrContentType };
 
             mr.Inputs(Bucket)
                 .Filter(f => f.And(l => l.StartsWith("time"),

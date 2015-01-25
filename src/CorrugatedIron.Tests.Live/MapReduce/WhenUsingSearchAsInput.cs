@@ -53,10 +53,10 @@ namespace CorrugatedIron.Tests.Live.MapReduce
         private int _randomId;
 
         [TestFixtureSetUp]
-        public void SetUp()
+        public override void SetUp()
         {
-            Cluster = new RiakCluster(ClusterConfig, new RiakConnectionFactory());
-            Client = Cluster.CreateClient();
+            base.SetUp();
+
             var index = new SearchIndex(Index);
             Client.PutSearchIndex(index);
 
