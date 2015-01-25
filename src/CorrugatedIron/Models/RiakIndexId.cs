@@ -1,5 +1,5 @@
 // Copyright (c) 2011 - 2014 OJ Reeves & Jeremiah Peschka
-// Copyright (c) 2014 - Basho Technologies, Inc.
+// Copyright (c) 2015 - Basho Technologies, Inc.
 // 
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -22,43 +22,45 @@ namespace CorrugatedIron.Models
 {
     public class RiakIndexId : IEquatable<RiakIndexId>
     {
-        private readonly string _bucketName;
-        private readonly string _bucketType;
-        private readonly string _indexName;
+        private readonly string bucketName;
+        private readonly string bucketType;
+        private readonly string indexName;
 
-        public RiakIndexId(string bucketName, string indexName) : this(null, bucketName, indexName)
+        public RiakIndexId(string bucketName, string indexName)
+            : this(null, bucketName, indexName)
         {
         }
 
         public RiakIndexId(string bucketType, string bucketName, string indexName)
         {
-            if (string.IsNullOrEmpty(bucketName))
+            if (String.IsNullOrEmpty(bucketName))
             {
                 throw new ArgumentOutOfRangeException("bucketName", "bucketName cannot be null, empty, or whitespace.");
             }
-            if (string.IsNullOrEmpty(indexName))
+
+            if (String.IsNullOrEmpty(indexName))
             {
                 throw new ArgumentOutOfRangeException("indexName", "indexName cannot be null, empty, or whitespace.");
             }
 
-            _bucketType = bucketType;
-            _bucketName = bucketName;
-            _indexName = indexName;
+            this.bucketType = bucketType;
+            this.bucketName = bucketName;
+            this.indexName = indexName;
         }
 
         public string BucketType
         {
-            get { return _bucketType; }
+            get { return bucketType; }
         }
 
         public string BucketName
         {
-            get { return _bucketName; }
+            get { return bucketName; }
         }
 
         public string IndexName
         {
-            get { return _indexName; }
+            get { return indexName; }
         }
 
         internal RiakBinIndexId ToBinIndexId()
@@ -73,26 +75,43 @@ namespace CorrugatedIron.Models
 
         public bool Equals(RiakIndexId other)
         {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return string.Equals(_bucketName, other._bucketName) && string.Equals(_bucketType, other._bucketType) && string.Equals(_indexName, other._indexName);
+            if (ReferenceEquals(null, other))
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(this, other))
+            {
+                return true;
+            }
+
+            return String.Equals(bucketName, other.bucketName) &&
+                   String.Equals(bucketType, other.bucketType) &&
+                   String.Equals(indexName, other.indexName);
         }
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((RiakIndexId) obj);
+            if (ReferenceEquals(null, obj))
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+
+            return Equals(obj as RiakIndexId);
         }
 
         public override int GetHashCode()
         {
             unchecked
             {
-                var hashCode = (_bucketName != null ? _bucketName.GetHashCode() : 0);
-                hashCode = (hashCode*397) ^ (_bucketType != null ? _bucketType.GetHashCode() : 0);
-                hashCode = (hashCode*397) ^ (_indexName != null ? _indexName.GetHashCode() : 0);
+                var hashCode = (bucketName != null ? bucketName.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (bucketType != null ? bucketType.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (indexName != null ? indexName.GetHashCode() : 0);
                 return hashCode;
             }
         }
