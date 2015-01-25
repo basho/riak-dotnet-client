@@ -1,5 +1,5 @@
 ﻿// Copyright (c) 2011 - 2014 OJ Reeves & Jeremiah Peschka
-// Copyright (c) 2014 - Basho Technologies, Inc.
+// Copyright (c) 2015 - Basho Technologies, Inc.
 // 
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -90,7 +90,7 @@ namespace CorrugatedIron.Tests.Models.MapReduce.Inputs
         public void TestAllKeysWorks()
         {
             var indexInput = RiakIndex.AllKeys(BucketType, Bucket);
-            
+
             var json = Serialize(indexInput.WriteJson);
             Assert.AreEqual("\"inputs\":{\"bucket\":[\"my_bucket_type\",\"my_bucket\"],\"index\":\"$bucket\",\"key\":\"my_bucket\"}", json);
 
@@ -163,3 +163,4 @@ namespace CorrugatedIron.Tests.Models.MapReduce.Inputs
 #pragma warning restore 612, 618
     }
 }
+

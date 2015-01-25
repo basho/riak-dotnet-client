@@ -1,5 +1,4 @@
-﻿// Copyright (c) 2011 - 2014 OJ Reeves & Jeremiah Peschka
-// Copyright (c) 2015 - Basho Technologies, Inc.
+﻿// Copyright (c) 2015 - Basho Technologies, Inc.
 // 
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -26,3 +25,4 @@ namespace CorrugatedIron.Tests.Live.MapReduce
         protected string Bucket = "fluent_key_bucket";
     }
 }
+
