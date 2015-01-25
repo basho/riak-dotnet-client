@@ -15,24 +15,14 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Config;
 using CorrugatedIron.Util;
 
 namespace CorrugatedIron.Tests.Live.MapReduce
 {
-    public class RiakMapReduceTestBase
+    public abstract class RiakMapReduceTestBase : LiveRiakConnectionTestBase
     {
         protected const string MrContentType = RiakConstants.ContentTypes.ApplicationJson;
         protected const string EmptyBody = "{}";
         protected string Bucket = "fluent_key_bucket";
-        protected IRiakClient Client;
-        protected IRiakEndPoint Cluster;
-        protected IRiakClusterConfiguration ClusterConfig;
-
-        public RiakMapReduceTestBase(string section = "riak1NodeConfiguration")
-        {
-            RiakClient.DisableListKeysWarning = true;
-            ClusterConfig = RiakClusterConfiguration.LoadFromConfig(section);
-        }
     }
 }
