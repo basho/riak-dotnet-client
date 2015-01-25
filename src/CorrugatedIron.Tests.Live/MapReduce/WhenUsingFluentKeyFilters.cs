@@ -28,16 +28,15 @@ using NUnit.Framework;
 
 namespace CorrugatedIron.Tests.Live.MapReduce
 {
+    public class RiakMapReduceTests : LiveRiakConnectionTestBase
+    {
+        protected const string MrContentType = RiakConstants.ContentTypes.ApplicationJson;
+        protected string Bucket = "fluent_key_bucket";
+        protected const string EmptyBody = "{}";
+        
     [TestFixture]
     public class WhenUsingFluentKeyFilters : RiakMapReduceTestBase
     {
-        [SetUp]
-        public void SetUp()
-        {
-            Cluster = new RiakCluster(ClusterConfig, new RiakConnectionFactory());
-            Client = Cluster.CreateClient();
-        }
-
         [TearDown]
         public void TearDown()
         {
