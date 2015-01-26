@@ -47,7 +47,7 @@ namespace CorrugatedIron.Tests.Live
         }
 
         [SetUp]
-        public new void SetUp()
+        public override void SetUp()
         {
             base.SetUp();
         }
@@ -102,7 +102,7 @@ namespace CorrugatedIron.Tests.Live
         private string Bucket;
 
         [SetUp]
-        public new void SetUp()
+        public override void SetUp()
         {
             base.SetUp();
             Bucket = System.Guid.NewGuid().ToString();
@@ -150,7 +150,7 @@ namespace CorrugatedIron.Tests.Live
     public class WhenCreatingLinks : RiakObjectTestBase
     {
         [SetUp]
-        public new void SetUp()
+        public override void SetUp()
         {
             base.SetUp();
             CreateLinkedObjects(TestBucket);
