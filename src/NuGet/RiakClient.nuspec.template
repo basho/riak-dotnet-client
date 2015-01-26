@@ -23,22 +23,22 @@
     <authors>OJ Reeves, Jeremiah Peschka, Alex Moore, Luke Bakken</authors>
     <owners>OJ Reeves, Jeremiah Peschka, Basho Technologies Inc.</owners>
     <description>
-      RiakClient - the .NET client for Riak.
+      Riak .NET Client - the .NET client for Riak.
 
-      Riak is a distributed, fault tolerant, highly-available Key/Value store written by Basho Technologies. Riak is Open Source and written in Erlang. RiakClient exposes the features of Riak through a developer-friendly API.
+      Riak is a distributed, fault tolerant, highly-available Key/Value store written by Basho Technologies. Riak is Open Source and written in Erlang. Riak .NET Client exposes the features of Riak through a developer-friendly API.
 
       After installing this package, make sure that you modify either the app.config (for client apps) or web.config (for web apps) so that the details of the target Riak cluster are set correctly.
 
       Riak Client 2.0 requires Riak 2.0, or Riak 1.4. 
     </description>
     <summary>
-      RiakClient - the .NET client for Riak.
+      Riak .NET Client - the .NET client for Riak.
     </summary>
     <projectUrl>http://corrugatediron.org/</projectUrl>
     <iconUrl>http://corrugatediron.org/nugeticon.png</iconUrl>
     <licenseUrl>http://corrugatediron.org/LICENSE.txt</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <tags>Riak RiakClient CorrugatedIron Corrugated Iron NoSQL Client Driver</tags>
+    <tags>Riak .NET RiakClient CorrugatedIron Corrugated Iron NoSQL Client Driver Distributed</tags>
     <dependencies>
       <dependency id="Newtonsoft.Json" version="${NEWTONSOFT_JSON_VERSION}" />
       <dependency id="protobuf-net" version="${PROTOBUF_NET_VERSION}" />
