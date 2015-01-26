@@ -1,4 +1,4 @@
-﻿# README - CorrugatedIron.Tests.Deprecated
+﻿# README - RiakClient.Tests.Deprecated
 
 This project contains tests for deprecated/soon to be removed features.
 Currently only Legacy Search Live Tests exist here, because you can't use them alongside some of the new Yokozuna features.

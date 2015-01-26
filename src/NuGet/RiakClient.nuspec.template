@@ -18,27 +18,27 @@
 -->
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
-    <id>CorrugatedIron</id>
+    <id>RiakClient</id>
     <version>${VERSION}</version>
-    <authors>OJ Reeves, Jeremiah Peschka</authors>
-    <owners>OJ Reeves, Jeremiah Peschka</owners>
+    <authors>OJ Reeves, Jeremiah Peschka, Alex Moore, Luke Bakken</authors>
+    <owners>OJ Reeves, Jeremiah Peschka, Basho Technologies Inc.</owners>
     <description>
-      CorrugatedIron - the .NET client for Riak.
+      RiakClient - the .NET client for Riak.
 
-      Riak is a distributed, fault tolerant, highly-available Key/Value store written by Basho Technologies. Riak is Open Source and written in Erlang. CorrugatedIron exposes the features of Riak through a developer-friendly API.
+      Riak is a distributed, fault tolerant, highly-available Key/Value store written by Basho Technologies. Riak is Open Source and written in Erlang. RiakClient exposes the features of Riak through a developer-friendly API.
 
       After installing this package, make sure that you modify either the app.config (for client apps) or web.config (for web apps) so that the details of the target Riak cluster are set correctly.
 
-      Corrugated Iron 1.4 requires Riak 1.3 or Riak 1.4
+      Riak Client 2.0 requires Riak 2.0, or Riak 1.4. 
     </description>
     <summary>
-      CorrugatedIron - the .NET client for Riak.
+      RiakClient - the .NET client for Riak.
     </summary>
     <projectUrl>http://corrugatediron.org/</projectUrl>
     <iconUrl>http://corrugatediron.org/nugeticon.png</iconUrl>
     <licenseUrl>http://corrugatediron.org/LICENSE.txt</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <tags>Riak CorrugatedIron Corrugated Iron NoSQL Client Driver</tags>
+    <tags>Riak RiakClient CorrugatedIron Corrugated Iron NoSQL Client Driver</tags>
     <dependencies>
       <dependency id="Newtonsoft.Json" version="${NEWTONSOFT_JSON_VERSION}" />
       <dependency id="protobuf-net" version="${PROTOBUF_NET_VERSION}" />
