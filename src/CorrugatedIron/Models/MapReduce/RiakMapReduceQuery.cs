@@ -1,4 +1,5 @@
 ﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -53,9 +54,23 @@ namespace CorrugatedIron.Models.MapReduce
             return this;
         }
 
+        // TODO: Replace the backwardsness of these parameters when we get a Namespace class.
+        public RiakMapReduceQuery Inputs(string bucket, string bucketType)
+        {
+            _inputs = new RiakBucketInput(bucket, bucketType);
+            return this;
+        }
+
+        [Obsolete("Using Legacy Search as input for MapReduce is depreciated. Please move to Riak 2.0 Search, and use the RiakSearchInput class instead.")]
         public RiakMapReduceQuery Inputs(RiakBucketSearchInput riakBucketSearchInput)
         {
             _inputs = riakBucketSearchInput;
+            return this;
+        }
+
+        public RiakMapReduceQuery Inputs(RiakSearchInput riakSearchInput)
+        {
+            _inputs = riakSearchInput;
             return this;
         }
 

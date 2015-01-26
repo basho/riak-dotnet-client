@@ -1,4 +1,5 @@
 ﻿// Copyright (c) 2013 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -23,46 +24,49 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
 {
     public class RiakBucketKeyInput : RiakPhaseInput
     {
-        private List<Tuple<string, string>> BucketKeyList { get; set; }
-
+        private List<RiakObjectId> RiakObjectIdList { get; set; }
+        
         public RiakBucketKeyInput()
         {
-            BucketKeyList = new List<Tuple<string, string>>();
+            RiakObjectIdList = new List<RiakObjectId>();
         }
 
+        [Obsolete("Use the Add() that accepts a RiakIndexId instead. This will be removed in the next version.")]
         public RiakBucketKeyInput Add(string bucket, string key)
         {
-            BucketKeyList.Add(Tuple.Create(bucket, key));
+            RiakObjectIdList.Add(new RiakObjectId(bucket, key));
             return this;
         }
 
         public RiakBucketKeyInput Add(RiakObjectId objectId)
         {
-            BucketKeyList.Add(Tuple.Create(objectId.Bucket, objectId.Key));
+            RiakObjectIdList.Add(objectId);
             return this;
         }
 
         public RiakBucketKeyInput Add(params RiakObjectId[] objectIds)
         {
-            BucketKeyList.AddRange(objectIds.Select(o => Tuple.Create(o.Bucket, o.Key)));
+            RiakObjectIdList.AddRange(objectIds);
             return this;
         }
 
         public RiakBucketKeyInput Add(IEnumerable<RiakObjectId> objectIds)
         {
-            BucketKeyList.AddRange(objectIds.Select(o => Tuple.Create(o.Bucket, o.Key)));
+            RiakObjectIdList.AddRange(objectIds);
             return this;
         }
 
+        [Obsolete("Use the Add() that accepts RiakIndexId[] instead. This will be removed in the next version.")]
         public RiakBucketKeyInput Add(params Tuple<string, string>[] pairs)
         {
-            BucketKeyList.AddRange(pairs);
+            RiakObjectIdList.AddRange(pairs.Select(p => new RiakObjectId(p.Item1, p.Item2)));
             return this;
         }
 
+        [Obsolete("Use the Add() that accepts an IEnumerable<RiakIndexId> instead. This will be removed in the next version.")]
         public RiakBucketKeyInput Add(IEnumerable<Tuple<string, string>> pairs)
         {
-            BucketKeyList.AddRange(pairs);
+            RiakObjectIdList.AddRange(pairs.Select(p => new RiakObjectId(p.Item1, p.Item2)));
             return this;
         }
 
@@ -71,19 +75,25 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
             writer.WritePropertyName("inputs");
             writer.WriteStartArray();
 
-            BucketKeyList.ForEach(bk =>
+            foreach (var id in RiakObjectIdList)
             {
-                writer.WriteStartArray();
-                writer.WriteValue(bk.Item1);
-                writer.WriteValue(bk.Item2);
-                writer.WriteEndArray();
-            });
+                WriteRiakObjectIdToWriter(writer, id);
+            }
 
             writer.WriteEndArray();
 
             return writer;
         }
-        
+
+        private static void WriteRiakObjectIdToWriter(JsonWriter writer, RiakObjectId id)
+        {
+            writer.WriteStartArray();
+            writer.WriteValue(id.Bucket);
+            writer.WriteValue(id.Key);
+            writer.WriteValue(id.BucketType ?? string.Empty);
+            writer.WriteEndArray();
+        }
+
         public static RiakBucketKeyInput FromRiakObjectIds(IEnumerable<RiakObjectId> riakObjectIds)
         {
             var rbki = new RiakBucketKeyInput();

@@ -1,12 +1,13 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
-//
+// Copyright (c) 2011 - 2014 OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
+// 
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
 // except in compliance with the License.  You may obtain
 // a copy of the License at
-//
+// 
 //   http://www.apache.org/licenses/LICENSE-2.0
-//
+// 
 // Unless required by applicable law or agreed to in writing,
 // software distributed under the License is distributed on an
 // "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -15,8 +16,6 @@
 // under the License.
 
 using System.Linq;
-using CorrugatedIron.Comms;
-using CorrugatedIron.Config;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
@@ -26,18 +25,10 @@ using CorrugatedIron.Util;
 using Newtonsoft.Json;
 using NUnit.Framework;
 
-namespace CorrugatedIron.Tests.Live
+namespace CorrugatedIron.Tests.Live.MapReduce
 {
-
-    public class RiakMapReduceTests : LiveRiakConnectionTestBase
-    {
-        protected const string MrContentType = RiakConstants.ContentTypes.ApplicationJson;
-        protected string Bucket = "fluent_key_bucket";
-        protected const string EmptyBody = "{}";
-    }
-
     [TestFixture]
-    public class WhenUsingFluentKeyFilters : RiakMapReduceTests
+    public class WhenUsingFluentKeyFilters : RiakMapReduceTestBase
     {
         [TearDown]
         public void TearDown()
@@ -50,10 +41,11 @@ namespace CorrugatedIron.Tests.Live
         {
             for (int i = 0; i < 10; i++)
             {
-                Client.Put(new RiakObject(Bucket, string.Format("time_{0}", i), EmptyBody, RiakConstants.ContentTypes.ApplicationJson));
+                Client.Put(new RiakObject(Bucket, string.Format("time_{0}", i), EmptyBody,
+                    RiakConstants.ContentTypes.ApplicationJson));
             }
 
-            var mr = new RiakMapReduceQuery {ContentType = MrContentType};
+            var mr = new RiakMapReduceQuery { ContentType = MrContentType };
 
             mr.Inputs(Bucket)
                 .Filter(f => f.Equal("time_8"))
@@ -72,9 +64,14 @@ namespace CorrugatedIron.Tests.Live
 
             mrResult.PhaseResults.ElementAt(0).Values.Count().ShouldEqual(0);
             mrResult.PhaseResults.ElementAt(1).Values.Count().ShouldNotEqual(0);
-            
-            
-            var values = JsonConvert.DeserializeObject<int[]>(mrResult.PhaseResults.ElementAt(1).Values.First().FromRiakString());
+
+
+            var values = JsonConvert.DeserializeObject<int[]>(mrResult.PhaseResults
+                                                                      .ElementAt(1)
+                                                                      .Values
+                                                                      .First()
+                                                                      .FromRiakString());
+
             values[0].ShouldEqual(1);
         }
 
@@ -83,7 +80,8 @@ namespace CorrugatedIron.Tests.Live
         {
             for (int i = 0; i < 10; i++)
             {
-                Client.Put(new RiakObject(Bucket, string.Format("time_{0}", i), EmptyBody, RiakConstants.ContentTypes.ApplicationJson));
+                Client.Put(new RiakObject(Bucket, string.Format("time_{0}", i), EmptyBody,
+                    RiakConstants.ContentTypes.ApplicationJson));
             }
 
             var mr = new RiakMapReduceQuery { ContentType = MrContentType };
@@ -105,8 +103,8 @@ namespace CorrugatedIron.Tests.Live
 
             mrResult.PhaseResults.ElementAt(0).Values.Count().ShouldEqual(0);
             mrResult.PhaseResults.ElementAt(1).Values.Count().ShouldNotEqual(0);
-   
-            
+
+
             var values = result.Value.PhaseResults.ElementAt(1).GetObjects<int[]>().First();
             values[0].ShouldEqual(10);
         }
@@ -116,7 +114,8 @@ namespace CorrugatedIron.Tests.Live
         {
             for (var i = 0; i < 10; i++)
             {
-                Client.Put(new RiakObject(Bucket, string.Format("time_{0}", i), EmptyBody, RiakConstants.ContentTypes.ApplicationJson));
+                Client.Put(new RiakObject(Bucket, string.Format("time_{0}", i), EmptyBody,
+                    RiakConstants.ContentTypes.ApplicationJson));
             }
 
             var mr = new RiakMapReduceQuery { ContentType = MrContentType };

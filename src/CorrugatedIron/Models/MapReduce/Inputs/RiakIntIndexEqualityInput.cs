@@ -1,12 +1,13 @@
 // Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
-//
+// Copyright (c) 2015 - Basho Technologies, Inc.
+// 
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
 // except in compliance with the License.  You may obtain
 // a copy of the License at
-//
+// 
 //   http://www.apache.org/licenses/LICENSE-2.0
-//
+// 
 // Unless required by applicable law or agreed to in writing,
 // software distributed under the License is distributed on an
 // "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -14,35 +15,31 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
 using System.Numerics;
-using CorrugatedIron.Extensions;
 using Newtonsoft.Json;
 
 namespace CorrugatedIron.Models.MapReduce.Inputs
 {
     public class RiakIntIndexEqualityInput : RiakIndexInput
     {
-        public string Bucket { get; set; }
-        public string Index { get; set; }
-        public BigInteger Key { get; set; }
-
+        [Obsolete("Use the constructor that accepts a RiakIndexId instead. This will be revoved in the next version.")]
         public RiakIntIndexEqualityInput(string bucket, string index, BigInteger key)
+            : this(new RiakIndexId(bucket, index), key)
         {
-            Bucket = bucket;
-            Index = index.ToIntegerKey();
+        }
+
+        public RiakIntIndexEqualityInput(RiakIndexId indexId, BigInteger key)
+            : base(indexId.ToIntIndexId())
+        {
             Key = key;
         }
 
+        public BigInteger Key { get; set; }
+
         public override JsonWriter WriteJson(JsonWriter writer)
         {
-            writer.WritePropertyName("inputs");
-
-            writer.WriteStartObject();
-            writer.WritePropertyName("bucket");
-            writer.WriteValue(Bucket);
-
-            writer.WritePropertyName("index");
-            writer.WriteValue(Index);
+            WriteIndexHeaderJson(writer);
 
             writer.WritePropertyName("key");
             writer.WriteValue(Key.ToString());

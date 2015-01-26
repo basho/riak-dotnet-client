@@ -41,11 +41,9 @@ namespace CorrugatedIron.Tests.Live.Extensions
             {
                 return;
             }
-            else
-            {
-                var objectIds = keylistResult.Value.Select(key => new RiakObjectId(bucketType, bucket, key));
-                client.Delete(objectIds);
-            }
+            
+            var objectIds = keylistResult.Value.Select(key => new RiakObjectId(bucketType, bucket, key));
+            client.Delete(objectIds);
         }
 
         private static readonly Func<RiakResult, bool> DefaultSuccessFunc = result => result.IsSuccess;

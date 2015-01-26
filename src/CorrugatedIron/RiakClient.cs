@@ -1,4 +1,4 @@
-// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2011 - 2014 OJ Reeves & Jeremiah Peschka
 // Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
@@ -869,7 +869,7 @@ namespace CorrugatedIron
             System.Diagnostics.Debug.Assert(riakLinks.Count > 0, "Link walking requires at least one link");
 
             var input = new RiakBucketKeyInput()
-                .Add(riakObject.Bucket, riakObject.Key);
+                .Add(riakObject.ToRiakObjectId());
 
             var query = new RiakMapReduceQuery()
                 .Inputs(input);
@@ -927,14 +927,14 @@ namespace CorrugatedIron
 
         public RiakResult<RiakStreamedIndexResult> StreamGetSecondaryIndex(RiakIndexId index, BigInteger value, RiakIndexGetOptions options = null)
         {
-            index.SetIndexName(index.IndexName.ToIntegerKey());
-            return StreamGetSecondaryIndexEquals(index, value.ToString(), options);
+            var intIndex = index.ToIntIndexId();
+            return StreamGetSecondaryIndexEquals(intIndex, value.ToString(), options);
         }
 
         public RiakResult<RiakStreamedIndexResult> StreamGetSecondaryIndex(RiakIndexId index, string value, RiakIndexGetOptions options = null)
         {
-            index.SetIndexName(index.IndexName.ToBinaryKey());
-            return StreamGetSecondaryIndexEquals(index, value, options);
+            var binIndex = index.ToBinIndexId();
+            return StreamGetSecondaryIndexEquals(binIndex, value, options);
         }
 
         private RiakResult<RiakStreamedIndexResult> StreamGetSecondaryIndexEquals(RiakIndexId index, string value, RiakIndexGetOptions options = null)
@@ -954,14 +954,14 @@ namespace CorrugatedIron
 
         public RiakResult<RiakStreamedIndexResult> StreamGetSecondaryIndex(RiakIndexId index, BigInteger min, BigInteger max, RiakIndexGetOptions options = null)
         {
-            index.SetIndexName(index.IndexName.ToIntegerKey());
-            return StreamGetSecondaryIndexRange(index, min.ToString(), max.ToString(), options);
+            var intIndex = index.ToIntIndexId();
+            return StreamGetSecondaryIndexRange(intIndex, min.ToString(), max.ToString(), options);
         }
 
         public RiakResult<RiakStreamedIndexResult> StreamGetSecondaryIndex(RiakIndexId index, string min, string max, RiakIndexGetOptions options = null)
         {
-            index.SetIndexName(index.IndexName.ToBinaryKey());
-            return StreamGetSecondaryIndexRange(index, min, max, options);
+            var binIndex = index.ToBinIndexId();
+            return StreamGetSecondaryIndexRange(binIndex, min, max, options);
         }
 
         private RiakResult<RiakStreamedIndexResult> StreamGetSecondaryIndexRange(RiakIndexId index, string min, string max,
@@ -1000,14 +1000,14 @@ namespace CorrugatedIron
 
         public RiakResult<RiakIndexResult> GetSecondaryIndex(RiakIndexId index, BigInteger minValue, BigInteger maxValue, RiakIndexGetOptions options = null)
         {
-            index.SetIndexName(index.IndexName.ToIntegerKey());
-            return GetSecondaryIndexRange(index, minValue.ToString(), maxValue.ToString(), options);
+            var intIndex = index.ToIntIndexId();
+            return GetSecondaryIndexRange(intIndex, minValue.ToString(), maxValue.ToString(), options);
         }
 
         public RiakResult<RiakIndexResult> GetSecondaryIndex(RiakIndexId index, string minValue, string maxValue, RiakIndexGetOptions options = null)
         {
-            index.SetIndexName(index.IndexName.ToBinaryKey());
-            return GetSecondaryIndexRange(index, minValue, maxValue, options);
+            var binIndex = index.ToBinIndexId();
+            return GetSecondaryIndexRange(binIndex, minValue, maxValue, options);
         }
 
         private RiakResult<RiakIndexResult> GetSecondaryIndexRange(RiakIndexId index, string minValue, string maxValue, RiakIndexGetOptions options = null)
@@ -1059,8 +1059,8 @@ namespace CorrugatedIron
         /// <returns>A <see cref="RiakResult{T}"/> of <see cref="RiakIndexResult"/></returns>
         public RiakResult<RiakIndexResult> GetSecondaryIndex(RiakIndexId index, BigInteger value, RiakIndexGetOptions options = null)
         {
-            index.SetIndexName(index.IndexName.ToIntegerKey());
-            return GetSecondaryIndexEquals(index, value.ToString(), options);
+            var intIndex = index.ToIntIndexId();
+            return GetSecondaryIndexEquals(intIndex, value.ToString(), options);
         }
 
         /// <summary>
@@ -1072,8 +1072,8 @@ namespace CorrugatedIron
         /// <returns>A <see cref="RiakResult{T}"/> of <see cref="RiakIndexResult"/></returns>
         public RiakResult<RiakIndexResult> GetSecondaryIndex(RiakIndexId index, string value, RiakIndexGetOptions options = null)
         {
-            index.SetIndexName(index.IndexName.ToBinaryKey());
-            return GetSecondaryIndexEquals(index, value, options);
+            var binIndex = index.ToBinIndexId();
+            return GetSecondaryIndexEquals(binIndex, value, options);
         }
 
         private RiakResult<RiakIndexResult> GetSecondaryIndexEquals(RiakIndexId index, string value, RiakIndexGetOptions options = null)

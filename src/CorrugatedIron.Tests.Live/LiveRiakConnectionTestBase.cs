@@ -24,7 +24,7 @@ using NUnit.Framework;
 
 namespace CorrugatedIron.Tests.Live
 {
-    public class LiveRiakConnectionTestBase
+    public abstract class LiveRiakConnectionTestBase
     {
         public static class BucketTypeNames
         {
