@@ -7,7 +7,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CorrugatedIron.Tests</RootNamespace>
-    <AssemblyName>CorrugatedIron.Tests</AssemblyName>
+    <AssemblyName>RiakClient.Tests</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
@@ -36,7 +36,7 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>..\CorrugatedIron.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\RiakClient.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json">
@@ -89,8 +89,8 @@
     <Compile Include="Auth\CertificateTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\CorrugatedIron.snk">
-      <Link>CorrugatedIron.snk</Link>
+    <None Include="..\RiakClient.snk">
+      <Link>RiakClient.snk</Link>
     </None>
     <None Include="App.config">
       <SubType>Designer</SubType>
@@ -98,9 +98,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CorrugatedIron\CorrugatedIron.csproj">
+    <ProjectReference Include="..\RiakClient\RiakClient.csproj">
       <Project>{A2CA0CDC-85BB-489D-99D0-3EE1D135BE17}</Project>
-      <Name>CorrugatedIron</Name>
+      <Name>RiakClient</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

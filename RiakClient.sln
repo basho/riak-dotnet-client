@@ -3,16 +3,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CorrugatedIron", "src\CorrugatedIron\CorrugatedIron.csproj", "{A2CA0CDC-85BB-489D-99D0-3EE1D135BE17}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RiakClient", "src\RiakClient\RiakClient.csproj", "{A2CA0CDC-85BB-489D-99D0-3EE1D135BE17}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CorrugatedIron.Tests", "src\CorrugatedIron.Tests\CorrugatedIron.Tests.csproj", "{E765CC5E-3C83-42CB-9B9A-C8AF400AC0AC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RiakClient.Tests", "src\RiakClient.Tests\RiakClient.Tests.csproj", "{E765CC5E-3C83-42CB-9B9A-C8AF400AC0AC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CorrugatedIron.Tests.Live", "src\CorrugatedIron.Tests.Live\CorrugatedIron.Tests.Live.csproj", "{5D52E2FA-931C-4E77-BF2B-3A9F0D0CD834}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RiakClient.Tests.Live", "src\RiakClient.Tests.Live\RiakClient.Tests.Live.csproj", "{5D52E2FA-931C-4E77-BF2B-3A9F0D0CD834}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Metadata", "Metadata", "{C6E7CFF8-CC0A-49A4-B235-DDF0F23EB2A6}"
 	ProjectSection(SolutionItems) = preProject
 		src\CommonAssemblyInfo.cs = src\CommonAssemblyInfo.cs
-		src\Metadata\CorrugatedIron.snk = src\Metadata\CorrugatedIron.snk
+		src\Metadata\RiakClient.snk = src\Metadata\RiakClient.snk
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{439A3CE3-AF1B-477C-896D-8970CF8AD29E}"
@@ -30,7 +30,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{FD5F81
 		.nuget\packages.config = .nuget\packages.config
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CorrugatedIron.Tests.Deprecated", "src\CorrugatedIron.Tests.Deprecated\CorrugatedIron.Tests.Deprecated.csproj", "{977A6FBC-9704-4FBD-8F0C-A3BDCFE347C9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RiakClient.Tests.Deprecated", "src\RiakClient.Tests.Deprecated\RiakClient.Tests.Deprecated.csproj", "{977A6FBC-9704-4FBD-8F0C-A3BDCFE347C9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{338F1F3E-18B8-421D-8287-179608C8CE58}"
 	ProjectSection(SolutionItems) = preProject
@@ -71,7 +71,7 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = src\CorrugatedIron\CorrugatedIron.csproj
+		StartupItem = src\RiakClient\RiakClient.csproj
 		Policies = $0
 		$0.TextStylePolicy = $4
 		$1.FileWidth = 120

@@ -21,7 +21,7 @@ lint:
 	echo Nope > /dev/null
 
 setup-integration:
-	cp -f $(CURDIR)/App.config $(PROJDIR)/CorrugatedIron.Tests.Live/bin/Debug/CorrugatedIron.Tests.Live.dll.config
+	cp -f $(CURDIR)/App.config $(PROJDIR)/RiakClient.Tests.Live/bin/Debug/RiakClient.Tests.Live.dll.config
 
 test: setup-integration test-all
 
