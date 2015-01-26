@@ -16,13 +16,13 @@
 
 using System;
 using System.Linq;
-using CorrugatedIron.Extensions;
-using CorrugatedIron.Models;
-using CorrugatedIron.Models.CommitHook;
-using CorrugatedIron.Tests.Extensions;
+using RiakClient.Extensions;
+using RiakClient.Tests.Extensions;
 using NUnit.Framework;
+using RiakClient.Models;
+using RiakClient.Models.CommitHook;
 
-namespace CorrugatedIron.Tests.Models
+namespace RiakClient.Tests.Models
 {
     [TestFixture]
     public class RiakBucketPropertyTests

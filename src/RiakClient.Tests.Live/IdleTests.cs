@@ -15,12 +15,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Comms;
-using CorrugatedIron.Tests.Extensions;
-using CorrugatedIron.Tests.Live;
+using RiakClient.Tests.Extensions;
+using RiakClient.Tests.Live;
 using NUnit.Framework;
+using RiakClient.Comms;
 
-namespace CorrugatedIron.Tests.Live.IdleTests
+namespace RiakClient.Tests.Live.IdleTests
 {
     [TestFixture]
     [Ignore("Idling is undergoing rework, so these tests are currently invalid")]

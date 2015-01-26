@@ -15,10 +15,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Models.MapReduce.Inputs;
 using NUnit.Framework;
+using RiakClient.Models.MapReduce.Inputs;
 
-namespace CorrugatedIron.Tests.Models.MapReduce.Inputs
+namespace RiakClient.Tests.Models.MapReduce.Inputs
 {
     [TestFixture]
     public class RiakModuleFunctionArgInputSerializationTest : MapReduceSerializationTestsBase

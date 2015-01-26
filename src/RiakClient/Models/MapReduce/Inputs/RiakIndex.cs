@@ -17,9 +17,9 @@
 
 using System;
 using System.Numerics;
-using CorrugatedIron.Util;
+using RiakClient.Util;
 
-namespace CorrugatedIron.Models.MapReduce.Inputs
+namespace RiakClient.Models.MapReduce.Inputs
 {
     public static class RiakIndex
     {

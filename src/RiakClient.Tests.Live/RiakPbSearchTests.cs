@@ -15,14 +15,14 @@
 // under the License.
 
 using System.Collections.Generic;
-using CorrugatedIron.Models;
-using CorrugatedIron.Models.Search;
-using CorrugatedIron.Tests.Extensions;
-using CorrugatedIron.Tests.Live;
-using CorrugatedIron.Util;
+using RiakClient.Models;
+using RiakClient.Models.Search;
+using RiakClient.Tests.Extensions;
+using RiakClient.Tests.Live;
+using RiakClient.Util;
 using NUnit.Framework;
 
-namespace CorrugatedIron.Tests.Live
+namespace RiakClient.Tests.Live
 {
     [TestFixture(Ignore = true, IgnoreReason = "Riak Search functionality has been deprecated in favor of Yokozuna/Solr.")]
     public class WhenQueryingRiakSearchViaPbc : LiveRiakConnectionTestBase

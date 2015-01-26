@@ -14,10 +14,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Containers;
 using Newtonsoft.Json;
+using RiakClient.Containers;
 
-namespace CorrugatedIron.Extensions
+namespace RiakClient.Extensions
 {
     public static class JsonExtensions
     {

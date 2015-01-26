@@ -14,12 +14,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Messages;
 using Newtonsoft.Json;
 using System.IO;
 using System.Text;
+using RiakClient.Messages;
 
-namespace CorrugatedIron.Models.CommitHook
+namespace RiakClient.Models.CommitHook
 {
     public interface IRiakCommitHook
     {

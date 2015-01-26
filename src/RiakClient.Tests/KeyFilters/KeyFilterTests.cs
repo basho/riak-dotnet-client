@@ -14,12 +14,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Models.MapReduce.KeyFilters;
-using CorrugatedIron.Tests.Extensions;
+using RiakClient.Tests.Extensions;
 using NUnit.Framework;
 using System.Collections.Generic;
+using RiakClient.Models.MapReduce.KeyFilters;
 
-namespace CorrugatedIron.Tests.KeyFilters
+namespace RiakClient.Tests.KeyFilters
 {
     [TestFixture]
     public abstract class KeyFilterTests

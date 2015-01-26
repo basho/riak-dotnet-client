@@ -14,12 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Containers;
-using CorrugatedIron.Extensions;
-using CorrugatedIron.Messages;
-using CorrugatedIron.Models.CommitHook;
-using CorrugatedIron.Models.Rest;
-using CorrugatedIron.Util;
+using RiakClient.Extensions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -27,8 +22,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using RiakClient.Containers;
+using RiakClient.Messages;
+using RiakClient.Models.CommitHook;
+using RiakClient.Models.Rest;
+using RiakClient.Util;
 
-namespace CorrugatedIron.Models
+namespace RiakClient.Models
 {
     public class RiakBucketProperties
     {

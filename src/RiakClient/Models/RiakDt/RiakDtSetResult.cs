@@ -17,9 +17,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using CorrugatedIron.Extensions;
+using RiakClient.Extensions;
 
-namespace CorrugatedIron.Models.RiakDt
+namespace RiakClient.Models.RiakDt
 {
     public class RiakDtSetResult
     {

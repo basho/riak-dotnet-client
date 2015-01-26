@@ -18,15 +18,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using CorrugatedIron.Extensions;
-using CorrugatedIron.Messages;
-using CorrugatedIron.Models;
-using CorrugatedIron.Models.RiakDt;
-using CorrugatedIron.Tests.Live.Extensions;
-using CorrugatedIron.Tests.Live;
+using RiakClient.Extensions;
+using RiakClient.Tests.Live.Extensions;
+using RiakClient.Tests.Live;
 using NUnit.Framework;
+using RiakClient.Messages;
+using RiakClient.Models;
+using RiakClient.Models.RiakDt;
 
-namespace CorrugatedIron.Tests.Live
+namespace RiakClient.Tests.Live
 {
 
     [TestFixture]

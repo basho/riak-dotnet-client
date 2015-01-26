@@ -14,17 +14,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Extensions;
-using CorrugatedIron.Models;
-using CorrugatedIron.Tests.Extensions;
-using CorrugatedIron.Util;
+using RiakClient.Extensions;
+using RiakClient.Tests.Extensions;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using RiakClient.Models;
+using RiakClient.Util;
 
-namespace CorrugatedIron.Tests.Json.RiakObjectConversionTests
+namespace RiakClient.Tests.Json.RiakObjectConversionTests
 {
     [TestFixture]
     public class WhenStoringDataIntoRiakObjectsAsJson

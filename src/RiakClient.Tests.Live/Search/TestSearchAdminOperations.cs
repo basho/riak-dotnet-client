@@ -17,14 +17,14 @@
 
 using System;
 using System.Linq;
-using CorrugatedIron.Models.Search;
-using CorrugatedIron.Tests.Extensions;
-using CorrugatedIron.Tests.Live.Extensions;
-using CorrugatedIron.Tests.Live;
-using CorrugatedIron.Util;
+using RiakClient.Tests.Extensions;
+using RiakClient.Tests.Live.Extensions;
+using RiakClient.Tests.Live;
 using NUnit.Framework;
+using RiakClient.Models.Search;
+using RiakClient.Util;
 
-namespace CorrugatedIron.Tests.Live.Search
+namespace RiakClient.Tests.Live.Search
 {
     [TestFixture]
     public class TestSearchAdminOperations : LiveRiakConnectionTestBase

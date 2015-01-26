@@ -16,11 +16,11 @@
 // under the License.
 
 using System;
-using CorrugatedIron.Converters;
-using CorrugatedIron.Extensions;
+using RiakClient.Extensions;
 using Newtonsoft.Json;
+using RiakClient.Converters;
 
-namespace CorrugatedIron.Models
+namespace RiakClient.Models
 {
     [JsonConverter(typeof(RiakObjectIdConverter))]
     public class RiakObjectId : IEquatable<RiakObjectId>

@@ -15,12 +15,12 @@
 // under the License.
 
 using System.Security.Cryptography.X509Certificates;
-using CorrugatedIron.Auth;
-using CorrugatedIron.Config;
-using CorrugatedIron.Extensions;
+using RiakClient.Extensions;
 using NUnit.Framework;
+using RiakClient.Auth;
+using RiakClient.Config;
 
-namespace CorrugatedIron.Tests.Auth
+namespace RiakClient.Tests.Auth
 {
     [TestFixture]
     public class RiakSecurityManagerTests : AuthTestBase

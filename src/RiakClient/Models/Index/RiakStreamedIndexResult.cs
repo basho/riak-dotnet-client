@@ -18,10 +18,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using CorrugatedIron.Extensions;
-using CorrugatedIron.Messages;
+using RiakClient.Extensions;
+using RiakClient.Messages;
 
-namespace CorrugatedIron.Models.Index
+namespace RiakClient.Models.Index
 {
     public class RiakStreamedIndexResult : IRiakIndexResult
     {

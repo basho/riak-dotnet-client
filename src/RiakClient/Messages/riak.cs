@@ -8,7 +8,7 @@
 //------------------------------------------------------------------------------
 
 // Generated from: riak.proto
-namespace CorrugatedIron.Messages
+namespace RiakClient.Messages
 {
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"RpbErrorResp")]
   public partial class RpbErrorResp : global::ProtoBuf.IExtensible

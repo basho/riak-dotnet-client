@@ -18,10 +18,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using CorrugatedIron.Messages;
 using NUnit.Framework;
+using RiakClient.Messages;
 
-namespace CorrugatedIron.Tests.Messages
+namespace RiakClient.Tests.Messages
 {
     [TestFixture]
     public class MessageCodeTests

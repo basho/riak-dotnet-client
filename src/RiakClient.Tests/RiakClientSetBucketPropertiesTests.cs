@@ -17,15 +17,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using CorrugatedIron.Comms;
-using CorrugatedIron.Messages;
-using CorrugatedIron.Models;
-using CorrugatedIron.Models.Rest;
-using CorrugatedIron.Util;
 using Moq;
 using NUnit.Framework;
+using RiakClient.Comms;
+using RiakClient.Messages;
+using RiakClient.Models;
+using RiakClient.Models.Rest;
+using RiakClient.Util;
 
-namespace CorrugatedIron.Tests.RiakClientSetBucketPropertiesTests
+namespace RiakClient.Tests.RiakClientSetBucketPropertiesTests
 {
     public class MockCluster : IRiakEndPoint
     {

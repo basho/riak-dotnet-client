@@ -14,11 +14,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Extensions;
+using RiakClient.Extensions;
 using Newtonsoft.Json;
 using System.Linq;
 
-namespace CorrugatedIron.Models.MapReduce.KeyFilters
+namespace RiakClient.Models.MapReduce.KeyFilters
 {
     internal abstract class RiakCompositeKeyFilterToken : RiakKeyFilterToken
     {

@@ -14,7 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CorrugatedIron.Models
+namespace RiakClient.Models
 {
     public class RiakCounterResult
     {

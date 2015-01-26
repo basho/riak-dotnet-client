@@ -14,12 +14,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Extensions;
+using RiakClient.Extensions;
 using Newtonsoft.Json;
 using System.IO;
 using System.Text;
 
-namespace CorrugatedIron.Models.MapReduce.Phases
+namespace RiakClient.Models.MapReduce.Phases
 {
     internal abstract class RiakPhase
     {

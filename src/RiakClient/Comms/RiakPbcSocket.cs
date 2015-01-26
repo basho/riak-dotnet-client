@@ -21,14 +21,14 @@ using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Authentication;
-using CorrugatedIron.Auth;
-using CorrugatedIron.Config;
-using CorrugatedIron.Exceptions;
-using CorrugatedIron.Extensions;
-using CorrugatedIron.Messages;
+using RiakClient.Extensions;
 using ProtoBuf;
+using RiakClient.Auth;
+using RiakClient.Config;
+using RiakClient.Exceptions;
+using RiakClient.Messages;
 
-namespace CorrugatedIron.Comms
+namespace RiakClient.Comms
 {
     internal class RiakPbcSocket : IDisposable
     {

@@ -21,14 +21,14 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
-using CorrugatedIron.Config;
-using CorrugatedIron.Exceptions;
-using CorrugatedIron.Extensions;
-using CorrugatedIron.Messages;
-using CorrugatedIron.Models.Rest;
-using CorrugatedIron.Util;
+using RiakClient.Extensions;
+using RiakClient.Config;
+using RiakClient.Exceptions;
+using RiakClient.Messages;
+using RiakClient.Models.Rest;
+using RiakClient.Util;
 
-namespace CorrugatedIron.Comms
+namespace RiakClient.Comms
 {
     public interface IRiakConnection : IDisposable
     {

@@ -15,15 +15,15 @@
 // under the License.
 
 using System.Numerics;
-using CorrugatedIron.Models;
-using CorrugatedIron.Models.Index;
-using CorrugatedIron.Models.MapReduce;
-using CorrugatedIron.Models.Search;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using RiakClient.Models;
+using RiakClient.Models.Index;
+using RiakClient.Models.MapReduce;
+using RiakClient.Models.Search;
 
-namespace CorrugatedIron
+namespace RiakClient
 {
     public interface IRiakAsyncClient
     {

@@ -14,14 +14,14 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Models.MapReduce.KeyFilters;
 using System;
 using System.Collections.Generic;
+using RiakClient.Models.MapReduce.KeyFilters;
 
-namespace CorrugatedIron.Models.MapReduce.Fluent
+namespace RiakClient.Models.MapReduce.Fluent
 {
     // TODO: Add summary info to public methods
-    // TODO: Switch CorrugatedIron.Models.MapReduce.KeyFilters classes to internal
+    // TODO: Switch RiakClient.Models.MapReduce.KeyFilters classes to internal
     public class RiakFluentKeyFilter
     {
         private readonly List<IRiakKeyFilterToken> _filters;

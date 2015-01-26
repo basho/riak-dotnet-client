@@ -16,7 +16,7 @@
 
 using System.Collections.Generic;
 
-namespace CorrugatedIron.Comms.LoadBalancing
+namespace RiakClient.Comms.LoadBalancing
 {
     public interface ILoadBalancingStrategy
     {

@@ -18,7 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CorrugatedIron.Tests.Json
+namespace RiakClient.Tests.Json
 {
     public class Person
     {

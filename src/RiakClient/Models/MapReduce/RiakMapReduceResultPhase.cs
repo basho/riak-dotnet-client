@@ -17,11 +17,11 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using CorrugatedIron.Extensions;
-using CorrugatedIron.Messages;
+using RiakClient.Extensions;
 using Newtonsoft.Json;
+using RiakClient.Messages;
 
-namespace CorrugatedIron.Models.MapReduce
+namespace RiakClient.Models.MapReduce
 {
     public class RiakMapReduceResultPhase
     {
@@ -53,9 +53,9 @@ namespace CorrugatedIron.Models.MapReduce
         }
 
         /// <summary>
-        /// Deserialize a List of <see cref="CorrugatedIron.Models.RiakObjectId"/> from $key query
+        /// Deserialize a List of <see cref="RiakObjectId"/> from $key query
         /// </summary>
-        /// <returns>IList of <see cref="CorrugatedIron.Models.RiakObjectId"/></returns>
+        /// <returns>IList of <see cref="RiakObjectId"/></returns>
         /// <remarks>This is designed specifically to deal with the data structure that is returned from
         /// Riak when querying the $key index. This should be used when querying $key directly or through
         /// one of the convenience methods.</remarks>

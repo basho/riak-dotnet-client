@@ -18,17 +18,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using CorrugatedIron.Models;
-using CorrugatedIron.Models.Index;
-using CorrugatedIron.Models.MapReduce;
-using CorrugatedIron.Models.MapReduce.Inputs;
-using CorrugatedIron.Tests.Extensions;
-using CorrugatedIron.Tests.Live.Extensions;
-using CorrugatedIron.Tests.Live.MapReduce;
-using CorrugatedIron.Util;
+using RiakClient.Tests.Extensions;
 using NUnit.Framework;
+using RiakClient.Models;
+using RiakClient.Models.Index;
+using RiakClient.Models.MapReduce;
+using RiakClient.Models.MapReduce.Inputs;
+using RiakClient.Tests.Live.Extensions;
+using RiakClient.Tests.Live.MapReduce;
+using RiakClient.Util;
 
-namespace CorrugatedIron.Tests.Live
+namespace RiakClient.Tests.Live
 {
     [TestFixture]
     public class WhenUsingIndexes : RiakMapReduceTestBase

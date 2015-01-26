@@ -22,7 +22,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace CorrugatedIron.Tests.Extensions
+namespace RiakClient.Tests.Extensions
 {
     [System.Diagnostics.DebuggerNonUserCode]
     public static class UnitTestExtensions

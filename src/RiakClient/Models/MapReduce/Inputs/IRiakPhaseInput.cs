@@ -15,11 +15,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Models.MapReduce.KeyFilters;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using RiakClient.Models.MapReduce.KeyFilters;
 
-namespace CorrugatedIron.Models.MapReduce.Inputs
+namespace RiakClient.Models.MapReduce.Inputs
 {
     public interface IRiakPhaseInput
     {

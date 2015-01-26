@@ -1,6 +1,6 @@
-using CorrugatedIron.Messages;
+using RiakClient.Messages;
 
-namespace CorrugatedIron.Models.RiakDt
+namespace RiakClient.Models.RiakDt
 {
     public class SetOperation :IDtOp
     {

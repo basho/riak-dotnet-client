@@ -16,9 +16,9 @@
 // under the License.
 
 using System;
-using CorrugatedIron.Extensions;
+using RiakClient.Extensions;
 
-namespace CorrugatedIron.Models
+namespace RiakClient.Models
 {
     public class RiakIndexId : IEquatable<RiakIndexId>
     {

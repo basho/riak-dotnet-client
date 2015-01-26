@@ -18,7 +18,7 @@
 using System;
 using Newtonsoft.Json;
 
-namespace CorrugatedIron.Models.MapReduce.Inputs
+namespace RiakClient.Models.MapReduce.Inputs
 {
     public class RiakBinIndexRangeInput : RiakIndexInput
     {

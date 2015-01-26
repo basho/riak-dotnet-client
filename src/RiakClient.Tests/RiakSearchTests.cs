@@ -14,13 +14,13 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Models.Search;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using RiakClient.Models.Search;
 
-namespace CorrugatedIron.Tests
+namespace RiakClient.Tests
 {
     [TestFixture]
     public class SimpleRiakSearchSerializationTests

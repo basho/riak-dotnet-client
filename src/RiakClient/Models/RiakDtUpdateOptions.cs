@@ -16,12 +16,12 @@
 
 using System;
 using System.Collections.Generic;
-using CorrugatedIron.Containers;
-using CorrugatedIron.Extensions;
-using CorrugatedIron.Messages;
-using CorrugatedIron.Util;
+using RiakClient.Extensions;
+using RiakClient.Containers;
+using RiakClient.Messages;
+using RiakClient.Util;
 
-namespace CorrugatedIron.Models
+namespace RiakClient.Models
 {
     public class RiakDtUpdateOptions
     {

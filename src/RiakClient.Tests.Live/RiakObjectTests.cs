@@ -17,18 +17,18 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using CorrugatedIron.Extensions;
-using CorrugatedIron.Models;
-using CorrugatedIron.Models.MapReduce;
-using CorrugatedIron.Models.MapReduce.Inputs;
-using CorrugatedIron.Tests.Extensions;
-using CorrugatedIron.Tests.Live.Extensions;
-using CorrugatedIron.Tests.Live;
-using CorrugatedIron.Util;
+using RiakClient.Extensions;
+using RiakClient.Tests.Extensions;
+using RiakClient.Tests.Live.Extensions;
+using RiakClient.Tests.Live;
 using NUnit.Framework;
 using ProtoBuf;
+using RiakClient.Models;
+using RiakClient.Models.MapReduce;
+using RiakClient.Models.MapReduce.Inputs;
+using RiakClient.Util;
 
-namespace CorrugatedIron.Tests.Live
+namespace RiakClient.Tests.Live
 {
     public class RiakObjectTestBase : LiveRiakConnectionTestBase
     {

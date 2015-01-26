@@ -18,15 +18,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using CorrugatedIron.Models;
-using CorrugatedIron.Models.MapReduce;
-using CorrugatedIron.Tests.Extensions;
-using CorrugatedIron.Tests.Live.Extensions;
-using CorrugatedIron.Tests.Live;
-using CorrugatedIron.Util;
+using RiakClient.Tests.Extensions;
+using RiakClient.Tests.Live.Extensions;
+using RiakClient.Tests.Live;
 using NUnit.Framework;
+using RiakClient.Models;
+using RiakClient.Models.MapReduce;
+using RiakClient.Util;
 
-namespace CorrugatedIron.Tests.Live.GeneralIntegrationTests
+namespace RiakClient.Tests.Live.GeneralIntegrationTests
 {
     [TestFixture]
     public class WhenTalkingToRiak : LiveRiakConnectionTestBase

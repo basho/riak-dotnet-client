@@ -20,7 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CorrugatedIron.Models.MapReduce.Inputs
+namespace RiakClient.Models.MapReduce.Inputs
 {
     public class RiakBucketKeyInput : RiakPhaseInput
     {

@@ -15,9 +15,9 @@
 // under the License.
 
 using System;
-using CorrugatedIron.Models.Search;
+using RiakClient.Models.Search;
 
-namespace CorrugatedIron.Tests.Live.Extensions
+namespace RiakClient.Tests.Live.Extensions
 {
     public static class SearchTestHelpers
     {

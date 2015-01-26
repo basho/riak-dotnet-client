@@ -14,16 +14,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Comms;
-using CorrugatedIron.Comms.LoadBalancing;
 using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using RiakClient.Comms;
+using RiakClient.Comms.LoadBalancing;
 
-namespace CorrugatedIron.Tests.Comms.RoundRobinStrategyTests
+namespace RiakClient.Tests.Comms.RoundRobinStrategyTests
 {
     [TestFixture]
     public class WhenAddingAndRemovingNodesConstantlyOnDifferentThreads

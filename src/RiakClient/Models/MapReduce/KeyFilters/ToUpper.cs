@@ -18,7 +18,7 @@ using Newtonsoft.Json;
 using System.IO;
 using System.Text;
 
-namespace CorrugatedIron.Models.MapReduce.KeyFilters
+namespace RiakClient.Models.MapReduce.KeyFilters
 {
     /// <summary>
     /// Changes all letters to uppercase.

@@ -9,7 +9,7 @@
 
 // Generated from: riak_search.proto
 // Note: requires additional types generated from: riak.proto
-namespace CorrugatedIron.Messages
+namespace RiakClient.Messages
 {
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"RpbSearchDoc")]
   public partial class RpbSearchDoc : global::ProtoBuf.IExtensible

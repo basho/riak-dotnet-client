@@ -21,14 +21,14 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Serialization;
-using CorrugatedIron.Extensions;
-using CorrugatedIron.Messages;
-using CorrugatedIron.Models.Index;
-using CorrugatedIron.Util;
+using RiakClient.Extensions;
 using Newtonsoft.Json;
 using ProtoBuf;
+using RiakClient.Messages;
+using RiakClient.Models.Index;
+using RiakClient.Util;
 
-namespace CorrugatedIron.Models
+namespace RiakClient.Models
 {
     public delegate string SerializeObjectToString<in T>(T theObject);
 
@@ -99,12 +99,12 @@ namespace CorrugatedIron.Models
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CorrugatedIron.Models.RiakObject"/> class.
+        /// Initializes a new instance of the <see cref="RiakObject"/> class.
         /// </summary>
         /// <param name="bucket">Bucket.</param>
         /// <param name="key">Key.</param>
         /// <remarks>When saving a binary object to Riak, one of the appropriate binary 
-        /// <see cref="CorrugatedIron.Util.RiakConstants.ContentTypes"/> should be used.
+        /// <see cref="RiakConstants.ContentTypes"/> should be used.
         /// If the content type is not know, fall back to application/octet-stream. In addition,
         /// when saving binary data to Riak, a charSet of null/empty string should be used. The 
         /// constant CharSets.Binary should be used.</remarks>
@@ -114,13 +114,13 @@ namespace CorrugatedIron.Models
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CorrugatedIron.Models.RiakObject"/> class.
+        /// Initializes a new instance of the <see cref="RiakObject"/> class.
         /// </summary>
         /// <param name="bucket">Bucket.</param>
         /// <param name="key">Key.</param>
         /// <param name="value">Value.</param>
         /// <remarks>When saving a binary object to Riak, one of the appropriate binary 
-        /// <see cref="CorrugatedIron.Util.RiakConstants.ContentTypes"/> should be used.
+        /// <see cref="RiakConstants.ContentTypes"/> should be used.
         /// If the content type is not know, fall back to application/octet-stream. In addition,
         /// when saving binary data to Riak, a charSet of null/empty string should be used. The 
         /// constant CharSets.Binary should be used.</remarks>
@@ -130,13 +130,13 @@ namespace CorrugatedIron.Models
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CorrugatedIron.Models.RiakObject"/> class.
+        /// Initializes a new instance of the <see cref="RiakObject"/> class.
         /// </summary>
         /// <param name="bucket">Bucket.</param>
         /// <param name="key">Key.</param>
         /// <param name="value">Value.</param>
         /// <remarks>When saving a binary object to Riak, one of the appropriate binary 
-        /// <see cref="CorrugatedIron.Util.RiakConstants.ContentTypes"/> should be used.
+        /// <see cref="RiakConstants.ContentTypes"/> should be used.
         /// If the content type is not know, fall back to application/octet-stream. In addition,
         /// when saving binary data to Riak, a charSet of null/empty string should be used. The 
         /// constant CharSets.Binary should be used.</remarks>
@@ -151,14 +151,14 @@ namespace CorrugatedIron.Models
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CorrugatedIron.Models.RiakObject"/> class.
+        /// Initializes a new instance of the <see cref="RiakObject"/> class.
         /// </summary>
         /// <param name="bucket">Bucket.</param>
         /// <param name="key">Key.</param>
         /// <param name="value">Value.</param>
         /// <param name="contentType">Content type of the object. These should be MIME compliant content types.</param>
         /// <remarks>When saving a binary object to Riak, one of the appropriate binary 
-        /// <see cref="CorrugatedIron.Util.RiakConstants.ContentTypes"/> should be used.
+        /// <see cref="RiakConstants.ContentTypes"/> should be used.
         /// If the content type is not know, fall back to application/octet-stream. In addition,
         /// when saving binary data to Riak, a charSet of null/empty string should be used. The 
         /// constant CharSets.Binary should be used.</remarks>
@@ -173,7 +173,7 @@ namespace CorrugatedIron.Models
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CorrugatedIron.Models.RiakObject"/> class.
+        /// Initializes a new instance of the <see cref="RiakObject"/> class.
         /// </summary>
         /// <param name="bucket">Bucket.</param>
         /// <param name="key">Key.</param>
@@ -181,7 +181,7 @@ namespace CorrugatedIron.Models
         /// <param name="contentType">Content type of the object. These should be MIME compliant content types.</param>
         /// <param name="charSet">Character set used to encode saved data.</param>
         /// <remarks>When saving a binary object to Riak, one of the appropriate binary 
-        /// <see cref="CorrugatedIron.Util.RiakConstants.ContentTypes"/> should be used.
+        /// <see cref="RiakConstants.ContentTypes"/> should be used.
         /// If the content type is not know, fall back to application/octet-stream. In addition,
         /// when saving binary data to Riak, a charSet of null/empty string should be used. The 
         /// constant CharSets.Binary should be used.</remarks>
@@ -196,7 +196,7 @@ namespace CorrugatedIron.Models
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CorrugatedIron.Models.RiakObject"/> class.
+        /// Initializes a new instance of the <see cref="RiakObject"/> class.
         /// </summary>
         /// <param name="bucket">Bucket.</param>
         /// <param name="key">Key.</param>
@@ -204,7 +204,7 @@ namespace CorrugatedIron.Models
         /// <param name="contentType">Content type of the object. These should be MIME compliant content types.</param>
         /// <param name="charSet">Character set used to encode saved data.</param>
         /// <remarks>When saving a binary object to Riak, one of the appropriate binary 
-        /// <see cref="CorrugatedIron.Util.RiakConstants.ContentTypes"/> should be used.
+        /// <see cref="RiakConstants.ContentTypes"/> should be used.
         /// If the content type is not know, fall back to application/octet-stream. In addition,
         /// when saving binary data to Riak, a charSet of null/empty string should be used. The 
         /// constant CharSets.Binary should be used.</remarks>
@@ -214,7 +214,7 @@ namespace CorrugatedIron.Models
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CorrugatedIron.Models.RiakObject"/> class.
+        /// Initializes a new instance of the <see cref="RiakObject"/> class.
         /// </summary>
         /// <param name="bucketType">Riak bucket type - a collection of buckets with similar configuraiton</param> 
         /// <param name="bucket">Bucket.</param>
@@ -223,7 +223,7 @@ namespace CorrugatedIron.Models
         /// <param name="contentType">Content type of the object. These should be MIME compliant content types.</param>
         /// <param name="charSet">Character set used to encode saved data.</param>
         /// <remarks>When saving a binary object to Riak, one of the appropriate binary 
-        /// <see cref="CorrugatedIron.Util.RiakConstants.ContentTypes"/> should be used.
+        /// <see cref="RiakConstants.ContentTypes"/> should be used.
         /// If the content type is not know, fall back to application/octet-stream. In addition,
         /// when saving binary data to Riak, a charSet of null/empty string should be used. The 
         /// constant CharSets.Binary should be used.</remarks>

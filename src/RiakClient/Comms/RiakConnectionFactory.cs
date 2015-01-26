@@ -15,9 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Config;
+using RiakClient.Config;
 
-namespace CorrugatedIron.Comms
+namespace RiakClient.Comms
 {
     public interface IRiakConnectionFactory
     {

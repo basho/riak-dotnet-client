@@ -14,11 +14,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Extensions;
-using CorrugatedIron.Models.MapReduce.Languages;
+using RiakClient.Extensions;
 using Newtonsoft.Json;
+using RiakClient.Models.MapReduce.Languages;
 
-namespace CorrugatedIron.Models.MapReduce.Phases
+namespace RiakClient.Models.MapReduce.Phases
 {
     internal abstract class RiakActionPhase<TLanguage> : RiakPhase
         where TLanguage : IRiakPhaseLanguage, new()

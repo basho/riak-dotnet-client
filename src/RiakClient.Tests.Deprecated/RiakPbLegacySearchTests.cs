@@ -17,14 +17,14 @@
 
 using System;
 using System.Collections.Generic;
-using CorrugatedIron.Extensions;
-using CorrugatedIron.Models;
-using CorrugatedIron.Models.Search;
-using CorrugatedIron.Tests.Live.Extensions;
-using CorrugatedIron.Util;
+using RiakClient.Extensions;
 using NUnit.Framework;
+using RiakClient.Models;
+using RiakClient.Models.Search;
+using RiakClient.Tests.Live.Extensions;
+using RiakClient.Util;
 
-namespace CorrugatedIron.Tests.Live.Deprecated
+namespace RiakClient.Tests.Live.Deprecated
 {
     [TestFixture]
     public class WhenQueryingRiakLegacySearchViaPbc : LiveRiakConnectionTestBase

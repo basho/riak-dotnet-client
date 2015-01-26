@@ -20,7 +20,7 @@ using System.IO;
 using System.Text;
 using Newtonsoft.Json;
 
-namespace CorrugatedIron.Tests.Models.MapReduce.Inputs
+namespace RiakClient.Tests.Models.MapReduce.Inputs
 {
     public abstract class MapReduceSerializationTestsBase
     {

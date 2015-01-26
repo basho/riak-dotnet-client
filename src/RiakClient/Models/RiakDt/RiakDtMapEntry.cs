@@ -16,9 +16,9 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using CorrugatedIron.Messages;
+using RiakClient.Messages;
 
-namespace CorrugatedIron.Models.RiakDt
+namespace RiakClient.Models.RiakDt
 {
     public class RiakDtMapEntry
     {

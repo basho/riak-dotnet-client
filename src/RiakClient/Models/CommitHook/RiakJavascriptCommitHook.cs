@@ -14,11 +14,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Extensions;
-using CorrugatedIron.Messages;
+using RiakClient.Extensions;
 using Newtonsoft.Json;
+using RiakClient.Messages;
 
-namespace CorrugatedIron.Models.CommitHook
+namespace RiakClient.Models.CommitHook
 {
     public class RiakJavascriptCommitHook : RiakCommitHook, IRiakPreCommitHook
     {

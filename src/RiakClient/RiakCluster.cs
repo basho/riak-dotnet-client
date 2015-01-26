@@ -21,12 +21,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using CorrugatedIron.Comms;
-using CorrugatedIron.Comms.LoadBalancing;
-using CorrugatedIron.Config;
-using CorrugatedIron.Messages;
+using RiakClient.Comms;
+using RiakClient.Comms.LoadBalancing;
+using RiakClient.Config;
+using RiakClient.Messages;
 
-namespace CorrugatedIron
+namespace RiakClient
 {
     public class RiakCluster : RiakEndPoint
     {
@@ -57,7 +57,7 @@ namespace CorrugatedIron
         }
 
         /// <summary>
-        /// Creates an instance of <see cref="CorrugatedIron.IRiakClient"/> populated from from the configuration section
+        /// Creates an instance of <see cref="IRiakClient"/> populated from from the configuration section
         /// specified by <paramref name="configSectionName"/>.
         /// </summary>
         /// <param name="configSectionName">The name of the configuration section to load the settings from.</param>
@@ -68,7 +68,7 @@ namespace CorrugatedIron
         }
 
         /// <summary>
-        /// Creates an instance of <see cref="CorrugatedIron.IRiakClient"/> populated from from the configuration section
+        /// Creates an instance of <see cref="IRiakClient"/> populated from from the configuration section
         /// specified by <paramref name="configSectionName"/>.
         /// </summary>
         /// <param name="configSectionName">The name of the configuration section to load the settings from.</param>

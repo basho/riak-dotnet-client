@@ -17,11 +17,11 @@
 
 using System;
 using System.Collections.Generic;
-using CorrugatedIron.Models;
-using CorrugatedIron.Models.MapReduce.Inputs;
 using NUnit.Framework;
+using RiakClient.Models;
+using RiakClient.Models.MapReduce.Inputs;
 
-namespace CorrugatedIron.Tests.Models.MapReduce.Inputs
+namespace RiakClient.Tests.Models.MapReduce.Inputs
 {
     [TestFixture]
     public class BucketKeyInputSerializationTests : MapReduceSerializationTestsBase

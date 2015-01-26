@@ -16,10 +16,10 @@
 // under the License.
 
 using System;
-using CorrugatedIron.Models;
 using Newtonsoft.Json;
+using RiakClient.Models;
 
-namespace CorrugatedIron.Converters
+namespace RiakClient.Converters
 {
     /*
      * TODO: FUTURE - Figure out if this is still needed

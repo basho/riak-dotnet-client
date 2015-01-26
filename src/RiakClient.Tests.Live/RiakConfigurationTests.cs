@@ -14,18 +14,18 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Config;
-using CorrugatedIron.Tests.Extensions;
+using RiakClient.Tests.Extensions;
 using NUnit.Framework;
 using System.IO;
+using RiakClient.Config;
 
-namespace CorrugatedIron.Tests.Live.RiakConfigurationTests
+namespace RiakClient.Tests.Live.RiakConfigurationTests
 {
     [TestFixture]
     public class WhenLoadingFromExternalConfiguration
     {
         private const string SampleConfig = @"<?xml version=""1.0"" encoding=""utf-8"" ?>
-<configuration><configSections><section name=""riakConfig"" type=""CorrugatedIron.Config.RiakClusterConfiguration, CorrugatedIron"" />
+<configuration><configSections><section name=""riakConfig"" type=""RiakClient.Config.RiakClusterConfiguration, RiakClient"" />
 </configSections><riakConfig nodePollTime=""5000"" defaultRetryWaitTime=""200"" defaultRetryCount=""3"">
 <nodes><node name=""node"" hostAddress=""host"" pbcPort=""8081"" restScheme=""http"" restPort=""8091"" poolSize=""5"" /></nodes></riakConfig></configuration>";
 

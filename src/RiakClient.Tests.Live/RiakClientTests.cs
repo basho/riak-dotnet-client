@@ -14,19 +14,19 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Extensions;
-using CorrugatedIron.Models;
-using CorrugatedIron.Tests.Extensions;
-using CorrugatedIron.Tests.Live.Extensions;
-using CorrugatedIron.Tests.Live;
-using CorrugatedIron.Util;
+using RiakClient.Extensions;
+using RiakClient.Tests.Extensions;
+using RiakClient.Tests.Live.Extensions;
+using RiakClient.Tests.Live;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System;
+using RiakClient.Models;
+using RiakClient.Util;
 
-namespace CorrugatedIron.Tests.Live
+namespace RiakClient.Tests.Live
 {
     [TestFixture]
     public class RiakClientTests : LiveRiakConnectionTestBase

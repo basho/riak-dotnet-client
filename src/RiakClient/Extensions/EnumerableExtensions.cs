@@ -20,7 +20,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CorrugatedIron.Extensions
+namespace RiakClient.Extensions
 {
     public static class EnumerableExtensions
     {

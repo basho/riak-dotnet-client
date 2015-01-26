@@ -14,10 +14,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Tests.Live;
+using RiakClient.Tests.Live;
 using NUnit.Framework;
 
-namespace CorrugatedIron.Tests.Live
+namespace RiakClient.Tests.Live
 {
 
     [TestFixture]

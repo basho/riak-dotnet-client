@@ -1,8 +1,8 @@
 ﻿using System;
-using CorrugatedIron.Tests.Extensions;
+using RiakClient.Tests.Extensions;
 using NUnit.Framework;
 
-namespace CorrugatedIron.Tests.Live.Extensions
+namespace RiakClient.Tests.Live.Extensions
 {
     [TestFixture]
     public class IntegrationTestExtensionsTest

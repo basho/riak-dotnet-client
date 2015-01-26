@@ -14,7 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CorrugatedIron.Models.Search
+namespace RiakClient.Models.Search
 {
     public class RangeTerm : Term
     {

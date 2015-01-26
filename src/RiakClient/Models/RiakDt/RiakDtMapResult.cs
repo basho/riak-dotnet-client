@@ -16,7 +16,7 @@
 
 using System.Collections.Generic;
 
-namespace CorrugatedIron.Models.RiakDt
+namespace RiakClient.Models.RiakDt
 {
     public class RiakDtMapResult
     {

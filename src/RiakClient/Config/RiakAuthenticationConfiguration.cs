@@ -16,7 +16,7 @@
 
 using System.Configuration;
 
-namespace CorrugatedIron.Config
+namespace RiakClient.Config
 {
     public class RiakAuthenticationConfiguration : ConfigurationElement, IRiakAuthenticationConfiguration
     {

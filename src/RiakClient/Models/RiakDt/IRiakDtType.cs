@@ -15,9 +15,9 @@
 // under the License.
 
 using System.Collections.ObjectModel;
-using CorrugatedIron.Messages;
+using RiakClient.Messages;
 
-namespace CorrugatedIron.Models.RiakDt
+namespace RiakClient.Models.RiakDt
 {
     public interface IRiakDtType<T>
     {

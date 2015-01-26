@@ -20,7 +20,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace CorrugatedIron.Models.MapReduce.KeyFilters
+namespace RiakClient.Models.MapReduce.KeyFilters
 {
     /// <summary>
     /// Joins two or more key-filter operations with a logical AND operation.

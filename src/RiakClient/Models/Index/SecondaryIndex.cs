@@ -18,7 +18,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
-namespace CorrugatedIron.Models.Index
+namespace RiakClient.Models.Index
 {
     public abstract class SecondaryIndex<TClass, TIndex>
     {

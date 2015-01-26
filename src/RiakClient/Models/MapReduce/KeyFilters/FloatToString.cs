@@ -18,7 +18,7 @@ using Newtonsoft.Json;
 using System.IO;
 using System.Text;
 
-namespace CorrugatedIron.Models.MapReduce.KeyFilters
+namespace RiakClient.Models.MapReduce.KeyFilters
 {
     /// <summary>
     /// Turns a floating point number (previously extracted with string_to_float), into a string.

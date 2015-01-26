@@ -18,10 +18,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using CorrugatedIron.Extensions;
-using CorrugatedIron.Messages;
+using RiakClient.Extensions;
+using RiakClient.Messages;
 
-namespace CorrugatedIron.Models.RiakDt
+namespace RiakClient.Models.RiakDt
 {
     public class CounterOperation : IDtOp
     {
