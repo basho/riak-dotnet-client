@@ -1,4 +1,5 @@
 ﻿// Copyright (c) 2010 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
 // 
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -19,9 +20,7 @@ using System.Collections.Generic;
 using CorrugatedIron.Extensions;
 using CorrugatedIron.Models;
 using CorrugatedIron.Models.Search;
-using CorrugatedIron.Tests.Extensions;
 using CorrugatedIron.Tests.Live.Extensions;
-using CorrugatedIron.Tests.Live;
 using CorrugatedIron.Util;
 using NUnit.Framework;
 
@@ -37,7 +36,7 @@ namespace CorrugatedIron.Tests.Live.Deprecated
         private const string RiakSearchDoc2 = "{\"name\":\"Alan Q. Public\", \"bio\":\"I'm an exciting awesome mathematician\", \"favorites\":{\"book\":\"Prelude to Mathematics\",\"album\":\"The Fame Monster\"}}";
 
         [TestFixtureSetUp]
-        public new void SetUp()
+        public override void SetUp()
         {
             base.SetUp();
 
