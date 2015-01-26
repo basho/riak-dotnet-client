@@ -1,0 +1,9 @@
+﻿<NUnitProject>
+  <Settings activeconfig="Debug" processModel="Default" domainUsage="Default" />
+  <Config name="Debug" binpathtype="Auto" runtimeFramework="v4.0.21006" configfile="bin\Debug\RiakClient.Tests.dll.config">
+    <assembly path="bin\Debug\RiakClient.Tests.dll" />
+  </Config>
+  <Config name="Debug-Mono" binpathtype="Auto" runtimeFramework="v4.0.21006" configfile="bin/Debug/RiakClient.Tests.dll.config">
+    <assembly path="bin/Debug/RiakClient.Tests.dll" />
+  </Config>
+</NUnitProject>
