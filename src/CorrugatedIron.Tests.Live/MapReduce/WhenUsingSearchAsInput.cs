@@ -51,10 +51,22 @@ namespace CorrugatedIron.Tests.Live.MapReduce
         private int _randomId;
 
         [TestFixtureSetUp]
-        public override void SetUp()
+        public new void SetUp()
         {
             base.SetUp();
 
+            SetupSearchIndexes();
+            LoadDataIntoRiak();
+        }
+
+        [TestFixtureTearDown]
+        public void TearDown()
+        {
+            Client.DeleteBucket(BucketType, Bucket);
+        }
+
+        private void SetupSearchIndexes()
+        {
             var index = new SearchIndex(Index);
             Client.PutSearchIndex(index);
 
@@ -74,16 +86,9 @@ namespace CorrugatedIron.Tests.Live.MapReduce
 
             setBucketProperties.WaitUntil(indexIsSet);
             Thread.Sleep(5000); // Wait for Yoko to start up
-            PrepSearch();
         }
 
-        [TestFixtureTearDown]
-        public void TearDown()
-        {
-            Client.DeleteBucket(BucketType, Bucket);
-        }
-
-        private void PrepSearch()
+        private void LoadDataIntoRiak()
         {
             _randomId = _random.Next();
             var alyssaKey = _randomId + HackerKey;
@@ -117,9 +122,7 @@ namespace CorrugatedIron.Tests.Live.MapReduce
                 .Inputs(new RiakSearchInput(Index, "name_s:" + _randomId + "Al*"));
 
 
-            Func<RiakResult<RiakMapReduceResult>> doMapReduce = () => Client.MapReduce(mr);
-
-            var result = doMapReduce.WaitUntil(OnePhaseWithTwoResultsFound);
+            var result = Client.RunMapReduceQuery(mr).WaitUntil(MapReduceTestHelpers.OnePhaseWithTwoResultsFound);
 
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
 
@@ -138,9 +141,8 @@ namespace CorrugatedIron.Tests.Live.MapReduce
 .Inputs(new RiakBucketSearchInput(search));
 #pragma warning restore 618
 
-            Func<RiakResult<RiakMapReduceResult>> doMapReduce = () => Client.MapReduce(mr);
 
-            var result = doMapReduce.WaitUntil(OnePhaseWithTwoResultsFound);
+            var result = Client.RunMapReduceQuery(mr).WaitUntil(MapReduceTestHelpers.OnePhaseWithTwoResultsFound);
 
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
 
@@ -153,9 +155,7 @@ namespace CorrugatedIron.Tests.Live.MapReduce
             var search = new RiakFluentSearch(Index, "name_s").Search(Token.StartsWith(_randomId + "Al")).Build();
             var mr = new RiakMapReduceQuery().Inputs(new RiakSearchInput(search));
 
-            Func<RiakResult<RiakMapReduceResult>> doMapReduce = () => Client.MapReduce(mr);
-
-            var result = doMapReduce.WaitUntil(OnePhaseWithTwoResultsFound);
+            var result = Client.RunMapReduceQuery(mr).WaitUntil(MapReduceTestHelpers.OnePhaseWithTwoResultsFound);
 
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
 
@@ -175,9 +175,7 @@ namespace CorrugatedIron.Tests.Live.MapReduce
 
             var mr = new RiakMapReduceQuery().Inputs(new RiakSearchInput(search));
 
-            Func<RiakResult<RiakMapReduceResult>> doMapReduce = () => Client.MapReduce(mr);
-
-            var result = doMapReduce.WaitUntil(OnePhaseWithOneResultFound);
+            var result = Client.RunMapReduceQuery(mr).WaitUntil(MapReduceTestHelpers.OnePhaseWithOneResultFound);
 
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
             var singleResult = result.Value.PhaseResults.First().Values[0].FromRiakString();
@@ -186,35 +184,7 @@ namespace CorrugatedIron.Tests.Live.MapReduce
             singleResult.Contains(PublicKey).ShouldBeTrue(failureMessage);
         }
 
-        private bool OnePhaseWithOneResultFound(RiakResult<RiakMapReduceResult> result)
-        {
-            return OnePhaseWithNResultsFound(result, 1);
-        }
-
-        private bool OnePhaseWithTwoResultsFound(RiakResult<RiakMapReduceResult> result)
-        {
-            return OnePhaseWithNResultsFound(result, 2);
-        }
-
-        private bool OnePhaseWithNResultsFound(RiakResult<RiakMapReduceResult> result, int numResults)
-        {
-            if (!result.IsSuccess || result.Value == null)
-            {
-                return false;
-            }
-
-            var phaseResults = result.Value.PhaseResults.ToList();
-
-            if (phaseResults.Count != 1)
-            {
-                return false;
-            }
-
-            var phase1Results = phaseResults[0].Values;
-
-            return phase1Results.Count == numResults;
-        }
-
+        
         private static void AssertThatResultContainsAllKeys(RiakResult<RiakMapReduceResult> mapReduceResult)
         {
             var phaseResults = mapReduceResult.Value.PhaseResults.ToList();
@@ -230,7 +200,8 @@ namespace CorrugatedIron.Tests.Live.MapReduce
             var usedKeys = solrResults.SelectMany(result => allKeys.Where(result.Contains));
             var unusedKeys = allKeys.Except(usedKeys).ToList();
 
-            Assert.AreEqual(0, unusedKeys.Count, "Results did not contain the following keys: {0}", string.Join(", ", allKeys));
+            Assert.AreEqual(0, unusedKeys.Count, "Results did not contain the following keys: {0}",
+                string.Join(", ", allKeys));
         }
     }
 }

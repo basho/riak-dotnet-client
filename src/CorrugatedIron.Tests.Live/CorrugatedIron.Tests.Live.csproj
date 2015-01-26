@@ -59,6 +59,7 @@
     <Compile Include="BucketPropertyTests.cs" />
     <Compile Include="Extensions\IntegrationTestExtensions.cs" />
     <Compile Include="Extensions\IntegrationTestExtensionsTest.cs" />
+    <Compile Include="Extensions\MapReduceTestHelpers.cs" />
     <Compile Include="Extensions\SearchTestHelpers.cs" />
     <Compile Include="GeneralIntegrationTests.cs" />
     <Compile Include="IdleTests.cs" />

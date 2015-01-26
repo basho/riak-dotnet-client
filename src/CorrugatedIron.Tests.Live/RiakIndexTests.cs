@@ -1,13 +1,13 @@
-// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2011 - 2014 OJ Reeves & Jeremiah Peschka
 // Copyright (c) 2015 - Basho Technologies, Inc.
-//
+// 
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
 // except in compliance with the License.  You may obtain
 // a copy of the License at
-//
+// 
 //   http://www.apache.org/licenses/LICENSE-2.0
-//
+// 
 // Unless required by applicable law or agreed to in writing,
 // software distributed under the License is distributed on an
 // "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using CorrugatedIron.Models;
+using CorrugatedIron.Models.Index;
 using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Models.MapReduce.Inputs;
 using CorrugatedIron.Tests.Extensions;
@@ -51,7 +52,7 @@ namespace CorrugatedIron.Tests.Live
         [Test]
         public void IndexesAreSavedWithAnObject()
         {
-            var o = CreateRiakObjectInLegacyBucket();
+            var o = CreateGuidKeyedRiakObject("IndexesAreSaved", true);
 
             o.BinIndex("tacos").Set("are great!");
             o.IntIndex("age").Set(12);
@@ -75,46 +76,51 @@ namespace CorrugatedIron.Tests.Live
         [Test]
         public void IntIndexGetReturnsListOfKeys()
         {
-            GenerateIntKeyObjects(indexAction: (o, i) => o.IntIndex("age").Add(32), useLegacyBucket: false);
+            GenerateIntKeyObjects("IntIndex", (o, i) => o.IntIndex("age").Add(32));
 
-            var idxid = new RiakIndexId(BucketType, Bucket, "age");
+            var idxid = new RiakIndexId(LegacyBucket, "age");
             var result = Client.GetSecondaryIndex(idxid, 32);
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
             result.Value.IndexKeyTerms.Count().ShouldEqual(DefaultKeyCount);
 
             foreach (var v in result.Value.IndexKeyTerms)
             {
-                var key = int.Parse(v.Key);
+                var key = ParseIntKeyWithPrefix(v);
                 key.ShouldBeLessThan(DefaultKeyCount);
                 key.ShouldBeGreaterThan(-1);
             }
 
-            Client.DeleteBucket(BucketType, Bucket);
+            Client.DeleteBucket(LegacyBucket);
         }
 
         [Test]
         public void BinIndexGetReturnsListOfKeys()
         {
-            GenerateIntKeyObjects((o, i) => o.BinIndex("age").Set("32"));
+            GenerateIntKeyObjects("BinIndex", (o, i) => o.BinIndex("age").Set("32"));
 
-            var result = Client.GetSecondaryIndex(new RiakIndexId(Bucket, "age"), "32");
+            var result = Client.GetSecondaryIndex(new RiakIndexId(LegacyBucket, "age"), "32");
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
             result.Value.IndexKeyTerms.Count().ShouldEqual(DefaultKeyCount);
 
             foreach (var v in result.Value.IndexKeyTerms)
             {
-                var key = int.Parse(v.Key);
+                var key = ParseIntKeyWithPrefix(v);
                 key.ShouldBeLessThan(DefaultKeyCount);
                 key.ShouldBeGreaterThan(-1);
             }
 
-            Client.DeleteBucket(Bucket);
+            Client.DeleteBucket(LegacyBucket);
+        }
+
+        private static int ParseIntKeyWithPrefix(RiakIndexKeyTerm indexKeyTerm)
+        {
+            return int.Parse(indexKeyTerm.Key.Split('_')[1]);
         }
 
         [Test]
         public void QueryingByIntIndexReturnsAListOfKeys()
         {
-            GenerateGuidKeyObjects((o, i) => o.IntIndex("age").Set(32, 20));
+            GenerateGuidKeyObjects("QueryByIntIndex", (o, i) => o.IntIndex("age").Set(32, 20));
 
             var mr = new RiakMapReduceQuery()
                 .Inputs(RiakIndex.Match(new RiakIndexId(LegacyBucket, "age"), 32));
@@ -138,7 +144,7 @@ namespace CorrugatedIron.Tests.Live
         [Test]
         public void IntRangeQueriesReturnMultipleKeys()
         {
-            GenerateGuidKeyObjects((o, i) => o.IntIndex("age").Set(25 + i));
+            GenerateGuidKeyObjects("IntRangeQueries", (o, i) => o.IntIndex("age").Set(25 + i));
 
             var result = Client.GetSecondaryIndex(new RiakIndexId(LegacyBucket, "age"), 27, 30);
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
@@ -149,15 +155,23 @@ namespace CorrugatedIron.Tests.Live
         [Test]
         public void AllKeysReturnsListOfKeys()
         {
-            var insertedKeys = GenerateGuidKeyObjects();
+            var insertedKeys = GenerateIntKeyObjects("AllKeys");
 
             var mr = new RiakMapReduceQuery().Inputs(RiakIndex.AllKeys(Bucket));
 
-            var result = Client.MapReduce(mr);
+            var result = Client.RunMapReduceQuery(mr).WaitUntil(MapReduceTestHelpers.OnePhaseWithTenResultsFound);
+
             var queriedKeys = result.Value.PhaseResults.SelectMany(x => x.GetObjectIds()).ToList();
 
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
-            Assert.AreEqual(queriedKeys.Count, DefaultKeyCount);
+
+            var foundKeys = string.Join("\",\r\n\t\"", queriedKeys);
+            if (foundKeys.Length > 0)
+            {
+                foundKeys = "Found keys: \"" + foundKeys + "\"";
+            }
+
+            queriedKeys.Count.ShouldEqual(DefaultKeyCount, foundKeys);
 
             foreach (var key in queriedKeys)
             {
@@ -166,33 +180,32 @@ namespace CorrugatedIron.Tests.Live
                 insertedKeys.Contains(key.Key).ShouldBeTrue();
             }
 
-            Client.DeleteBucket(Bucket);
+            Client.DeleteBucket(LegacyBucket);
         }
-
 
         [Test]
         public void KeysReturnsSelectiveListOfKeys()
         {
-            int keyStart = 10;
-            int keyCount = 10;
-            int idxStart = 12;
-            int idxEnd = 16;
+            const int keyStart = 10;
+            const int keyCount = 10;
+            const int idxStart = 12;
+            const int idxEnd = 16;
+            const string keyPrefix = "KeysReturnsSelectiveListOfKeys";
             var originalKeys = new List<string>();
+
 
             for (var i = keyStart; i < keyStart + keyCount; i++)
             {
-                var o = CreateRiakObjectInLegacyBucket(i);
+                var o = CreateIntKeyedRiakObject(keyPrefix, true, i);
                 originalKeys.Add(o.Key);
                 Client.Put(o);
             }
 
             var mr = new RiakMapReduceQuery()
-                .Inputs(RiakIndex.Keys(LegacyBucket, idxStart.ToString(), idxEnd.ToString()))
-                .ReduceErlang(r => r.ModFun("riak_kv_mapreduce", "reduce_identity")
-                .Argument("do_prereduce")
-                .Keep(true));
+                .Inputs(RiakIndex.Keys(LegacyBucket, keyPrefix + "_" + idxStart, keyPrefix + "_" + idxEnd));
 
-            var result = Client.MapReduce(mr);
+            var result = Client.RunMapReduceQuery(mr).WaitUntil(MapReduceTestHelpers.OnePhaseWithFiveResultsFound);
+
             var keys = result.Value.PhaseResults.SelectMany(x => x.GetObjectIds()).ToList();
 
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
@@ -210,9 +223,9 @@ namespace CorrugatedIron.Tests.Live
         [Test]
         public void ListKeysUsingIndexReturnsAllKeys()
         {
-            int keyCount = 10;
+            const int keyCount = 10;
 
-            var generatedKeys = GenerateGuidKeyObjects();
+            var generatedKeys = GenerateGuidKeyObjects("ListKeysUsingIndex");
             var originalKeys = new HashSet<string>(generatedKeys);
 
             var result = Client.ListKeysFromIndex(LegacyBucket);
@@ -234,13 +247,13 @@ namespace CorrugatedIron.Tests.Live
         [Test]
         public void GettingKeysWithReturnTermsReturnsThem()
         {
-            int keyCount = 10;
+            const int keyCount = 10;
             var keysAndTerms = new Dictionary<string, int>();
 
 
             for (var i = 0; i < keyCount; i++)
             {
-                var o = CreateRiakObjectInLegacyBucket();
+                var o = CreateGuidKeyedRiakObject("GettingKeysWithReturnTerms", true);
                 o.IntIndex("sandwiches").Set(i);
                 keysAndTerms.Add(o.Key, i);
                 Client.Put(o);
@@ -264,9 +277,9 @@ namespace CorrugatedIron.Tests.Live
         [Test]
         public void GettingKeysWithContinuationDoesNotSetDone()
         {
-            int keyCount = 1000;
+            const int keyCount = 1000;
 
-            GenerateGuidKeyObjects((o, i) => o.IntIndex("position").Set(i), keyCount);
+            GenerateGuidKeyObjects("GettingKeysWithContinuation", (o, i) => o.IntIndex("position").Set(i), keyCount);
 
             var results = Client.GetSecondaryIndex(new RiakIndexId(LegacyBucket,
                 "position"), 10, 500, new RiakIndexGetOptions().SetMaxResults(10));
@@ -286,10 +299,10 @@ namespace CorrugatedIron.Tests.Live
         {
             for (var i = 0; i < DefaultKeyCount; i++)
             {
-                var o = CreateRiakObjectInLegacyBucket();
-                o.IntIndex("position").Set(i % 2);
+                var o = CreateIntKeyedRiakObject("StreamingIndex", true, i);
+                o.IntIndex("position").Set(i%2);
                 Client.Put(o, new RiakPutOptions().SetW(RiakConstants.QuorumOptions.All)
-                                                  .SetDw(RiakConstants.QuorumOptions.All));
+                    .SetDw(RiakConstants.QuorumOptions.All));
             }
 
             var results = Client.StreamGetSecondaryIndex(new RiakIndexId(Bucket, "position"), 0);
@@ -297,16 +310,17 @@ namespace CorrugatedIron.Tests.Live
             results.IsSuccess.ShouldBeTrue(results.ErrorMessage);
             results.Value.IndexKeyTerms.Count().ShouldEqual(5);
 
-            Client.DeleteBucket(Bucket);
+            Client.DeleteBucket(LegacyBucket);
         }
 
         [Test]
         public void TimeoutOptionWorks()
         {
-            var keyCount = 1000;
-            GenerateGuidKeyObjects((o, i) => o.IntIndex("position").Set(i), keyCount);
+            const int keyCount = 1000;
+            GenerateGuidKeyObjects("Timeout", (o, i) => o.IntIndex("position").Set(i), keyCount);
 
-            var results = Client.GetSecondaryIndex(new RiakIndexId(Bucket, "position"), 1, 500, new RiakIndexGetOptions().SetTimeout(1));
+            var results = Client.GetSecondaryIndex(new RiakIndexId(Bucket, "position"), 1, 500,
+                new RiakIndexGetOptions().SetTimeout(1));
 
             results.IsSuccess.ShouldBeFalse();
             results.ErrorMessage.Contains("timeout").ShouldBeTrue(results.ErrorMessage);
@@ -315,31 +329,41 @@ namespace CorrugatedIron.Tests.Live
             results.Done.ShouldNotEqual(true);
             results.Done.ShouldEqual(null);
             results.Continuation.ShouldBeNull();
+
+            Client.DeleteBucket(LegacyBucket);
         }
 
         [Test]
         public void UsingTermRegexOnARangeFiltersTheResults()
         {
-            var keyCount = 750;
+            const int keyCount = 750;
 
-            GenerateGuidKeyObjects((o, i) => o.BinIndex("lessthan500").Set(i < 500 ? "less" : "more"), keyCount);
+            GenerateGuidKeyObjects("TermRegex",
+                (o, i) => o.BinIndex("lessthan500").Set(i < 500 ? "less" : "more"), keyCount);
 
-            var results = Client.GetSecondaryIndex(new RiakIndexId(Bucket, "lessthan500"), "a", "z", new RiakIndexGetOptions().SetTermRegex("^less"));
+            var results = Client.GetSecondaryIndex(new RiakIndexId(Bucket, "lessthan500"), "a", "z",
+                new RiakIndexGetOptions().SetTermRegex("^less"));
 
             results.IsSuccess.ShouldBeTrue(results.ErrorMessage);
             results.Value.ShouldNotBeNull();
             var keyTerms = results.Value.IndexKeyTerms.ToList();
             keyTerms.Count.ShouldEqual(500);
+
+            Client.DeleteBucket(LegacyBucket);
         }
 
         [Test]
         public void UsingPaginationSortWillSortResultsWhilePaging()
         {
-            var keyCount = 1000;
+            const int keyCount = 1000;
 
-            GenerateGuidKeyObjects((o, i) => o.IntIndex("positionSorting").Set(i), keyCount);
+            GenerateGuidKeyObjects("PaginationSort", (o, i) => o.IntIndex("positionSorting").Set(i), keyCount);
 
-            var results = Client.GetSecondaryIndex(new RiakIndexId(Bucket, "positionSorting"), 1, 500, new RiakIndexGetOptions().SetPaginationSort(true).SetReturnTerms(true).SetMaxResults(10));
+            var results = Client.GetSecondaryIndex(new RiakIndexId(Bucket, "positionSorting"), 1, 500,
+                new RiakIndexGetOptions()
+                    .SetPaginationSort(true)
+                    .SetReturnTerms(true)
+                    .SetMaxResults(10));
 
             results.IsSuccess.ShouldBeTrue(results.ErrorMessage);
             results.Value.ShouldNotBeNull();
@@ -348,7 +372,8 @@ namespace CorrugatedIron.Tests.Live
             keyTerms[0].Term.ShouldEqual("1");
 
             var results2 = Client.GetSecondaryIndex(new RiakIndexId(Bucket, "positionSorting"), 1, 500,
-                new RiakIndexGetOptions().SetPaginationSort(true)
+                new RiakIndexGetOptions()
+                    .SetPaginationSort(true)
                     .SetReturnTerms(true)
                     .SetMaxResults(10)
                     .SetContinuation(results.Continuation));
@@ -356,13 +381,15 @@ namespace CorrugatedIron.Tests.Live
             var keyTerms2 = results2.Value.IndexKeyTerms.ToList();
             keyTerms2[0].Term.ShouldEqual("11");
 
+            Client.DeleteBucket(LegacyBucket);
         }
 
         [Test]
         public void AsyncStreamingKeysReturnsListOfKeys()
         {
-            var keyCount = 100;
-            var insertedKeys = GenerateGuidKeyObjects((o, i) => o.IntIndex("position").Set(i), keyCount);
+            const int keyCount = 100;
+            var insertedKeys = GenerateGuidKeyObjects("AsyncStreamingMR",
+                (o, i) => o.IntIndex("position").Set(i), keyCount);
 
             var asyncTask = Client.Async.StreamGetSecondaryIndex(new RiakIndexId(Bucket, "position"), 0, keyCount);
             asyncTask.Wait();
@@ -380,22 +407,27 @@ namespace CorrugatedIron.Tests.Live
 
             foreach (var insertedKey in insertedKeys)
             {
-                resultKeys.ShouldContain(insertedKey, string.Format("Could not find key {0} in index result set", insertedKey));
+                resultKeys.ShouldContain(insertedKey,
+                    string.Format("Could not find key {0} in index result set", insertedKey));
             }
 
-            Client.DeleteBucket(Bucket);
+            Client.DeleteBucket(LegacyBucket);
         }
 
-        private List<string> GenerateIntKeyObjects(Action<RiakObject, int> indexAction = null, int maxKeys = DefaultKeyCount, bool useLegacyBucket = true)
+        private List<string> GenerateIntKeyObjects(
+            string keyPrefix, Action<RiakObject, int> indexAction = null, int maxKeys = DefaultKeyCount,
+            bool useLegacyBucket = true)
         {
             var insertedKeys = new List<string>();
 
             for (var idx = 0; idx < maxKeys; idx++)
             {
-                var riakObject = useLegacyBucket ? CreateRiakObjectInLegacyBucket(idx) : CreateRiakObject(idx);
+                var riakObject = CreateIntKeyedRiakObject(keyPrefix, useLegacyBucket, idx);
 
                 if (indexAction != null)
+                {
                     indexAction(riakObject, idx);
+                }
 
                 insertedKeys.Add(riakObject.Key);
                 Client.Put(riakObject);
@@ -403,16 +435,20 @@ namespace CorrugatedIron.Tests.Live
             return insertedKeys;
         }
 
-        private List<string> GenerateGuidKeyObjects(Action<RiakObject, int> indexAction = null, int maxKeys = DefaultKeyCount, bool useLegacyBucket = true)
+        private List<string> GenerateGuidKeyObjects(
+            string keyPrefix, Action<RiakObject, int> indexAction = null, int maxKeys = DefaultKeyCount,
+            bool useLegacyBucket = true)
         {
             var insertedKeys = new List<string>();
 
             for (var idx = 0; idx < maxKeys; idx++)
             {
-                var riakObject = useLegacyBucket ? CreateRiakObjectInLegacyBucket() : CreateRiakObject();
+                var riakObject = CreateGuidKeyedRiakObject(keyPrefix, useLegacyBucket);
 
                 if (indexAction != null)
+                {
                     indexAction(riakObject, idx);
+                }
 
                 insertedKeys.Add(riakObject.Key);
                 Client.Put(riakObject);
@@ -420,27 +456,23 @@ namespace CorrugatedIron.Tests.Live
             return insertedKeys;
         }
 
-        private RiakObject CreateRiakObjectInLegacyBucket()
+        private RiakObject CreateGuidKeyedRiakObject(string keyPrefix, bool useLegacyBucket)
         {
-            var id = new RiakObjectId(LegacyBucket, Guid.NewGuid().ToString());
-            return CreateRiakObject(id, "{ value: \"this is an object\" }");
+            var key = string.Join("_", keyPrefix, Guid.NewGuid());
+            return CreateRiakObject(useLegacyBucket, key);
         }
 
-        private RiakObject CreateRiakObjectInLegacyBucket(int key)
+        private RiakObject CreateIntKeyedRiakObject(string keyPrefix, bool useLegacyBucket, int key)
         {
-            var id = new RiakObjectId(LegacyBucket, key.ToString());
-            return CreateRiakObject(id, "{ value: \"this is an object\" }");
+            var stringKey = string.Join("_", keyPrefix, key);
+            return CreateRiakObject(useLegacyBucket, stringKey);
         }
 
-        private RiakObject CreateRiakObject()
+        private RiakObject CreateRiakObject(bool useLegacyBucket, string key)
         {
-            var id = new RiakObjectId(BucketType, Bucket, Guid.NewGuid().ToString());
-            return CreateRiakObject(id, "{ value: \"this is an object\" }");
-        }
-
-        private RiakObject CreateRiakObject(int key)
-        {
-            var id = new RiakObjectId(BucketType, Bucket, key.ToString());
+            var id = useLegacyBucket
+                ? new RiakObjectId(LegacyBucket, key)
+                : new RiakObjectId(BucketType, Bucket, key);
             return CreateRiakObject(id, "{ value: \"this is an object\" }");
         }
 
@@ -450,4 +482,3 @@ namespace CorrugatedIron.Tests.Live
         }
     }
 }
-
