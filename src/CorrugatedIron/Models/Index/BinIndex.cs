@@ -48,7 +48,7 @@ namespace CorrugatedIron.Models.Index
             return base.Add(values.Where(value => !string.IsNullOrEmpty(value)).ToArray());
         }
 
-        public new BinIndex Add(params string[] values)
+        public override BinIndex Add(params string[] values)
         {
             return base.Add(values.Where(value => !string.IsNullOrEmpty(value)).ToArray());
         }
