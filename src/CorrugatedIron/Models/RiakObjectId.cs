@@ -110,5 +110,15 @@ namespace CorrugatedIron.Models
         {
             return !Equals(left, right);
         }
+
+        public override string ToString()
+        {
+            if (string.IsNullOrEmpty(BucketType))
+            {
+                return string.Format("BucketType: DefaultBucketType, Bucket: {0}, Key: {1}", Bucket, Key);
+            }
+
+            return string.Format("BucketType: {0}, Bucket: {1}, Key: {2}", BucketType, Bucket, Key);
+        }
     }
 }
