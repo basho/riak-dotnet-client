@@ -51,7 +51,7 @@ namespace CorrugatedIron.Tests.Live.MapReduce
         private int _randomId;
 
         [TestFixtureSetUp]
-        public new void SetUp()
+        public override void SetUp()
         {
             base.SetUp();
 

@@ -30,7 +30,7 @@ namespace CorrugatedIron.Tests.Live.Search
     public class TestSearchAdminOperations : LiveRiakConnectionTestBase
     {
         [SetUp]
-        public new void SetUp()
+        public override void SetUp()
         {
             base.SetUp();
         }
