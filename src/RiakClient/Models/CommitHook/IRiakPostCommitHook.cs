@@ -14,7 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CorrugatedIron.Models.CommitHook
+namespace RiakClient.Models.CommitHook
 {
     public interface IRiakPostCommitHook : IRiakCommitHook
     {

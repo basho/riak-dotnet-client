@@ -15,10 +15,10 @@
 // under the License.
 
 using System.Numerics;
-using CorrugatedIron.Extensions;
-using CorrugatedIron.Messages;
+using RiakClient.Extensions;
+using RiakClient.Messages;
 
-namespace CorrugatedIron.Models
+namespace RiakClient.Models
 {
     public class RiakIndexGetOptions
     {

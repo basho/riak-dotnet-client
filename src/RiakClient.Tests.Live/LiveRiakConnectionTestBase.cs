@@ -17,12 +17,12 @@
 
 using System;
 using System.Collections.Generic;
-using CorrugatedIron.Config;
-using CorrugatedIron.Extensions;
-using CorrugatedIron.Util;
+using RiakClient.Extensions;
 using NUnit.Framework;
+using RiakClient.Config;
+using RiakClient.Util;
 
-namespace CorrugatedIron.Tests.Live
+namespace RiakClient.Tests.Live
 {
     public abstract class LiveRiakConnectionTestBase
     {

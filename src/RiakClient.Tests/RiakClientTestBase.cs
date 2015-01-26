@@ -15,11 +15,11 @@
 // under the License.
 
 using System.Collections.Generic;
-using CorrugatedIron.Comms;
-using CorrugatedIron.Config;
 using Moq;
+using RiakClient.Comms;
+using RiakClient.Config;
 
-namespace CorrugatedIron.Tests.RiakClientTests
+namespace RiakClient.Tests.RiakClientTests
 {
     internal abstract class RiakClientTestBase<TRequest, TResult>
         where TRequest : class, ProtoBuf.IExtensible

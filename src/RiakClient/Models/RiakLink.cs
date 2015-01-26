@@ -14,13 +14,13 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Extensions;
-using CorrugatedIron.Messages;
+using RiakClient.Extensions;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
+using RiakClient.Messages;
 
-namespace CorrugatedIron.Models
+namespace RiakClient.Models
 {
     public class RiakLink
     {

@@ -14,9 +14,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Messages;
+using RiakClient.Messages;
 
-namespace CorrugatedIron.Models.RiakDt
+namespace RiakClient.Models.RiakDt
 {
     public interface IDtOp
     {

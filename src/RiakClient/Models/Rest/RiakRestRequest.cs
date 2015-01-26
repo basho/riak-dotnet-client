@@ -14,10 +14,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Util;
 using System.Collections.Generic;
+using RiakClient.Util;
 
-namespace CorrugatedIron.Models.Rest
+namespace RiakClient.Models.Rest
 {
     public class RiakRestRequest
     {

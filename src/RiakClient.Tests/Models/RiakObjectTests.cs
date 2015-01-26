@@ -16,11 +16,11 @@
 
 using System;
 using System.Linq;
-using CorrugatedIron.Models;
-using CorrugatedIron.Tests.Extensions;
+using RiakClient.Tests.Extensions;
 using NUnit.Framework;
+using RiakClient.Models;
 
-namespace CorrugatedIron.Tests.Models
+namespace RiakClient.Tests.Models
 {
     [TestFixture]
     public class RiakObjectTests

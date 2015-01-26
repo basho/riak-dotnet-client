@@ -19,7 +19,7 @@ using System;
 using System.IO;
 using System.Text;
 
-namespace CorrugatedIron.Models.MapReduce.KeyFilters
+namespace RiakClient.Models.MapReduce.KeyFilters
 {
     /// <summary>
     /// Splits the input on the string given as the first argument and returns the nth

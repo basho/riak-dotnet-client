@@ -17,9 +17,9 @@
 
 using System;
 using System.Collections.Generic;
-using CorrugatedIron.Config;
+using RiakClient.Config;
 
-namespace CorrugatedIron.Comms
+namespace RiakClient.Comms
 {
     public interface IRiakNode : IDisposable
     {

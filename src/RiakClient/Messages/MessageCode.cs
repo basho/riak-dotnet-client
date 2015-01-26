@@ -18,7 +18,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace CorrugatedIron.Messages
+namespace RiakClient.Messages
 {
     public enum MessageCode : byte
     {

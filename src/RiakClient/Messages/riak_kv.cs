@@ -9,7 +9,7 @@
 
 // Generated from: riak_kv.proto
 // Note: requires additional types generated from: riak.proto
-namespace CorrugatedIron.Messages
+namespace RiakClient.Messages
 {
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"RpbGetClientIdResp")]
   public partial class RpbGetClientIdResp : global::ProtoBuf.IExtensible

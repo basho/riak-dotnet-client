@@ -19,7 +19,7 @@ using System;
 using System.IO;
 using System.Text;
 
-namespace CorrugatedIron.Models.MapReduce.KeyFilters
+namespace RiakClient.Models.MapReduce.KeyFilters
 {
     internal abstract class RiakKeyFilterToken : IRiakKeyFilterToken
     {

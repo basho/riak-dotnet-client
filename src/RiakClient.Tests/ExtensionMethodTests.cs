@@ -17,10 +17,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using CorrugatedIron.Extensions;
+using RiakClient.Extensions;
 using NUnit.Framework;
 
-namespace CorrugatedIron.Tests
+namespace RiakClient.Tests
 {
     [TestFixture]
     public class ExtensionMethodTests

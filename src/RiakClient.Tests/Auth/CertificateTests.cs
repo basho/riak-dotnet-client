@@ -14,10 +14,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Config;
 using NUnit.Framework;
+using RiakClient.Config;
 
-namespace CorrugatedIron.Tests.Auth
+namespace RiakClient.Tests.Auth
 {
     [TestFixture]
     public class CertificateTests : AuthTestBase

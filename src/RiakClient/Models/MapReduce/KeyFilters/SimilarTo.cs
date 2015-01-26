@@ -19,7 +19,7 @@ using System;
 using System.IO;
 using System.Text;
 
-namespace CorrugatedIron.Models.MapReduce.KeyFilters
+namespace RiakClient.Models.MapReduce.KeyFilters
 {
     /// <summary>
     /// Tests that input is within the Levenshtein distance of the first argument given by the second argument.

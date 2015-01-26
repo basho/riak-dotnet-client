@@ -16,10 +16,10 @@
 // under the License.
 
 using System;
-using CorrugatedIron.Models.Search;
 using Newtonsoft.Json;
+using RiakClient.Models.Search;
 
-namespace CorrugatedIron.Models.MapReduce.Inputs
+namespace RiakClient.Models.MapReduce.Inputs
 {
     [Obsolete("Using Legacy Search as input for MapReduce is depreciated. Please move to Riak 2.0 Search, and use the RiakSearchInput class instead.")]
     public class RiakBucketSearchInput : RiakPhaseInput

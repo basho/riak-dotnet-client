@@ -14,9 +14,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Models.MapReduce.Phases;
+using RiakClient.Models.MapReduce.Phases;
 
-namespace CorrugatedIron.Models.MapReduce.Fluent
+namespace RiakClient.Models.MapReduce.Fluent
 {
     public class RiakFluentLinkPhase
     {

@@ -16,10 +16,10 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using CorrugatedIron.Extensions;
-using CorrugatedIron.Messages;
+using RiakClient.Extensions;
+using RiakClient.Messages;
 
-namespace CorrugatedIron.Models.Search
+namespace RiakClient.Models.Search
 {
     /// <summary>
     /// Specifies the sort order of Riak Search Results

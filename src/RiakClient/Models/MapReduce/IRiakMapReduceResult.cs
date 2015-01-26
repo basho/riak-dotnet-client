@@ -16,7 +16,7 @@
 
 using System.Collections.Generic;
 
-namespace CorrugatedIron.Models.MapReduce
+namespace RiakClient.Models.MapReduce
 {
     public interface IRiakMapReduceResult
     {

@@ -16,10 +16,10 @@
 // under the License.
 
 using System.Collections.Generic;
-using CorrugatedIron.Models.MapReduce.KeyFilters;
 using Newtonsoft.Json;
+using RiakClient.Models.MapReduce.KeyFilters;
 
-namespace CorrugatedIron.Models.MapReduce.Inputs
+namespace RiakClient.Models.MapReduce.Inputs
 {
     public class RiakBucketInput : RiakPhaseInput
     {

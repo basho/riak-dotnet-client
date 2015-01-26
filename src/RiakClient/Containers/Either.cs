@@ -14,7 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CorrugatedIron.Containers
+namespace RiakClient.Containers
 {
     public class Either<TLeft, TRight>
     {

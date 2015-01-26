@@ -72,7 +72,7 @@ Riak Security:
 ```xml
 <configuration>
   <configSections>
-    <section name="riakConfiguration" type="CorrugatedIron.Config.RiakClusterConfiguration, CorrugatedIron" />
+    <section name="riakConfiguration" type="RiakClient.Config.RiakClusterConfiguration, RiakClient" />
   </configSections>
   <riakConfiguration nodePollTime="5000" defaultRetryWaitTime="200" defaultRetryCount="3">
     <authentication username="riakuser" password="Test1234"

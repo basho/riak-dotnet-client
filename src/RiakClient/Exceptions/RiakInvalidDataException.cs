@@ -14,10 +14,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Extensions;
+using RiakClient.Extensions;
 using System;
 
-namespace CorrugatedIron.Exceptions
+namespace RiakClient.Exceptions
 {
     public class RiakInvalidDataException : Exception
     {

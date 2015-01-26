@@ -16,16 +16,16 @@
 // under the License.
 
 using System.Linq;
-using CorrugatedIron.Extensions;
-using CorrugatedIron.Models;
-using CorrugatedIron.Models.MapReduce;
-using CorrugatedIron.Tests.Extensions;
-using CorrugatedIron.Tests.Live.Extensions;
-using CorrugatedIron.Util;
+using RiakClient.Extensions;
+using RiakClient.Tests.Extensions;
+using RiakClient.Tests.Live.Extensions;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using RiakClient.Models;
+using RiakClient.Models.MapReduce;
+using RiakClient.Util;
 
-namespace CorrugatedIron.Tests.Live.MapReduce
+namespace RiakClient.Tests.Live.MapReduce
 {
     [TestFixture]
     public class WhenUsingFluentKeyFilters : RiakMapReduceTestBase

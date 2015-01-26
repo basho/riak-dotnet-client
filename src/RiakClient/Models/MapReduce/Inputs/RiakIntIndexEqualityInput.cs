@@ -19,7 +19,7 @@ using System;
 using System.Numerics;
 using Newtonsoft.Json;
 
-namespace CorrugatedIron.Models.MapReduce.Inputs
+namespace RiakClient.Models.MapReduce.Inputs
 {
     public class RiakIntIndexEqualityInput : RiakIndexInput
     {

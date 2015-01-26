@@ -16,7 +16,7 @@
 
 using Newtonsoft.Json;
 
-namespace CorrugatedIron.Models.MapReduce.Languages
+namespace RiakClient.Models.MapReduce.Languages
 {
     internal interface IRiakPhaseLanguage
     {

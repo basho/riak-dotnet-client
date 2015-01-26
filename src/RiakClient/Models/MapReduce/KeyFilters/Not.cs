@@ -20,7 +20,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace CorrugatedIron.Models.MapReduce.KeyFilters
+namespace RiakClient.Models.MapReduce.KeyFilters
 {
     /// <summary>
     /// Negates the result of key-filter operations.

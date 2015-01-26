@@ -20,9 +20,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
-using CorrugatedIron.Util;
+using RiakClient.Util;
 
-namespace CorrugatedIron.Extensions
+namespace RiakClient.Extensions
 {
     public static class StringExtensions
     {

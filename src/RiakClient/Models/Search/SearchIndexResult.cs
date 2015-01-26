@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using CorrugatedIron.Extensions;
-using CorrugatedIron.Messages;
-using CorrugatedIron.Util;
+using RiakClient.Extensions;
+using RiakClient.Messages;
+using RiakClient.Util;
 
-namespace CorrugatedIron.Models.Search
+namespace RiakClient.Models.Search
 {
     public class SearchIndexResult
     {

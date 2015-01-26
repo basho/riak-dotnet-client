@@ -16,12 +16,12 @@
 
 using System;
 using System.Collections.Generic;
-using CorrugatedIron.Containers;
-using CorrugatedIron.Extensions;
-using CorrugatedIron.Messages;
-using CorrugatedIron.Util;
+using RiakClient.Extensions;
+using RiakClient.Containers;
+using RiakClient.Messages;
+using RiakClient.Util;
 
-namespace CorrugatedIron.Models
+namespace RiakClient.Models
 {
     public class RiakDtFetchOptions
     {
@@ -32,7 +32,7 @@ namespace CorrugatedIron.Models
         /// The R value. Possible values include any integer as well as 
         /// a string value of 'quorum', 'one', 'all', or 'default'. 
         /// </value>
-        /// <remarks>Developers looking for an easy way to set this can look at <see cref="CorrugatedIron.Util.RiakConstants.QuorumOptions"/></remarks>
+        /// <remarks>Developers looking for an easy way to set this can look at <see cref="RiakConstants.QuorumOptions"/></remarks>
         public Either<uint, string> R { get; private set; }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace CorrugatedIron.Models
         /// The primary read quorum. Possible values include any integer as well as 
         /// a string value of 'quorum', 'one', 'all', or 'default'. 
         /// </value>
-        /// <remarks>Developers looking for an easy way to set this can look at <see cref="CorrugatedIron.Util.RiakConstants.QuorumOptions"/></remarks>
+        /// <remarks>Developers looking for an easy way to set this can look at <see cref="RiakConstants.QuorumOptions"/></remarks>
         public Either<uint, string> Pr { get; private set; }
 
         /// <summary>

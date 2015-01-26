@@ -16,7 +16,7 @@
 
 using System;
 
-namespace CorrugatedIron.Models.Search
+namespace RiakClient.Models.Search
 {
     public class RiakFluentSearch
     {

@@ -17,10 +17,10 @@
 using System;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
-using CorrugatedIron.Util;
 using NUnit.Framework;
+using RiakClient.Util;
 
-namespace CorrugatedIron.Tests.Auth
+namespace RiakClient.Tests.Auth
 {
     public abstract class AuthTestBase
     {

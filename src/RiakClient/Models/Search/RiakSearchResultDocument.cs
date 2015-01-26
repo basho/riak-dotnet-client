@@ -15,12 +15,12 @@
 // under the License.
 
 using System;
-using CorrugatedIron.Messages;
 using System.Collections.Generic;
 using System.Linq;
-using CorrugatedIron.Util;
+using RiakClient.Messages;
+using RiakClient.Util;
 
-namespace CorrugatedIron.Models.Search
+namespace RiakClient.Models.Search
 {
     public class RiakSearchResultDocument
     {

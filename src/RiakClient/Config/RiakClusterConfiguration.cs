@@ -18,7 +18,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 
-namespace CorrugatedIron.Config
+namespace RiakClient.Config
 {
     public class RiakClusterConfiguration : ConfigurationSection, IRiakClusterConfiguration
     {

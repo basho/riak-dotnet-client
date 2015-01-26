@@ -6,7 +6,7 @@
     <ProjectGuid>{A2CA0CDC-85BB-489D-99D0-3EE1D135BE17}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CorrugatedIron</RootNamespace>
+    <RootNamespace>RiakClient</RootNamespace>
     <AssemblyName>RiakClient</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>

@@ -1,6 +1,6 @@
 <configuration>
     <configSections>
-        <section name="riakConfig" type="CorrugatedIron.Config.RiakClusterConfiguration, CorrugatedIron" />
+        <section name="riakConfig" type="RiakClient.Config.RiakClusterConfiguration, RiakClient" />
     </configSections>
 
     <riakConfig nodePollTime="5000"

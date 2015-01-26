@@ -8,7 +8,7 @@
 //------------------------------------------------------------------------------
 
 // Generated from: riak_dt.proto
-namespace CorrugatedIron.Messages
+namespace RiakClient.Messages
 {
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"MapField")]
   public partial class MapField : global::ProtoBuf.IExtensible

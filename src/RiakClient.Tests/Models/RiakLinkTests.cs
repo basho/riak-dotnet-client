@@ -14,10 +14,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Models;
 using NUnit.Framework;
+using RiakClient.Models;
 
-namespace CorrugatedIron.Tests.Models
+namespace RiakClient.Tests.Models
 {
     [TestFixture]
     public class RiakLinkTests

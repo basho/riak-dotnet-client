@@ -16,9 +16,9 @@
 
 using System;
 using System.Collections.Generic;
-using CorrugatedIron.Messages;
+using RiakClient.Messages;
 
-namespace CorrugatedIron.Util
+namespace RiakClient.Util
 {
     public static class RiakConstants
     {
@@ -132,7 +132,7 @@ namespace CorrugatedIron.Util
 
         public static class Rest
         {
-            public const string UserAgent = "CorrugatedIron v0.1 (REST)";
+            public const string UserAgent = "RiakClient v2.0 (REST)";
 
             public static class QueryParameters
             {

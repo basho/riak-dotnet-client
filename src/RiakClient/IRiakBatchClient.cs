@@ -14,17 +14,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Models;
-using CorrugatedIron.Models.Index;
-using CorrugatedIron.Models.MapReduce;
-using CorrugatedIron.Models.Search;
-using CorrugatedIron.Util;
+using RiakClient.Util;
 using System.Collections.Generic;
 using System.Numerics;
-using CorrugatedIron.Models.RiakDt;
-using CorrugatedIron.Messages;
+using RiakClient.Messages;
+using RiakClient.Models;
+using RiakClient.Models.Index;
+using RiakClient.Models.MapReduce;
+using RiakClient.Models.RiakDt;
+using RiakClient.Models.Search;
 
-namespace CorrugatedIron
+namespace RiakClient
 {
     public interface IRiakBatchClient
     {

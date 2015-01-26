@@ -18,9 +18,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using CorrugatedIron.Extensions;
+using RiakClient.Extensions;
 
-namespace CorrugatedIron.Exceptions
+namespace RiakClient.Exceptions
 {
     public class RiakException : Exception
     {

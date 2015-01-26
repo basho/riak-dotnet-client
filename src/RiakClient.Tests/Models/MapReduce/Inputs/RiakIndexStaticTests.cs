@@ -16,13 +16,13 @@
 // under the License.
 
 using System.Numerics;
-using CorrugatedIron.Models;
-using CorrugatedIron.Models.MapReduce.Inputs;
-using CorrugatedIron.Tests.Extensions;
-using CorrugatedIron.Util;
+using RiakClient.Tests.Extensions;
 using NUnit.Framework;
+using RiakClient.Models;
+using RiakClient.Models.MapReduce.Inputs;
+using RiakClient.Util;
 
-namespace CorrugatedIron.Tests.Models.MapReduce.Inputs
+namespace RiakClient.Tests.Models.MapReduce.Inputs
 {
     [TestFixture]
     public class RiakIndexStaticTests : MapReduceSerializationTestsBase

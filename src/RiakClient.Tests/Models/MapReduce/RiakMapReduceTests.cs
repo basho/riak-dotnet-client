@@ -15,15 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Extensions;
-using CorrugatedIron.Models;
-using CorrugatedIron.Models.MapReduce;
-using CorrugatedIron.Models.MapReduce.Inputs;
-using CorrugatedIron.Tests.Extensions;
-using CorrugatedIron.Util;
+using RiakClient.Extensions;
+using RiakClient.Tests.Extensions;
 using NUnit.Framework;
+using RiakClient.Models;
+using RiakClient.Models.MapReduce;
+using RiakClient.Models.MapReduce.Inputs;
+using RiakClient.Util;
 
-namespace CorrugatedIron.Tests.Models.MapReduce
+namespace RiakClient.Tests.Models.MapReduce
 {
     [TestFixture]
     public class RiakMapReduceTests

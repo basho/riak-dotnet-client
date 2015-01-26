@@ -17,7 +17,7 @@
 
 using System.Collections.Generic;
 
-namespace CorrugatedIron.Config
+namespace RiakClient.Config
 {
     public interface IRiakClusterConfiguration
     {

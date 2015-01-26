@@ -14,11 +14,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Comms;
 using System;
 using System.Collections.Generic;
+using RiakClient.Comms;
 
-namespace CorrugatedIron
+namespace RiakClient
 {
     public interface IRiakEndPoint : IDisposable
     {

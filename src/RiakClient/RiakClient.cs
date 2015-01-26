@@ -21,19 +21,19 @@ using System.Linq;
 using System.Net;
 using System.Numerics;
 using System.Web;
-using CorrugatedIron.Comms;
-using CorrugatedIron.Extensions;
-using CorrugatedIron.Messages;
-using CorrugatedIron.Models;
-using CorrugatedIron.Models.Index;
-using CorrugatedIron.Models.MapReduce;
-using CorrugatedIron.Models.MapReduce.Inputs;
-using CorrugatedIron.Models.Rest;
-using CorrugatedIron.Models.RiakDt;
-using CorrugatedIron.Models.Search;
-using CorrugatedIron.Util;
+using RiakClient.Extensions;
+using RiakClient.Comms;
+using RiakClient.Messages;
+using RiakClient.Models;
+using RiakClient.Models.Index;
+using RiakClient.Models.MapReduce;
+using RiakClient.Models.MapReduce.Inputs;
+using RiakClient.Models.Rest;
+using RiakClient.Models.RiakDt;
+using RiakClient.Models.Search;
+using RiakClient.Util;
 
-namespace CorrugatedIron
+namespace RiakClient
 {
     public interface IRiakClient : IRiakBatchClient
     {
@@ -164,12 +164,12 @@ namespace CorrugatedIron
         /// <param name='key'>
         /// The key.
         /// </param>
-        /// <param name='options'>The <see cref="CorrugatedIron.Models.RiakGetOptions" /> responsible for 
+        /// <param name='options'>The <see cref="RiakGetOptions" /> responsible for 
         /// configuring the semantics of this single get request. These options will override any previously 
         /// defined bucket configuration properties.</param>
         /// <remarks>If a node does not respond, that does not necessarily mean that the 
         /// <paramref name="bucket"/>/<paramref name="key"/> combination is not available. It simply means
-        /// that fewer than R/PR nodes responded to the read request. See <see cref="CorrugatedIron.Models.RiakGetOptions" />
+        /// that fewer than R/PR nodes responded to the read request. See <see cref="RiakGetOptions" />
         /// for information on how different options change Riak's default behavior.
         /// </remarks>
         public RiakResult<RiakObject> Get(string bucket, string key, RiakGetOptions options = null)
@@ -206,9 +206,9 @@ namespace CorrugatedIron
         /// Retrieve the specified object from Riak.
         /// </summary>
         /// <param name='objectId'>
-        /// Object identifier made up of a key and bucket. <see cref="CorrugatedIron.Models.RiakObjectId"/>
+        /// Object identifier made up of a key and bucket. <see cref="RiakObjectId"/>
         /// </param>
-        /// <param name='options'>The <see cref="CorrugatedIron.Models.RiakGetOptions" /> responsible for 
+        /// <param name='options'>The <see cref="RiakGetOptions" /> responsible for 
         /// configuring the semantics of this single get request. These options will override any previously 
         /// defined bucket configuration properties.</param>
         /// <remarks>If a node does not respond, that does not necessarily mean that the 
@@ -250,14 +250,14 @@ namespace CorrugatedIron
         /// Retrieve multiple objects from Riak.
         /// </summary>
         /// <param name='objectIds'>
-        /// An <see href="System.Collections.Generic.IEnumerable&lt;T&gt;"/> of <see cref="CorrugatedIron.Models.RiakObjectId"/> to be retrieved
+        /// An <see href="System.Collections.Generic.IEnumerable&lt;T&gt;"/> of <see cref="RiakObjectId"/> to be retrieved
         /// </param>
-        /// <param name='options'>The <see cref="CorrugatedIron.Models.RiakGetOptions" /> responsible for 
+        /// <param name='options'>The <see cref="RiakGetOptions" /> responsible for 
         /// configuring the semantics of this single get request. These options will override any previously 
         /// defined bucket configuration properties.</param>
         /// <returns>An <see cref="System.Collections.Generic.IEnumerable{T}"/> of <see cref="RiakResult{T}"/>
         /// is returned. You should verify the success or failure of each result separately.</returns>
-        /// <remarks>Riak does not support multi get behavior. CorrugatedIron's multi get functionality wraps multiple
+        /// <remarks>Riak does not support multi get behavior. RiakClient's multi get functionality wraps multiple
         /// get requests and returns results as an IEnumerable{RiakResult{RiakObject}}. Callers should be aware that
         /// this may result in partial success - all results should be evaluated individually in the calling application.
         /// In addition, applications should plan for multiple failures or multiple cases of siblings being present.</remarks>
@@ -313,10 +313,10 @@ namespace CorrugatedIron
         }
 
         /// <summary>
-        /// Persist a <see cref="CorrugatedIron.Models.RiakObject"/> to Riak using the specific <see cref="CorrugatedIron.Models.RiakPutOptions" />.
+        /// Persist a <see cref="RiakObject"/> to Riak using the specific <see cref="RiakPutOptions" />.
         /// </summary>
         /// <param name='value'>
-        /// The <see cref="CorrugatedIron.Models.RiakObject"/> to save.
+        /// The <see cref="RiakObject"/> to save.
         /// </param>
         /// <param name='options'>
         /// Put options
@@ -349,17 +349,17 @@ namespace CorrugatedIron
         }
 
         /// <summary>
-        /// Persist an <see href="System.Collections.Generic.IEnumerable{T}"/> of <see cref="CorrugatedIron.Models.RiakObjectId"/> to Riak.
+        /// Persist an <see href="System.Collections.Generic.IEnumerable{T}"/> of <see cref="RiakObjectId"/> to Riak.
         /// </summary>
         /// <param name='values'>
-        /// The <see href="System.Collections.Generic.IEnumerable{T}"/> of <see cref="CorrugatedIron.Models.RiakObjectId"/> to save.
+        /// The <see href="System.Collections.Generic.IEnumerable{T}"/> of <see cref="RiakObjectId"/> to save.
         /// </param>
         /// <param name='options'>
         /// Put options.
         /// </param>
         /// <returns>An <see cref="System.Collections.Generic.IEnumerable{T}"/> of <see cref="RiakResult{T}"/>
         /// is returned. You should verify the success or failure of each result separately.</returns>
-        /// <remarks>Riak does not support multi put behavior. CorrugatedIron's multi put functionality wraps multiple
+        /// <remarks>Riak does not support multi put behavior. RiakClient's multi put functionality wraps multiple
         /// put requests and returns results as an IEnumerable{RiakResult{RiakObject}}. Callers should be aware that
         /// this may result in partial success - all results should be evaluated individually in the calling application.
         /// In addition, applications should plan for multiple failures or multiple cases of siblings being present.</remarks>
@@ -451,7 +451,7 @@ namespace CorrugatedIron
         /// Delete the record identified by the <paramref name="objectId"/>.
         /// </summary>
         /// <param name='objectId'>
-        /// A <see cref="CorrugatedIron.Models.RiakObjectId"/> identifying the bucket/key combination for the record to be deleted.
+        /// A <see cref="RiakObjectId"/> identifying the bucket/key combination for the record to be deleted.
         /// </param>
         /// <param name='options'>
         /// Delete options
@@ -474,10 +474,10 @@ namespace CorrugatedIron
         }
 
         /// <summary>
-        /// Delete multiple objects identified by a <see cref="System.Collections.Generic.IEnumerable&lt;T&gt;"/> of <see cref="CorrugatedIron.Models.RiakObjectId"/>.
+        /// Delete multiple objects identified by a <see cref="System.Collections.Generic.IEnumerable&lt;T&gt;"/> of <see cref="RiakObjectId"/>.
         /// </summary>
         /// <param name='objectIds'>
-        /// A <see cref="System.Collections.Generic.IEnumerable&lt;T&gt;"/> of <see cref="CorrugatedIron.Models.RiakObjectId"/>.
+        /// A <see cref="System.Collections.Generic.IEnumerable&lt;T&gt;"/> of <see cref="RiakObjectId"/>.
         /// </param>
         /// <param name='options'>
         /// Delete options.
@@ -744,10 +744,10 @@ namespace CorrugatedIron
         }
 
         /// <summary>
-        /// Sets the <see cref="CorrugatedIron.Models.RiakBucketProperties"/> properties of a <paramref name="bucket"/>.
+        /// Sets the <see cref="RiakBucketProperties"/> properties of a <paramref name="bucket"/>.
         /// </summary>
         /// <returns>
-        /// A <see cref="CorrugatedIron.RiakResult"/> detailing the success or failure of the operation.
+        /// A <see cref="RiakResult"/> detailing the success or failure of the operation.
         /// </returns>
         /// <param name='bucket'>
         /// The Bucket.
@@ -755,8 +755,8 @@ namespace CorrugatedIron
         /// <param name='properties'>
         /// The Properties.
         /// </param>
-        /// <param name='useHttp'>When true, CorrugatedIron will use the HTTP interface</param>
-        /// <remarks>There is, as of CorrugatedIron 2.0, no reason to use the HTTP interface. This is kept for legacy reasons.</remarks>
+        /// <param name='useHttp'>When true, RiakClient will use the HTTP interface</param>
+        /// <remarks>There is, as of RiakClient 2.0, no reason to use the HTTP interface. This is kept for legacy reasons.</remarks>
         public RiakResult SetBucketProperties(string bucket, RiakBucketProperties properties, bool useHttp = false)
         {
             return useHttp ? SetHttpBucketProperties(bucket, properties) : SetBucketProperties(null, bucket, properties);
@@ -803,7 +803,7 @@ namespace CorrugatedIron
         /// <param name="bucket">The name of the bucket to reset the properties on.</param>
         /// <param name="useHttp">Whether or not to use the HTTP interface to Riak. Set to true for Riak 1.3 and earlier</param> 
         /// <returns>An indication of success or failure.</returns>
-        /// <remarks>There is, as of CorrugatedIron 2.0, no reason to use the HTTP interface. This is kept for legacy reasons.</remarks>
+        /// <remarks>There is, as of RiakClient 2.0, no reason to use the HTTP interface. This is kept for legacy reasons.</remarks>
         public RiakResult ResetBucketProperties(string bucket, bool useHttp = false)
         {
             return useHttp ? ResetHttpBucketProperties(bucket) : ResetPbcBucketProperties(null, bucket);

@@ -19,11 +19,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using CorrugatedIron.Extensions;
-using CorrugatedIron.Models;
+using RiakClient.Extensions;
 using NUnit.Framework;
+using RiakClient.Models;
 
-namespace CorrugatedIron.Tests.Live.Extensions
+namespace RiakClient.Tests.Live.Extensions
 {
     internal static class IntegrationTestExtensions
     {

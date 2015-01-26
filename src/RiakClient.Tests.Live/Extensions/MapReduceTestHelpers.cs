@@ -16,9 +16,9 @@
 
 using System;
 using System.Linq;
-using CorrugatedIron.Models.MapReduce;
+using RiakClient.Models.MapReduce;
 
-namespace CorrugatedIron.Tests.Live.Extensions
+namespace RiakClient.Tests.Live.Extensions
 {
     public static class MapReduceTestHelpers
     {

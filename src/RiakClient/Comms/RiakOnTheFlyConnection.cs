@@ -16,9 +16,9 @@
 // under the License.
 
 using System;
-using CorrugatedIron.Config;
+using RiakClient.Config;
 
-namespace CorrugatedIron.Comms
+namespace RiakClient.Comms
 {
     internal class RiakOnTheFlyConnection : IRiakConnectionManager
     {

@@ -14,9 +14,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Util;
+using RiakClient.Util;
 
-namespace CorrugatedIron.Tests.Live.MapReduce
+namespace RiakClient.Tests.Live.MapReduce
 {
     public abstract class RiakMapReduceTestBase : LiveRiakConnectionTestBase
     {

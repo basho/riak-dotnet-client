@@ -16,7 +16,7 @@
 
 using System;
 
-namespace CorrugatedIron.Util
+namespace RiakClient.Util
 {
     internal static class MonoUtil
     {

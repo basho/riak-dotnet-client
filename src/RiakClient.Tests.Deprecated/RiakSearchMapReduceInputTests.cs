@@ -16,20 +16,20 @@
 
 using System;
 using System.Linq;
-using CorrugatedIron.Comms;
-using CorrugatedIron.Extensions;
-using CorrugatedIron.Models;
-using CorrugatedIron.Models.MapReduce;
-using CorrugatedIron.Models.MapReduce.Inputs;
-using CorrugatedIron.Models.Search;
-using CorrugatedIron.Tests.Extensions;
-using CorrugatedIron.Tests.Live;
-using CorrugatedIron.Tests.Live.Extensions;
-using CorrugatedIron.Tests.Live.MapReduce;
-using CorrugatedIron.Util;
+using RiakClient.Extensions;
+using RiakClient.Tests.Extensions;
+using RiakClient.Tests.Live;
+using RiakClient.Tests.Live.Extensions;
 using NUnit.Framework;
+using RiakClient.Comms;
+using RiakClient.Models;
+using RiakClient.Models.MapReduce;
+using RiakClient.Models.MapReduce.Inputs;
+using RiakClient.Models.Search;
+using RiakClient.Tests.Live.MapReduce;
+using RiakClient.Util;
 
-namespace CorrugatedIron.Tests.Deprecated
+namespace RiakClient.Tests.Deprecated
 {
     [TestFixture]
     public class RiakSearchMapReduceInputTests : RiakMapReduceTestBase

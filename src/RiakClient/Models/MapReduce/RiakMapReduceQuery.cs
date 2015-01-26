@@ -15,21 +15,21 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Extensions;
-using CorrugatedIron.Messages;
-using CorrugatedIron.Models.MapReduce.Fluent;
-using CorrugatedIron.Models.MapReduce.Inputs;
-using CorrugatedIron.Models.MapReduce.KeyFilters;
-using CorrugatedIron.Models.MapReduce.Languages;
-using CorrugatedIron.Models.MapReduce.Phases;
-using CorrugatedIron.Util;
+using RiakClient.Extensions;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using RiakClient.Messages;
+using RiakClient.Models.MapReduce.Fluent;
+using RiakClient.Models.MapReduce.Inputs;
+using RiakClient.Models.MapReduce.KeyFilters;
+using RiakClient.Models.MapReduce.Languages;
+using RiakClient.Models.MapReduce.Phases;
+using RiakClient.Util;
 
-namespace CorrugatedIron.Models.MapReduce
+namespace RiakClient.Models.MapReduce
 {
     public class RiakMapReduceQuery
     {

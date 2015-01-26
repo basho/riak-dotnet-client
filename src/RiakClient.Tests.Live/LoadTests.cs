@@ -19,16 +19,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CorrugatedIron.Extensions;
-using CorrugatedIron.Models;
-using CorrugatedIron.Models.MapReduce;
-using CorrugatedIron.Models.MapReduce.Inputs;
-using CorrugatedIron.Tests.Extensions;
-using CorrugatedIron.Tests.Live;
+using RiakClient.Extensions;
+using RiakClient.Tests.Extensions;
+using RiakClient.Tests.Live;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using RiakClient.Models;
+using RiakClient.Models.MapReduce;
+using RiakClient.Models.MapReduce.Inputs;
 
-namespace CorrugatedIron.Tests.Live.LoadTests
+namespace RiakClient.Tests.Live.LoadTests
 {
     [TestFixture]
     public class WhenUnderLoad : LiveRiakConnectionTestBase

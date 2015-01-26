@@ -14,11 +14,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Messages;
 using System.Collections.ObjectModel;
 using System.Linq;
+using RiakClient.Messages;
 
-namespace CorrugatedIron.Models.Search
+namespace RiakClient.Models.Search
 {
     public class RiakSearchResult
     {

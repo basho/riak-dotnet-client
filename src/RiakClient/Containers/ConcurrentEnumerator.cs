@@ -16,7 +16,7 @@
 
 using System.Collections.Generic;
 
-namespace CorrugatedIron.Containers
+namespace RiakClient.Containers
 {
     public interface IConcurrentEnumerator<T>
     {

@@ -14,12 +14,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Util;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using RiakClient.Util;
 
-namespace CorrugatedIron.Models.Index
+namespace RiakClient.Models.Index
 {
     public class IntIndex : SecondaryIndex<IntIndex, BigInteger>
     {

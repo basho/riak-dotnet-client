@@ -14,11 +14,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Comms;
 using System;
 using System.Collections.Generic;
+using RiakClient.Comms;
 
-namespace CorrugatedIron
+namespace RiakClient
 {
     public abstract class RiakEndPoint : IRiakEndPoint
     {
@@ -26,7 +26,7 @@ namespace CorrugatedIron
         protected abstract int DefaultRetryCount { get; }
 
         /// <summary>
-        /// Creates a new instance of <see cref="CorrugatedIron.RiakClient"/>.
+        /// Creates a new instance of <see cref="RiakClient"/>.
         /// </summary>
         /// <returns>
         /// A minty fresh client.

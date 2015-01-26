@@ -17,16 +17,16 @@
 
 using System;
 using System.Linq;
-using CorrugatedIron.Extensions;
-using CorrugatedIron.Models;
-using CorrugatedIron.Models.CommitHook;
-using CorrugatedIron.Tests.Extensions;
-using CorrugatedIron.Tests.Live.Extensions;
-using CorrugatedIron.Tests.Live;
-using CorrugatedIron.Util;
+using RiakClient.Extensions;
+using RiakClient.Tests.Extensions;
+using RiakClient.Tests.Live.Extensions;
+using RiakClient.Tests.Live;
 using NUnit.Framework;
+using RiakClient.Models;
+using RiakClient.Models.CommitHook;
+using RiakClient.Util;
 
-namespace CorrugatedIron.Tests.Live.BucketPropertyTests
+namespace RiakClient.Tests.Live.BucketPropertyTests
 {
     [TestFixture]
     public class WhenDealingWithBucketProperties : LiveRiakConnectionTestBase

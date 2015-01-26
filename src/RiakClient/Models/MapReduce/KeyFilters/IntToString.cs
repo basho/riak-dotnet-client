@@ -18,7 +18,7 @@ using Newtonsoft.Json;
 using System.IO;
 using System.Text;
 
-namespace CorrugatedIron.Models.MapReduce.KeyFilters
+namespace RiakClient.Models.MapReduce.KeyFilters
 {
     /// <summary>
     /// Turns an integer (previously extracted with string_to_int), into a string.

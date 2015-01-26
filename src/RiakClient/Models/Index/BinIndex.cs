@@ -16,9 +16,9 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using CorrugatedIron.Util;
+using RiakClient.Util;
 
-namespace CorrugatedIron.Models.Index
+namespace RiakClient.Models.Index
 {
     public class BinIndex : SecondaryIndex<BinIndex, string>
     {

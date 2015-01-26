@@ -18,9 +18,9 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using CorrugatedIron.Config;
+using RiakClient.Config;
 
-namespace CorrugatedIron.Comms
+namespace RiakClient.Comms
 {
     internal class RiakConnectionPool : IRiakConnectionManager
     {

@@ -16,12 +16,12 @@
 
 using System;
 using System.Collections.Generic;
-using CorrugatedIron.Containers;
-using CorrugatedIron.Extensions;
-using CorrugatedIron.Messages;
-using CorrugatedIron.Util;
+using RiakClient.Extensions;
+using RiakClient.Containers;
+using RiakClient.Messages;
+using RiakClient.Util;
 
-namespace CorrugatedIron.Models
+namespace RiakClient.Models
 {
     public class RiakDeleteOptions
     {
@@ -29,7 +29,7 @@ namespace CorrugatedIron.Models
         /// The number of replicas that need to agree when retrieving the object.
         /// </summary>
         /// <value>The RW Value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.</value>
-        /// <remarks>Developers looking for an easy way to set this can look at <see cref="CorrugatedIron.Util.RiakConstants.QuorumOptions"/></remarks>
+        /// <remarks>Developers looking for an easy way to set this can look at <see cref="RiakConstants.QuorumOptions"/></remarks>
         public Either<uint, string> Rw { get; private set; }
 
         /// <summary>
@@ -48,14 +48,14 @@ namespace CorrugatedIron.Models
         /// <value>
         /// The R value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.
         /// </value>
-        /// <remarks>Developers looking for an easy way to set this can look at <see cref="CorrugatedIron.Util.RiakConstants.QuorumOptions"/></remarks>
+        /// <remarks>Developers looking for an easy way to set this can look at <see cref="RiakConstants.QuorumOptions"/></remarks>
         public Either<uint, string> R { get; private set; }
 
         /// <summary>
         /// The number of replicas that must respond before a write is considered a success.
         /// </summary>
         /// <value>The W value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.</value>
-        /// <remarks>Developers looking for an easy way to set this can look at <see cref="CorrugatedIron.Util.RiakConstants.QuorumOptions"/></remarks>
+        /// <remarks>Developers looking for an easy way to set this can look at <see cref="RiakConstants.QuorumOptions"/></remarks>
         public Either<uint, string> W { get; private set; }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace CorrugatedIron.Models
         /// <value>
         /// The primary read quorum. Possible values include 'default', 'one', 'quorum', 'all', or any integer.
         /// </value>
-        /// <remarks>Developers looking for an easy way to set this can look at <see cref="CorrugatedIron.Util.RiakConstants.QuorumOptions"/></remarks>
+        /// <remarks>Developers looking for an easy way to set this can look at <see cref="RiakConstants.QuorumOptions"/></remarks>
         public Either<uint, string> Pr { get; private set; }
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace CorrugatedIron.Models
         /// <value>
         /// The primary write quorum. Possible values include 'default', 'one', 'quorum', 'all', or any integer.
         /// </value>
-        /// <remarks>Developers looking for an easy way to set this can look at <see cref="CorrugatedIron.Util.RiakConstants.QuorumOptions"/></remarks>
+        /// <remarks>Developers looking for an easy way to set this can look at <see cref="RiakConstants.QuorumOptions"/></remarks>
         public Either<uint, string> Pw { get; private set; }
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace CorrugatedIron.Models
         /// <value>
         /// The durable write value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.
         /// </value>
-        /// <remarks>Developers looking for an easy way to set this can look at <see cref="CorrugatedIron.Util.RiakConstants.QuorumOptions"/></remarks>
+        /// <remarks>Developers looking for an easy way to set this can look at <see cref="RiakConstants.QuorumOptions"/></remarks>
         public Either<uint, string> Dw { get; private set; }
 
         public uint? Timeout { get; set; }

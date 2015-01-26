@@ -16,7 +16,7 @@
 
 using System;
 
-namespace CorrugatedIron.Comms
+namespace RiakClient.Comms
 {
     internal interface IRiakConnectionManager : IDisposable
     {

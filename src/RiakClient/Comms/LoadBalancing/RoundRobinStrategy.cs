@@ -18,9 +18,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using CorrugatedIron.Containers;
+using RiakClient.Containers;
 
-namespace CorrugatedIron.Comms.LoadBalancing
+namespace RiakClient.Comms.LoadBalancing
 {
     public class RoundRobinStrategy : ILoadBalancingStrategy
     {

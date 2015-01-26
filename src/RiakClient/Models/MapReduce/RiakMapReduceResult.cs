@@ -14,12 +14,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Messages;
 using System.Collections.Generic;
 using System.Linq;
-using CorrugatedIron.Extensions;
+using RiakClient.Extensions;
+using RiakClient.Messages;
 
-namespace CorrugatedIron.Models.MapReduce
+namespace RiakClient.Models.MapReduce
 {
     public class RiakMapReduceResult : IRiakMapReduceResult
     {

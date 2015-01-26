@@ -17,7 +17,7 @@
 using System.Collections.Generic;
 using System.Net;
 
-namespace CorrugatedIron.Models.Rest
+namespace RiakClient.Models.Rest
 {
     public class RiakRestResponse
     {

@@ -19,11 +19,11 @@ using System.IO;
 using System.Linq;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
-using CorrugatedIron.Config;
-using CorrugatedIron.Extensions;
-using CorrugatedIron.Messages;
+using RiakClient.Extensions;
+using RiakClient.Config;
+using RiakClient.Messages;
 
-namespace CorrugatedIron.Auth
+namespace RiakClient.Auth
 {
     internal class RiakSecurityManager
     {

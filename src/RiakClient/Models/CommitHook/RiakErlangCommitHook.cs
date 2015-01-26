@@ -15,11 +15,11 @@
 // under the License.
 
 using System;
-using CorrugatedIron.Extensions;
-using CorrugatedIron.Messages;
+using RiakClient.Extensions;
 using Newtonsoft.Json;
+using RiakClient.Messages;
 
-namespace CorrugatedIron.Models.CommitHook
+namespace RiakClient.Models.CommitHook
 {
     public class RiakErlangCommitHook : RiakCommitHook, IRiakPreCommitHook, IRiakPostCommitHook
     {

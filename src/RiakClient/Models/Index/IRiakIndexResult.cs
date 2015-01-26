@@ -16,7 +16,7 @@
 
 using System.Collections.Generic;
 
-namespace CorrugatedIron.Models.Index
+namespace RiakClient.Models.Index
 {
     public interface IRiakIndexResult
     {

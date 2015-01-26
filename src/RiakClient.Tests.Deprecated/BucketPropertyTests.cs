@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Linq;
-using CorrugatedIron.Models;
-using CorrugatedIron.Models.Search;
-using CorrugatedIron.Tests.Extensions;
-using CorrugatedIron.Tests.Live;
+using RiakClient.Tests.Extensions;
 using NUnit.Framework;
+using RiakClient.Models;
+using RiakClient.Models.Search;
+using RiakClient.Tests.Live;
 
-namespace CorrugatedIron.Tests.Deprecated
+namespace RiakClient.Tests.Deprecated
 {
     [TestFixture]
     public class WhenDealingWithBucketProperties : LiveRiakConnectionTestBase

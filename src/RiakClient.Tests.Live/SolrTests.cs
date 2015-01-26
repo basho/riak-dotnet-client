@@ -15,17 +15,17 @@
 // under the License.
 
 using System.Linq;
-using CorrugatedIron.Comms;
-using CorrugatedIron.Models.RiakSearch;
-using CorrugatedIron.Models.RiakSearch.Solr;
-using CorrugatedIron.Util;
-using CorrugatedIron.Models;
-using CorrugatedIron.Models.MapReduce;
-using CorrugatedIron.Models.MapReduce.Inputs;
-using CorrugatedIron.Tests.Extensions;
+using RiakClient.Comms;
+using RiakClient.Models.RiakSearch;
+using RiakClient.Models.RiakSearch.Solr;
+using RiakClient.Util;
+using RiakClient.Models;
+using RiakClient.Models.MapReduce;
+using RiakClient.Models.MapReduce.Inputs;
+using RiakClient.Tests.Extensions;
 using NUnit.Framework;
 
-namespace CorrugatedIron.Tests.Live
+namespace RiakClient.Tests.Live
 {
     [TestFixture]
     public class SolrTests : RiakMapReduceTests

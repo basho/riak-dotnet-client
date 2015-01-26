@@ -15,10 +15,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Models.Search;
 using Newtonsoft.Json;
+using RiakClient.Models.Search;
 
-namespace CorrugatedIron.Models.MapReduce.Inputs
+namespace RiakClient.Models.MapReduce.Inputs
 {
     public class RiakSearchInput : RiakPhaseInput
     {

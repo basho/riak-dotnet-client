@@ -14,16 +14,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CorrugatedIron.Extensions;
-using CorrugatedIron.Models;
-using CorrugatedIron.Tests.Extensions;
+using RiakClient.Extensions;
+using RiakClient.Tests.Extensions;
 using Moq;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.Linq;
-using CorrugatedIron.Util;
+using RiakClient.Util;
+using RiakClient.Models;
 
-namespace CorrugatedIron.Tests.RiakAsyncClientTests
+namespace RiakClient.Tests.RiakAsyncClientTests
 {
     internal abstract class RiakAsyncClientTestBase<TResult>
     {
