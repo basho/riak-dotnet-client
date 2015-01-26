@@ -75,22 +75,22 @@
   </Target>
 
   <PropertyGroup>
-    <SolutionFile>$(SolutionDir)CorrugatedIron.sln</SolutionFile>
+    <SolutionFile>$(SolutionDir)RiakClient.sln</SolutionFile>
     <ProjDir>$(SolutionDir)src</ProjDir>
 
     <ProtoGenExe>$(SolutionDir)tools\protobuf-net\protogen\protogen.exe</ProtoGenExe>
     <ProtoDir>$(SolutionDir)src\riak_pb\src</ProtoDir>
-    <ProtoMsgDir>$(SolutionDir)src\CorrugatedIron\Messages</ProtoMsgDir>
+    <ProtoMsgDir>$(SolutionDir)src\RiakClient\Messages</ProtoMsgDir>
     <ProtoMsgCsvFile>$(ProtoDir)\riak_pb_messages.csv</ProtoMsgCsvFile>
     <NuGetExe>$(SolutionDir).nuget\NuGet.exe</NuGetExe>
-    <NuGetSpecTemplate>$(ProjDir)\NuGet\CorrugatedIron.nuspec.template</NuGetSpecTemplate>
-    <NuGetSpecFile>$(ProjDir)\NuGet\CorrugatedIron.nuspec</NuGetSpecFile>
+    <NuGetSpecTemplate>$(ProjDir)\NuGet\RiakClient.nuspec.template</NuGetSpecTemplate>
+    <NuGetSpecFile>$(ProjDir)\NuGet\RiakClient.nuspec</NuGetSpecFile>
 
     <NUnitConsoleRunnerExe>$(SolutionDir)packages\NUnit.Runners.2.6.3\tools\nunit-console.exe -nologo -nodots</NUnitConsoleRunnerExe>
     <NUnitConsoleRunnerCommand Condition="'$(OS)' == 'Windows_NT'">$(NUnitConsoleRunnerExe) -config Debug</NUnitConsoleRunnerCommand>
     <NUnitConsoleRunnerCommand Condition="'$(OS)' != 'Windows_NT'">$(MonoExe) $(NUnitConsoleRunnerExe) -config Debug-Mono</NUnitConsoleRunnerCommand>
 
-    <CorrugatedIronPackagesConfig>$(ProjDir)\CorrugatedIron\packages.config</CorrugatedIronPackagesConfig>
+    <RiakClientPackagesConfig>$(ProjDir)\RiakClient\packages.config</RiakClientPackagesConfig>
   </PropertyGroup>
 
   <ItemGroup>
@@ -111,14 +111,14 @@
 
   <Target Name="ProtoGen">
     <Exec WorkingDirectory="$(ProtoDir)"
-          Command="$(ProtoGenExe) -ns:CorrugatedIron.Messages -i:%(ProtoFile.Identity) -o:$(ProtoMsgDir)\@(ProtoFile->'%(filename)').cs" />
+          Command="$(ProtoGenExe) -ns:RiakClient.Messages -i:%(ProtoFile.Identity) -o:$(ProtoMsgDir)\@(ProtoFile->'%(filename)').cs" />
   </Target>
 
   <Target Name="NuGetRelease" DependsOnTargets="Release">
-    <XmlQuery XmlFileName="$(CorrugatedIronPackagesConfig)" XPath="/packages/package[@id='Newtonsoft.Json']/@version">
+    <XmlQuery XmlFileName="$(RiakClientPackagesConfig)" XPath="/packages/package[@id='Newtonsoft.Json']/@version">
       <Output TaskParameter="Values" PropertyName="NewtonsoftJsonVersion" />
     </XmlQuery>
-    <XmlQuery XmlFileName="$(CorrugatedIronPackagesConfig)" XPath="/packages/package[@id='protobuf-net']/@version">
+    <XmlQuery XmlFileName="$(RiakClientPackagesConfig)" XPath="/packages/package[@id='protobuf-net']/@version">
       <Output TaskParameter="Values" PropertyName="ProtobufNetVersion" />
     </XmlQuery>
     <ItemGroup>
@@ -163,12 +163,12 @@
 
   <Target Name="IntegrationTest" DependsOnTargets="Debug">
     <Exec WorkingDirectory="$(SolutionDir)"
-          Command="$(NUnitConsoleRunnerCommand) -work=$(ProjDir)\CorrugatedIron.Tests.Live $(ProjDir)\CorrugatedIron.Tests.Live\CorrugatedIron.Tests.Live.nunit" />
+          Command="$(NUnitConsoleRunnerCommand) -work=$(ProjDir)\RiakClient.Tests.Live $(ProjDir)\RiakClient.Tests.Live\RiakClient.Tests.Live.nunit" />
   </Target>
 
   <Target Name="UnitTest" DependsOnTargets="GitSubmodule;Debug">
     <Exec WorkingDirectory="$(SolutionDir)"
-          Command="$(NUnitConsoleRunnerCommand) -work=$(ProjDir)\CorrugatedIron.Tests $(ProjDir)\CorrugatedIron.Tests\CorrugatedIron.Tests.nunit" />
+          Command="$(NUnitConsoleRunnerCommand) -work=$(ProjDir)\RiakClient.Tests $(ProjDir)\RiakClient.Tests\RiakClient.Tests.nunit" />
   </Target>
 
   <Target Name="TestAll" DependsOnTargets="UnitTest;IntegrationTest" />
@@ -179,7 +179,7 @@
 
   <Target Name="DeprecatedTest" DependsOnTargets="DeprecatedDebug">
     <Exec WorkingDirectory="$(SolutionDir)"
-          Command="$(NUnitConsoleRunnerCommand) -work=$(ProjDir)\CorrugatedIron.Tests.Deprecated $(ProjDir)\CorrugatedIron.Tests.Deprecated\CorrugatedIron.Tests.Deprecated.nunit" />
+          Command="$(NUnitConsoleRunnerCommand) -work=$(ProjDir)\RiakClient.Tests.Deprecated $(ProjDir)\RiakClient.Tests.Deprecated\RiakClient.Tests.Deprecated.nunit" />
   </Target>
 
 </Project>

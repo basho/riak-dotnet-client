@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CorrugatedIron.Tests.Deprecated</RootNamespace>
-    <AssemblyName>CorrugatedIron.Tests.Deprecated</AssemblyName>
+    <AssemblyName>RiakClient.Tests.Deprecated</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
@@ -40,17 +40,17 @@
     <Compile Include="RiakSearchMapReduceInputTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CorrugatedIron.Tests.Live\CorrugatedIron.Tests.Live.csproj">
+    <ProjectReference Include="..\RiakClient.Tests.Live\RiakClient.Tests.Live.csproj">
       <Project>{5d52e2fa-931c-4e77-bf2b-3a9f0d0cd834}</Project>
-      <Name>CorrugatedIron.Tests.Live</Name>
+      <Name>RiakClient.Tests.Live</Name>
     </ProjectReference>
-    <ProjectReference Include="..\CorrugatedIron.Tests\CorrugatedIron.Tests.csproj">
+    <ProjectReference Include="..\RiakClient.Tests\RiakClient.Tests.csproj">
       <Project>{e765cc5e-3c83-42cb-9b9a-c8af400ac0ac}</Project>
-      <Name>CorrugatedIron.Tests</Name>
+      <Name>RiakClient.Tests</Name>
     </ProjectReference>
-    <ProjectReference Include="..\CorrugatedIron\CorrugatedIron.csproj">
+    <ProjectReference Include="..\RiakClient\RiakClient.csproj">
       <Project>{a2ca0cdc-85bb-489d-99d0-3ee1d135be17}</Project>
-      <Name>CorrugatedIron</Name>
+      <Name>RiakClient</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
