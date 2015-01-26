@@ -1,12 +1,13 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
-//
+﻿// Copyright (c) 2011 - 2014 OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
+// 
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
 // except in compliance with the License.  You may obtain
 // a copy of the License at
-//
+// 
 //   http://www.apache.org/licenses/LICENSE-2.0
-//
+// 
 // Unless required by applicable law or agreed to in writing,
 // software distributed under the License is distributed on an
 // "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -15,6 +16,7 @@
 // under the License.
 
 using CorrugatedIron.Extensions;
+using CorrugatedIron.Models;
 using CorrugatedIron.Models.MapReduce;
 using CorrugatedIron.Models.MapReduce.Inputs;
 using CorrugatedIron.Tests.Extensions;
@@ -38,6 +40,9 @@ namespace CorrugatedIron.Tests.Models.MapReduce
         private const string ComplexMrJobWithFilterText =
             @"{""inputs"":{""bucket"":""animals"",""key_filters"":[[""matches"",""spider""]]},""query"":[{""map"":{""language"":""javascript"",""source"":""function(o) { return [1]; }"",""keep"":false}},{""reduce"":{""language"":""javascript"",""name"":""Riak.reduceSum"",""keep"":true}}]}";
 
+        private const string ComplexMrJobWithTypeAndFilterText =
+            @"{""inputs"":{""bucket"":[""zoo"",""animals""],""key_filters"":[[""matches"",""spider""]]},""query"":[{""map"":{""language"":""javascript"",""source"":""function(o) { return [1]; }"",""keep"":false}},{""reduce"":{""language"":""javascript"",""name"":""Riak.reduceSum"",""keep"":true}}]}";
+
         private const string MrJobWithArgumentsArray =
             @"{""inputs"":""animals"",""query"":[{""reduce"":{""language"":""javascript"",""name"":""Riak.reduceSlice"",""arg"":[1,10],""keep"":true}}]}";
 
@@ -53,9 +58,9 @@ namespace CorrugatedIron.Tests.Models.MapReduce
         public void BuildingSimpleMapReduceJobsWithTheApiProducesByteArrays()
         {
             var query = new RiakMapReduceQuery
-                {
-                    ContentType = MrContentType
-                }
+            {
+                ContentType = MrContentType
+            }
                 .Inputs("animals")
                 .MapJs(m => m.Source("function(v) { return [v]; }").Keep(true));
 
@@ -84,9 +89,9 @@ namespace CorrugatedIron.Tests.Models.MapReduce
         public void BuildingComplexMapReduceJobsWithTheApiProducesTheCorrectCommand()
         {
             var query = new RiakMapReduceQuery
-                {
-                    ContentType = MrContentType
-                }
+            {
+                ContentType = MrContentType
+            }
                 .Inputs("animals")
                 .MapJs(m => m.Source("function(o) { if (o.key.indexOf('spider') != -1) return [1]; return []; }"))
                 .ReduceJs(r => r.Name("Riak.reduceSum").Keep(true));
@@ -99,9 +104,9 @@ namespace CorrugatedIron.Tests.Models.MapReduce
         public void BuildingComplexMapReduceJobsWithFiltersProducesTheCorrectCommand()
         {
             var query = new RiakMapReduceQuery
-                {
-                    ContentType = MrContentType
-                }
+            {
+                ContentType = MrContentType
+            }
                 .Inputs("animals")
                 //.Filter(new Matches<string>("spider"))
                 .Filter(f => f.Matches("spider"))
@@ -113,13 +118,30 @@ namespace CorrugatedIron.Tests.Models.MapReduce
         }
 
         [Test]
-        public void QueryingDollarKeyDoesNotAppendBinIndexSuffix() 
+        public void BuildingComplexMapReduceJobsWithFiltersAndTypesProducesTheCorrectCommand()
         {
-            var query = new RiakMapReduceQuery 
-                {
-                    ContentType = MrContentType
-                }
-                .Inputs(RiakIndex.Range("animals", "$key", "0", "zzzzz"));
+            var query = new RiakMapReduceQuery
+            {
+                ContentType = MrContentType
+            }
+                .Inputs("animals", "zoo")
+                //.Filter(new Matches<string>("spider"))
+                .Filter(f => f.Matches("spider"))
+                .MapJs(m => m.Source("function(o) { return [1]; }"))
+                .ReduceJs(r => r.Name("Riak.reduceSum").Keep(true));
+
+            var request = query.ToMessage();
+            request.request.ShouldEqual(ComplexMrJobWithTypeAndFilterText.ToRiakString());
+        }
+
+        [Test]
+        public void QueryingDollarKeyDoesNotAppendBinIndexSuffix()
+        {
+            var query = new RiakMapReduceQuery
+            {
+                ContentType = MrContentType
+            }
+                .Inputs(RiakIndex.Range(new RiakIndexId("animals", "$key"), "0", "zzzzz"));
 
             var request = query.ToMessage();
             var requestString = request.request.FromRiakString();
@@ -133,7 +155,7 @@ namespace CorrugatedIron.Tests.Models.MapReduce
         {
             var query = new RiakMapReduceQuery { ContentType = MrContentType }
                 .Inputs("animals")
-                .ReduceJs(c => c.Name("Riak.reduceSlice").Keep(true).Argument(new [] { 1, 10 }));
+                .ReduceJs(c => c.Name("Riak.reduceSlice").Keep(true).Argument(new[] { 1, 10 }));
 
             var request = query.ToMessage();
             request.request.ShouldEqual(MrJobWithArgumentsArray.ToRiakString());
@@ -162,3 +184,4 @@ namespace CorrugatedIron.Tests.Models.MapReduce
         }
     }
 }
+

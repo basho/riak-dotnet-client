@@ -1,4 +1,5 @@
 ﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -46,12 +47,27 @@ namespace CorrugatedIron.Tests.Live
         }
 
         [SetUp]
-        public new void SetUp()
+        public override void SetUp()
         {
             base.SetUp();
         }
 
-        public void CreateLinkedObjects(string bucketName)
+        protected void CreateObjects(string bucketName)
+        {
+            var oj = new RiakObject(bucketName, OJ, new Person() { Name = "oj" });
+            var jeremiah = new RiakObject(bucketName, Jeremiah, new Person() { Name = "jeremiah" });
+            var brent = new RiakObject(bucketName, Brent, new Person() { Name = "brent" });
+            var rob = new RiakObject(bucketName, Rob, new Person() { Name = "rob" });
+
+            oj.ContentType = RiakConstants.ContentTypes.ApplicationJson;
+            jeremiah.ContentType = RiakConstants.ContentTypes.ApplicationJson;
+            brent.ContentType = RiakConstants.ContentTypes.ApplicationJson;
+            rob.ContentType = RiakConstants.ContentTypes.ApplicationJson;
+
+            Client.Put(new[] { oj, jeremiah, brent, rob });
+        }
+
+        protected void CreateLinkedObjects(string bucketName)
         {
             var oj = new RiakObject(bucketName, OJ, new Person() { Name = "oj" });
             var jeremiah = new RiakObject(bucketName, Jeremiah, new Person() { Name = "jeremiah" });
@@ -86,12 +102,12 @@ namespace CorrugatedIron.Tests.Live
         private string Bucket;
 
         [SetUp]
-        public new void SetUp()
+        public override void SetUp()
         {
             base.SetUp();
             Bucket = System.Guid.NewGuid().ToString();
 
-            CreateLinkedObjects(Bucket);
+            CreateObjects(Bucket);
 
             var props = new RiakBucketProperties().SetAllowMultiple(true);
             Client.SetBucketProperties(Bucket, props);
@@ -134,7 +150,7 @@ namespace CorrugatedIron.Tests.Live
     public class WhenCreatingLinks : RiakObjectTestBase
     {
         [SetUp]
-        public new void SetUp()
+        public override void SetUp()
         {
             base.SetUp();
             CreateLinkedObjects(TestBucket);
@@ -164,7 +180,7 @@ namespace CorrugatedIron.Tests.Live
             var jLinks = jeremiah.Links;
 
             var input = new RiakBucketKeyInput()
-                .Add(TestBucket, Jeremiah);
+                .Add(new RiakObjectId(TestBucket, Jeremiah));
 
             var query = new RiakMapReduceQuery()
                 .Inputs(input)

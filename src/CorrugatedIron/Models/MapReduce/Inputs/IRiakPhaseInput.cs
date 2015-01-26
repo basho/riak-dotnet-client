@@ -1,4 +1,5 @@
 ﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -29,10 +30,22 @@ namespace CorrugatedIron.Models.MapReduce.Inputs
     {
         public List<IRiakKeyFilterToken> Filters { get; set; }
         public abstract JsonWriter WriteJson(JsonWriter writer);
-    }
 
-    // TODO: Confirm with JP that this isn't violating LSP.
-    public abstract class RiakIndexInput : RiakPhaseInput
-    {
+        protected void WriteBucketKeyBucketJson(JsonWriter writer, string bucketType, string bucketName)
+        {
+            writer.WritePropertyName("bucket");
+
+            if (string.IsNullOrEmpty(bucketType))
+            {
+                writer.WriteValue(bucketName);
+            }
+            else
+            {
+                writer.WriteStartArray();
+                writer.WriteValue(bucketType);
+                writer.WriteValue(bucketName);
+                writer.WriteEndArray();
+            }
+        }
     }
 }

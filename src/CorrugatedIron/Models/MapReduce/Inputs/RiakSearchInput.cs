@@ -1,4 +1,4 @@
-// Copyright (c) 2011 - 2014 OJ Reeves & Jeremiah Peschka
+﻿// Copyright (c) 2011 - 2014 OJ Reeves & Jeremiah Peschka
 // Copyright (c) 2015 - Basho Technologies, Inc.
 // 
 // This file is provided to you under the Apache License,
@@ -15,38 +15,37 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
+using CorrugatedIron.Models.Search;
 using Newtonsoft.Json;
 
 namespace CorrugatedIron.Models.MapReduce.Inputs
 {
-    public class RiakBinIndexRangeInput : RiakIndexInput
+    public class RiakSearchInput : RiakPhaseInput
     {
-        [Obsolete("Use the constructor that accepts a RiakIndexId instead. This will be revoved in the next version.")]
-        public RiakBinIndexRangeInput(string bucket, string index, string start, string end)
-            : this(new RiakIndexId(bucket, index), start, end)
+        private readonly string _index;
+        private readonly string _query;
+
+        public RiakSearchInput(RiakFluentSearch query)
+            : this(query.Index, query.ToString())
         {
         }
 
-        public RiakBinIndexRangeInput(RiakIndexId indexId, string start, string end)
-            : base(indexId.ToBinIndexId())
+        public RiakSearchInput(string index, string query)
         {
-            Start = start;
-            End = end;
+            _index = index;
+            _query = query;
         }
-
-        public string Start { get; set; }
-        public string End { get; set; }
 
         public override JsonWriter WriteJson(JsonWriter writer)
         {
-            WriteIndexHeaderJson(writer);
+            writer.WritePropertyName("inputs");
+            writer.WriteStartObject();
 
-            writer.WritePropertyName("start");
-            writer.WriteValue(Start);
+            writer.WritePropertyName("index");
+            writer.WriteValue(_index);
 
-            writer.WritePropertyName("end");
-            writer.WriteValue(End);
+            writer.WritePropertyName("query");
+            writer.WriteValue(_query);
 
             writer.WriteEndObject();
 

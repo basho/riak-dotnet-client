@@ -25,13 +25,14 @@ using CorrugatedIron.Models.Search;
 using CorrugatedIron.Tests.Extensions;
 using CorrugatedIron.Tests.Live;
 using CorrugatedIron.Tests.Live.Extensions;
+using CorrugatedIron.Tests.Live.MapReduce;
 using CorrugatedIron.Util;
 using NUnit.Framework;
 
 namespace CorrugatedIron.Tests.Deprecated
 {
     [TestFixture]
-    public class RiakSearchMapReduceInputTests : RiakMapReduceTests
+    public class RiakSearchMapReduceInputTests : RiakMapReduceTestBase
     {
         private new const string Bucket = "riak_search_bucket";
         private const string RiakSearchKey = "a.hacker";
