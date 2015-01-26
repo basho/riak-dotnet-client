@@ -4,7 +4,7 @@ Release Notes
 v2.0.0
 ------
 
-* Renamed project to "RiakClient".
+* Renamed project to "Riak .NET Client".
 * Renamed namespaces from "CorrugatedIron.*" to "RiakClient.*"
 * Removed checks for slashes in key and bucket names (#184).
 

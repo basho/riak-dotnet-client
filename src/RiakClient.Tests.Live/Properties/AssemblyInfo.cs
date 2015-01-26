@@ -1,4 +1,4 @@
 ﻿using System.Reflection;
 
-[assembly: AssemblyTitle("RiakClient.Tests.Live")]
-[assembly: AssemblyDescription("Collection of live tests for the RiakClient library.")]
+[assembly: AssemblyTitle("Riak .NET Client Integration Tests")]
+[assembly: AssemblyDescription("Collection of live tests for the Riak .NET Client library.")]

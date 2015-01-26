@@ -1,9 +1,9 @@
-RiakClient - a .NET client for Riak
-=======================================
+Riak .NET Client - a .NET client for Riak
+=========================================
 
-**RiakClient** is a .NET library which makes it easy to communicate with [Riak](http://riak.basho.com/), [Basho](http://www.basho.com/)'s fault-tolerante, distributed KV store.
+**Riak .NET Client** is a .NET library which makes it easy to communicate with [Riak](http://riak.basho.com/), [Basho](http://www.basho.com/)'s fault-tolerante, distributed KV store.
 
-The easiest way to get hold of it is to install the [Nuget package](http://www.nuget.org/Packages/CorrugatedIron/).
+The easiest way to get hold of it is to install the [Nuget package](http://www.nuget.org/Packages/RiakClient/).
 
 Building From Source
 ----------------------
@@ -50,7 +50,7 @@ Please see the [Release Notes](RELNOTES.md) document.
 License
 -------
 
-**RiakClient** is Open Source software released under the Apache 2.0 License. Please see the [LICENSE](LICENSE) file for full license details.
+**Riak .NET Client** is Open Source software released under the Apache 2.0 License. Please see the [LICENSE](LICENSE) file for full license details.
 
 Regenerating .proto files
 =========================
@@ -58,7 +58,7 @@ Regenerating .proto files
 * Ensure submodules are checked out
 * `.\make.cmd ProtoGen`
 
-RiakClient Deployment Process
+Riak .NET Client Deployment Process
 =================================
 
 * Merge all required feature branches into develop.
@@ -76,7 +76,7 @@ RiakClient Deployment Process
 
 Give yourself a pat on the back and have some tea.
 
-RiakClient Roadmap
+Riak .NET Client Roadmap
 ======================
 
 ### Cluster and node info
@@ -93,7 +93,7 @@ Create an HTTP interface for [Faceted queries vi the Solr Interface](http://wiki
 Thanks
 ======
 
-The following people have contributed to RiakClient, it's predecessor CorrugatedIron, or one of the related libraries or applications that make it work:
+The following people have contributed to Riak .NET Client, it's predecessor CorrugatedIron, or one of the related libraries or applications that make it work:
 
 * Jeremiah Peschka
 * OJ Reeves
