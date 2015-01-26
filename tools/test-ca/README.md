@@ -79,7 +79,7 @@ Ensure that `riak-test` is an alias for `127.0.0.1` (or the appropriate
 IP address) in your `hosts` file.
 
 ```
-curl -vvv4 --cacert ~/Projects/basho/CorrugatedIron/tools/test-ca/certs/cacert.pem https://riak-test:10418/stats
+curl -vvv4 --cacert ~/Projects/basho/riak-dotnet-client/tools/test-ca/certs/cacert.pem https://riak-test:10418/stats
 ```
 
 ### Resources

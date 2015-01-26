@@ -4,6 +4,8 @@ Release Notes
 v2.0.0
 ------
 
+* Renamed project to "Riak .NET Client".
+* Renamed namespaces from "CorrugatedIron.*" to "RiakClient.*"
 * Removed checks for slashes in key and bucket names (#184).
 
 v1.4.2
@@ -42,7 +44,7 @@ v1.3.3
 
 ### Fixes
 
-* [Issue 123](https://github.com/DistributedNonsense/CorrugatedIron/issues/123) - Added `RiakGetOptions` to the `IRiakClient` interface. This breaks the previous `Get` methods that relied on the old mechanism using `uint` for R (the methods were marked as obsolete anyway, so nobody should have been using them.
+* [Issue 123](https://github.com/basho-labs/riak-dotnet-client/issues/123) - Added `RiakGetOptions` to the `IRiakClient` interface. This breaks the previous `Get` methods that relied on the old mechanism using `uint` for R (the methods were marked as obsolete anyway, so nobody should have been using them.
 
 v1.3.2
 ------
@@ -53,8 +55,8 @@ v1.3.2
 
 ### Fixes
 
-* [Issue 120](https://github.com/DistributedNonsense/CorrugatedIron/issues/120) - Update both `RiakBucketKeyInput` and `RiakBucketKeyKeyDataInput` classes so that their APIs are a little nicer to use. This also results in a bug fix in `RiakBucketKeyKeyDataInput` where the serialisation was (rather horribly) incorrect.
-* [Issue 115](https://github.com/DistributedNonsense/CorrugatedIron/issues/115) - Fix problem where secondary indexes are not forced to lower case (like they are in Riak).
+* [Issue 120](https://github.com/basho-labs/riak-dotnet-client/issues/120) - Update both `RiakBucketKeyInput` and `RiakBucketKeyKeyDataInput` classes so that their APIs are a little nicer to use. This also results in a bug fix in `RiakBucketKeyKeyDataInput` where the serialisation was (rather horribly) incorrect.
+* [Issue 115](https://github.com/basho-labs/riak-dotnet-client/issues/115) - Fix problem where secondary indexes are not forced to lower case (like they are in Riak).
 
 v1.3.1
 ------
@@ -63,7 +65,7 @@ This is a small bug fix release.
 
 ### Fixes
 
-* [Issue 118](https://github.com/DistributedNonsense/CorrugatedIron/issues/118) - Fix problem where the Riak Search API didn't provide all the fields available when doing searches in Riak.
+* [Issue 118](https://github.com/basho-labs/riak-dotnet-client/issues/118) - Fix problem where the Riak Search API didn't provide all the fields available when doing searches in Riak.
 
 v1.3.0
 ------
@@ -74,14 +76,14 @@ This version also includes a change which "breaks" the interface to integer seco
 
 ## Features
 
-* [Issue 111](https://github.com/DistributedNonsense/CorrugatedIron/issues/111) - Add support for per-node on-the-fly connections.
-* [Issue 109](https://github.com/DistributedNonsense/CorrugatedIron/issues/109) - Add `Binary` to the `CharSet` constants and add some docs.
+* [Issue 111](https://github.com/basho-labs/riak-dotnet-client/issues/111) - Add support for per-node on-the-fly connections.
+* [Issue 109](https://github.com/basho-labs/riak-dotnet-client/issues/109) - Add `Binary` to the `CharSet` constants and add some docs.
 
 ### Fixes
 
-* [Issue 112](https://github.com/DistributedNonsense/CorrugatedIron/issues/112) - Prevent invalid bucket/keys names.
-* [Issue 106](https://github.com/DistributedNonsense/CorrugatedIron/issues/106) - Fix problem where the `arg` parameter for Map/Reduce jobs was only supporting string elements. Now supports value types, collections and complex objects.
-* [Issue 105](https://github.com/DistributedNonsense/CorrugatedIron/issues/106) - Fixed 2i implementation to use `BigInteger` instead of `int`.
+* [Issue 112](https://github.com/basho-labs/riak-dotnet-client/issues/112) - Prevent invalid bucket/keys names.
+* [Issue 106](https://github.com/basho-labs/riak-dotnet-client/issues/106) - Fix problem where the `arg` parameter for Map/Reduce jobs was only supporting string elements. Now supports value types, collections and complex objects.
+* [Issue 105](https://github.com/basho-labs/riak-dotnet-client/issues/106) - Fixed 2i implementation to use `BigInteger` instead of `int`.
 
 
 ## Thanks
@@ -100,9 +102,9 @@ v1.2.1
 
 ### Fixes
 
-* [Issue 103](https://github.com/DistributedNonsense/CorrugatedIron/issues/103) - Add ListKeysFromIndex to IRiakClient.
-* [Issue 100](https://github.com/DistributedNonsense/CorrugatedIron/issues/100) - Slight refactor of Batch() to use TPL.
-* [Issue 94](https://github.com/DistributedNonsense/CorrugatedIron/issues/94) - Riak 1.3 Reset Bucket Properties functionality.
+* [Issue 103](https://github.com/basho-labs/riak-dotnet-client/issues/103) - Add ListKeysFromIndex to IRiakClient.
+* [Issue 100](https://github.com/basho-labs/riak-dotnet-client/issues/100) - Slight refactor of Batch() to use TPL.
+* [Issue 94](https://github.com/basho-labs/riak-dotnet-client/issues/94) - Riak 1.3 Reset Bucket Properties functionality.
 
 v1.2.0
 ------
@@ -122,14 +124,14 @@ In addition to the issues listed below, we also fixed a bug where some Riak MapR
 
 We were incorrectly handling Map/Reduce results when multiple tuples were returned within the same protocol buffer message from Riak. CorrugatedIron would only consume a single tuple from each message. This has been fixed within CI.
 
-* [Issue 91](https://github.com/DistributedNonsense/CorrugatedIron/issues/91) - Remove evidence of LastModifiedDate munging.
-* [Issue 90](https://github.com/DistributedNonsense/CorrugatedIron/issues/90) - Remove minor perf issue in `WalkLinks`.
-* [Issue 89](https://github.com/DistributedNonsense/CorrugatedIron/issues/89) - Remove unused code `CondenseResult`.
-* [Issue 80](https://github.com/DistributedNonsense/CorrugatedIron/issues/80) - `$key` is auto-mucked to `$key_bin` .
-* [Issue 78](https://github.com/DistributedNonsense/CorrugatedIron/issues/78) - Enabling search via `SetBucketProperties()` now correctly enabled the search pre-commit hook.
-* [Issue 72](https://github.com/DistributedNonsense/CorrugatedIron/issues/72) - XML documentation is now included in the Nuget package for better support from Intellisense.
-* [Issue 71](https://github.com/DistributedNonsense/CorrugatedIron/issues/71) - Getting extended properties on a new bucket no longer throws exceptions.
-* [Issue 67](https://github.com/DistributedNonsense/CorrugatedIron/issues/67) - Finally added support for the `Either<TLeft, TRight>` on all options.
+* [Issue 91](https://github.com/basho-labs/riak-dotnet-client/issues/91) - Remove evidence of LastModifiedDate munging.
+* [Issue 90](https://github.com/basho-labs/riak-dotnet-client/issues/90) - Remove minor perf issue in `WalkLinks`.
+* [Issue 89](https://github.com/basho-labs/riak-dotnet-client/issues/89) - Remove unused code `CondenseResult`.
+* [Issue 80](https://github.com/basho-labs/riak-dotnet-client/issues/80) - `$key` is auto-mucked to `$key_bin` .
+* [Issue 78](https://github.com/basho-labs/riak-dotnet-client/issues/78) - Enabling search via `SetBucketProperties()` now correctly enabled the search pre-commit hook.
+* [Issue 72](https://github.com/basho-labs/riak-dotnet-client/issues/72) - XML documentation is now included in the Nuget package for better support from Intellisense.
+* [Issue 71](https://github.com/basho-labs/riak-dotnet-client/issues/71) - Getting extended properties on a new bucket no longer throws exceptions.
+* [Issue 67](https://github.com/basho-labs/riak-dotnet-client/issues/67) - Finally added support for the `Either<TLeft, TRight>` on all options.
 
 ### Thanks
 
@@ -140,7 +142,7 @@ v1.1.0
 
 ### Fixes
 
- * [Issue 69](https://github.com/DistributedNonsense/CorrugatedIron/issues/69) - Multiple values can now be stored in Secondary Indexes .
+ * [Issue 69](https://github.com/basho-labs/riak-dotnet-client/issues/69) - Multiple values can now be stored in Secondary Indexes .
 
 v1.0.0
 ------
@@ -163,8 +165,8 @@ v1.0.0
 
 ### Fixes
 
-* [Issue 57](https://github.com/DistributedNonsense/CorrugatedIron/issues/57) - `Set<T>()` operations no longer require a content type.
-* [Issue 53](https://github.com/DistributedNonsense/CorrugatedIron/issues/54) - Linux & OSX builds now correctly resolve their deps.
+* [Issue 57](https://github.com/basho-labs/riak-dotnet-client/issues/57) - `Set<T>()` operations no longer require a content type.
+* [Issue 53](https://github.com/basho-labs/riak-dotnet-client/issues/54) - Linux & OSX builds now correctly resolve their deps.
 
 ### Thanks
 
@@ -204,7 +206,7 @@ To make life easier for developers we've added a GetIndex method. Developers who
 We think that this will make it easier for developers to work with secondary indexes in Riak.
 
 #### Configuration
-After a bit of work and time on OJ's part (everybody thank OJ), we've pushed out fluent configuration code. The relevant code is in [`RiakClusterConfiguration`](https://github.com/DistributedNonsense/CorrugatedIron/blob/master/CorrugatedIron/Config/Fluent/RiakClusterConfiguration.cs), [`RiakNodeConfiguration`](https://github.com/DistributedNonsense/CorrugatedIron/blob/master/CorrugatedIron/Config/Fluent/RiakNodeConfiguration.cs), and [`RiakExternalLoadBalancerConfiguration`](https://github.com/DistributedNonsense/CorrugatedIron/blob/master/CorrugatedIron/Config/Fluent/RiakExternalLoadBalancerConfiguration.cs).
+After a bit of work and time on OJ's part (everybody thank OJ), we've pushed out fluent configuration code. The relevant code is in [`RiakClusterConfiguration`](https://github.com/basho-labs/riak-dotnet-client/blob/master/CorrugatedIron/Config/Fluent/RiakClusterConfiguration.cs), [`RiakNodeConfiguration`](https://github.com/basho-labs/riak-dotnet-client/blob/master/CorrugatedIron/Config/Fluent/RiakNodeConfiguration.cs), and [`RiakExternalLoadBalancerConfiguration`](https://github.com/basho-labs/riak-dotnet-client/blob/master/CorrugatedIron/Config/Fluent/RiakExternalLoadBalancerConfiguration.cs).
 
 ### Fixes
 

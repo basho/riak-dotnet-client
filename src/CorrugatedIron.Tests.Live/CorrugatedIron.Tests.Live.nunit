@@ -1,9 +1,0 @@
-﻿<NUnitProject>
-  <Settings activeconfig="Debug" processModel="Default" domainUsage="Default" />
-  <Config name="Debug" binpathtype="Auto" runtimeFramework="v4.0.21006" configfile="bin\Debug\CorrugatedIron.Tests.Live.dll.config">
-    <assembly path="bin\Debug\CorrugatedIron.Tests.Live.dll" />
-  </Config>
-  <Config name="Debug-Mono" binpathtype="Auto" runtimeFramework="v4.0.21006" configfile="bin/Debug/CorrugatedIron.Tests.Live.dll.config">
-    <assembly path="bin/Debug/CorrugatedIron.Tests.Live.dll" />
-  </Config>
-</NUnitProject>
