@@ -53,7 +53,6 @@ Write-Debug "GitHub API Key '$github_api_key'"
 
 $release_info = New-Object PSObject -Property @{
         tag_name = $VersionString
-        target_commitish = "master"
         name = $VersionString
         body ="riak-dotnet-client $VersionString"
         draft = $false
