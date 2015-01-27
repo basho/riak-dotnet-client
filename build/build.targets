@@ -38,6 +38,10 @@
       <Output TaskParameter="Tag" PropertyName="VersionString" />
     </GitDescribe>
 
+    <GitDescribe LocalPath="$(SolutionDir)" Condition="'$(Configuration)' == 'Release' And '$(VersionString)' != 'unknown'">
+      <Output TaskParameter="CommitHash" PropertyName="GitCommitHash" />
+    </GitDescribe>
+
     <Message Text="Parsing VersionString: $(VersionString)" />
 
     <!--
@@ -97,6 +101,9 @@
     <PropertyGroup Condition="'$(VPreRelease)' != ''">
       <NuGetVersion>$(VMajor).$(VMinor).$(VPatch)-$(VPreRelease)</NuGetVersion>
     </PropertyGroup>
+    <PropertyGroup>
+      <GitTagVersion>v$(NuGetVersion)</GitTagVersion>
+    </PropertyGroup>
   </Target>
 
   <Target Name="PublishMergeMasterAndTag" DependsOnTargets="PublishValidateOnDevelopBranch">
@@ -106,7 +113,7 @@
     <GitClient Command="clean" Arguments="-fxd" LocalPath="$(SolutionDir)" />
     <Message Text="Merging '$(DevelopBranchName)' into '$(MasterBranchName)' NOTE: this will fail if the merge can't be done via fast-forward!" />
     <GitClient Command="merge" Arguments="--no-ff --commit --ff-only $(DevelopBranchName)" LocalPath="$(SolutionDir)" />
-    <GitClient Command="tag" Arguments="--message &quot;riak-dotnet-client $(NuGetVersion)&quot; &quot;$(NuGetVersion)&quot;" LocalPath="$(SolutionDir)" />
+    <GitClient Command="tag" Arguments="--message &quot;riak-dotnet-client $(NuGetVersion)&quot; &quot;$(GitTagVersion)&quot;" LocalPath="$(SolutionDir)" />
   </Target>
 
   <Target Name="GenerateCommonAssemblyInfo" DependsOnTargets="PopulateVersionInformation">
