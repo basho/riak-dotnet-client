@@ -158,6 +158,8 @@
     <NUnitConsoleRunnerCommand Condition="'$(OS)' != 'Windows_NT'">$(MonoExe) $(NUnitConsoleRunnerExe) -config Debug-Mono</NUnitConsoleRunnerCommand>
 
     <RiakClientPackagesConfig>$(ProjDir)\RiakClient\packages.config</RiakClientPackagesConfig>
+
+    <PowerShellExe Condition="'$(PowerShellExe)'== ''">$(WINDIR)\System32\WindowsPowerShell\v1.0\powershell.exe</PowerShellExe>
   </PropertyGroup>
 
   <ItemGroup>
@@ -207,8 +209,13 @@
           Command="$(NuGetExe) push -NonInteractive -Verbosity normal *.nupkg" />
   </Target>
 
+  <Target Name="PublishGitHubRelease" DependsOnTargets="PublishValidation">
+    <Exec WorkingDirectory="$(SolutionDir)"
+          Command="$(PowerShellExe) -NonInteractive -NoProfile -ExecutionPolicy Bypass -File $(SolutionDir)build\create-github-release.ps1 $(VersionString)" />
+  </Target>
+
   <Target Name="Publish"
-          DependsOnTargets="PublishValidation;TestAll;PublishMergeMasterAndTag;Release;PublishNuGetPackage" />
+          DependsOnTargets="PublishValidation;TestAll;PublishMergeMasterAndTag;Release;PublishNuGetPackage;PublishGitHubRelease" />
 
   <Target Name="GitSubmodule" Condition="!Exists('$(ProtoMsgCsvFile)')">
     <GitClient Command="submodule" Arguments="update --init" LocalPath="$(SolutionDir)" />
