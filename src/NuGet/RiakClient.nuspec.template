@@ -58,6 +58,7 @@
     <file src="..\RiakClient\bin\Release\RiakClient.pdb" target="lib\net40" />
     <file src="..\RiakClient\bin\Release\RiakClient.xml" target="lib\net40" />
     <file src="..\RiakClient\**\*.cs" target="src" />
+    <file src="..\CommonAssemblyInfo.cs" target="src" />
   </files>
 </package>
 
