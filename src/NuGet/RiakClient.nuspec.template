@@ -20,6 +20,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>RiakClient</id>
+    <title>Riak .NET Client</title>
     <version>${VERSION}</version>
     <authors>OJ Reeves, Jeremiah Peschka, Alex Moore, Luke Bakken</authors>
     <owners>Basho Technologies, Inc.</owners>
