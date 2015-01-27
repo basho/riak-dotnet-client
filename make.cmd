@@ -33,11 +33,14 @@ if (%TARGET%)==() set TARGET=Debug
 set VERBOSITY=%2
 if (%VERBOSITY%)==() set VERBOSITY=Normal
 
+set VERSIONSTRING=%3
+if not (%VERSIONSTRING%)==() set VERSIONPROPERTY=/property:VersionString=%VERSIONSTRING%
+
 %NUGETEXE% restore -PackagesDirectory %CURDIR%\packages .nuget\packages.config
 if errorlevel 1 goto ERR_FAILED
 
 rem NB: this will always do build for Release *and* Debug configuration
-%MSBUILDEXE% /verbosity:%VERBOSITY% /nologo /m /property:SolutionDir=%CURDIR% /target:%TARGET% %CURDIR%\build\build.targets
+%MSBUILDEXE% /verbosity:%VERBOSITY% /nologo /m /property:SolutionDir=%CURDIR% %VERSIONPROPERTY% /target:%TARGET% %CURDIR%\build\build.targets
 if errorlevel 1 goto ERR_FAILED
 
 echo.

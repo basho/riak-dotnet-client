@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!--
 // Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -19,13 +20,15 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>RiakClient</id>
+    <title>Riak .NET Client</title>
     <version>${VERSION}</version>
     <authors>OJ Reeves, Jeremiah Peschka, Alex Moore, Luke Bakken</authors>
-    <owners>OJ Reeves, Jeremiah Peschka, Basho Technologies Inc.</owners>
+    <owners>Basho Technologies, Inc.</owners>
+    <copyright>© 2011-2014 OJ Reeves &amp; Jeremiah Peschka / © 2015 Basho Technologies, Inc.</copyright>
     <description>
       Riak .NET Client - the .NET client for Riak.
 
-      Riak is a distributed, fault tolerant, highly-available Key/Value store written by Basho Technologies. Riak is Open Source and written in Erlang. Riak .NET Client exposes the features of Riak through a developer-friendly API.
+      Riak is a distributed, fault tolerant, highly-available Key/Value store written by Basho Technologies. Riak .NET Client exposes the features of Riak through a developer-friendly API.
 
       After installing this package, make sure that you modify either the app.config (for client apps) or web.config (for web apps) so that the details of the target Riak cluster are set correctly.
 
@@ -36,9 +39,9 @@
     </summary>
     <projectUrl>http://corrugatediron.org/</projectUrl>
     <iconUrl>http://corrugatediron.org/nugeticon.png</iconUrl>
-    <licenseUrl>http://corrugatediron.org/LICENSE.txt</licenseUrl>
+    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <tags>Riak .NET RiakClient CorrugatedIron Corrugated Iron NoSQL Client Driver Distributed</tags>
+    <tags>Riak .NET Client riak-dotnet-client CorrugatedIron Corrugated Iron NoSQL Client Driver Distributed</tags>
     <dependencies>
       <dependency id="Newtonsoft.Json" version="${NEWTONSOFT_JSON_VERSION}" />
       <dependency id="protobuf-net" version="${PROTOBUF_NET_VERSION}" />
@@ -55,5 +58,7 @@
     <file src="..\RiakClient\bin\Release\RiakClient.pdb" target="lib\net40" />
     <file src="..\RiakClient\bin\Release\RiakClient.xml" target="lib\net40" />
     <file src="..\RiakClient\**\*.cs" target="src" />
+    <file src="..\CommonAssemblyInfo.cs" target="src" />
   </files>
 </package>
+

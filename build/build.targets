@@ -19,46 +19,112 @@
     <Configuration>Release</Configuration>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <VersionString Condition="'$(Configuration)' == 'Release'">unknown</VersionString>
+    <VersionString Condition="'$(Configuration)' != 'Release'">v0.0.0</VersionString>
+    <GitCommitHash>unknown</GitCommitHash>
+    <MasterBranchName>master</MasterBranchName>
+    <DevelopBranchName>develop</DevelopBranchName>
+  </PropertyGroup>
+
   <Target Name="CleanCommonAssemblyInfo">
     <Delete Files="$(CommonAssemblyInfoFile)" />
   </Target>
 
-  <Target Name="GenerateCommonAssemblyInfo">
+  <Target Name="PopulateVersionInformation">
 
-    <PropertyGroup>
-      <VMajor>0</VMajor>
-      <VMinor>0</VMinor>
-      <VPatch>0</VPatch>
-      <VBuildVer>0</VBuildVer>
-      <GitCommitHash>unknown</GitCommitHash>
-    </PropertyGroup>
-
-    <Time>
-      <Output TaskParameter="Year" PropertyName="Year" />
-    </Time>
-
-    <GitDescribe LocalPath="$(SolutionDir)" Condition="'$(Configuration)' == 'Release'">
+    <GitDescribe LocalPath="$(SolutionDir)" Condition="'$(VersionString)' == 'unknown'">
       <Output TaskParameter="CommitHash" PropertyName="GitCommitHash" />
-      <Output TaskParameter="Tag" PropertyName="GitTag" />
+      <Output TaskParameter="Tag" PropertyName="VersionString" />
     </GitDescribe>
+
+    <GitDescribe LocalPath="$(SolutionDir)" Condition="'$(Configuration)' == 'Release' And '$(VersionString)' != 'unknown'">
+      <Output TaskParameter="CommitHash" PropertyName="GitCommitHash" />
+    </GitDescribe>
+
+    <Message Text="Parsing VersionString: $(VersionString)" />
 
     <!--
       NB: these regexes are Mono and Windows compatible. "\." to represent literal period
           does not work on Mono 3.10
     -->
-    <RegexReplace Input="$(GitTag)" Expression="v([0-9])[.][0-9][.][0-9]" Replacement="$1" Count="1" Condition="'$(Configuration)' == 'Release'">
+    <RegexReplace Input="$(VersionString)" Expression="v([0-9])[.][0-9][.][0-9](-[a-z0-9]+)?" Replacement="$1" Count="1">
       <Output PropertyName="VMajor" TaskParameter="Output" />
     </RegexReplace>
-    <RegexReplace Input="$(GitTag)" Expression="v[0-9][.]([0-9])[.][0-9]" Replacement="$1" Count="1" Condition="'$(Configuration)' == 'Release'">
+    <RegexReplace Input="$(VersionString)" Expression="v[0-9][.]([0-9])[.][0-9](-[a-z0-9]+)?" Replacement="$1" Count="1">
       <Output PropertyName="VMinor" TaskParameter="Output" />
     </RegexReplace>
-    <RegexReplace Input="$(GitTag)" Expression="v[0-9][.][0-9][.]([0-9])" Replacement="$1" Count="1" Condition="'$(Configuration)' == 'Release'">
+    <RegexReplace Input="$(VersionString)" Expression="v[0-9][.][0-9][.]([0-9])(-[a-z0-9]+)?" Replacement="$1" Count="1">
       <Output PropertyName="VPatch" TaskParameter="Output" />
     </RegexReplace>
+    <RegexReplace Input="$(VersionString)" Expression="v[0-9][.][0-9][.][0-9]-([a-z0-9]+)?" Replacement="$1" Count="1">
+      <Output PropertyName="VPreRelease" TaskParameter="Output" />
+    </RegexReplace>
+  </Target>
 
-    <Message Text="GitTag: $(GitTag) Version: $(VMajor).$(VMinor).$(VPatch).$(VBuildVer) Commit hash: $(GitCommitHash)"/>
+  <Target Name="PublishValidateOnDevelopBranch">
+    <!-- Validate that we are on develop branch -->
+    <GitBranch LocalPath="$(SolutionDir)">
+      <Output TaskParameter="Branch" PropertyName="GitBranch" />
+    </GitBranch>
+    <Error Condition="'$(GitBranch)' != '$(DevelopBranchName)'"
+           Text="Please ensure all features have been merged into $(DevelopBranchName) and that you are on the $(DevelopBranchName) branch." />
+  </Target>
+
+  <Target Name="PublishValidateVersionString">
+    <Error Condition="'$(VersionString)' == '' Or '$(VersionString)' == 'unknown'"
+           Text="Must set VersionString property on command line!" />
+  </Target>
+
+  <Target Name="PublishValidation" DependsOnTargets="PublishValidateVersionString;PublishValidateOnDevelopBranch;PopulateVersionInformation">
+    <!-- Validate parsed VersionString -->
+    <RegexMatch Input="$(VMajor)" Expression="^[1-9]$">
+      <Output PropertyName="VMajorValidated" TaskParameter="Output" />
+    </RegexMatch>
+    <Error Condition="'$(VMajorValidated)' == '' Or (!($(VMajorValidated) &gt; 0))"
+           Text="VersionString must be in vX.Y.Z-PreRelStr where X &gt; 0 and -PreRelStr is optional" />
+    <RegexMatch Input="$(VMinor)" Expression="^[0-9]$">
+      <Output PropertyName="VMinorValidated" TaskParameter="Output" />
+    </RegexMatch>
+    <Error Condition="'$(VMinorValidated)' == '' Or (!($(VMajorValidated) &gt;= 0))"
+           Text="VersionString must be in vX.Y.Z-PreRelStr where X &gt; 0 and -PreRelStr is optional" />
+    <RegexMatch Input="$(VPatch)" Expression="^[0-9]$">
+      <Output PropertyName="VPatchValidated" TaskParameter="Output" />
+    </RegexMatch>
+    <Error Condition="'$(VPatchValidated)' == '' Or (!($(VMajorValidated) &gt;= 0))"
+           Text="VersionString must be in vX.Y.Z-PreRelStr where X &gt; 0 and -PreRelStr is optional" />
+
+    <PropertyGroup Condition="'$(VPreRelease)' == ''">
+      <NuGetVersion>$(VMajor).$(VMinor).$(VPatch)</NuGetVersion>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(VPreRelease)' != ''">
+      <NuGetVersion>$(VMajor).$(VMinor).$(VPatch)-$(VPreRelease)</NuGetVersion>
+    </PropertyGroup>
+    <PropertyGroup>
+      <GitTagVersion>v$(NuGetVersion)</GitTagVersion>
+    </PropertyGroup>
+  </Target>
+
+  <Target Name="PublishMergeMasterAndTag" DependsOnTargets="PublishValidateOnDevelopBranch">
+    <Message Text="Checking out '$(MasterBranchName)' branch" />
+    <GitClient Command="checkout" Arguments="$(MasterBranchName)" LocalPath="$(SolutionDir)" />
+    <Message Text="Cleaning '$(MasterBranchName)' branch" />
+    <GitClient Command="clean" Arguments="-fxd" LocalPath="$(SolutionDir)" />
+    <Message Text="Merging '$(DevelopBranchName)' into '$(MasterBranchName)' NOTE: this will fail if the merge can't be done via fast-forward!" />
+    <GitClient Command="merge" Arguments="--no-ff --commit --ff-only $(DevelopBranchName)" LocalPath="$(SolutionDir)" />
+    <GitClient Command="tag" Arguments="--message &quot;riak-dotnet-client $(NuGetVersion)&quot; &quot;$(GitTagVersion)&quot;" LocalPath="$(SolutionDir)" />
+  </Target>
+
+  <Target Name="GenerateCommonAssemblyInfo" DependsOnTargets="PopulateVersionInformation">
+
+    <Message Text="VersionString: $(VersionString) Version: $(VMajor).$(VMinor).$(VPatch) PreRelease: $(VPreRelease) Commit hash: $(GitCommitHash)"/>
+
+    <Time>
+      <Output TaskParameter="Year" PropertyName="Year" />
+    </Time>
 
     <Attrib Files="$(CommonAssemblyInfoFile)" ReadOnly="False" />
+
     <!-- http://stackoverflow.com/questions/64602/what-are-differences-between-assemblyversion-assemblyfileversion-and-assemblyin -->
     <AssemblyInfo CodeLanguage="CS"
                   OutputFile="$(SolutionDir)src\CommonAssemblyInfo.cs"
@@ -69,8 +135,8 @@
                   AssemblyTrademark="riak-dotnet-client"
                   AssemblyCulture=""
                   AssemblyConfiguration="$(Configuration)"
-                  AssemblyVersion="$(VMajor).$(VMinor).0.0"
-                  AssemblyFileVersion="$(VMajor).$(VMinor).$(VPatch).$(VBuildVer)"
+                  AssemblyVersion="$(VMajor).0.0"
+                  AssemblyFileVersion="$(VMajor).$(VMinor).$(VPatch)"
                   AssemblyInformationalVersion="$(GitCommitHash)" />
   </Target>
 
@@ -83,14 +149,17 @@
     <ProtoMsgDir>$(SolutionDir)src\RiakClient\Messages</ProtoMsgDir>
     <ProtoMsgCsvFile>$(ProtoDir)\riak_pb_messages.csv</ProtoMsgCsvFile>
     <NuGetExe>$(SolutionDir).nuget\NuGet.exe</NuGetExe>
-    <NuGetSpecTemplate>$(ProjDir)\NuGet\RiakClient.nuspec.template</NuGetSpecTemplate>
-    <NuGetSpecFile>$(ProjDir)\NuGet\RiakClient.nuspec</NuGetSpecFile>
+    <NuGetDir>$(ProjDir)\NuGet</NuGetDir>
+    <NuGetSpecTemplate>$(NuGetDir)\RiakClient.nuspec.template</NuGetSpecTemplate>
+    <NuGetSpecFile>$(NuGetDir)\RiakClient.nuspec</NuGetSpecFile>
 
     <NUnitConsoleRunnerExe>$(SolutionDir)packages\NUnit.Runners.2.6.3\tools\nunit-console.exe -nologo -nodots</NUnitConsoleRunnerExe>
     <NUnitConsoleRunnerCommand Condition="'$(OS)' == 'Windows_NT'">$(NUnitConsoleRunnerExe) -config Debug</NUnitConsoleRunnerCommand>
     <NUnitConsoleRunnerCommand Condition="'$(OS)' != 'Windows_NT'">$(MonoExe) $(NUnitConsoleRunnerExe) -config Debug-Mono</NUnitConsoleRunnerCommand>
 
     <RiakClientPackagesConfig>$(ProjDir)\RiakClient\packages.config</RiakClientPackagesConfig>
+
+    <PowerShellExe Condition="'$(PowerShellExe)'== ''">$(WINDIR)\System32\WindowsPowerShell\v1.0\powershell.exe</PowerShellExe>
   </PropertyGroup>
 
   <ItemGroup>
@@ -114,16 +183,17 @@
           Command="$(ProtoGenExe) -ns:RiakClient.Messages -i:%(ProtoFile.Identity) -o:$(ProtoMsgDir)\@(ProtoFile->'%(filename)').cs" />
   </Target>
 
-  <Target Name="NuGetRelease" DependsOnTargets="Release">
+  <Target Name="PublishNuGetPackage" DependsOnTargets="PublishValidation">
     <XmlQuery XmlFileName="$(RiakClientPackagesConfig)" XPath="/packages/package[@id='Newtonsoft.Json']/@version">
       <Output TaskParameter="Values" PropertyName="NewtonsoftJsonVersion" />
     </XmlQuery>
     <XmlQuery XmlFileName="$(RiakClientPackagesConfig)" XPath="/packages/package[@id='protobuf-net']/@version">
       <Output TaskParameter="Values" PropertyName="ProtobufNetVersion" />
     </XmlQuery>
+
     <ItemGroup>
       <Tokens Include="VERSION">
-        <ReplacementValue>$(VMajor).$(VMinor).$(VPatch)</ReplacementValue>
+        <ReplacementValue>$(NuGetVersion)</ReplacementValue>
       </Tokens>
       <Tokens Include="NEWTONSOFT_JSON_VERSION">
         <ReplacementValue>$(NewtonsoftJsonVersion)</ReplacementValue>
@@ -133,9 +203,19 @@
       </Tokens>
     </ItemGroup>
     <TemplateFile Template="$(NuGetSpecTemplate)" OutputFileName="$(NuGetSpecFile)" Tokens="@(Tokens)" />
-    <Exec WorkingDirectory="$(ProjDir)\NuGet"
+    <Exec WorkingDirectory="$(NuGetDir)"
           Command="$(NuGetExe) pack -Symbols -Verbosity normal $(NuGetSpecFile)" />
+    <Exec WorkingDirectory="$(NuGetDir)"
+          Command="$(NuGetExe) push -NonInteractive -Verbosity normal *.nupkg" />
   </Target>
+
+  <Target Name="PublishGitHubRelease" DependsOnTargets="PublishValidation">
+    <Exec WorkingDirectory="$(SolutionDir)"
+          Command="$(PowerShellExe) -NonInteractive -NoProfile -ExecutionPolicy Bypass -File $(SolutionDir)build\create-github-release.ps1 $(VersionString)" />
+  </Target>
+
+  <Target Name="Publish"
+          DependsOnTargets="PublishValidation;TestAll;PublishMergeMasterAndTag;Release;PublishNuGetPackage;PublishGitHubRelease" />
 
   <Target Name="GitSubmodule" Condition="!Exists('$(ProtoMsgCsvFile)')">
     <GitClient Command="submodule" Arguments="update --init" LocalPath="$(SolutionDir)" />
