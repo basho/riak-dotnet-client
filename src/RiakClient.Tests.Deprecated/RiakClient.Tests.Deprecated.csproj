@@ -33,6 +33,12 @@
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>..\RiakClient.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
@@ -67,6 +73,9 @@
     </None>
     <None Include="packages.config" />
     <None Include="README.md" />
+    <None Include="..\RiakClient.snk">
+      <Link>RiakClient.snk</Link>
+    </None>
     <None Include="sample.advanced.config" />
   </ItemGroup>
   <ItemGroup>
