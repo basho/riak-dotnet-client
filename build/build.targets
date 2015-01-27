@@ -23,8 +23,8 @@
     <VersionString Condition="'$(Configuration)' == 'Release'">unknown</VersionString>
     <VersionString Condition="'$(Configuration)' != 'Release'">v0.0.0</VersionString>
     <GitCommitHash>unknown</GitCommitHash>
-    <MasterBranchName>master-test-147</MasterBranchName>
-    <DevelopBranchName>jira/lrb/clients-147</DevelopBranchName>
+    <MasterBranchName>master</MasterBranchName>
+    <DevelopBranchName>develop</DevelopBranchName>
   </PropertyGroup>
 
   <Target Name="CleanCommonAssemblyInfo">
@@ -77,7 +77,6 @@
   </Target>
 
   <Target Name="PublishValidation" DependsOnTargets="PublishValidateVersionString;PublishValidateOnDevelopBranch;PopulateVersionInformation">
-    <!-- TODO: check for NuGet token, GH token, etc -->
     <!-- Validate parsed VersionString -->
     <RegexMatch Input="$(VMajor)" Expression="^[1-9]$">
       <Output PropertyName="VMajorValidated" TaskParameter="Output" />
@@ -150,8 +149,9 @@
     <ProtoMsgDir>$(SolutionDir)src\RiakClient\Messages</ProtoMsgDir>
     <ProtoMsgCsvFile>$(ProtoDir)\riak_pb_messages.csv</ProtoMsgCsvFile>
     <NuGetExe>$(SolutionDir).nuget\NuGet.exe</NuGetExe>
-    <NuGetSpecTemplate>$(ProjDir)\NuGet\RiakClient.nuspec.template</NuGetSpecTemplate>
-    <NuGetSpecFile>$(ProjDir)\NuGet\RiakClient.nuspec</NuGetSpecFile>
+    <NuGetDir>$(ProjDir)\NuGet</NuGetDir>
+    <NuGetSpecTemplate>$(NuGetDir)\RiakClient.nuspec.template</NuGetSpecTemplate>
+    <NuGetSpecFile>$(NuGetDir)\RiakClient.nuspec</NuGetSpecFile>
 
     <NUnitConsoleRunnerExe>$(SolutionDir)packages\NUnit.Runners.2.6.3\tools\nunit-console.exe -nologo -nodots</NUnitConsoleRunnerExe>
     <NUnitConsoleRunnerCommand Condition="'$(OS)' == 'Windows_NT'">$(NUnitConsoleRunnerExe) -config Debug</NUnitConsoleRunnerCommand>
@@ -181,7 +181,7 @@
           Command="$(ProtoGenExe) -ns:RiakClient.Messages -i:%(ProtoFile.Identity) -o:$(ProtoMsgDir)\@(ProtoFile->'%(filename)').cs" />
   </Target>
 
-  <Target Name="PublishBuildNuGetPackage" DependsOnTargets="PublishValidation">
+  <Target Name="PublishNuGetPackage" DependsOnTargets="PublishValidation">
     <XmlQuery XmlFileName="$(RiakClientPackagesConfig)" XPath="/packages/package[@id='Newtonsoft.Json']/@version">
       <Output TaskParameter="Values" PropertyName="NewtonsoftJsonVersion" />
     </XmlQuery>
@@ -201,12 +201,14 @@
       </Tokens>
     </ItemGroup>
     <TemplateFile Template="$(NuGetSpecTemplate)" OutputFileName="$(NuGetSpecFile)" Tokens="@(Tokens)" />
-    <Exec WorkingDirectory="$(ProjDir)\NuGet"
+    <Exec WorkingDirectory="$(NuGetDir)"
           Command="$(NuGetExe) pack -Symbols -Verbosity normal $(NuGetSpecFile)" />
+    <Exec WorkingDirectory="$(NuGetDir)"
+          Command="$(NuGetExe) push -NonInteractive -Verbosity normal *.nupkg" />
   </Target>
 
   <Target Name="Publish"
-          DependsOnTargets="PublishValidation;UnitTest;PublishMergeMasterAndTag;Release;PublishBuildNuGetPackage" /> <!-- TODO change to TestAll -->
+          DependsOnTargets="PublishValidation;TestAll;PublishMergeMasterAndTag;Release;PublishNuGetPackage" />
 
   <Target Name="GitSubmodule" Condition="!Exists('$(ProtoMsgCsvFile)')">
     <GitClient Command="submodule" Arguments="update --init" LocalPath="$(SolutionDir)" />
