@@ -3,6 +3,7 @@
 
 # Files that must be CRLF ending
 build/build.targets text eol=crlf encoding=UTF-8
+src/NuGet/RiakClient.nuspec.template text eol=crlf encoding=UTF-8
 
 # Files that must be LF ending
 Makefile                  text eol=lf

@@ -59,7 +59,7 @@ Regenerating .proto files
 * `.\make.cmd ProtoGen`
 
 Riak .NET Client Deployment Process
-=================================
+===================================
 
 * Merge all required feature branches into develop.
 * Verify that all tests succeed.
