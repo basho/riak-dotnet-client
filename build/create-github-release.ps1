@@ -1,3 +1,24 @@
+<#
+.SYNOPSIS
+    Powershell script to create release in GitHub for RiakClient.
+.DESCRIPTION
+    Powershell script to create release in GitHub for RiakClient.
+.PARAMETER VersionString
+    Version of the release. Must be in vX.Y.Z-PreRelease format.
+.EXAMPLE
+    C:\PS>cd path\to\riak-dotnet-client
+    >.\build\create-github-release.ps1 v2.0.0-beta1
+.NOTES
+    Author: Luke Bakken
+    Date:   January 27, 2015
+#>
+[CmdletBinding()]
+Param(
+    [Parameter(Mandatory=$True, Position=1)]
+    [ValidatePattern("^v[1-9]\.[0-9]\.[0-9](-[a-z0-9]+)?$")]
+    [string]$VersionString
+)
+
 Set-StrictMode -Version Latest
 
 function Get-ScriptPath {
@@ -18,27 +39,21 @@ function Get-ScriptPath {
 	return $scriptDir
 }
 
-$release_zip_path = Resolve-Path ($(Get-ScriptPath) + '\..\src\RiakClient\bin\Release\RiakClient.zip')
-Write-Host -ForegroundColor Yellow $release_zip_path
-exit 0
+$release_zip_name = 'RiakClient.zip'
+$release_zip_path = Resolve-Path ($(Get-ScriptPath) + '\..\src\RiakClient\bin\Release\' + $release_zip_name)
+Write-Debug -Message "RiakClient release zip file: $release_zip_path"
 
-$github_api_key_file = '~/.ghapi'
-
-if (Test-Path $github_api_key_file) {
-    $github_api_key = Get-Content ~/.ghapi
-    Write-Host -ForegroundColor Green "GitHub API Key '$github_api_key'"
-}
-else {
-    throw "GitHub API Key must be in file '$github_api_key_file'"
-}
+$github_api_key_file = Resolve-Path '~/.ghapi'
+$github_api_key = Get-Content $github_api_key_file
+Write-Debug "GitHub API Key '$github_api_key'"
 
 $headers = @{ Authorization = "token $github_api_key" }
 
 $release_info = New-Object PSObject -Property @{
-        tag_name = "v2.0.0-beta1"
+        tag_name = $VersionString
         target_commitish = "master"
-        name = "v2.0.0-beta1"
-        body ="riak-dotnet-client 2.0.0-beta1"
+        name = $VersionString
+        body ="riak-dotnet-client $VersionString"
         draft = $false
         prerelease = $true
     }
@@ -54,3 +69,7 @@ if (!($response.StatusCode == 201)) {
 $response_json = ConvertFrom-Json -InputObject $response.Content
 $assets_url_with_name = $response_json.assets_url + '?name=' + $release_zip_name
 $response = Get-Content $release_zip_path | Invoke-WebRequest -Headers $headers -ContentType 'application/zip' -Method Post -Uri $assets_url_with_name
+if (!($response.StatusCode == 201)) {
+    throw "Creating release failed: $response.StatusCode"
+}
+
