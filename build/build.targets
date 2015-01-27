@@ -206,12 +206,14 @@
     <Exec WorkingDirectory="$(NuGetDir)"
           Command="$(NuGetExe) pack -Symbols -Verbosity normal $(NuGetSpecFile)" />
     <Exec WorkingDirectory="$(NuGetDir)"
-          Command="$(NuGetExe) push -NonInteractive -Verbosity normal *.nupkg" />
+          Command="$(NuGetExe) push -NonInteractive -Verbosity normal RiakClient.$(NuGetVersion).nupkg" />
+    <Exec WorkingDirectory="$(NuGetDir)"
+          Command="$(NuGetExe) push -NonInteractive -Verbosity normal RiakClient.$(NuGetVersion).symbols.nupkg" />
   </Target>
 
   <Target Name="PublishGitHubRelease" DependsOnTargets="PublishValidation">
     <Exec WorkingDirectory="$(SolutionDir)"
-          Command="$(PowerShellExe) -NonInteractive -NoProfile -ExecutionPolicy Bypass -File $(SolutionDir)build\create-github-release.ps1 $(VersionString)" />
+          Command="$(PowerShellExe) -NonInteractive -NoProfile -ExecutionPolicy Bypass -File $(SolutionDir)build\create-github-release.ps1 $(NuGetVersion)" />
   </Target>
 
   <Target Name="Publish"
