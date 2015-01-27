@@ -22,6 +22,7 @@
   <PropertyGroup>
     <VersionString Condition="'$(Configuration)' == 'Release'">unknown</VersionString>
     <VersionString Condition="'$(Configuration)' != 'Release'">v0.0.0</VersionString>
+    <GitRemoteName>basho-labs</GitRemoteName>
     <GitCommitHash>unknown</GitCommitHash>
     <MasterBranchName>master</MasterBranchName>
     <DevelopBranchName>develop</DevelopBranchName>
@@ -113,6 +114,7 @@
     <Message Text="Merging '$(DevelopBranchName)' into '$(MasterBranchName)' NOTE: this will fail if the merge can't be done via fast-forward!" />
     <GitClient Command="merge" Arguments="--no-ff --commit --ff-only $(DevelopBranchName)" LocalPath="$(SolutionDir)" />
     <GitClient Command="tag" Arguments="--message &quot;riak-dotnet-client $(NuGetVersion)&quot; &quot;$(GitTagVersion)&quot;" LocalPath="$(SolutionDir)" />
+    <GitClient Command="push" Arguments="$(GitRemoteName) &quot;$(GitTagVersion)&quot;" LocalPath="$(SolutionDir)" />
   </Target>
 
   <Target Name="GenerateCommonAssemblyInfo" DependsOnTargets="PopulateVersionInformation">
@@ -213,7 +215,7 @@
 
   <Target Name="PublishGitHubRelease" DependsOnTargets="PublishValidation">
     <Exec WorkingDirectory="$(SolutionDir)"
-          Command="$(PowerShellExe) -NonInteractive -NoProfile -ExecutionPolicy Bypass -File $(SolutionDir)build\create-github-release.ps1 $(NuGetVersion)" />
+          Command="$(PowerShellExe) -NonInteractive -NoProfile -ExecutionPolicy Bypass -File $(SolutionDir)build\create-github-release.ps1 $(GitTagVersion)" />
   </Target>
 
   <Target Name="Publish"
