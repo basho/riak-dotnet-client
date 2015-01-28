@@ -25,7 +25,7 @@ using RiakClient.Models;
 
 namespace RiakClient.Tests.Live.Extensions
 {
-    internal static class IntegrationTestExtensions
+    public static class IntegrationTestExtensions
     {
         // TESTING PURPOSES ONLY
         public static void DeleteBucket(this IRiakBatchClient client, string bucket)
