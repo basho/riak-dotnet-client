@@ -1,12 +1,13 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
-//
+﻿// Copyright (c) 2011 - 2014 OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
+// 
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
 // except in compliance with the License.  You may obtain
 // a copy of the License at
-//
+// 
 //   http://www.apache.org/licenses/LICENSE-2.0
-//
+// 
 // Unless required by applicable law or agreed to in writing,
 // software distributed under the License is distributed on an
 // "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -14,16 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using RiakClient.Extensions;
-using RiakClient.Tests.Extensions;
-using RiakClient.Tests.Live.Extensions;
-using RiakClient.Tests.Live;
-using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System;
+using NUnit.Framework;
+using RiakClient.Extensions;
 using RiakClient.Models;
+using RiakClient.Tests.Extensions;
+using RiakClient.Tests.Live.Extensions;
 using RiakClient.Util;
 
 namespace RiakClient.Tests.Live
@@ -35,7 +35,10 @@ namespace RiakClient.Tests.Live
         [Ignore("Nondeterministic or failing")]
         public void WritingLargeObjectIsSuccessful()
         {
-            var text = Enumerable.Range(0, 2000000).Aggregate(new StringBuilder(), (sb, i) => sb.Append(i.ToString())).ToString();
+            var text = Enumerable.Range(0, 2000000)
+                                 .Aggregate(new StringBuilder(), 
+                                            (sb, i) => sb.Append(i.ToString()))
+                                 .ToString();
             var riakObject = new RiakObject(TestBucket, "large", text, RiakConstants.ContentTypes.TextPlain);
             var result = Client.Put(riakObject);
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
@@ -63,21 +66,22 @@ namespace RiakClient.Tests.Live
         public void DeleteIsSuccessfulInBatch()
         {
             Client.Batch(batch =>
-                {
-                    var riakObject = new RiakObject(TestBucket, TestKey, TestJson, RiakConstants.ContentTypes.ApplicationJson);
-                    var riakObjectId = riakObject.ToRiakObjectId();
+            {
+                var riakObject = new RiakObject(TestBucket, TestKey, TestJson,
+                                                RiakConstants.ContentTypes.ApplicationJson);
+                var riakObjectId = riakObject.ToRiakObjectId();
 
-                    var putResult = batch.Put(riakObject);
-                    putResult.IsSuccess.ShouldBeTrue(putResult.ErrorMessage);
+                var putResult = batch.Put(riakObject);
+                putResult.IsSuccess.ShouldBeTrue(putResult.ErrorMessage);
 
-                    var delResult = batch.Delete(riakObjectId);
-                    delResult.IsSuccess.ShouldBeTrue(delResult.ErrorMessage);
+                var delResult = batch.Delete(riakObjectId);
+                delResult.IsSuccess.ShouldBeTrue(delResult.ErrorMessage);
 
-                    var getResult = batch.Get(riakObjectId);
-                    getResult.IsSuccess.ShouldBeFalse();
-                    getResult.ResultCode.ShouldEqual(ResultCode.NotFound);
-                    getResult.Value.ShouldBeNull();
-                });
+                var getResult = batch.Get(riakObjectId);
+                getResult.IsSuccess.ShouldBeFalse();
+                getResult.ResultCode.ShouldEqual(ResultCode.NotFound);
+                getResult.Value.ShouldBeNull();
+            });
         }
 
         [Test]
@@ -111,7 +115,7 @@ namespace RiakClient.Tests.Live
             var oneObjectId = one.ToRiakObjectId();
             var twoObjectId = two.ToRiakObjectId();
 
-            var list = new List<RiakObjectId> { oneObjectId, twoObjectId };
+            var list = new List<RiakObjectId> {oneObjectId, twoObjectId};
 
             var results = Client.Async.Delete(list).Result;
 
@@ -179,7 +183,7 @@ namespace RiakClient.Tests.Live
             var riakObject = new RiakObject(TestBucket, TestKey, TestJson, RiakConstants.ContentTypes.ApplicationJson);
 
             var result = Client.Async.Put(riakObject).Result;
-            
+
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
             result.Value.ShouldNotBeNull();
         }
@@ -202,19 +206,20 @@ namespace RiakClient.Tests.Live
         [Test]
         public void ListKeysFromIndexReturnsAllKeys()
         {
-            int keyCount = 10;
+            const int keyCount = 10;
+            const string listKeysBucket = "listKeysBucket";
             var originalKeyList = new List<string>();
 
             for (var i = 0; i < keyCount; i++)
             {
                 string idx = i.ToString();
-                var id = new RiakObjectId(TestBucketType, TestBucket, idx);
+                var id = new RiakObjectId(TestBucketType, listKeysBucket, idx);
                 var o = new RiakObject(id, "{ value: \"this is an object\" }");
                 originalKeyList.Add(idx);
                 Client.Put(o);
             }
 
-            var result = Client.ListKeysFromIndex(TestBucketType, TestBucket);
+            var result = Client.ListKeysFromIndex(TestBucketType, listKeysBucket);
             var keys = result.Value;
 
             keys.Count.ShouldEqual(keyCount);
@@ -224,13 +229,13 @@ namespace RiakClient.Tests.Live
                 originalKeyList.ShouldContain(key);
             }
 
-            Client.DeleteBucket(TestBucketType, TestBucket);
+            Client.DeleteBucket(TestBucketType, listKeysBucket);
         }
 
         [Test]
         public void UpdatingCounterOnBucketWithoutAllowMultFails()
         {
-            var bucket = TestBucket + "_" + Guid.NewGuid().ToString();
+            var bucket = TestBucket + "_" + Guid.NewGuid();
             var counter = "counter";
 
             var result = Client.IncrementCounter(bucket, counter, 1);
@@ -241,7 +246,7 @@ namespace RiakClient.Tests.Live
         [Test]
         public void UpdatingCounterOnBucketWithAllowMultIsSuccessful()
         {
-            var bucket = TestBucket + "_" + Guid.NewGuid().ToString();
+            var bucket = TestBucket + "_" + Guid.NewGuid();
             var counter = "counter";
 
             var props = Client.GetBucketProperties(bucket).Value;
@@ -258,7 +263,7 @@ namespace RiakClient.Tests.Live
         [Ignore("Nondeterministic or failing")]
         public void UpdatingCounterOnBucketWithReturnValueShouldReturnIncrementedCounterValue()
         {
-            var bucket = TestBucket + "_" + Guid.NewGuid().ToString();
+            var bucket = TestBucket + "_" + Guid.NewGuid();
             var counter = "counter";
 
             var props = Client.GetBucketProperties(bucket).Value ?? new RiakBucketProperties();
@@ -276,14 +281,13 @@ namespace RiakClient.Tests.Live
             result.Result.IsSuccess.ShouldBeTrue();
             result.Result.ShouldNotBeNull();
             result.Value.ShouldBeGreaterThan(currentCounter);
-
         }
 
         [Test]
         [Ignore("Nondeterministic or failing")]
         public void ReadingWithTimeoutSetToZeroShouldImmediatelyReturn()
         {
-            var bucket = TestBucket + "_" + Guid.NewGuid().ToString();
+            var bucket = TestBucket + "_" + Guid.NewGuid();
 
             for (var i = 0; i < 10; i++)
             {
@@ -292,7 +296,8 @@ namespace RiakClient.Tests.Live
                 Client.Put(o);
             }
 
-            var result = Client.Get(bucket, "2", new RiakGetOptions().SetTimeout(0).SetPr(RiakConstants.QuorumOptions.All));
+            var result = Client.Get(bucket, "2",
+                new RiakGetOptions().SetTimeout(0).SetPr(RiakConstants.QuorumOptions.All));
 
             result.IsSuccess.ShouldBeFalse();
         }

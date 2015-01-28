@@ -543,6 +543,8 @@ namespace RiakClient.Tests.Live.GeneralIntegrationTests
             result.Value.Siblings.Count.ShouldBeGreaterThan(2);
         }
 
+
+        //TODO: remove, unused
         private Func<RiakResult<IEnumerable<String>>> RunListKeys(IRiakBatchClient client, string bucket)
         {
             Func<RiakResult<IEnumerable<String>>> runListKeys =
@@ -550,6 +552,7 @@ namespace RiakClient.Tests.Live.GeneralIntegrationTests
             return runListKeys;
         }
 
+        //TODO: remove, unused
         private static Func<RiakResult<IEnumerable<string>>, bool> NoKeysListed
         {
             get { return result => result.IsSuccess && !result.Value.Any(); }
