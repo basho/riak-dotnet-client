@@ -542,17 +542,5 @@ namespace RiakClient.Tests.Live.GeneralIntegrationTests
             var result = client.Get(MultiBucket, MultiKey);
             result.Value.Siblings.Count.ShouldBeGreaterThan(2);
         }
-
-        private Func<RiakResult<IEnumerable<String>>> RunListKeys(IRiakBatchClient client, string bucket)
-        {
-            Func<RiakResult<IEnumerable<String>>> runListKeys =
-                () => client.ListKeys(bucket);
-            return runListKeys;
-        }
-
-        private static Func<RiakResult<IEnumerable<string>>, bool> NoKeysListed
-        {
-            get { return result => result.IsSuccess && !result.Value.Any(); }
-        }
     }
 }
