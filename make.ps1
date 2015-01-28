@@ -28,9 +28,11 @@ Param(
     [Parameter(Mandatory=$False, Position=0)]
     [ValidateSet('Debug','Release','All','Publish',
         'Test','TestAll','UnitTest','IntegrationTest','DeprecatedTest',
-        'CleanAll','Clean')]
+        'CleanAll','Clean', IgnoreCase = $True)]
     [string]$Target = 'Debug',
     [Parameter(Mandatory=$False)]
+    [ValidateSet('Quiet','q','Minimal','m','Normal','n',
+        'Detailed','d','Diagnostic','diag', IgnoreCase = $True)]
     [string]$Verbosity = 'Normal',
     [Parameter(Mandatory=$False)]
     [ValidatePattern("^v[1-9]\.[0-9]\.[0-9](-[a-z0-9]+)?")]
@@ -146,8 +148,13 @@ if ($? -ne $True) {
 }
 Write-Debug "$nuget_exe exit code: $LastExitCode"
 
-Write-Debug "MSBuild command: $msbuild_exe ""/verbosity:$Verbosity"" /nologo /m ""/property:SolutionDir=$script_path\"" ""$version_property"" ""/target:$Target"" ""$build_targets_file"""
-& $msbuild_exe "/verbosity:$Verbosity" /nologo /m "/property:SolutionDir=$script_path\" "$version_property" "/target:$Target" "$build_targets_file"
+$verbose_property = ''
+if ($Verbosity -eq 'detailed' -or $Verbosity -eq 'd' -or
+    $Verbosity -eq 'diagnostic' -or $Verbosity -eq 'diag') {
+    $verbose_property = '/property:Verbose=true'
+}
+Write-Debug "MSBuild command: $msbuild_exe ""/verbosity:$Verbosity"" /nologo /m ""/property:SolutionDir=$script_path\"" ""$version_property"" ""$verbose_property"" ""/target:$Target"" ""$build_targets_file"""
+& $msbuild_exe "/verbosity:$Verbosity" /nologo /m "/property:SolutionDir=$script_path\" "$version_property" "$verbose_property" "/target:$Target" "$build_targets_file"
 if ($? -ne $True) {
     throw "$msbuild_exe failed: $LastExitCode"
 }
