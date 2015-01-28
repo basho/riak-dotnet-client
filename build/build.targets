@@ -155,7 +155,8 @@
     <NuGetSpecTemplate>$(NuGetDir)\RiakClient.nuspec.template</NuGetSpecTemplate>
     <NuGetSpecFile>$(NuGetDir)\RiakClient.nuspec</NuGetSpecFile>
 
-    <NUnitConsoleRunnerExe>$(SolutionDir)packages\NUnit.Runners.2.6.3\tools\nunit-console.exe -nologo -nodots</NUnitConsoleRunnerExe>
+    <NUnitConsoleRunnerExe Condition="'$(Verbose)' != 'true'">$(SolutionDir)packages\NUnit.Runners.2.6.3\tools\nunit-console.exe -nologo -nodots</NUnitConsoleRunnerExe>
+    <NUnitConsoleRunnerExe Condition="'$(Verbose)' == 'true'">$(SolutionDir)packages\NUnit.Runners.2.6.3\tools\nunit-console.exe -labels</NUnitConsoleRunnerExe>
     <NUnitConsoleRunnerCommand Condition="'$(OS)' == 'Windows_NT'">$(NUnitConsoleRunnerExe) -config Debug</NUnitConsoleRunnerCommand>
     <NUnitConsoleRunnerCommand Condition="'$(OS)' != 'Windows_NT'">$(MonoExe) $(NUnitConsoleRunnerExe) -config Debug-Mono</NUnitConsoleRunnerCommand>
 
@@ -250,9 +251,9 @@
 
   <Target Name="TestAll" DependsOnTargets="UnitTest;IntegrationTest" />
 
-  <Target Name="Test">
-    <CallTarget Targets="TestAll" />
-  </Target>
+  <Target Name="Test" DependsOnTargets="TestAll" />
+
+  <Target Name="Clean" DependsOnTargets="CleanAll" />
 
   <Target Name="DeprecatedTest" DependsOnTargets="Debug">
     <Exec WorkingDirectory="$(SolutionDir)"

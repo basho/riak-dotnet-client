@@ -19,7 +19,11 @@ Open `RiakClient.sln` and build. This will generate the required `src/CommonAsse
 *Note*: `git` must be in your `PATH` when doing a `Release`-configuration build.
 
 * Windows
- * Execute `make.cmd` either via double-click in the file explorer, or by opening a shell in your cloned repository and running `.\make.cmd`
+ * Execute `make.cmd` either via double-click in the file explorer, or
+   by opening a shell in your cloned repository and running `.\make.cmd`.
+   This will use `powershell.exe` to run `make.ps1` and create a Debug
+   build. Running `make.ps1` has much more flexibility. Use the `Get-Help
+   .\make.ps1 -Full` command in Powershell for more information.
 * Mono
  * Execute `make` (GNU Make required)
 
@@ -56,7 +60,7 @@ Regenerating .proto files
 =========================
 
 * Ensure submodules are checked out
-* `.\make.cmd ProtoGen`
+* In Powershell: `.\make.ps1 -Target ProtoGen`
 
 Riak .NET Client Deployment Process
 ===================================
