@@ -155,8 +155,8 @@
     <NuGetSpecTemplate>$(NuGetDir)\RiakClient.nuspec.template</NuGetSpecTemplate>
     <NuGetSpecFile>$(NuGetDir)\RiakClient.nuspec</NuGetSpecFile>
 
-    <NUnitConsoleRunnerExe Condition="'$(Verbose)' != 'true'">$(SolutionDir)packages\NUnit.Runners.2.6.3\tools\nunit-console.exe /nologo /nodots</NUnitConsoleRunnerExe>
-    <NUnitConsoleRunnerExe Condition="'$(Verbose)' == 'true'">$(SolutionDir)packages\NUnit.Runners.2.6.3\tools\nunit-console.exe /labels</NUnitConsoleRunnerExe>
+    <NUnitConsoleRunnerExe Condition="'$(Verbose)' != 'true'">$(SolutionDir)packages\NUnit.Runners.2.6.3\tools\nunit-console.exe -nologo -nodots</NUnitConsoleRunnerExe>
+    <NUnitConsoleRunnerExe Condition="'$(Verbose)' == 'true'">$(SolutionDir)packages\NUnit.Runners.2.6.3\tools\nunit-console.exe -labels</NUnitConsoleRunnerExe>
     <NUnitConsoleRunnerCommand Condition="'$(OS)' == 'Windows_NT'">$(NUnitConsoleRunnerExe) -config Debug</NUnitConsoleRunnerCommand>
     <NUnitConsoleRunnerCommand Condition="'$(OS)' != 'Windows_NT'">$(MonoExe) $(NUnitConsoleRunnerExe) -config Debug-Mono</NUnitConsoleRunnerCommand>
 
