@@ -115,7 +115,7 @@ namespace RiakClient.Tests.Live
             var oneObjectId = one.ToRiakObjectId();
             var twoObjectId = two.ToRiakObjectId();
 
-            var list = new List<RiakObjectId> {oneObjectId, twoObjectId};
+            var list = new List<RiakObjectId> { oneObjectId, twoObjectId };
 
             var results = Client.Async.Delete(list).Result;
 
@@ -147,7 +147,7 @@ namespace RiakClient.Tests.Live
             var oneObjectId = one.ToRiakObjectId();
             var twoObjectId = two.ToRiakObjectId();
 
-            var list = new List<RiakObjectId> {oneObjectId, twoObjectId};
+            var list = new List<RiakObjectId> { oneObjectId, twoObjectId };
 
             var results = Client.Async.Get(list).Result;
 
@@ -194,7 +194,7 @@ namespace RiakClient.Tests.Live
             var one = new RiakObject(TestBucket, "one", TestJson, RiakConstants.ContentTypes.ApplicationJson);
             var two = new RiakObject(TestBucket, "two", TestJson, RiakConstants.ContentTypes.ApplicationJson);
 
-            var results = Client.Async.Put(new List<RiakObject> {one, two}).Result;
+            var results = Client.Async.Put(new List<RiakObject> { one, two }).Result;
 
             foreach (var riakResult in results)
             {
@@ -235,8 +235,8 @@ namespace RiakClient.Tests.Live
         [Test]
         public void UpdatingCounterOnBucketWithoutAllowMultFails()
         {
+            const string counter = "counter";
             var bucket = TestBucket + "_" + Guid.NewGuid();
-            var counter = "counter";
 
             var result = Client.IncrementCounter(bucket, counter, 1);
 
@@ -246,9 +246,9 @@ namespace RiakClient.Tests.Live
         [Test]
         public void UpdatingCounterOnBucketWithAllowMultIsSuccessful()
         {
+            const string counter = "counter";
             var bucket = TestBucket + "_" + Guid.NewGuid();
-            var counter = "counter";
-
+            
             var props = Client.GetBucketProperties(bucket).Value;
             props.SetAllowMultiple(true);
 
@@ -263,9 +263,9 @@ namespace RiakClient.Tests.Live
         [Ignore("Nondeterministic or failing")]
         public void UpdatingCounterOnBucketWithReturnValueShouldReturnIncrementedCounterValue()
         {
+            const string counter = "counter";
             var bucket = TestBucket + "_" + Guid.NewGuid();
-            var counter = "counter";
-
+            
             var props = Client.GetBucketProperties(bucket).Value ?? new RiakBucketProperties();
             props.SetAllowMultiple(true);
 

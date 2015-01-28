@@ -597,7 +597,7 @@ namespace RiakClient
 
             if (result.IsSuccess)
             {
-                var buckets = result.Value.buckets.Select(b => b.FromRiakString()).ToList();
+                var buckets = result.Value.buckets.Select(b => b.FromRiakString());
                 return RiakResult<IEnumerable<string>>.Success(buckets);
             }
 
