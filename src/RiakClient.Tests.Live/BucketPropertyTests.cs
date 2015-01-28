@@ -32,24 +32,6 @@ namespace RiakClient.Tests.Live.BucketPropertyTests
     {
         private readonly Random _random = new Random();
 
-        // use the one node configuration here because we might run the risk
-        // of hitting different nodes in the configuration before the props
-        // are replicated to other nodes.
-
-        //TODO: remove, duplicate test
-        [Test]
-        public void ListKeysReturnsAllkeys()
-        {
-            Func<string> generator = () => Guid.NewGuid().ToString();
-            var bucket = generator();
-            var pairs = generator.Replicate(10).Select(f => new RiakObject(bucket, f(), "foo", RiakConstants.ContentTypes.TextPlain)).ToList();
-            Client.Put(pairs);
-
-            var results = Client.ListKeys(bucket);
-            results.IsSuccess.ShouldBeTrue(results.ErrorMessage);
-            results.Value.Count().ShouldEqual(10);
-        }
-
         [Test]
         public void GettingExtendedPropertiesOnABucketWithoutExtendedPropertiesSetDoesntThrowAnException()
         {
