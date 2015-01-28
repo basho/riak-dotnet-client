@@ -271,6 +271,29 @@ namespace RiakClient.Tests.Live.BucketPropertyTests
             var plainBucketTypeBucketPropsResult = Client.GetBucketProperties("plain", "Schmoopy");
             plainBucketTypeBucketPropsResult.Value.DataType.ShouldBeNull();
         }
-    }
 
+        [Test]
+        public void TestConsistentPropertyOnRegularBucketType()
+        {
+            var regProps = Client.GetBucketProperties("plain", "bucket");
+            regProps.IsSuccess.ShouldBeTrue();
+            regProps.Value.Consistent.Value.ShouldBeFalse();
+        }
+
+        [Test]
+        public void TestConsistentPropertyIsNullOnNewProps()
+        {
+            var props = new RiakBucketProperties();
+            props.Consistent.HasValue.ShouldBeFalse();
+        }
+
+        [Test]
+        [Ignore("Test will only pass if you have a bucket type named \"consistent\" with SC enabled on it.")]
+        public void TestConsistentPropertyOnSCBucketType()
+        {
+            var regProps = Client.GetBucketProperties("consistent", "bucket");
+            regProps.IsSuccess.ShouldBeTrue();
+            regProps.Value.Consistent.Value.ShouldBeTrue();
+        }
+    }
 }
