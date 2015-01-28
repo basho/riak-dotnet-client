@@ -16,16 +16,15 @@
 
 using System;
 using System.Linq;
-using RiakClient.Extensions;
-using RiakClient.Tests.Extensions;
-using RiakClient.Tests.Live;
-using RiakClient.Tests.Live.Extensions;
 using NUnit.Framework;
 using RiakClient.Comms;
+using RiakClient.Extensions;
 using RiakClient.Models;
 using RiakClient.Models.MapReduce;
 using RiakClient.Models.MapReduce.Inputs;
 using RiakClient.Models.Search;
+using RiakClient.Tests.Extensions;
+using RiakClient.Tests.Live.Extensions;
 using RiakClient.Tests.Live.MapReduce;
 using RiakClient.Util;
 
@@ -41,7 +40,7 @@ namespace RiakClient.Tests.Deprecated
         private const string RiakSearchDoc2 = "{\"name\":\"Alan Q. Public\", \"bio\":\"I'm an exciting mathematician\", \"favorites\":{\"book\":\"Prelude to Mathematics\",\"album\":\"The Fame Monster\"}}";
 
         [TestFixtureSetUp]
-        public void SetUp() 
+        public override void SetUp()
         {
             Cluster = new RiakCluster(ClusterConfig, new RiakConnectionFactory());
             Client = Cluster.CreateClient();
@@ -74,29 +73,31 @@ namespace RiakClient.Tests.Deprecated
             put1Result.IsSuccess.ShouldBeTrue(put1Result.ErrorMessage);
             put2Result.IsSuccess.ShouldBeTrue(put2Result.ErrorMessage);
         }
-        
-       
+
+
         [Test]
         public void SearchingByNameReturnsTheObjectId()
         {
-            var mr = new RiakMapReduceQuery()
-                .Inputs(new RiakBucketSearchInput(Bucket, "name:Al*"));
+#pragma warning disable 612, 618
+            var mr = new RiakMapReduceQuery().Inputs(new RiakBucketSearchInput(Bucket, "name:Al*"));
+#pragma warning restore 612, 618
 
             var result = Client.MapReduce(mr);
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
-            
+
             var phaseResults = result.Value.PhaseResults.ToList();
             phaseResults.Count.ShouldEqual(1);
 
             CheckThatResultContainAllKeys(result);
         }
-        
+
         [Test]
         public void SearchingViaFluentSearchObjectWorks()
         {
             var search = new RiakFluentSearch(Bucket, "name").Search(Token.StartsWith("Al")).Build();
-            var mr = new RiakMapReduceQuery()
-                .Inputs(new RiakBucketSearchInput(search));
+#pragma warning disable 612, 618
+            var mr = new RiakMapReduceQuery().Inputs(new RiakBucketSearchInput(search));
+#pragma warning restore 612, 618
 
             var result = Client.MapReduce(mr);
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);

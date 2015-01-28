@@ -17,10 +17,11 @@
 
 using System;
 using System.Collections.Generic;
-using RiakClient.Extensions;
 using NUnit.Framework;
+using RiakClient.Extensions;
 using RiakClient.Models;
 using RiakClient.Models.Search;
+using RiakClient.Tests.Extensions;
 using RiakClient.Tests.Live.Extensions;
 using RiakClient.Util;
 
