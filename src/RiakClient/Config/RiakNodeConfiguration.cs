@@ -14,12 +14,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
 using System.Configuration;
 
 namespace RiakClient.Config
 {
     public class RiakNodeConfiguration : ConfigurationElement, IRiakNodeConfiguration
     {
+        private static readonly TimeSpan s_defaultTimeout = TimeSpan.FromMilliseconds(4000);
+
         [ConfigurationProperty("name", IsRequired = true)]
         public string Name
         {
@@ -70,18 +73,73 @@ namespace RiakClient.Config
         //     set { this["idleTimeout"] = value; }
         // }
 
-        [ConfigurationProperty("networkReadTimeout", DefaultValue = 4000, IsRequired = false)]
-        public int NetworkReadTimeout
+        [ConfigurationProperty("networkReadTimeout", IsRequired = false)]
+        public TimeSpan NetworkReadTimeout
         {
-            get { return (int)this["networkReadTimeout"]; }
-            set { this["networkReadTimeout"] = value; }
+            get
+            {
+                if (this["networkReadTimeout"] == null)
+                {
+                    return s_defaultTimeout;
+                }
+
+                int networkReadTimeoutMilliseconds;
+                if (int.TryParse(this["networkReadTimeout"].ToString(), out networkReadTimeoutMilliseconds))
+                {
+                    return TimeSpan.FromMilliseconds(networkReadTimeoutMilliseconds);
+                }
+                else
+                {
+                    return s_defaultTimeout;
+                }
+            }
+            set { this["networkReadTimeout"] = value.TotalMilliseconds.ToString(); }
         }
 
-        [ConfigurationProperty("networkWriteTimeout", DefaultValue = 4000, IsRequired = false)]
-        public int NetworkWriteTimeout
+        [ConfigurationProperty("networkWriteTimeout", IsRequired = false)]
+        public TimeSpan NetworkWriteTimeout
         {
-            get { return (int)this["networkWriteTimeout"]; }
-            set { this["networkWriteTimeout"] = value; }
+            get
+            {
+                if (this["networkWriteTimeout"] == null)
+                {
+                    return s_defaultTimeout;
+                }
+
+                int networkWriteTimeoutMilliseconds;
+                if (int.TryParse(this["networkWriteTimeout"].ToString(), out networkWriteTimeoutMilliseconds))
+                {
+                    return TimeSpan.FromMilliseconds(networkWriteTimeoutMilliseconds);
+                }
+                else
+                {
+                    return s_defaultTimeout;
+                }
+            }
+            set { this["networkWriteTimeout"] = value.TotalMilliseconds.ToString(); }
+        }
+
+        [ConfigurationProperty("networkConnectTimeout", IsRequired = false)]
+        public TimeSpan NetworkConnectTimeout
+        {
+            get
+            {
+                if (this["networkConnectTimeout"] == null)
+                {
+                    return s_defaultTimeout;
+                }
+
+                int networkConnectTimeoutMilliseconds;
+                if (int.TryParse(this["networkConnectTimeout"].ToString(), out networkConnectTimeoutMilliseconds))
+                {
+                    return TimeSpan.FromMilliseconds(networkConnectTimeoutMilliseconds);
+                }
+                else
+                {
+                    return s_defaultTimeout;
+                }
+            }
+            set { this["networkConnectTimeout"] = value.TotalMilliseconds.ToString(); }
         }
     }
 }
