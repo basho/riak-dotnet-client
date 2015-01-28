@@ -42,8 +42,7 @@ namespace RiakClient.Tests.Deprecated
         [TestFixtureSetUp]
         public override void SetUp()
         {
-            Cluster = new RiakCluster(ClusterConfig, new RiakConnectionFactory());
-            Client = Cluster.CreateClient();
+            base.SetUp();
 
             var props = Client.GetBucketProperties(Bucket).Value;
             props.SetLegacySearch(true);
