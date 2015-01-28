@@ -186,7 +186,7 @@ namespace RiakClient.Models
         /// when saving binary data to Riak, a charSet of null/empty string should be used. The 
         /// constant CharSets.Binary should be used.</remarks>
         public RiakObject(string bucket, string key, string value, string contentType, string charSet)
-            : this(new RiakObjectId(null, bucket, key), value.ToRiakString(), contentType, charSet)
+            : this(new RiakObjectId(bucket, key), value.ToRiakString(), contentType, charSet)
         {
         }
 
@@ -345,7 +345,7 @@ namespace RiakClient.Models
 
         public RiakObjectId ToRiakObjectId()
         {
-            return new RiakObjectId(Bucket, Key);
+            return new RiakObjectId(BucketType, Bucket, Key);
         }
 
         internal RiakObject(string bucketType, string bucket, string key, RpbContent content, byte[] vectorClock)
@@ -387,17 +387,12 @@ namespace RiakClient.Models
             _hashCode = CalculateHashCode();
         }
 
-        internal RiakObject(string bucket, string key, RpbContent content, byte[] vectorClock)
-            : this(null, bucket, key, content, vectorClock)
-        {
-        }
-
-        internal RiakObject(string bucket, string key, ICollection<RpbContent> contents, byte[] vectorClock)
-            : this(bucket, key, contents.First(), vectorClock)
+        internal RiakObject(string bucketType, string bucket, string key, ICollection<RpbContent> contents, byte[] vectorClock)
+            : this(bucketType, bucket, key, contents.First(), vectorClock)
         {
             if (contents.Count > 1)
             {
-                Siblings = contents.Select(c => new RiakObject(bucket, key, c, vectorClock)).ToList();
+                Siblings = contents.Select(c => new RiakObject(bucketType, bucket, key, c, vectorClock)).ToList();
                 _hashCode = CalculateHashCode();
             }
         }

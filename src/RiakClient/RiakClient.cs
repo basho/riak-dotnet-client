@@ -47,8 +47,10 @@ namespace RiakClient
 
     public class RiakClient : IRiakClient
     {
+        internal static bool DisableListBucketsWarning = false;
         internal static bool DisableListKeysWarning = false;
 
+        private const string ListBucketsWarning = "*** [CI] -> ListBuckets has serious performance implications and should not be used in production applications. ***";
         private const string ListKeysWarning = "*** [CI] -> ListKeys has serious performance implications and should not be used in production applications. ***";
         private const string InvalidBucketErrorMessage = "Bucket cannot be blank or contain forward-slashes";
         private const string InvalidKeyErrorMessage = "Key cannot be blank or contain forward-slashes";
@@ -241,7 +243,7 @@ namespace RiakClient
                 return RiakResult<RiakObject>.Error(ResultCode.NotFound, "Unable to find value in Riak", false);
             }
 
-            var o = new RiakObject(objectId.Bucket, objectId.Key, result.Value.content, result.Value.vclock);
+            var o = new RiakObject(objectId.BucketType, objectId.Bucket, objectId.Key, result.Value.content, result.Value.vclock);
 
             return RiakResult<RiakObject>.Success(o);
         }
@@ -300,12 +302,12 @@ namespace RiakClient
                     return RiakResult<RiakObject>.Error(ResultCode.NotFound, "Unable to find value in Riak", false);
                 }
 
-                var o = new RiakObject(result.Item2.Bucket, result.Item2.Key, result.Item1.Value.content.First(), result.Item1.Value.vclock);
+                var o = new RiakObject(result.Item2.BucketType, result.Item2.Bucket, result.Item2.Key, result.Item1.Value.content.First(), result.Item1.Value.vclock);
 
                 if (result.Item1.Value.content.Count > 1)
                 {
                     o.Siblings = result.Item1.Value.content.Select(c =>
-                        new RiakObject(result.Item2.Bucket, result.Item2.Key, c, result.Item1.Value.vclock)).ToList();
+                        new RiakObject(result.Item2.BucketType, result.Item2.Bucket, result.Item2.Key, c, result.Item1.Value.vclock)).ToList();
                 }
 
                 return RiakResult<RiakObject>.Success(o);
@@ -336,13 +338,13 @@ namespace RiakClient
             }
 
             var finalResult = options.ReturnBody
-                ? new RiakObject(value.Bucket, value.Key, result.Value.content.First(), result.Value.vclock)
+                ? new RiakObject(value.BucketType, value.Bucket, value.Key, result.Value.content.First(), result.Value.vclock)
                 : value;
 
             if (options.ReturnBody && result.Value.content.Count > 1)
             {
                 finalResult.Siblings = result.Value.content.Select(c =>
-                    new RiakObject(value.Bucket, value.Key, c, result.Value.vclock)).ToList();
+                    new RiakObject(value.BucketType, value.Bucket, value.Key, c, result.Value.vclock)).ToList();
             }
 
             return RiakResult<RiakObject>.Success(finalResult);
@@ -559,7 +561,7 @@ namespace RiakClient
         }
 
         /// <summary>
-        /// Lists all buckets available on the Riak cluster.
+        /// Lists all buckets in the default Bucket Type.
         /// </summary>
         /// <returns>
         /// An <see cref="System.Collections.Generic.IEnumerable&lt;T&gt;"/> of <see cref="string"/> bucket names.
@@ -569,14 +571,52 @@ namespace RiakClient
         /// physical I/O and can take a long time.</remarks>
         public RiakResult<IEnumerable<string>> ListBuckets()
         {
-            var result = UseConnection(conn => conn.PbcWriteRead<RpbListBucketsResp>(MessageCode.RpbListBucketsReq));
+            return ListBuckets(RiakConstants.DefaultBucketType);
+        }
+
+        /// <summary>
+        /// Lists all buckets in the specified Bucket Type.
+        /// </summary>
+        /// <param name="bucketType">The name of the Bucket Type to list buckets for.</param>
+        /// <returns>
+        /// An <see cref="System.Collections.Generic.IEnumerable&lt;T&gt;"/> of <see cref="string"/> bucket names.
+        /// </returns>
+        /// <remarks>Buckets provide a logical namespace for keys. Listing buckets requires folding over all keys in a cluster and 
+        /// reading a list of buckets from disk. This operation, while non-blocking in Riak 1.0 and newer, still produces considerable
+        /// physical I/O and can take a long time.</remarks>
+        public RiakResult<IEnumerable<string>> ListBuckets(string bucketType) 
+        {            
+            WarnAboutListBuckets();
+
+            var listBucketReq = new RpbListBucketsReq
+            {
+                type = bucketType.ToRiakString()
+            };
+
+            var result = UseConnection(conn => conn.PbcWriteRead<RpbListBucketsReq, RpbListBucketsResp>(listBucketReq));
 
             if (result.IsSuccess)
             {
-                var buckets = result.Value.buckets.Select(b => b.FromRiakString());
-                return RiakResult<IEnumerable<string>>.Success(buckets.ToList());
+                var buckets = result.Value.buckets.Select(b => b.FromRiakString()).ToList();
+                return RiakResult<IEnumerable<string>>.Success(buckets);
             }
+
             return RiakResult<IEnumerable<string>>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
+        }
+
+        private static Func<RiakResult<RpbListBucketsResp>, bool> ListBucketsRepeatRead()
+        {
+            return lbr => 
+                lbr.IsSuccess && !lbr.Value.done;
+        }
+
+        private static void WarnAboutListBuckets()
+        {
+            if (DisableListBucketsWarning)
+                return;
+            System.Diagnostics.Debug.Write(ListBucketsWarning);
+            System.Diagnostics.Trace.TraceWarning(ListBucketsWarning);
+            Console.WriteLine(ListBucketsWarning);
         }
 
         /// <summary>
@@ -647,13 +687,19 @@ namespace RiakClient
                 bucket = bucket.ToRiakString()
             };
             var result = conn.PbcWriteRead<RpbListKeysReq, RpbListKeysResp>(lkReq,
-                lkr => lkr.IsSuccess && !lkr.Value.done);
+                ListKeysRepeatRead());
             if (result.IsSuccess)
             {
                 var keys = result.Value.Where(r => r.IsSuccess).SelectMany(r => r.Value.keys).Select(k => k.FromRiakString()).Distinct().ToList();
                 return RiakResult<IEnumerable<string>>.Success(keys);
             }
             return RiakResult<IEnumerable<string>>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
+        }
+
+        private static Func<RiakResult<RpbListKeysResp>, bool> ListKeysRepeatRead()
+        {
+            return lkr => 
+                lkr.IsSuccess && !lkr.Value.done;
         }
 
         private static void WarnAboutListKeys()

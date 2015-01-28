@@ -17,13 +17,12 @@
 
 using System;
 using System.Linq;
-using RiakClient.Extensions;
-using RiakClient.Tests.Extensions;
-using RiakClient.Tests.Live.Extensions;
-using RiakClient.Tests.Live;
 using NUnit.Framework;
+using RiakClient.Extensions;
 using RiakClient.Models;
 using RiakClient.Models.CommitHook;
+using RiakClient.Tests.Extensions;
+using RiakClient.Tests.Live.Extensions;
 using RiakClient.Util;
 
 namespace RiakClient.Tests.Live.BucketPropertyTests
@@ -37,6 +36,7 @@ namespace RiakClient.Tests.Live.BucketPropertyTests
         // of hitting different nodes in the configuration before the props
         // are replicated to other nodes.
 
+        //TODO: remove, duplicate test
         [Test]
         public void ListKeysReturnsAllkeys()
         {
