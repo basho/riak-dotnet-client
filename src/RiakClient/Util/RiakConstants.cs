@@ -22,6 +22,8 @@ namespace RiakClient.Util
 {
     public static class RiakConstants
     {
+        public const string DefaultBucketType = null;
+
         public static class RiakEnterprise
         {
             public enum ReplicationMode

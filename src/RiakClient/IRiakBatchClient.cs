@@ -54,6 +54,7 @@ namespace RiakClient
         RiakResult<RiakStreamedMapReduceResult> StreamMapReduce(RiakMapReduceQuery query);
 
         RiakResult<IEnumerable<string>> ListBuckets();
+        RiakResult<IEnumerable<string>> ListBuckets(string bucketType);
         RiakResult<IEnumerable<string>> StreamListBuckets();
         RiakResult<IEnumerable<string>> ListKeys(string bucket);
         RiakResult<IEnumerable<string>> ListKeys(string bucketType, string bucket);
