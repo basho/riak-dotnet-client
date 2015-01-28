@@ -257,9 +257,9 @@
 
   <Target Name="TestAll" DependsOnTargets="UnitTest;IntegrationTest" />
 
-  <Target Name="Test">
-    <CallTarget Targets="TestAll" />
-  </Target>
+  <Target Name="Test" DependsOnTargets="TestAll" />
+
+  <Target Name="Clean" DependsOnTargets="CleanAll" />
 
   <Target Name="DeprecatedTest" DependsOnTargets="DeprecatedDebug">
     <Exec WorkingDirectory="$(SolutionDir)"
