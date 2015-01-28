@@ -2,7 +2,7 @@
 .SYNOPSIS
     Powershell script to build Riak .NET Client
 .DESCRIPTION
-    This script ensures that your build environment is sane and will run msbuild.exe correctly depending on parameters passed to this script.
+    This script ensures that your build environment is sane and will run MSBuild.exe correctly depending on parameters passed to this script.
 .PARAMETER Target
     Target to build. Can be one of the following:
         * Debug           - debug build that is not versioned (default)
@@ -11,10 +11,14 @@
         * UnitTest        - Run unit tests
         * IntegrationTest - Run live integration tests
         * CleanAll        - parallel clean build tree
+.PARAMETER Verbosity
+    Parameter to set MSBuild verbosity
 .EXAMPLE
-    C:\>.\make.ps1 Debug
+    C:\Users\Bashoman> cd Projects\basho\riak-dotnet-client
+    C:\Users\Bashoman\Projects\basho\riak-dotnet-client>.\make.ps1 Debug
 .EXAMPLE
-    C:\>.\make.ps1 -Target Release
+    C:\Users\Bashoman> cd Projects\basho\riak-dotnet-client
+    C:\Users\Bashoman\Projects\basho\riak-dotnet-client>.\make.ps1 -Target Release -Verbosity Detailed
 .NOTES
     Author: Luke Bakken
     Date:   January 28, 2015
@@ -22,7 +26,15 @@
 [CmdletBinding()]
 Param(
     [Parameter(Mandatory=$False, Position=0)]
-    [string]$Target = 'Debug'
+    [ValidateSet('Debug','Release','All','Publish',
+        'Test','TestAll','UnitTest','IntegrationTest','DeprecatedTest',
+        'CleanAll','Clean')]
+    [string]$Target = 'Debug',
+    [Parameter(Mandatory=$False)]
+    [string]$Verbosity = 'Normal',
+    [Parameter(Mandatory=$False)]
+    [ValidatePattern("^v[1-9]\.[0-9]\.[0-9](-[a-z0-9]+)?")]
+    [string]$VersionString
 )
 
 Set-StrictMode -Version Latest
@@ -31,98 +43,114 @@ if ([System.Environment]::Version.Major -ne 4) {
     throw "The build depends on CLR version 4"
 }
 
-function Get-PathToMSBuildExe {
+function Get-ScriptPath {
+    $scriptDir = Get-Variable PSScriptRoot -ErrorAction SilentlyContinue | ForEach-Object { $_.Value }
+    if (!$scriptDir) {
+        if ($MyInvocation.MyCommand.Path) {
+            $scriptDir = Split-Path $MyInvocation.MyCommand.Path -Parent
+        }
+    }
+    if (!$scriptDir) {
+        if ($ExecutionContext.SessionState.Module.Path) {
+            $scriptDir = Split-Path (Split-Path $ExecutionContext.SessionState.Module.Path)
+        }
+    }
+    if (!$scriptDir) {
+        $scriptDir = $PWD
+    }
+    return $scriptDir
+}
 
+function Get-PathToMSBuildExe {
     $msbuild_exe_path = ''
     $msbuild_exe_name = 'MSBuild.exe'
 
-    $clr_runtime_version = 'v' + [String]::Join('.', @(
-                [System.Environment]::Version.Major,
-                [System.Environment]::Version.Minor,
-                [System.Environment]::Version.Build)
-            )
-
+    $clr_version = @([System.Environment]::Version.Major, [System.Environment]::Version.Minor, [System.Environment]::Version.Build)
+    $clr_version_str = 'v' + [String]::Join('.', $clr_version)
 
     $install_root = (Get-ItemProperty -Name InstallRoot HKLM:\SOFTWARE\Microsoft\.NETFramework).InstallRoot
-    $msbuild_exe_path = Join-Path -Path $install_root -ChildPath (Join-Path -Path $clr_runtime_version -ChildPath $msbuild_exe_name)
+    $msbuild_exe_path = Join-Path -Path $install_root -ChildPath (Join-Path -Path $clr_version_str -ChildPath $msbuild_exe_name)
     if (!(Test-Path $msbuild_exe_path)) {
         $install_root = (Get-ItemProperty -Name InstallRoot HKLM:\SOFTWARE\Wow6432Node\Microsoft\.NETFramework).InstallRoot
-        $msbuild_exe_path = Join-Path -Path $install_root -ChildPath (Join-Path -Path $clr_runtime_version -ChildPath $msbuild_exe_name)
+        $msbuild_exe_path = Join-Path -Path $install_root -ChildPath (Join-Path -Path $clr_version_str -ChildPath $msbuild_exe_name)
         if (!(Test-Path $msbuild_exe_path)) {
             throw "Could not find $msbuild_exe_name on this system"
         }
     }
 
+    Write-Debug "Using $msbuild_exe_name at $msbuild_exe_path"
+
     return $msbuild_exe_path
 }
+
+function Get-BuildTargetsFile {
+    Param([Parameter(Mandatory=$True, Position=0)]
+          [string]$ScriptPath)
+
+    $build_targets_file_name = 'build.targets'
+
+    $build_dir = Join-Path -Path $ScriptPath -ChildPath 'build'
+    $build_targets_file = Join-Path -Path $build_dir -ChildPath 'build.targets'
+    if (!(Test-Path $build_targets_file)) {
+        throw "Could not find $build_targets_file_name on this system"
+    }
+
+    return $build_targets_file
+}
+
+function Get-PathToNuGetExe {
+    Param([Parameter(Mandatory=$True, Position=0)]
+          [string]$NuGetDir)
+
+    $nuget_exe_name = 'NuGet.exe'
+
+    $nuget_exe_path = Join-Path -Path $NuGetDir -ChildPath $nuget_exe_name
+
+    if (!(Test-Path $nuget_exe_path)) {
+        throw "Could not find $nuget_exe_name on this system"
+    }
+
+    Write-Debug "Using $nuget_exe_name at $nuget_exe_path"
+
+    return $nuget_exe_path
+}
+
 # Note:
 # Set to Continue to see DEBUG messages
 # $DebugPreference = 'Continue'
 
-function Get-ScriptPath {
-  $scriptDir = Get-Variable PSScriptRoot -ErrorAction SilentlyContinue | ForEach-Object { $_.Value }
-  if (!$scriptDir) {
-    if ($MyInvocation.MyCommand.Path) {
-      $scriptDir = Split-Path $MyInvocation.MyCommand.Path -Parent
+Write-Debug "Target: $Target"
+
+$version_property = ''
+if (! ([String]::IsNullOrEmpty($VersionString))) {
+    if ($Target -ne 'Publish') {
+        throw 'Only use the -VersionString parameter for the "Publish" target'
     }
-  }
-  if (!$scriptDir) {
-    if ($ExecutionContext.SessionState.Module.Path) {
-      $scriptDir = Split-Path (Split-Path $ExecutionContext.SessionState.Module.Path)
-    }
-  }
-  if (!$scriptDir) {
-    $scriptDir = $PWD
-  }
-  return $scriptDir
+    $version_property = "/property:VersionString=$VersionString"
 }
 
-Get-PathToMSBuildExe
+$script_path = Get-ScriptPath
 
+$build_targets_file = Get-BuildTargetsFile -ScriptPath $script_path
+
+$msbuild_exe = Get-PathToMSBuildExe
+
+$nuget_dir = Join-Path -Path $script_path -ChildPath '.nuget'
+$nuget_exe = Get-PathToNuGetExe -NuGetDir $nuget_dir
+$nuget_packages_dir = Join-Path -Path $script_path -ChildPath 'packages'
+$nuget_packages_config = Join-Path -Path $nuget_dir -ChildPath 'packages.config'
+Write-Debug "NuGet command: $nuget_exe restore -PackagesDirectory $nuget_packages_dir $nuget_packages_config"
+& $nuget_exe restore -PackagesDirectory $nuget_packages_dir $nuget_packages_config
+if ($? -ne $True) {
+    throw "$nuget_exe failed: $LastExitCode"
+}
+Write-Debug "$nuget_exe exit code: $LastExitCode"
+
+Write-Debug "MSBuild command: $msbuild_exe ""/verbosity:$Verbosity"" /nologo /m ""/property:SolutionDir=$script_path\"" ""$version_property"" ""/target:$Target"" ""$build_targets_file"""
+& $msbuild_exe "/verbosity:$Verbosity" /nologo /m "/property:SolutionDir=$script_path\" "$version_property" "/target:$Target" "$build_targets_file"
+if ($? -ne $True) {
+    throw "$msbuild_exe failed: $LastExitCode"
+}
+Write-Debug "$msbuild_exe exit code: $LastExitCode"
 exit 0
-
-$release_zip_name = 'RiakClient.zip'
-$release_zip_path = Resolve-Path ($(Get-ScriptPath) + '\..\src\RiakClient\bin\Release\' + $release_zip_name)
-Write-Debug -Message "RiakClient release zip file: $release_zip_path"
-
-$github_api_key_file = Resolve-Path '~/.ghapi'
-$github_api_key = Get-Content $github_api_key_file
-Write-Debug "GitHub API Key '$github_api_key'"
-
-$release_info = New-Object PSObject -Property @{
-        tag_name = $VersionString
-        name = $VersionString
-        body ="riak-dotnet-client $VersionString"
-        draft = $false
-        prerelease = $true
-    }
-
-$headers = @{ Authorization = "token $github_api_key" }
-
-$release_json = ConvertTo-Json -InputObject $release_info -Compress
-
-try {
-    $response = Invoke-WebRequest -Headers $headers -ContentType 'application/json' -Method Post -Body $release_json -Uri 'https://api.github.com/repos/basho-labs/riak-dotnet-client/releases'
-    if ([int]$response.StatusCode -ne 201) {
-        throw "Creating release failed: $response.StatusCode"
-    }
-}
-catch {
-    if ([int]$_.Exception.Response.StatusCode -eq 422) {
-        Write-Error -Category InvalidOperation "Release already exists in GitHub!"
-        exit 1
-    }
-    else {
-        throw
-    }
-}
-
-$response_json = ConvertFrom-Json -InputObject $response.Content
-# https://uploads.github.com/repos/basho-labs/riak-dotnet-client/releases/890350/assets{?name}
-$upload_url_with_name = $response_json.upload_url -Replace '{\?name}', ('?name=' + $release_zip_name)
-
-$response = Get-Content $release_zip_path | Invoke-WebRequest -Headers $headers -ContentType 'application/zip' -Method Post -Uri $upload_url_with_name
-if ([int]$response.StatusCode -ne 201) {
-    throw "Creating release asset failed: $response.StatusCode"
-}
 
