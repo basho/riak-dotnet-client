@@ -171,9 +171,6 @@
     <ProjectToBuild Include="$(SolutionFile)">
       <Properties>Configuration=Release</Properties>
     </ProjectToBuild>
-    <ProjectToBuild Include="$(SolutionFile)">
-      <Properties>Configuration=DeprecatedTests</Properties>
-    </ProjectToBuild>
   </ItemGroup>
 
   <ItemGroup>
@@ -241,10 +238,6 @@
     <MSBuild Projects="$(SolutionFile)" Properties="Configuration=Debug" />
   </Target>
 
-  <Target Name="DeprecatedDebug" DependsOnTargets="GenerateCommonAssemblyInfo">
-    <MSBuild Projects="$(SolutionFile)" Properties="Configuration=DeprecatedTests" />
-  </Target>
-
   <Target Name="IntegrationTest" DependsOnTargets="Debug">
     <Exec WorkingDirectory="$(SolutionDir)"
           Command="$(NUnitConsoleRunnerCommand) -work=$(ProjDir)\RiakClient.Tests.Live $(ProjDir)\RiakClient.Tests.Live\RiakClient.Tests.Live.nunit" />
@@ -261,7 +254,7 @@
     <CallTarget Targets="TestAll" />
   </Target>
 
-  <Target Name="DeprecatedTest" DependsOnTargets="DeprecatedDebug">
+  <Target Name="DeprecatedTest" DependsOnTargets="Debug">
     <Exec WorkingDirectory="$(SolutionDir)"
           Command="$(NUnitConsoleRunnerCommand) -work=$(ProjDir)\RiakClient.Tests.Deprecated $(ProjDir)\RiakClient.Tests.Deprecated\RiakClient.Tests.Deprecated.nunit" />
   </Target>
