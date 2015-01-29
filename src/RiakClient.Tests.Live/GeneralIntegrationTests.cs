@@ -18,12 +18,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using RiakClient.Tests.Extensions;
-using RiakClient.Tests.Live.Extensions;
-using RiakClient.Tests.Live;
 using NUnit.Framework;
 using RiakClient.Models;
 using RiakClient.Models.MapReduce;
+using RiakClient.Tests.Extensions;
+using RiakClient.Tests.Live.Extensions;
 using RiakClient.Util;
 
 namespace RiakClient.Tests.Live.GeneralIntegrationTests
@@ -31,6 +30,42 @@ namespace RiakClient.Tests.Live.GeneralIntegrationTests
     [TestFixture]
     public class WhenTalkingToRiak : LiveRiakConnectionTestBase
     {
+        [Test]
+        public void ShortConnectTimeoutMayResultInError()
+        {
+            IRiakEndPoint cluster = RiakCluster.FromConfig("riakShortConnectConfiguration");
+            IRiakClient client = cluster.CreateClient();
+            RiakResult result = client.Ping();
+            if (!result.IsSuccess)
+            {
+                Assert.IsTrue(result.ErrorMessage.Contains("Connection to remote server timed out"));
+            }
+        }
+
+        [Test]
+        public void ShortWriteTimeoutMayResultInError()
+        {
+            IRiakEndPoint cluster = RiakCluster.FromConfig("riakShortWriteConfiguration");
+            IRiakClient client = cluster.CreateClient();
+            RiakResult result = client.Ping();
+            if (! result.IsSuccess)
+            {
+                Assert.IsTrue(result.ErrorMessage.Contains("the connected party did not properly respond after a period of time"));
+            }
+        }
+
+        [Test]
+        public void ShortReadTimeoutMayResultInError()
+        {
+            IRiakEndPoint cluster = RiakCluster.FromConfig("riakShortReadConfiguration");
+            IRiakClient client = cluster.CreateClient();
+            RiakResult result = client.Ping();
+            if (! result.IsSuccess)
+            {
+                Assert.IsTrue(result.ErrorMessage.Contains("the connected party did not properly respond after a period of time"));
+            }
+        }
+
         [Test]
         public void ServerInfoIsSuccessfullyExtracted()
         {

@@ -7,10 +7,11 @@
     Target to build. Can be one of the following:
         * Debug           - debug build that is not versioned (default)
         * Release         - release build that versioned
+        * All             - debug and release build (parallel)
+        * Clean           - clean build artifacts
         * Test            - Run all tests
         * UnitTest        - Run unit tests
         * IntegrationTest - Run live integration tests
-        * CleanAll        - parallel clean build tree
 .PARAMETER Verbosity
     Parameter to set MSBuild verbosity
 .EXAMPLE
@@ -26,9 +27,9 @@
 [CmdletBinding()]
 Param(
     [Parameter(Mandatory=$False, Position=0)]
-    [ValidateSet('Debug','Release','All','Publish',
+    [ValidateSet('Debug','Release', 'All', 'Publish', 'Clean', 'CleanAll',
         'Test','TestAll','UnitTest','IntegrationTest','DeprecatedTest',
-        'CleanAll','Clean', IgnoreCase = $True)]
+        IgnoreCase = $True)]
     [string]$Target = 'Debug',
     [Parameter(Mandatory=$False)]
     [ValidateSet('Quiet','q','Minimal','m','Normal','n',
@@ -153,6 +154,12 @@ if ($Verbosity -eq 'detailed' -or $Verbosity -eq 'd' -or
     $Verbosity -eq 'diagnostic' -or $Verbosity -eq 'diag') {
     $verbose_property = '/property:Verbose=true'
 }
+
+# Fix up Target to use CleanAll in build.targets file
+if ($Target -eq 'Clean') {
+    $Target = 'CleanAll'
+}
+
 Write-Debug "MSBuild command: $msbuild_exe ""/verbosity:$Verbosity"" /nologo /m ""/property:SolutionDir=$script_path\"" ""$version_property"" ""$verbose_property"" ""/target:$Target"" ""$build_targets_file"""
 & $msbuild_exe "/verbosity:$Verbosity" /nologo /m "/property:SolutionDir=$script_path\" "$version_property" "$verbose_property" "/target:$Target" "$build_targets_file"
 if ($? -ne $True) {
