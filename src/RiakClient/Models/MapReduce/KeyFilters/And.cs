@@ -87,21 +87,23 @@ namespace RiakClient.Models.MapReduce.KeyFilters
             var sb = new StringBuilder();
 
             using (var sw = new StringWriter(sb))
-            using (JsonWriter jw = new JsonTextWriter(sw))
             {
-                jw.WriteStartArray();
+                using (JsonWriter jw = new JsonTextWriter(sw))
+                {
+                    jw.WriteStartArray();
 
-                jw.WriteValue(this.FunctionName);
+                    jw.WriteValue(this.FunctionName);
 
-                jw.WriteStartArray();
-                this.Left.ForEach(l => jw.WriteRawValue(l.ToString()));
-                jw.WriteEndArray();
+                    jw.WriteStartArray();
+                    this.Left.ForEach(l => jw.WriteRawValue(l.ToString()));
+                    jw.WriteEndArray();
 
-                jw.WriteStartArray();
-                this.Right.ForEach(r => jw.WriteRawValue(r.ToString()));
-                jw.WriteEndArray();
+                    jw.WriteStartArray();
+                    this.Right.ForEach(r => jw.WriteRawValue(r.ToString()));
+                    jw.WriteEndArray();
 
-                jw.WriteEndArray();
+                    jw.WriteEndArray();
+                }
             }
 
             return sb.ToString();
