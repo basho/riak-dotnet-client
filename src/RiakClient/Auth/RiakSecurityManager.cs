@@ -22,6 +22,7 @@ using System.Security.Cryptography.X509Certificates;
 using RiakClient.Extensions;
 using RiakClient.Config;
 using RiakClient.Messages;
+using RiakClient.Util;
 
 namespace RiakClient.Auth
 {
@@ -58,7 +59,8 @@ namespace RiakClient.Auth
         {
             get
             {
-                return (authConfig != null && (!authConfig.Username.IsNullOrEmpty()));
+                return (false == MonoUtil.IsRunningOnMono) &&
+                       (authConfig != null && (!authConfig.Username.IsNullOrEmpty()));
             }
         }
 
