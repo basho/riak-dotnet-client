@@ -14,6 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
@@ -22,6 +23,9 @@ namespace RiakClient.Config
 {
     public class RiakClusterConfiguration : ConfigurationSection, IRiakClusterConfiguration
     {
+        private static TimeSpan s_defaultNodePollTime = TimeSpan.FromSeconds(5);
+        private static TimeSpan s_defaultRetryWaitTime = TimeSpan.FromMilliseconds(200);
+
         public static IRiakClusterConfiguration LoadFromConfig(string sectionName)
         {
             return (IRiakClusterConfiguration)ConfigurationManager.GetSection(sectionName);
@@ -47,18 +51,50 @@ namespace RiakClient.Config
             get { return this.Nodes.Cast<IRiakNodeConfiguration>().ToList(); }
         }
 
-        [ConfigurationProperty("nodePollTime", DefaultValue = 5000, IsRequired = false)]
-        public int NodePollTime
+        [ConfigurationProperty("nodePollTime", DefaultValue = "5000", IsRequired = false)]
+        private string NodePollTimeProperty
         {
-            get { return (int)this["nodePollTime"]; }
+            get { return (string)this["nodePollTime"]; }
             set { this["nodePollTime"] = value; }
         }
 
-        [ConfigurationProperty("defaultRetryWaitTime", DefaultValue = 200, IsRequired = false)]
-        public int DefaultRetryWaitTime
+        public TimeSpan NodePollTime
         {
-            get { return (int)this["defaultRetryWaitTime"]; }
+            get
+            {
+                int nodePollTimeMilliseconds;
+                if (int.TryParse(NodePollTimeProperty, out nodePollTimeMilliseconds))
+                {
+                    return TimeSpan.FromMilliseconds(nodePollTimeMilliseconds);
+                }
+                else
+                {
+                    return s_defaultNodePollTime;
+                }
+            }
+        }
+
+        [ConfigurationProperty("defaultRetryWaitTime", DefaultValue = "200", IsRequired = false)]
+        private string DefaultRetryWaitTimeProperty
+        {
+            get { return (string)this["defaultRetryWaitTime"]; }
             set { this["defaultRetryWaitTime"] = value; }
+        }
+
+        public TimeSpan DefaultRetryWaitTime
+        {
+            get
+            {
+                int defaultRetryWaitTimeMilliseconds;
+                if (int.TryParse(DefaultRetryWaitTimeProperty, out defaultRetryWaitTimeMilliseconds))
+                {
+                    return TimeSpan.FromMilliseconds(defaultRetryWaitTimeMilliseconds);
+                }
+                else
+                {
+                    return s_defaultRetryWaitTime;
+                }
+            }
         }
 
         [ConfigurationProperty("defaultRetryCount", DefaultValue = 3, IsRequired = false)]
