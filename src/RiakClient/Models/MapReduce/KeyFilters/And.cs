@@ -42,7 +42,7 @@ namespace RiakClient.Models.MapReduce.KeyFilters
         /// <param name="right">right hand token</param>
         public And(List<IRiakKeyFilterToken> left, List<IRiakKeyFilterToken> right)
         {
-            this.keyFilterDefinition = Tuple.Create("and", left, right);
+            keyFilterDefinition = Tuple.Create("and", left, right);
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace RiakClient.Models.MapReduce.KeyFilters
         /// </summary>
         public string FunctionName
         {
-            get { return this.keyFilterDefinition.Item1; }
+            get { return keyFilterDefinition.Item1; }
         }
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace RiakClient.Models.MapReduce.KeyFilters
         /// </summary>
         public List<IRiakKeyFilterToken> Left
         {
-            get { return this.keyFilterDefinition.Item2; }
+            get { return keyFilterDefinition.Item2; }
         }
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace RiakClient.Models.MapReduce.KeyFilters
         /// </summary>
         public List<IRiakKeyFilterToken> Right
         {
-            get { return this.keyFilterDefinition.Item3; }
+            get { return keyFilterDefinition.Item3; }
         }
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace RiakClient.Models.MapReduce.KeyFilters
         /// <returns>JSON representation of the <see cref="And"/> class</returns>
         public override string ToString()
         {
-            return this.ToJsonString();
+            return ToJsonString();
         }
 
         /// <summary>
@@ -92,14 +92,14 @@ namespace RiakClient.Models.MapReduce.KeyFilters
                 {
                     jw.WriteStartArray();
 
-                    jw.WriteValue(this.FunctionName);
+                    jw.WriteValue(FunctionName);
 
                     jw.WriteStartArray();
-                    this.Left.ForEach(l => jw.WriteRawValue(l.ToString()));
+                    Left.ForEach(l => jw.WriteRawValue(l.ToString()));
                     jw.WriteEndArray();
 
                     jw.WriteStartArray();
-                    this.Right.ForEach(r => jw.WriteRawValue(r.ToString()));
+                    Right.ForEach(r => jw.WriteRawValue(r.ToString()));
                     jw.WriteEndArray();
 
                     jw.WriteEndArray();

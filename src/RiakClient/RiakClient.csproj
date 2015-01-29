@@ -15,6 +15,8 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <NoWarn Condition="$(OS) == 'Windows_NT'">0419;1570;1572;1573;1591;1710;1734</NoWarn>
     <NoWarn Condition="$(OS) != 'Windows_NT'">0419;1570;1572;1573;1591</NoWarn>
+    <NuGetPackageImportStamp>857f709c</NuGetPackageImportStamp>
+    <StyleCopTreatErrorsAsWarnings>false</StyleCopTreatErrorsAsWarnings>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>True</DebugSymbols>
@@ -286,6 +288,7 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
+    <Error Condition="!Exists('..\..\packages\StyleCop.MSBuild.4.7.49.0\build\StyleCop.MSBuild.Targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\StyleCop.MSBuild.4.7.49.0\build\StyleCop.MSBuild.Targets'))" />
   </Target>
   <Target Name="BeforeBuild">
     <CallTarget Targets="GenerateCommonAssemblyInfo" />
@@ -301,4 +304,5 @@
     </ItemGroup>
     <Zip Files="@(ZipFiles)" WorkingDirectory="$(OutputPath)" ZipFileName="$(OutputPath)$(AssemblyName).zip" ZipLevel="9" />
   </Target>
+  <Import Project="..\..\packages\StyleCop.MSBuild.4.7.49.0\build\StyleCop.MSBuild.Targets" Condition="Exists('..\..\packages\StyleCop.MSBuild.4.7.49.0\build\StyleCop.MSBuild.Targets')" />
 </Project>
