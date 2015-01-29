@@ -14,6 +14,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
+
 namespace RiakClient.Config
 {
     public interface IRiakNodeConfiguration
@@ -24,8 +26,9 @@ namespace RiakClient.Config
         string RestScheme { get; }
         int RestPort { get; }
         int PoolSize { get; }
-        //int IdleTimeout { get; }
-        int NetworkReadTimeout { get; }
-        int NetworkWriteTimeout { get; }
+        // TimeSpan IdleTimeout { get; }
+        TimeSpan NetworkReadTimeout { get; }
+        TimeSpan NetworkWriteTimeout { get; }
+        TimeSpan NetworkConnectTimeout { get; }
     }
 }

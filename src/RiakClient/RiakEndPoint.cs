@@ -1,4 +1,5 @@
 ﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -22,7 +23,7 @@ namespace RiakClient
 {
     public abstract class RiakEndPoint : IRiakEndPoint
     {
-        public int RetryWaitTime { get; set; }
+        public TimeSpan RetryWaitTime { get; set; }
         protected abstract int DefaultRetryCount { get; }
 
         /// <summary>

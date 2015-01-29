@@ -21,9 +21,9 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
-using RiakClient.Extensions;
 using RiakClient.Config;
 using RiakClient.Exceptions;
+using RiakClient.Extensions;
 using RiakClient.Messages;
 using RiakClient.Models.Rest;
 using RiakClient.Util;
@@ -215,6 +215,7 @@ namespace RiakClient.Comms
                 {
                     Disconnect();
                 }
+                // TODO: we really should preserve the Exception object
                 return RiakResult.Error(ResultCode.CommunicationError, ex.Message, ex.NodeOffline);
             }
             catch (Exception ex)

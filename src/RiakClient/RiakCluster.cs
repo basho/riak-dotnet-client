@@ -20,7 +20,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using RiakClient.Comms;
 using RiakClient.Comms.LoadBalancing;
 using RiakClient.Config;
@@ -33,7 +32,7 @@ namespace RiakClient
         private readonly RoundRobinStrategy loadBalancer;
         private readonly List<IRiakNode> nodes;
         private readonly ConcurrentQueue<IRiakNode> offlineNodes;
-        private readonly int nodePollTime;
+        private readonly TimeSpan nodePollTime;
         private readonly int defaultRetryCount;
         private bool disposing;
 

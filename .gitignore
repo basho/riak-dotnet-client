@@ -42,3 +42,4 @@ GlobalAssemblyInfo.cs
 CommonAssemblyInfo.cs
 *.DotSettings
 *.dcvr.settings
+StyleCop.Cache
