@@ -21,11 +21,11 @@ using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Authentication;
-using RiakClient.Extensions;
 using ProtoBuf;
 using RiakClient.Auth;
 using RiakClient.Config;
 using RiakClient.Exceptions;
+using RiakClient.Extensions;
 using RiakClient.Messages;
 
 namespace RiakClient.Comms
@@ -34,8 +34,9 @@ namespace RiakClient.Comms
     {
         private readonly string server;
         private readonly int port;
-        private readonly int readTimeout;
-        private readonly int writeTimeout;
+        private readonly TimeSpan connectTimeout;
+        private readonly TimeSpan readTimeout;
+        private readonly TimeSpan writeTimeout;
         private readonly RiakSecurityManager securityManager;
         private readonly bool checkCertificateRevocation = false;
 
@@ -47,6 +48,7 @@ namespace RiakClient.Comms
             port = nodeConfig.PbcPort;
             readTimeout = nodeConfig.NetworkReadTimeout;
             writeTimeout = nodeConfig.NetworkWriteTimeout;
+            connectTimeout = nodeConfig.NetworkConnectTimeout;
             securityManager = new RiakSecurityManager(server, authConfig);
             checkCertificateRevocation = authConfig.CheckCertificateRevocation;
         }
@@ -201,14 +203,28 @@ namespace RiakClient.Comms
         {
             var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             socket.NoDelay = true;
-            socket.Connect(server, port);
+
+            // https://social.msdn.microsoft.com/Forums/en-US/313cf28c-2a6d-498e-8188-7a0639dbd552/tcpclientbeginconnect-issue
+            IAsyncResult result = socket.BeginConnect(server, port, null, null);
+            if (result.AsyncWaitHandle.WaitOne(connectTimeout))
+            {
+                socket.EndConnect(result);
+            }
+            else
+            {
+                socket.Close();
+                string errorMessage = "Connection to remote server timed out: {0}:{1}".Fmt(server, port);
+                throw new RiakException(errorMessage, true);
+            }
+
             if (!socket.Connected)
             {
                 string errorMessage = "Unable to connect to remote server: {0}:{1}".Fmt(server, port);
                 throw new RiakException(errorMessage, true);
             }
-            socket.ReceiveTimeout = readTimeout;
-            socket.SendTimeout = writeTimeout;
+
+            socket.ReceiveTimeout = (int)readTimeout.TotalMilliseconds;
+            socket.SendTimeout = (int)writeTimeout.TotalMilliseconds;
             this.networkStream = new NetworkStream(socket, true);
             SetUpSslStream(this.networkStream);
         }
@@ -230,8 +246,8 @@ namespace RiakClient.Comms
                 securityManager.ServerCertificateValidationCallback,
                 securityManager.ClientCertificateSelectionCallback);
 
-            sslStream.ReadTimeout = readTimeout;
-            sslStream.WriteTimeout = writeTimeout;
+            sslStream.ReadTimeout = (int)readTimeout.TotalMilliseconds;
+            sslStream.WriteTimeout = (int)writeTimeout.TotalMilliseconds;
 
             if (securityManager.ClientCertificatesConfigured)
             {

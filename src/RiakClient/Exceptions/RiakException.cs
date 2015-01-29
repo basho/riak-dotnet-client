@@ -22,6 +22,7 @@ using RiakClient.Extensions;
 
 namespace RiakClient.Exceptions
 {
+    // TODO: ensure that subclass is correct
     public class RiakException : Exception
     {
         private readonly string _errorMessage;
