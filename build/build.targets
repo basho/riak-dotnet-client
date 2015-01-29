@@ -253,7 +253,10 @@
 
   <Target Name="Test" DependsOnTargets="TestAll" />
 
-  <Target Name="Clean" DependsOnTargets="CleanAll" />
+  <!--
+    NB:
+    Do NOT create a 'Clean' target - that will screw up VS
+  -->
 
   <Target Name="DeprecatedTest" DependsOnTargets="Debug">
     <Exec WorkingDirectory="$(SolutionDir)"
