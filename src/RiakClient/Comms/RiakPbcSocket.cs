@@ -206,6 +206,7 @@ namespace RiakClient.Comms
             socket.LingerState.Enabled = true;
             socket.LingerState.LingerTime = 0;
 
+            // https://social.msdn.microsoft.com/Forums/en-US/313cf28c-2a6d-498e-8188-7a0639dbd552/tcpclientbeginconnect-issue
             IAsyncResult result = socket.BeginConnect(server, port, null, null);
             if (result.AsyncWaitHandle.WaitOne(connectTimeout))
             {
