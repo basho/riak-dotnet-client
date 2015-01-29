@@ -36,7 +36,7 @@ namespace RiakClient
         public bool IsSuccess { get; protected set; }
         public string ErrorMessage { get; protected set; }
         public ResultCode ResultCode { get; protected set; }
-        
+
         internal bool NodeOffline { get; set; }
 
         protected RiakResult()
@@ -52,6 +52,7 @@ namespace RiakClient
             };
         }
 
+        // TODO: add Exception
         internal static RiakResult Error(ResultCode code, string message, bool nodeOffline)
         {
             return new RiakResult
@@ -152,7 +153,7 @@ namespace RiakClient
                 && Equals(other.NodeOffline, NodeOffline)
                 && Equals(other.Continuation, Continuation)
                 && (other.Done.HasValue
-                    && Done.HasValue 
+                    && Done.HasValue
                     && Equals(other.Done.Value && Done.Value));
         }
 
