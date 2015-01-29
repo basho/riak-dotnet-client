@@ -17,9 +17,9 @@
 
 using System;
 using System.Collections.Generic;
-using RiakClient.Extensions;
 using NUnit.Framework;
 using RiakClient.Config;
+using RiakClient.Extensions;
 using RiakClient.Util;
 
 namespace RiakClient.Tests.Live
@@ -92,4 +92,3 @@ namespace RiakClient.Tests.Live
         }
     }
 }
-

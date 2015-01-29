@@ -25,12 +25,22 @@ using NUnit.Framework;
 using RiakClient.Models;
 using RiakClient.Models.MapReduce;
 using RiakClient.Util;
+using RiakClient.Exceptions;
 
 namespace RiakClient.Tests.Live.GeneralIntegrationTests
 {
     [TestFixture]
     public class WhenTalkingToRiak : LiveRiakConnectionTestBase
     {
+        [Test]
+        public void ShortConnectTimeoutResultsInException()
+        {
+            IRiakEndPoint cluster = RiakCluster.FromConfig("riakShortConnectConfiguration");
+            IRiakClient client = cluster.CreateClient();
+            RiakResult result = client.Ping();
+            Assert.IsFalse(result.IsSuccess);
+        }
+
         [Test]
         public void ServerInfoIsSuccessfullyExtracted()
         {
