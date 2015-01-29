@@ -1,4 +1,5 @@
 ﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -14,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
 using System.Collections.Generic;
 using Moq;
 using RiakClient.Comms;
@@ -49,7 +51,7 @@ namespace RiakClient.Tests.RiakClientTests
             NodeConfigMock.SetupGet(m => m.PoolSize).Returns(1);
             ClusterConfigMock.SetupGet(m => m.RiakNodes).Returns(new List<IRiakNodeConfiguration> { NodeConfigMock.Object });
             ClusterConfigMock.SetupGet(m => m.DefaultRetryCount).Returns(100);
-            ClusterConfigMock.SetupGet(m => m.DefaultRetryWaitTime).Returns(100);
+            ClusterConfigMock.SetupGet(m => m.DefaultRetryWaitTime).Returns(TimeSpan.FromMilliseconds(100));
 
             Cluster = new RiakCluster(ClusterConfigMock.Object, ConnFactoryMock.Object);
             Client = Cluster.CreateClient();

@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
 using System.Collections.Generic;
 
 namespace RiakClient.Config
@@ -22,8 +23,8 @@ namespace RiakClient.Config
     public interface IRiakClusterConfiguration
     {
         IList<IRiakNodeConfiguration> RiakNodes { get; }
-        int NodePollTime { get; }
-        int DefaultRetryWaitTime { get; }
+        TimeSpan NodePollTime { get; }
+        TimeSpan DefaultRetryWaitTime { get; }
         int DefaultRetryCount { get; }
         IRiakAuthenticationConfiguration Authentication { get; }
     }

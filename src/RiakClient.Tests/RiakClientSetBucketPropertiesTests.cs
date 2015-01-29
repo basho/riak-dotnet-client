@@ -1,4 +1,5 @@
 ﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -33,7 +34,7 @@ namespace RiakClient.Tests.RiakClientSetBucketPropertiesTests
 
         public MockCluster()
         {
-            RetryWaitTime = 200;
+            RetryWaitTime = TimeSpan.FromMilliseconds(200);
         }
 
         public void Dispose()
@@ -50,7 +51,7 @@ namespace RiakClient.Tests.RiakClientSetBucketPropertiesTests
             return new Mock<IRiakClient>().Object;
         }
 
-        public int RetryWaitTime { get; set; }
+        public TimeSpan RetryWaitTime { get; set; }
 
         public RiakResult<TResult> UseConnection<TResult>(Func<IRiakConnection, RiakResult<TResult>> useFun, int retryAttempts)
         {
