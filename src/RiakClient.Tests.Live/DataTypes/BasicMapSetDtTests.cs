@@ -13,8 +13,7 @@ namespace RiakClient.Tests.Live.DataTypes
         [Test]
         public void TestMapSetOperations()
         {
-            var key = "TestMapSetOperations_" + Random.Next();
-            Console.WriteLine("Using {0} for TestMapSetOperations() key", key);
+            string key = GetRandomKey();
 
             var id = new RiakObjectId(BucketTypeNames.Maps, Bucket, key);
             const string setName = "Name";

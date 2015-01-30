@@ -13,8 +13,7 @@ namespace RiakClient.Tests.Live.DataTypes
         [Test]
         public void TestFlagOperations()
         {
-            var key = "TestFlagOperations_" + Random.Next();
-            Console.WriteLine("Using {0} for TestFlagOperations() key", key);
+            string key = GetRandomKey();
 
             var id = new RiakObjectId(BucketTypeNames.Maps, Bucket, key);
             const string flagName = "Name";
