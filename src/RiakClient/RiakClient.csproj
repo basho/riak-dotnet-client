@@ -84,6 +84,7 @@
     <Compile Include="Exceptions\RiakException.cs" />
     <Compile Include="IRiakBatchClient.cs" />
     <Compile Include="IRiakEndPoint.cs" />
+    <Compile Include="Messages\MessageCode.cs" />
     <Compile Include="Messages\riak.cs" />
     <Compile Include="Messages\riak_dt.cs" />
     <Compile Include="Messages\riak_kv.cs" />
@@ -110,6 +111,7 @@
     <Compile Include="Models\Index\RiakIndexKeyTerm.cs" />
     <Compile Include="Models\Index\RiakIndexResult.cs" />
     <Compile Include="Models\Index\RiakStreamedIndexResult.cs" />
+    <Compile Include="Models\IWriteableVClock.cs" />
     <Compile Include="Models\MapReduce\Fluent\RiakFluentKeyFilter.cs" />
     <Compile Include="Models\MapReduce\Fluent\RiakFluentLinkPhase.cs" />
     <Compile Include="Models\MapReduce\Fluent\RiakFluentActionPhaseErlang.cs" />
@@ -250,7 +252,7 @@
     <Compile Include="Util\MonoUtil.cs" />
     <Compile Include="Util\RiakConstants.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
-    <Compile Include="Messages\MessageCode.cs" />
+    <Compile Include="Messages\MessageCodeTypeMapBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Models\MapReduce\Inputs\RiakModuleFunctionArgInput.cs" />
     <Compile Include="Models\RiakDeleteOptions.cs" />
