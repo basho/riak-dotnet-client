@@ -1,5 +1,6 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
-// Copyright (c) 2015 - Basho Technologies, Inc.
+// <copyright file="RiakObject.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -14,22 +15,23 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Xml;
-using System.Xml.Serialization;
-using RiakClient.Extensions;
-using Newtonsoft.Json;
-using ProtoBuf;
-using RiakClient.Messages;
-using RiakClient.Models.Index;
-using RiakClient.Util;
+// </copyright>
 
 namespace RiakClient.Models
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Xml;
+    using System.Xml.Serialization;
+    using Newtonsoft.Json;
+    using ProtoBuf;
+    using Extensions;
+    using Messages;
+    using Models.Index;
+    using Util;
+
     public delegate string SerializeObjectToString<in T>(T theObject);
 
     public delegate byte[] SerializeObjectToByteArray<in T>(T theObject);
@@ -37,23 +39,6 @@ namespace RiakClient.Models
     public delegate T DeserializeObject<out T>(byte[] theObject, string contentType = null);
 
     public delegate T ResolveConflict<T>(List<T> conflictedObjects);
-
-    /// <summary>
-    /// <para>Implements a writeable vector clock interface. Callers must explictly use the
-    /// IWriteableVClock interface to set the vector clock value. This is by design and
-    /// is implemented in an attempt to prevent developers new to Riak from causing themselves
-    /// more pain. This trade off should present developers with a reliable way to explicitly
-    /// drop down to mucking about with vector clocks - it becomes apparent to a casual 
-    /// observer that something out of the ordinary is happening.</para>
-    /// <para>A better understanding of the usefulness of vector clocks can be found in 
-    /// John Daily's Understanding Riak’s Configurable Behaviors: Part 2
-    /// (http://basho.com/riaks-config-behaviors-part-2/).
-    /// </para>
-    /// </summary>
-    public interface IWriteableVClock
-    {
-        void SetVClock(byte[] vclock);
-    }
 
     public class RiakObject : IWriteableVClock
     {
