@@ -37,16 +37,6 @@ namespace RiakClient
     using Models.Search;
     using Util;
 
-    public interface IRiakClient : IRiakBatchClient
-    {
-        void Batch(Action<IRiakBatchClient> batchAction);
-
-        T Batch<T>(Func<IRiakBatchClient, T> batchFunction);
-
-        IRiakAsyncClient Async { get; }
-
-    }
-
     public class RiakClient : IRiakClient
     {
         internal static bool DisableListBucketsWarning = false;

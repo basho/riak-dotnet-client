@@ -17,13 +17,13 @@
 // under the License.
 // </copyright>
 
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using RiakClient.Config;
-
 namespace RiakClient.Comms
 {
+    using System;
+    using System.Collections.Concurrent;
+    using System.Collections.Generic;
+    using Config;
+
     internal class RiakConnectionPool : IRiakConnectionManager
     {
         private readonly List<IRiakConnection> _allResources;

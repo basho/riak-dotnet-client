@@ -35,12 +35,12 @@ namespace RiakClient.Models
 
         public RiakIndexId(string bucketType, string bucketName, string indexName)
         {
-            if (String.IsNullOrEmpty(bucketName))
+            if (string.IsNullOrEmpty(bucketName))
             {
                 throw new ArgumentOutOfRangeException("bucketName", "bucketName cannot be null, empty, or whitespace.");
             }
 
-            if (String.IsNullOrEmpty(indexName))
+            if (string.IsNullOrEmpty(indexName))
             {
                 throw new ArgumentOutOfRangeException("indexName", "indexName cannot be null, empty, or whitespace.");
             }
@@ -87,9 +87,9 @@ namespace RiakClient.Models
                 return true;
             }
 
-            return String.Equals(bucketName, other.bucketName) &&
-                   String.Equals(bucketType, other.bucketType) &&
-                   String.Equals(indexName, other.indexName);
+            return string.Equals(bucketName, other.bucketName) &&
+                   string.Equals(bucketType, other.bucketType) &&
+                   string.Equals(indexName, other.indexName);
         }
 
         public override bool Equals(object obj)

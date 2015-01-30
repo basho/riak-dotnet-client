@@ -116,10 +116,10 @@ namespace RiakClientTests.Live.GeneralIntegrationTests
             Assert.Throws<ArgumentNullException>(() => Client.Get("", "key"));
 
             Assert.Throws<ArgumentNullException>(() => Client.Get(null, "key"));
-            Assert.Throws<ArgumentNullException>(() => Client.Get(String.Empty, "key"));
+            Assert.Throws<ArgumentNullException>(() => Client.Get(string.Empty, "key"));
 
             Assert.Throws<ArgumentNullException>(() => Client.Get(null, null, "key"));
-            Assert.Throws<ArgumentNullException>(() => Client.Get(null, String.Empty, "key"));
+            Assert.Throws<ArgumentNullException>(() => Client.Get(null, string.Empty, "key"));
         }
 
         [Test]

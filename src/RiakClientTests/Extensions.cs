@@ -1,4 +1,4 @@
-// <copyright file="UnitTestExtensions.cs" company="Basho Technologies, Inc.">
+// <copyright file="Extensions.cs" company="Basho Technologies, Inc.">
 // Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
 // Copyright (c) 2014 - Basho Technologies, Inc.
 //
@@ -17,14 +17,14 @@
 // under the License.
 // </copyright>
 
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using NUnit.Framework;
-
 namespace RiakClientTests
 {
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using NUnit.Framework;
+
     [System.Diagnostics.DebuggerNonUserCode]
     public static class Extensions
     {

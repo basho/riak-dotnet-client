@@ -82,9 +82,9 @@ namespace RiakClient.Models
             {
                 return true;
             }
-            return String.Equals(bucket, other.Bucket) &&
-                String.Equals(bucketType, other.BucketType) &&
-                String.Equals(key, other.key);
+            return string.Equals(bucket, other.Bucket) &&
+                string.Equals(bucketType, other.BucketType) &&
+                string.Equals(key, other.key);
         }
 
         public override bool Equals(object obj)

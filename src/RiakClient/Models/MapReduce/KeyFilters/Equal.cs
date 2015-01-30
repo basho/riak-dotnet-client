@@ -1,4 +1,4 @@
-// <copyright file="EqualTo.cs" company="Basho Technologies, Inc.">
+// <copyright file="Equal.cs" company="Basho Technologies, Inc.">
 // Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
 // Copyright (c) 2014 - Basho Technologies, Inc.
 //
@@ -17,13 +17,13 @@
 // under the License.
 // </copyright>
 
-using Newtonsoft.Json;
-using System;
-using System.IO;
-using System.Text;
-
 namespace RiakClient.Models.MapReduce.KeyFilters
 {
+    using System;
+    using System.IO;
+    using System.Text;
+    using Newtonsoft.Json;
+
     /// <summary>
     /// Tests that the input is equal to the argument.
     /// </summary>
@@ -50,9 +50,9 @@ namespace RiakClient.Models.MapReduce.KeyFilters
         {
             var sb = new StringBuilder();
 
-            using(var sw = new StringWriter(sb))
+            using (var sw = new StringWriter(sb))
             {
-                using(JsonWriter jw = new JsonTextWriter(sw))
+                using (JsonWriter jw = new JsonTextWriter(sw))
                 {
                     jw.WriteStartArray();
 
