@@ -13,8 +13,7 @@ namespace RiakClient.Tests.Live.DataTypes
         [Test]
         public void TestRegisterOperations()
         {
-            var key = "TestRegisterOperations_" + Random.Next();
-            Console.WriteLine("Using {0} for TestRegisterOperations() key", key);
+            string key = GetRandomKey();
 
             var id = new RiakObjectId(BucketTypeNames.Maps, Bucket, key);
             const string registerName = "Name";

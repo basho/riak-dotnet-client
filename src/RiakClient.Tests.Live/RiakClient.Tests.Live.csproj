@@ -62,7 +62,10 @@
     <Compile Include="DataTypes\BasicMapDtTests.cs" />
     <Compile Include="DataTypes\BasicMapFlagDtTests.cs" />
     <Compile Include="DataTypes\BasicMapRegisterDtTests.cs" />
+    <Compile Include="DataTypes\BasicMapSetDtTests.cs" />
+    <Compile Include="DataTypes\BasicSetDtTests.cs" />
     <Compile Include="DataTypes\DataTypeTestsBase.cs" />
+    <Compile Include="DataTypes\SetDtEdgeCaseTests.cs" />
     <Compile Include="Extensions\IntegrationTestExtensions.cs" />
     <Compile Include="Extensions\IntegrationTestExtensionsTest.cs" />
     <Compile Include="Extensions\MapReduceTestHelpers.cs" />
@@ -75,7 +78,6 @@
     <Compile Include="MapReduce\WhenUsingFluentKeyFilters.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Search\TestSearchOperation.cs" />
-    <Compile Include="DataTypes\RawRiakDtTests.cs" />
     <Compile Include="RiakClientTests.cs" />
     <Compile Include="RiakConfigurationTests.cs" />
     <Compile Include="MapReduce\RiakMapReduceTestBase.cs" />

@@ -14,8 +14,7 @@ namespace RiakClient.Tests.Live.DataTypes
         [Test]
         public void TestBasicMapOperations()
         {
-            var key = "TestMapOperations_" + Random.Next();
-            Console.WriteLine("Using {0} for TestMapOperations() key", key);
+            string key = GetRandomKey();
 
             var id = new RiakObjectId(BucketTypeNames.Maps, Bucket, key);
 

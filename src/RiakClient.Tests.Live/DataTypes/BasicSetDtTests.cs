@@ -14,7 +14,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -28,8 +27,7 @@ namespace RiakClient.Tests.Live.DataTypes
         [Test]
         public void TestSetOperations()
         {
-            var key = "TestSetOperations_" + Random.Next();
-            Console.WriteLine("Using {0} for TestSetOperations() key", key);
+            string key = GetRandomKey();
 
             var id = new RiakObjectId(BucketTypeNames.Sets, Bucket, key);
             var initialSet = Client.DtFetchSet(id);

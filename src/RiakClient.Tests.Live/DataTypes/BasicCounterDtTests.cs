@@ -10,8 +10,7 @@ namespace RiakClient.Tests.Live.DataTypes
         [Test]
         public void TestCounterOperations()
         {
-            var key = "TestCounterOperations_" + Random.Next();
-            Console.WriteLine("Using {0} for TestCounterOperations() key", key);
+            string key = GetRandomKey();
 
             var id = new RiakObjectId(BucketTypeNames.Counters, Bucket, key);
 
