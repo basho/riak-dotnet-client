@@ -17,11 +17,12 @@
 // under the License.
 // </copyright>
 
-using NUnit.Framework;
 using RiakClient.Models.MapReduce.Inputs;
 
 namespace RiakClient.Tests.Models.MapReduce.Inputs
 {
+    using NUnit.Framework;
+
     [TestFixture]
     public class RiakModuleFunctionArgInputSerializationTest : MapReduceSerializationTestsBase
     {
@@ -44,4 +45,3 @@ namespace RiakClient.Tests.Models.MapReduce.Inputs
         }
     }
 }
-

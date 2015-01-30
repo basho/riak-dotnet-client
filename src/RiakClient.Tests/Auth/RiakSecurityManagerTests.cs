@@ -18,7 +18,6 @@
 // </copyright>
 
 using System.Security.Cryptography.X509Certificates;
-using RiakClient.Extensions;
 using NUnit.Framework;
 using RiakClient.Auth;
 using RiakClient.Config;
@@ -85,7 +84,7 @@ namespace RiakClient.Tests.Auth
             var authConfig = certSubjectOnlyClusterConfig.Authentication;
             var securityManager = new RiakSecurityManager("riak-test", authConfig);
             Assert.True(securityManager.ClientCertificatesConfigured);
-            Assert.False(authConfig.ClientCertificateSubject.IsNullOrEmpty());
+            Assert.False(string.IsNullOrWhiteSpace(authConfig.ClientCertificateSubject));
 
             X509Store x509Store = null;
             try

@@ -17,21 +17,21 @@
 // under the License.
 // </copyright>
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Text;
-using RiakClient.Config;
-using RiakClient.Exceptions;
-using RiakClient.Extensions;
-using RiakClient.Messages;
-using RiakClient.Models.Rest;
-using RiakClient.Util;
-
 namespace RiakClient.Comms
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Net;
+    using System.Text;
+    using Config;
+    using Exceptions;
+    using Extensions;
+    using Messages;
+    using Models.Rest;
+    using Util;
+
     public interface IRiakConnection : IDisposable
     {
         void Disconnect();
@@ -92,7 +92,7 @@ namespace RiakClient.Comms
 
         public RiakConnection(IRiakNodeConfiguration nodeConfiguration, IRiakAuthenticationConfiguration authConfiguration)
         {
-            restRootUrl = @"{0}://{1}:{2}".Fmt(nodeConfiguration.RestScheme,
+            restRootUrl = string.Format(@"{0}://{1}:{2}", nodeConfiguration.RestScheme,
                 nodeConfiguration.HostAddress,
                 nodeConfiguration.RestPort);
 

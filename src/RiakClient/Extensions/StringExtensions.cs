@@ -17,7 +17,6 @@
 // under the License.
 // </copyright>
 
-using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -26,7 +25,7 @@ using RiakClient.Util;
 
 namespace RiakClient.Extensions
 {
-    public static class StringExtensions
+    internal static class StringExtensions
     {
         private static readonly Encoding RiakEncoding = new UTF8Encoding(false);
 
@@ -43,11 +42,6 @@ namespace RiakClient.Extensions
         public static string FromRiakString(this byte[] value)
         {
             return value == null ? null : RiakEncoding.GetString(value);
-        }
-
-        public static string Fmt(this string formatter, params object[] args)
-        {
-            return String.Format(formatter, args);
         }
 
         public static string UrlEncoded(this string value)
@@ -114,7 +108,7 @@ namespace RiakClient.Extensions
             return result;
         }
 
-        internal static uint ToRpbOption(this string value)
+        public static uint ToRpbOption(this string value)
         {
             System.Diagnostics.Debug.Assert(new HashSet<string> { "all", "quorum", "one", "default" }.Contains(value), "Incorrect quorum value");
 

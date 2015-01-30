@@ -95,11 +95,11 @@ namespace RiakClient.Tests.Live.MapReduce
             _randomId = _random.Next();
             var alyssaKey = _randomId + HackerKey;
             _alyssaRiakId = new RiakObjectId(BucketType, Bucket, alyssaKey);
-            var alyssaDoc = String.Format(HackerDoc, _randomId);
+            var alyssaDoc = string.Format(HackerDoc, _randomId);
 
             var alanKey = _randomId + PublicKey;
             var alanRiakId = new RiakObjectId(BucketType, Bucket, alanKey);
-            var alanDoc = String.Format(PublicDoc, _randomId);
+            var alanDoc = string.Format(PublicDoc, _randomId);
 
             Console.WriteLine("Using {0}, {1} for Yokozuna/MapReduce search keys", alyssaKey, alanKey);
 

@@ -1,4 +1,4 @@
-// <copyright file="RiakInvalidDataException.cs" company="Basho Technologies, Inc.">
+// <copyright file="IRiakNode.cs" company="Basho Technologies, Inc.">
 // Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
 // Copyright (c) 2014 - Basho Technologies, Inc.
 //
@@ -17,22 +17,17 @@
 // under the License.
 // </copyright>
 
-namespace RiakClient.Exceptions
+namespace RiakClient.Comms
 {
     using System;
+    using System.Collections.Generic;
 
-    public class RiakInvalidDataException : Exception
+    public interface IRiakNode : IDisposable
     {
-        public byte MessageCode { get; private set; }
+        RiakResult UseConnection(Func<IRiakConnection, RiakResult> useFun);
+        RiakResult<TResult> UseConnection<TResult>(Func<IRiakConnection, RiakResult<TResult>> useFun);
 
-        public RiakInvalidDataException(byte messageCode)
-        {
-            MessageCode = messageCode;
-        }
-
-        public override string Message
-        {
-            get { return string.Format("Unexpected message code returned from Riak: {0}", MessageCode); }
-        }
+        RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun)
+            where TResult : RiakResult;
     }
 }
