@@ -15,7 +15,8 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <NoWarn>0618</NoWarn>
     <NuGetPackageImportStamp>7eb4607f</NuGetPackageImportStamp>
-    <StyleCopTreatErrorsAsWarnings>false</StyleCopTreatErrorsAsWarnings>
+    <!-- TODO: eventually set to false -->
+    <StyleCopTreatErrorsAsWarnings>true</StyleCopTreatErrorsAsWarnings>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -66,7 +67,6 @@
     <Compile Include="Auth\AuthTestBase.cs" />
     <Compile Include="Auth\RiakSecurityManagerTests.cs" />
     <Compile Include="Comms\RoundRobinStrategyTests.cs" />
-    <Compile Include="ExtensionMethodTests.cs" />
     <Compile Include="Json\RiakObjectConversionTests.cs" />
     <Compile Include="Json\TestObjects.cs" />
     <Compile Include="Models\MapReduce\Inputs\BucketKeyKeyDataInputSerializationTests.cs" />

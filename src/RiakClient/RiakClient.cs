@@ -17,26 +17,26 @@
 // under the License.
 // </copyright>
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Numerics;
-using System.Web;
-using RiakClient.Extensions;
-using RiakClient.Comms;
-using RiakClient.Messages;
-using RiakClient.Models;
-using RiakClient.Models.Index;
-using RiakClient.Models.MapReduce;
-using RiakClient.Models.MapReduce.Inputs;
-using RiakClient.Models.Rest;
-using RiakClient.Models.RiakDt;
-using RiakClient.Models.Search;
-using RiakClient.Util;
-
 namespace RiakClient
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Net;
+    using System.Numerics;
+    using System.Web;
+    using Comms;
+    using Extensions;
+    using Messages;
+    using Models;
+    using Models.Index;
+    using Models.MapReduce;
+    using Models.MapReduce.Inputs;
+    using Models.Rest;
+    using Models.RiakDt;
+    using Models.Search;
+    using Util;
+
     public interface IRiakClient : IRiakBatchClient
     {
         void Batch(Action<IRiakBatchClient> batchAction);
@@ -586,8 +586,8 @@ namespace RiakClient
         /// <remarks>Buckets provide a logical namespace for keys. Listing buckets requires folding over all keys in a cluster and 
         /// reading a list of buckets from disk. This operation, while non-blocking in Riak 1.0 and newer, still produces considerable
         /// physical I/O and can take a long time.</remarks>
-        public RiakResult<IEnumerable<string>> ListBuckets(string bucketType) 
-        {            
+        public RiakResult<IEnumerable<string>> ListBuckets(string bucketType)
+        {
             WarnAboutListBuckets();
 
             var listBucketReq = new RpbListBucketsReq
@@ -608,7 +608,7 @@ namespace RiakClient
 
         private static Func<RiakResult<RpbListBucketsResp>, bool> ListBucketsRepeatRead()
         {
-            return lbr => 
+            return lbr =>
                 lbr.IsSuccess && !lbr.Value.done;
         }
 
@@ -700,7 +700,7 @@ namespace RiakClient
 
         private static Func<RiakResult<RpbListKeysResp>, bool> ListKeysRepeatRead()
         {
-            return lkr => 
+            return lkr =>
                 lkr.IsSuccess && !lkr.Value.done;
         }
 
@@ -826,7 +826,8 @@ namespace RiakClient
             var result = UseConnection(conn => conn.RestRequest(request));
             if (result.IsSuccess && result.Value.StatusCode != HttpStatusCode.NoContent)
             {
-                return RiakResult.Error(ResultCode.InvalidResponse, "Unexpected Status Code: {0} ({1})".Fmt(result.Value.StatusCode, (int)result.Value.StatusCode), result.NodeOffline);
+                return RiakResult.Error(ResultCode.InvalidResponse,
+                    string.Format("Unexpected Status Code: {0} ({1})", result.Value.StatusCode, (int)result.Value.StatusCode), result.NodeOffline);
             }
 
             return result;
@@ -891,9 +892,10 @@ namespace RiakClient
                     case HttpStatusCode.NoContent:
                         return result;
                     case HttpStatusCode.NotFound:
-                        return RiakResult.Error(ResultCode.NotFound, "Bucket {0} not found.".Fmt(bucket), false);
+                        return RiakResult.Error(ResultCode.NotFound, string.Format("Bucket {0} not found.", bucket), false);
                     default:
-                        return RiakResult.Error(ResultCode.InvalidResponse, "Unexpected Status Code: {0} ({1})".Fmt(result.Value.StatusCode, (int)result.Value.StatusCode), result.NodeOffline);
+                        return RiakResult.Error(ResultCode.InvalidResponse,
+                            string.Format("Unexpected Status Code: {0} ({1})", result.Value.StatusCode, (int)result.Value.StatusCode), result.NodeOffline);
                 }
             }
             return result;
@@ -1177,7 +1179,8 @@ namespace RiakClient
                 }
                 catch (Exception ex)
                 {
-                    return RiakResult<IEnumerable<RiakResult<object>>>.Error(ResultCode.BatchException, "{0}\n{1}".Fmt(ex.Message, ex.StackTrace), true);
+                    return RiakResult<IEnumerable<RiakResult<object>>>.Error(ResultCode.BatchException,
+                        string.Format("{0}\n{1}", ex.Message, ex.StackTrace), true);
                 }
                 finally
                 {
@@ -1215,12 +1218,12 @@ namespace RiakClient
 
         private static string ToBucketUri(string bucket)
         {
-            return "{0}/{1}".Fmt(RiakConstants.Rest.Uri.RiakRoot, HttpUtility.UrlEncode(bucket));
+            return string.Format("{0}/{1}", RiakConstants.Rest.Uri.RiakRoot, HttpUtility.UrlEncode(bucket));
         }
 
         private static string ToBucketPropsUri(string bucket)
         {
-            return RiakConstants.Rest.Uri.BucketPropsFmt.Fmt(HttpUtility.UrlEncode(bucket));
+            return string.Format(RiakConstants.Rest.Uri.BucketPropsFmt, HttpUtility.UrlEncode(bucket));
         }
 
         internal static RiakGetOptions DefaultGetOptions()
@@ -1566,7 +1569,7 @@ namespace RiakClient
             var result = UseConnection(conn => conn.RestRequest(request));
             if (!result.IsSuccess || result.Value.StatusCode != HttpStatusCode.OK)
                 return RiakResult<string>.Error(ResultCode.InvalidResponse,
-                                                "Unexpected Status Code: {0} ({1})".Fmt(result.Value.StatusCode, (int)result.Value.StatusCode),
+                                                string.Format("Unexpected Status Code: {0} ({1})", result.Value.StatusCode, (int)result.Value.StatusCode),
                                                 result.NodeOffline);
 
             return RiakResult<string>.Success(result.Value.Body);

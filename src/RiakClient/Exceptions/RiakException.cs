@@ -17,13 +17,12 @@
 // under the License.
 // </copyright>
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using RiakClient.Extensions;
-
 namespace RiakClient.Exceptions
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+
     // TODO: ensure that subclass is correct
     public class RiakException : Exception
     {
@@ -42,7 +41,7 @@ namespace RiakClient.Exceptions
         {
             NodeOffline = nodeOffline;
             ErrorCode = errorCode;
-            _errorMessage = "Riak returned an error. Code '{0}'. Message: {1}".Fmt(ErrorCode, errorMessage);
+            _errorMessage = string.Format("Riak returned an error. Code '{0}'. Message: {1}", ErrorCode, errorMessage);
         }
 
         internal RiakException(string errorMessage, bool nodeOffline)

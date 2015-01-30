@@ -17,16 +17,17 @@
 // under the License.
 // </copyright>
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using RiakClient.Extensions;
-using NUnit.Framework;
 using RiakClient.Models;
 
 namespace RiakClient.Tests.Live.Extensions
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading;
+    using NUnit.Framework;
+    using Models;
+
     public static class IntegrationTestExtensions
     {
         // TESTING PURPOSES ONLY
@@ -39,11 +40,11 @@ namespace RiakClient.Tests.Live.Extensions
         public static void DeleteBucket(this IRiakBatchClient client, string bucketType, string bucket)
         {
             var keylistResult = client.ListKeys(bucketType, bucket);
-            if (keylistResult.Value.IsNullOrEmpty())
+            if (keylistResult.Value == null)
             {
                 return;
             }
-            
+
             var objectIds = keylistResult.Value.Select(key => new RiakObjectId(bucketType, bucket, key));
             client.Delete(objectIds);
         }

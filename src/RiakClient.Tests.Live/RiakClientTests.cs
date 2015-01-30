@@ -17,19 +17,20 @@
 // under the License.
 // </copyright>
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using NUnit.Framework;
-using RiakClient.Extensions;
 using RiakClient.Models;
-using RiakClient.Tests.Extensions;
-using RiakClient.Tests.Live.Extensions;
-using RiakClient.Util;
+using RiakClient.Extensions;
 
 namespace RiakClient.Tests.Live
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using Extensions;
+    using NUnit.Framework;
+    using Tests.Extensions;
+    using Util;
+
     [TestFixture]
     public class RiakClientTests : LiveRiakConnectionTestBase
     {
@@ -38,7 +39,7 @@ namespace RiakClient.Tests.Live
         public void WritingLargeObjectIsSuccessful()
         {
             var text = Enumerable.Range(0, 2000000)
-                                 .Aggregate(new StringBuilder(), 
+                                 .Aggregate(new StringBuilder(),
                                             (sb, i) => sb.Append(i.ToString()))
                                  .ToString();
             var riakObject = new RiakObject(TestBucket, "large", text, RiakConstants.ContentTypes.TextPlain);
@@ -250,7 +251,7 @@ namespace RiakClient.Tests.Live
         {
             const string counter = "counter";
             var bucket = TestBucket + "_" + Guid.NewGuid();
-            
+
             var props = Client.GetBucketProperties(bucket).Value;
             props.SetAllowMultiple(true);
 
@@ -267,7 +268,7 @@ namespace RiakClient.Tests.Live
         {
             const string counter = "counter";
             var bucket = TestBucket + "_" + Guid.NewGuid();
-            
+
             var props = Client.GetBucketProperties(bucket).Value ?? new RiakBucketProperties();
             props.SetAllowMultiple(true);
 

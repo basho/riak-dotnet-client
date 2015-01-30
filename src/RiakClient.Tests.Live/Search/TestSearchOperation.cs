@@ -87,11 +87,11 @@ namespace RiakClient.Tests.Live.Search
             _randomId = _random.Next();
             var alyssaKey = _randomId + RiakSearchKey;
             _alyssaRiakId = new RiakObjectId(BucketType, Bucket, alyssaKey);
-            var alyssaDoc = String.Format(RiakSearchDoc, _randomId);
+            var alyssaDoc = string.Format(RiakSearchDoc, _randomId);
 
             var alanKey = _randomId + RiakSearchKey2;
             var alanRiakId = new RiakObjectId(BucketType, Bucket, alanKey);
-            var alanDoc = String.Format(RiakSearchDoc2, _randomId);
+            var alanDoc = string.Format(RiakSearchDoc2, _randomId);
 
             Console.WriteLine("Using {0}, {1} for Yokozuna search keys", alyssaKey, alanKey);
 

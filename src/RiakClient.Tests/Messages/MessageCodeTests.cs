@@ -59,13 +59,13 @@ namespace RiakClient.Tests.Messages
             foreach (string name in messageMapByName.Keys)
             {
                 Assert.True(messageCodeEnumNames.Contains(name),
-                    String.Format("CSV contains name '{0}' but enum does NOT", name));
+                    string.Format("CSV contains name '{0}' but enum does NOT", name));
 
                 ushort messageCodeValue = messageMapByName[name];
 
                 MessageCode parsedMessageCode;
                 Assert.True(Enum.TryParse(messageCodeValue.ToString(), out parsedMessageCode),
-                    String.Format("Can't parse message code '{0}' with value '{1}' as Message Code enum",
+                    string.Format("Can't parse message code '{0}' with value '{1}' as Message Code enum",
                         name, messageCodeValue));
 
                 bool condition =
@@ -82,14 +82,14 @@ namespace RiakClient.Tests.Messages
                     parsedMessageCode.Equals(MessageCode.RpbAuthResp) ||
                     parsedMessageCode.Equals(MessageCode.RpbStartTls) ||
                     MessageCodeTypeMapBuilder.Contains(parsedMessageCode);
-                Assert.True(condition, String.Format("MessageCodeTypeMapBuilder does NOT contain '{0}'", parsedMessageCode));
+                Assert.True(condition, string.Format("MessageCodeTypeMapBuilder does NOT contain '{0}'", parsedMessageCode));
 
             }
 
             foreach (string name in messageCodeEnumNames)
             {
                 Assert.True(messageMapByName.ContainsKey(name),
-                    String.Format("MessageCode enum contains name '{0}' but CSV does NOT", name));
+                    string.Format("MessageCode enum contains name '{0}' but CSV does NOT", name));
             }
         }
     }

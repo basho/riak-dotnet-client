@@ -25,11 +25,11 @@ namespace RiakClient.Models
     using System.Linq;
     using System.Xml;
     using System.Xml.Serialization;
-    using Newtonsoft.Json;
-    using ProtoBuf;
     using Extensions;
     using Messages;
     using Models.Index;
+    using Newtonsoft.Json;
+    using ProtoBuf;
     using Util;
 
     public delegate string SerializeObjectToString<in T>(T theObject);
@@ -228,7 +228,7 @@ namespace RiakClient.Models
             BucketType = objectId.BucketType;
 
             Bucket = objectId.Bucket;
-            if (Bucket.IsNullOrEmpty())
+            if (string.IsNullOrWhiteSpace(Bucket))
             {
                 throw new ArgumentNullException("objectId.Bucket");
             }

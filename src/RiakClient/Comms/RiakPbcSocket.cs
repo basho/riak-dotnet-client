@@ -17,21 +17,21 @@
 // under the License.
 // </copyright>
 
-using System;
-using System.IO;
-using System.Net;
-using System.Net.Security;
-using System.Net.Sockets;
-using System.Security.Authentication;
-using ProtoBuf;
-using RiakClient.Auth;
-using RiakClient.Config;
-using RiakClient.Exceptions;
-using RiakClient.Extensions;
-using RiakClient.Messages;
-
 namespace RiakClient.Comms
 {
+    using System;
+    using System.IO;
+    using System.Net;
+    using System.Net.Security;
+    using System.Net.Sockets;
+    using System.Security.Authentication;
+    using Auth;
+    using Config;
+    using Exceptions;
+    using Extensions;
+    using Messages;
+    using ProtoBuf;
+
     internal class RiakPbcSocket : IDisposable
     {
         private readonly string server;
@@ -109,7 +109,7 @@ namespace RiakClient.Comms
             }
             else
             {
-                string errorMessage = "Failed to send data to server - Can't write: {0}:{1}".Fmt(server, port);
+                string errorMessage = string.Format("Failed to send data to server - Can't write: {0}:{1}", server, port);
                 throw new RiakException(errorMessage, true);
             }
         }
@@ -129,7 +129,7 @@ namespace RiakClient.Comms
 
             if (expectedCode != messageCode)
             {
-                string errorMessage = "Expected return code {0} received {1}".Fmt(expectedCode, messageCode);
+                string errorMessage = string.Format("Expected return code {0} received {1}", expectedCode, messageCode);
                 throw new RiakException(errorMessage, false);
             }
 
@@ -167,7 +167,7 @@ namespace RiakClient.Comms
             {
                 string received_message_code_type_name = MessageCodeTypeMapBuilder.GetTypeNameFor(messageCode);
                 throw new InvalidOperationException(
-                    String.Format("Attempt to decode message to type '{0}' when received type '{1}'.",
+                    string.Format("Attempt to decode message to type '{0}' when received type '{1}'.",
                     t_type.Name, received_message_code_type_name));
             }
 
@@ -215,13 +215,13 @@ namespace RiakClient.Comms
             else
             {
                 socket.Close();
-                string errorMessage = "Connection to remote server timed out: {0}:{1}".Fmt(server, port);
+                string errorMessage = string.Format("Connection to remote server timed out: {0}:{1}", server, port);
                 throw new RiakException(errorMessage, true);
             }
 
             if (!socket.Connected)
             {
-                string errorMessage = "Unable to connect to remote server: {0}:{1}".Fmt(server, port);
+                string errorMessage = string.Format("Unable to connect to remote server: {0}:{1}", server, port);
                 throw new RiakException(errorMessage, true);
             }
 

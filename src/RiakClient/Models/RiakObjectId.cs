@@ -17,13 +17,13 @@
 // under the License.
 // </copyright>
 
-using System;
-using RiakClient.Extensions;
-using Newtonsoft.Json;
-using RiakClient.Converters;
-
 namespace RiakClient.Models
 {
+    using System;
+    using Converters;
+    using Newtonsoft.Json;
+    using Util;
+
     [JsonConverter(typeof(RiakObjectIdConverter))]
     public class RiakObjectId : IEquatable<RiakObjectId>
     {
@@ -37,7 +37,7 @@ namespace RiakClient.Models
 
         public RiakObjectId(string bucket, string key)
         {
-            if (bucket.IsNullOrEmpty())
+            if (EnumerableUtil.IsNullOrEmpty(bucket))
             {
                 throw new ArgumentNullException("bucket");
             }

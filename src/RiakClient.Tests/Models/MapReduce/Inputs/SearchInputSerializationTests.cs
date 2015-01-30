@@ -44,4 +44,3 @@ namespace RiakClient.Tests.Models.MapReduce.Inputs
         }
     }
 }
-
