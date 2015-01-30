@@ -17,13 +17,13 @@
 // under the License.
 // </copyright>
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using RiakClient.Containers;
-
 namespace RiakClient.Comms.LoadBalancing
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using Containers;
+
     public class RoundRobinStrategy : ILoadBalancingStrategy
     {
         private readonly object nodesLock = new object();
@@ -39,10 +39,12 @@ namespace RiakClient.Comms.LoadBalancing
         public IRiakNode SelectNode()
         {
             IRiakNode node = null;
+
             if (roundRobin.TryMoveNext(out node))
             {
                 return node;
             }
+
             return null;
         }
 
@@ -73,10 +75,12 @@ namespace RiakClient.Comms.LoadBalancing
             while (true)
             {
                 IList<IRiakNode> list;
+
                 lock (nodesLock)
                 {
                     list = new List<IRiakNode>(nodes);
                 }
+
                 if (list.Count > 0)
                 {
                     var nodes = list.GetEnumerator();

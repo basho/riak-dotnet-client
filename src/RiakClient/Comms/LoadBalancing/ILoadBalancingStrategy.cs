@@ -17,15 +17,18 @@
 // under the License.
 // </copyright>
 
-using System.Collections.Generic;
-
 namespace RiakClient.Comms.LoadBalancing
 {
+    using System.Collections.Generic;
+
     public interface ILoadBalancingStrategy
     {
         void Initialise(IEnumerable<IRiakNode> nodes);
+
         IRiakNode SelectNode();
+
         void RemoveNode(IRiakNode node);
+
         void AddNode(IRiakNode node);
     }
 }
