@@ -25,7 +25,7 @@ using RiakClient.Models.RiakDt;
 namespace RiakClient.Tests.Live.DataTypes
 {
     [TestFixture]
-    public class RawRiakDtTests : DataTypeTestsBase
+    public class BasicSetDtTests : DataTypeTestsBase
     {
         [Test]
         public void TestSetOperations()
@@ -74,7 +74,11 @@ namespace RiakClient.Tests.Live.DataTypes
 
             Assert.AreEqual(0, updatedSet4.Values.Count);
         }
+    }
 
+    [TestFixture]
+    public class BasicCounterDtTests : DataTypeTestsBase
+    {
         [Test]
         public void TestCounterOperations()
         {
@@ -109,6 +113,12 @@ namespace RiakClient.Tests.Live.DataTypes
             Assert.AreEqual(0, updatedCounter4.Value);
         }
 
+    }
+
+    [TestFixture]
+    public class BasicMapDtTests : DataTypeTestsBase
+    {
+
         [Test]
         public void TestBasicMapOperations()
         {
@@ -133,7 +143,8 @@ namespace RiakClient.Tests.Live.DataTypes
                 field = new MapField { name = Serializer.Invoke(counterName), type = MapField.MapFieldType.COUNTER }
             };
 
-            var updatedMap1 = Client.DtUpdateMap(id, Serializer, initialMap.Context, null, new List<MapUpdate> { counterMapUpdate });
+            var updatedMap1 = Client.DtUpdateMap(id, Serializer, initialMap.Context, null,
+                new List<MapUpdate> { counterMapUpdate });
 
             Assert.IsNotNull(updatedMap1.Context);
             Assert.IsNotEmpty(updatedMap1.Values);
@@ -143,7 +154,8 @@ namespace RiakClient.Tests.Live.DataTypes
             // Increment Counter
             // [ Score => 5 ]
             counterMapUpdate.counter_op.increment = 4;
-            RiakDtMapResult updatedMap2 = Client.DtUpdateMap(id, Serializer, updatedMap1.Context, null, new List<MapUpdate> { counterMapUpdate });
+            RiakDtMapResult updatedMap2 = Client.DtUpdateMap(id, Serializer, updatedMap1.Context, null,
+                new List<MapUpdate> { counterMapUpdate });
             var counterMapField = updatedMap2.Values.Single(s => s.Field.Name == counterName);
             Assert.AreEqual(5, counterMapField.Counter.Value);
 
@@ -156,7 +168,8 @@ namespace RiakClient.Tests.Live.DataTypes
             var innerCounterMapUpdate = new MapUpdate
             {
                 counter_op = new CounterOp { increment = 42 },
-                field = new MapField { name = Serializer.Invoke(innerMapCounterName), type = MapField.MapFieldType.COUNTER }
+                field =
+                    new MapField { name = Serializer.Invoke(innerMapCounterName), type = MapField.MapFieldType.COUNTER }
             };
 
             var parentMapUpdate = new MapUpdate
@@ -168,7 +181,8 @@ namespace RiakClient.Tests.Live.DataTypes
             parentMapUpdate.map_op.updates.Add(innerCounterMapUpdate);
             counterMapUpdate.counter_op.increment = -10;
 
-            var updatedMap3 = Client.DtUpdateMap(id, Serializer, updatedMap1.Context, null, new List<MapUpdate> { parentMapUpdate, counterMapUpdate });
+            var updatedMap3 = Client.DtUpdateMap(id, Serializer, updatedMap1.Context, null,
+                new List<MapUpdate> { parentMapUpdate, counterMapUpdate });
 
             counterMapField = updatedMap3.Values.Single(entry => entry.Field.Name == counterName);
             var innerMapField = updatedMap3.Values.Single(entry => entry.Field.Name == innerMapName);
@@ -190,6 +204,11 @@ namespace RiakClient.Tests.Live.DataTypes
             Assert.AreEqual(1, updatedMap4.Values.Count);
             Assert.AreEqual(42, innerMapCounterField.Counter.Value);
         }
+    }
+
+    [TestFixture]
+    public class BasicMapRegisterDtTests : DataTypeTestsBase
+    {
 
         [Test]
         public void TestRegisterOperations()
@@ -207,13 +226,20 @@ namespace RiakClient.Tests.Live.DataTypes
             };
 
             var updatedMap1 = Client.DtUpdateMap(id, Serializer, null, null, new List<MapUpdate> { registerMapUpdate });
-            Assert.AreEqual("Alex", Deserializer.Invoke(updatedMap1.Values.Single(s => s.Field.Name == registerName).RegisterValue));
+            Assert.AreEqual("Alex",
+                Deserializer.Invoke(updatedMap1.Values.Single(s => s.Field.Name == registerName).RegisterValue));
 
             registerMapUpdate.register_op = Serializer.Invoke("Luke");
-            var updatedMap2 = Client.DtUpdateMap(id, Serializer, updatedMap1.Context, null, new List<MapUpdate> { registerMapUpdate });
-            Assert.AreEqual("Luke", Deserializer.Invoke(updatedMap2.Values.Single(s => s.Field.Name == registerName).RegisterValue));
+            var updatedMap2 = Client.DtUpdateMap(id, Serializer, updatedMap1.Context, null,
+                new List<MapUpdate> { registerMapUpdate });
+            Assert.AreEqual("Luke",
+                Deserializer.Invoke(updatedMap2.Values.Single(s => s.Field.Name == registerName).RegisterValue));
         }
+    }
 
+    [TestFixture]
+    public class BasicMapFlagDtTests : DataTypeTestsBase
+    {
         [Test]
         public void TestFlagOperations()
         {
@@ -230,7 +256,7 @@ namespace RiakClient.Tests.Live.DataTypes
             };
 
             var updatedMap1 = Client.DtUpdateMap(id, Serializer, null, null, new List<MapUpdate> { flagMapUpdate });
-            
+
             Assert.True(updatedMap1.Result.IsSuccess, updatedMap1.Result.ErrorMessage);
             var mapEntry = updatedMap1.Values.Single(s => s.Field.Name == flagName);
             Assert.NotNull(mapEntry.FlagValue);
@@ -242,14 +268,18 @@ namespace RiakClient.Tests.Live.DataTypes
                 field = new MapField { name = Serializer.Invoke(flagName), type = MapField.MapFieldType.FLAG }
             };
 
-            var updatedMap2 = Client.DtUpdateMap(id, Serializer, updatedMap1.Context, null, new List<MapUpdate> { flagMapUpdate2 });
+            var updatedMap2 = Client.DtUpdateMap(id, Serializer, updatedMap1.Context, null,
+                new List<MapUpdate> { flagMapUpdate2 });
 
             Assert.True(updatedMap2.Result.IsSuccess, updatedMap2.Result.ErrorMessage);
             mapEntry = updatedMap2.Values.Single(s => s.Field.Name == flagName);
             Assert.NotNull(mapEntry.FlagValue);
             Assert.IsTrue(mapEntry.FlagValue.Value);
         }
-
+    }
+    [TestFixture]
+    public class BasicMapSetDtTests : DataTypeTestsBase
+    {
         [Test]
         public void TestMapSetOperations()
         {
