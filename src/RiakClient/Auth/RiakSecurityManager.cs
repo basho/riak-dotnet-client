@@ -97,8 +97,11 @@ namespace RiakClient.Auth
         /// <param name="chain">The X509 certificate chain</param>
         /// <param name="sslPolicyErrors">The set of errors according to SSL policy</param>
         /// <returns>boolean indicating validity of server certificate</returns>
-        public bool ServerCertificateValidationCallback(object sender, X509Certificate certificate,
-            X509Chain chain, SslPolicyErrors sslPolicyErrors)
+        public bool ServerCertificateValidationCallback(
+            object sender,
+            X509Certificate certificate,
+            X509Chain chain,
+            SslPolicyErrors sslPolicyErrors)
         {
             if (sslPolicyErrors == SslPolicyErrors.None)
             {
@@ -163,8 +166,12 @@ namespace RiakClient.Auth
         /// <param name="remoteCertificate">The remote certificate</param>
         /// <param name="acceptableIssuers">The collection of acceptable issuers</param>
         /// <returns>A matching certificate for authentication</returns>
-        public X509Certificate ClientCertificateSelectionCallback(object sender, string targetHost,
-            X509CertificateCollection localCertificates, X509Certificate remoteCertificate, string[] acceptableIssuers)
+        public X509Certificate ClientCertificateSelectionCallback(
+            object sender,
+            string targetHost,
+            X509CertificateCollection localCertificates,
+            X509Certificate remoteCertificate,
+            string[] acceptableIssuers)
         {
             X509Certificate clientCertToPresent = null;
 
@@ -232,8 +239,7 @@ namespace RiakClient.Auth
         {
             X509Certificate2 certificateAuthorityCert = null;
 
-            if ((!string.IsNullOrWhiteSpace(authConfig.CertificateAuthorityFile)) &&
-                (File.Exists(authConfig.CertificateAuthorityFile)))
+            if (!string.IsNullOrWhiteSpace(authConfig.CertificateAuthorityFile) && File.Exists(authConfig.CertificateAuthorityFile))
             {
                 certificateAuthorityCert = new X509Certificate2(authConfig.CertificateAuthorityFile);
             }
@@ -250,8 +256,7 @@ namespace RiakClient.Auth
             var clientCertificates = new X509CertificateCollection();
 
             // http://stackoverflow.com/questions/18462064/associate-a-private-key-with-the-x509certificate2-class-in-net
-            if ((!string.IsNullOrWhiteSpace(authConfig.ClientCertificateFile)) &&
-                (File.Exists(authConfig.ClientCertificateFile)))
+            if (!string.IsNullOrWhiteSpace(authConfig.ClientCertificateFile) && File.Exists(authConfig.ClientCertificateFile))
             {
                 var cert = new X509Certificate2(authConfig.ClientCertificateFile);
                 clientCertificates.Add(cert);
