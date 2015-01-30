@@ -17,30 +17,20 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using RiakClient.Extensions;
-using RiakClient.Tests.Live.Extensions;
-using RiakClient.Tests.Live;
 using NUnit.Framework;
 using RiakClient.Messages;
 using RiakClient.Models;
 using RiakClient.Models.RiakDt;
 
-namespace RiakClient.Tests.Live
+namespace RiakClient.Tests.Live.DataTypes
 {
-
     [TestFixture]
-    public class RawRiakDtTests : LiveRiakConnectionTestBase
+    public class RawRiakDtTests : DataTypeTestsBase
     {
-        private const string Bucket = "riak_dt_bucket";
-        private readonly DeserializeObject<string> _deserializer = (b, type) => Encoding.UTF8.GetString(b);
-        private readonly SerializeObjectToByteArray<string> _serializer = s => Encoding.UTF8.GetBytes(s);
-        private readonly Random _random = new Random();
-
         [Test]
         public void TestSetOperations()
         {
-            var key = "TestSetOperations_" + _random.Next();
+            var key = "TestSetOperations_" + Random.Next();
             Console.WriteLine("Using {0} for TestSetOperations() key", key);
 
             var id = new RiakObjectId(BucketTypeNames.Sets, Bucket, key);
@@ -51,16 +41,16 @@ namespace RiakClient.Tests.Live
 
             // Single Add
             var add = new List<string> { "foo" };
-            var updatedSet1 = Client.DtUpdateSet(id, _serializer, initialSet.Context, add, null);
-            var valuesAsStrings1 = updatedSet1.GetObjects(_deserializer).ToList();
+            var updatedSet1 = Client.DtUpdateSet(id, Serializer, initialSet.Context, add, null);
+            var valuesAsStrings1 = updatedSet1.GetObjects(Deserializer).ToList();
 
             Assert.AreEqual(1, updatedSet1.Values.Count);
             Assert.Contains("foo", valuesAsStrings1);
 
             // Many Add
             var manyAdds = new List<string> { "foo", "bar", "baz", "qux" };
-            var updatedSet2 = Client.DtUpdateSet(id, _serializer, updatedSet1.Context, manyAdds, null);
-            var valuesAsStrings2 = updatedSet2.GetObjects(_deserializer).ToList();
+            var updatedSet2 = Client.DtUpdateSet(id, Serializer, updatedSet1.Context, manyAdds, null);
+            var valuesAsStrings2 = updatedSet2.GetObjects(Deserializer).ToList();
 
             Assert.AreEqual(4, updatedSet2.Values.Count);
             Assert.Contains("foo", valuesAsStrings2);
@@ -70,8 +60,8 @@ namespace RiakClient.Tests.Live
 
             // Single Remove
             var remove = new List<string> { "baz" };
-            var updatedSet3 = Client.DtUpdateSet(id, _serializer, updatedSet2.Context, null, remove);
-            var valuesAsStrings3 = updatedSet3.GetObjects(_deserializer).ToList();
+            var updatedSet3 = Client.DtUpdateSet(id, Serializer, updatedSet2.Context, null, remove);
+            var valuesAsStrings3 = updatedSet3.GetObjects(Deserializer).ToList();
 
             Assert.AreEqual(3, updatedSet3.Values.Count);
             Assert.Contains("foo", valuesAsStrings3);
@@ -80,7 +70,7 @@ namespace RiakClient.Tests.Live
 
             // Many Remove
             var manyRemove = new List<string> { "foo", "bar", "qux" };
-            var updatedSet4 = Client.DtUpdateSet(id, _serializer, updatedSet3.Context, null, manyRemove);
+            var updatedSet4 = Client.DtUpdateSet(id, Serializer, updatedSet3.Context, null, manyRemove);
 
             Assert.AreEqual(0, updatedSet4.Values.Count);
         }
@@ -88,7 +78,7 @@ namespace RiakClient.Tests.Live
         [Test]
         public void TestCounterOperations()
         {
-            var key = "TestCounterOperations_" + _random.Next();
+            var key = "TestCounterOperations_" + Random.Next();
             Console.WriteLine("Using {0} for TestCounterOperations() key", key);
 
             var id = new RiakObjectId(BucketTypeNames.Counters, Bucket, key);
@@ -122,7 +112,7 @@ namespace RiakClient.Tests.Live
         [Test]
         public void TestBasicMapOperations()
         {
-            var key = "TestMapOperations_" + _random.Next();
+            var key = "TestMapOperations_" + Random.Next();
             Console.WriteLine("Using {0} for TestMapOperations() key", key);
 
             var id = new RiakObjectId(BucketTypeNames.Maps, Bucket, key);
@@ -140,10 +130,10 @@ namespace RiakClient.Tests.Live
             var counterMapUpdate = new MapUpdate
             {
                 counter_op = new CounterOp { increment = 1 },
-                field = new MapField { name = _serializer.Invoke(counterName), type = MapField.MapFieldType.COUNTER }
+                field = new MapField { name = Serializer.Invoke(counterName), type = MapField.MapFieldType.COUNTER }
             };
 
-            var updatedMap1 = Client.DtUpdateMap(id, _serializer, initialMap.Context, null, new List<MapUpdate> { counterMapUpdate });
+            var updatedMap1 = Client.DtUpdateMap(id, Serializer, initialMap.Context, null, new List<MapUpdate> { counterMapUpdate });
 
             Assert.IsNotNull(updatedMap1.Context);
             Assert.IsNotEmpty(updatedMap1.Values);
@@ -153,7 +143,7 @@ namespace RiakClient.Tests.Live
             // Increment Counter
             // [ Score => 5 ]
             counterMapUpdate.counter_op.increment = 4;
-            RiakDtMapResult updatedMap2 = Client.DtUpdateMap(id, _serializer, updatedMap1.Context, null, new List<MapUpdate> { counterMapUpdate });
+            RiakDtMapResult updatedMap2 = Client.DtUpdateMap(id, Serializer, updatedMap1.Context, null, new List<MapUpdate> { counterMapUpdate });
             var counterMapField = updatedMap2.Values.Single(s => s.Field.Name == counterName);
             Assert.AreEqual(5, counterMapField.Counter.Value);
 
@@ -166,19 +156,19 @@ namespace RiakClient.Tests.Live
             var innerCounterMapUpdate = new MapUpdate
             {
                 counter_op = new CounterOp { increment = 42 },
-                field = new MapField { name = _serializer.Invoke(innerMapCounterName), type = MapField.MapFieldType.COUNTER }
+                field = new MapField { name = Serializer.Invoke(innerMapCounterName), type = MapField.MapFieldType.COUNTER }
             };
 
             var parentMapUpdate = new MapUpdate
             {
-                field = new MapField { name = _serializer.Invoke(innerMapName), type = MapField.MapFieldType.MAP },
+                field = new MapField { name = Serializer.Invoke(innerMapName), type = MapField.MapFieldType.MAP },
                 map_op = new MapOp()
             };
 
             parentMapUpdate.map_op.updates.Add(innerCounterMapUpdate);
             counterMapUpdate.counter_op.increment = -10;
 
-            var updatedMap3 = Client.DtUpdateMap(id, _serializer, updatedMap1.Context, null, new List<MapUpdate> { parentMapUpdate, counterMapUpdate });
+            var updatedMap3 = Client.DtUpdateMap(id, Serializer, updatedMap1.Context, null, new List<MapUpdate> { parentMapUpdate, counterMapUpdate });
 
             counterMapField = updatedMap3.Values.Single(entry => entry.Field.Name == counterName);
             var innerMapField = updatedMap3.Values.Single(entry => entry.Field.Name == innerMapName);
@@ -193,7 +183,7 @@ namespace RiakClient.Tests.Live
             // Remove Counter from map
             // [ subMap [ InnerScore => 42 ]]
             var removes = new List<RiakDtMapField> { new RiakDtMapField(counterMapField.Field.ToMapField()) };
-            var updatedMap4 = Client.DtUpdateMap(id, _serializer, updatedMap3.Context, removes);
+            var updatedMap4 = Client.DtUpdateMap(id, Serializer, updatedMap3.Context, removes);
 
             innerMapField = updatedMap4.Values.Single(entry => entry.Field.Name == innerMapName);
             innerMapCounterField = innerMapField.MapValue.Single(entry => entry.Field.Name == innerMapCounterName);
@@ -204,7 +194,7 @@ namespace RiakClient.Tests.Live
         [Test]
         public void TestRegisterOperations()
         {
-            var key = "TestRegisterOperations_" + _random.Next();
+            var key = "TestRegisterOperations_" + Random.Next();
             Console.WriteLine("Using {0} for TestRegisterOperations() key", key);
 
             var id = new RiakObjectId(BucketTypeNames.Maps, Bucket, key);
@@ -212,22 +202,22 @@ namespace RiakClient.Tests.Live
 
             var registerMapUpdate = new MapUpdate
             {
-                register_op = _serializer.Invoke("Alex"),
-                field = new MapField { name = _serializer.Invoke(registerName), type = MapField.MapFieldType.REGISTER }
+                register_op = Serializer.Invoke("Alex"),
+                field = new MapField { name = Serializer.Invoke(registerName), type = MapField.MapFieldType.REGISTER }
             };
 
-            var updatedMap1 = Client.DtUpdateMap(id, _serializer, null, null, new List<MapUpdate> { registerMapUpdate });
-            Assert.AreEqual("Alex", _deserializer.Invoke(updatedMap1.Values.Single(s => s.Field.Name == registerName).RegisterValue));
+            var updatedMap1 = Client.DtUpdateMap(id, Serializer, null, null, new List<MapUpdate> { registerMapUpdate });
+            Assert.AreEqual("Alex", Deserializer.Invoke(updatedMap1.Values.Single(s => s.Field.Name == registerName).RegisterValue));
 
-            registerMapUpdate.register_op = _serializer.Invoke("Luke");
-            var updatedMap2 = Client.DtUpdateMap(id, _serializer, updatedMap1.Context, null, new List<MapUpdate> { registerMapUpdate });
-            Assert.AreEqual("Luke", _deserializer.Invoke(updatedMap2.Values.Single(s => s.Field.Name == registerName).RegisterValue));
+            registerMapUpdate.register_op = Serializer.Invoke("Luke");
+            var updatedMap2 = Client.DtUpdateMap(id, Serializer, updatedMap1.Context, null, new List<MapUpdate> { registerMapUpdate });
+            Assert.AreEqual("Luke", Deserializer.Invoke(updatedMap2.Values.Single(s => s.Field.Name == registerName).RegisterValue));
         }
 
         [Test]
         public void TestFlagOperations()
         {
-            var key = "TestFlagOperations_" + _random.Next();
+            var key = "TestFlagOperations_" + Random.Next();
             Console.WriteLine("Using {0} for TestFlagOperations() key", key);
 
             var id = new RiakObjectId(BucketTypeNames.Maps, Bucket, key);
@@ -236,10 +226,10 @@ namespace RiakClient.Tests.Live
             var flagMapUpdate = new MapUpdate
             {
                 flag_op = MapUpdate.FlagOp.DISABLE,
-                field = new MapField { name = _serializer.Invoke(flagName), type = MapField.MapFieldType.FLAG }
+                field = new MapField { name = Serializer.Invoke(flagName), type = MapField.MapFieldType.FLAG }
             };
 
-            var updatedMap1 = Client.DtUpdateMap(id, _serializer, null, null, new List<MapUpdate> { flagMapUpdate });
+            var updatedMap1 = Client.DtUpdateMap(id, Serializer, null, null, new List<MapUpdate> { flagMapUpdate });
             
             Assert.True(updatedMap1.Result.IsSuccess, updatedMap1.Result.ErrorMessage);
             var mapEntry = updatedMap1.Values.Single(s => s.Field.Name == flagName);
@@ -249,10 +239,10 @@ namespace RiakClient.Tests.Live
             var flagMapUpdate2 = new MapUpdate
             {
                 flag_op = MapUpdate.FlagOp.ENABLE,
-                field = new MapField { name = _serializer.Invoke(flagName), type = MapField.MapFieldType.FLAG }
+                field = new MapField { name = Serializer.Invoke(flagName), type = MapField.MapFieldType.FLAG }
             };
 
-            var updatedMap2 = Client.DtUpdateMap(id, _serializer, updatedMap1.Context, null, new List<MapUpdate> { flagMapUpdate2 });
+            var updatedMap2 = Client.DtUpdateMap(id, Serializer, updatedMap1.Context, null, new List<MapUpdate> { flagMapUpdate2 });
 
             Assert.True(updatedMap2.Result.IsSuccess, updatedMap2.Result.ErrorMessage);
             mapEntry = updatedMap2.Values.Single(s => s.Field.Name == flagName);
@@ -263,7 +253,7 @@ namespace RiakClient.Tests.Live
         [Test]
         public void TestMapSetOperations()
         {
-            var key = "TestMapSetOperations_" + _random.Next();
+            var key = "TestMapSetOperations_" + Random.Next();
             Console.WriteLine("Using {0} for TestMapSetOperations() key", key);
 
             var id = new RiakObjectId(BucketTypeNames.Maps, Bucket, key);
@@ -272,37 +262,28 @@ namespace RiakClient.Tests.Live
             var setMapUpdate = new MapUpdate
             {
                 set_op = new SetOp(),
-                field = new MapField {name = _serializer.Invoke(setName), type = MapField.MapFieldType.SET}
+                field = new MapField {name = Serializer.Invoke(setName), type = MapField.MapFieldType.SET}
             };
-            var addSet = new List<string> {"Alex"}.Select(s => _serializer.Invoke(s)).ToList();
+            var addSet = new List<string> {"Alex"}.Select(s => Serializer.Invoke(s)).ToList();
             setMapUpdate.set_op.adds.AddRange(addSet);
 
-            var updatedMap1 = Client.DtUpdateMap(id, _serializer, null, null, new List<MapUpdate> {setMapUpdate});
-            var setValues1 = updatedMap1.Values.Single(s => s.Field.Name == setName).SetValue.Select(v => _deserializer.Invoke(v)).ToList();
+            var updatedMap1 = Client.DtUpdateMap(id, Serializer, null, null, new List<MapUpdate> {setMapUpdate});
+            var setValues1 = updatedMap1.Values.Single(s => s.Field.Name == setName).SetValue.Select(v => Deserializer.Invoke(v)).ToList();
             Assert.Contains("Alex", setValues1);
             Assert.AreEqual(1, setValues1.Count);
 
             setMapUpdate.set_op = new SetOp();
             var removeSet = addSet;
-            var addSet2 = new List<string> { "Luke", "Jeremiah" }.Select(s => _serializer.Invoke(s)).ToList();
+            var addSet2 = new List<string> { "Luke", "Jeremiah" }.Select(s => Serializer.Invoke(s)).ToList();
             setMapUpdate.set_op.adds.AddRange(addSet2);
             setMapUpdate.set_op.removes.AddRange(removeSet);
 
-            var updatedMap2 = Client.DtUpdateMap(id, _serializer, updatedMap1.Context, null, new List<MapUpdate> { setMapUpdate });
-            var setValues2 = updatedMap2.Values.Single(s => s.Field.Name == setName).SetValue.Select(v => _deserializer.Invoke(v)).ToList();
+            var updatedMap2 = Client.DtUpdateMap(id, Serializer, updatedMap1.Context, null, new List<MapUpdate> { setMapUpdate });
+            var setValues2 = updatedMap2.Values.Single(s => s.Field.Name == setName).SetValue.Select(v => Deserializer.Invoke(v)).ToList();
             Assert.Contains("Luke", setValues2);
             Assert.Contains("Jeremiah", setValues2);
             Assert.AreEqual(2, setValues2.Count);
 
-        }
-
-        /// <summary>
-        /// The tearing of the down, it is done here.
-        /// </summary>
-        [TearDown]
-        public void TearDown()
-        {
-            Client.DeleteBucket(Bucket);
         }
     }
 }
