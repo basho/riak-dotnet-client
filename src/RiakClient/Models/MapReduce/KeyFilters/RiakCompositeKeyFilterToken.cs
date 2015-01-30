@@ -17,12 +17,11 @@
 // under the License.
 // </copyright>
 
-using RiakClient.Extensions;
-using Newtonsoft.Json;
-using System.Linq;
-
 namespace RiakClient.Models.MapReduce.KeyFilters
 {
+    using System.Linq;
+    using Newtonsoft.Json;
+
     internal abstract class RiakCompositeKeyFilterToken : RiakKeyFilterToken
     {
         protected RiakCompositeKeyFilterToken(string functionName, params object[] args)
@@ -32,7 +31,10 @@ namespace RiakClient.Models.MapReduce.KeyFilters
 
         protected override void WriteArguments(JsonWriter writer)
         {
-            Arguments.Cast<IRiakKeyFilterToken>().ForEach(v => WriteArgumentAsArray(v, writer));
+            foreach (IRiakKeyFilterToken keyFilterToken in Arguments.Cast<IRiakKeyFilterToken>())
+            {
+                WriteArgumentAsArray(keyFilterToken, writer);
+            }
         }
 
         protected void WriteArgumentAsArray(IRiakKeyFilterToken argument, JsonWriter writer)
