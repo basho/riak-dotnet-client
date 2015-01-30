@@ -21,7 +21,7 @@ lint:
 	echo Nope > /dev/null
 
 setup-integration:
-	cp -f $(CURDIR)/App.config $(PROJDIR)/RiakClient.Tests.Live/bin/Debug/RiakClient.Tests.Live.dll.config
+	cp -f $(CURDIR)/App.config $(PROJDIR)/RiakClientTests.Live/bin/Debug/RiakClientTests.Live.dll.config
 
 test: setup-integration test-all
 
