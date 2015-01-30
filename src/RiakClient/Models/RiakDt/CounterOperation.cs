@@ -1,5 +1,4 @@
-// <copyright file="RiakConnectionFactory.cs" company="Basho Technologies, Inc.">
-// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+﻿// <copyright file="CounterOperation.cs" company="Basho Technologies, Inc.">
 // Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
@@ -17,18 +16,28 @@
 // under the License.
 // </copyright>
 
-namespace RiakClient.Comms
+namespace RiakClient.Models.RiakDt
 {
-    using Config;
+    using Messages;
 
-    public class RiakConnectionFactory : IRiakConnectionFactory
+    public class CounterOperation : IDtOp
     {
-        public IRiakConnection CreateConnection(IRiakNodeConfiguration nodeConfig, IRiakAuthenticationConfiguration authConfig)
+        public long Value { get; private set; }
+
+        public CounterOperation(long value)
         {
-            // As pointless as this seems, it serves the purpose of decoupling the
-            // creation of the connections to the node itself. Also means we can
-            // pull it apart to test it
-            return new RiakConnection(nodeConfig, authConfig);
+            Value = value;
+        }
+
+        public DtOp ToDtOp()
+        {
+            return new DtOp
+                {
+                    counter_op = new CounterOp
+                        {
+                            increment = Value
+                        }
+                };
         }
     }
 }

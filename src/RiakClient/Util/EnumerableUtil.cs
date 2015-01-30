@@ -1,4 +1,4 @@
-// <copyright file="Enumerable.cs" company="Basho Technologies, Inc.">
+// <copyright file="EnumerableUtil.cs" company="Basho Technologies, Inc.">
 // Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
 // Copyright (c) 2014 - Basho Technologies, Inc.
 //

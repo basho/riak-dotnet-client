@@ -43,8 +43,8 @@ namespace RiakClient.Models.MapReduce.Phases
         {
             var sb = new StringBuilder();
 
-            using(var sw = new StringWriter(sb))
-            using(JsonWriter writer = new JsonTextWriter(sw))
+            using (var sw = new StringWriter(sb))
+            using (JsonWriter writer = new JsonTextWriter(sw))
             {
                 writer.WriteStartObject();
                 writer.WritePropertyName(PhaseType);

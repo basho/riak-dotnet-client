@@ -1,4 +1,4 @@
-// <copyright file="RiakCommitHook.cs" company="Basho Technologies, Inc.">
+﻿// <copyright file="IRiakClient.cs" company="Basho Technologies, Inc.">
 // Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
 // Copyright (c) 2014 - Basho Technologies, Inc.
 //
@@ -17,29 +17,17 @@
 // under the License.
 // </copyright>
 
-namespace RiakClient.Models.CommitHook
+namespace RiakClient
 {
-    using System.IO;
-    using System.Text;
-    using Messages;
-    using Newtonsoft.Json;
+    using System;
 
-    public abstract class RiakCommitHook : IRiakCommitHook
+    public interface IRiakClient : IRiakBatchClient
     {
-        public string ToJsonString()
-        {
-            var sb = new StringBuilder();
+        void Batch(Action<IRiakBatchClient> batchAction);
 
-            using (var sw = new StringWriter(sb))
-            using (JsonWriter writer = new JsonTextWriter(sw))
-            {
-                WriteJson(writer);
-            }
+        T Batch<T>(Func<IRiakBatchClient, T> batchFunction);
 
-            return sb.ToString();
-        }
+        IRiakAsyncClient Async { get; }
 
-        public abstract void WriteJson(JsonWriter writer);
-        public abstract RpbCommitHook ToRpbCommitHook();
     }
 }

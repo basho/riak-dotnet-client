@@ -625,8 +625,10 @@ namespace RiakClient.Models
                     });
             }
 
-            if (!String.IsNullOrEmpty(SearchIndex))
+            if (!string.IsNullOrEmpty(SearchIndex))
+            {
                 message.search_index = SearchIndex.ToRiakString();
+            }
 
             return message;
         }
@@ -635,8 +637,8 @@ namespace RiakClient.Models
         {
             var sb = new StringBuilder();
 
-            using(var sw = new StringWriter(sb))
-            using(JsonWriter jw = new JsonTextWriter(sw))
+            using (var sw = new StringWriter(sb))
+            using (JsonWriter jw = new JsonTextWriter(sw))
             {
                 jw.WriteStartObject();
                 jw.WritePropertyName("props");
@@ -672,8 +674,10 @@ namespace RiakClient.Models
                     jw.WriteEndArray();
                 }
 
-                if (!String.IsNullOrEmpty(SearchIndex))
+                if (!string.IsNullOrEmpty(SearchIndex))
+                {
                     jw.WriteNonNullProperty("search_index", SearchIndex);
+                }
 
                 jw.WriteEndObject();
                 jw.WriteEndObject();

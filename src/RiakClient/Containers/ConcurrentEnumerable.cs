@@ -17,14 +17,9 @@
 // under the License.
 // </copyright>
 
-using System.Collections.Generic;
-
 namespace RiakClient.Containers
 {
-    public interface IConcurrentEnumerable<T>
-    {
-        IConcurrentEnumerator<T> GetEnumerator();
-    }
+    using System.Collections.Generic;
 
     public class ConcurrentEnumerable<T> : IConcurrentEnumerable<T>
     {

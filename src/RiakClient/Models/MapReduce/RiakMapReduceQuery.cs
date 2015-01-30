@@ -166,8 +166,8 @@ namespace RiakClient.Models.MapReduce
 
             var sb = new StringBuilder();
 
-            using(var sw = new StringWriter(sb))
-            using(JsonWriter writer = new JsonTextWriter(sw))
+            using (var sw = new StringWriter(sb))
+            using (JsonWriter writer = new JsonTextWriter(sw))
             {
                 writer.WriteStartObject();
 

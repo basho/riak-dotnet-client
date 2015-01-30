@@ -1,4 +1,13 @@
 <StyleCopSettings Version="105">
+  <SourceFileList>
+    <SourceFile>AssemblyInfo.cs</SourceFile>
+    <SourceFile>CommonAssemblyInfo.cs</SourceFile>
+    <Settings>
+      <GlobalSettings>
+        <BooleanProperty Name="RulesEnabledByDefault">False</BooleanProperty>
+      </GlobalSettings>
+    </Settings>
+  </SourceFileList>
   <Analyzers>
     <Analyzer AnalyzerId="StyleCop.CSharp.DocumentationRules">
       <Rules>
@@ -37,3 +46,4 @@
     </Analyzer>
   </Analyzers>
 </StyleCopSettings>
+

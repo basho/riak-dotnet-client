@@ -17,35 +17,14 @@
 // under the License.
 // </copyright>
 
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
-using RiakClient.Extensions;
-using RiakClient.Messages;
-
 namespace RiakClient.Models.RiakDt
 {
-    public class CounterOperation : IDtOp
-    {
-        public long Value { get; private set; }
-
-        public CounterOperation(long value)
-        {
-            Value = value;
-        }
-
-        public DtOp ToDtOp()
-        {
-            return new DtOp
-                {
-                    counter_op = new CounterOp
-                        {
-                            increment = Value
-                        }
-                };
-        }
-    }
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.ComponentModel;
+    using System.Linq;
+    using Extensions;
+    using Messages;
 
     public class RiakDtCounter : IRiakDtType<CounterOperation>, IDtOp, IChangeTracking 
     {

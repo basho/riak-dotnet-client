@@ -75,6 +75,7 @@
     <Compile Include="Comms\LoadBalancing\RoundRobinStrategy.cs" />
     <Compile Include="Comms\IRiakNode.cs" />
     <Compile Include="Comms\IRiakConnection.cs" />
+    <Compile Include="Comms\IRiakConnectionFactory.cs" />
     <Compile Include="Comms\RiakOnTheFlyConnection.cs" />
     <Compile Include="Comms\RiakPbcSocket.cs" />
     <Compile Include="Config\IRiakAuthenticationConfiguration.cs" />
@@ -85,6 +86,12 @@
     <Compile Include="Containers\ConcurrentEnumerator.cs" />
     <Compile Include="Comms\RiakConnectionPool.cs" />
     <Compile Include="Containers\Either.cs" />
+    <Compile Include="Containers\IConcurrentEnumerable.cs" />
+    <Compile Include="Containers\IConcurrentEnumerator.cs" />
+    <Compile Include="IRiakAsyncClient.cs" />
+    <Compile Include="IRiakClient.cs" />
+    <Compile Include="Models\CommitHook\IRiakCommitHook.cs" />
+    <Compile Include="Models\RiakDt\CounterOperation.cs" />
     <Compile Include="Util\EnumerableUtil.cs" />
     <Compile Include="Exceptions\RiakInvalidDataException.cs" />
     <Compile Include="Exceptions\RiakException.cs" />
@@ -146,7 +153,7 @@
     <Compile Include="Models\MapReduce\KeyFilters\And.cs" />
     <Compile Include="Models\MapReduce\KeyFilters\Between.cs" />
     <Compile Include="Models\MapReduce\KeyFilters\EndsWith.cs" />
-    <Compile Include="Models\MapReduce\KeyFilters\EqualTo.cs" />
+    <Compile Include="Models\MapReduce\KeyFilters\Equal.cs" />
     <Compile Include="Models\MapReduce\KeyFilters\FloatToString.cs" />
     <Compile Include="Models\MapReduce\KeyFilters\GreaterThan.cs" />
     <Compile Include="Models\MapReduce\KeyFilters\GreaterThanOrEqualTo.cs" />
@@ -287,7 +294,9 @@
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Settings.StyleCop" />
+    <None Include="Settings.StyleCop">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\build\build.targets" Condition="Exists('$(SolutionDir)\build\build.targets')" />

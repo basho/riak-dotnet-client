@@ -17,32 +17,27 @@
 // under the License.
 // </copyright>
 
-using System.Collections.Generic;
-
 namespace RiakClient.Containers
 {
-    public interface IConcurrentEnumerator<T>
-    {
-        bool TryMoveNext(out T next);
-    }
+    using System.Collections.Generic;
 
     public sealed class ConcurrentEnumerator<T> : IConcurrentEnumerator<T>
     {
-        private readonly object _lock = new object();
-        private readonly IEnumerator<T> _wrapped;
+        private readonly object lockObj = new object();
+        private readonly IEnumerator<T> wrapped;
 
         public ConcurrentEnumerator(IEnumerator<T> wrapped)
         {
-            _wrapped = wrapped;
+            this.wrapped = wrapped;
         }
 
         public bool TryMoveNext(out T next)
         {
-            lock (_lock)
+            lock (lockObj)
             {
-                if (_wrapped.MoveNext())
+                if (wrapped.MoveNext())
                 {
-                    next = _wrapped.Current;
+                    next = wrapped.Current;
                     return true;
                 }
 
