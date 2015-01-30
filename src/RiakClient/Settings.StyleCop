@@ -1,0 +1,14 @@
+<StyleCopSettings Version="105">
+  <SourceFileList>
+    <SourceFile>riak.cs</SourceFile>
+    <SourceFile>riak_dt.cs</SourceFile>
+    <SourceFile>riak_kv.cs</SourceFile>
+    <SourceFile>riak_search.cs</SourceFile>
+    <SourceFile>riak_yokozuna.cs</SourceFile>
+    <Settings>
+      <GlobalSettings>
+        <BooleanProperty Name="RulesEnabledByDefault">False</BooleanProperty>
+      </GlobalSettings>
+    </Settings>
+  </SourceFileList>
+</StyleCopSettings>
