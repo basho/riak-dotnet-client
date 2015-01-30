@@ -58,6 +58,10 @@
     </Compile>
     <Compile Include="BucketPropertyTests.cs" />
     <Compile Include="BucketTypeTests.cs" />
+    <Compile Include="DataTypes\BasicCounterDtTests.cs" />
+    <Compile Include="DataTypes\BasicMapDtTests.cs" />
+    <Compile Include="DataTypes\BasicMapFlagDtTests.cs" />
+    <Compile Include="DataTypes\BasicMapRegisterDtTests.cs" />
     <Compile Include="DataTypes\DataTypeTestsBase.cs" />
     <Compile Include="Extensions\IntegrationTestExtensions.cs" />
     <Compile Include="Extensions\IntegrationTestExtensionsTest.cs" />
