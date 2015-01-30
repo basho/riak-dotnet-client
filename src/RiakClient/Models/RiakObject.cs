@@ -319,8 +319,10 @@ namespace RiakClient.Models
         public void RemoveLinks(RiakObjectId riakObjectId)
         {
             var linksToRemove = Links.Where(l => l.Bucket == riakObjectId.Bucket && l.Key == riakObjectId.Key);
-
-            linksToRemove.ForEach(l => Links.Remove(l));
+            foreach (RiakLink linkToRemove in linksToRemove)
+            {
+                Links.Remove(linkToRemove);
+            }
         }
 
         internal RiakLink ToRiakLink(string tag)

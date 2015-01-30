@@ -367,51 +367,57 @@ namespace RiakClient.Comms
             return new[] { RiakResult<TResult>.Error(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline) };
         }
 
-        public RiakResult<RiakRestResponse> RestRequest(RiakRestRequest request)
+        public RiakResult<RiakRestResponse> RestRequest(RiakRestRequest restRequest)
         {
-            var baseUri = new StringBuilder(restRootUrl).Append(request.Uri);
-            if (request.QueryParams.Count > 0)
+            var baseUri = new StringBuilder(restRootUrl).Append(restRequest.Uri);
+            if (restRequest.QueryParams.Count > 0)
             {
                 baseUri.Append("?");
-                var first = request.QueryParams.First();
+                var first = restRequest.QueryParams.First();
                 baseUri.Append(first.Key.UrlEncoded()).Append("=").Append(first.Value.UrlEncoded());
-                request.QueryParams.Skip(1).ForEach(kv => baseUri.Append("&").Append(kv.Key.UrlEncoded()).Append("=").Append(kv.Value.UrlEncoded()));
+                foreach (var queryParam in restRequest.QueryParams.Skip(1))
+                {
+                    baseUri.Append("&").Append(queryParam.Key.UrlEncoded()).Append("=").Append(queryParam.Value.UrlEncoded());
+                }
             }
             var targetUri = new Uri(baseUri.ToString());
 
-            var req = (HttpWebRequest)WebRequest.Create(targetUri);
-            req.KeepAlive = true;
-            req.Method = request.Method;
-            req.Credentials = CredentialCache.DefaultCredentials;
+            var httpWebRequest = (HttpWebRequest)WebRequest.Create(targetUri);
+            httpWebRequest.KeepAlive = true;
+            httpWebRequest.Method = restRequest.Method;
+            httpWebRequest.Credentials = CredentialCache.DefaultCredentials;
 
-            if (!string.IsNullOrWhiteSpace(request.ContentType))
+            if (!string.IsNullOrWhiteSpace(restRequest.ContentType))
             {
-                req.ContentType = request.ContentType;
+                httpWebRequest.ContentType = restRequest.ContentType;
             }
 
-            if (!request.Cache)
+            if (!restRequest.Cache)
             {
-                req.Headers.Set(RiakConstants.Rest.HttpHeaders.DisableCacheKey, RiakConstants.Rest.HttpHeaders.DisableCacheValue);
+                httpWebRequest.Headers.Set(RiakConstants.Rest.HttpHeaders.DisableCacheKey, RiakConstants.Rest.HttpHeaders.DisableCacheValue);
             }
 
-            request.Headers.ForEach(h => req.Headers.Set(h.Key, h.Value));
-
-            if (request.Body != null && request.Body.Length > 0)
+            foreach (KeyValuePair<string, string> restRequestHeader in restRequest.Headers)
             {
-                req.ContentLength = request.Body.Length;
-                using (var writer = req.GetRequestStream())
+                httpWebRequest.Headers.Set(restRequestHeader.Key, restRequestHeader.Value);
+            }
+
+            if (!EnumerableUtil.IsNullOrEmpty(restRequest.Body))
+            {
+                httpWebRequest.ContentLength = restRequest.Body.Length;
+                using (var writer = httpWebRequest.GetRequestStream())
                 {
-                    writer.Write(request.Body, 0, request.Body.Length);
+                    writer.Write(restRequest.Body, 0, restRequest.Body.Length);
                 }
             }
             else
             {
-                req.ContentLength = 0;
+                httpWebRequest.ContentLength = 0;
             }
 
             try
             {
-                var response = (HttpWebResponse)req.GetResponse();
+                var response = (HttpWebResponse)httpWebRequest.GetResponse();
 
                 var result = new RiakRestResponse
                 {

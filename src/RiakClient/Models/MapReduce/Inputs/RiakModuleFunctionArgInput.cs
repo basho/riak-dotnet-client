@@ -17,11 +17,10 @@
 // under the License.
 // </copyright>
 
-using RiakClient.Extensions;
-using Newtonsoft.Json;
-
 namespace RiakClient.Models.MapReduce.Inputs
 {
+    using Newtonsoft.Json;
+
     public class RiakModuleFunctionArgInput : RiakPhaseInput
     {
         private readonly string[] _arg;
@@ -64,7 +63,12 @@ namespace RiakClient.Models.MapReduce.Inputs
             writer.WritePropertyName("arg");
 
             writer.WriteStartArray();
-            Arg.ForEach(writer.WriteValue);
+
+            foreach (string arg in Arg)
+            {
+                writer.WriteValue(arg);
+            }
+
             writer.WriteEndArray();
 
             writer.WriteEndObject();

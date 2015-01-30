@@ -25,14 +25,6 @@ namespace RiakClient.Extensions
 
     public static class EnumerableExtensions
     {
-        public static void ForEach<T>(this IEnumerable<T> items, Action<T> action)
-        {
-            foreach (var item in items)
-            {
-                action(item);
-            }
-        }
-
         public static IEnumerable<T> Replicate<T>(this T obj, int count)
         {
             while (count-- > 0)
