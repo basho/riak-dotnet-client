@@ -1,14 +1,7 @@
 <StyleCopSettings Version="105">
-  <Analyzers>
-    <Analyzer AnalyzerId="StyleCop.CSharp.DocumentationRules">
-      <Rules>
-        <Rule Name="FileHeaderFileNameDocumentationMustMatchTypeName">
-          <RuleSettings>
-            <BooleanProperty Name="Enabled">False</BooleanProperty>
-          </RuleSettings>
-        </Rule>
-      </Rules>
-      <AnalyzerSettings />
-    </Analyzer>
-  </Analyzers>
+  <GlobalSettings>
+    <StringProperty Name="LinkedSettingsFile">..\Settings.StyleCop</StringProperty>
+    <StringProperty Name="MergeSettingsFiles">Linked</StringProperty>
+  </GlobalSettings>
 </StyleCopSettings>
+

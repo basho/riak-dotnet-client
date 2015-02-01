@@ -99,6 +99,7 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />
+    <None Include="Settings.StyleCop" />
   </ItemGroup>
   <ItemGroup>
     <!-- https://connect.microsoft.com/VisualStudio/feedback/details/800245/vs2013rc-adds-to-vs2012-c-project-section-itemgroup -->
