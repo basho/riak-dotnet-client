@@ -22,6 +22,7 @@ namespace RiakClientTests.Live
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Extensions;
     using MapReduce;
     using NUnit.Framework;
     using RiakClient.Models;
@@ -29,7 +30,6 @@ namespace RiakClientTests.Live
     using RiakClient.Models.MapReduce;
     using RiakClient.Models.MapReduce.Inputs;
     using RiakClient.Util;
-    using Extensions;
 
     [TestFixture]
     public class WhenUsingIndexes : RiakMapReduceTestBase

@@ -86,8 +86,8 @@ namespace RiakClient.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="RiakObject"/> class.
         /// </summary>
-        /// <param name="bucket">Bucket.</param>
-        /// <param name="key">Key.</param>
+        /// <param name="bucket">Object bucket name</param>
+        /// <param name="key">Object key</param>
         /// <remarks>When saving a binary object to Riak, one of the appropriate binary 
         /// <see cref="RiakConstants.ContentTypes"/> should be used.
         /// If the content type is not know, fall back to application/octet-stream. In addition,
@@ -101,9 +101,9 @@ namespace RiakClient.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="RiakObject"/> class.
         /// </summary>
-        /// <param name="bucket">Bucket.</param>
-        /// <param name="key">Key.</param>
-        /// <param name="value">Value.</param>
+        /// <param name="bucket">Object bucket name</param>
+        /// <param name="key">Object key</param>
+        /// <param name="value">Object value</param>
         /// <remarks>When saving a binary object to Riak, one of the appropriate binary 
         /// <see cref="RiakConstants.ContentTypes"/> should be used.
         /// If the content type is not know, fall back to application/octet-stream. In addition,
@@ -117,9 +117,9 @@ namespace RiakClient.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="RiakObject"/> class.
         /// </summary>
-        /// <param name="bucket">Bucket.</param>
-        /// <param name="key">Key.</param>
-        /// <param name="value">Value.</param>
+        /// <param name="bucket">Object bucket name</param>
+        /// <param name="key">Object key</param>
+        /// <param name="value">Object value</param>
         /// <remarks>When saving a binary object to Riak, one of the appropriate binary 
         /// <see cref="RiakConstants.ContentTypes"/> should be used.
         /// If the content type is not know, fall back to application/octet-stream. In addition,
@@ -130,6 +130,11 @@ namespace RiakClient.Models
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RiakObject"/> class.
+        /// </summary>
+        /// <param name="objectId">Object ID</param>
+        /// <param name="value">Object value</param>
         public RiakObject(RiakObjectId objectId, object value)
             : this(objectId, value.ToJson(), RiakConstants.ContentTypes.ApplicationJson)
         {
@@ -138,9 +143,9 @@ namespace RiakClient.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="RiakObject"/> class.
         /// </summary>
-        /// <param name="bucket">Bucket.</param>
-        /// <param name="key">Key.</param>
-        /// <param name="value">Value.</param>
+        /// <param name="bucket">Object bucket name</param>
+        /// <param name="key">Object key</param>
+        /// <param name="value">Object value</param>
         /// <param name="contentType">Content type of the object. These should be MIME compliant content types.</param>
         /// <remarks>When saving a binary object to Riak, one of the appropriate binary 
         /// <see cref="RiakConstants.ContentTypes"/> should be used.
@@ -160,9 +165,9 @@ namespace RiakClient.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="RiakObject"/> class.
         /// </summary>
-        /// <param name="bucket">Bucket.</param>
-        /// <param name="key">Key.</param>
-        /// <param name="value">Value.</param>
+        /// <param name="bucket">Object bucket name</param>
+        /// <param name="key">Object key</param>
+        /// <param name="value">Object value</param>
         /// <param name="contentType">Content type of the object. These should be MIME compliant content types.</param>
         /// <param name="charSet">Character set used to encode saved data.</param>
         /// <remarks>When saving a binary object to Riak, one of the appropriate binary 
@@ -183,9 +188,9 @@ namespace RiakClient.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="RiakObject"/> class.
         /// </summary>
-        /// <param name="bucket">Bucket.</param>
-        /// <param name="key">Key.</param>
-        /// <param name="value">Value.</param>
+        /// <param name="bucket">Object bucket name</param>
+        /// <param name="key">Object key</param>
+        /// <param name="value">Object value</param>
         /// <param name="contentType">Content type of the object. These should be MIME compliant content types.</param>
         /// <param name="charSet">Character set used to encode saved data.</param>
         /// <remarks>When saving a binary object to Riak, one of the appropriate binary 
@@ -202,9 +207,9 @@ namespace RiakClient.Models
         /// Initializes a new instance of the <see cref="RiakObject"/> class.
         /// </summary>
         /// <param name="bucketType">Riak bucket type - a collection of buckets with similar configuraiton</param> 
-        /// <param name="bucket">Bucket.</param>
-        /// <param name="key">Key.</param>
-        /// <param name="value">Value.</param>
+        /// <param name="bucket">Object bucket name</param>
+        /// <param name="key">Object key</param>
+        /// <param name="value">Object value</param>
         /// <param name="contentType">Content type of the object. These should be MIME compliant content types.</param>
         /// <param name="charSet">Character set used to encode saved data.</param>
         /// <remarks>When saving a binary object to Riak, one of the appropriate binary 

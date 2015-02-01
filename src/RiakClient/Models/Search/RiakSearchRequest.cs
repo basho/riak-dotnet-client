@@ -65,7 +65,7 @@ namespace RiakClient.Models.Search
         public DefaultOperation? DefaultOperation { get; set; }
 
         /// <summary>
-        /// Specifies the list of fields that should be returned for each
+        /// Gets or sets the list of fields that should be returned for each
         /// record in the result list.
         /// </summary>
         /// <remarks>
