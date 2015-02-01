@@ -98,6 +98,7 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />
+    <None Include="Settings.StyleCop" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RiakClient\RiakClient.csproj">
