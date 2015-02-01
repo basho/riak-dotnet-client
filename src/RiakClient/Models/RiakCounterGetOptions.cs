@@ -41,7 +41,7 @@ namespace RiakClient.Models
         public uint? RVal { get; private set; }
 
         /// <summary>
-        /// Basic Quorum semantics - whether to return early in some failure cases (eg. when r=1 and you get 2 errors and a success basic_quorum=true would return an error)
+        /// Gets or sets basic quorum semantics - whether to return early in some failure cases (eg. when r=1 and you get 2 errors and a success basic_quorum=true would return an error)
         /// </summary>
         /// <value>
         /// Whether basic quorum semantics will be used.
@@ -49,7 +49,7 @@ namespace RiakClient.Models
         public bool? BasicQuorum { get; set; }
 
         /// <summary>
-        /// Should not found responses from Riak be treated as an OK result for a find operation. 
+        /// Gets or sets a boolean - Should not found responses from Riak be treated as an OK result for a find operation. 
         /// </summary>
         /// <value>
         /// The notfound_ok value.

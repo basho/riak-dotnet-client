@@ -739,8 +739,8 @@ namespace RiakClient
         /// <summary>
         /// Return a list of keys from the given bucket.
         /// </summary>
-        /// <param name="bucket"></param>
-        /// <returns></returns>
+        /// <param name="bucket">Riak bucket from which to list keys</param>
+        /// <returns>List of keys</returns>
         /// <remarks>This uses the $key special index instead of the list keys API to 
         /// quickly return an unsorted list of keys from Riak.</remarks>
         public RiakResult<IList<string>> ListKeysFromIndex(string bucket)
