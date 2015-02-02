@@ -17,31 +17,31 @@
 // under the License.
 // </copyright>
 
-using RiakClient.Extensions;
-using Newtonsoft.Json;
-using RiakClient.Util;
-
 namespace RiakClient.Models.MapReduce.Languages
 {
+    using Extensions;
+    using Newtonsoft.Json;
+    using Util;
+
     internal class RiakPhaseLanguageErlang : IRiakPhaseLanguage
     {
-        private string _module;
-        private string _function;
+        private string module;
+        private string function;
 
         public void ModFun(string module, string function)
         {
-            _module = module;
-            _function = function;
+            this.module = module;
+            this.function = function;
         }
 
         public void WriteJson(JsonWriter writer)
         {
-            System.Diagnostics.Debug.Assert(!string.IsNullOrWhiteSpace(_module), "Module must be set");
-            System.Diagnostics.Debug.Assert(!string.IsNullOrWhiteSpace(_function), "Function must be set");
+            System.Diagnostics.Debug.Assert(!string.IsNullOrWhiteSpace(module), "Module must be set");
+            System.Diagnostics.Debug.Assert(!string.IsNullOrWhiteSpace(function), "Function must be set");
 
             writer.WriteSpecifiedProperty("language", RiakConstants.MapReduceLanguage.Erlang)
-                .WriteSpecifiedProperty("module", _module)
-                .WriteSpecifiedProperty("function", _function);
+                .WriteSpecifiedProperty("module", module)
+                .WriteSpecifiedProperty("function", function);
         }
     }
 }
