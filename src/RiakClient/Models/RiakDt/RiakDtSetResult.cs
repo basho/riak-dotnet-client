@@ -17,31 +17,34 @@
 // under the License.
 // </copyright>
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using RiakClient.Extensions;
-
 namespace RiakClient.Models.RiakDt
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
     public class RiakDtSetResult
     {
-        public RiakResult<RiakObject> Result { get; private set; }
-        public byte[] Context { get; internal set; }
-        public List<byte[]> Values { get; internal set; } 
-
         public RiakDtSetResult(
-            RiakResult<RiakObject> result, 
-           byte[] context = null,
-           List<byte[]> values = null )
+            RiakResult<RiakObject> result,
+            byte[] context = null,
+            List<byte[]> values = null)
         {
             Result = result;
 
             if (context != null)
+            {
                 Context = context;
+            }
 
             Values = values ?? new List<byte[]>();
         }
+
+        public RiakResult<RiakObject> Result { get; private set; }
+
+        public byte[] Context { get; internal set; }
+
+        public List<byte[]> Values { get; internal set; }
 
         public ISet<T> GetObjects<T>(DeserializeObject<T> deserializeObject)
         {

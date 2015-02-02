@@ -92,6 +92,7 @@
     <Compile Include="IRiakClient.cs" />
     <Compile Include="Models\CommitHook\IRiakCommitHook.cs" />
     <Compile Include="Models\RiakDt\CounterOperation.cs" />
+    <Compile Include="Models\RiakDt\MapOperation.cs" />
     <Compile Include="Util\EnumerableUtil.cs" />
     <Compile Include="Exceptions\RiakInvalidDataException.cs" />
     <Compile Include="Exceptions\RiakException.cs" />

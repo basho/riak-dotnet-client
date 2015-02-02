@@ -17,10 +17,10 @@
 // under the License.
 // </copyright>
 
-using RiakClient.Messages;
-
 namespace RiakClient.Models.RiakDt
 {
+    using Messages;
+
     public interface IDtOp
     {
         DtOp ToDtOp();

@@ -1,4 +1,4 @@
-// <copyright file="RiakDtMapResult.cs" company="Basho Technologies, Inc.">
+// <copyright file="MapOperation.cs" company="Basho Technologies, Inc.">
 // Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
 // Copyright (c) 2014 - Basho Technologies, Inc.
 //
@@ -19,29 +19,16 @@
 
 namespace RiakClient.Models.RiakDt
 {
-    using System.Collections.Generic;
+    using Messages;
 
-    public class RiakDtMapResult
+    public class MapOperation : IDtOp
     {
-        public RiakDtMapResult(
-            RiakResult<RiakObject> result,
-            byte[] context = null,
-            List<RiakDtMapEntry> values = null)
+        public DtOp ToDtOp()
         {
-            Result = result;
-
-            if (context != null)
+            return new DtOp
             {
-                Context = context;
-            }
-
-            Values = values ?? new List<RiakDtMapEntry>();
+                map_op = new MapOp()
+            };
         }
-
-        public RiakResult<RiakObject> Result { get; private set; }
-
-        public byte[] Context { get; internal set; }
-
-        public List<RiakDtMapEntry> Values { get; internal set; }
     }
 }
