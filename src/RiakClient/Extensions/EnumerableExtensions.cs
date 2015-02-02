@@ -21,53 +21,15 @@ namespace RiakClient.Extensions
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
 
     public static class EnumerableExtensions
     {
-        public static IEnumerable<T> Replicate<T>(this T obj, int count)
-        {
-            while (count-- > 0)
-            {
-                yield return obj;
-            }
-        }
-
-        public static IEnumerable<T> Cycle<T>(this IEnumerable<T> items)
-        {
-            while (true)
-            {
-                foreach (var item in items)
-                {
-                    yield return item;
-                }
-            }
-        }
-
-        public static void Times(this int count, Action action)
-        {
-            while (count-- > 0)
-            {
-                action();
-            }
-        }
-
         public static IEnumerable<T> Times<T>(this int count, Func<T> generator)
         {
             while (count-- > 0)
             {
                 yield return generator();
             }
-        }
-
-        public static bool In<T>(this T val, IEnumerable<T> items)
-        {
-            return items.Contains(val);
-        }
-
-        public static HashSet<T> ToHashSet<T>(this IEnumerable<T> source)
-        {
-            return new HashSet<T>(source);
         }
     }
 }

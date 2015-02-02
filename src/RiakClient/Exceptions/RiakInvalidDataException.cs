@@ -21,6 +21,9 @@ namespace RiakClient.Exceptions
 {
     using System;
 
+    /*
+     * TODO: should be subclass of RiakException
+     */
     public class RiakInvalidDataException : Exception
     {
         private readonly byte messageCode;

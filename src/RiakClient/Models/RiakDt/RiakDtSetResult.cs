@@ -30,9 +30,10 @@ namespace RiakClient.Models.RiakDt
         public byte[] Context { get; internal set; }
         public List<byte[]> Values { get; internal set; } 
 
-        public RiakDtSetResult(RiakResult<RiakObject> result, 
-                               byte[] context = null,
-                               List<byte[]> values = null )
+        public RiakDtSetResult(
+            RiakResult<RiakObject> result, 
+           byte[] context = null,
+           List<byte[]> values = null )
         {
             Result = result;
 
@@ -49,7 +50,7 @@ namespace RiakClient.Models.RiakDt
                 throw new ArgumentException("deserializeObject must not be null");
             }
 
-            return Values.Select(v => deserializeObject(v)).ToHashSet();
+            return new HashSet<T>(Values.Select(v => deserializeObject(v)));
         }
     }
 }
