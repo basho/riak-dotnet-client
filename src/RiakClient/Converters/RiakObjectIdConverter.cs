@@ -17,18 +17,28 @@
 // under the License.
 // </copyright>
 
-using System;
-using Newtonsoft.Json;
-using RiakClient.Models;
-
 namespace RiakClient.Converters
 {
+    using System;
+    using Models;
+    using Newtonsoft.Json;
+
     /*
      * TODO: FUTURE - Figure out if this is still needed
      */
     public class RiakObjectIdConverter : JsonConverter
     {
-        public override object ReadJson(JsonReader reader, Type objectType, Object existingValue, JsonSerializer serializer)
+        public override bool CanRead
+        {
+            get { return true; }
+        }
+
+        public override bool CanConvert(Type objectType)
+        {
+            return true;
+        }
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             int pos = 0;
             string bucket = null;
@@ -42,15 +52,18 @@ namespace RiakClient.Converters
                     {
                         bucket = reader.Value.ToString();
                     }
+
                     if (pos == 1)
                     {
                         key = reader.Value.ToString();
                     }
                 }
+
                 if (pos > 1)
                 {
                     break;
                 }
+
                 pos++;
             }
 
@@ -60,16 +73,6 @@ namespace RiakClient.Converters
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             throw new NotImplementedException();
-        }
-
-        public override bool CanRead
-        {
-            get { return true; }
-        }
-
-        public override bool CanConvert(Type objectType)
-        {
-            return true;
         }
     }
 }

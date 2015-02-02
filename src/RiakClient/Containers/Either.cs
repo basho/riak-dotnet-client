@@ -21,20 +21,35 @@ namespace RiakClient.Containers
 {
     public class Either<TLeft, TRight>
     {
-        public bool IsLeft { get; private set; }
-        public TLeft Left { get; private set; }
-        public TRight Right { get; private set; }
+        private readonly bool isLeft;
+        private readonly TLeft left;
+        private readonly TRight right;
 
         public Either(TLeft left)
         {
-            Left = left;
-            IsLeft = true;
+            this.left = left;
+            isLeft = true;
         }
 
         public Either(TRight right)
         {
-            Right = right;
-            IsLeft = false;
+            this.right = right;
+            isLeft = false;
+        }
+
+        public bool IsLeft
+        {
+            get { return isLeft; }
+        }
+
+        public TLeft Left
+        {
+            get { return left; }
+        }
+
+        public TRight Right
+        {
+            get { return right; }
         }
     }
 }
