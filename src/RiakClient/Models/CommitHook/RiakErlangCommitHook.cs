@@ -17,21 +17,17 @@
 // under the License.
 // </copyright>
 
-using System;
-using RiakClient.Extensions;
-using Newtonsoft.Json;
-using RiakClient.Messages;
-
 namespace RiakClient.Models.CommitHook
 {
+    using Extensions;
+    using Messages;
+    using Newtonsoft.Json;
+
     public class RiakErlangCommitHook : RiakCommitHook, IRiakPreCommitHook, IRiakPostCommitHook
     {
-        [Obsolete("RiakSearchCommitHook is deprecated, please use RiakLegacySearchCommitHook instead.", true)]
-        internal static RiakErlangCommitHook RiakSearchCommitHook;
-        internal static RiakErlangCommitHook RiakLegacySearchCommitHook;
-
-        public string Module { get; private set; }
-        public string Function { get; private set; }
+        internal static readonly RiakErlangCommitHook RiakLegacySearchCommitHook;
+        private readonly string module;
+        private readonly string function;
 
         static RiakErlangCommitHook()
         {
@@ -40,15 +36,35 @@ namespace RiakClient.Models.CommitHook
 
         public RiakErlangCommitHook(string module, string function)
         {
-            Module = module;
-            Function = function;
+            this.module = module;
+            this.function = function;
+        }
+
+        public string Module
+        {
+            get { return this.module; }
+        }
+
+        public string Function
+        {
+            get { return this.function; }
+        }
+
+        public static bool operator ==(RiakErlangCommitHook left, RiakErlangCommitHook right)
+        {
+            return RiakErlangCommitHook.Equals(left, right);
+        }
+
+        public static bool operator !=(RiakErlangCommitHook left, RiakErlangCommitHook right)
+        {
+            return !RiakErlangCommitHook.Equals(left, right);
         }
 
         public override void WriteJson(JsonWriter writer)
         {
             writer.WriteStartObject();
-            writer.WriteProperty("mod", Module);
-            writer.WriteProperty("fun", Function);
+            writer.WriteProperty("mod", this.module);
+            writer.WriteProperty("fun", this.function);
             writer.WriteEndObject();
         }
 
@@ -58,42 +74,49 @@ namespace RiakClient.Models.CommitHook
                 {
                     modfun = new RpbModFun
                         {
-                            function = Function.ToRiakString(),
-                            module = Module.ToRiakString()
+                            function = this.function.ToRiakString(),
+                            module = this.module.ToRiakString()
                         }
                 };
         }
 
-        protected bool Equals(RiakErlangCommitHook other)
+        public override bool Equals(RiakCommitHook other)
         {
-            return string.Equals(Module, other.Module) && string.Equals(Function, other.Function);
+            return this.Equals(other as RiakErlangCommitHook);
         }
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (object.ReferenceEquals(null, obj))
+            {
+                return false;
+            }
 
-            return Equals((RiakErlangCommitHook)obj);
+            if (object.ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+
+            return this.Equals(obj as RiakErlangCommitHook);
         }
 
         public override int GetHashCode()
         {
             unchecked
             {
-                return (Module.GetHashCode() * 397) ^ Function.GetHashCode();
+                return (this.module.GetHashCode() * 397) ^ this.function.GetHashCode();
             }
         }
 
-        public static bool operator ==(RiakErlangCommitHook left, RiakErlangCommitHook right)
+        private bool Equals(RiakErlangCommitHook other)
         {
-            return Equals(left, right);
-        }
+            if (object.ReferenceEquals(null, other))
+            {
+                return false;
+            }
 
-        public static bool operator !=(RiakErlangCommitHook left, RiakErlangCommitHook right)
-        {
-            return !Equals(left, right);
+            return string.Equals(this.module, other.Module) &&
+                string.Equals(this.function, other.Function);
         }
     }
 }

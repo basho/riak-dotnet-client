@@ -17,59 +17,81 @@
 // under the License.
 // </copyright>
 
-using RiakClient.Extensions;
-using Newtonsoft.Json;
-using RiakClient.Messages;
-
 namespace RiakClient.Models.CommitHook
 {
+    using Extensions;
+    using Messages;
+    using Newtonsoft.Json;
+
     public class RiakJavascriptCommitHook : RiakCommitHook, IRiakPreCommitHook
     {
-        public string Name { get; private set; }
+        private readonly string name;
 
         public RiakJavascriptCommitHook(string name)
         {
-            Name = name;
+            this.name = name;
         }
 
-        protected bool Equals(RiakJavascriptCommitHook other)
+        public string Name
         {
-            return string.Equals(Name, other.Name);
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((RiakJavascriptCommitHook)obj);
-        }
-
-        public override int GetHashCode()
-        {
-            return Name.GetHashCode();
+            get { return this.name; }
         }
 
         public static bool operator ==(RiakJavascriptCommitHook left, RiakJavascriptCommitHook right)
         {
-            return Equals(left, right);
+            return RiakJavascriptCommitHook.Equals(left, right);
         }
 
         public static bool operator !=(RiakJavascriptCommitHook left, RiakJavascriptCommitHook right)
         {
-            return !Equals(left, right);
+            return !RiakJavascriptCommitHook.Equals(left, right);
+        }
+
+        public override bool Equals(RiakCommitHook other)
+        {
+            return this.Equals(other as RiakJavascriptCommitHook);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (object.ReferenceEquals(null, obj))
+            {
+                return false;
+            }
+
+            if (object.ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+
+            return this.Equals(obj as RiakJavascriptCommitHook);
+        }
+
+        public override int GetHashCode()
+        {
+            return this.name.GetHashCode();
         }
 
         public override void WriteJson(JsonWriter writer)
         {
             writer.WriteStartObject();
-            writer.WriteProperty("name", Name);
+            writer.WriteProperty("name", this.name);
             writer.WriteEndObject();
         }
 
         public override RpbCommitHook ToRpbCommitHook()
         {
-            return new RpbCommitHook {name = Name.ToRiakString()};
+            return new RpbCommitHook { name = this.name.ToRiakString() };
+        }
+
+        private bool Equals(RiakJavascriptCommitHook other)
+        {
+            if (object.ReferenceEquals(null, other))
+            {
+                return false;
+            }
+
+            return string.Equals(this.name, other.Name);
         }
     }
 }
