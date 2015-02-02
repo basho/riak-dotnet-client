@@ -1281,7 +1281,9 @@ namespace RiakClient
             var rcr = new RiakCounterResult(RiakResult<RiakObject>.Success(o));
 
             if (result.Value.value != null)
+            {
                 rcr.Value = result.Value.value.counter_value;
+            }
 
             return rcr;
         }
@@ -1318,7 +1320,9 @@ namespace RiakClient
             var rcr = new RiakCounterResult(RiakResult<RiakObject>.Success(o));
 
             if (options.ReturnBody)
+            {
                 rcr.Value = result.Value.counter_value;
+            }
 
             return rcr;
         }

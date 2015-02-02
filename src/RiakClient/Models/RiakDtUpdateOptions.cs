@@ -17,24 +17,40 @@
 // under the License.
 // </copyright>
 
-using System;
-using System.Collections.Generic;
-using RiakClient.Extensions;
-using RiakClient.Containers;
-using RiakClient.Messages;
-using RiakClient.Util;
-
 namespace RiakClient.Models
 {
+    using System;
+    using System.Collections.Generic;
+    using Containers;
+    using Extensions;
+    using Messages;
+    using Util;
+
     public class RiakDtUpdateOptions
     {
+        public RiakDtUpdateOptions()
+        {
+            W = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
+            Dw = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
+            Pw = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
+            ReturnBody = true;
+            IncludeContext = true;
+        }
+
         public Either<uint, string> W { get; private set; }
+
         public Either<uint, string> Dw { get; private set; }
+
         public Either<uint, string> Pw { get; private set; }
+
         public bool ReturnBody { get; private set; }
+
         public uint? Timeout { get; private set; }
+
         public bool SloppyQuorum { get; private set; }
+
         public uint? NVal { get; private set; }
+
         public bool IncludeContext { get; private set; }
 
         public RiakDtUpdateOptions SetW(uint value)
@@ -97,15 +113,6 @@ namespace RiakClient.Models
             return this;
         }
 
-        public RiakDtUpdateOptions()
-        {
-            W = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
-            Dw = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
-            Pw = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
-            ReturnBody = true;
-            IncludeContext = true;
-        }
-
         internal void Populate(DtUpdateReq request)
         {
             request.w = W.IsLeft ? W.Left : W.Right.ToRpbOption();
@@ -115,12 +122,16 @@ namespace RiakClient.Models
             request.return_body = ReturnBody;
 
             if (Timeout.HasValue)
+            {
                 request.timeout = Timeout.Value;
+            }
 
             request.sloppy_quorum = SloppyQuorum;
 
             if (NVal.HasValue)
+            {
                 request.n_val = NVal.Value;
+            }
 
             request.include_context = IncludeContext;
         }
@@ -135,7 +146,7 @@ namespace RiakClient.Models
 
         private RiakDtUpdateOptions WriteQuorum(uint value, Action<Either<uint, string>> setter)
         {
-            System.Diagnostics.Debug.Assert(value >= 1);
+            System.Diagnostics.Debug.Assert(value >= 1, "value must be greater than or equal to 1");
 
             setter(new Either<uint, string>(value));
             return this;

@@ -17,17 +17,27 @@
 // under the License.
 // </copyright>
 
-using System;
-using System.Collections.Generic;
-using RiakClient.Extensions;
-using RiakClient.Containers;
-using RiakClient.Messages;
-using RiakClient.Util;
-
 namespace RiakClient.Models
 {
+    using System;
+    using System.Collections.Generic;
+    using Containers;
+    using Extensions;
+    using Messages;
+    using Util;
+
     public class RiakDeleteOptions
     {
+        public RiakDeleteOptions()
+        {
+            Rw = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
+            R = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
+            W = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
+            Pr = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
+            Pw = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
+            Dw = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
+        }
+
         /// <summary>
         /// The number of replicas that need to agree when retrieving the object.
         /// </summary>
@@ -156,16 +166,6 @@ namespace RiakClient.Models
             return this;
         }
 
-        public RiakDeleteOptions()
-        {
-            Rw = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
-            R = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
-            W = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
-            Pr = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
-            Pw = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
-            Dw = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
-        }
-
         internal void Populate(RpbDelReq request)
         {
             request.r = R.IsLeft ? R.Left : R.Right.ToRpbOption();
@@ -176,7 +176,9 @@ namespace RiakClient.Models
             request.dw = Dw.IsLeft ? Dw.Left : Dw.Right.ToRpbOption();
 
             if (Timeout.HasValue)
+            {
                 request.timeout = Timeout.Value;
+            }
 
             if (Vclock != null)
             {
@@ -194,7 +196,7 @@ namespace RiakClient.Models
 
         private RiakDeleteOptions WriteQuorum(uint value, Action<Either<uint, string>> setter)
         {
-            System.Diagnostics.Debug.Assert(value >= 1);
+            System.Diagnostics.Debug.Assert(value >= 1, "value must be greater than equal to 1");
 
             setter(new Either<uint, string>(value));
             return this;

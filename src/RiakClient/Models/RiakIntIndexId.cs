@@ -1,4 +1,4 @@
-// <copyright file="RiakCounterResult.cs" company="Basho Technologies, Inc.">
+﻿// <copyright file="RiakIntIndexId.cs" company="Basho Technologies, Inc.">
 // Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
 // Copyright (c) 2014 - Basho Technologies, Inc.
 //
@@ -19,28 +19,18 @@
 
 namespace RiakClient.Models
 {
-    public class RiakCounterResult
+    using Extensions;
+
+    internal class RiakIntIndexId : RiakIndexId
     {
-        private readonly RiakResult<RiakObject> result;
-
-        public RiakCounterResult(RiakResult<RiakObject> result)
+        public RiakIntIndexId(string bucketName, string indexName)
+            : base(bucketName, indexName.ToIntegerKey())
         {
-            this.result = result;
         }
 
-        public RiakCounterResult(RiakResult<RiakObject> result, long? value) : this(result)
+        public RiakIntIndexId(string bucketType, string bucketName, string indexName)
+            : base(bucketType, bucketName, indexName.ToIntegerKey())
         {
-            this.Value = value;
-        }
-
-        public RiakResult<RiakObject> Result
-        {
-            get { return result; }
-        }
-
-        public long? Value
-        {
-            get; set;
         }
     }
 }

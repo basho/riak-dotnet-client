@@ -17,17 +17,23 @@
 // under the License.
 // </copyright>
 
-using System;
-using System.Collections.Generic;
-using RiakClient.Extensions;
-using RiakClient.Containers;
-using RiakClient.Messages;
-using RiakClient.Util;
-
 namespace RiakClient.Models
 {
+    using System;
+    using System.Collections.Generic;
+    using Containers;
+    using Extensions;
+    using Messages;
+    using Util;
+
     public class RiakGetOptions
     {
+        public RiakGetOptions()
+        {
+            R = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
+            Pr = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
+        }
+
         /// <summary>
         /// The number of replicas that must return before a delete is considered a success.
         /// </summary>
@@ -122,12 +128,6 @@ namespace RiakClient.Models
             return this;
         }
 
-        public RiakGetOptions()
-        {
-            R = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
-            Pr = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
-        }
-
         internal void Populate(RpbGetReq request)
         {
             request.r = R.IsLeft ? R.Left : R.Right.ToRpbOption();
@@ -174,11 +174,10 @@ namespace RiakClient.Models
 
         private RiakGetOptions WriteQuorum(uint value, Action<Either<uint, string>> setter)
         {
-            System.Diagnostics.Debug.Assert(value >= 1);
+            System.Diagnostics.Debug.Assert(value >= 1, "value must be greater than or equal to 1");
 
             setter(new Either<uint, string>(value));
             return this;
         }
     }
 }
-
