@@ -42,46 +42,11 @@ namespace RiakClient.Models
 
     public class RiakObject : IWriteableVClock
     {
-        private readonly int _hashCode;
-        private readonly Dictionary<string, IntIndex> _intIndexes;
-        private readonly Dictionary<string, BinIndex> _binIndexes;
+        private readonly int hashCode;
+        private readonly Dictionary<string, IntIndex> intIndexes;
+        private readonly Dictionary<string, BinIndex> binIndexes;
 
-        private List<string> _vtags;
-
-        public string BucketType { get; private set; }
-        public string Bucket { get; private set; }
-        public string Key { get; private set; }
-        public byte[] Value { get; set; }
-        public string ContentEncoding { get; set; }
-        public string ContentType { get; set; }
-        public string CharSet { get; set; }
-        public byte[] VectorClock { get; private set; }
-        public string VTag { get; private set; }
-        public IDictionary<string, string> UserMetaData { get; set; }
-        public uint LastModified { get; internal set; }
-        public uint LastModifiedUsec { get; internal set; }
-        public IList<RiakLink> Links { get; private set; }
-        public IList<RiakObject> Siblings { get; set; }
-
-        public IDictionary<string, IntIndex> IntIndexes
-        {
-            get { return _intIndexes; }
-        }
-
-        public IDictionary<string, BinIndex> BinIndexes
-        {
-            get { return _binIndexes; }
-        }
-
-        public bool HasChanged
-        {
-            get { return _hashCode != CalculateHashCode(); }
-        }
-
-        public List<string> VTags
-        {
-            get { return _vtags ?? (_vtags = Siblings.Count == 0 ? new List<string> { VTag } : Siblings.Select(s => s.VTag).ToList()); }
-        }
+        private List<string> vtags;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RiakObject"/> class.
@@ -248,8 +213,106 @@ namespace RiakClient.Models
             Links = new List<RiakLink>();
             Siblings = new List<RiakObject>();
 
-            _intIndexes = new Dictionary<string, IntIndex>();
-            _binIndexes = new Dictionary<string, BinIndex>();
+            intIndexes = new Dictionary<string, IntIndex>();
+            binIndexes = new Dictionary<string, BinIndex>();
+        }
+
+        internal RiakObject(string bucketType, string bucket, string key, RpbContent content, byte[] vectorClock)
+        {
+            BucketType = bucketType;
+            Bucket = bucket;
+            Key = key;
+            VectorClock = vectorClock;
+
+            Value = content.value;
+            VTag = content.vtag.FromRiakString();
+            ContentEncoding = content.content_encoding.FromRiakString();
+            ContentType = content.content_type.FromRiakString();
+            UserMetaData = content.usermeta.ToDictionary(p => p.key.FromRiakString(), p => p.value.FromRiakString());
+            Links = content.links.Select(l => new RiakLink(l)).ToList();
+            Siblings = new List<RiakObject>();
+            LastModified = content.last_mod;
+            LastModifiedUsec = content.last_mod_usecs;
+
+            intIndexes = new Dictionary<string, IntIndex>();
+            binIndexes = new Dictionary<string, BinIndex>();
+
+            foreach (var index in content.indexes)
+            {
+                var name = index.key.FromRiakString();
+
+                if (name.EndsWith(RiakConstants.IndexSuffix.Integer))
+                {
+                    IntIndex(name.Remove(name.Length - RiakConstants.IndexSuffix.Integer.Length))
+                        .Add(index.value.FromRiakString());
+                }
+                else
+                {
+                    BinIndex(name.Remove(name.Length - RiakConstants.IndexSuffix.Binary.Length))
+                        .Add(index.value.FromRiakString());
+                }
+            }
+
+            hashCode = CalculateHashCode();
+        }
+
+        internal RiakObject(string bucketType, string bucket, string key, ICollection<RpbContent> contents, byte[] vectorClock)
+            : this(bucketType, bucket, key, contents.First(), vectorClock)
+        {
+            if (contents.Count > 1)
+            {
+                Siblings = contents.Select(c => new RiakObject(bucketType, bucket, key, c, vectorClock)).ToList();
+                hashCode = CalculateHashCode();
+            }
+        }
+
+        public string BucketType { get; private set; }
+
+        public string Bucket { get; private set; }
+
+        public string Key { get; private set; }
+
+        public byte[] Value { get; set; }
+
+        public string ContentEncoding { get; set; }
+
+        public string ContentType { get; set; }
+
+        public string CharSet { get; set; }
+
+        public byte[] VectorClock { get; private set; }
+
+        public string VTag { get; private set; }
+
+        public IDictionary<string, string> UserMetaData { get; set; }
+
+        public uint LastModified { get; internal set; }
+
+        public uint LastModifiedUsec { get; internal set; }
+
+        public IList<RiakLink> Links { get; private set; }
+
+        public IList<RiakObject> Siblings { get; set; }
+
+        public IDictionary<string, IntIndex> IntIndexes
+        {
+            get { return intIndexes; }
+        }
+
+        public IDictionary<string, BinIndex> BinIndexes
+        {
+            get { return binIndexes; }
+        }
+
+        public bool HasChanged
+        {
+            get { return hashCode != CalculateHashCode(); }
+        }
+
+        public List<string> VTags
+        {
+            // TODO: this is too complex
+            get { return vtags ?? (vtags = Siblings.Count == 0 ? new List<string> { VTag } : Siblings.Select(s => s.VTag).ToList()); }
         }
 
         public IntIndex IntIndex(string name)
@@ -257,9 +320,9 @@ namespace RiakClient.Models
             var index = default(IntIndex);
             name = name.ToLower();
 
-            if (!_intIndexes.TryGetValue(name, out index))
+            if (!intIndexes.TryGetValue(name, out index))
             {
-                _intIndexes[name] = index = new IntIndex(this, name);
+                intIndexes[name] = index = new IntIndex(this, name);
             }
 
             return index;
@@ -270,9 +333,9 @@ namespace RiakClient.Models
             var index = default(BinIndex);
             name = name.ToLower();
 
-            if (!_binIndexes.TryGetValue(name, out index))
+            if (!binIndexes.TryGetValue(name, out index))
             {
-                _binIndexes[name] = index = new BinIndex(this, name);
+                binIndexes[name] = index = new BinIndex(this, name);
             }
 
             return index;
@@ -330,90 +393,9 @@ namespace RiakClient.Models
             }
         }
 
-        internal RiakLink ToRiakLink(string tag)
-        {
-            return new RiakLink(Bucket, Key, tag);
-        }
-
         public RiakObjectId ToRiakObjectId()
         {
             return new RiakObjectId(BucketType, Bucket, Key);
-        }
-
-        internal RiakObject(string bucketType, string bucket, string key, RpbContent content, byte[] vectorClock)
-        {
-            BucketType = bucketType;
-            Bucket = bucket;
-            Key = key;
-            VectorClock = vectorClock;
-
-            Value = content.value;
-            VTag = content.vtag.FromRiakString();
-            ContentEncoding = content.content_encoding.FromRiakString();
-            ContentType = content.content_type.FromRiakString();
-            UserMetaData = content.usermeta.ToDictionary(p => p.key.FromRiakString(), p => p.value.FromRiakString());
-            Links = content.links.Select(l => new RiakLink(l)).ToList();
-            Siblings = new List<RiakObject>();
-            LastModified = content.last_mod;
-            LastModifiedUsec = content.last_mod_usecs;
-
-            _intIndexes = new Dictionary<string, IntIndex>();
-            _binIndexes = new Dictionary<string, BinIndex>();
-
-            foreach (var index in content.indexes)
-            {
-                var name = index.key.FromRiakString();
-
-                if (name.EndsWith(RiakConstants.IndexSuffix.Integer))
-                {
-                    IntIndex(name.Remove(name.Length - RiakConstants.IndexSuffix.Integer.Length))
-                        .Add(index.value.FromRiakString());
-                }
-                else
-                {
-                    BinIndex(name.Remove(name.Length - RiakConstants.IndexSuffix.Binary.Length))
-                        .Add(index.value.FromRiakString());
-                }
-            }
-
-            _hashCode = CalculateHashCode();
-        }
-
-        internal RiakObject(string bucketType, string bucket, string key, ICollection<RpbContent> contents, byte[] vectorClock)
-            : this(bucketType, bucket, key, contents.First(), vectorClock)
-        {
-            if (contents.Count > 1)
-            {
-                Siblings = contents.Select(c => new RiakObject(bucketType, bucket, key, c, vectorClock)).ToList();
-                _hashCode = CalculateHashCode();
-            }
-        }
-
-        internal RpbPutReq ToMessage()
-        {
-            var message = new RpbPutReq
-            {
-                type = BucketType.ToRiakString(),
-                bucket = Bucket.ToRiakString(),
-                key = Key.ToRiakString(),
-                vclock = VectorClock,
-                content = new RpbContent
-                {
-                    content_type = ContentType.ToRiakString(),
-                    value = Value,
-                    vtag = VTag.ToRiakString()
-                }
-            };
-
-            message.content.usermeta.AddRange(UserMetaData.Select(kv => new RpbPair { key = kv.Key.ToRiakString(), value = kv.Value.ToRiakString() }));
-            message.content.links.AddRange(Links.Select(l => l.ToMessage()));
-
-            message.content.indexes.AddRange(IntIndexes.Values.SelectMany(i =>
-                i.Values.Select(v => new RpbPair { key = i.RiakIndexName.ToRiakString(), value = v.ToString().ToRiakString() })));
-            message.content.indexes.AddRange(BinIndexes.Values.SelectMany(i =>
-                i.Values.Select(v => new RpbPair { key = i.RiakIndexName.ToRiakString(), value = v.ToRiakString() })));
-
-            return message;
         }
 
         public override bool Equals(object obj)
@@ -462,7 +444,7 @@ namespace RiakClient.Models
                 && other.LastModified == LastModified
                 && other.LastModifiedUsec == LastModifiedUsec
                 && Equals(other.Links, Links)
-                && Equals(other._vtags, _vtags)
+                && Equals(other.vtags, vtags)
                 && other.Links.SequenceEqual(Links)
                 && other.UserMetaData.SequenceEqual(UserMetaData)
                 && other.BinIndexes.SequenceEqual(BinIndexes)
@@ -472,34 +454,6 @@ namespace RiakClient.Models
         public override int GetHashCode()
         {
             return CalculateHashCode();
-        }
-
-        /// <summary>
-        /// This was moved into its own function that isn't virtual so that it could
-        /// be called inside the object's constructor.
-        /// </summary>
-        /// <returns>The Object's hash code.</returns>
-        private int CalculateHashCode()
-        {
-            unchecked
-            {
-                var result = (BucketType != null ? BucketType.GetHashCode() : 0);
-                result = (result * 397) ^ (Bucket != null ? Bucket.GetHashCode() : 0);
-                result = (result * 397) ^ (Key != null ? Key.GetHashCode() : 0);
-                result = (result * 397) ^ (Value != null ? Value.GetHashCode() : 0);
-                result = (result * 397) ^ (ContentType != null ? ContentType.GetHashCode() : 0);
-                result = (result * 397) ^ (ContentEncoding != null ? ContentEncoding.GetHashCode() : 0);
-                result = (result * 397) ^ (CharSet != null ? CharSet.GetHashCode() : 0);
-                result = (result * 397) ^ (VectorClock != null ? VectorClock.GetHashCode() : 0);
-                result = (result * 397) ^ (UserMetaData != null ? UserMetaData.GetHashCode() : 0);
-                result = (result * 397) ^ (BinIndexes != null ? BinIndexes.GetHashCode() : 0);
-                result = (result * 397) ^ (IntIndexes != null ? IntIndexes.GetHashCode() : 0);
-                result = (result * 397) ^ LastModified.GetHashCode();
-                result = (result * 397) ^ LastModifiedUsec.GetHashCode();
-                result = (result * 397) ^ (Links != null ? Links.GetHashCode() : 0);
-                result = (result * 397) ^ (_vtags != null ? _vtags.GetHashCode() : 0);
-                return result;
-            }
         }
 
         void IWriteableVClock.SetVClock(byte[] vclock)
@@ -580,9 +534,10 @@ namespace RiakClient.Models
                         Serializer.Serialize(ms, value);
                         return ms.ToArray();
                     }
-
                 });
+
                 SetObject(value, ContentType, soba);
+
                 return;
             }
 
@@ -595,7 +550,9 @@ namespace RiakClient.Models
                     serde.Serialize(ms, value);
                     return ms.ToArray();
                 });
+
                 SetObject(value, ContentType, soba);
+
                 return;
             }
 
@@ -661,6 +618,78 @@ namespace RiakClient.Models
             }
 
             throw new NotSupportedException(string.Format("Your current ContentType ({0}), is not supported.", ContentType));
+        }
+
+        internal RiakLink ToRiakLink(string tag)
+        {
+            return new RiakLink(Bucket, Key, tag);
+        }
+
+        internal RpbPutReq ToMessage()
+        {
+            var message = new RpbPutReq
+            {
+                type = BucketType.ToRiakString(),
+                bucket = Bucket.ToRiakString(),
+                key = Key.ToRiakString(),
+                vclock = VectorClock,
+                content = new RpbContent
+                {
+                    content_type = ContentType.ToRiakString(),
+                    value = Value,
+                    vtag = VTag.ToRiakString()
+                }
+            };
+
+            message.content.usermeta.AddRange(UserMetaData.Select(kv => new RpbPair { key = kv.Key.ToRiakString(), value = kv.Value.ToRiakString() }));
+
+            message.content.links.AddRange(Links.Select(l => l.ToMessage()));
+
+            message.content.indexes.AddRange(IntIndexes.Values.SelectMany(i =>
+                i.Values.Select(v =>
+                    new RpbPair
+                    {
+                        key = i.RiakIndexName.ToRiakString(),
+                        value = v.ToString().ToRiakString()
+                    })));
+
+            message.content.indexes.AddRange(BinIndexes.Values.SelectMany(i =>
+                i.Values.Select(v =>
+                    new RpbPair
+                    {
+                        key = i.RiakIndexName.ToRiakString(),
+                        value = v.ToRiakString()
+                    })));
+
+            return message;
+        }
+
+        /// <summary>
+        /// This was moved into its own function that isn't virtual so that it could
+        /// be called inside the object's constructor.
+        /// </summary>
+        /// <returns>The Object's hash code.</returns>
+        private int CalculateHashCode()
+        {
+            unchecked
+            {
+                int result = BucketType != null ? BucketType.GetHashCode() : 0;
+                result = (result * 397) ^ (Bucket != null ? Bucket.GetHashCode() : 0);
+                result = (result * 397) ^ (Key != null ? Key.GetHashCode() : 0);
+                result = (result * 397) ^ (Value != null ? Value.GetHashCode() : 0);
+                result = (result * 397) ^ (ContentType != null ? ContentType.GetHashCode() : 0);
+                result = (result * 397) ^ (ContentEncoding != null ? ContentEncoding.GetHashCode() : 0);
+                result = (result * 397) ^ (CharSet != null ? CharSet.GetHashCode() : 0);
+                result = (result * 397) ^ (VectorClock != null ? VectorClock.GetHashCode() : 0);
+                result = (result * 397) ^ (UserMetaData != null ? UserMetaData.GetHashCode() : 0);
+                result = (result * 397) ^ (BinIndexes != null ? BinIndexes.GetHashCode() : 0);
+                result = (result * 397) ^ (IntIndexes != null ? IntIndexes.GetHashCode() : 0);
+                result = (result * 397) ^ LastModified.GetHashCode();
+                result = (result * 397) ^ LastModifiedUsec.GetHashCode();
+                result = (result * 397) ^ (Links != null ? Links.GetHashCode() : 0);
+                result = (result * 397) ^ (vtags != null ? vtags.GetHashCode() : 0);
+                return result;
+            }
         }
     }
 }
