@@ -17,10 +17,10 @@
 // under the License.
 // </copyright>
 
-using System.Configuration;
-
 namespace RiakClient.Config
 {
+    using System.Configuration;
+
     public class RiakAuthenticationConfiguration : ConfigurationElement, IRiakAuthenticationConfiguration
     {
         [ConfigurationProperty("username", DefaultValue = "", IsRequired = true)]

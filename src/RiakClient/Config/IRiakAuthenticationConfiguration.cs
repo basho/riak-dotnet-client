@@ -22,10 +22,15 @@ namespace RiakClient.Config
     public interface IRiakAuthenticationConfiguration
     {
         string Username { get; }
+
         string Password { get; }
+
         string ClientCertificateFile { get; }
+
         string ClientCertificateSubject { get; }
+
         string CertificateAuthorityFile { get; }
+
         bool CheckCertificateRevocation { get; }
     }
 }

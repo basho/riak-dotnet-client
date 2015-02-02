@@ -17,17 +17,21 @@
 // under the License.
 // </copyright>
 
-using System;
-using System.Collections.Generic;
-
 namespace RiakClient.Config
 {
+    using System;
+    using System.Collections.Generic;
+
     public interface IRiakClusterConfiguration
     {
         IList<IRiakNodeConfiguration> RiakNodes { get; }
+
         TimeSpan NodePollTime { get; }
+
         TimeSpan DefaultRetryWaitTime { get; }
+
         int DefaultRetryCount { get; }
+
         IRiakAuthenticationConfiguration Authentication { get; }
     }
 }
