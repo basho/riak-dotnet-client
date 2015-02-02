@@ -17,33 +17,34 @@
 // under the License.
 // </copyright>
 
-using Newtonsoft.Json;
-using System;
-using System.IO;
-using System.Text;
-
 namespace RiakClient.Models.MapReduce.KeyFilters
 {
+    using System;
+    using System.IO;
+    using System.Text;
+    using Newtonsoft.Json;
+
     /// <summary>
     /// Tests that the input is not equal to the argument.
     /// </summary>
+    /// <typeparam name="T">Type of key filter token</typeparam>
     internal class NotEqual<T> : IRiakKeyFilterToken
     {
-        private readonly Tuple<string, T> _kfDefinition;
+        private readonly Tuple<string, T> keyFilterDefinition;
+
+        public NotEqual(T arg)
+        {
+            keyFilterDefinition = Tuple.Create("neq", arg);
+        }
 
         public string FunctionName
         {
-            get { return _kfDefinition.Item1; }
+            get { return keyFilterDefinition.Item1; }
         }
 
         public T Argument
         {
-            get { return _kfDefinition.Item2; }
-        }
-
-        public NotEqual(T arg)
-        {
-            _kfDefinition = Tuple.Create("neq", arg);
+            get { return keyFilterDefinition.Item2; }
         }
 
         public override string ToString()
@@ -56,14 +57,16 @@ namespace RiakClient.Models.MapReduce.KeyFilters
             var sb = new StringBuilder();
 
             using (var sw = new StringWriter(sb))
-            using (JsonWriter jw = new JsonTextWriter(sw))
             {
-                jw.WriteStartArray();
+                using (JsonWriter jw = new JsonTextWriter(sw))
+                {
+                    jw.WriteStartArray();
 
-                jw.WriteValue(FunctionName);
-                jw.WriteValue(Argument);
+                    jw.WriteValue(FunctionName);
+                    jw.WriteValue(Argument);
 
-                jw.WriteEndArray();
+                    jw.WriteEndArray();
+                }
             }
 
             return sb.ToString();

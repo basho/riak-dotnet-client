@@ -17,33 +17,33 @@
 // under the License.
 // </copyright>
 
-using Newtonsoft.Json;
-using System;
-using System.IO;
-using System.Text;
-
 namespace RiakClient.Models.MapReduce.KeyFilters
 {
+    using System;
+    using System.IO;
+    using System.Text;
+    using Newtonsoft.Json;
+
     /// <summary>
     /// Tests that the input begins with the argument (a string).
     /// </summary>
     internal class StartsWith : IRiakKeyFilterToken
     {
-        private readonly Tuple<string, string> _kfDefinition;
+        private readonly Tuple<string, string> keyFilterDefinition;
+
+        public StartsWith(string arg)
+        {
+            keyFilterDefinition = Tuple.Create("starts_with", arg);
+        }
 
         public string FunctionName
         {
-            get { return _kfDefinition.Item1; }
+            get { return keyFilterDefinition.Item1; }
         }
 
         public string Argument
         {
-            get { return _kfDefinition.Item2; }
-        }
-
-        public StartsWith(string arg)
-        {
-            _kfDefinition = Tuple.Create("starts_with", arg);
+            get { return keyFilterDefinition.Item2; }
         }
 
         public override string ToString()
@@ -56,14 +56,16 @@ namespace RiakClient.Models.MapReduce.KeyFilters
             var sb = new StringBuilder();
 
             using (var sw = new StringWriter(sb))
-            using (JsonWriter jw = new JsonTextWriter(sw))
             {
-                jw.WriteStartArray();
+                using (JsonWriter jw = new JsonTextWriter(sw))
+                {
+                    jw.WriteStartArray();
 
-                jw.WriteValue(FunctionName);
-                jw.WriteValue(Argument);
+                    jw.WriteValue(FunctionName);
+                    jw.WriteValue(Argument);
 
-                jw.WriteEndArray();
+                    jw.WriteEndArray();
+                }
             }
 
             return sb.ToString();

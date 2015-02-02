@@ -24,4 +24,3 @@ namespace RiakClient.Models.MapReduce.KeyFilters
         string ToJsonString();
     }
 }
-

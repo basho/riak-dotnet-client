@@ -33,31 +33,31 @@ namespace RiakClient.Models.MapReduce.KeyFilters
     /// <remarks>It is assumed that left and right supply their own JSON conversion.</remarks>
     internal class Between<T> : IRiakKeyFilterToken
     {
-        private readonly Tuple<string, T, T, bool> _kfDefinition;
+        private readonly Tuple<string, T, T, bool> keyFilterDefinition;
+
+        public Between(T left, T right, bool inclusive = true)
+        {
+            keyFilterDefinition = Tuple.Create("between", left, right, inclusive);
+        }
 
         public string FunctionName
         {
-            get { return _kfDefinition.Item1; }
+            get { return keyFilterDefinition.Item1; }
         }
 
         public T Left
         {
-            get { return _kfDefinition.Item2; }
+            get { return keyFilterDefinition.Item2; }
         }
 
         public T Right
         {
-            get { return _kfDefinition.Item3; }
+            get { return keyFilterDefinition.Item3; }
         }
 
         public bool Inclusive
         {
-            get { return _kfDefinition.Item4; }
-        }
-
-        public Between(T left, T right, bool inclusive = true)
-        {
-            _kfDefinition = Tuple.Create("between", left, right, inclusive);
+            get { return keyFilterDefinition.Item4; }
         }
 
         public override string ToString()
@@ -70,16 +70,18 @@ namespace RiakClient.Models.MapReduce.KeyFilters
             var sb = new StringBuilder();
 
             using (var sw = new StringWriter(sb))
-            using (JsonWriter jw = new JsonTextWriter(sw))
             {
-                jw.WriteStartArray();
+                using (JsonWriter jw = new JsonTextWriter(sw))
+                {
+                    jw.WriteStartArray();
 
-                jw.WriteValue(FunctionName);
-                jw.WriteValue(Left);
-                jw.WriteValue(Right);
-                jw.WriteValue(Inclusive);
+                    jw.WriteValue(FunctionName);
+                    jw.WriteValue(Left);
+                    jw.WriteValue(Right);
+                    jw.WriteValue(Inclusive);
 
-                jw.WriteEndArray();
+                    jw.WriteEndArray();
+                }
             }
 
             return sb.ToString();

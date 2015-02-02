@@ -17,38 +17,39 @@
 // under the License.
 // </copyright>
 
-using Newtonsoft.Json;
-using System;
-using System.IO;
-using System.Text;
-
 namespace RiakClient.Models.MapReduce.KeyFilters
 {
+    using System;
+    using System.IO;
+    using System.Text;
+    using Newtonsoft.Json;
+
     /// <summary>
     /// Tests that input is within the Levenshtein distance of the first argument given by the second argument.
     /// </summary>
+    /// <typeparam name="T">Type of key filter token</typeparam>
     internal class SimilarTo<T> : IRiakKeyFilterToken
     {
-        private readonly Tuple<string, T, int> _kfDefintion;
+        private readonly Tuple<string, T, int> keyFilterDefintion;
+
+        public SimilarTo(T arg, int distance)
+        {
+            keyFilterDefintion = Tuple.Create("similar_to", arg, distance);
+        }
 
         public string FunctionName
         {
-            get { return _kfDefintion.Item1; }
+            get { return keyFilterDefintion.Item1; }
         }
 
         public T Argument
         {
-            get { return _kfDefintion.Item2; }
+            get { return keyFilterDefintion.Item2; }
         }
 
         public int Distance
         {
-            get { return _kfDefintion.Item3; }
-        }
-
-        public SimilarTo(T arg, int distance)
-        {
-            _kfDefintion = Tuple.Create("similar_to", arg, distance);
+            get { return keyFilterDefintion.Item3; }
         }
 
         public override string ToString()
@@ -61,15 +62,17 @@ namespace RiakClient.Models.MapReduce.KeyFilters
             var sb = new StringBuilder();
 
             using (var sw = new StringWriter(sb))
-            using (JsonWriter jw = new JsonTextWriter(sw))
             {
-                jw.WriteStartArray();
+                using (JsonWriter jw = new JsonTextWriter(sw))
+                {
+                    jw.WriteStartArray();
 
-                jw.WriteValue(FunctionName);
-                jw.WriteValue(Argument);
-                jw.WriteValue(Distance);
+                    jw.WriteValue(FunctionName);
+                    jw.WriteValue(Argument);
+                    jw.WriteValue(Distance);
 
-                jw.WriteEndArray();
+                    jw.WriteEndArray();
+                }
             }
 
             return sb.ToString();

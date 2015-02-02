@@ -17,34 +17,34 @@
 // under the License.
 // </copyright>
 
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-
 namespace RiakClient.Models.MapReduce.KeyFilters
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Text;
+    using Newtonsoft.Json;
+
     /// <summary>
     /// Negates the result of key-filter operations.
     /// </summary>
     internal class Not : IRiakKeyFilterToken
     {
-        private readonly Tuple<string, List<IRiakKeyFilterToken>> _kfDefinition;
+        private readonly Tuple<string, List<IRiakKeyFilterToken>> keyFilterDefinition;
+
+        public Not(List<IRiakKeyFilterToken> arg)
+        {
+            keyFilterDefinition = Tuple.Create("not", arg);
+        }
 
         public string FunctionName
         {
-            get { return _kfDefinition.Item1; }
+            get { return keyFilterDefinition.Item1; }
         }
 
         public List<IRiakKeyFilterToken> Argument
         {
-            get { return _kfDefinition.Item2; }
-        }
-
-        public Not(List<IRiakKeyFilterToken> arg)
-        {
-            _kfDefinition = Tuple.Create("not", arg);
+            get { return keyFilterDefinition.Item2; }
         }
 
         public override string ToString()
@@ -57,17 +57,19 @@ namespace RiakClient.Models.MapReduce.KeyFilters
             var sb = new StringBuilder();
 
             using (var sw = new StringWriter(sb))
-            using (JsonWriter jw = new JsonTextWriter(sw))
             {
-                jw.WriteStartArray();
+                using (JsonWriter jw = new JsonTextWriter(sw))
+                {
+                    jw.WriteStartArray();
 
-                jw.WriteValue(FunctionName);
-                jw.WriteStartArray();
+                    jw.WriteValue(FunctionName);
+                    jw.WriteStartArray();
 
-                Argument.ForEach(a => jw.WriteRawValue(a.ToString()));
+                    Argument.ForEach(a => jw.WriteRawValue(a.ToString()));
 
-                jw.WriteEndArray();
-                jw.WriteEndArray();
+                    jw.WriteEndArray();
+                    jw.WriteEndArray();
+                }
             }
 
             return sb.ToString();
