@@ -17,77 +17,77 @@
 // under the License.
 // </copyright>
 
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-
 namespace RiakClient.Models.Index
 {
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.Linq;
+
     public abstract class SecondaryIndex<TClass, TIndex>
     {
-        private readonly HashSet<TIndex> _values;
-        private readonly string _name;
-
         protected readonly RiakObject Container;
 
-        protected abstract TClass TypedThis { get; }
-        protected abstract string IndexSuffix { get; }
+        private readonly HashSet<TIndex> values = new HashSet<TIndex>();
+        private readonly string name;
+
+        protected SecondaryIndex(RiakObject container, string name)
+        {
+            this.Container = container;
+            this.name = name.ToLower();
+        }
 
         public ReadOnlyCollection<TIndex> Values
         {
-            get { return new ReadOnlyCollection<TIndex>(_values.ToList()); }
-        }
-
-        internal string RiakIndexName
-        {
-            get { return _name + IndexSuffix; }
+            get { return new ReadOnlyCollection<TIndex>(values.ToList()); }
         }
 
         public string Name
         {
-            get { return _name; }
+            get { return name; }
         }
 
-        protected SecondaryIndex(RiakObject container, string name)
+        internal string RiakIndexName
         {
-            Container = container;
-
-            _values = new HashSet<TIndex>();
-            _name = name.ToLower();
+            get { return name + IndexSuffix; }
         }
+
+        protected abstract TClass TypedThis { get; }
+
+        protected abstract string IndexSuffix { get; }
 
         public TClass Clear()
         {
-            _values.Clear();
+            values.Clear();
             return TypedThis;
         }
 
-        public virtual TClass Add(IEnumerable<TIndex> values)
+        public virtual TClass Add(IEnumerable<TIndex> valuesToAdd)
         {
-            return Add(values.ToArray());
+            return Add(valuesToAdd.ToArray());
         }
 
-        public virtual TClass Add(params TIndex[] values)
+        public virtual TClass Add(params TIndex[] valuesToAdd)
         {
-            foreach (var val in values)
+            foreach (var val in valuesToAdd)
             {
-                _values.Add(val);
+                this.values.Add(val);
             }
 
             return TypedThis;
         }
 
-        public TClass Remove(IEnumerable<TIndex> values)
+        public TClass Remove(IEnumerable<TIndex> valuesToRemove)
         {
-            return Remove(values.ToArray());
+            return Remove(valuesToRemove.ToArray());
         }
 
-        public TClass Remove(params TIndex[] values)
+        public TClass Remove(params TIndex[] valuesToRemove)
         {
-            foreach (var val in values)
+            foreach (var val in valuesToRemove)
             {
-                _values.Remove(val);
+                this.values.Remove(val);
             }
+
             return TypedThis;
         }
 
@@ -105,7 +105,7 @@ namespace RiakClient.Models.Index
 
         public bool HasValue(TIndex value)
         {
-            return _values.Contains(value);
+            return values.Contains(value);
         }
     }
 }
