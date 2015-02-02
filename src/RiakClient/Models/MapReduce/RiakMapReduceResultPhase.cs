@@ -17,14 +17,14 @@
 // under the License.
 // </copyright>
 
-using System.Collections.Generic;
-using System.Linq;
-using RiakClient.Extensions;
-using Newtonsoft.Json;
-using RiakClient.Messages;
-
 namespace RiakClient.Models.MapReduce
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using Extensions;
+    using Messages;
+    using Newtonsoft.Json;
+
     public class RiakMapReduceResultPhase
     {
         public bool Success { get; private set; }
@@ -46,7 +46,7 @@ namespace RiakClient.Models.MapReduce
         /// <summary>
         /// Deserialize a List of <typeparam name="T">T</typeparam> from the phase results
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T">Entity type</typeparam>
         /// <returns>IList<typeparam name="T">T</typeparam></returns>
         public IList<T> GetObjects<T>()
         {

@@ -17,18 +17,19 @@
 // under the License.
 // </copyright>
 
-using Newtonsoft.Json;
-using System;
-using System.IO;
-using System.Text;
-
 namespace RiakClient.Models.MapReduce.KeyFilters
 {
+    using System;
+    using System.IO;
+    using System.Text;
+    using Newtonsoft.Json;
+
     /// <summary>
     /// Tests that the input is between the first two arguments. 
     /// If the third argument is given, it is whether to treat the range as inclusive. 
     /// If the third argument is omitted, the range is treated as inclusive.
     /// </summary>
+    /// <typeparam name="T">Entity type</typeparam>
     /// <remarks>It is assumed that left and right supply their own JSON conversion.</remarks>
     internal class Between<T> : IRiakKeyFilterToken
     {

@@ -17,11 +17,11 @@
 // under the License.
 // </copyright>
 
-using System;
-using RiakClient.Config;
-
 namespace RiakClient.Comms
 {
+    using System;
+    using Config;
+
     internal class RiakOnTheFlyConnection : IRiakConnectionManager
     {
         private readonly IRiakNodeConfiguration nodeConfig;
@@ -29,7 +29,8 @@ namespace RiakClient.Comms
         private readonly IRiakConnectionFactory connFactory;
         private bool disposing;
 
-        public RiakOnTheFlyConnection(IRiakNodeConfiguration nodeConfig,
+        public RiakOnTheFlyConnection(
+            IRiakNodeConfiguration nodeConfig,
             IRiakAuthenticationConfiguration authConfig,
             IRiakConnectionFactory connFactory)
         {
@@ -41,7 +42,9 @@ namespace RiakClient.Comms
         public Tuple<bool, TResult> Consume<TResult>(Func<IRiakConnection, TResult> consumer)
         {
             if (disposing)
+            {
                 return Tuple.Create(false, default(TResult));
+            }
 
             using (var conn = connFactory.CreateConnection(nodeConfig, authConfig))
             {
@@ -60,7 +63,9 @@ namespace RiakClient.Comms
         public Tuple<bool, TResult> DelayedConsume<TResult>(Func<IRiakConnection, Action, TResult> consumer)
         {
             if (disposing)
+            {
                 return Tuple.Create(false, default(TResult));
+            }
 
             IRiakConnection conn = null;
 
@@ -76,6 +81,7 @@ namespace RiakClient.Comms
                 {
                     conn.Dispose();
                 }
+
                 return Tuple.Create(false, default(TResult));
             }
         }
@@ -83,7 +89,9 @@ namespace RiakClient.Comms
         public void Dispose()
         {
             if (disposing)
+            {
                 return;
+            }
 
             disposing = true;
         }
