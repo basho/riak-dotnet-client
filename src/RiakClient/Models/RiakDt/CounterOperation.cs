@@ -22,21 +22,23 @@ namespace RiakClient.Models.RiakDt
 
     public class CounterOperation : IDtOp
     {
-        public long Value { get; private set; }
+        private readonly long value;
 
         public CounterOperation(long value)
         {
-            Value = value;
+            this.value = value;
+        }
+
+        public long Value
+        {
+            get { return value; }
         }
 
         public DtOp ToDtOp()
         {
             return new DtOp
                 {
-                    counter_op = new CounterOp
-                        {
-                            increment = Value
-                        }
+                    counter_op = new CounterOp { increment = value }
                 };
         }
     }

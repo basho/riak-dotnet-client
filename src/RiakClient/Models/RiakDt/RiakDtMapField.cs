@@ -17,13 +17,19 @@
 // under the License.
 // </copyright>
 
-using RiakClient.Extensions;
-using RiakClient.Messages;
-
 namespace RiakClient.Models.RiakDt
 {
+    using Extensions;
+    using Messages;
+
     public class RiakDtMapField
     {
+        internal RiakDtMapField(MapField mapField)
+        {
+            Name = mapField.name.FromRiakString();
+            Type = (RiakDtMapFieldType)mapField.type;
+        }
+
         public enum RiakDtMapFieldType
         {
             Counter = MapField.MapFieldType.COUNTER,
@@ -34,17 +40,12 @@ namespace RiakClient.Models.RiakDt
         }
 
         public string Name { get; private set; }
-        public RiakDtMapFieldType Type { get; private set; }
 
-        internal RiakDtMapField(MapField mapField)
-        {
-            Name = mapField.name.FromRiakString();
-            Type = (RiakDtMapFieldType)mapField.type;
-        }
+        public RiakDtMapFieldType Type { get; private set; }
 
         public MapField ToMapField()
         {
-            return new MapField {name = Name.ToRiakString(), type = (MapField.MapFieldType)Type};
+            return new MapField { name = Name.ToRiakString(), type = (MapField.MapFieldType)Type };
         }
     }
 }

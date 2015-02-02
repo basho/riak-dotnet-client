@@ -17,39 +17,54 @@
 // under the License.
 // </copyright>
 
-using System.Collections.Generic;
-using System.Linq;
-using RiakClient.Messages;
-
 namespace RiakClient.Models.RiakDt
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using Messages;
+
     public class RiakDtMapEntry
     {
-        public RiakDtMapField Field { get; internal set; }
-        public RiakDtCounter Counter { get; internal set; }
-        public List<byte[]> SetValue { get; internal set; }
-        public byte[] RegisterValue { get; internal set; }
-        public bool? FlagValue { get; internal set; }
-        public List<RiakDtMapEntry> MapValue { get; internal set; }
-
         internal RiakDtMapEntry(MapEntry entry)
         {
             Field = new RiakDtMapField(entry.field);
 
             if (Field.Type == RiakDtMapField.RiakDtMapFieldType.Counter)
-                Counter = new RiakDtCounter {Value = entry.counter_value};
+            {
+                Counter = new RiakDtCounter { Value = entry.counter_value };
+            }
 
             if (Field.Type == RiakDtMapField.RiakDtMapFieldType.Flag)
+            {
                 FlagValue = entry.flag_value;
+            }
 
             if (Field.Type == RiakDtMapField.RiakDtMapFieldType.Map)
+            {
                 MapValue = entry.map_value.Select(mv => new RiakDtMapEntry(mv)).ToList();
+            }
 
             if (Field.Type == RiakDtMapField.RiakDtMapFieldType.Register)
+            {
                 RegisterValue = entry.register_value;
+            }
 
             if (Field.Type == RiakDtMapField.RiakDtMapFieldType.Set)
+            {
                 SetValue = entry.set_value;
+            }
         }
+
+        public RiakDtMapField Field { get; internal set; }
+
+        public RiakDtCounter Counter { get; internal set; }
+
+        public List<byte[]> SetValue { get; internal set; }
+
+        public byte[] RegisterValue { get; internal set; }
+
+        public bool? FlagValue { get; internal set; }
+
+        public List<RiakDtMapEntry> MapValue { get; internal set; }
     }
 }

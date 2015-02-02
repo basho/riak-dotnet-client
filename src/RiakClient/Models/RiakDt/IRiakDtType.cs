@@ -17,17 +17,21 @@
 // under the License.
 // </copyright>
 
-using System.Collections.ObjectModel;
-using RiakClient.Messages;
-
 namespace RiakClient.Models.RiakDt
 {
+    using System.Collections.ObjectModel;
+    using Messages;
+
     public interface IRiakDtType<T>
     {
         string Bucket { get; }
+
         string BucketType { get; }
+
         string Key { get; }
+
         ReadOnlyCollection<T> Operations { get; }
+
         MapEntry ToMapEntry(string fieldName);
     }
 }
