@@ -48,7 +48,10 @@ namespace RiakClient.Models.MapReduce
             get { return success; }
         }
 
-        public uint Phase { get; private set; }
+        public uint Phase
+        {
+            get { return phase; }
+        }
 
         public IList<byte[]> Values
         {
