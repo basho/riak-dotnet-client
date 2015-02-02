@@ -17,11 +17,10 @@
 // under the License.
 // </copyright>
 
-using Newtonsoft.Json;
-using RiakClient.Containers;
-
 namespace RiakClient.Extensions
 {
+    using Newtonsoft.Json;
+
     public static class JsonExtensions
     {
         public static string ToJson<T>(this T value)
@@ -48,22 +47,7 @@ namespace RiakClient.Extensions
             {
                 writer.WriteProperty(name, value);
             }
-            return writer;
-        }
 
-        public static JsonWriter WriteEither<TLeft, TRight>(this JsonWriter writer, string name, Either<TLeft, TRight> either)
-        {
-            if (either != null)
-            {
-                if (either.IsLeft)
-                {
-                    writer.WriteProperty(name, either.Left);
-                }
-                else
-                {
-                    writer.WriteProperty(name, either.Right);
-                }
-            }
             return writer;
         }
 
@@ -74,6 +58,7 @@ namespace RiakClient.Extensions
             {
                 writer.WriteProperty(name, value.Value);
             }
+
             return writer;
         }
 
@@ -83,6 +68,7 @@ namespace RiakClient.Extensions
             {
                 writer.WriteProperty(name, value);
             }
+
             return writer;
         }
     }

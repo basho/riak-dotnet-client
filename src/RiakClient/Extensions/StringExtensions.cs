@@ -17,21 +17,20 @@
 // under the License.
 // </copyright>
 
-using System.Collections.Generic;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Web;
-using RiakClient.Util;
-
 namespace RiakClient.Extensions
 {
+    using System.Collections.Generic;
+    using System.Text;
+    using System.Text.RegularExpressions;
+    using System.Web;
+    using Util;
+
     internal static class StringExtensions
     {
-        private static readonly Encoding RiakEncoding = new UTF8Encoding(false);
-
         // + - && || ! ( ) { } [ ] ^ " ~ * ? : \
         private const string SearchTermPattern = @"[\+\-!\(\)\{\}\[\]^\""~\*\?\:\\]{1}";
         private const string SearchTermReplacement = @"\$&";
+        private static readonly Encoding RiakEncoding = new UTF8Encoding(false);
         private static readonly Regex SearchTermRegex = new Regex(SearchTermPattern, RegexOptions.Compiled);
 
         public static byte[] ToRiakString(this string value)
