@@ -17,12 +17,12 @@
 // under the License.
 // </copyright>
 
-using System.Collections.Generic;
-using System.Linq;
-using RiakClient.Util;
-
 namespace RiakClient.Models.Index
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using Util;
+
     public class BinIndex : SecondaryIndex<BinIndex, string>
     {
         internal BinIndex(RiakObject container, string name)

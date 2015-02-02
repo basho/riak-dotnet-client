@@ -37,7 +37,7 @@ namespace RiakClient.Exceptions
         {
             get
             {
-                return this.messageCode;
+                return messageCode;
             }
         }
 
@@ -45,7 +45,7 @@ namespace RiakClient.Exceptions
         {
             get
             {
-                return string.Format("Unexpected message code returned from Riak: {0}", this.messageCode);
+                return string.Format("Unexpected message code returned from Riak: {0}", messageCode);
             }
         }
     }
