@@ -17,13 +17,12 @@
 // under the License.
 // </copyright>
 
-
-using System;
-using System.Numerics;
-using Newtonsoft.Json;
-
 namespace RiakClient.Models.MapReduce.Inputs
 {
+    using System;
+    using System.Numerics;
+    using Newtonsoft.Json;
+
     public class RiakIntIndexRangeInput : RiakIndexInput
     {
         [Obsolete("Use the constructor that accepts a RiakIndexId instead. This will be revoved in the next version.")]
@@ -39,7 +38,9 @@ namespace RiakClient.Models.MapReduce.Inputs
             End = end;
         }
 
+        // TODO: immutable
         public BigInteger Start { get; set; }
+
         public BigInteger End { get; set; }
 
         public override JsonWriter WriteJson(JsonWriter writer)

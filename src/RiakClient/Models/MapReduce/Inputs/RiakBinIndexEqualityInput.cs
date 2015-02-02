@@ -17,11 +17,11 @@
 // under the License.
 // </copyright>
 
-using System;
-using Newtonsoft.Json;
-
 namespace RiakClient.Models.MapReduce.Inputs
 {
+    using System;
+    using Newtonsoft.Json;
+
     public class RiakBinIndexEqualityInput : RiakIndexInput
     {
         [Obsolete("Use the constructor that accepts a RiakIndexId instead. This will be removed in the next version.")]

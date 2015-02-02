@@ -17,15 +17,15 @@
 // under the License.
 // </copyright>
 
-using Newtonsoft.Json;
-using RiakClient.Models.Search;
-
 namespace RiakClient.Models.MapReduce.Inputs
 {
+    using Models.Search;
+    using Newtonsoft.Json;
+
     public class RiakSearchInput : RiakPhaseInput
     {
-        private readonly string _index;
-        private readonly string _query;
+        private readonly string index;
+        private readonly string query;
 
         public RiakSearchInput(RiakFluentSearch query)
             : this(query.Index, query.ToString())
@@ -34,8 +34,8 @@ namespace RiakClient.Models.MapReduce.Inputs
 
         public RiakSearchInput(string index, string query)
         {
-            _index = index;
-            _query = query;
+            this.index = index;
+            this.query = query;
         }
 
         public override JsonWriter WriteJson(JsonWriter writer)
@@ -44,10 +44,10 @@ namespace RiakClient.Models.MapReduce.Inputs
             writer.WriteStartObject();
 
             writer.WritePropertyName("index");
-            writer.WriteValue(_index);
+            writer.WriteValue(index);
 
             writer.WritePropertyName("query");
-            writer.WriteValue(_query);
+            writer.WriteValue(query);
 
             writer.WriteEndObject();
 

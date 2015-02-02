@@ -17,46 +17,46 @@
 // under the License.
 // </copyright>
 
-using RiakClient.Models.MapReduce.Phases;
-
 namespace RiakClient.Models.MapReduce.Fluent
 {
+    using Models.MapReduce.Phases;
+
     public class RiakFluentLinkPhase
     {
-        private readonly RiakLinkPhase _phase;
+        private readonly RiakLinkPhase phase;
 
         internal RiakFluentLinkPhase(RiakLinkPhase phase)
         {
-            _phase = phase;
+            this.phase = phase;
         }
 
         public RiakFluentLinkPhase Keep(bool keep)
         {
-            _phase.Keep(keep);
+            phase.Keep(keep);
             return this;
         }
 
         public RiakFluentLinkPhase Bucket(string bucket)
         {
-            _phase.Bucket(bucket);
+            phase.Bucket(bucket);
             return this;
         }
 
         public RiakFluentLinkPhase Tag(string tag)
         {
-            _phase.Tag(tag);
+            phase.Tag(tag);
             return this;
         }
 
         public RiakFluentLinkPhase FromRiakLink(RiakLink link)
         {
-            _phase.FromRiakLink(link);
+            phase.FromRiakLink(link);
             return this;
         }
 
         public RiakFluentLinkPhase AllLinks()
         {
-            _phase.AllLinks();
+            phase.AllLinks();
             return this;
         }
     }

@@ -17,18 +17,18 @@
 // under the License.
 // </copyright>
 
-using System;
-using Newtonsoft.Json;
-using RiakClient.Models.Search;
-
 namespace RiakClient.Models.MapReduce.Inputs
 {
+    using System;
+    using Models.Search;
+    using Newtonsoft.Json;
+
     [Obsolete("Using Legacy Search as input for MapReduce is depreciated. Please move to Riak 2.0 Search, and use the RiakSearchInput class instead.")]
     public class RiakBucketSearchInput : RiakPhaseInput
     {
-        private readonly string _bucket;
-        private readonly string _query;
-        private string _filter;
+        private readonly string bucket;
+        private readonly string query;
+        private string filter;
 
         public RiakBucketSearchInput(RiakFluentSearch query)
             : this(query.Index, query.ToString())
@@ -37,8 +37,8 @@ namespace RiakClient.Models.MapReduce.Inputs
 
         public RiakBucketSearchInput(string bucket, string query)
         {
-            _bucket = bucket;
-            _query = query;
+            this.bucket = bucket;
+            this.query = query;
         }
 
         public RiakBucketSearchInput Filter(RiakFluentSearch filter)
@@ -48,7 +48,7 @@ namespace RiakClient.Models.MapReduce.Inputs
 
         public RiakBucketSearchInput Filter(string filter)
         {
-            _filter = filter;
+            this.filter = filter;
             return this;
         }
 
@@ -58,15 +58,15 @@ namespace RiakClient.Models.MapReduce.Inputs
             writer.WriteStartObject();
 
             writer.WritePropertyName("bucket");
-            writer.WriteValue(_bucket);
+            writer.WriteValue(bucket);
 
             writer.WritePropertyName("query");
-            writer.WriteValue(_query);
+            writer.WriteValue(query);
 
-            if (!string.IsNullOrEmpty(_filter))
+            if (!string.IsNullOrEmpty(filter))
             {
                 writer.WritePropertyName("filter");
-                writer.WriteValue(_filter);
+                writer.WriteValue(filter);
             }
 
             writer.WriteEndObject();

@@ -17,35 +17,35 @@
 // under the License.
 // </copyright>
 
-using RiakClient.Models.MapReduce.Languages;
-using RiakClient.Models.MapReduce.Phases;
-
 namespace RiakClient.Models.MapReduce.Fluent
 {
+    using Models.MapReduce.Languages;
+    using Models.MapReduce.Phases;
+
     public class RiakFluentActionPhaseErlang
     {
-        private readonly RiakActionPhase<RiakPhaseLanguageErlang> _phase;
+        private readonly RiakActionPhase<RiakPhaseLanguageErlang> phase;
 
         internal RiakFluentActionPhaseErlang(RiakActionPhase<RiakPhaseLanguageErlang> phase)
         {
-            _phase = phase;
+            this.phase = phase;
         }
 
         public RiakFluentActionPhaseErlang Keep(bool keep)
         {
-            _phase.Keep(keep);
+            phase.Keep(keep);
             return this;
         }
 
         public RiakFluentActionPhaseErlang Argument<T>(T argument)
         {
-            _phase.Argument(argument);
+            phase.Argument(argument);
             return this;
         }
 
         public RiakFluentActionPhaseErlang ModFun(string module, string function)
         {
-            _phase.Language.ModFun(module, function);
+            phase.Language.ModFun(module, function);
             return this;
         }
     }
