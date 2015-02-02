@@ -34,6 +34,9 @@ namespace RiakClient.Comms
 
     internal class RiakPbcSocket : IDisposable
     {
+        private const int SizeOfInt = sizeof(int);
+        private const int PbMsgHeaderSize = SizeOfInt + sizeof(byte);
+
         private readonly string server;
         private readonly int port;
         private readonly TimeSpan connectTimeout;
@@ -55,6 +58,19 @@ namespace RiakClient.Comms
             checkCertificateRevocation = authConfig.CheckCertificateRevocation;
         }
 
+        private Stream NetworkStream
+        {
+            get
+            {
+                if (networkStream == null)
+                {
+                    SetUpNetworkStream();
+                }
+
+                return networkStream;
+            }
+        }
+
         /*
          * TODO: FUTURE
          * Read/Write in this class should *only* deal with byte[]
@@ -62,46 +78,39 @@ namespace RiakClient.Comms
          */
         public void Write(MessageCode messageCode)
         {
-            const int sizeSize = sizeof(int);
-            const int codeSize = sizeof(byte);
-            const int headerSize = sizeSize + codeSize;
-
-            var messageBody = new byte[headerSize];
+            var messageBody = new byte[PbMsgHeaderSize];
 
             var size = BitConverter.GetBytes(IPAddress.HostToNetworkOrder(1));
-            Array.Copy(size, messageBody, sizeSize);
-            messageBody[sizeSize] = (byte)messageCode;
+            Array.Copy(size, messageBody, SizeOfInt);
+            messageBody[SizeOfInt] = (byte)messageCode;
 
-            NetworkStream.Write(messageBody, 0, headerSize);
+            NetworkStream.Write(messageBody, 0, PbMsgHeaderSize);
         }
 
         public void Write<T>(T message) where T : class, ProtoBuf.IExtensible
         {
-            const int sizeSize = sizeof(int);
-            const int codeSize = sizeof(byte);
-            const int headerSize = sizeSize + codeSize;
             byte[] messageBody;
             int messageLength = 0;
 
             using (var memStream = new MemoryStream())
             {
                 // add a buffer to the start of the array to put the size and message code
-                memStream.Position += headerSize;
+                memStream.Position += PbMsgHeaderSize;
                 Serializer.Serialize(memStream, message);
                 messageBody = memStream.GetBuffer();
                 messageLength = (int)memStream.Position;
             }
 
             // check to make sure something was written, otherwise we'll have to create a new array
-            if (messageLength == headerSize)
+            if (messageLength == PbMsgHeaderSize)
             {
-                messageBody = new byte[headerSize];
+                messageBody = new byte[PbMsgHeaderSize];
             }
 
             byte messageCode = MessageCodeTypeMapBuilder.GetMessageCodeFor(typeof(T));
-            var size = BitConverter.GetBytes(IPAddress.HostToNetworkOrder((int)messageLength - headerSize + 1));
-            Array.Copy(size, messageBody, sizeSize);
-            messageBody[sizeSize] = (byte)messageCode;
+            var size = BitConverter.GetBytes(IPAddress.HostToNetworkOrder((int)messageLength - PbMsgHeaderSize + 1));
+            Array.Copy(size, messageBody, SizeOfInt);
+            messageBody[SizeOfInt] = (byte)messageCode;
 
             if (NetworkStream.CanWrite)
             {
@@ -167,8 +176,10 @@ namespace RiakClient.Comms
             {
                 string received_message_code_type_name = MessageCodeTypeMapBuilder.GetTypeNameFor(messageCode);
                 throw new InvalidOperationException(
-                    string.Format("Attempt to decode message to type '{0}' when received type '{1}'.",
-                    t_type.Name, received_message_code_type_name));
+                    string.Format(
+                        "Attempt to decode message to type '{0}' when received type '{1}'.",
+                        t_type.Name,
+                        received_message_code_type_name));
             }
 
             return DeserializeInstance<T>(size);
@@ -186,18 +197,6 @@ namespace RiakClient.Comms
             {
                 networkStream.Close();
                 networkStream.Dispose();
-            }
-        }
-
-        private Stream NetworkStream
-        {
-            get
-            {
-                if (networkStream == null)
-                {
-                    SetUpNetworkStream();
-                }
-                return networkStream;
             }
         }
 
@@ -239,12 +238,15 @@ namespace RiakClient.Comms
             }
 
             Write(MessageCode.RpbStartTls);
+
             // NB: the following will throw an exception if the returned code is not the expected code
             // TODO: FUTURE -> should throw a RiakSslException
             Read(MessageCode.RpbStartTls);
 
             // http://stackoverflow.com/questions/9934975/does-sslstream-dispose-disposes-its-inner-stream
-            var sslStream = new SslStream(networkStream, false,
+            var sslStream = new SslStream(
+                networkStream,
+                false,
                 securityManager.ServerCertificateValidationCallback,
                 securityManager.ClientCertificateSelectionCallback);
 
@@ -307,9 +309,11 @@ namespace RiakClient.Comms
                     // http://msdn.microsoft.com/en-us/library/system.net.sockets.networkstream.read(v=vs.110).aspx
                     break;
                 }
+
                 totalBytesReceived += bytesReceived;
                 lengthToReceive -= bytesReceived;
             }
+
             return resultBuffer;
         }
     }
