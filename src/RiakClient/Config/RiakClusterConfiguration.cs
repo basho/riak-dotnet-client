@@ -17,29 +17,17 @@
 // under the License.
 // </copyright>
 
-using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
-
 namespace RiakClient.Config
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Configuration;
+    using System.Linq;
+
     public class RiakClusterConfiguration : ConfigurationSection, IRiakClusterConfiguration
     {
-        private static TimeSpan s_defaultNodePollTime = TimeSpan.FromSeconds(5);
-        private static TimeSpan s_defaultRetryWaitTime = TimeSpan.FromMilliseconds(200);
-
-        public static IRiakClusterConfiguration LoadFromConfig(string sectionName)
-        {
-            return (IRiakClusterConfiguration)ConfigurationManager.GetSection(sectionName);
-        }
-
-        public static IRiakClusterConfiguration LoadFromConfig(string sectionName, string fileName)
-        {
-            var map = new ConfigurationFileMap(fileName);
-            var config = ConfigurationManager.OpenMappedMachineConfiguration(map);
-            return (IRiakClusterConfiguration)config.GetSection(sectionName);
-        }
+        private static readonly TimeSpan DefaultNodePollTime = TimeSpan.FromSeconds(5);
+        private static readonly TimeSpan DefaultDefaultRetryWaitTime = TimeSpan.FromMilliseconds(200);
 
         [ConfigurationProperty("nodes", IsDefaultCollection = true, IsRequired = true)]
         [ConfigurationCollection(typeof(RiakNodeConfigurationCollection), AddItemName = "node")]
@@ -54,34 +42,20 @@ namespace RiakClient.Config
             get { return this.Nodes.Cast<IRiakNodeConfiguration>().ToList(); }
         }
 
-        [ConfigurationProperty("nodePollTime", DefaultValue = "5000", IsRequired = false)]
-        private string NodePollTimeProperty
-        {
-            get { return (string)this["nodePollTime"]; }
-            set { this["nodePollTime"] = value; }
-        }
-
         public TimeSpan NodePollTime
         {
             get
             {
                 int nodePollTimeMilliseconds;
-                if (int.TryParse(NodePollTimeProperty, out nodePollTimeMilliseconds))
+                if (int.TryParse(this.NodePollTimeProperty, out nodePollTimeMilliseconds))
                 {
                     return TimeSpan.FromMilliseconds(nodePollTimeMilliseconds);
                 }
                 else
                 {
-                    return s_defaultNodePollTime;
+                    return DefaultNodePollTime;
                 }
             }
-        }
-
-        [ConfigurationProperty("defaultRetryWaitTime", DefaultValue = "200", IsRequired = false)]
-        private string DefaultRetryWaitTimeProperty
-        {
-            get { return (string)this["defaultRetryWaitTime"]; }
-            set { this["defaultRetryWaitTime"] = value; }
         }
 
         public TimeSpan DefaultRetryWaitTime
@@ -89,13 +63,13 @@ namespace RiakClient.Config
             get
             {
                 int defaultRetryWaitTimeMilliseconds;
-                if (int.TryParse(DefaultRetryWaitTimeProperty, out defaultRetryWaitTimeMilliseconds))
+                if (int.TryParse(this.DefaultRetryWaitTimeProperty, out defaultRetryWaitTimeMilliseconds))
                 {
                     return TimeSpan.FromMilliseconds(defaultRetryWaitTimeMilliseconds);
                 }
                 else
                 {
-                    return s_defaultRetryWaitTime;
+                    return DefaultDefaultRetryWaitTime;
                 }
             }
         }
@@ -116,6 +90,32 @@ namespace RiakClient.Config
         IRiakAuthenticationConfiguration IRiakClusterConfiguration.Authentication
         {
             get { return this.Authentication; }
+        }
+
+        [ConfigurationProperty("defaultRetryWaitTime", DefaultValue = "200", IsRequired = false)]
+        private string DefaultRetryWaitTimeProperty
+        {
+            get { return (string)this["defaultRetryWaitTime"]; }
+            set { this["defaultRetryWaitTime"] = value; }
+        }
+
+        [ConfigurationProperty("nodePollTime", DefaultValue = "5000", IsRequired = false)]
+        private string NodePollTimeProperty
+        {
+            get { return (string)this["nodePollTime"]; }
+            set { this["nodePollTime"] = value; }
+        }
+
+        public static IRiakClusterConfiguration LoadFromConfig(string sectionName)
+        {
+            return (IRiakClusterConfiguration)ConfigurationManager.GetSection(sectionName);
+        }
+
+        public static IRiakClusterConfiguration LoadFromConfig(string sectionName, string fileName)
+        {
+            var map = new ConfigurationFileMap(fileName);
+            var config = ConfigurationManager.OpenMappedMachineConfiguration(map);
+            return (IRiakClusterConfiguration)config.GetSection(sectionName);
         }
     }
 }

@@ -17,21 +17,28 @@
 // under the License.
 // </copyright>
 
-using System;
-
 namespace RiakClient.Config
 {
+    using System;
+
     public interface IRiakNodeConfiguration
     {
         string Name { get; }
+
         string HostAddress { get; }
+
         int PbcPort { get; }
+
         string RestScheme { get; }
+
         int RestPort { get; }
+
         int PoolSize { get; }
-        // TimeSpan IdleTimeout { get; }
+
         TimeSpan NetworkReadTimeout { get; }
+
         TimeSpan NetworkWriteTimeout { get; }
+
         TimeSpan NetworkConnectTimeout { get; }
     }
 }
