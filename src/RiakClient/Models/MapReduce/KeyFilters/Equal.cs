@@ -26,8 +26,8 @@ namespace RiakClient.Models.MapReduce.KeyFilters
 
     /// <summary>
     /// Tests that the input is equal to the argument.
-    /// <typeparam name="T">TODO documentation</typeparam>
     /// </summary>
+    /// <typeparam name="T">Type of key filter token</typeparam>
     internal class Equal<T> : IRiakKeyFilterToken
     {
         private readonly Tuple<string, T> keyFilterDefinition;

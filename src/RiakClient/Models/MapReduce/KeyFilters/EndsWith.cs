@@ -17,33 +17,33 @@
 // under the License.
 // </copyright>
 
-using Newtonsoft.Json;
-using System;
-using System.IO;
-using System.Text;
-
 namespace RiakClient.Models.MapReduce.KeyFilters
 {
+    using System;
+    using System.IO;
+    using System.Text;
+    using Newtonsoft.Json;
+
     /// <summary>
     /// Tests that the input ends with the argument (a string).
     /// </summary>
     internal class EndsWith : IRiakKeyFilterToken
     {
-        private readonly Tuple<string, string> _kfDefinition;
+        private readonly Tuple<string, string> keyFilterDefinition;
 
         public EndsWith(string arg)
         {
-            _kfDefinition = Tuple.Create("ends_with", arg);
+            keyFilterDefinition = Tuple.Create("ends_with", arg);
         }
 
         public string FunctionName
         {
-            get { return _kfDefinition.Item1; }
+            get { return keyFilterDefinition.Item1; }
         }
 
         public string Argument
         {
-            get { return _kfDefinition.Item2; }
+            get { return keyFilterDefinition.Item2; }
         }
 
         public string ToJsonString()

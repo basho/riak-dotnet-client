@@ -39,9 +39,14 @@ namespace RiakClient.Models.MapReduce.KeyFilters
 
         protected void WriteArgumentAsArray(IRiakKeyFilterToken argument, JsonWriter writer)
         {
-            //writer.WriteStartArray();
+            /*
+             * TODO: is StartArray really not needed? 
+             * writer.WriteStartArray();
+             */
+
             writer.WriteRawValue(argument.ToJsonString());
-            //writer.WriteEndArray();
+
+            // writer.WriteEndArray();
         }
     }
 }
