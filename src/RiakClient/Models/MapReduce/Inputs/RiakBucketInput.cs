@@ -17,21 +17,21 @@
 // under the License.
 // </copyright>
 
-using System.Collections.Generic;
-using Newtonsoft.Json;
-using RiakClient.Models.MapReduce.KeyFilters;
-
 namespace RiakClient.Models.MapReduce.Inputs
 {
+    using System.Collections.Generic;
+    using Models.MapReduce.KeyFilters;
+    using Newtonsoft.Json;
+
     public class RiakBucketInput : RiakPhaseInput
     {
-        private readonly string _bucket;
-        private readonly string _type;
+        private readonly string bucket;
+        private readonly string type;
 
         public RiakBucketInput(string bucket, string type = null)
         {
-            _type = type;
-            _bucket = bucket;
+            this.type = type;
+            this.bucket = bucket;
             Filters = new List<IRiakKeyFilterToken>();
         }
 
@@ -42,7 +42,7 @@ namespace RiakClient.Models.MapReduce.Inputs
                 writer.WritePropertyName("inputs");
                 writer.WriteStartObject();
 
-                WriteBucketKeyBucketJson(writer, _type, _bucket);
+                WriteBucketKeyBucketJson(writer, type, bucket);
 
                 writer.WritePropertyName("key_filters");
                 writer.WriteStartArray();
@@ -55,7 +55,7 @@ namespace RiakClient.Models.MapReduce.Inputs
             else
             {
                 writer.WritePropertyName("inputs");
-                writer.WriteValue(_bucket);
+                writer.WriteValue(bucket);
             }
 
             return writer;

@@ -17,12 +17,12 @@
 // under the License.
 // </copyright>
 
-using Newtonsoft.Json;
-using System.Collections.Generic;
-using RiakClient.Models.MapReduce.KeyFilters;
-
 namespace RiakClient.Models.MapReduce.Inputs
 {
+    using System.Collections.Generic;
+    using Models.MapReduce.KeyFilters;
+    using Newtonsoft.Json;
+
     public interface IRiakPhaseInput
     {
         JsonWriter WriteJson(JsonWriter writer);
@@ -31,6 +31,7 @@ namespace RiakClient.Models.MapReduce.Inputs
     public abstract class RiakPhaseInput : IRiakPhaseInput
     {
         public List<IRiakKeyFilterToken> Filters { get; set; }
+
         public abstract JsonWriter WriteJson(JsonWriter writer);
 
         protected void WriteBucketKeyBucketJson(JsonWriter writer, string bucketType, string bucketName)

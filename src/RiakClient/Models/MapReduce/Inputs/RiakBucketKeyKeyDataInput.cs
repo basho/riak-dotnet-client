@@ -17,70 +17,41 @@
 // under the License.
 // </copyright>
 
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 namespace RiakClient.Models.MapReduce.Inputs
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using Newtonsoft.Json;
+
     public class RiakBucketKeyKeyDataInput : RiakPhaseInput
     {
-        private class RiakBucketKeyKeyDataInputItem
-        {
-            internal RiakObjectId ObjectId { get; private set; }
-            internal Object KeyData { get; private set; }
-
-            internal RiakBucketKeyKeyDataInputItem(RiakObjectId objectId, object keyData)
-            {
-                ObjectId = objectId;
-                KeyData = keyData;
-            }
-
-            // Helper constructor
-            internal RiakBucketKeyKeyDataInputItem(Tuple<RiakObjectId, object> data) : this(data.Item1, data.Item2)
-            {
-            }
-
-            // Helper constructor for old-style RiakBucketKeyKeyDataInput builder methods.
-            // Will be removed in future.
-            internal RiakBucketKeyKeyDataInputItem(Tuple<string, string, object> data)
-                : this(new RiakObjectId(data.Item1, data.Item2), data.Item3)
-            {
-            }
-        }
-
-        private List<RiakBucketKeyKeyDataInputItem> BucketKeyKeyData { get; set; }
-
-        public RiakBucketKeyKeyDataInput()
-        {
-            BucketKeyKeyData = new List<RiakBucketKeyKeyDataInputItem>();
-        }
+        private readonly List<RiakBucketKeyKeyDataInputItem> bucketKeyKeyData = new List<RiakBucketKeyKeyDataInputItem>();
 
         [Obsolete("Use the Add() that accepts a RiakIndexId instead. This will be removed in the next version.")]
         public RiakBucketKeyKeyDataInput Add(string bucket, string key, object keyData)
         {
-            BucketKeyKeyData.Add(new RiakBucketKeyKeyDataInputItem(new RiakObjectId(bucket, key), keyData));
+            bucketKeyKeyData.Add(new RiakBucketKeyKeyDataInputItem(new RiakObjectId(bucket, key), keyData));
             return this;
         }
 
         [Obsolete("Use the Add() that accepts a RiakIndexId instead. This will be removed in the next version.")]
         public RiakBucketKeyKeyDataInput Add(params Tuple<string, string, object>[] pairs)
         {
-            BucketKeyKeyData.AddRange(pairs.Select(p => new RiakBucketKeyKeyDataInputItem(p)));
+            bucketKeyKeyData.AddRange(pairs.Select(p => new RiakBucketKeyKeyDataInputItem(p)));
             return this;
         }
 
         [Obsolete("Use the Add() that accepts a RiakIndexId instead. This will be removed in the next version.")]
         public RiakBucketKeyKeyDataInput Add(IEnumerable<Tuple<string, string, object>> pairs)
         {
-            BucketKeyKeyData.AddRange(pairs.Select(p => new RiakBucketKeyKeyDataInputItem(p)));
+            bucketKeyKeyData.AddRange(pairs.Select(p => new RiakBucketKeyKeyDataInputItem(p)));
             return this;
         }
 
         public RiakBucketKeyKeyDataInput Add(RiakObjectId objectId, object keyData)
         {
-            BucketKeyKeyData.Add(new RiakBucketKeyKeyDataInputItem(objectId, keyData));
+            bucketKeyKeyData.Add(new RiakBucketKeyKeyDataInputItem(objectId, keyData));
             return this;
         }
 
@@ -96,11 +67,6 @@ namespace RiakClient.Models.MapReduce.Inputs
             return this;
         }
 
-        private void AddRange(IEnumerable<Tuple<RiakObjectId, object>> pairs)
-        {
-            BucketKeyKeyData.AddRange(pairs.Select(p => new RiakBucketKeyKeyDataInputItem(p)));
-        }
-        
         public override JsonWriter WriteJson(JsonWriter writer)
         {
             writer.WritePropertyName("inputs");
@@ -108,7 +74,7 @@ namespace RiakClient.Models.MapReduce.Inputs
 
             var s = new JsonSerializer();
 
-            foreach (var bkkd in BucketKeyKeyData)
+            foreach (var bkkd in bucketKeyKeyData)
             {
                 writer.WriteStartArray();
                 writer.WriteValue(bkkd.ObjectId.Bucket);
@@ -118,12 +84,53 @@ namespace RiakClient.Models.MapReduce.Inputs
                 {
                     writer.WriteValue(bkkd.ObjectId.BucketType);
                 }
+
                 writer.WriteEndArray();
             }
 
             writer.WriteEndArray();
 
             return writer;
+        }
+
+        private void AddRange(IEnumerable<Tuple<RiakObjectId, object>> pairs)
+        {
+            bucketKeyKeyData.AddRange(pairs.Select(p => new RiakBucketKeyKeyDataInputItem(p)));
+        }
+
+        private class RiakBucketKeyKeyDataInputItem
+        {
+            private readonly RiakObjectId objectId;
+            private readonly object keyData;
+
+            public RiakBucketKeyKeyDataInputItem(RiakObjectId objectId, object keyData)
+            {
+                this.objectId = objectId;
+                this.keyData = keyData;
+            }
+
+            // Helper constructor
+            public RiakBucketKeyKeyDataInputItem(Tuple<RiakObjectId, object> data)
+                : this(data.Item1, data.Item2)
+            {
+            }
+
+            // Helper constructor for old-style RiakBucketKeyKeyDataInput builder methods.
+            // Will be removed in future.
+            public RiakBucketKeyKeyDataInputItem(Tuple<string, string, object> data)
+                : this(new RiakObjectId(data.Item1, data.Item2), data.Item3)
+            {
+            }
+
+            public RiakObjectId ObjectId
+            {
+                get { return objectId; }
+            }
+
+            public object KeyData
+            {
+                get { return keyData; }
+            }
         }
     }
 }

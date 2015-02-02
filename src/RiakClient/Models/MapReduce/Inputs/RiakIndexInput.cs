@@ -17,23 +17,23 @@
 // under the License.
 // </copyright>
 
-using System;
-using Newtonsoft.Json;
-
 namespace RiakClient.Models.MapReduce.Inputs
 {
+    using System;
+    using Newtonsoft.Json;
+
     public abstract class RiakIndexInput : RiakPhaseInput
     {
-        private readonly RiakIndexId _indexId;
+        private readonly RiakIndexId indexId;
 
         protected RiakIndexInput(RiakIndexId indexId)
         {
-            _indexId = indexId;
+            this.indexId = indexId;
         }
 
         public RiakIndexId IndexId
         {
-            get { return _indexId; }
+            get { return indexId; }
         }
 
         [Obsolete("Use IndexId.BucketName instead. This will be removed in the next version.")]

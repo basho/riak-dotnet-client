@@ -23,30 +23,30 @@ namespace RiakClient.Models.MapReduce.Inputs
 
     public class RiakModuleFunctionArgInput : RiakPhaseInput
     {
-        private readonly string[] _arg;
-        private readonly string _function;
-        private readonly string _module;
+        private readonly string[] arg;
+        private readonly string function;
+        private readonly string module;
 
         public RiakModuleFunctionArgInput(string module, string function, string[] arg)
         {
-            _module = module;
-            _function = function;
-            _arg = arg;
+            this.module = module;
+            this.function = function;
+            this.arg = arg;
         }
 
         public string Module
         {
-            get { return _module; }
+            get { return module; }
         }
 
         public string Function
         {
-            get { return _function; }
+            get { return function; }
         }
 
         public string[] Arg
         {
-            get { return _arg; }
+            get { return arg; }
         }
 
         public override JsonWriter WriteJson(JsonWriter writer)
