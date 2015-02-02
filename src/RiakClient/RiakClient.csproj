@@ -91,8 +91,10 @@
     <Compile Include="IRiakAsyncClient.cs" />
     <Compile Include="IRiakClient.cs" />
     <Compile Include="Models\CommitHook\IRiakCommitHook.cs" />
+    <Compile Include="Models\RiakBinIndexId.cs" />
     <Compile Include="Models\RiakDt\CounterOperation.cs" />
     <Compile Include="Models\RiakDt\MapOperation.cs" />
+    <Compile Include="Models\RiakIntIndexId.cs" />
     <Compile Include="Models\Search\SearchIndex.cs" />
     <Compile Include="Models\Search\SearchSchema.cs" />
     <Compile Include="Util\EnumerableUtil.cs" />

@@ -17,13 +17,13 @@
 // under the License.
 // </copyright>
 
-using System;
-using System.Collections.Generic;
-using RiakClient.Messages;
-using RiakClient.Util;
-
 namespace RiakClient.Models
 {
+    using System;
+    using System.Collections.Generic;
+    using Messages;
+    using Util;
+
     public class RiakCounterGetOptions
     {
         /// <summary>
@@ -88,6 +88,29 @@ namespace RiakClient.Models
             return WriteQuorum(value, v => RVal = v);
         }
 
+        internal void Populate(RpbCounterGetReq request)
+        {
+            if (RVal.HasValue)
+            {
+                request.r = RVal.Value;
+            }
+
+            if (PrVal.HasValue)
+            {
+                request.pr = PrVal.Value;
+            }
+
+            if (BasicQuorum.HasValue)
+            {
+                request.basic_quorum = BasicQuorum.Value;
+            }
+
+            if (NotFoundOk.HasValue)
+            {
+                request.notfound_ok = NotFoundOk.Value;
+            }
+        }
+
         private RiakCounterGetOptions WriteQuorum(string value, Action<uint> setter)
         {
             System.Diagnostics.Debug.Assert(new HashSet<string> { "all", "quorum", "one", "default" }.Contains(value), "Incorrect quorum value");
@@ -98,25 +121,10 @@ namespace RiakClient.Models
 
         private RiakCounterGetOptions WriteQuorum(uint value, Action<uint> setter)
         {
-            System.Diagnostics.Debug.Assert(value >= 1);
+            System.Diagnostics.Debug.Assert(value >= 1, "value must be greater than or equal to 1");
 
             setter(value);
             return this;
-        }
-
-        internal void Populate(RpbCounterGetReq request)
-        {
-            if (RVal.HasValue)
-                request.r = RVal.Value;
-
-            if (PrVal.HasValue)
-                request.pr = PrVal.Value;
-
-            if (BasicQuorum.HasValue)
-                request.basic_quorum = BasicQuorum.Value;
-
-            if (NotFoundOk.HasValue)
-                request.notfound_ok = NotFoundOk.Value;
         }
     }
 }

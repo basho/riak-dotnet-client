@@ -17,13 +17,13 @@
 // under the License.
 // </copyright>
 
-using System;
-using System.Collections.Generic;
-using RiakClient.Messages;
-using RiakClient.Util;
-
 namespace RiakClient.Models
 {
+    using System;
+    using System.Collections.Generic;
+    using Messages;
+    using Util;
+
     public class RiakCounterUpdateOptions
     {
         /// <summary>
@@ -82,6 +82,29 @@ namespace RiakClient.Models
             return this;
         }
 
+        internal void Populate(RpbCounterUpdateReq request)
+        {
+            if (WVal.HasValue)
+            {
+                request.w = WVal.Value;
+            }
+
+            if (DwVal.HasValue)
+            {
+                request.dw = DwVal.Value;
+            }
+
+            if (PwVal.HasValue)
+            {
+                request.pw = PwVal.Value;
+            }
+
+            if (ReturnValue.HasValue)
+            {
+                request.returnvalue = ReturnValue.Value;
+            }
+        }
+
         private RiakCounterUpdateOptions WriteQuorum(string value, Action<uint> setter)
         {
             System.Diagnostics.Debug.Assert(new HashSet<string> { "all", "quorum", "one", "default" }.Contains(value), "Incorrect quorum value");
@@ -92,25 +115,10 @@ namespace RiakClient.Models
 
         private RiakCounterUpdateOptions WriteQuorum(uint value, Action<uint> setter)
         {
-            System.Diagnostics.Debug.Assert(value >= 1);
+            System.Diagnostics.Debug.Assert(value >= 1, "value must be greater than or equal to 1");
 
             setter(value);
             return this;
-        }
-
-        internal void Populate(RpbCounterUpdateReq request)
-        {
-            if (WVal.HasValue)
-                request.w = WVal.Value;
-
-            if (DwVal.HasValue)
-                request.dw = DwVal.Value;
-
-            if (PwVal.HasValue)
-                request.pw = PwVal.Value;
-
-            if (ReturnValue.HasValue)
-                request.returnvalue = ReturnValue.Value;
         }
     }
 }

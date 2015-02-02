@@ -17,11 +17,10 @@
 // under the License.
 // </copyright>
 
-using System;
-using RiakClient.Extensions;
-
 namespace RiakClient.Models
 {
+    using System;
+
     public class RiakIndexId : IEquatable<RiakIndexId>
     {
         private readonly string bucketName;
@@ -65,14 +64,14 @@ namespace RiakClient.Models
             get { return indexName; }
         }
 
-        internal RiakBinIndexId ToBinIndexId()
+        public static bool operator ==(RiakIndexId left, RiakIndexId right)
         {
-            return new RiakBinIndexId(BucketType, BucketName, IndexName);
+            return Equals(left, right);
         }
 
-        internal RiakIntIndexId ToIntIndexId()
+        public static bool operator !=(RiakIndexId left, RiakIndexId right)
         {
-            return new RiakIntIndexId(BucketType, BucketName, IndexName);
+            return !Equals(left, right);
         }
 
         public bool Equals(RiakIndexId other)
@@ -111,47 +110,21 @@ namespace RiakClient.Models
         {
             unchecked
             {
-                var hashCode = (bucketName != null ? bucketName.GetHashCode() : 0);
+                var hashCode = bucketName != null ? bucketName.GetHashCode() : 0;
                 hashCode = (hashCode * 397) ^ (bucketType != null ? bucketType.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (indexName != null ? indexName.GetHashCode() : 0);
                 return hashCode;
             }
         }
 
-        public static bool operator ==(RiakIndexId left, RiakIndexId right)
+        internal RiakBinIndexId ToBinIndexId()
         {
-            return Equals(left, right);
+            return new RiakBinIndexId(BucketType, BucketName, IndexName);
         }
 
-        public static bool operator !=(RiakIndexId left, RiakIndexId right)
+        internal RiakIntIndexId ToIntIndexId()
         {
-            return !Equals(left, right);
-        }
-    }
-
-    internal class RiakBinIndexId : RiakIndexId
-    {
-        public RiakBinIndexId(string bucketName, string indexName)
-            : base(bucketName, indexName.ToBinaryKey())
-        {
-        }
-
-        public RiakBinIndexId(string bucketType, string bucketName, string indexName)
-            : base(bucketType, bucketName, indexName.ToBinaryKey())
-        {
-        }
-    }
-
-    internal class RiakIntIndexId : RiakIndexId
-    {
-        public RiakIntIndexId(string bucketName, string indexName)
-            : base(bucketName, indexName.ToIntegerKey())
-        {
-        }
-
-        public RiakIntIndexId(string bucketType, string bucketName, string indexName)
-            : base(bucketType, bucketName, indexName.ToIntegerKey())
-        {
+            return new RiakIntIndexId(BucketType, BucketName, IndexName);
         }
     }
 }
