@@ -17,20 +17,30 @@
 // under the License.
 // </copyright>
 
-using RiakClient.Extensions;
-using RiakClient.Messages;
-
 namespace RiakClient.Models.Search
 {
+    using Extensions;
+    using Messages;
+
     public class RiakSearchResultField
     {
-        public string Key { get; private set; }
-        public string Value { get; private set; }
+        private readonly string key;
+        private readonly string value;
 
         internal RiakSearchResultField(RpbPair field)
         {
-            Key = field.key.FromRiakString();
-            Value = field.value.FromRiakString();
+            this.key = field.key.FromRiakString();
+            this.value = field.value.FromRiakString();
+        }
+
+        public string Key
+        {
+            get { return key; }
+        }
+
+        public string Value
+        {
+            get { return value; }
         }
     }
 }

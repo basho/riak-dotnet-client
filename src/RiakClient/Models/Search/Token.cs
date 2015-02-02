@@ -17,16 +17,16 @@
 // under the License.
 // </copyright>
 
-using System.Text.RegularExpressions;
-
 namespace RiakClient.Models.Search
 {
+    using System.Text.RegularExpressions;
+
     public class Token
     {
         private static readonly Regex EncodeRegex = new Regex(@"(["" \\'\(\)\[\]\\:\+\-\/\?])");
 
-        private readonly string _value;
-        private readonly string _suffix;
+        private readonly string value;
+        private readonly string suffix;
 
         internal Token(string value)
             : this(value, null)
@@ -35,8 +35,8 @@ namespace RiakClient.Models.Search
 
         internal Token(string value, string suffix)
         {
-            _value = value;
-            _suffix = suffix;
+            this.value = value;
+            this.suffix = suffix;
         }
 
         public static Token Is(string value)
@@ -51,7 +51,7 @@ namespace RiakClient.Models.Search
 
         public override string ToString()
         {
-            return _value != null ? EncodeRegex.Replace(_value, m => "\\" + m.Value) + _suffix : string.Empty;
+            return value != null ? EncodeRegex.Replace(value, m => "\\" + m.Value) + suffix : string.Empty;
         }
     }
 }

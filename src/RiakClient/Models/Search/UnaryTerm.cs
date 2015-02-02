@@ -21,7 +21,7 @@ namespace RiakClient.Models.Search
 {
     public class UnaryTerm : Term
     {
-        private readonly Token _value;
+        private readonly Token value;
 
         public UnaryTerm(RiakFluentSearch search, string field, string value)
             : this(search, field, Token.Is(value))
@@ -31,12 +31,12 @@ namespace RiakClient.Models.Search
         public UnaryTerm(RiakFluentSearch search, string field, Token value)
             : base(search, field)
         {
-            _value = value;
+            this.value = value;
         }
 
         public override string ToString()
         {
-            return Prefix() + Field() + _value + Suffix();
+            return Prefix() + Field() + value + Suffix();
         }
     }
 }

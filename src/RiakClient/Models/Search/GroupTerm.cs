@@ -21,23 +21,24 @@ namespace RiakClient.Models.Search
 {
     public class GroupTerm : Term
     {
-        private readonly Term _term;
+        private readonly Term term;
 
         public GroupTerm(RiakFluentSearch search, string field, Term term)
             : base(search, field)
         {
-            _term = term;
+            this.term = term;
         }
 
         public override string ToString()
         {
-            var term = _term;
-            while (term.Owner != null)
+            Term tmpTerm = term;
+
+            while (tmpTerm.Owner != null)
             {
-                term = term.Owner;
+                tmpTerm = tmpTerm.Owner;
             }
 
-            return Prefix() + "(" + term + ")" + Suffix();
+            return Prefix() + "(" + tmpTerm + ")" + Suffix();
         }
     }
 }

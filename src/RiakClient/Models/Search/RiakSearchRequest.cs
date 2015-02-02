@@ -17,13 +17,13 @@
 // under the License.
 // </copyright>
 
-using System.Collections.Generic;
-using System.Linq;
-using RiakClient.Extensions;
-using RiakClient.Messages;
-
 namespace RiakClient.Models.Search
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using Extensions;
+    using Messages;
+
     /// <summary>
     /// Specifies the sort order of Riak Search Results
     /// </summary>
@@ -33,6 +33,7 @@ namespace RiakClient.Models.Search
         /// Sort the results by bucket key.
         /// </summary>
         Key,
+
         /// <summary>
         /// Sort the results by search score.
         /// </summary>
