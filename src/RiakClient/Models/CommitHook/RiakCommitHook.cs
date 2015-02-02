@@ -19,27 +19,33 @@
 
 namespace RiakClient.Models.CommitHook
 {
+    using System;
     using System.IO;
     using System.Text;
     using Messages;
     using Newtonsoft.Json;
 
-    public abstract class RiakCommitHook : IRiakCommitHook
+    public abstract class RiakCommitHook : IRiakCommitHook, IEquatable<RiakCommitHook>
     {
         public string ToJsonString()
         {
             var sb = new StringBuilder();
 
             using (var sw = new StringWriter(sb))
-            using (JsonWriter writer = new JsonTextWriter(sw))
             {
-                WriteJson(writer);
+                using (JsonWriter writer = new JsonTextWriter(sw))
+                {
+                    WriteJson(writer);
+                }
             }
 
             return sb.ToString();
         }
 
         public abstract void WriteJson(JsonWriter writer);
+
         public abstract RpbCommitHook ToRpbCommitHook();
+
+        public abstract bool Equals(RiakCommitHook other);
     }
 }
