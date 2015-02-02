@@ -42,12 +42,12 @@ namespace RiakClient.Models.CommitHook
 
         public string Module
         {
-            get { return this.module; }
+            get { return module; }
         }
 
         public string Function
         {
-            get { return this.function; }
+            get { return function; }
         }
 
         public static bool operator ==(RiakErlangCommitHook left, RiakErlangCommitHook right)
@@ -63,8 +63,8 @@ namespace RiakClient.Models.CommitHook
         public override void WriteJson(JsonWriter writer)
         {
             writer.WriteStartObject();
-            writer.WriteProperty("mod", this.module);
-            writer.WriteProperty("fun", this.function);
+            writer.WriteProperty("mod", module);
+            writer.WriteProperty("fun", function);
             writer.WriteEndObject();
         }
 
@@ -74,15 +74,15 @@ namespace RiakClient.Models.CommitHook
                 {
                     modfun = new RpbModFun
                         {
-                            function = this.function.ToRiakString(),
-                            module = this.module.ToRiakString()
+                            function = function.ToRiakString(),
+                            module = module.ToRiakString()
                         }
                 };
         }
 
         public override bool Equals(RiakCommitHook other)
         {
-            return this.Equals(other as RiakErlangCommitHook);
+            return Equals(other as RiakErlangCommitHook);
         }
 
         public override bool Equals(object obj)
@@ -97,14 +97,14 @@ namespace RiakClient.Models.CommitHook
                 return true;
             }
 
-            return this.Equals(obj as RiakErlangCommitHook);
+            return Equals(obj as RiakErlangCommitHook);
         }
 
         public override int GetHashCode()
         {
             unchecked
             {
-                return (this.module.GetHashCode() * 397) ^ this.function.GetHashCode();
+                return (module.GetHashCode() * 397) ^ this.function.GetHashCode();
             }
         }
 
@@ -115,8 +115,8 @@ namespace RiakClient.Models.CommitHook
                 return false;
             }
 
-            return string.Equals(this.module, other.Module) &&
-                string.Equals(this.function, other.Function);
+            return string.Equals(module, other.Module) &&
+                string.Equals(function, other.Function);
         }
     }
 }

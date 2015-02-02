@@ -34,7 +34,7 @@ namespace RiakClient.Models.CommitHook
 
         public string Name
         {
-            get { return this.name; }
+            get { return name; }
         }
 
         public static bool operator ==(RiakJavascriptCommitHook left, RiakJavascriptCommitHook right)
@@ -49,7 +49,7 @@ namespace RiakClient.Models.CommitHook
 
         public override bool Equals(RiakCommitHook other)
         {
-            return this.Equals(other as RiakJavascriptCommitHook);
+            return Equals(other as RiakJavascriptCommitHook);
         }
 
         public override bool Equals(object obj)
@@ -64,24 +64,24 @@ namespace RiakClient.Models.CommitHook
                 return true;
             }
 
-            return this.Equals(obj as RiakJavascriptCommitHook);
+            return Equals(obj as RiakJavascriptCommitHook);
         }
 
         public override int GetHashCode()
         {
-            return this.name.GetHashCode();
+            return name.GetHashCode();
         }
 
         public override void WriteJson(JsonWriter writer)
         {
             writer.WriteStartObject();
-            writer.WriteProperty("name", this.name);
+            writer.WriteProperty("name", name);
             writer.WriteEndObject();
         }
 
         public override RpbCommitHook ToRpbCommitHook()
         {
-            return new RpbCommitHook { name = this.name.ToRiakString() };
+            return new RpbCommitHook { name = name.ToRiakString() };
         }
 
         private bool Equals(RiakJavascriptCommitHook other)
@@ -91,7 +91,7 @@ namespace RiakClient.Models.CommitHook
                 return false;
             }
 
-            return string.Equals(this.name, other.Name);
+            return string.Equals(name, other.Name);
         }
     }
 }

@@ -45,17 +45,17 @@ namespace RiakClient.Exceptions
 
         public uint ErrorCode
         {
-            get { return this.errorCode; }
+            get { return errorCode; }
         }
 
         public string ErrorMessage
         {
-            get { return this.errorMessage; }
+            get { return errorMessage; }
         }
 
         public override string Message
         {
-            get { return this.errorMessage; }
+            get { return errorMessage; }
         }
 
         public override IDictionary Data
@@ -64,15 +64,15 @@ namespace RiakClient.Exceptions
             {
                 return new Dictionary<string, object>
                 {
-                    { "ErrorCode", this.errorCode },
-                    { "ErrorMessage", this.errorMessage }
+                    { "ErrorCode", errorCode },
+                    { "ErrorMessage", errorMessage }
                 };
             }
         }
 
         internal bool NodeOffline
         {
-            get { return this.nodeOffline; }
+            get { return nodeOffline; }
         }
     }
 }
