@@ -17,13 +17,13 @@
 // under the License.
 // </copyright>
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using RiakClient.Util;
-
 namespace RiakClient.Models.Index
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Numerics;
+    using Util;
+
     public class IntIndex : SecondaryIndex<IntIndex, BigInteger>
     {
         internal IntIndex(RiakObject container, string name)

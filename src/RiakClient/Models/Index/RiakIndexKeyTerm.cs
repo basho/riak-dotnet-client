@@ -21,17 +21,28 @@ namespace RiakClient.Models.Index
 {
     public class RiakIndexKeyTerm
     {
-        public string Key { get; private set; }
-        public string Term { get; private set; }
+        private readonly string key;
+        private readonly string term;
 
         public RiakIndexKeyTerm(string key)
         {
-            Key = key;
+            this.key = key;
         }
 
-        public RiakIndexKeyTerm(string key, string term) : this(key)
+        public RiakIndexKeyTerm(string key, string term)
+            : this(key)
         {
-            Term = term;
+            this.term = term;
+        }
+
+        public string Key
+        {
+            get { return key; }
+        }
+
+        public string Term
+        {
+            get { return term; }
         }
     }
 }

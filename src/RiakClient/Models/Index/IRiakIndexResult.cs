@@ -17,10 +17,10 @@
 // under the License.
 // </copyright>
 
-using System.Collections.Generic;
-
 namespace RiakClient.Models.Index
 {
+    using System.Collections.Generic;
+
     public interface IRiakIndexResult
     {
         IEnumerable<RiakIndexKeyTerm> IndexKeyTerms { get; }
