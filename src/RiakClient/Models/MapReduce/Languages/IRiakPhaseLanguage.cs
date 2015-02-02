@@ -17,10 +17,10 @@
 // under the License.
 // </copyright>
 
-using Newtonsoft.Json;
-
 namespace RiakClient.Models.MapReduce.Languages
 {
+    using Newtonsoft.Json;
+
     internal interface IRiakPhaseLanguage
     {
         void WriteJson(JsonWriter writer);

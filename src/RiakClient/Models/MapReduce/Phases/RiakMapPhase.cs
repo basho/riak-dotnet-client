@@ -17,10 +17,10 @@
 // under the License.
 // </copyright>
 
-using RiakClient.Models.MapReduce.Languages;
-
 namespace RiakClient.Models.MapReduce.Phases
 {
+    using Models.MapReduce.Languages;
+
     internal class RiakMapPhase<TLanguage> : RiakActionPhase<TLanguage>
         where TLanguage : IRiakPhaseLanguage, new()
     {

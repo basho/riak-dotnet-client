@@ -17,27 +17,32 @@
 // under the License.
 // </copyright>
 
-using System.Collections.Generic;
-using System.Linq;
-using RiakClient.Messages;
-
 namespace RiakClient.Models.MapReduce
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using Messages;
+
     public class RiakStreamedMapReduceResult : IRiakMapReduceResult
     {
-        private readonly IEnumerable<RiakResult<RpbMapRedResp>> _responseReader;
+        private readonly IEnumerable<RiakResult<RpbMapRedResp>> responseReader;
 
         internal RiakStreamedMapReduceResult(IEnumerable<RiakResult<RpbMapRedResp>> responseReader)
         {
-            _responseReader = responseReader;
+            this.responseReader = responseReader;
         }
 
         public IEnumerable<RiakMapReduceResultPhase> PhaseResults
         {
             get
             {
-                return _responseReader.Select(item => item.IsSuccess
-                    ? new RiakMapReduceResultPhase(item.Value.phase, new List<RpbMapRedResp> { item.Value })
+                return responseReader.Select(item => item.IsSuccess
+                    ? new RiakMapReduceResultPhase(
+                            item.Value.phase,
+                            new List<RpbMapRedResp>
+                            {
+                                item.Value
+                            })
                     : new RiakMapReduceResultPhase());
             }
         }

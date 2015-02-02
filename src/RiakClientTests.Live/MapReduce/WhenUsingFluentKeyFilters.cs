@@ -45,7 +45,7 @@ namespace RiakClientTests.Live.MapReduce
                     RiakConstants.ContentTypes.ApplicationJson));
             }
 
-            var mr = new RiakMapReduceQuery { ContentType = MrContentType };
+            var mr = new RiakMapReduceQuery(MrContentType);
 
             mr.Inputs(Bucket)
                 .Filter(f => f.Equal("time_8"))
@@ -84,7 +84,7 @@ namespace RiakClientTests.Live.MapReduce
                     RiakConstants.ContentTypes.ApplicationJson));
             }
 
-            var mr = new RiakMapReduceQuery { ContentType = MrContentType };
+            var mr = new RiakMapReduceQuery(MrContentType);
 
             mr.Inputs(Bucket)
                 .Filter(f => f.StartsWith("time"))
@@ -118,7 +118,7 @@ namespace RiakClientTests.Live.MapReduce
                     RiakConstants.ContentTypes.ApplicationJson));
             }
 
-            var mr = new RiakMapReduceQuery { ContentType = MrContentType };
+            var mr = new RiakMapReduceQuery(MrContentType);
 
             mr.Inputs(Bucket)
                 .Filter(f => f.And(l => l.StartsWith("time"),

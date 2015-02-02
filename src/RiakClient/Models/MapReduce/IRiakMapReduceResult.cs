@@ -17,10 +17,10 @@
 // under the License.
 // </copyright>
 
-using System.Collections.Generic;
-
 namespace RiakClient.Models.MapReduce
 {
+    using System.Collections.Generic;
+
     public interface IRiakMapReduceResult
     {
         IEnumerable<RiakMapReduceResultPhase> PhaseResults { get; }

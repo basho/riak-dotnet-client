@@ -17,17 +17,17 @@
 // under the License.
 // </copyright>
 
-using RiakClient.Extensions;
-using Newtonsoft.Json;
-using System.IO;
-using System.Text;
-
 namespace RiakClient.Models.MapReduce.Phases
 {
+    using System.IO;
+    using System.Text;
+    using Extensions;
+    using Newtonsoft.Json;
+
     internal abstract class RiakPhase
     {
         public abstract string PhaseType { get; }
-        private bool _keep;
+        private bool keep;
 
         public override string ToString()
         {
@@ -36,7 +36,7 @@ namespace RiakClient.Models.MapReduce.Phases
 
         public void Keep(bool keep)
         {
-            _keep = keep;
+            this.keep = keep;
         }
 
         public string ToJsonString()
@@ -44,19 +44,21 @@ namespace RiakClient.Models.MapReduce.Phases
             var sb = new StringBuilder();
 
             using (var sw = new StringWriter(sb))
-            using (JsonWriter writer = new JsonTextWriter(sw))
             {
-                writer.WriteStartObject();
-                writer.WritePropertyName(PhaseType);
+                using (JsonWriter writer = new JsonTextWriter(sw))
+                {
+                    writer.WriteStartObject();
+                    writer.WritePropertyName(PhaseType);
 
-                // phase start
-                writer.WriteStartObject();
-                WriteJson(writer);
-                writer.WriteProperty("keep", _keep);
-                writer.WriteEndObject();
-                // phase end
+                    // phase start
+                    writer.WriteStartObject();
+                    WriteJson(writer);
+                    writer.WriteProperty("keep", keep);
+                    writer.WriteEndObject();
+                    // phase end
 
-                writer.WriteEndObject();
+                    writer.WriteEndObject();
+                }
             }
 
             return sb.ToString();

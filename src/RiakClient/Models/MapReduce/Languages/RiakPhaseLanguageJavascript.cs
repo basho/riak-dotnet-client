@@ -17,60 +17,60 @@
 // under the License.
 // </copyright>
 
-using RiakClient.Extensions;
-using Newtonsoft.Json;
-using RiakClient.Util;
-
 namespace RiakClient.Models.MapReduce.Languages
 {
+    using Extensions;
+    using Newtonsoft.Json;
+    using Util;
+
     internal class RiakPhaseLanguageJavascript : IRiakPhaseLanguage
     {
-        private string _name;
-        private string _source;
-        private string _bucket;
-        private string _key;
+        private string name;
+        private string source;
+        private string bucket;
+        private string key;
 
         public void Name(string name)
         {
-            _name = name;
+            this.name = name;
         }
 
         public void Source(string source)
         {
-            _source = source;
+            this.source = source;
         }
 
         public void BucketKey(string bucket, string key)
         {
-            _bucket = bucket;
-            _key = key;
+            this.bucket = bucket;
+            this.key = key;
         }
 
         public void WriteJson(JsonWriter writer)
         {
-            if (!string.IsNullOrWhiteSpace(_name))
+            if (!string.IsNullOrWhiteSpace(name))
             {
-                System.Diagnostics.Debug.Assert(string.IsNullOrWhiteSpace(_bucket), "Bucket should be empty if Name specified");
-                System.Diagnostics.Debug.Assert(string.IsNullOrWhiteSpace(_key), "Key should be empty if Name specified");
-                System.Diagnostics.Debug.Assert(string.IsNullOrWhiteSpace(_source), "Source should be empty if Name specified");
+                System.Diagnostics.Debug.Assert(string.IsNullOrWhiteSpace(bucket), "Bucket should be empty if Name specified");
+                System.Diagnostics.Debug.Assert(string.IsNullOrWhiteSpace(key), "Key should be empty if Name specified");
+                System.Diagnostics.Debug.Assert(string.IsNullOrWhiteSpace(source), "Source should be empty if Name specified");
             }
-            else if (!string.IsNullOrWhiteSpace(_source))
+            else if (!string.IsNullOrWhiteSpace(source))
             {
-                System.Diagnostics.Debug.Assert(string.IsNullOrWhiteSpace(_bucket), "Bucket should be empty if Name specified");
-                System.Diagnostics.Debug.Assert(string.IsNullOrWhiteSpace(_key), "Key should be empty if Name specified");
-                System.Diagnostics.Debug.Assert(string.IsNullOrWhiteSpace(_name), "Name should be empty if Name specified");
+                System.Diagnostics.Debug.Assert(string.IsNullOrWhiteSpace(bucket), "Bucket should be empty if Name specified");
+                System.Diagnostics.Debug.Assert(string.IsNullOrWhiteSpace(key), "Key should be empty if Name specified");
+                System.Diagnostics.Debug.Assert(string.IsNullOrWhiteSpace(name), "Name should be empty if Name specified");
             }
             else
             {
-                System.Diagnostics.Debug.Assert(!string.IsNullOrWhiteSpace(_bucket), "Bucket should not be empty");
-                System.Diagnostics.Debug.Assert(!string.IsNullOrWhiteSpace(_key), "Key should not be empty");
+                System.Diagnostics.Debug.Assert(!string.IsNullOrWhiteSpace(bucket), "Bucket should not be empty");
+                System.Diagnostics.Debug.Assert(!string.IsNullOrWhiteSpace(key), "Key should not be empty");
             }
 
             writer.WriteSpecifiedProperty("language", RiakConstants.MapReduceLanguage.JavaScript)
-                .WriteSpecifiedProperty("source", _source)
-                .WriteSpecifiedProperty("name", _name)
-                .WriteSpecifiedProperty("bucket", _bucket)
-                .WriteSpecifiedProperty("key", _key);
+                .WriteSpecifiedProperty("source", source)
+                .WriteSpecifiedProperty("name", name)
+                .WriteSpecifiedProperty("bucket", bucket)
+                .WriteSpecifiedProperty("key", key);
         }
     }
 }

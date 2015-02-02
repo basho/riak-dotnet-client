@@ -27,20 +27,32 @@ namespace RiakClient.Models.MapReduce
 
     public class RiakMapReduceResultPhase
     {
-        public bool Success { get; private set; }
-        public uint Phase { get; private set; }
-        public List<byte[]> Values { get; private set; }
+        private readonly bool success;
+        private readonly uint phase;
+        private readonly IList<byte[]> values;
 
         internal RiakMapReduceResultPhase(uint phase, IEnumerable<RpbMapRedResp> results)
         {
-            Phase = phase;
-            Values = results.Select(r => r.response).Where(b => b != null).ToList();
-            Success = true;
+            this.phase = phase;
+            this.values = results.Select(r => r.response).Where(b => b != null).ToList();
+            this.success = true;
         }
 
         internal RiakMapReduceResultPhase()
         {
-            Success = false;
+            this.success = false;
+        }
+
+        public bool Success
+        {
+            get { return success; }
+        }
+
+        public uint Phase { get; private set; }
+
+        public IList<byte[]> Values
+        {
+            get { return values; }
         }
 
         /// <summary>
@@ -50,8 +62,7 @@ namespace RiakClient.Models.MapReduce
         /// <returns>IList<typeparam name="T">T</typeparam></returns>
         public IList<T> GetObjects<T>()
         {
-            var rVal = Values.Select(v => JsonConvert.DeserializeObject<T>(v.FromRiakString())).ToList();
-            return rVal;
+            return Values.Select(v => JsonConvert.DeserializeObject<T>(v.FromRiakString())).ToList();
         }
 
         /// <summary>
@@ -63,9 +74,8 @@ namespace RiakClient.Models.MapReduce
         /// one of the convenience methods.</remarks>
         public IList<RiakObjectId> GetObjectIds()
         {
-            var rVal = Values.SelectMany(v => JsonConvert.DeserializeObject<string[][]>(v.FromRiakString()).Select(
+            return Values.SelectMany(v => JsonConvert.DeserializeObject<string[][]>(v.FromRiakString()).Select(
                 a => new RiakObjectId(a[0], a[1]))).ToList();
-            return rVal;
         }
     }
 }

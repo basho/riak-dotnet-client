@@ -17,35 +17,39 @@
 // under the License.
 // </copyright>
 
-using RiakClient.Extensions;
-using Newtonsoft.Json;
-using RiakClient.Models.MapReduce.Languages;
-
 namespace RiakClient.Models.MapReduce.Phases
 {
+    using Models.MapReduce.Languages;
+    using Newtonsoft.Json;
+
     internal abstract class RiakActionPhase<TLanguage> : RiakPhase
         where TLanguage : IRiakPhaseLanguage, new()
     {
-        private object _argument;
-        public TLanguage Language { get; private set; }
+        private readonly TLanguage language;
+        private object argument;
 
         protected RiakActionPhase()
         {
-            Language = new TLanguage();
+            this.language = new TLanguage();
+        }
+
+        public TLanguage Language
+        {
+            get { return language; }
         }
 
         public void Argument<T>(T argument)
         {
-            _argument = argument;
+            this.argument = argument;
         }
 
         protected override void WriteJson(JsonWriter writer)
         {
             Language.WriteJson(writer);
 
-            if (_argument != null)
+            if (argument != null)
             {
-                var json = JsonConvert.SerializeObject(_argument);
+                var json = JsonConvert.SerializeObject(argument);
                 writer.WritePropertyName("arg");
                 writer.WriteRawValue(json);
             }
