@@ -23,16 +23,16 @@ namespace RiakClient.Containers
 
     public class ConcurrentEnumerable<T> : IConcurrentEnumerable<T>
     {
-        private readonly IEnumerable<T> _wrapped;
+        private readonly IEnumerable<T> wrapped;
 
         public ConcurrentEnumerable(IEnumerable<T> wrapped)
         {
-            _wrapped = wrapped;
+            this.wrapped = wrapped;
         }
 
         public IConcurrentEnumerator<T> GetEnumerator()
         {
-            return new ConcurrentEnumerator<T>(_wrapped.GetEnumerator());
+            return new ConcurrentEnumerator<T>(wrapped.GetEnumerator());
         }
     }
 }
