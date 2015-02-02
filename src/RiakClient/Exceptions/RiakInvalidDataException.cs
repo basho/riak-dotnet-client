@@ -23,16 +23,27 @@ namespace RiakClient.Exceptions
 
     public class RiakInvalidDataException : Exception
     {
-        public byte MessageCode { get; private set; }
+        private readonly byte messageCode;
 
         public RiakInvalidDataException(byte messageCode)
         {
-            MessageCode = messageCode;
+            this.messageCode = messageCode;
+        }
+
+        public byte MessageCode
+        {
+            get
+            {
+                return this.messageCode;
+            }
         }
 
         public override string Message
         {
-            get { return string.Format("Unexpected message code returned from Riak: {0}", MessageCode); }
+            get
+            {
+                return string.Format("Unexpected message code returned from Riak: {0}", this.messageCode);
+            }
         }
     }
 }

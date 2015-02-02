@@ -26,33 +26,36 @@ namespace RiakClient.Exceptions
     // TODO: ensure that subclass is correct
     public class RiakException : Exception
     {
-        private readonly string _errorMessage;
-
-        public uint ErrorCode { get; private set; }
-
-        internal bool NodeOffline { get; private set; }
-
-        public string ErrorMessage
-        {
-            get { return _errorMessage; }
-        }
+        private readonly string errorMessage;
+        private readonly uint errorCode;
+        private readonly bool nodeOffline;
 
         internal RiakException(uint errorCode, string errorMessage, bool nodeOffline)
         {
-            NodeOffline = nodeOffline;
-            ErrorCode = errorCode;
-            _errorMessage = string.Format("Riak returned an error. Code '{0}'. Message: {1}", ErrorCode, errorMessage);
+            this.nodeOffline = nodeOffline;
+            this.errorCode = errorCode;
+            this.errorMessage = string.Format("Riak returned an error. Code '{0}'. Message: {1}", this.errorCode, errorMessage);
         }
 
         internal RiakException(string errorMessage, bool nodeOffline)
         {
-            NodeOffline = nodeOffline;
-            _errorMessage = errorMessage;
+            this.nodeOffline = nodeOffline;
+            this.errorMessage = errorMessage;
+        }
+
+        public uint ErrorCode
+        {
+            get { return this.errorCode; }
+        }
+
+        public string ErrorMessage
+        {
+            get { return this.errorMessage; }
         }
 
         public override string Message
         {
-            get { return _errorMessage; }
+            get { return this.errorMessage; }
         }
 
         public override IDictionary Data
@@ -61,10 +64,15 @@ namespace RiakClient.Exceptions
             {
                 return new Dictionary<string, object>
                 {
-                    { "ErrorCode", ErrorCode },
-                    { "ErrorMessage", ErrorMessage }
+                    { "ErrorCode", this.errorCode },
+                    { "ErrorMessage", this.errorMessage }
                 };
             }
+        }
+
+        internal bool NodeOffline
+        {
+            get { return this.nodeOffline; }
         }
     }
 }
