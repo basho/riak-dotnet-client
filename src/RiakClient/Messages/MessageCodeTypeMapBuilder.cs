@@ -17,11 +17,11 @@
 // under the License.
 // </copyright>
 
-using System;
-using System.Collections.Generic;
-
 namespace RiakClient.Messages
 {
+    using System;
+    using System.Collections.Generic;
+
     internal static class MessageCodeTypeMapBuilder
     {
         private static readonly Dictionary<MessageCode, Type> MessageCodeToTypeMap;
@@ -62,12 +62,12 @@ namespace RiakClient.Messages
                 { MessageCode.RpbCounterGetResp, typeof(RpbCounterGetResp) },
 
                 { MessageCode.RpbYokozunaIndexGetReq, typeof(RpbYokozunaIndexGetReq) },
-                { MessageCode.RpbYokozunaIndexGetResp , typeof(RpbYokozunaIndexGetResp) },
-                { MessageCode.RpbYokozunaIndexPutReq , typeof(RpbYokozunaIndexPutReq) },
-                { MessageCode.RpbYokozunaIndexDeleteReq , typeof(RpbYokozunaIndexDeleteReq) },
-                { MessageCode.RpbYokozunaSchemaGetReq , typeof(RpbYokozunaSchemaGetReq) },
-                { MessageCode.RpbYokozunaSchemaGetResp , typeof(RpbYokozunaSchemaGetResp) },
-                { MessageCode.RpbYokozunaSchemaPutReq , typeof(RpbYokozunaSchemaPutReq) },
+                { MessageCode.RpbYokozunaIndexGetResp, typeof(RpbYokozunaIndexGetResp) },
+                { MessageCode.RpbYokozunaIndexPutReq, typeof(RpbYokozunaIndexPutReq) },
+                { MessageCode.RpbYokozunaIndexDeleteReq, typeof(RpbYokozunaIndexDeleteReq) },
+                { MessageCode.RpbYokozunaSchemaGetReq, typeof(RpbYokozunaSchemaGetReq) },
+                { MessageCode.RpbYokozunaSchemaGetResp, typeof(RpbYokozunaSchemaGetResp) },
+                { MessageCode.RpbYokozunaSchemaPutReq, typeof(RpbYokozunaSchemaPutReq) },
 
                 { MessageCode.DtFetchReq, typeof(DtFetchReq) },
                 { MessageCode.DtFetchResp, typeof(DtFetchResp) },

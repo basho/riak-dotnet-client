@@ -17,7 +17,6 @@
 // under the License.
 // </copyright>
 
-
 namespace RiakClient.Messages
 {
     public enum MessageCode : byte
