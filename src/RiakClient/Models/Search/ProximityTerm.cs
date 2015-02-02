@@ -17,26 +17,26 @@
 // under the License.
 // </copyright>
 
-using System.Collections.Generic;
-using System.Linq;
-
 namespace RiakClient.Models.Search
 {
+    using System.Collections.Generic;
+    using System.Linq;
+
     public class ProximityTerm : Term
     {
-        private readonly List<Token> _words;
-        private readonly double _proximity;
+        private readonly List<Token> words;
+        private readonly double proximity;
 
         public ProximityTerm(RiakFluentSearch search, string field, double proximity, params string[] words)
             : base(search, field)
         {
-            _words = new List<Token>(words.Select(Token.Is));
-            _proximity = proximity;
+            this.words = new List<Token>(words.Select(Token.Is));
+            this.proximity = proximity;
         }
 
         public override string ToString()
         {
-            return Prefix() + Field() + "\"" + string.Join(" ", _words.Select(w => w.ToString()).ToArray()) + "\"~" + _proximity + Suffix();
+            return Prefix() + Field() + "\"" + string.Join(" ", words.Select(w => w.ToString()).ToArray()) + "\"~" + proximity + Suffix();
         }
     }
 }

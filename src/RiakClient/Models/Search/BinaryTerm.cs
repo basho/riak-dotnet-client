@@ -21,12 +21,10 @@ namespace RiakClient.Models.Search
 {
     public class BinaryTerm : Term
     {
-        internal enum Op { And, Or }
-
-        private readonly Term _left;
-        private readonly Term _right;
-        private readonly Op _op;
-        private readonly Token _value;
+        private readonly Term left;
+        private readonly Term right;
+        private readonly Op op;
+        private readonly Token value;
 
         internal BinaryTerm(RiakFluentSearch search, string field, Op op, Term left, string value)
             : this(search, field, op, left, Token.Is(value))
@@ -36,28 +34,34 @@ namespace RiakClient.Models.Search
         internal BinaryTerm(RiakFluentSearch search, string field, Op op, Term left, Token value)
             : this(search, field, op, left)
         {
-            _value = value;
+            this.value = value;
         }
 
         internal BinaryTerm(RiakFluentSearch search, string field, Op op, Term left, Term right)
             : this(search, field, op, left)
         {
-            _right = right;
+            this.right = right;
         }
 
         private BinaryTerm(RiakFluentSearch search, string field, Op op, Term left)
             : base(search, field)
         {
-            _op = op;
-            _left = left;
+            this.op = op;
+            this.left = left;
             left.Owner = this;
+        }
+
+        internal enum Op
+        {
+            And,
+            Or
         }
 
         public override string ToString()
         {
-            return _left + " " + _op.ToString().ToUpper() + " "
+            return left + " " + op.ToString().ToUpper() + " "
                 + Prefix()
-                + (_right != null ? _right.ToString() : Field() + _value) + Suffix();
+                + (right != null ? right.ToString() : Field() + value) + Suffix();
         }
     }
 }
