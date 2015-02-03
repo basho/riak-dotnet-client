@@ -160,8 +160,20 @@ if ($Target -eq 'Clean') {
     $Target = 'CleanAll'
 }
 
-Write-Debug "MSBuild command: $msbuild_exe ""/verbosity:$Verbosity"" /nologo /m ""/property:SolutionDir=$script_path\"" ""$version_property"" ""$verbose_property"" ""/target:$Target"" ""$build_targets_file"""
-& $msbuild_exe "/verbosity:$Verbosity" /nologo /m "/property:SolutionDir=$script_path\" "$version_property" "$verbose_property" "/target:$Target" "$build_targets_file"
+$maxcpu_property = ''
+if ($env:USERNAME -eq 'buildbot')
+{
+    $env:MSBUILDDISABLENODEREUSE = 1
+    $maxcpu_property = '/maxcpucount:1'
+}
+else
+{
+    $env:MSBUILDDISABLENODEREUSE = 0
+    $maxcpu_property = '/maxcpucount'
+}
+
+Write-Debug "MSBuild command: $msbuild_exe ""/verbosity:$Verbosity"" /nologo /m ""/property:SolutionDir=$script_path\"" ""$maxcpu_property"" ""$version_property"" ""$verbose_property"" ""/target:$Target"" ""$build_targets_file"""
+& $msbuild_exe "/verbosity:$Verbosity" /nologo /m "/property:SolutionDir=$script_path\" "$maxcpu_property" "$version_property" "$verbose_property" "/target:$Target" "$build_targets_file"
 if ($? -ne $True) {
     throw "$msbuild_exe failed: $LastExitCode"
 }
