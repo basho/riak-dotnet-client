@@ -31,10 +31,6 @@ namespace RiakClient.Models
         private readonly string bucketType;
         private readonly string key;
 
-        protected RiakObjectId()
-        {
-        }
-
         public RiakObjectId(string bucket, string key)
         {
             if (EnumerableUtil.IsNullOrEmpty(bucket))
@@ -52,11 +48,6 @@ namespace RiakClient.Models
             this.bucketType = bucketType;
         }
 
-        internal RiakLink ToRiakLink(string tag)
-        {
-            return new RiakLink(bucket, key, tag);
-        }
-
         public string Bucket
         {
             get { return bucket; }
@@ -72,16 +63,28 @@ namespace RiakClient.Models
             get { return key; }
         }
 
+        public static bool operator ==(RiakObjectId left, RiakObjectId right)
+        {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(RiakObjectId left, RiakObjectId right)
+        {
+            return !Equals(left, right);
+        }
+
         public bool Equals(RiakObjectId other)
         {
             if (ReferenceEquals(null, other))
             {
                 return false;
             }
+
             if (ReferenceEquals(this, other))
             {
                 return true;
             }
+
             return string.Equals(bucket, other.Bucket) &&
                 string.Equals(bucketType, other.BucketType) &&
                 string.Equals(key, other.key);
@@ -96,21 +99,11 @@ namespace RiakClient.Models
         {
             unchecked
             {
-                int hashCode = (bucket != null ? bucket.GetHashCode() : 0);
+                int hashCode = bucket != null ? bucket.GetHashCode() : 0;
                 hashCode = (hashCode * 397) ^ (bucketType != null ? bucketType.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (key != null ? key.GetHashCode() : 0);
                 return hashCode;
             }
-        }
-
-        public static bool operator ==(RiakObjectId left, RiakObjectId right)
-        {
-            return Equals(left, right);
-        }
-
-        public static bool operator !=(RiakObjectId left, RiakObjectId right)
-        {
-            return !Equals(left, right);
         }
 
         public override string ToString()
@@ -121,6 +114,11 @@ namespace RiakClient.Models
             }
 
             return string.Format("BucketType: {0}, Bucket: {1}, Key: {2}", BucketType, Bucket, Key);
+        }
+
+        internal RiakLink ToRiakLink(string tag)
+        {
+            return new RiakLink(bucket, key, tag);
         }
     }
 }
