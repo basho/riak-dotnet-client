@@ -26,8 +26,9 @@ namespace RiakClient.Models.MapReduce.Phases
 
     internal abstract class RiakPhase
     {
-        public abstract string PhaseType { get; }
         private bool keep;
+
+        public abstract string PhaseType { get; }
 
         public override string ToString()
         {
@@ -52,11 +53,12 @@ namespace RiakClient.Models.MapReduce.Phases
 
                     // phase start
                     writer.WriteStartObject();
+
                     WriteJson(writer);
                     writer.WriteProperty("keep", keep);
                     writer.WriteEndObject();
-                    // phase end
 
+                    // phase end
                     writer.WriteEndObject();
                 }
             }

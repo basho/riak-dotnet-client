@@ -39,9 +39,6 @@ namespace RiakClient
 
     public class RiakClient : IRiakClient
     {
-        internal static bool DisableListBucketsWarning = false;
-        internal static bool DisableListKeysWarning = false;
-
         private const string ListBucketsWarning = "*** [CI] -> ListBuckets has serious performance implications and should not be used in production applications. ***";
         private const string ListKeysWarning = "*** [CI] -> ListKeys has serious performance implications and should not be used in production applications. ***";
         private const string InvalidBucketErrorMessage = "Bucket cannot be blank or contain forward-slashes";
@@ -66,6 +63,13 @@ namespace RiakClient
         public int RetryCount { get; set; }
 
         public IRiakAsyncClient Async { get; private set; }
+
+        /*
+         * TODO: these should be client options set via an options object and/or set in app.config
+         */
+        internal static bool DisableListBucketsWarning { get; set; }
+
+        internal static bool DisableListKeysWarning { get; set; }
 
         /// <summary>
         /// Ping this instance of Riak
@@ -104,13 +108,14 @@ namespace RiakClient
             }
 
             var o = new RiakObject(bucket, counter, result.Value.value);
-            var cVal = 0L;
-            var parseResult = false;
-
+            bool parseResult = false;
+            long counterValue = 0L;
             if (options.ReturnValue != null && options.ReturnValue.Value)
-                parseResult = long.TryParse(o.Value.FromRiakString(), out cVal);
+            {
+                parseResult = long.TryParse(o.Value.FromRiakString(), out counterValue);
+            }
 
-            return new RiakCounterResult(RiakResult<RiakObject>.Success(o), parseResult ? (long?)cVal : null);
+            return new RiakCounterResult(RiakResult<RiakObject>.Success(o), parseResult ? (long?)counterValue : null);
         }
 
         /// <summary>
@@ -135,10 +140,10 @@ namespace RiakClient
             }
 
             var o = new RiakObject(bucket, counter, result.Value.value);
-            long cVal;
-            var parseResult = long.TryParse(o.Value.FromRiakString(), out cVal);
+            long counterValue;
+            bool parseResult = long.TryParse(o.Value.FromRiakString(), out counterValue);
 
-            return new RiakCounterResult(RiakResult<RiakObject>.Success(o), parseResult ? (long?)cVal : null);
+            return new RiakCounterResult(RiakResult<RiakObject>.Success(o), parseResult ? (long?)counterValue : null);
         }
 
         public RiakResult<RiakObject> Get(string bucketType, string bucket, string key, RiakGetOptions options = null)
@@ -166,6 +171,7 @@ namespace RiakClient
         /// that fewer than R/PR nodes responded to the read request. See <see cref="RiakGetOptions" />
         /// for information on how different options change Riak's default behavior.
         /// </remarks>
+        /// <returns>An indication of success or failure.</returns>
         public RiakResult<RiakObject> Get(string bucket, string key, RiakGetOptions options = null)
         {
             options = options ?? DefaultGetOptions();
@@ -190,6 +196,7 @@ namespace RiakClient
         /// nodes successfully responding and a <paramref name="bucket"/>/<paramref name="key"/> combination
         /// not being found in Riak.
         /// </remarks>
+        /// <returns>An indication of success or failure.</returns>
         public RiakResult<RiakObject> Get(string bucket, string key)
         {
             var options = new RiakGetOptions().SetR(RiakConstants.Defaults.RVal);
@@ -211,6 +218,7 @@ namespace RiakClient
         /// the Riak API does not allow us to distinguish between a 404 resulting from less than <paramref name="rVal"/>
         /// nodes successfully responding and an <paramref name="objectId"/> not being found in Riak.
         /// </remarks>
+        /// <returns>An indication of success or failure.</returns>
         public RiakResult<RiakObject> Get(RiakObjectId objectId, RiakGetOptions options = null)
         {
             var request = new RpbGetReq
@@ -315,6 +323,7 @@ namespace RiakClient
         /// <param name='options'>
         /// Put options
         /// </param>
+        /// <returns>An indication of success or failure.</returns>
         public RiakResult<RiakObject> Put(RiakObject value, RiakPutOptions options = null)
         {
             options = options ?? new RiakPutOptions();
@@ -398,9 +407,9 @@ namespace RiakClient
         /// <summary>
         /// Delete the data identified by the <paramref name="riakObject"/>
         /// </summary>
-        /// <param name='riakObject'>
-        /// The object to delete
-        /// </param>
+        /// <param name='riakObject'>The object to delete</param>
+        /// <param name="options">Deletion options</param>
+        /// <returns>An indication of success or failure.</returns>
         public RiakResult Delete(RiakObject riakObject, RiakDeleteOptions options = null)
         {
             return Delete(riakObject.BucketType, riakObject.Bucket, riakObject.Key, options);
@@ -418,6 +427,7 @@ namespace RiakClient
         /// <param name='options'>
         /// Delete options
         /// </param>
+        /// <returns>An indication of success or failure.</returns>
         public RiakResult Delete(string bucket, string key, RiakDeleteOptions options = null)
         {
             return Delete(null, bucket, key, options);
@@ -436,6 +446,7 @@ namespace RiakClient
         /// <param name='options'>
         /// Delete options
         /// </param>
+        /// <returns>An indication of success or failure.</returns>
         public RiakResult Delete(string bucketType, string bucket, string key, RiakDeleteOptions options = null)
         {
             return Delete(new RiakObjectId(bucketType, bucket, key), options);
@@ -450,6 +461,7 @@ namespace RiakClient
         /// <param name='options'>
         /// Delete options
         /// </param>
+        /// <returns>An indication of success or failure.</returns>
         public RiakResult Delete(RiakObjectId objectId, RiakDeleteOptions options = null)
         {
             options = options ?? new RiakDeleteOptions();
@@ -476,6 +488,7 @@ namespace RiakClient
         /// <param name='options'>
         /// Delete options.
         /// </param>    
+        /// <returns>An indication of success or failure.</returns>
         public IEnumerable<RiakResult> Delete(IEnumerable<RiakObjectId> objectIds, RiakDeleteOptions options = null)
         {
             var results = UseConnection(conn => Delete(conn, objectIds, options));
@@ -534,6 +547,7 @@ namespace RiakClient
             {
                 return RiakResult<RiakStreamedMapReduceResult>.Success(new RiakStreamedMapReduceResult(response.Value));
             }
+
             return RiakResult<RiakStreamedMapReduceResult>.Error(response.ResultCode, response.ErrorMessage, response.NodeOffline);
         }
 
@@ -593,9 +607,10 @@ namespace RiakClient
         /// physical I/O and can take a long time. Callers should fully enumerate the collection or else close the connection when finished.</remarks>
         public RiakResult<IEnumerable<string>> StreamListBuckets()
         {
-            var lbReq = new RpbListBucketsReq { stream = true };
-            var result = UseDelayedConnection((conn, onFinish) =>
-                                              conn.PbcWriteStreamRead<RpbListBucketsReq, RpbListBucketsResp>(lbReq, lbr => lbr.IsSuccess && !lbr.Value.done, onFinish));
+            var listBucketsRequest = new RpbListBucketsReq { stream = true };
+            var result = UseDelayedConnection(
+                (conn, onFinish) => conn.PbcWriteStreamRead<RpbListBucketsReq, RpbListBucketsResp>(
+                    listBucketsRequest, lbr => lbr.IsSuccess && !lbr.Value.done, onFinish));
 
             if (result.IsSuccess)
             {
@@ -656,19 +671,22 @@ namespace RiakClient
         {
             WarnAboutListKeys();
 
-            var lkReq = new RpbListKeysReq
+            var listKeysRequest = new RpbListKeysReq
             {
                 type = bucketType.ToRiakString(),
                 bucket = bucket.ToRiakString()
             };
-            var result = UseDelayedConnection((conn, onFinish) =>
-                                              conn.PbcWriteStreamRead<RpbListKeysReq, RpbListKeysResp>(lkReq, lkr => lkr.IsSuccess && !lkr.Value.done, onFinish));
+
+            var result = UseDelayedConnection(
+                (conn, onFinish) => conn.PbcWriteStreamRead<RpbListKeysReq, RpbListKeysResp>(
+                    listKeysRequest, lkr => lkr.IsSuccess && !lkr.Value.done, onFinish));
 
             if (result.IsSuccess)
             {
                 var keys = result.Value.Where(r => r.IsSuccess).SelectMany(r => r.Value.keys).Select(k => k.FromRiakString());
                 return RiakResult<IEnumerable<string>>.Success(keys);
             }
+
             return RiakResult<IEnumerable<string>>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
 
@@ -758,8 +776,8 @@ namespace RiakClient
         /// <summary>
         /// Reset the properties on a bucket back to their defaults.
         /// </summary>
-        /// <param name="bucket">The name of the bucket to reset the properties on.</param>
         /// <param name="bucketType">The bucket type. Bucket types are a Riak 2.0 feature and do not apply to Riak 1.4 and earlier</param>
+        /// <param name="bucket">The name of the bucket on which to reset properties</param>
         /// <returns>An indication of success or failure.</returns>
         public RiakResult ResetBucketProperties(string bucketType, string bucket)
         {
@@ -818,6 +836,7 @@ namespace RiakClient
                 // This really should be a multi-phase map/reduce
                 return RiakResult<IList<RiakObject>>.Success(objects.Where(r => r.IsSuccess).Select(r => r.Value).ToList());
             }
+
             return RiakResult<IList<RiakObject>>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
 
@@ -837,6 +856,7 @@ namespace RiakClient
             {
                 return RiakResult<RiakServerInfo>.Success(new RiakServerInfo(result.Value));
             }
+
             return RiakResult<RiakServerInfo>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
 
@@ -1074,16 +1094,21 @@ namespace RiakClient
             var result = UseConnection(conn => conn.PbcWriteRead<DtFetchReq, DtFetchResp>(message));
 
             if (!result.IsSuccess)
+            {
                 return new RiakDtSetResult(RiakResult<RiakObject>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline));
+            }
 
-            var rsr =
-                new RiakDtSetResult(RiakResult<RiakObject>.Success(new RiakObject(objectId, result.Value)));
+            var rsr = new RiakDtSetResult(RiakResult<RiakObject>.Success(new RiakObject(objectId, result.Value)));
 
             if (options.IncludeContext)
+            {
                 rsr.Context = result.Value.context;
+            }
 
             if (result.Value.value != null)
+            {
                 rsr.Values = result.Value.value.set_value;
+            }
 
             return rsr;
         }
@@ -1122,21 +1147,28 @@ namespace RiakClient
             options.Populate(request);
 
             if (adds != null)
+            {
                 request.op.set_op.adds.AddRange(adds.Select(a => serialize(a)));
+            }
 
             if (removes != null)
+            {
                 request.op.set_op.removes.AddRange(removes.Select(r => serialize(r)));
+            }
 
             var response = UseConnection(conn => conn.PbcWriteRead<DtUpdateReq, DtUpdateResp>(request));
 
-            var rdsr =
-                new RiakDtSetResult(RiakResult<RiakObject>.Success(new RiakObject(objectId, response.Value)));
+            var rdsr = new RiakDtSetResult(RiakResult<RiakObject>.Success(new RiakObject(objectId, response.Value)));
 
             if (options.IncludeContext)
+            {
                 rdsr.Context = response.Value.context;
+            }
 
             if (options.ReturnBody)
+            {
                 rdsr.Values = response.Value.set_value;
+            }
 
             return rdsr;
         }
@@ -1168,16 +1200,21 @@ namespace RiakClient
             var result = UseConnection(conn => conn.PbcWriteRead<DtFetchReq, DtFetchResp>(message));
 
             if (!result.IsSuccess)
+            {
                 return new RiakDtMapResult(RiakResult<RiakObject>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline));
+            }
 
-            var rmr =
-                new RiakDtMapResult(RiakResult<RiakObject>.Success(new RiakObject(objectId.Bucket, objectId.Key, result.Value.value)));
+            var rmr = new RiakDtMapResult(RiakResult<RiakObject>.Success(new RiakObject(objectId.Bucket, objectId.Key, result.Value.value)));
 
             if (options.IncludeContext)
+            {
                 rmr.Context = result.Value.context;
+            }
 
             if (result.Value.value != null)
+            {
                 rmr.Values = result.Value.value.map_value.Select(mapEntry => new RiakDtMapEntry(mapEntry)).ToList();
+            }
 
             return rmr;
         }
@@ -1226,27 +1263,38 @@ namespace RiakClient
             options.Populate(request);
 
             if (removes != null)
+            {
                 request.op.map_op.removes.AddRange(removes.Select(a => a.ToMapField()));
+            }
 
             if (updates != null)
+            {
                 request.op.map_op.updates.AddRange(updates);
+            }
 
             if (context != null)
+            {
                 request.context = context;
+            }
 
             var result = UseConnection(conn => conn.PbcWriteRead<DtUpdateReq, DtUpdateResp>(request));
 
             if (!result.IsSuccess)
+            {
                 return new RiakDtMapResult(RiakResult<RiakObject>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline));
+            }
 
-            var rmr =
-                new RiakDtMapResult(RiakResult<RiakObject>.Success(new RiakObject(objectId, result.Value.map_value)));
+            var rmr = new RiakDtMapResult(RiakResult<RiakObject>.Success(new RiakObject(objectId, result.Value.map_value)));
 
             if (options.IncludeContext)
+            {
                 rmr.Context = result.Value.context;
+            }
 
             if (options.ReturnBody)
+            {
                 rmr.Values = result.Value.map_value.Select(mv => new RiakDtMapEntry(mv)).ToList();
+            }
 
             return rmr;
         }
@@ -1258,7 +1306,9 @@ namespace RiakClient
                 UseConnection(conn => conn.PbcWriteRead<RpbYokozunaIndexGetReq, RpbYokozunaIndexGetResp>(request));
 
             if (!result.IsSuccess)
+            {
                 return RiakResult<SearchIndexResult>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
+            }
 
             return RiakResult<SearchIndexResult>.Success(new SearchIndexResult(result.Value));
         }
@@ -1282,7 +1332,9 @@ namespace RiakClient
                 UseConnection(conn => conn.PbcWriteRead<RpbYokozunaSchemaGetReq, RpbYokozunaSchemaGetResp>(request));
 
             if (!result.IsSuccess)
+            {
                 return RiakResult<SearchSchema>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
+            }
 
             return RiakResult<SearchSchema>.Success(new SearchSchema(result.Value.schema));
         }
@@ -1364,6 +1416,7 @@ namespace RiakClient
                             result.NodeOffline);
                 }
             }
+
             return result;
         }
 
@@ -1406,7 +1459,10 @@ namespace RiakClient
         private static void WarnAboutListBuckets()
         {
             if (DisableListBucketsWarning)
+            {
                 return;
+            }
+
             System.Diagnostics.Debug.Write(ListBucketsWarning);
             System.Diagnostics.Trace.TraceWarning(ListBucketsWarning);
             Console.WriteLine(ListBucketsWarning);
@@ -1416,13 +1472,13 @@ namespace RiakClient
         {
             WarnAboutListKeys();
 
-            var lkReq = new RpbListKeysReq
+            var listKeysRequest = new RpbListKeysReq
             {
                 type = bucketType.ToRiakString(),
                 bucket = bucket.ToRiakString()
             };
 
-            var result = conn.PbcWriteRead<RpbListKeysReq, RpbListKeysResp>(lkReq, ListKeysRepeatRead());
+            var result = conn.PbcWriteRead<RpbListKeysReq, RpbListKeysResp>(listKeysRequest, ListKeysRepeatRead());
 
             if (result.IsSuccess)
             {
@@ -1510,6 +1566,7 @@ namespace RiakClient
             {
                 return RiakResult<RiakStreamedIndexResult>.Success(new RiakStreamedIndexResult(ReturnTerms(options), result.Value));
             }
+
             return RiakResult<RiakStreamedIndexResult>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
 
@@ -1535,14 +1592,18 @@ namespace RiakClient
                 var r = RiakResult<RiakIndexResult>.Success(new RiakIndexResult(ReturnTerms(options), result));
 
                 if (result.Done.HasValue)
+                {
                     r.SetDone(result.Done.Value);
+                }
 
                 if (result.Value.continuation != null)
                 {
                     var continuation = result.Value.continuation.FromRiakString();
 
                     if (!string.IsNullOrEmpty(continuation))
+                    {
                         r.SetContinuation(continuation);
+                    }
                 }
 
                 return r;
