@@ -16,8 +16,7 @@
     <NoWarn Condition="$(OS) == 'Windows_NT'">0419;1570;1572;1573;1591;1710;1734</NoWarn>
     <NoWarn Condition="$(OS) != 'Windows_NT'">0419;1570;1572;1573;1591</NoWarn>
     <NuGetPackageImportStamp>857f709c</NuGetPackageImportStamp>
-    <!-- TODO: eventually set to false -->
-    <StyleCopTreatErrorsAsWarnings>true</StyleCopTreatErrorsAsWarnings>
+    <StyleCopTreatErrorsAsWarnings>false</StyleCopTreatErrorsAsWarnings>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>True</DebugSymbols>
