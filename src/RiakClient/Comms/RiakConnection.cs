@@ -356,14 +356,12 @@ namespace RiakClient.Comms
 
                 if (response.ContentLength > 0)
                 {
-                    using (var responseStream = response.GetResponseStream())
+                    Stream responseStream = response.GetResponseStream();
+                    if (responseStream != null)
                     {
-                        if (responseStream != null)
+                        using (var reader = new StreamReader(responseStream, result.ContentEncoding))
                         {
-                            using (var reader = new StreamReader(responseStream, result.ContentEncoding))
-                            {
-                                result.Body = reader.ReadToEnd();
-                            }
+                            result.Body = reader.ReadToEnd();
                         }
                     }
                 }
