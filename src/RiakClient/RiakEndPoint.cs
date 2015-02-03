@@ -17,15 +17,16 @@
 // under the License.
 // </copyright>
 
-using System;
-using System.Collections.Generic;
-using RiakClient.Comms;
-
 namespace RiakClient
 {
+    using System;
+    using System.Collections.Generic;
+    using Comms;
+
     public abstract class RiakEndPoint : IRiakEndPoint
     {
         public TimeSpan RetryWaitTime { get; set; }
+
         protected abstract int DefaultRetryCount { get; }
 
         /// <summary>
@@ -49,12 +50,12 @@ namespace RiakClient
             return UseConnection(useFun, RiakResult<TResult>.Error, retryAttempts);
         }
 
-        protected abstract TRiakResult UseConnection<TRiakResult>(Func<IRiakConnection, TRiakResult> useFun, Func<ResultCode, string, bool, TRiakResult> onError, int retryAttempts)
-            where TRiakResult : RiakResult;
-
         public abstract RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun, int retryAttempts)
             where TResult : RiakResult;
 
         public abstract void Dispose();
+
+        protected abstract TRiakResult UseConnection<TRiakResult>(Func<IRiakConnection, TRiakResult> useFun, Func<ResultCode, string, bool, TRiakResult> onError, int retryAttempts)
+            where TRiakResult : RiakResult;
     }
 }

@@ -97,6 +97,8 @@
     <Compile Include="Models\RiakIntIndexId.cs" />
     <Compile Include="Models\Search\SearchIndex.cs" />
     <Compile Include="Models\Search\SearchSchema.cs" />
+    <Compile Include="ResultCode.cs" />
+    <Compile Include="RiakResult{TResult}.cs" />
     <Compile Include="Util\EnumerableUtil.cs" />
     <Compile Include="Exceptions\RiakInvalidDataException.cs" />
     <Compile Include="Exceptions\RiakException.cs" />
