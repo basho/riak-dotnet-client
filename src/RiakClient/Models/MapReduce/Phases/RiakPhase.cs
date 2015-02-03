@@ -42,25 +42,26 @@ namespace RiakClient.Models.MapReduce.Phases
 
         public string ToJsonString()
         {
+            /*
+             * NB: JsonTextWriter is guaranteed to close the StringWriter
+             * https://github.com/JamesNK/Newtonsoft.Json/blob/master/Src/Newtonsoft.Json/JsonTextWriter.cs#L150-L160
+             */
             var sb = new StringBuilder();
-
-            using (var sw = new StringWriter(sb))
+            var sw = new StringWriter(sb);
+            using (JsonWriter writer = new JsonTextWriter(sw))
             {
-                using (JsonWriter writer = new JsonTextWriter(sw))
-                {
-                    writer.WriteStartObject();
-                    writer.WritePropertyName(PhaseType);
+                writer.WriteStartObject();
+                writer.WritePropertyName(PhaseType);
 
-                    // phase start
-                    writer.WriteStartObject();
+                // phase start
+                writer.WriteStartObject();
 
-                    WriteJson(writer);
-                    writer.WriteProperty("keep", keep);
-                    writer.WriteEndObject();
+                WriteJson(writer);
+                writer.WriteProperty("keep", keep);
+                writer.WriteEndObject();
 
-                    // phase end
-                    writer.WriteEndObject();
-                }
+                // phase end
+                writer.WriteEndObject();
             }
 
             return sb.ToString();
