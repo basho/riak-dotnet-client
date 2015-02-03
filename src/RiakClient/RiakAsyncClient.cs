@@ -17,300 +17,301 @@
 // under the License.
 // </copyright>
 
-using System.Numerics;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using RiakClient.Models;
-using RiakClient.Models.Index;
-using RiakClient.Models.MapReduce;
-using RiakClient.Models.Search;
-
 namespace RiakClient
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Numerics;
+    using System.Threading.Tasks;
+    using Models;
+    using Models.Index;
+    using Models.MapReduce;
+    using Models.Search;
+
     internal class RiakAsyncClient : IRiakAsyncClient
     {
-        private readonly IRiakClient _client;
+        private readonly IRiakClient client;
 
         public RiakAsyncClient(IRiakClient client)
         {
-            _client = client;
+            this.client = client;
         }
 
         public Task<RiakResult> Ping()
         {
-            return Task.Factory.StartNew(() => _client.Ping());
+            return Task.Factory.StartNew(() => client.Ping());
         }
 
         public Task<RiakResult<RiakObject>> Get(string bucket, string key, RiakGetOptions options = null)
         {
             options = options ?? RiakClient.DefaultGetOptions();
-            return Task.Factory.StartNew(() => _client.Get(bucket, key, options));
+            return Task.Factory.StartNew(() => client.Get(bucket, key, options));
         }
 
         public Task<RiakResult<RiakObject>> Get(RiakObjectId objectId, RiakGetOptions options = null)
         {
             options = options ?? RiakClient.DefaultGetOptions();
-            return Task.Factory.StartNew(() => _client.Get(objectId.Bucket, objectId.Key, options));
+            return Task.Factory.StartNew(() => client.Get(objectId.Bucket, objectId.Key, options));
         }
 
         public Task<IEnumerable<RiakResult<RiakObject>>> Get(IEnumerable<RiakObjectId> bucketKeyPairs, RiakGetOptions options = null)
         {
             options = options ?? RiakClient.DefaultGetOptions();
-            return Task.Factory.StartNew(() => _client.Get(bucketKeyPairs, options));
+            return Task.Factory.StartNew(() => client.Get(bucketKeyPairs, options));
         }
 
         public Task<RiakCounterResult> IncrementCounter(string bucket, string counter, long amount, RiakCounterUpdateOptions options = null)
         {
-            return Task.Factory.StartNew(() => _client.IncrementCounter(bucket, counter, amount, options));
+            return Task.Factory.StartNew(() => client.IncrementCounter(bucket, counter, amount, options));
         }
 
-        public Task<RiakCounterResult> GetCounter(string bucket, string counter, RiakCounterGetOptions options = null) 
+        public Task<RiakCounterResult> GetCounter(string bucket, string counter, RiakCounterGetOptions options = null)
         {
-            return Task.Factory.StartNew(() => _client.GetCounter(bucket, counter, options));
+            return Task.Factory.StartNew(() => client.GetCounter(bucket, counter, options));
         }
 
         public Task<IEnumerable<RiakResult<RiakObject>>> Put(IEnumerable<RiakObject> values, RiakPutOptions options)
         {
-            return Task.Factory.StartNew(() => _client.Put(values, options));
+            return Task.Factory.StartNew(() => client.Put(values, options));
         }
 
         public Task<RiakResult<RiakObject>> Put(RiakObject value, RiakPutOptions options)
         {
-            return Task.Factory.StartNew(() => _client.Put(value, options));
+            return Task.Factory.StartNew(() => client.Put(value, options));
         }
 
         public Task<RiakResult> Delete(RiakObject riakObject, RiakDeleteOptions options = null)
         {
-            return Task.Factory.StartNew(() => _client.Delete(riakObject, options));
+            return Task.Factory.StartNew(() => client.Delete(riakObject, options));
         }
 
         public Task<RiakResult> Delete(string bucket, string key, RiakDeleteOptions options = null)
         {
-            return Task.Factory.StartNew(() => _client.Delete(bucket, key, options));
+            return Task.Factory.StartNew(() => client.Delete(bucket, key, options));
         }
 
         public Task<RiakResult> Delete(RiakObjectId objectId, RiakDeleteOptions options = null)
         {
-            return Task.Factory.StartNew(() => _client.Delete(objectId.Bucket, objectId.Key, options));
+            return Task.Factory.StartNew(() => client.Delete(objectId.Bucket, objectId.Key, options));
         }
 
         public Task<IEnumerable<RiakResult>> Delete(IEnumerable<RiakObjectId> objectIds, RiakDeleteOptions options = null)
         {
-            return Task.Factory.StartNew(() => _client.Delete(objectIds, options));
+            return Task.Factory.StartNew(() => client.Delete(objectIds, options));
         }
 
         public Task<RiakResult<RiakSearchResult>> Search(RiakSearchRequest search)
         {
-            return Task.Factory.StartNew(() => _client.Search(search));
+            return Task.Factory.StartNew(() => client.Search(search));
         }
 
         public Task<RiakResult<RiakMapReduceResult>> MapReduce(RiakMapReduceQuery query)
         {
-            return Task.Factory.StartNew(() => _client.MapReduce(query));
+            return Task.Factory.StartNew(() => client.MapReduce(query));
         }
 
         public Task<RiakResult<RiakStreamedMapReduceResult>> StreamMapReduce(RiakMapReduceQuery query)
         {
-            return Task.Factory.StartNew(() => _client.StreamMapReduce(query));
+            return Task.Factory.StartNew(() => client.StreamMapReduce(query));
         }
 
         public Task<RiakResult<IEnumerable<string>>> StreamListBuckets()
         {
-            return Task.Factory.StartNew(() => _client.StreamListBuckets());
+            return Task.Factory.StartNew(() => client.StreamListBuckets());
         }
 
-        public Task<RiakResult<IEnumerable<string>>>  ListBuckets()
+        public Task<RiakResult<IEnumerable<string>>> ListBuckets()
         {
-            return Task.Factory.StartNew(() => _client.ListBuckets());
+            return Task.Factory.StartNew(() => client.ListBuckets());
         }
 
         public Task<RiakResult<IEnumerable<string>>> ListKeys(string bucket)
         {
-            return Task.Factory.StartNew(() => _client.ListKeys(bucket));
+            return Task.Factory.StartNew(() => client.ListKeys(bucket));
         }
 
         public Task<RiakResult<IEnumerable<string>>> StreamListKeys(string bucket)
         {
-            return Task.Factory.StartNew(() => _client.StreamListKeys(bucket));
+            return Task.Factory.StartNew(() => client.StreamListKeys(bucket));
         }
 
         public Task<RiakResult<RiakBucketProperties>> GetBucketProperties(string bucket)
         {
-            return Task.Factory.StartNew(() => _client.GetBucketProperties(bucket));
+            return Task.Factory.StartNew(() => client.GetBucketProperties(bucket));
         }
 
         public Task<RiakResult> SetBucketProperties(string bucket, RiakBucketProperties properties, bool useHttp = false)
         {
-            return Task.Factory.StartNew(() => _client.SetBucketProperties(bucket, properties, useHttp));
+            return Task.Factory.StartNew(() => client.SetBucketProperties(bucket, properties, useHttp));
         }
 
         public Task<RiakResult> ResetBucketProperties(string bucket, bool useHttp = false)
         {
-            return Task.Factory.StartNew(() => _client.ResetBucketProperties(bucket, useHttp));
+            return Task.Factory.StartNew(() => client.ResetBucketProperties(bucket, useHttp));
         }
 
         public Task<RiakResult<IList<string>>> ListKeysFromIndex(string bucket)
         {
-            return Task.Factory.StartNew(() => _client.ListKeysFromIndex(bucket));
+            return Task.Factory.StartNew(() => client.ListKeysFromIndex(bucket));
         }
 
         public Task<RiakResult<IList<RiakObject>>> WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks)
         {
-            return Task.Factory.StartNew(() => _client.WalkLinks(riakObject, riakLinks));
+            return Task.Factory.StartNew(() => client.WalkLinks(riakObject, riakLinks));
         }
 
-        public Task<RiakResult<RiakServerInfo>>  GetServerInfo()
+        public Task<RiakResult<RiakServerInfo>> GetServerInfo()
         {
-            return Task.Factory.StartNew(() => _client.GetServerInfo());
+            return Task.Factory.StartNew(() => client.GetServerInfo());
         }
 
         public Task<RiakResult<RiakIndexResult>> GetSecondaryIndex(RiakIndexId index, BigInteger value, RiakIndexGetOptions options = null)
         {
-            return Task.Factory.StartNew(() => _client.GetSecondaryIndex(index, value, options));
+            return Task.Factory.StartNew(() => client.GetSecondaryIndex(index, value, options));
         }
 
         public Task<RiakResult<RiakIndexResult>> GetSecondaryIndex(RiakIndexId index, string value, RiakIndexGetOptions options = null)
         {
-            return Task.Factory.StartNew(() => _client.GetSecondaryIndex(index, value, options));
+            return Task.Factory.StartNew(() => client.GetSecondaryIndex(index, value, options));
         }
 
         public Task<RiakResult<RiakIndexResult>> GetSecondaryIndex(RiakIndexId index, BigInteger min, BigInteger max, RiakIndexGetOptions options = null)
         {
-            return Task.Factory.StartNew(() => _client.GetSecondaryIndex(index, min, max, options));
+            return Task.Factory.StartNew(() => client.GetSecondaryIndex(index, min, max, options));
         }
 
         public Task<RiakResult<RiakIndexResult>> GetSecondaryIndex(RiakIndexId index, string min, string max, RiakIndexGetOptions options = null)
         {
-            return Task.Factory.StartNew(() => _client.GetSecondaryIndex(index, min, max, options));
+            return Task.Factory.StartNew(() => client.GetSecondaryIndex(index, min, max, options));
         }
 
         public Task<RiakResult<RiakStreamedIndexResult>> StreamGetSecondaryIndex(RiakIndexId index, BigInteger value, RiakIndexGetOptions options = null)
         {
-            return Task.Factory.StartNew(() => _client.StreamGetSecondaryIndex(index, value, options));
+            return Task.Factory.StartNew(() => client.StreamGetSecondaryIndex(index, value, options));
         }
 
         public Task<RiakResult<RiakStreamedIndexResult>> StreamGetSecondaryIndex(RiakIndexId index, string value, RiakIndexGetOptions options = null)
         {
-            return Task.Factory.StartNew(() => _client.StreamGetSecondaryIndex(index, value, options));
+            return Task.Factory.StartNew(() => client.StreamGetSecondaryIndex(index, value, options));
         }
 
         public Task<RiakResult<RiakStreamedIndexResult>> StreamGetSecondaryIndex(RiakIndexId index, BigInteger min, BigInteger max, RiakIndexGetOptions options = null)
         {
-            return Task.Factory.StartNew(() => _client.StreamGetSecondaryIndex(index, min, max, options));
+            return Task.Factory.StartNew(() => client.StreamGetSecondaryIndex(index, min, max, options));
         }
 
         public Task<RiakResult<RiakStreamedIndexResult>> StreamGetSecondaryIndex(RiakIndexId index, string min, string max, RiakIndexGetOptions options = null)
         {
-            return Task.Factory.StartNew(() => _client.StreamGetSecondaryIndex(index, min, max, options));
+            return Task.Factory.StartNew(() => client.StreamGetSecondaryIndex(index, min, max, options));
         }
 
         public Task Batch(Action<IRiakBatchClient> batchAction)
         {
-            return Task.Factory.StartNew(() => _client.Batch(batchAction));
+            return Task.Factory.StartNew(() => client.Batch(batchAction));
         }
 
         public Task<T> Batch<T>(Func<IRiakBatchClient, T> batchFunc)
         {
-            return Task.Factory.StartNew<T>(() => _client.Batch(batchFunc));
+            return Task.Factory.StartNew<T>(() => client.Batch(batchFunc));
         }
 
-
-        // -----------------------------------------------------------------------------------------------------------
-        // All functions below are marked as obsolete
-        // -----------------------------------------------------------------------------------------------------------
+        /*
+         * -----------------------------------------------------------------------------------------------------------
+         * All functions below are marked as obsolete
+         * -----------------------------------------------------------------------------------------------------------
+         */
 
         public void Ping(Action<RiakResult> callback)
         {
-            ExecAsync(() => callback(_client.Ping()));
+            ExecAsync(() => callback(client.Ping()));
         }
 
         public void Get(string bucket, string key, Action<RiakResult<RiakObject>> callback, RiakGetOptions options = null)
         {
             options = options ?? RiakClient.DefaultGetOptions();
-            ExecAsync(() => callback(_client.Get(bucket, key, options)));
+            ExecAsync(() => callback(client.Get(bucket, key, options)));
         }
 
         public void Get(RiakObjectId objectId, Action<RiakResult<RiakObject>> callback, RiakGetOptions options = null)
         {
             options = options ?? RiakClient.DefaultGetOptions();
-            ExecAsync(() => callback(_client.Get(objectId.Bucket, objectId.Key, options)));
+            ExecAsync(() => callback(client.Get(objectId.Bucket, objectId.Key, options)));
         }
 
         public void Get(IEnumerable<RiakObjectId> bucketKeyPairs, Action<IEnumerable<RiakResult<RiakObject>>> callback, RiakGetOptions options = null)
         {
             options = options ?? RiakClient.DefaultGetOptions();
-            ExecAsync(() => callback(_client.Get(bucketKeyPairs, options)));
+            ExecAsync(() => callback(client.Get(bucketKeyPairs, options)));
         }
 
         public void Put(IEnumerable<RiakObject> values, Action<IEnumerable<RiakResult<RiakObject>>> callback, RiakPutOptions options)
         {
-            ExecAsync(() => callback(_client.Put(values, options)));
+            ExecAsync(() => callback(client.Put(values, options)));
         }
 
         public void Put(RiakObject value, Action<RiakResult<RiakObject>> callback, RiakPutOptions options)
         {
-            ExecAsync(() => callback(_client.Put(value, options)));
+            ExecAsync(() => callback(client.Put(value, options)));
         }
 
         public void Delete(string bucket, string key, Action<RiakResult> callback, RiakDeleteOptions options = null)
         {
-            ExecAsync(() => callback(_client.Delete(bucket, key, options)));
+            ExecAsync(() => callback(client.Delete(bucket, key, options)));
         }
 
         public void Delete(RiakObjectId objectId, Action<RiakResult> callback, RiakDeleteOptions options = null)
         {
-            ExecAsync(() => callback(_client.Delete(objectId.Bucket, objectId.Key, options)));
+            ExecAsync(() => callback(client.Delete(objectId.Bucket, objectId.Key, options)));
         }
 
         public void Delete(IEnumerable<RiakObjectId> objectIds, Action<IEnumerable<RiakResult>> callback, RiakDeleteOptions options = null)
         {
-            ExecAsync(() => callback(_client.Delete(objectIds, options)));
+            ExecAsync(() => callback(client.Delete(objectIds, options)));
         }
 
         public void MapReduce(RiakMapReduceQuery query, Action<RiakResult<RiakMapReduceResult>> callback)
         {
-            ExecAsync(() => callback(_client.MapReduce(query)));
+            ExecAsync(() => callback(client.MapReduce(query)));
         }
 
         public void StreamMapReduce(RiakMapReduceQuery query, Action<RiakResult<RiakStreamedMapReduceResult>> callback)
         {
-            ExecAsync(() => callback(_client.StreamMapReduce(query)));
+            ExecAsync(() => callback(client.StreamMapReduce(query)));
         }
 
         public void ListBuckets(Action<RiakResult<IEnumerable<string>>> callback)
         {
-            ExecAsync(() => callback(_client.ListBuckets()));
+            ExecAsync(() => callback(client.ListBuckets()));
         }
 
         public void ListKeys(string bucket, Action<RiakResult<IEnumerable<string>>> callback)
         {
-            ExecAsync(() => callback(_client.ListKeys(bucket)));
+            ExecAsync(() => callback(client.ListKeys(bucket)));
         }
 
         public void StreamListKeys(string bucket, Action<RiakResult<IEnumerable<string>>> callback)
         {
-            ExecAsync(() => callback(_client.StreamListKeys(bucket)));
+            ExecAsync(() => callback(client.StreamListKeys(bucket)));
         }
 
         public void GetBucketProperties(string bucket, Action<RiakResult<RiakBucketProperties>> callback)
         {
-            ExecAsync(() => callback(_client.GetBucketProperties(bucket)));
+            ExecAsync(() => callback(client.GetBucketProperties(bucket)));
         }
 
         public void SetBucketProperties(string bucket, RiakBucketProperties properties, Action<RiakResult> callback)
         {
-            ExecAsync(() => callback(_client.SetBucketProperties(bucket, properties)));
+            ExecAsync(() => callback(client.SetBucketProperties(bucket, properties)));
         }
 
         public void WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks, Action<RiakResult<IList<RiakObject>>> callback)
         {
-            ExecAsync(() => callback(_client.WalkLinks(riakObject, riakLinks)));
+            ExecAsync(() => callback(client.WalkLinks(riakObject, riakLinks)));
         }
 
         public void GetServerInfo(Action<RiakResult<RiakServerInfo>> callback)
         {
-            ExecAsync(() => callback(_client.GetServerInfo()));
+            ExecAsync(() => callback(client.GetServerInfo()));
         }
 
         private static void ExecAsync(Action action)

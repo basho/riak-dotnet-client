@@ -17,12 +17,12 @@
 // under the License.
 // </copyright>
 
-using System;
-using System.Collections.Generic;
-using RiakClient.Comms;
-
 namespace RiakClient
 {
+    using System;
+    using System.Collections.Generic;
+    using Comms;
+
     public interface IRiakEndPoint : IDisposable
     {
         TimeSpan RetryWaitTime { get; set; }
@@ -30,6 +30,7 @@ namespace RiakClient
         IRiakClient CreateClient();
 
         RiakResult<TResult> UseConnection<TResult>(Func<IRiakConnection, RiakResult<TResult>> useFun, int retryAttempts);
+
         RiakResult UseConnection(Func<IRiakConnection, RiakResult> useFun, int retryAttempts);
 
         RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun, int retryAttempts)

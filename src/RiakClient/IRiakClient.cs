@@ -23,11 +23,10 @@ namespace RiakClient
 
     public interface IRiakClient : IRiakBatchClient
     {
+        IRiakAsyncClient Async { get; }
+
         void Batch(Action<IRiakBatchClient> batchAction);
 
         T Batch<T>(Func<IRiakBatchClient, T> batchFunction);
-
-        IRiakAsyncClient Async { get; }
-
     }
 }

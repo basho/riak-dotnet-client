@@ -48,24 +48,24 @@ namespace RiakClient
         private const string InvalidKeyErrorMessage = "Key cannot be blank or contain forward-slashes";
         private const string InvalidBucketTypeErrorMessage = "Bucket type cannot be blank or contain forward-slashes";
 
-        private readonly IRiakEndPoint _endPoint;
-        private readonly IRiakConnection _batchConnection;
-
-        public int RetryCount { get; set; }
-
-        public IRiakAsyncClient Async { get; private set; }
+        private readonly IRiakEndPoint endPoint;
+        private readonly IRiakConnection batchConnection;
 
         internal RiakClient(IRiakEndPoint endPoint)
         {
-            _endPoint = endPoint;
+            this.endPoint = endPoint;
             Async = new RiakAsyncClient(this);
         }
 
         private RiakClient(IRiakConnection batchConnection)
         {
-            _batchConnection = batchConnection;
+            this.batchConnection = batchConnection;
             Async = new RiakAsyncClient(this);
         }
+
+        public int RetryCount { get; set; }
+
+        public IRiakAsyncClient Async { get; private set; }
 
         /// <summary>
         /// Ping this instance of Riak
@@ -255,8 +255,8 @@ namespace RiakClient
         /// get requests and returns results as an IEnumerable{RiakResult{RiakObject}}. Callers should be aware that
         /// this may result in partial success - all results should be evaluated individually in the calling application.
         /// In addition, applications should plan for multiple failures or multiple cases of siblings being present.</remarks>
-        public IEnumerable<RiakResult<RiakObject>> Get(IEnumerable<RiakObjectId> objectIds,
-                                                       RiakGetOptions options = null)
+        public IEnumerable<RiakResult<RiakObject>> Get(
+            IEnumerable<RiakObjectId> objectIds, RiakGetOptions options = null)
         {
             objectIds = objectIds.ToList();
 
@@ -482,21 +482,6 @@ namespace RiakClient
             return results.Value;
         }
 
-        private static RiakResult<IEnumerable<RiakResult>> Delete(IRiakConnection conn,
-            IEnumerable<RiakObjectId> objectIds, RiakDeleteOptions options = null)
-        {
-            options = options ?? new RiakDeleteOptions();
-
-            var responses = objectIds.Select(id =>
-                {
-                    var req = new RpbDelReq { bucket = id.Bucket.ToRiakString(), key = id.Key.ToRiakString() };
-                    options.Populate(req);
-                    return conn.PbcWriteRead(req, MessageCode.RpbDelResp);
-                }).ToList();
-
-            return RiakResult<IEnumerable<RiakResult>>.Success(responses);
-        }
-
         /// <summary>
         /// Execute a map reduce query.
         /// </summary>
@@ -596,21 +581,6 @@ namespace RiakClient
             return RiakResult<IEnumerable<string>>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
 
-        private static Func<RiakResult<RpbListBucketsResp>, bool> ListBucketsRepeatRead()
-        {
-            return lbr =>
-                lbr.IsSuccess && !lbr.Value.done;
-        }
-
-        private static void WarnAboutListBuckets()
-        {
-            if (DisableListBucketsWarning)
-                return;
-            System.Diagnostics.Debug.Write(ListBucketsWarning);
-            System.Diagnostics.Trace.TraceWarning(ListBucketsWarning);
-            Console.WriteLine(ListBucketsWarning);
-        }
-
         /// <summary>
         /// Lists all buckets available on the Riak cluster. This uses an <see cref="System.Collections.Generic.IEnumerable&lt;T&gt;"/> 
         /// of <see cref="string"/> to lazy initialize the collection of bucket names. 
@@ -667,40 +637,6 @@ namespace RiakClient
         public RiakResult<IEnumerable<string>> ListKeys(string bucketType, string bucket)
         {
             return UseConnection(conn => ListKeys(conn, bucketType, bucket));
-        }
-
-        private static RiakResult<IEnumerable<string>> ListKeys(IRiakConnection conn, string bucketType, string bucket)
-        {
-            WarnAboutListKeys();
-
-            var lkReq = new RpbListKeysReq
-            {
-                type = bucketType.ToRiakString(),
-                bucket = bucket.ToRiakString()
-            };
-            var result = conn.PbcWriteRead<RpbListKeysReq, RpbListKeysResp>(lkReq,
-                ListKeysRepeatRead());
-            if (result.IsSuccess)
-            {
-                var keys = result.Value.Where(r => r.IsSuccess).SelectMany(r => r.Value.keys).Select(k => k.FromRiakString()).Distinct().ToList();
-                return RiakResult<IEnumerable<string>>.Success(keys);
-            }
-            return RiakResult<IEnumerable<string>>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
-        }
-
-        private static Func<RiakResult<RpbListKeysResp>, bool> ListKeysRepeatRead()
-        {
-            return lkr =>
-                lkr.IsSuccess && !lkr.Value.done;
-        }
-
-        private static void WarnAboutListKeys()
-        {
-            if (DisableListKeysWarning)
-                return;
-            System.Diagnostics.Debug.Write(ListKeysWarning);
-            System.Diagnostics.Trace.TraceWarning(ListKeysWarning);
-            Console.WriteLine(ListKeysWarning);
         }
 
         /// <summary>
@@ -770,14 +706,16 @@ namespace RiakClient
 
         public RiakResult<RiakBucketProperties> GetBucketProperties(string bucketType, string bucket)
         {
-            var bpReq = new RpbGetBucketReq { type = bucketType.ToRiakString(), bucket = bucket.ToRiakString() };
-            var result = UseConnection(conn => conn.PbcWriteRead<RpbGetBucketReq, RpbGetBucketResp>(bpReq));
+            var getBucketRequest = new RpbGetBucketReq { type = bucketType.ToRiakString(), bucket = bucket.ToRiakString() };
+
+            var result = UseConnection(conn => conn.PbcWriteRead<RpbGetBucketReq, RpbGetBucketResp>(getBucketRequest));
 
             if (result.IsSuccess)
             {
                 var props = new RiakBucketProperties(result.Value.props);
                 return RiakResult<RiakBucketProperties>.Success(props);
             }
+
             return RiakResult<RiakBucketProperties>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
 
@@ -805,37 +743,6 @@ namespace RiakClient
             return SetPbcBucketProperties(bucketType, bucket, properties);
         }
 
-        internal RiakResult SetHttpBucketProperties(string bucket, RiakBucketProperties properties)
-        {
-            var request = new RiakRestRequest(ToBucketUri(bucket), RiakConstants.Rest.HttpMethod.Put)
-            {
-                Body = properties.ToJsonString().ToRiakString(),
-                ContentType = RiakConstants.ContentTypes.ApplicationJson
-            };
-
-            var result = UseConnection(conn => conn.RestRequest(request));
-            if (result.IsSuccess && result.Value.StatusCode != HttpStatusCode.NoContent)
-            {
-                return RiakResult.Error(ResultCode.InvalidResponse,
-                    string.Format("Unexpected Status Code: {0} ({1})", result.Value.StatusCode, (int)result.Value.StatusCode), result.NodeOffline);
-            }
-
-            return result;
-        }
-
-        internal RiakResult SetPbcBucketProperties(string bucketType, string bucket, RiakBucketProperties properties)
-        {
-            var request = new RpbSetBucketReq
-            {
-                type = bucketType.ToRiakString(),
-                bucket = bucket.ToRiakString(),
-                props = properties.ToMessage()
-            };
-            var result = UseConnection(conn => conn.PbcWriteRead(request, MessageCode.RpbSetBucketResp));
-
-            return result;
-        }
-
         /// <summary>
         /// Reset the properties on a bucket back to their defaults.
         /// </summary>
@@ -857,38 +764,6 @@ namespace RiakClient
         public RiakResult ResetBucketProperties(string bucketType, string bucket)
         {
             return ResetPbcBucketProperties(bucketType, bucket);
-        }
-
-        internal RiakResult ResetPbcBucketProperties(string bucketType, string bucket)
-        {
-            var request = new RpbResetBucketReq
-            {
-                type = bucketType.ToRiakString(),
-                bucket = bucket.ToRiakString()
-            };
-            var result = UseConnection(conn => conn.PbcWriteRead(request, MessageCode.RpbResetBucketResp));
-            return result;
-        }
-
-        internal RiakResult ResetHttpBucketProperties(string bucket)
-        {
-            var request = new RiakRestRequest(ToBucketPropsUri(bucket), RiakConstants.Rest.HttpMethod.Delete);
-
-            var result = UseConnection(conn => conn.RestRequest(request));
-            if (result.IsSuccess)
-            {
-                switch (result.Value.StatusCode)
-                {
-                    case HttpStatusCode.NoContent:
-                        return result;
-                    case HttpStatusCode.NotFound:
-                        return RiakResult.Error(ResultCode.NotFound, string.Format("Bucket {0} not found.", bucket), false);
-                    default:
-                        return RiakResult.Error(ResultCode.InvalidResponse,
-                            string.Format("Unexpected Status Code: {0} ({1})", result.Value.StatusCode, (int)result.Value.StatusCode), result.NodeOffline);
-                }
-            }
-            return result;
         }
 
         /// <summary>
@@ -932,7 +807,7 @@ namespace RiakClient
                 var linkResultStrings = linkResults.SelectMany(lr => lr.ToList(), (lr, r) => new { lr, r })
                     .SelectMany(@t => @t.r.Values, (@t, s) => s.FromRiakString());
 
-                //var linkResultStrings = linkResults.SelectMany(g => g.Select(r => r.Values.Value.FromRiakString()));
+                // var linkResultStrings = linkResults.SelectMany(g => g.Select(r => r.Values.Value.FromRiakString()));
                 var rawLinks = linkResultStrings.SelectMany(RiakLink.ParseArrayFromJsonString).Distinct();
                 var oids = rawLinks.Select(l => new RiakObjectId(l.Bucket, l.Key)).ToList();
 
@@ -977,21 +852,6 @@ namespace RiakClient
             return StreamGetSecondaryIndexEquals(binIndex, value, options);
         }
 
-        private RiakResult<RiakStreamedIndexResult> StreamGetSecondaryIndexEquals(RiakIndexId index, string value, RiakIndexGetOptions options = null)
-        {
-            var message = new RpbIndexReq
-            {
-                type = index.BucketType.ToRiakString(),
-                bucket = index.BucketName.ToRiakString(),
-                index = index.IndexName.ToRiakString(),
-                qtype = RpbIndexReq.IndexQueryType.eq,
-                key = value.ToRiakString(),
-                stream = true
-            };
-
-            return StreamingIndexRead(message, options);
-        }
-
         public RiakResult<RiakStreamedIndexResult> StreamGetSecondaryIndex(RiakIndexId index, BigInteger min, BigInteger max, RiakIndexGetOptions options = null)
         {
             var intIndex = index.ToIntIndexId();
@@ -1002,40 +862,6 @@ namespace RiakClient
         {
             var binIndex = index.ToBinIndexId();
             return StreamGetSecondaryIndexRange(binIndex, min, max, options);
-        }
-
-        private RiakResult<RiakStreamedIndexResult> StreamGetSecondaryIndexRange(RiakIndexId index, string min, string max,
-                                                                                 RiakIndexGetOptions options = null)
-        {
-            var message = new RpbIndexReq
-            {
-                type = index.BucketType.ToRiakString(),
-                bucket = index.BucketName.ToRiakString(),
-                index = index.IndexName.ToRiakString(),
-                qtype = RpbIndexReq.IndexQueryType.range,
-                range_min = min.ToRiakString(),
-                range_max = max.ToRiakString(),
-                stream = true
-            };
-
-            return StreamingIndexRead(message, options);
-        }
-
-        private RiakResult<RiakStreamedIndexResult> StreamingIndexRead(RpbIndexReq message, RiakIndexGetOptions options)
-        {
-            options = options ?? new RiakIndexGetOptions();
-            options.Populate(message);
-            var result = UseDelayedConnection((conn, onFinish) => conn.PbcWriteStreamRead<RpbIndexReq, RpbIndexResp>(message, lbr => lbr.IsSuccess && !lbr.Value.done, onFinish));
-            if (result.IsSuccess)
-            {
-                return RiakResult<RiakStreamedIndexResult>.Success(new RiakStreamedIndexResult(ReturnTerms(options), result.Value));
-            }
-            return RiakResult<RiakStreamedIndexResult>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
-        }
-
-        private static bool ReturnTerms(RiakIndexGetOptions options)
-        {
-            return options.ReturnTerms != null && options.ReturnTerms.Value;
         }
 
         public RiakResult<RiakIndexResult> GetSecondaryIndex(RiakIndexId index, BigInteger minValue, BigInteger maxValue, RiakIndexGetOptions options = null)
@@ -1049,46 +875,6 @@ namespace RiakClient
             var binIndex = index.ToBinIndexId();
             return GetSecondaryIndexRange(binIndex, minValue, maxValue, options);
         }
-
-        private RiakResult<RiakIndexResult> GetSecondaryIndexRange(RiakIndexId index, string minValue, string maxValue, RiakIndexGetOptions options = null)
-        {
-            var message = new RpbIndexReq
-            {
-                type = index.BucketType.ToRiakString(),
-                bucket = index.BucketName.ToRiakString(),
-                index = index.IndexName.ToRiakString(),
-                qtype = RpbIndexReq.IndexQueryType.range,
-                range_min = minValue.ToRiakString(),
-                range_max = maxValue.ToRiakString()
-            };
-
-            options = options ?? new RiakIndexGetOptions();
-            options.Populate(message);
-
-            var result = UseConnection(conn => conn.PbcWriteRead<RpbIndexReq, RpbIndexResp>(message));
-
-            if (result.IsSuccess)
-            {
-                var r = RiakResult<RiakIndexResult>.Success(new RiakIndexResult(ReturnTerms(options), result));
-
-                if (result.Done.HasValue)
-                    r.SetDone(result.Done.Value);
-
-                if (result.Value.continuation != null)
-                {
-                    var continuation = result.Value.continuation.FromRiakString();
-
-                    if (!string.IsNullOrEmpty(continuation))
-                        r.SetContinuation(continuation);
-                }
-
-                return r;
-            }
-
-            return RiakResult<RiakIndexResult>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
-        }
-
-
 
         /// <summary>
         /// Retrieve an indexed values
@@ -1115,32 +901,6 @@ namespace RiakClient
             var binIndex = index.ToBinIndexId();
             return GetSecondaryIndexEquals(binIndex, value, options);
         }
-
-        private RiakResult<RiakIndexResult> GetSecondaryIndexEquals(RiakIndexId index, string value, RiakIndexGetOptions options = null)
-        {
-            var message = new RpbIndexReq
-            {
-                type = index.BucketType.ToRiakString(),
-                bucket = index.BucketName.ToRiakString(),
-                index = index.IndexName.ToRiakString(),
-                key = value.ToRiakString(),
-                qtype = RpbIndexReq.IndexQueryType.eq
-            };
-
-            options = options ?? new RiakIndexGetOptions();
-            options.Populate(message);
-
-            var result = UseConnection(conn => conn.PbcWriteRead<RpbIndexReq, RpbIndexResp>(message));
-
-            if (result.IsSuccess)
-            {
-                return RiakResult<RiakIndexResult>.Success(new RiakIndexResult(ReturnTerms(options), result));
-            }
-
-            return RiakResult<RiakIndexResult>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
-        }
-
-
 
         /// <summary>
         /// Used to create a batched set of actions to be sent to a Riak cluster. This guarantees some level of serialized activity.
@@ -1169,8 +929,10 @@ namespace RiakClient
                 }
                 catch (Exception ex)
                 {
-                    return RiakResult<IEnumerable<RiakResult<object>>>.Error(ResultCode.BatchException,
-                        string.Format("{0}\n{1}", ex.Message, ex.StackTrace), true);
+                    return RiakResult<IEnumerable<RiakResult<object>>>.Error(
+                        ResultCode.BatchException,
+                        string.Format("{0}\n{1}", ex.Message, ex.StackTrace),
+                        true);
                 }
                 finally
                 {
@@ -1178,7 +940,7 @@ namespace RiakClient
                 }
             };
 
-            var result = _endPoint.UseDelayedConnection(helperBatchFun, RetryCount);
+            var result = endPoint.UseDelayedConnection(helperBatchFun, RetryCount);
 
             if (!result.IsSuccess && result.ResultCode == ResultCode.BatchException)
             {
@@ -1188,41 +950,8 @@ namespace RiakClient
             return funResult;
         }
 
-        private RiakResult UseConnection(Func<IRiakConnection, RiakResult> op)
-        {
-            return _batchConnection != null ? op(_batchConnection) : _endPoint.UseConnection(op, RetryCount);
-        }
-
-        private RiakResult<TResult> UseConnection<TResult>(Func<IRiakConnection, RiakResult<TResult>> op)
-        {
-            return _batchConnection != null ? op(_batchConnection) : _endPoint.UseConnection(op, RetryCount);
-        }
-
-        private RiakResult<IEnumerable<RiakResult<TResult>>> UseDelayedConnection<TResult>(
-            Func<IRiakConnection, Action, RiakResult<IEnumerable<RiakResult<TResult>>>> op)
-        {
-            return _batchConnection != null
-                ? op(_batchConnection, () => { })
-                : _endPoint.UseDelayedConnection(op, RetryCount);
-        }
-
-        private static string ToBucketUri(string bucket)
-        {
-            return string.Format("{0}/{1}", RiakConstants.Rest.Uri.RiakRoot, HttpUtility.UrlEncode(bucket));
-        }
-
-        private static string ToBucketPropsUri(string bucket)
-        {
-            return string.Format(RiakConstants.Rest.Uri.BucketPropsFmt, HttpUtility.UrlEncode(bucket));
-        }
-
-        internal static RiakGetOptions DefaultGetOptions()
-        {
-            return (new RiakGetOptions()).SetR(RiakConstants.Defaults.RVal);
-        }
-
-        public RiakResult<RiakObject> DtFetch(string bucketType, string bucket, string key,
-                                              RiakDtFetchOptions options = null)
+        public RiakResult<RiakObject> DtFetch(
+            string bucketType, string bucket, string key, RiakDtFetchOptions options = null)
         {
             return DtFetch(new RiakObjectId(bucketType, bucket, key), options);
         }
@@ -1242,16 +971,13 @@ namespace RiakClient
 
             var result = UseConnection(conn => conn.PbcWriteRead<DtFetchReq, DtFetchResp>(message));
 
-            return result.IsSuccess ? RiakResult<RiakObject>.Success(new RiakObject(new RiakObjectId(riakObject.BucketType,
-                                                                                                     riakObject.Bucket,
-                                                                                                     riakObject.Key),
-                                                                                    result))
+            return result.IsSuccess ?
+                RiakResult<RiakObject>.Success(new RiakObject(new RiakObjectId(riakObject.BucketType, riakObject.Bucket, riakObject.Key), result))
                 : RiakResult<RiakObject>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
 
-
-        public RiakCounterResult DtFetchCounter(string bucketType, string bucket, string key,
-                                                RiakDtFetchOptions options = null)
+        public RiakCounterResult DtFetchCounter(
+            string bucketType, string bucket, string key, RiakDtFetchOptions options = null)
         {
             return DtFetchCounter(new RiakObjectId(bucketType, bucket, key), options);
         }
@@ -1288,14 +1014,14 @@ namespace RiakClient
             return rcr;
         }
 
-        public RiakCounterResult DtUpdateCounter(string bucketType, string bucket, string key,
-                                                 long amount, RiakDtUpdateOptions options = null)
+        public RiakCounterResult DtUpdateCounter(
+            string bucketType, string bucket, string key, long amount, RiakDtUpdateOptions options = null)
         {
             return DtUpdateCounter(new RiakObjectId(bucketType, bucket, key), amount, options);
         }
 
-        public RiakCounterResult DtUpdateCounter(RiakObjectId objectId, long amount,
-                                                 RiakDtUpdateOptions options = null)
+        public RiakCounterResult DtUpdateCounter(
+            RiakObjectId objectId, long amount, RiakDtUpdateOptions options = null)
         {
             var request = new DtUpdateReq
             {
@@ -1362,24 +1088,26 @@ namespace RiakClient
             return rsr;
         }
 
-        public RiakDtSetResult DtUpdateSet<T>(string bucketType,
-                                              string bucket,
-                                              string key,
-                                              SerializeObjectToByteArray<T> serialize,
-                                              byte[] context,
-                                              List<T> adds = null,
-                                              List<T> removes = null,
-                                              RiakDtUpdateOptions options = null)
+        public RiakDtSetResult DtUpdateSet<T>(
+            string bucketType,
+            string bucket,
+            string key,
+            SerializeObjectToByteArray<T> serialize,
+            byte[] context,
+            List<T> adds = null,
+            List<T> removes = null,
+            RiakDtUpdateOptions options = null)
         {
             return DtUpdateSet(new RiakObjectId(bucketType, bucket, key), serialize, context, adds, removes, options);
         }
 
-        public RiakDtSetResult DtUpdateSet<T>(RiakObjectId objectId,
-                                              SerializeObjectToByteArray<T> serialize,
-                                              byte[] context,
-                                              List<T> adds = null,
-                                              List<T> removes = null,
-                                              RiakDtUpdateOptions options = null)
+        public RiakDtSetResult DtUpdateSet<T>(
+            RiakObjectId objectId,
+            SerializeObjectToByteArray<T> serialize,
+            byte[] context,
+            List<T> adds = null,
+            List<T> removes = null,
+            RiakDtUpdateOptions options = null)
         {
             var request = new DtUpdateReq
             {
@@ -1413,7 +1141,8 @@ namespace RiakClient
             return rdsr;
         }
 
-        public RiakDtMapResult DtFetchMap(string bucket,
+        public RiakDtMapResult DtFetchMap(
+            string bucket,
             string key,
             string bucketType = null,
             RiakDtFetchOptions options = null)
@@ -1421,8 +1150,9 @@ namespace RiakClient
             return DtFetchMap(new RiakObjectId(bucketType, bucket, key), options);
         }
 
-        public RiakDtMapResult DtFetchMap(RiakObjectId objectId,
-                                          RiakDtFetchOptions options = null)
+        public RiakDtMapResult DtFetchMap(
+            RiakObjectId objectId,
+            RiakDtFetchOptions options = null)
         {
             var message = new DtFetchReq
             {
@@ -1452,31 +1182,37 @@ namespace RiakClient
             return rmr;
         }
 
-        public RiakDtMapResult DtUpdateMap<T>(string bucketType,
-                                              string bucket,
-                                              string key,
-                                              SerializeObjectToByteArray<T> serialize,
-                                              byte[] context,
-                                              List<RiakDtMapField> removes = null,
+        public RiakDtMapResult DtUpdateMap<T>(
+            string bucketType,
+            string bucket,
+            string key,
+            SerializeObjectToByteArray<T> serialize,
+            byte[] context,
+            List<RiakDtMapField> removes = null,
             /* Is this the right way to represent updates?
              * It seems like there should be something better, but it requires data
              * structures that track themselves and my guess is building the update
              * should be handled long before we get to calling DtUpdateMap<T>
              */
-                                              List<MapUpdate> updates = null,
-                                              RiakDtUpdateOptions options = null
-            )
+            List<MapUpdate> updates = null,
+            RiakDtUpdateOptions options = null)
         {
-            return DtUpdateMap(new RiakObjectId(bucketType, bucket, key),
-                               serialize, context, removes, updates, options);
+            return DtUpdateMap(
+                new RiakObjectId(bucketType, bucket, key),
+                serialize,
+                context,
+                removes,
+                updates,
+                options);
         }
 
-        public RiakDtMapResult DtUpdateMap<T>(RiakObjectId objectId,
-                                              SerializeObjectToByteArray<T> serialize,
-                                              byte[] context,
-                                              List<RiakDtMapField> removes = null,
-                                              List<MapUpdate> updates = null,
-                                              RiakDtUpdateOptions options = null)
+        public RiakDtMapResult DtUpdateMap<T>(
+            RiakObjectId objectId,
+            SerializeObjectToByteArray<T> serialize,
+            byte[] context,
+            List<RiakDtMapField> removes = null,
+            List<MapUpdate> updates = null,
+            RiakDtUpdateOptions options = null)
         {
             var request = new DtUpdateReq
             {
@@ -1557,16 +1293,304 @@ namespace RiakClient
             return UseConnection(conn => conn.PbcWriteRead(request, MessageCode.RpbPutResp));
         }
 
-        public RiakResult<String> GetServerStatus()
+        public RiakResult<string> GetServerStatus()
         {
             var request = new RiakRestRequest(RiakConstants.Rest.Uri.StatsRoot, RiakConstants.Rest.HttpMethod.Get);
             var result = UseConnection(conn => conn.RestRequest(request));
             if (!result.IsSuccess || result.Value.StatusCode != HttpStatusCode.OK)
-                return RiakResult<string>.Error(ResultCode.InvalidResponse,
-                                                string.Format("Unexpected Status Code: {0} ({1})", result.Value.StatusCode, (int)result.Value.StatusCode),
-                                                result.NodeOffline);
+            {
+                return RiakResult<string>.Error(
+                    ResultCode.InvalidResponse,
+                    string.Format("Unexpected Status Code: {0} ({1})", result.Value.StatusCode, (int)result.Value.StatusCode),
+                    result.NodeOffline);
+            }
 
             return RiakResult<string>.Success(result.Value.Body);
+        }
+
+        internal static RiakGetOptions DefaultGetOptions()
+        {
+            return (new RiakGetOptions()).SetR(RiakConstants.Defaults.RVal);
+        }
+
+        internal RiakResult SetHttpBucketProperties(string bucket, RiakBucketProperties properties)
+        {
+            var request = new RiakRestRequest(ToBucketUri(bucket), RiakConstants.Rest.HttpMethod.Put)
+            {
+                Body = properties.ToJsonString().ToRiakString(),
+                ContentType = RiakConstants.ContentTypes.ApplicationJson
+            };
+
+            var result = UseConnection(conn => conn.RestRequest(request));
+            if (result.IsSuccess && result.Value.StatusCode != HttpStatusCode.NoContent)
+            {
+                return RiakResult.Error(
+                    ResultCode.InvalidResponse,
+                    string.Format("Unexpected Status Code: {0} ({1})", result.Value.StatusCode, (int)result.Value.StatusCode),
+                    result.NodeOffline);
+            }
+
+            return result;
+        }
+
+        internal RiakResult ResetPbcBucketProperties(string bucketType, string bucket)
+        {
+            var request = new RpbResetBucketReq
+            {
+                type = bucketType.ToRiakString(),
+                bucket = bucket.ToRiakString()
+            };
+            var result = UseConnection(conn => conn.PbcWriteRead(request, MessageCode.RpbResetBucketResp));
+            return result;
+        }
+
+        internal RiakResult ResetHttpBucketProperties(string bucket)
+        {
+            var request = new RiakRestRequest(ToBucketPropsUri(bucket), RiakConstants.Rest.HttpMethod.Delete);
+
+            var result = UseConnection(conn => conn.RestRequest(request));
+            if (result.IsSuccess)
+            {
+                switch (result.Value.StatusCode)
+                {
+                    case HttpStatusCode.NoContent:
+                        return result;
+                    case HttpStatusCode.NotFound:
+                        return RiakResult.Error(ResultCode.NotFound, string.Format("Bucket {0} not found.", bucket), false);
+                    default:
+                        return RiakResult.Error(
+                            ResultCode.InvalidResponse,
+                            string.Format("Unexpected Status Code: {0} ({1})", result.Value.StatusCode, (int)result.Value.StatusCode),
+                            result.NodeOffline);
+                }
+            }
+            return result;
+        }
+
+        internal RiakResult SetPbcBucketProperties(string bucketType, string bucket, RiakBucketProperties properties)
+        {
+            var request = new RpbSetBucketReq
+            {
+                type = bucketType.ToRiakString(),
+                bucket = bucket.ToRiakString(),
+                props = properties.ToMessage()
+            };
+            var result = UseConnection(conn => conn.PbcWriteRead(request, MessageCode.RpbSetBucketResp));
+
+            return result;
+        }
+
+        private static RiakResult<IEnumerable<RiakResult>> Delete(
+            IRiakConnection conn,
+            IEnumerable<RiakObjectId> objectIds,
+            RiakDeleteOptions options = null)
+        {
+            options = options ?? new RiakDeleteOptions();
+
+            var responses = objectIds.Select(id =>
+                {
+                    var req = new RpbDelReq { bucket = id.Bucket.ToRiakString(), key = id.Key.ToRiakString() };
+                    options.Populate(req);
+                    return conn.PbcWriteRead(req, MessageCode.RpbDelResp);
+                }).ToList();
+
+            return RiakResult<IEnumerable<RiakResult>>.Success(responses);
+        }
+
+        private static Func<RiakResult<RpbListBucketsResp>, bool> ListBucketsRepeatRead()
+        {
+            return lbr =>
+                lbr.IsSuccess && !lbr.Value.done;
+        }
+
+        private static void WarnAboutListBuckets()
+        {
+            if (DisableListBucketsWarning)
+                return;
+            System.Diagnostics.Debug.Write(ListBucketsWarning);
+            System.Diagnostics.Trace.TraceWarning(ListBucketsWarning);
+            Console.WriteLine(ListBucketsWarning);
+        }
+
+        private static RiakResult<IEnumerable<string>> ListKeys(IRiakConnection conn, string bucketType, string bucket)
+        {
+            WarnAboutListKeys();
+
+            var lkReq = new RpbListKeysReq
+            {
+                type = bucketType.ToRiakString(),
+                bucket = bucket.ToRiakString()
+            };
+
+            var result = conn.PbcWriteRead<RpbListKeysReq, RpbListKeysResp>(lkReq, ListKeysRepeatRead());
+
+            if (result.IsSuccess)
+            {
+                var keys = result.Value.Where(r => r.IsSuccess).SelectMany(r => r.Value.keys).Select(k => k.FromRiakString()).Distinct().ToList();
+                return RiakResult<IEnumerable<string>>.Success(keys);
+            }
+
+            return RiakResult<IEnumerable<string>>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
+        }
+
+        private static Func<RiakResult<RpbListKeysResp>, bool> ListKeysRepeatRead()
+        {
+            return lkr =>
+                lkr.IsSuccess && !lkr.Value.done;
+        }
+
+        private static void WarnAboutListKeys()
+        {
+            if (DisableListKeysWarning)
+            {
+                return;
+            }
+
+            System.Diagnostics.Debug.Write(ListKeysWarning);
+            System.Diagnostics.Trace.TraceWarning(ListKeysWarning);
+            Console.WriteLine(ListKeysWarning);
+        }
+
+        private static bool ReturnTerms(RiakIndexGetOptions options)
+        {
+            return options.ReturnTerms != null && options.ReturnTerms.Value;
+        }
+
+        private static string ToBucketUri(string bucket)
+        {
+            return string.Format("{0}/{1}", RiakConstants.Rest.Uri.RiakRoot, HttpUtility.UrlEncode(bucket));
+        }
+
+        private static string ToBucketPropsUri(string bucket)
+        {
+            return string.Format(RiakConstants.Rest.Uri.BucketPropsFmt, HttpUtility.UrlEncode(bucket));
+        }
+
+        private RiakResult<RiakStreamedIndexResult> StreamGetSecondaryIndexEquals(RiakIndexId index, string value, RiakIndexGetOptions options = null)
+        {
+            var message = new RpbIndexReq
+            {
+                type = index.BucketType.ToRiakString(),
+                bucket = index.BucketName.ToRiakString(),
+                index = index.IndexName.ToRiakString(),
+                qtype = RpbIndexReq.IndexQueryType.eq,
+                key = value.ToRiakString(),
+                stream = true
+            };
+
+            return StreamingIndexRead(message, options);
+        }
+
+        private RiakResult<RiakStreamedIndexResult> StreamGetSecondaryIndexRange(
+            RiakIndexId index,
+            string min,
+            string max,
+            RiakIndexGetOptions options = null)
+        {
+            var message = new RpbIndexReq
+            {
+                type = index.BucketType.ToRiakString(),
+                bucket = index.BucketName.ToRiakString(),
+                index = index.IndexName.ToRiakString(),
+                qtype = RpbIndexReq.IndexQueryType.range,
+                range_min = min.ToRiakString(),
+                range_max = max.ToRiakString(),
+                stream = true
+            };
+
+            return StreamingIndexRead(message, options);
+        }
+
+        private RiakResult<RiakStreamedIndexResult> StreamingIndexRead(RpbIndexReq message, RiakIndexGetOptions options)
+        {
+            options = options ?? new RiakIndexGetOptions();
+            options.Populate(message);
+            var result = UseDelayedConnection((conn, onFinish) => conn.PbcWriteStreamRead<RpbIndexReq, RpbIndexResp>(message, lbr => lbr.IsSuccess && !lbr.Value.done, onFinish));
+            if (result.IsSuccess)
+            {
+                return RiakResult<RiakStreamedIndexResult>.Success(new RiakStreamedIndexResult(ReturnTerms(options), result.Value));
+            }
+            return RiakResult<RiakStreamedIndexResult>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
+        }
+
+        private RiakResult<RiakIndexResult> GetSecondaryIndexRange(RiakIndexId index, string minValue, string maxValue, RiakIndexGetOptions options = null)
+        {
+            var message = new RpbIndexReq
+            {
+                type = index.BucketType.ToRiakString(),
+                bucket = index.BucketName.ToRiakString(),
+                index = index.IndexName.ToRiakString(),
+                qtype = RpbIndexReq.IndexQueryType.range,
+                range_min = minValue.ToRiakString(),
+                range_max = maxValue.ToRiakString()
+            };
+
+            options = options ?? new RiakIndexGetOptions();
+            options.Populate(message);
+
+            var result = UseConnection(conn => conn.PbcWriteRead<RpbIndexReq, RpbIndexResp>(message));
+
+            if (result.IsSuccess)
+            {
+                var r = RiakResult<RiakIndexResult>.Success(new RiakIndexResult(ReturnTerms(options), result));
+
+                if (result.Done.HasValue)
+                    r.SetDone(result.Done.Value);
+
+                if (result.Value.continuation != null)
+                {
+                    var continuation = result.Value.continuation.FromRiakString();
+
+                    if (!string.IsNullOrEmpty(continuation))
+                        r.SetContinuation(continuation);
+                }
+
+                return r;
+            }
+
+            return RiakResult<RiakIndexResult>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
+        }
+
+        private RiakResult<RiakIndexResult> GetSecondaryIndexEquals(RiakIndexId index, string value, RiakIndexGetOptions options = null)
+        {
+            var message = new RpbIndexReq
+            {
+                type = index.BucketType.ToRiakString(),
+                bucket = index.BucketName.ToRiakString(),
+                index = index.IndexName.ToRiakString(),
+                key = value.ToRiakString(),
+                qtype = RpbIndexReq.IndexQueryType.eq
+            };
+
+            options = options ?? new RiakIndexGetOptions();
+            options.Populate(message);
+
+            var result = UseConnection(conn => conn.PbcWriteRead<RpbIndexReq, RpbIndexResp>(message));
+
+            if (result.IsSuccess)
+            {
+                return RiakResult<RiakIndexResult>.Success(new RiakIndexResult(ReturnTerms(options), result));
+            }
+
+            return RiakResult<RiakIndexResult>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
+        }
+
+        private RiakResult UseConnection(Func<IRiakConnection, RiakResult> op)
+        {
+            return batchConnection != null ? op(batchConnection) : endPoint.UseConnection(op, RetryCount);
+        }
+
+        private RiakResult<TResult> UseConnection<TResult>(Func<IRiakConnection, RiakResult<TResult>> op)
+        {
+            return batchConnection != null ? op(batchConnection) : endPoint.UseConnection(op, RetryCount);
+        }
+
+        private RiakResult<IEnumerable<RiakResult<TResult>>> UseDelayedConnection<TResult>(
+            Func<IRiakConnection, Action, RiakResult<IEnumerable<RiakResult<TResult>>>> op)
+        {
+            return batchConnection != null
+                ? op(batchConnection, () => { })
+                : endPoint.UseDelayedConnection(op, RetryCount);
         }
     }
 }
