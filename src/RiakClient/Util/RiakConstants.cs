@@ -17,15 +17,23 @@
 // under the License.
 // </copyright>
 
-using System;
-using System.Collections.Generic;
-using RiakClient.Messages;
-
 namespace RiakClient.Util
 {
+    using System;
+    using System.Collections.Generic;
+    using Messages;
+
     public static class RiakConstants
     {
         public const string DefaultBucketType = null;
+
+        internal static readonly Dictionary<string, uint> QuorumOptionsLookup = new Dictionary<string, uint>
+            {
+                { "one", QuorumOptions.One },
+                { "quorum", QuorumOptions.Quorum },
+                { "all", QuorumOptions.All },
+                { "default", QuorumOptions.Default }
+            };
 
         public static class RiakEnterprise
         {
@@ -51,7 +59,7 @@ namespace RiakClient.Util
             public const string ImagePng = @"image/png";
             public const string ErlangBinary = @"application/x-erlang-binary";
             public const string Xml = @"application/xml";
-            public const string ProtocolBuffers = ApplicationOctetStream; //@"application/x-protobuf";
+            public const string ProtocolBuffers = ApplicationOctetStream; // @"application/x-protobuf";
         }
 
         public static class IndexSuffix
@@ -82,31 +90,24 @@ namespace RiakClient.Util
 
         public static class QuorumOptions
         {
-            private const uint UintMax = UInt32.MaxValue;
             public const uint One = UintMax - 1;
             public const uint Quorum = UintMax - 2;
             public const uint All = UintMax - 3;
             public const uint Default = UintMax - 4;
-        }
 
-        internal static Dictionary<string, uint> QuorumOptionsLookup = new Dictionary<string, uint>
-        {
-            {"one", QuorumOptions.One},
-            {"quorum", QuorumOptions.Quorum},
-            {"all", QuorumOptions.All},
-            {"default", QuorumOptions.Default}
-        };
+            private const uint UintMax = uint.MaxValue;
+        }
 
         public static class Defaults
         {
+            public const uint RVal = QuorumOptions.Default;
+            public const string ContentType = ContentTypes.ApplicationJson;
+            public const string CharSet = CharSets.Utf8;
+
             public static class Rest
             {
                 public const int Timeout = 30000;
             }
-
-            public const uint RVal = QuorumOptions.Default;
-            public const string ContentType = ContentTypes.ApplicationJson;
-            public const string CharSet = CharSets.Utf8;
 
             public static class YokozunaIndex
             {
@@ -131,8 +132,8 @@ namespace RiakClient.Util
             public const string RiakKeysIndex = "$key";
             public const string RiakBucketIndex = "$bucket";
 
-            public readonly static HashSet<string> SystemBinKeys = new HashSet<string> { RiakKeysIndex, RiakBucketIndex };
-            public readonly static HashSet<string> SystemIntKeys = new HashSet<string>();
+            public static readonly HashSet<string> SystemBinKeys = new HashSet<string> { RiakKeysIndex, RiakBucketIndex };
+            public static readonly HashSet<string> SystemIntKeys = new HashSet<string>();
         }
 
         public static class Rest
@@ -165,7 +166,6 @@ namespace RiakClient.Util
             {
                 public const string DisableCacheKey = @"Pragma";
                 public const string DisableCacheValue = @"no-cache";
-                //public const string ClientId = @"X-Riak-ClientId";
             }
 
             public static class HttpMethod

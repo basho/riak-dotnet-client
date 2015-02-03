@@ -17,20 +17,30 @@
 // under the License.
 // </copyright>
 
-using RiakClient.Extensions;
-using RiakClient.Messages;
-
 namespace RiakClient.Models
 {
+    using Extensions;
+    using Messages;
+
     public class RiakServerInfo
     {
-        public string Node { get; set; }
-        public string Version { get; set; }
+        private readonly string node;
+        private readonly string version;
 
         internal RiakServerInfo(RpbGetServerInfoResp resp)
         {
-            Node = resp.node.FromRiakString();
-            Version = resp.server_version.FromRiakString();
+            this.node = resp.node.FromRiakString();
+            this.version = resp.server_version.FromRiakString();
+        }
+
+        public string Node
+        {
+            get { return node; }
+        }
+
+        public string Version
+        {
+            get { return version; }
         }
     }
 }

@@ -17,24 +17,24 @@
 // under the License.
 // </copyright>
 
-using System;
-
 namespace RiakClient.Util
 {
+    using System;
+
     internal static class MonoUtil
     {
-        private static readonly bool isRunningOnMono = false;
+        private static readonly bool IsRunningOnMonoValue = false;
 
         static MonoUtil()
         {
-            isRunningOnMono = (null != Type.GetType("Mono.Runtime"));
+            IsRunningOnMonoValue = null != Type.GetType("Mono.Runtime");
         }
 
         internal static bool IsRunningOnMono
         {
             get
             {
-                return isRunningOnMono;
+                return IsRunningOnMonoValue;
             }
         }
     }
