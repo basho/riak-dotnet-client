@@ -89,6 +89,7 @@
     <Compile Include="Containers\IConcurrentEnumerator.cs" />
     <Compile Include="IRiakAsyncClient.cs" />
     <Compile Include="IRiakClient.cs" />
+    <Compile Include="Messages\RpbClasses.cs" />
     <Compile Include="Models\CommitHook\IRiakCommitHook.cs" />
     <Compile Include="Models\RiakBinIndexId.cs" />
     <Compile Include="Models\RiakDt\CounterOperation.cs" />
