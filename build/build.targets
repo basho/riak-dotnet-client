@@ -21,7 +21,7 @@
 
   <PropertyGroup>
     <VersionString Condition="'$(Configuration)' == 'Release'">unknown</VersionString>
-    <VersionString Condition="'$(Configuration)' != 'Release'">v0.0.0</VersionString>
+    <VersionString Condition="'$(Configuration)' != 'Release'">v2.0.0</VersionString> <!-- NB: increment this manually for non-Release builds -->
     <GitRemoteName>basho-labs</GitRemoteName>
     <GitCommitHash>unknown</GitCommitHash>
     <MasterBranchName>master</MasterBranchName>
