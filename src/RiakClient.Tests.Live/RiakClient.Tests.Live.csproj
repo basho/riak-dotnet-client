@@ -65,6 +65,7 @@
     <Compile Include="DataTypes\BasicMapSetDtTests.cs" />
     <Compile Include="DataTypes\BasicSetDtTests.cs" />
     <Compile Include="DataTypes\DataTypeTestsBase.cs" />
+    <Compile Include="DataTypes\MapDtEdgeCaseTests.cs" />
     <Compile Include="DataTypes\SetDtEdgeCaseTests.cs" />
     <Compile Include="Extensions\IntegrationTestExtensions.cs" />
     <Compile Include="Extensions\IntegrationTestExtensionsTest.cs" />
