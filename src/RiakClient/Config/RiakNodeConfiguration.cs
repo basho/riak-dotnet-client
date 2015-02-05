@@ -22,7 +22,7 @@ namespace RiakClient.Config
     using System;
     using System.Configuration;
 
-    public class RiakNodeConfiguration : ConfigurationElement, IRiakNodeConfiguration
+    public sealed class RiakNodeConfiguration : ConfigurationElement, IRiakNodeConfiguration
     {
         private static readonly TimeSpan DefaultTimeout = TimeSpan.FromMilliseconds(4000);
 
