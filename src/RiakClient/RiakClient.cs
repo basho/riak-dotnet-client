@@ -1349,16 +1349,24 @@ namespace RiakClient
             var result = UseConnection(conn => conn.PbcWriteRead<DtFetchReq, DtFetchResp>(message));
 
             if (!result.IsSuccess)
-                return new RiakDtSetResult(RiakResult<RiakObject>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline));
+            {
+                return
+                    new RiakDtSetResult(RiakResult<RiakObject>.Error(result.ResultCode, result.ErrorMessage,
+                        result.NodeOffline));
+            }
 
             var rsr =
                 new RiakDtSetResult(RiakResult<RiakObject>.Success(new RiakObject(objectId, result.Value)));
 
             if (options.IncludeContext)
+            {
                 rsr.Context = result.Value.context;
+            }
 
             if (result.Value.value != null)
+            {
                 rsr.Values = result.Value.value.set_value;
+            }
 
             return rsr;
         }
@@ -1382,6 +1390,11 @@ namespace RiakClient
                                               List<T> removes = null,
                                               RiakDtUpdateOptions options = null)
         {
+            if (removes != null && removes.Count > 0 && context == null)
+            {
+                throw new ArgumentNullException("context", "Set removal, but context was null");
+            }
+
             var request = new DtUpdateReq
             {
                 type = objectId.BucketType.ToRiakString(),
@@ -1395,23 +1408,31 @@ namespace RiakClient
             options.Populate(request);
 
             if (adds != null)
+            {
                 request.op.set_op.adds.AddRange(adds.Select(a => serialize(a)));
+            }
 
             if (removes != null)
+            {
                 request.op.set_op.removes.AddRange(removes.Select(r => serialize(r)));
+            }
 
             var response = UseConnection(conn => conn.PbcWriteRead<DtUpdateReq, DtUpdateResp>(request));
 
-            var rdsr =
+            var resultSet =
                 new RiakDtSetResult(RiakResult<RiakObject>.Success(new RiakObject(objectId, response.Value)));
 
-            if (options.IncludeContext)
-                rdsr.Context = response.Value.context;
+            if (options.IncludeContext && response.Value != null)
+            {
+                resultSet.Context = response.Value.context;
+            }
 
-            if (options.ReturnBody)
-                rdsr.Values = response.Value.set_value;
+            if (options.ReturnBody && response.Value != null)
+            {
+                resultSet.Values = response.Value.set_value;
+            }
 
-            return rdsr;
+            return resultSet;
         }
 
         public RiakDtMapResult DtFetchMap(string bucket,
