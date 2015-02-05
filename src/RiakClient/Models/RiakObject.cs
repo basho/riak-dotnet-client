@@ -456,6 +456,12 @@ namespace RiakClient.Models
             return CalculateHashCode();
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Microsoft.Design",
+            "CA1033:InterfaceMethodsShouldBeCallableByChildTypes",
+            Scope = "member",
+            Target = "RiakClient.Models.RiakObject.#RiakClient.Models.RiakObject.SetVClock()",
+            Justification = "Mucking with a VClock should require casting to IWriteableVClock. TODO - FUTURE: evaluate this decision")]
         void IWriteableVClock.SetVClock(byte[] vclock)
         {
             VectorClock = vclock;

@@ -24,6 +24,7 @@ namespace RiakClient
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
+    using System.Threading.Tasks;
     using Comms;
     using Comms.LoadBalancing;
     using Config;
@@ -36,7 +37,8 @@ namespace RiakClient
         private readonly ConcurrentQueue<IRiakNode> offlineNodes;
         private readonly TimeSpan nodePollTime;
         private readonly int defaultRetryCount;
-        private bool disposing;
+
+        private bool disposing = false;
 
         public RiakCluster(IRiakClusterConfiguration clusterConfig, IRiakConnectionFactory connectionFactory)
         {
@@ -49,7 +51,7 @@ namespace RiakClient
             defaultRetryCount = clusterConfig.DefaultRetryCount;
             RetryWaitTime = clusterConfig.DefaultRetryWaitTime;
 
-            // Task.Factory.StartNew(NodeMonitor);
+            Task.Factory.StartNew(NodeMonitor);
         }
 
         protected override int DefaultRetryCount
@@ -123,11 +125,14 @@ namespace RiakClient
             return RiakResult<IEnumerable<TResult>>.Error(ResultCode.ClusterOffline, "Unable to access functioning Riak node", true);
         }
 
-        public override void Dispose()
+        protected override void Dispose(bool disposing)
         {
-            disposing = true;
+            this.disposing = disposing;
 
-            nodes.ForEach(n => n.Dispose());
+            if (disposing)
+            {
+                nodes.ForEach(n => n.Dispose());
+            }
         }
 
         protected override TRiakResult UseConnection<TRiakResult>(
@@ -197,6 +202,7 @@ namespace RiakClient
             }
         }
 
+        // TODO: move to own class
         private void NodeMonitor()
         {
             while (!disposing)

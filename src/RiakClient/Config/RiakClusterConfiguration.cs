@@ -24,7 +24,7 @@ namespace RiakClient.Config
     using System.Configuration;
     using System.Linq;
 
-    public class RiakClusterConfiguration : ConfigurationSection, IRiakClusterConfiguration
+    public sealed class RiakClusterConfiguration : ConfigurationSection, IRiakClusterConfiguration
     {
         private static readonly TimeSpan DefaultNodePollTime = TimeSpan.FromSeconds(5);
         private static readonly TimeSpan DefaultDefaultRetryWaitTime = TimeSpan.FromMilliseconds(200);

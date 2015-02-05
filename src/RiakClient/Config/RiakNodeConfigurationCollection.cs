@@ -21,7 +21,7 @@ namespace RiakClient.Config
 {
     using System.Configuration;
 
-    public class RiakNodeConfigurationCollection : ConfigurationElementCollection
+    public sealed class RiakNodeConfigurationCollection : ConfigurationElementCollection
     {
         protected override ConfigurationElement CreateNewElement()
         {
