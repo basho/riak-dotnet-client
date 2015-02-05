@@ -20,27 +20,49 @@
 namespace RiakClient.Exceptions
 {
     using System;
-    using System.Collections;
-    using System.Collections.Generic;
+    using System.Runtime.Serialization;
+    using System.Security.Permissions;
 
-    // TODO: ensure that subclass is correct
+    // http://stackoverflow.com/questions/94488/what-is-the-correct-way-to-make-a-custom-net-exception-serializable
+    [Serializable]
     public class RiakException : Exception
     {
-        private readonly string errorMessage;
         private readonly uint errorCode;
         private readonly bool nodeOffline;
 
-        internal RiakException(uint errorCode, string errorMessage, bool nodeOffline)
+        public RiakException()
+        {
+        }
+
+        public RiakException(string message)
+            : base(message)
+        {
+        }
+
+        public RiakException(string message, Exception innerException)
+            : base(message, innerException)
+        {
+        }
+
+        public RiakException(uint errorCode, string message, bool nodeOffline)
+            : this(string.Format("Riak returned an error. Code '{0}'. Message: {1}", errorCode, message))
         {
             this.nodeOffline = nodeOffline;
             this.errorCode = errorCode;
-            this.errorMessage = string.Format("Riak returned an error. Code '{0}'. Message: {1}", this.errorCode, errorMessage);
         }
 
-        internal RiakException(string errorMessage, bool nodeOffline)
+        public RiakException(string message, bool nodeOffline)
+            : this(message)
         {
             this.nodeOffline = nodeOffline;
-            this.errorMessage = errorMessage;
+        }
+
+        [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
+        protected RiakException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+            this.errorCode = info.GetUInt32("ErrorCode");
+            this.nodeOffline = info.GetBoolean("NodeOffline");
         }
 
         public uint ErrorCode
@@ -48,31 +70,23 @@ namespace RiakClient.Exceptions
             get { return errorCode; }
         }
 
-        public string ErrorMessage
-        {
-            get { return errorMessage; }
-        }
-
-        public override string Message
-        {
-            get { return errorMessage; }
-        }
-
-        public override IDictionary Data
-        {
-            get
-            {
-                return new Dictionary<string, object>
-                {
-                    { "ErrorCode", errorCode },
-                    { "ErrorMessage", errorMessage }
-                };
-            }
-        }
-
-        internal bool NodeOffline
+        public bool NodeOffline
         {
             get { return nodeOffline; }
+        }
+
+        [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            if (info == null)
+            {
+                throw new ArgumentNullException("info");
+            }
+
+            info.AddValue("ErrorCode", errorCode);
+            info.AddValue("NodeOffline", nodeOffline);
+
+            base.GetObjectData(info, context);
         }
     }
 }

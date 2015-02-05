@@ -50,10 +50,16 @@ namespace RiakClient
             return UseConnection(useFun, RiakResult<TResult>.Error, retryAttempts);
         }
 
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
         public abstract RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun, int retryAttempts)
             where TResult : RiakResult;
 
-        public abstract void Dispose();
+        protected abstract void Dispose(bool disposing);
 
         protected abstract TRiakResult UseConnection<TRiakResult>(Func<IRiakConnection, TRiakResult> useFun, Func<ResultCode, string, bool, TRiakResult> onError, int retryAttempts)
             where TRiakResult : RiakResult;

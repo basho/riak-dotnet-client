@@ -17,25 +17,22 @@
 // under the License.
 // </copyright>
 
-using System;
-using System.IO;
-using System.Text;
-using Newtonsoft.Json;
-
 namespace RiakClientTests.Models.MapReduce.Inputs
 {
+    using System;
+    using System.IO;
+    using System.Text;
+    using Newtonsoft.Json;
+
     public abstract class MapReduceSerializationTestsBase
     {
         protected static string Serialize(Func<JsonWriter, JsonWriter> doWrite)
         {
             var sb = new StringBuilder();
-
-            using (var sw = new StringWriter(sb))
+            var sw = new StringWriter(sb);
+            using (JsonWriter writer = new JsonTextWriter(sw))
             {
-                using (JsonWriter writer = new JsonTextWriter(sw))
-                {
-                    doWrite(writer);
-                }
+                doWrite(writer);
             }
 
             return sb.ToString();
