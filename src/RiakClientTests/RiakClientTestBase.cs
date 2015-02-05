@@ -26,7 +26,7 @@ namespace RiakClientTests.RiakClientTests
     using RiakClient.Comms;
     using RiakClient.Config;
 
-    internal abstract class RiakClientTestBase<TRequest, TResult>
+    internal abstract class RiakClientTestBase<TRequest, TResult> : IDisposable
         where TRequest : class, ProtoBuf.IExtensible
         where TResult : class, ProtoBuf.IExtensible, new()
     {
@@ -37,6 +37,20 @@ namespace RiakClientTests.RiakClientTests
         protected Mock<IRiakConnectionFactory> ConnFactoryMock;
         protected RiakCluster Cluster;
         protected IRiakClient Client;
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing && Cluster != null)
+            {
+                Cluster.Dispose();
+            }
+        }
 
         protected void SetUpInternal()
         {

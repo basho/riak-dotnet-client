@@ -31,7 +31,7 @@ namespace RiakClientTests.RiakClientSetBucketPropertiesTests
     using RiakClient.Models.Rest;
     using RiakClient.Util;
 
-    public class MockCluster : IRiakEndPoint
+    public sealed class MockCluster : IRiakEndPoint
     {
         public Mock<IRiakConnection> ConnectionMock = new Mock<IRiakConnection>();
 
@@ -73,7 +73,7 @@ namespace RiakClientTests.RiakClientSetBucketPropertiesTests
         }
     }
 
-    public abstract class RiakClientSetBucketPropertiesTestBase
+    public abstract class RiakClientSetBucketPropertiesTestBase : IDisposable
     {
         protected MockCluster Cluster;
         protected RiakClient Client;
@@ -84,6 +84,20 @@ namespace RiakClientTests.RiakClientSetBucketPropertiesTests
             Cluster = new MockCluster();
             ClientId = System.Text.Encoding.Default.GetBytes("fadjskl").Take(4).ToArray();
             Client = new RiakClient(Cluster);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing && Cluster != null)
+            {
+                Cluster.Dispose();
+            }
         }
     }
 
