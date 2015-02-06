@@ -157,8 +157,9 @@
           Command="$(NUnitConsoleRunnerCommand) -work=$(ProjDir)\RiakClientTests.Live $(ProjDir)\RiakClientTests.Live\RiakClientTests.Live.nunit" />
   </Target>
 
-  <Target Name="CodeAnalysis"> <!-- DependsOnTargets="Debug;ResolveReferences;RunCodeAnalysis" -->
-    <MSBuild Projects="$(SolutionFile)" Properties="Configuration=Debug;VisualStudioVersion=12.0;CodeAnalysisTreatWarningsAsErrors=true;CodeAnalysisRuleSet=MinimumRecommendedRules.ruleset;RunCodeAnalysis=true" />
+  <Target Name="CodeAnalysis">
+    <MSBuild Projects="$(SolutionFile)"
+             Properties="Configuration=Debug;VisualStudioVersion=12.0;CodeAnalysisTreatWarningsAsErrors=true;CodeAnalysisRuleSet=MinimumRecommendedRules.ruleset;RunCodeAnalysis=true" />
   </Target>
 
   <Target Name="UnitTest" DependsOnTargets="GitSubmodule;Debug;CodeAnalysis">
