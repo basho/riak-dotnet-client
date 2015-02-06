@@ -1,4 +1,6 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// <copyright file="RiakMapReduceResult.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,22 +15,18 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using System.Collections.Generic;
-using System.Linq;
-using RiakClient.Extensions;
-using RiakClient.Messages;
+// </copyright>
 
 namespace RiakClient.Models.MapReduce
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using Extensions;
+    using Messages;
+
     public class RiakMapReduceResult : IRiakMapReduceResult
     {
-        private readonly IEnumerable<RiakMapReduceResultPhase> _phaseResults;
-
-        public IEnumerable<RiakMapReduceResultPhase> PhaseResults
-        {
-            get { return _phaseResults; }
-        }
+        private readonly IEnumerable<RiakMapReduceResultPhase> phaseResults;
 
         internal RiakMapReduceResult(IEnumerable<RiakResult<RpbMapRedResp>> response)
         {
@@ -42,7 +40,12 @@ namespace RiakClient.Models.MapReduce
                              PhaseResults = g.Select(rr => rr.Value)
                          };
 
-            _phaseResults = phases.OrderBy(p => p.Phase).Select(p => p.Success ? new RiakMapReduceResultPhase(p.Phase, p.PhaseResults) : new RiakMapReduceResultPhase()).ToList();
+            phaseResults = phases.OrderBy(p => p.Phase).Select(p => p.Success ? new RiakMapReduceResultPhase(p.Phase, p.PhaseResults) : new RiakMapReduceResultPhase()).ToList();
+        }
+
+        public IEnumerable<RiakMapReduceResultPhase> PhaseResults
+        {
+            get { return phaseResults; }
         }
     }
 }

@@ -1,4 +1,6 @@
+// <copyright file="UnaryTerm.cs" company="Basho Technologies, Inc.">
 // Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,12 +15,13 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
+// </copyright>
 
 namespace RiakClient.Models.Search
 {
     public class UnaryTerm : Term
     {
-        private readonly Token _value;
+        private readonly Token value;
 
         public UnaryTerm(RiakFluentSearch search, string field, string value)
             : this(search, field, Token.Is(value))
@@ -28,12 +31,12 @@ namespace RiakClient.Models.Search
         public UnaryTerm(RiakFluentSearch search, string field, Token value)
             : base(search, field)
         {
-            _value = value;
+            this.value = value;
         }
 
         public override string ToString()
         {
-            return Prefix() + Field() + _value + Suffix();
+            return Prefix() + Field() + value + Suffix();
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// <copyright file="RiakPutOptions.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,25 +15,41 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using System;
-using System.Collections.Generic;
-using RiakClient.Extensions;
-using RiakClient.Containers;
-using RiakClient.Messages;
-using RiakClient.Util;
+// </copyright>
 
 namespace RiakClient.Models
 {
+    using System;
+    using System.Collections.Generic;
+    using Containers;
+    using Extensions;
+    using Messages;
+    using Util;
+
     public class RiakPutOptions
     {
+        public RiakPutOptions()
+        {
+            ReturnBody = true;
+            W = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
+            Dw = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
+            Pw = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
+        }
+
         public Either<uint, string> W { get; private set; }
+
         public Either<uint, string> Dw { get; private set; }
+
         public Either<uint, string> Pw { get; private set; }
+
         public bool ReturnBody { get; set; }
+
         public bool IfNotModified { get; set; }
+
         public bool IfNoneMatch { get; set; }
+
         public bool ReturnHead { get; set; }
+
         public uint? Timeout { get; set; }
 
         public RiakPutOptions SetW(uint value)
@@ -94,14 +112,6 @@ namespace RiakClient.Models
             return this;
         }
 
-        public RiakPutOptions()
-        {
-            ReturnBody = true;
-            W = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
-            Dw = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
-            Pw = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
-        }
-
         internal void Populate(RpbPutReq request)
         {
             request.w = W.IsLeft ? W.Left : W.Right.ToRpbOption();
@@ -114,7 +124,9 @@ namespace RiakClient.Models
             request.return_body = ReturnBody;
 
             if (Timeout.HasValue)
+            {
                 request.timeout = Timeout.Value;
+            }
         }
 
         private RiakPutOptions WriteQuorum(string value, Action<Either<uint, string>> setter)
@@ -127,7 +139,7 @@ namespace RiakClient.Models
 
         private RiakPutOptions WriteQuorum(uint value, Action<Either<uint, string>> setter)
         {
-            System.Diagnostics.Debug.Assert(value >= 1);
+            System.Diagnostics.Debug.Assert(value >= 1, "value must be greater than or equal to 1");
 
             setter(new Either<uint, string>(value));
             return this;

@@ -1,5 +1,6 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
-// Copyright (c) 2015 - Basho Technologies, Inc.
+// <copyright file="StringExtensions.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -14,23 +15,22 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Web;
-using RiakClient.Util;
+// </copyright>
 
 namespace RiakClient.Extensions
 {
-    public static class StringExtensions
-    {
-        private static readonly Encoding RiakEncoding = new UTF8Encoding(false);
+    using System.Collections.Generic;
+    using System.Text;
+    using System.Text.RegularExpressions;
+    using System.Web;
+    using Util;
 
+    internal static class StringExtensions
+    {
         // + - && || ! ( ) { } [ ] ^ " ~ * ? : \
         private const string SearchTermPattern = @"[\+\-!\(\)\{\}\[\]^\""~\*\?\:\\]{1}";
         private const string SearchTermReplacement = @"\$&";
+        private static readonly Encoding RiakEncoding = new UTF8Encoding(false);
         private static readonly Regex SearchTermRegex = new Regex(SearchTermPattern, RegexOptions.Compiled);
 
         public static byte[] ToRiakString(this string value)
@@ -41,11 +41,6 @@ namespace RiakClient.Extensions
         public static string FromRiakString(this byte[] value)
         {
             return value == null ? null : RiakEncoding.GetString(value);
-        }
-
-        public static string Fmt(this string formatter, params object[] args)
-        {
-            return String.Format(formatter, args);
         }
 
         public static string UrlEncoded(this string value)
@@ -112,7 +107,7 @@ namespace RiakClient.Extensions
             return result;
         }
 
-        internal static uint ToRpbOption(this string value)
+        public static uint ToRpbOption(this string value)
         {
             System.Diagnostics.Debug.Assert(new HashSet<string> { "all", "quorum", "one", "default" }.Contains(value), "Incorrect quorum value");
 

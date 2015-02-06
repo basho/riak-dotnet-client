@@ -1,4 +1,6 @@
+// <copyright file="EndsWith.cs" company="Basho Technologies, Inc.">
 // Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,43 +15,44 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using Newtonsoft.Json;
-using System;
-using System.IO;
-using System.Text;
+// </copyright>
 
 namespace RiakClient.Models.MapReduce.KeyFilters
 {
+    using System;
+    using System.IO;
+    using System.Text;
+    using Newtonsoft.Json;
+
     /// <summary>
     /// Tests that the input ends with the argument (a string).
     /// </summary>
     internal class EndsWith : IRiakKeyFilterToken
     {
-        private readonly Tuple<string, string> _kfDefinition;
+        private readonly Tuple<string, string> keyFilterDefinition;
 
         public EndsWith(string arg)
         {
-            _kfDefinition = Tuple.Create("ends_with", arg);
+            keyFilterDefinition = Tuple.Create("ends_with", arg);
         }
 
         public string FunctionName
         {
-            get { return _kfDefinition.Item1; }
+            get { return keyFilterDefinition.Item1; }
         }
 
         public string Argument
         {
-            get { return _kfDefinition.Item2; }
+            get { return keyFilterDefinition.Item2; }
         }
 
         public string ToJsonString()
         {
             var sb = new StringBuilder();
 
-            using(var sw = new StringWriter(sb))
+            using (var sw = new StringWriter(sb))
             {
-                using(JsonWriter jw = new JsonTextWriter(sw))
+                using (JsonWriter jw = new JsonTextWriter(sw))
                 {
                     jw.WriteStartArray();
 

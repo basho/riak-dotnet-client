@@ -1,4 +1,6 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// <copyright file="RiakServerInfo.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,21 +15,32 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using RiakClient.Extensions;
-using RiakClient.Messages;
+// </copyright>
 
 namespace RiakClient.Models
 {
+    using Extensions;
+    using Messages;
+
     public class RiakServerInfo
     {
-        public string Node { get; set; }
-        public string Version { get; set; }
+        private readonly string node;
+        private readonly string version;
 
         internal RiakServerInfo(RpbGetServerInfoResp resp)
         {
-            Node = resp.node.FromRiakString();
-            Version = resp.server_version.FromRiakString();
+            this.node = resp.node.FromRiakString();
+            this.version = resp.server_version.FromRiakString();
+        }
+
+        public string Node
+        {
+            get { return node; }
+        }
+
+        public string Version
+        {
+            get { return version; }
         }
     }
 }

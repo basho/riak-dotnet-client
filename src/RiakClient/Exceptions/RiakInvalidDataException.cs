@@ -1,4 +1,6 @@
+// <copyright file="RiakInvalidDataException.cs" company="Basho Technologies, Inc.">
 // Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,24 +15,38 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using RiakClient.Extensions;
-using System;
+// </copyright>
 
 namespace RiakClient.Exceptions
 {
+    using System;
+
+    /*
+     * TODO: should be subclass of RiakException
+     */
     public class RiakInvalidDataException : Exception
     {
-        public byte MessageCode { get; private set; }
+        private readonly byte messageCode;
 
         public RiakInvalidDataException(byte messageCode)
         {
-            MessageCode = messageCode;
+            this.messageCode = messageCode;
+        }
+
+        public byte MessageCode
+        {
+            get
+            {
+                return messageCode;
+            }
         }
 
         public override string Message
         {
-            get { return "Unexpected message code returned from Riak: {0}".Fmt(MessageCode); }
+            get
+            {
+                return string.Format("Unexpected message code returned from Riak: {0}", messageCode);
+            }
         }
     }
 }

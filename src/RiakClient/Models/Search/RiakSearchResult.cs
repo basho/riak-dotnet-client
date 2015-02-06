@@ -1,4 +1,6 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// <copyright file="RiakSearchResult.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,19 +15,16 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using System.Collections.ObjectModel;
-using System.Linq;
-using RiakClient.Messages;
+// </copyright>
 
 namespace RiakClient.Models.Search
 {
+    using System.Collections.ObjectModel;
+    using System.Linq;
+    using Messages;
+
     public class RiakSearchResult
     {
-        public float MaxScore { get; private set; }
-        public uint NumFound { get; private set; }
-        public ReadOnlyCollection<RiakSearchResultDocument> Documents { get; private set; }
-
         internal RiakSearchResult(RpbSearchQueryResp response)
         {
             MaxScore = response.max_score;
@@ -33,6 +32,24 @@ namespace RiakClient.Models.Search
 
             var docs = response.docs.Select(d => new RiakSearchResultDocument(d));
             Documents = new ReadOnlyCollection<RiakSearchResultDocument>(docs.ToList());
+        }
+
+        public float MaxScore
+        {
+            get;
+            private set;
+        }
+
+        public uint NumFound
+        {
+            get;
+            private set;
+        }
+
+        public ReadOnlyCollection<RiakSearchResultDocument> Documents
+        {
+            get;
+            private set;
         }
     }
 }

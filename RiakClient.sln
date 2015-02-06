@@ -5,9 +5,9 @@ VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RiakClient", "src\RiakClient\RiakClient.csproj", "{A2CA0CDC-85BB-489D-99D0-3EE1D135BE17}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RiakClient.Tests", "src\RiakClient.Tests\RiakClient.Tests.csproj", "{E765CC5E-3C83-42CB-9B9A-C8AF400AC0AC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RiakClientTests", "src\RiakClientTests\RiakClientTests.csproj", "{E765CC5E-3C83-42CB-9B9A-C8AF400AC0AC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RiakClient.Tests.Live", "src\RiakClient.Tests.Live\RiakClient.Tests.Live.csproj", "{5D52E2FA-931C-4E77-BF2B-3A9F0D0CD834}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RiakClientTests.Live", "src\RiakClientTests.Live\RiakClientTests.Live.csproj", "{5D52E2FA-931C-4E77-BF2B-3A9F0D0CD834}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Metadata", "Metadata", "{C6E7CFF8-CC0A-49A4-B235-DDF0F23EB2A6}"
 	ProjectSection(SolutionItems) = preProject
@@ -30,11 +30,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{FD5F81
 		.nuget\packages.config = .nuget\packages.config
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RiakClient.Tests.Deprecated", "src\RiakClient.Tests.Deprecated\RiakClient.Tests.Deprecated.csproj", "{977A6FBC-9704-4FBD-8F0C-A3BDCFE347C9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RiakClientTests.Deprecated", "src\RiakClientTests.Deprecated\RiakClientTests.Deprecated.csproj", "{977A6FBC-9704-4FBD-8F0C-A3BDCFE347C9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{338F1F3E-18B8-421D-8287-179608C8CE58}"
 	ProjectSection(SolutionItems) = preProject
 		build\build.targets = build\build.targets
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Settings", "Settings", "{2FF98773-DE50-4775-AA8F-34CC663C3EEF}"
+	ProjectSection(SolutionItems) = preProject
+		src\Settings.StyleCop = src\Settings.StyleCop
 	EndProjectSection
 EndProject
 Global

@@ -1,4 +1,6 @@
-﻿// Copyright (c) 2015 - Basho Technologies, Inc.
+// <copyright file="RiakSecurityManager.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,24 +15,27 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using System;
-using System.IO;
-using System.Linq;
-using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
-using RiakClient.Extensions;
-using RiakClient.Config;
-using RiakClient.Messages;
-using RiakClient.Util;
+// </copyright>
 
 namespace RiakClient.Auth
 {
+    using System;
+    using System.IO;
+    using System.Linq;
+    using System.Net.Security;
+    using System.Security.Cryptography.X509Certificates;
+    using Config;
+    using Extensions;
+    using Messages;
+    using Util;
+
     internal class RiakSecurityManager
     {
-        private static readonly StoreLocation[] storeLocations =
+        private static readonly StoreLocation[] StoreLocations =
             new StoreLocation[] { StoreLocation.CurrentUser, StoreLocation.LocalMachine };
-        private static readonly string[] subjectSplit = new[] { ", " };
+
+        private static readonly string[] SubjectSplit = new[] { ", " };
+
         private readonly string targetHostCommonName;
         private readonly IRiakAuthenticationConfiguration authConfig;
         private readonly X509CertificateCollection clientCertificates;
@@ -41,11 +46,12 @@ namespace RiakClient.Auth
         // http://stackoverflow.com/questions/9302236/why-use-a-public-method-in-an-internal-class
         internal RiakSecurityManager(string targetHost, IRiakAuthenticationConfiguration authConfig)
         {
-            if (targetHost.IsNullOrEmpty())
+            if (string.IsNullOrWhiteSpace(targetHost))
             {
                 throw new ArgumentNullException("targetHost");
             }
-            targetHostCommonName = String.Format("CN={0}", targetHost);
+
+            targetHostCommonName = string.Format("CN={0}", targetHost);
             this.authConfig = authConfig;
 
             if (IsSecurityEnabled)
@@ -55,27 +61,47 @@ namespace RiakClient.Auth
             }
         }
 
+        /// <summary>
+        /// Gets a value indicating whether security is enabled
+        /// </summary>
         public bool IsSecurityEnabled
         {
             get
             {
                 return (false == MonoUtil.IsRunningOnMono) &&
-                       (authConfig != null && (!authConfig.Username.IsNullOrEmpty()));
+                       (authConfig != null && (!string.IsNullOrWhiteSpace(authConfig.Username)));
             }
         }
 
+        /// <summary>
+        /// Gets a value indicating whether client certs are configured and at least one available
+        /// </summary>
         public bool ClientCertificatesConfigured
         {
             get { return clientCertificates.Count > 0; }
         }
 
+        /// <summary>
+        /// Gets the client certs collection
+        /// </summary>
         public X509CertificateCollection ClientCertificates
         {
             get { return clientCertificates; }
         }
 
-        public bool ServerCertificateValidationCallback(object sender, X509Certificate certificate,
-            X509Chain chain, SslPolicyErrors sslPolicyErrors)
+        /// <summary>
+        /// Method used to validate a server certificate
+        /// </summary>
+        /// <param name="sender">The sender</param>
+        /// <param name="certificate">The server certificate</param>
+        /// <param name="chain">The X509 certificate chain</param>
+        /// <param name="sslPolicyErrors">The set of errors according to SSL policy</param>
+        /// <returns>boolean indicating validity of server certificate</returns>
+        public bool ServerCertificateValidationCallback(
+            object sender,
+            X509Certificate certificate,
+            X509Chain chain,
+            SslPolicyErrors sslPolicyErrors)
         {
             if (sslPolicyErrors == SslPolicyErrors.None)
             {
@@ -101,7 +127,7 @@ namespace RiakClient.Auth
                             foreach (X509ChainStatus status in chain.ChainStatus)
                             {
                                 if ((status.Status == X509ChainStatusFlags.UntrustedRoot) &&
-                                    (!chain.ChainElements.IsNullOrEmpty()))
+                                    (!EnumerableUtil.IsNullOrEmpty(chain.ChainElements)))
                                 {
                                     // The root cert must not be installed but we provided a file
                                     // See if anything in the chain matches our root cert
@@ -131,16 +157,21 @@ namespace RiakClient.Auth
             return false;
         }
 
-        private bool EnsureServerCertificateSubject(string serverCertificateSubject)
-        {
-            string serverCommonName =
-                serverCertificateSubject.Split(subjectSplit, StringSplitOptions.RemoveEmptyEntries)
-                    .FirstOrDefault(s => s.StartsWith("CN="));
-            return targetHostCommonName.Equals(serverCommonName);
-        }
-
-        public X509Certificate ClientCertificateSelectionCallback(object sender, string targetHost,
-            X509CertificateCollection localCertificates, X509Certificate remoteCertificate, string[] acceptableIssuers)
+        /// <summary>
+        /// Callback to select a client certificate for authentication
+        /// </summary>
+        /// <param name="sender">The sender</param>
+        /// <param name="targetHost">The host requesting authentication</param>
+        /// <param name="localCertificates">The collection of local certificates</param>
+        /// <param name="remoteCertificate">The remote certificate</param>
+        /// <param name="acceptableIssuers">The collection of acceptable issuers</param>
+        /// <returns>A matching certificate for authentication</returns>
+        public X509Certificate ClientCertificateSelectionCallback(
+            object sender,
+            string targetHost,
+            X509CertificateCollection localCertificates,
+            X509Certificate remoteCertificate,
+            string[] acceptableIssuers)
         {
             X509Certificate clientCertToPresent = null;
 
@@ -150,9 +181,9 @@ namespace RiakClient.Auth
              * 2nd time in here, targetHost == "riak-test" and acceptableIssues is one element in array:
              *     OU=Development, O=Basho Technologies, L=Bellevue, S=WA, C=US
              */
-            if (!localCertificates.IsNullOrEmpty())
+            if (!EnumerableUtil.IsNullOrEmpty(localCertificates))
             {
-                if (!acceptableIssuers.IsNullOrEmpty())
+                if (!EnumerableUtil.IsNullOrEmpty(acceptableIssuers))
                 {
                     foreach (X509Certificate cert in localCertificates)
                     {
@@ -174,6 +205,10 @@ namespace RiakClient.Auth
             return clientCertToPresent;
         }
 
+        /// <summary>
+        /// Gets the protobuf object for an authentication request
+        /// </summary>
+        /// <returns>A correctly constructed protobuf object</returns>
         public RpbAuthReq GetAuthRequest()
         {
             return new RpbAuthReq
@@ -183,12 +218,28 @@ namespace RiakClient.Auth
                 };
         }
 
+        /// <summary>
+        /// Ensures that the server certificate is for the target host
+        /// </summary>
+        /// <param name="serverCertificateSubject">The presented subject</param>
+        /// <returns>boolean indicating validity</returns>
+        private bool EnsureServerCertificateSubject(string serverCertificateSubject)
+        {
+            string serverCommonName =
+                serverCertificateSubject.Split(SubjectSplit, StringSplitOptions.RemoveEmptyEntries)
+                    .FirstOrDefault(s => s.StartsWith("CN="));
+            return targetHostCommonName.Equals(serverCommonName);
+        }
+
+        /// <summary>
+        /// Gets a file containing the certificate authority certificate
+        /// </summary>
+        /// <returns>An <see cref="X509Certificate2"/> object</returns>
         private X509Certificate2 GetCertificateAuthorityCert()
         {
             X509Certificate2 certificateAuthorityCert = null;
 
-            if ((!authConfig.CertificateAuthorityFile.IsNullOrEmpty()) &&
-                (File.Exists(authConfig.CertificateAuthorityFile)))
+            if (!string.IsNullOrWhiteSpace(authConfig.CertificateAuthorityFile) && File.Exists(authConfig.CertificateAuthorityFile))
             {
                 certificateAuthorityCert = new X509Certificate2(authConfig.CertificateAuthorityFile);
             }
@@ -196,21 +247,24 @@ namespace RiakClient.Auth
             return certificateAuthorityCert;
         }
 
+        /// <summary>
+        /// Returns a collection of client certificates from the configuration setting and local stores
+        /// </summary>
+        /// <returns>Returns <see cref="X509CertificateCollection "/> representing available client certificates</returns>
         private X509CertificateCollection GetClientCertificates()
         {
             var clientCertificates = new X509CertificateCollection();
 
             // http://stackoverflow.com/questions/18462064/associate-a-private-key-with-the-x509certificate2-class-in-net
-            if ((!authConfig.ClientCertificateFile.IsNullOrEmpty()) &&
-                (File.Exists(authConfig.ClientCertificateFile)))
+            if (!string.IsNullOrWhiteSpace(authConfig.ClientCertificateFile) && File.Exists(authConfig.ClientCertificateFile))
             {
                 var cert = new X509Certificate2(authConfig.ClientCertificateFile);
                 clientCertificates.Add(cert);
             }
 
-            if (!authConfig.ClientCertificateSubject.IsNullOrEmpty())
+            if (!string.IsNullOrWhiteSpace(authConfig.ClientCertificateSubject))
             {
-                foreach (var storeLocation in storeLocations)
+                foreach (var storeLocation in StoreLocations)
                 {
                     X509Store x509Store = null;
                     try

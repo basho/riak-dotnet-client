@@ -1,4 +1,6 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// <copyright file="RiakDtMapField.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,14 +15,21 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using RiakClient.Extensions;
-using RiakClient.Messages;
+// </copyright>
 
 namespace RiakClient.Models.RiakDt
 {
+    using Extensions;
+    using Messages;
+
     public class RiakDtMapField
     {
+        internal RiakDtMapField(MapField mapField)
+        {
+            Name = mapField.name.FromRiakString();
+            Type = (RiakDtMapFieldType)mapField.type;
+        }
+
         public enum RiakDtMapFieldType
         {
             Counter = MapField.MapFieldType.COUNTER,
@@ -31,17 +40,12 @@ namespace RiakClient.Models.RiakDt
         }
 
         public string Name { get; private set; }
-        public RiakDtMapFieldType Type { get; private set; }
 
-        internal RiakDtMapField(MapField mapField)
-        {
-            Name = mapField.name.FromRiakString();
-            Type = (RiakDtMapFieldType)mapField.type;
-        }
+        public RiakDtMapFieldType Type { get; private set; }
 
         public MapField ToMapField()
         {
-            return new MapField {name = Name.ToRiakString(), type = (MapField.MapFieldType)Type};
+            return new MapField { name = Name.ToRiakString(), type = (MapField.MapFieldType)Type };
         }
     }
 }

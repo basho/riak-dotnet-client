@@ -1,4 +1,6 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// <copyright file="RiakLinkPhase.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,16 +15,17 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using RiakClient.Extensions;
-using Newtonsoft.Json;
+// </copyright>
 
 namespace RiakClient.Models.MapReduce.Phases
 {
+    using Extensions;
+    using Newtonsoft.Json;
+
     internal class RiakLinkPhase : RiakPhase
     {
-        private string _bucket;
-        private string _tag;
+        private string bucket;
+        private string tag;
 
         public RiakLinkPhase()
         {
@@ -38,9 +41,14 @@ namespace RiakClient.Models.MapReduce.Phases
             }
             else
             {
-                _bucket = riakLink.Bucket;
-                _tag = riakLink.Tag;
+                bucket = riakLink.Bucket;
+                tag = riakLink.Tag;
             }
+        }
+
+        public override string PhaseType
+        {
+            get { return "link"; }
         }
 
         public RiakLinkPhase FromRiakLink(RiakLink riakLink)
@@ -53,42 +61,37 @@ namespace RiakClient.Models.MapReduce.Phases
             }
             else
             {
-                _bucket = riakLink.Bucket;
-                _tag = riakLink.Tag;
+                bucket = riakLink.Bucket;
+                tag = riakLink.Tag;
             }
 
             return this;
         }
 
-        public override string PhaseType
-        {
-            get { return "link"; }
-        }
-
         public RiakLinkPhase Bucket(string bucket)
         {
-            _bucket = bucket;
+            this.bucket = bucket;
             return this;
         }
 
         public RiakLinkPhase Tag(string tag)
         {
-            _tag = tag;
+            this.tag = tag;
             return this;
         }
 
         public RiakLinkPhase AllLinks()
         {
-            _bucket = default(string);
-            _tag = default(string);
+            bucket = default(string);
+            tag = default(string);
             Keep(false);
             return this;
         }
 
         protected override void WriteJson(JsonWriter writer)
         {
-            writer.WriteSpecifiedProperty("bucket", _bucket)
-                .WriteSpecifiedProperty("tag", _tag);
+            writer.WriteSpecifiedProperty("bucket", bucket)
+                .WriteSpecifiedProperty("tag", tag);
         }
     }
 }

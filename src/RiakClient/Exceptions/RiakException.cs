@@ -1,5 +1,6 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
-// Copyright (c) 2015 - Basho Technologies, Inc.
+// <copyright file="RiakException.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -14,44 +15,47 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using RiakClient.Extensions;
+// </copyright>
 
 namespace RiakClient.Exceptions
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+
     // TODO: ensure that subclass is correct
     public class RiakException : Exception
     {
-        private readonly string _errorMessage;
-
-        public uint ErrorCode { get; private set; }
-
-        internal bool NodeOffline { get; private set; }
-
-        public string ErrorMessage
-        {
-            get { return _errorMessage; }
-        }
+        private readonly string errorMessage;
+        private readonly uint errorCode;
+        private readonly bool nodeOffline;
 
         internal RiakException(uint errorCode, string errorMessage, bool nodeOffline)
         {
-            NodeOffline = nodeOffline;
-            ErrorCode = errorCode;
-            _errorMessage = "Riak returned an error. Code '{0}'. Message: {1}".Fmt(ErrorCode, errorMessage);
+            this.nodeOffline = nodeOffline;
+            this.errorCode = errorCode;
+            this.errorMessage = string.Format("Riak returned an error. Code '{0}'. Message: {1}", this.errorCode, errorMessage);
         }
 
         internal RiakException(string errorMessage, bool nodeOffline)
         {
-            NodeOffline = nodeOffline;
-            _errorMessage = errorMessage;
+            this.nodeOffline = nodeOffline;
+            this.errorMessage = errorMessage;
+        }
+
+        public uint ErrorCode
+        {
+            get { return errorCode; }
+        }
+
+        public string ErrorMessage
+        {
+            get { return errorMessage; }
         }
 
         public override string Message
         {
-            get { return _errorMessage; }
+            get { return errorMessage; }
         }
 
         public override IDictionary Data
@@ -60,10 +64,15 @@ namespace RiakClient.Exceptions
             {
                 return new Dictionary<string, object>
                 {
-                    { "ErrorCode", ErrorCode },
-                    { "ErrorMessage", ErrorMessage }
+                    { "ErrorCode", errorCode },
+                    { "ErrorMessage", errorMessage }
                 };
             }
+        }
+
+        internal bool NodeOffline
+        {
+            get { return nodeOffline; }
         }
     }
 }

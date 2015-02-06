@@ -1,4 +1,6 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// <copyright file="ConcurrentEnumerator.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,33 +15,29 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using System.Collections.Generic;
+// </copyright>
 
 namespace RiakClient.Containers
 {
-    public interface IConcurrentEnumerator<T>
-    {
-        bool TryMoveNext(out T next);
-    }
+    using System.Collections.Generic;
 
     public sealed class ConcurrentEnumerator<T> : IConcurrentEnumerator<T>
     {
-        private readonly object _lock = new object();
-        private readonly IEnumerator<T> _wrapped;
+        private readonly object lockObj = new object();
+        private readonly IEnumerator<T> wrapped;
 
         public ConcurrentEnumerator(IEnumerator<T> wrapped)
         {
-            _wrapped = wrapped;
+            this.wrapped = wrapped;
         }
 
         public bool TryMoveNext(out T next)
         {
-            lock (_lock)
+            lock (lockObj)
             {
-                if (_wrapped.MoveNext())
+                if (wrapped.MoveNext())
                 {
-                    next = _wrapped.Current;
+                    next = wrapped.Current;
                     return true;
                 }
 

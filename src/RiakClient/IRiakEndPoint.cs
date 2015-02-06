@@ -1,5 +1,6 @@
+// <copyright file="IRiakEndPoint.cs" company="Basho Technologies, Inc.">
 // Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
-// Copyright (c) 2015 - Basho Technologies, Inc.
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -14,13 +15,14 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using System;
-using System.Collections.Generic;
-using RiakClient.Comms;
+// </copyright>
 
 namespace RiakClient
 {
+    using System;
+    using System.Collections.Generic;
+    using Comms;
+
     public interface IRiakEndPoint : IDisposable
     {
         TimeSpan RetryWaitTime { get; set; }
@@ -28,6 +30,7 @@ namespace RiakClient
         IRiakClient CreateClient();
 
         RiakResult<TResult> UseConnection<TResult>(Func<IRiakConnection, RiakResult<TResult>> useFun, int retryAttempts);
+
         RiakResult UseConnection(Func<IRiakConnection, RiakResult> useFun, int retryAttempts);
 
         RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun, int retryAttempts)
