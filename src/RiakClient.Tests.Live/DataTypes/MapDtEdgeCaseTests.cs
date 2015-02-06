@@ -14,6 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -200,6 +201,87 @@ namespace RiakClient.Tests.Live.DataTypes
 
             Assert.AreEqual(1, setValues2.Count);
             Assert.Contains("Z", setValues2);
+        }
+
+
+        [Test]
+        public void Test4()
+        {
+            string key = GetRandomKey();
+
+            var id = new RiakObjectId(BucketTypeNames.Maps, Bucket, key);
+            const string setName = "set";
+
+            // New Map with Set
+            var setMapUpdate = new MapUpdate
+            {
+                set_op = new SetOp(),
+                field = new MapField { name = Serializer.Invoke(setName), type = MapField.MapFieldType.SET }
+            };
+
+            // Add X, Y to set
+            var addSet = new List<string> { "X", "Y" }.Select(s => Serializer.Invoke(s)).ToList();
+            setMapUpdate.set_op.adds.AddRange(addSet);
+
+            // Store
+            var updatedMap1 = Client.DtUpdateMap(id, Serializer, NoContext, NoRemovals,
+                new List<MapUpdate> { setMapUpdate });
+
+            // Add Z
+            var setMapUpdate2 = new MapUpdate
+            {
+                set_op = new SetOp(),
+                field = new MapField { name = Serializer.Invoke(setName), type = MapField.MapFieldType.SET }
+            };
+
+            var addSet2 = new List<string> { "Z" }.Select(s => Serializer.Invoke(s)).ToList();
+            setMapUpdate2.set_op.adds.AddRange(addSet2);
+
+            // Remove Set
+            var fieldToRemove = new RiakDtMapField(setMapUpdate.field);
+
+            // Store again, no context
+            Assert.Throws<ArgumentNullException>(() =>
+                Client.DtUpdateMap(id, Serializer, NoContext,
+                    new List<RiakDtMapField> { fieldToRemove },
+                    new List<MapUpdate> { setMapUpdate2 }));
+        }
+
+        [Test]
+        public void Test5()
+        {
+            string key = GetRandomKey();
+
+            var id = new RiakObjectId(BucketTypeNames.Maps, Bucket, key);
+            const string setName = "set";
+
+            // New Map with Set
+            var setMapUpdate = new MapUpdate
+            {
+                set_op = new SetOp(),
+                field = new MapField { name = Serializer.Invoke(setName), type = MapField.MapFieldType.SET }
+            };
+
+            // Add X, Y to set
+            var addSet = new List<string> { "X", "Y" }.Select(s => Serializer.Invoke(s)).ToList();
+            setMapUpdate.set_op.adds.AddRange(addSet);
+
+            // Store
+            var updatedMap1 = Client.DtUpdateMap(id, Serializer, NoContext, NoRemovals,
+                new List<MapUpdate> { setMapUpdate });
+
+            // Remove X from set
+            var setMapUpdate2 = new MapUpdate
+            {
+                set_op = new SetOp(),
+                field = new MapField { name = Serializer.Invoke(setName), type = MapField.MapFieldType.SET }
+            };
+
+            setMapUpdate2.set_op.removes.Add(Serializer("X"));
+
+            // Store again, no context
+            Assert.Throws<ArgumentNullException>(() =>
+                Client.DtUpdateMap(id, Serializer, NoContext, NoRemovals, new List<MapUpdate> { setMapUpdate2 }));
         }
     }
 }

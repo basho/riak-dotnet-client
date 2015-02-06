@@ -1392,7 +1392,7 @@ namespace RiakClient
         {
             if (removes != null && removes.Count > 0 && context == null)
             {
-                throw new ArgumentNullException("context", "Set removal, but context was null");
+                throw new ArgumentNullException("context", "Set item removal specified, but context was null");
             }
 
             var request = new DtUpdateReq
@@ -1460,18 +1460,25 @@ namespace RiakClient
             var result = UseConnection(conn => conn.PbcWriteRead<DtFetchReq, DtFetchResp>(message));
 
             if (!result.IsSuccess)
-                return new RiakDtMapResult(RiakResult<RiakObject>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline));
+            {
+                return new RiakDtMapResult(RiakResult<RiakObject>
+                               .Error(result.ResultCode, result.ErrorMessage, result.NodeOffline));
+            }
 
-            var rmr =
-                new RiakDtMapResult(RiakResult<RiakObject>.Success(new RiakObject(objectId.Bucket, objectId.Key, result.Value.value)));
+            var riakSuccessResult = RiakResult<RiakObject>.Success(new RiakObject(objectId.Bucket, objectId.Key, result.Value.value));
+            var riakMapResult = new RiakDtMapResult(riakSuccessResult);
 
             if (options.IncludeContext)
-                rmr.Context = result.Value.context;
+            {
+                riakMapResult.Context = result.Value.context;
+            }
 
             if (result.Value.value != null)
-                rmr.Values = result.Value.value.map_value.Select(mapEntry => new RiakDtMapEntry(mapEntry)).ToList();
+            {
+                riakMapResult.Values = result.Value.value.map_value.Select(mapEntry => new RiakDtMapEntry(mapEntry)).ToList();
+            }
 
-            return rmr;
+            return riakMapResult;
         }
 
         public RiakDtMapResult DtUpdateMap<T>(string bucketType,
@@ -1500,6 +1507,16 @@ namespace RiakClient
                                               List<MapUpdate> updates = null,
                                               RiakDtUpdateOptions options = null)
         {
+            if (context == null && removes != null && removes.Count > 0)
+            {
+                throw new ArgumentNullException("context", "Map field removal specified, but context was null");
+            }
+
+            if (context == null && AnyNestedRemovalsIn(updates))
+            {
+                throw new ArgumentNullException("context", "Map field removal specified, but context was null");
+            }
+
             var request = new DtUpdateReq
             {
                 type = objectId.BucketType.ToRiakString(),
@@ -1512,29 +1529,65 @@ namespace RiakClient
             options.Populate(request);
 
             if (removes != null)
+            {
                 request.op.map_op.removes.AddRange(removes.Select(a => a.ToMapField()));
+            }
 
             if (updates != null)
+            {
                 request.op.map_op.updates.AddRange(updates);
+            }
 
             if (context != null)
+            {
                 request.context = context;
+            }
 
             var result = UseConnection(conn => conn.PbcWriteRead<DtUpdateReq, DtUpdateResp>(request));
 
             if (!result.IsSuccess)
-                return new RiakDtMapResult(RiakResult<RiakObject>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline));
-
-            var rmr =
+            {
+                return new RiakDtMapResult(RiakResult<RiakObject>
+                               .Error(result.ResultCode, result.ErrorMessage, result.NodeOffline));
+            }
+            
+            var riakMapResult =
                 new RiakDtMapResult(RiakResult<RiakObject>.Success(new RiakObject(objectId, result.Value.map_value)));
 
             if (options.IncludeContext)
-                rmr.Context = result.Value.context;
+            {
+                riakMapResult.Context = result.Value.context;
+            }
 
             if (options.ReturnBody)
-                rmr.Values = result.Value.map_value.Select(mv => new RiakDtMapEntry(mv)).ToList();
+            {
+                riakMapResult.Values = result.Value.map_value.Select(mv => new RiakDtMapEntry(mv)).ToList();
+            }
 
-            return rmr;
+            return riakMapResult;
+        }
+
+        private bool AnyNestedRemovalsIn(IEnumerable<MapUpdate> updates)
+        {
+            foreach (var mapUpdate in updates)
+            {
+                if (mapUpdate.map_op != null && mapUpdate.map_op.removes != null && mapUpdate.map_op.removes.Count > 0)
+                {
+                    return true;
+                }
+
+                if (mapUpdate.set_op != null && mapUpdate.set_op.removes != null && mapUpdate.set_op.removes.Count > 0)
+                {
+                    return true;
+                }
+
+                if (mapUpdate.map_op != null)
+                {
+                    AnyNestedRemovalsIn(mapUpdate.map_op.updates);
+                }
+            }
+
+            return false;
         }
 
         public RiakResult<SearchIndexResult> GetSearchIndex(string indexName)
