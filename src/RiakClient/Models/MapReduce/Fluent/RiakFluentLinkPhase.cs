@@ -1,4 +1,6 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// <copyright file="RiakFluentLinkPhase.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,47 +15,48 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using RiakClient.Models.MapReduce.Phases;
+// </copyright>
 
 namespace RiakClient.Models.MapReduce.Fluent
 {
+    using Models.MapReduce.Phases;
+
     public class RiakFluentLinkPhase
     {
-        private readonly RiakLinkPhase _phase;
+        private readonly RiakLinkPhase phase;
 
         internal RiakFluentLinkPhase(RiakLinkPhase phase)
         {
-            _phase = phase;
+            this.phase = phase;
         }
 
         public RiakFluentLinkPhase Keep(bool keep)
         {
-            _phase.Keep(keep);
+            phase.Keep(keep);
             return this;
         }
 
         public RiakFluentLinkPhase Bucket(string bucket)
         {
-            _phase.Bucket(bucket);
+            phase.Bucket(bucket);
             return this;
         }
 
         public RiakFluentLinkPhase Tag(string tag)
         {
-            _phase.Tag(tag);
+            phase.Tag(tag);
             return this;
         }
 
         public RiakFluentLinkPhase FromRiakLink(RiakLink link)
         {
-            _phase.FromRiakLink(link);
+            phase.FromRiakLink(link);
             return this;
         }
 
         public RiakFluentLinkPhase AllLinks()
         {
-            _phase.AllLinks();
+            phase.AllLinks();
             return this;
         }
     }

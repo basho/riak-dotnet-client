@@ -1,4 +1,6 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// <copyright file="RiakCounterUpdateOptions.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,14 +15,15 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using System;
-using System.Collections.Generic;
-using RiakClient.Messages;
-using RiakClient.Util;
+// </copyright>
 
 namespace RiakClient.Models
 {
+    using System;
+    using System.Collections.Generic;
+    using Messages;
+    using Util;
+
     public class RiakCounterUpdateOptions
     {
         /// <summary>
@@ -79,6 +82,29 @@ namespace RiakClient.Models
             return this;
         }
 
+        internal void Populate(RpbCounterUpdateReq request)
+        {
+            if (WVal.HasValue)
+            {
+                request.w = WVal.Value;
+            }
+
+            if (DwVal.HasValue)
+            {
+                request.dw = DwVal.Value;
+            }
+
+            if (PwVal.HasValue)
+            {
+                request.pw = PwVal.Value;
+            }
+
+            if (ReturnValue.HasValue)
+            {
+                request.returnvalue = ReturnValue.Value;
+            }
+        }
+
         private RiakCounterUpdateOptions WriteQuorum(string value, Action<uint> setter)
         {
             System.Diagnostics.Debug.Assert(new HashSet<string> { "all", "quorum", "one", "default" }.Contains(value), "Incorrect quorum value");
@@ -89,25 +115,10 @@ namespace RiakClient.Models
 
         private RiakCounterUpdateOptions WriteQuorum(uint value, Action<uint> setter)
         {
-            System.Diagnostics.Debug.Assert(value >= 1);
+            System.Diagnostics.Debug.Assert(value >= 1, "value must be greater than or equal to 1");
 
             setter(value);
             return this;
-        }
-
-        internal void Populate(RpbCounterUpdateReq request)
-        {
-            if (WVal.HasValue)
-                request.w = WVal.Value;
-
-            if (DwVal.HasValue)
-                request.dw = DwVal.Value;
-
-            if (PwVal.HasValue)
-                request.pw = PwVal.Value;
-
-            if (ReturnValue.HasValue)
-                request.returnvalue = ReturnValue.Value;
         }
     }
 }

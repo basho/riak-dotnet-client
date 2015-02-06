@@ -1,4 +1,6 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// <copyright file="RiakIndexKeyTerm.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,22 +15,34 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
+// </copyright>
 
 namespace RiakClient.Models.Index
 {
     public class RiakIndexKeyTerm
     {
-        public string Key { get; private set; }
-        public string Term { get; private set; }
+        private readonly string key;
+        private readonly string term;
 
         public RiakIndexKeyTerm(string key)
         {
-            Key = key;
+            this.key = key;
         }
 
-        public RiakIndexKeyTerm(string key, string term) : this(key)
+        public RiakIndexKeyTerm(string key, string term)
+            : this(key)
         {
-            Term = term;
+            this.term = term;
+        }
+
+        public string Key
+        {
+            get { return key; }
+        }
+
+        public string Term
+        {
+            get { return term; }
         }
     }
 }

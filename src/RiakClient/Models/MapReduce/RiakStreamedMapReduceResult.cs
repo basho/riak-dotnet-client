@@ -1,4 +1,6 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// <copyright file="RiakStreamedMapReduceResult.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,28 +15,34 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using System.Collections.Generic;
-using System.Linq;
-using RiakClient.Messages;
+// </copyright>
 
 namespace RiakClient.Models.MapReduce
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using Messages;
+
     public class RiakStreamedMapReduceResult : IRiakMapReduceResult
     {
-        private readonly IEnumerable<RiakResult<RpbMapRedResp>> _responseReader;
+        private readonly IEnumerable<RiakResult<RpbMapRedResp>> responseReader;
 
         internal RiakStreamedMapReduceResult(IEnumerable<RiakResult<RpbMapRedResp>> responseReader)
         {
-            _responseReader = responseReader;
+            this.responseReader = responseReader;
         }
 
         public IEnumerable<RiakMapReduceResultPhase> PhaseResults
         {
             get
             {
-                return _responseReader.Select(item => item.IsSuccess
-                    ? new RiakMapReduceResultPhase(item.Value.phase, new List<RpbMapRedResp> { item.Value })
+                return responseReader.Select(item => item.IsSuccess
+                    ? new RiakMapReduceResultPhase(
+                            item.Value.phase,
+                            new List<RpbMapRedResp>
+                            {
+                                item.Value
+                            })
                     : new RiakMapReduceResultPhase());
             }
         }

@@ -1,5 +1,6 @@
-﻿// Copyright (c) 2013 - OJ Reeves & Jeremiah Peschka
-// Copyright (c) 2015 - Basho Technologies, Inc.
+// <copyright file="RiakBucketKeyInput.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -14,59 +15,62 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+// </copyright>
 
 namespace RiakClient.Models.MapReduce.Inputs
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using Newtonsoft.Json;
+
     public class RiakBucketKeyInput : RiakPhaseInput
     {
-        private List<RiakObjectId> RiakObjectIdList { get; set; }
-        
-        public RiakBucketKeyInput()
+        private readonly List<RiakObjectId> riakObjectIdList = new List<RiakObjectId>();
+
+        public static RiakBucketKeyInput FromRiakObjectIds(IEnumerable<RiakObjectId> riakObjectIds)
         {
-            RiakObjectIdList = new List<RiakObjectId>();
+            var rbki = new RiakBucketKeyInput();
+            rbki.Add(riakObjectIds);
+            return rbki;
         }
 
         [Obsolete("Use the Add() that accepts a RiakIndexId instead. This will be removed in the next version.")]
         public RiakBucketKeyInput Add(string bucket, string key)
         {
-            RiakObjectIdList.Add(new RiakObjectId(bucket, key));
+            riakObjectIdList.Add(new RiakObjectId(bucket, key));
             return this;
         }
 
         public RiakBucketKeyInput Add(RiakObjectId objectId)
         {
-            RiakObjectIdList.Add(objectId);
+            riakObjectIdList.Add(objectId);
             return this;
         }
 
         public RiakBucketKeyInput Add(params RiakObjectId[] objectIds)
         {
-            RiakObjectIdList.AddRange(objectIds);
+            riakObjectIdList.AddRange(objectIds);
             return this;
         }
 
         public RiakBucketKeyInput Add(IEnumerable<RiakObjectId> objectIds)
         {
-            RiakObjectIdList.AddRange(objectIds);
+            riakObjectIdList.AddRange(objectIds);
             return this;
         }
 
         [Obsolete("Use the Add() that accepts RiakIndexId[] instead. This will be removed in the next version.")]
         public RiakBucketKeyInput Add(params Tuple<string, string>[] pairs)
         {
-            RiakObjectIdList.AddRange(pairs.Select(p => new RiakObjectId(p.Item1, p.Item2)));
+            riakObjectIdList.AddRange(pairs.Select(p => new RiakObjectId(p.Item1, p.Item2)));
             return this;
         }
 
         [Obsolete("Use the Add() that accepts an IEnumerable<RiakIndexId> instead. This will be removed in the next version.")]
         public RiakBucketKeyInput Add(IEnumerable<Tuple<string, string>> pairs)
         {
-            RiakObjectIdList.AddRange(pairs.Select(p => new RiakObjectId(p.Item1, p.Item2)));
+            riakObjectIdList.AddRange(pairs.Select(p => new RiakObjectId(p.Item1, p.Item2)));
             return this;
         }
 
@@ -75,7 +79,7 @@ namespace RiakClient.Models.MapReduce.Inputs
             writer.WritePropertyName("inputs");
             writer.WriteStartArray();
 
-            foreach (var id in RiakObjectIdList)
+            foreach (var id in riakObjectIdList)
             {
                 WriteRiakObjectIdToWriter(writer, id);
             }
@@ -92,13 +96,6 @@ namespace RiakClient.Models.MapReduce.Inputs
             writer.WriteValue(id.Key);
             writer.WriteValue(id.BucketType ?? string.Empty);
             writer.WriteEndArray();
-        }
-
-        public static RiakBucketKeyInput FromRiakObjectIds(IEnumerable<RiakObjectId> riakObjectIds)
-        {
-            var rbki = new RiakBucketKeyInput();
-            rbki.Add(riakObjectIds);
-            return rbki;
         }
     }
 }

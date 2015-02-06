@@ -1,4 +1,6 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// <copyright file="RiakRestRequest.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,42 +15,78 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using System.Collections.Generic;
-using RiakClient.Util;
+// </copyright>
 
 namespace RiakClient.Models.Rest
 {
+    using System;
+    using System.Collections.Generic;
+    using Util;
+
     public class RiakRestRequest
     {
-        public string Uri { get; set; }
-        public string Method { get; set; }
-        public string ContentType { get; set; }
-        public byte[] Body { get; set; }
-        public Dictionary<string, string> Headers { get; private set; }
-        public Dictionary<string, string> QueryParams { get; private set; }
-        public int Timeout { get; set; }
-        public bool Cache { get; set; }
+        private readonly string uri;
+        private readonly string method;
+        private readonly IDictionary<string, string> headers = new Dictionary<string, string>();
+        private readonly IDictionary<string, string> queryParams = new Dictionary<string, string>();
 
         public RiakRestRequest(string uri, string method)
         {
-            Uri = uri;
-            Method = method;
-            Headers = new Dictionary<string, string>();
-            QueryParams = new Dictionary<string, string>();
+            if (string.IsNullOrWhiteSpace(uri))
+            {
+                throw new ArgumentNullException("uri");
+            }
+
+            this.uri = uri;
+
+            if (string.IsNullOrWhiteSpace(method))
+            {
+                throw new ArgumentNullException("method");
+            }
+
+            this.method = method;
+
             Timeout = RiakConstants.Defaults.Rest.Timeout;
             Cache = false;
         }
 
+        public string Uri
+        {
+            get { return uri; }
+        }
+
+        public string Method
+        {
+            get { return method; }
+        }
+
+        public string ContentType { get; set; }
+
+        public byte[] Body { get; set; }
+
+        public IDictionary<string, string> Headers
+        {
+            get { return headers; }
+        }
+
+        public IDictionary<string, string> QueryParams
+        {
+            get { return queryParams; }
+        }
+
+        public int Timeout { get; set; }
+
+        public bool Cache { get; set; }
+
         public RiakRestRequest AddQueryParam(string key, string value)
         {
-            QueryParams.Add(key, value);
+            queryParams.Add(key, value);
             return this;
         }
 
         public RiakRestRequest AddHeader(string key, string value)
         {
-            Headers.Add(key, value);
+            headers.Add(key, value);
             return this;
         }
     }

@@ -1,4 +1,6 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// <copyright file="ProximityTerm.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,27 +15,28 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using System.Collections.Generic;
-using System.Linq;
+// </copyright>
 
 namespace RiakClient.Models.Search
 {
+    using System.Collections.Generic;
+    using System.Linq;
+
     public class ProximityTerm : Term
     {
-        private readonly List<Token> _words;
-        private readonly double _proximity;
+        private readonly List<Token> words;
+        private readonly double proximity;
 
         public ProximityTerm(RiakFluentSearch search, string field, double proximity, params string[] words)
             : base(search, field)
         {
-            _words = new List<Token>(words.Select(Token.Is));
-            _proximity = proximity;
+            this.words = new List<Token>(words.Select(Token.Is));
+            this.proximity = proximity;
         }
 
         public override string ToString()
         {
-            return Prefix() + Field() + "\"" + string.Join(" ", _words.Select(w => w.ToString()).ToArray()) + "\"~" + _proximity + Suffix();
+            return Prefix() + Field() + "\"" + string.Join(" ", words.Select(w => w.ToString()).ToArray()) + "\"~" + proximity + Suffix();
         }
     }
 }

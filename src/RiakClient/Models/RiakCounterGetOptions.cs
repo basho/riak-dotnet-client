@@ -1,4 +1,6 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// <copyright file="RiakCounterGetOptions.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,13 +15,15 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-using System;
-using System.Collections.Generic;
-using RiakClient.Messages;
-using RiakClient.Util;
+// </copyright>
 
 namespace RiakClient.Models
 {
+    using System;
+    using System.Collections.Generic;
+    using Messages;
+    using Util;
+
     public class RiakCounterGetOptions
     {
         /// <summary>
@@ -37,7 +41,7 @@ namespace RiakClient.Models
         public uint? RVal { get; private set; }
 
         /// <summary>
-        /// Basic Quorum semantics - whether to return early in some failure cases (eg. when r=1 and you get 2 errors and a success basic_quorum=true would return an error)
+        /// Gets or sets basic quorum semantics - whether to return early in some failure cases (eg. when r=1 and you get 2 errors and a success basic_quorum=true would return an error)
         /// </summary>
         /// <value>
         /// Whether basic quorum semantics will be used.
@@ -45,7 +49,7 @@ namespace RiakClient.Models
         public bool? BasicQuorum { get; set; }
 
         /// <summary>
-        /// Should not found responses from Riak be treated as an OK result for a find operation. 
+        /// Gets or sets a boolean - Should not found responses from Riak be treated as an OK result for a find operation. 
         /// </summary>
         /// <value>
         /// The notfound_ok value.
@@ -84,6 +88,29 @@ namespace RiakClient.Models
             return WriteQuorum(value, v => RVal = v);
         }
 
+        internal void Populate(RpbCounterGetReq request)
+        {
+            if (RVal.HasValue)
+            {
+                request.r = RVal.Value;
+            }
+
+            if (PrVal.HasValue)
+            {
+                request.pr = PrVal.Value;
+            }
+
+            if (BasicQuorum.HasValue)
+            {
+                request.basic_quorum = BasicQuorum.Value;
+            }
+
+            if (NotFoundOk.HasValue)
+            {
+                request.notfound_ok = NotFoundOk.Value;
+            }
+        }
+
         private RiakCounterGetOptions WriteQuorum(string value, Action<uint> setter)
         {
             System.Diagnostics.Debug.Assert(new HashSet<string> { "all", "quorum", "one", "default" }.Contains(value), "Incorrect quorum value");
@@ -94,25 +121,10 @@ namespace RiakClient.Models
 
         private RiakCounterGetOptions WriteQuorum(uint value, Action<uint> setter)
         {
-            System.Diagnostics.Debug.Assert(value >= 1);
+            System.Diagnostics.Debug.Assert(value >= 1, "value must be greater than or equal to 1");
 
             setter(value);
             return this;
-        }
-
-        internal void Populate(RpbCounterGetReq request)
-        {
-            if (RVal.HasValue)
-                request.r = RVal.Value;
-
-            if (PrVal.HasValue)
-                request.pr = PrVal.Value;
-
-            if (BasicQuorum.HasValue)
-                request.basic_quorum = BasicQuorum.Value;
-
-            if (NotFoundOk.HasValue)
-                request.notfound_ok = NotFoundOk.Value;
         }
     }
 }

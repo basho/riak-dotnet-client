@@ -1,5 +1,6 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
-// Copyright (c) 2015 - Basho Technologies, Inc.
+// <copyright file="RiakObjectId.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -14,14 +15,15 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using System;
-using RiakClient.Extensions;
-using Newtonsoft.Json;
-using RiakClient.Converters;
+// </copyright>
 
 namespace RiakClient.Models
 {
+    using System;
+    using Converters;
+    using Newtonsoft.Json;
+    using Util;
+
     [JsonConverter(typeof(RiakObjectIdConverter))]
     public class RiakObjectId : IEquatable<RiakObjectId>
     {
@@ -29,13 +31,9 @@ namespace RiakClient.Models
         private readonly string bucketType;
         private readonly string key;
 
-        protected RiakObjectId()
-        {
-        }
-
         public RiakObjectId(string bucket, string key)
         {
-            if (bucket.IsNullOrEmpty())
+            if (EnumerableUtil.IsNullOrEmpty(bucket))
             {
                 throw new ArgumentNullException("bucket");
             }
@@ -48,11 +46,6 @@ namespace RiakClient.Models
             : this(bucket, key)
         {
             this.bucketType = bucketType;
-        }
-
-        internal RiakLink ToRiakLink(string tag)
-        {
-            return new RiakLink(bucket, key, tag);
         }
 
         public string Bucket
@@ -70,19 +63,31 @@ namespace RiakClient.Models
             get { return key; }
         }
 
+        public static bool operator ==(RiakObjectId left, RiakObjectId right)
+        {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(RiakObjectId left, RiakObjectId right)
+        {
+            return !Equals(left, right);
+        }
+
         public bool Equals(RiakObjectId other)
         {
             if (ReferenceEquals(null, other))
             {
                 return false;
             }
+
             if (ReferenceEquals(this, other))
             {
                 return true;
             }
-            return String.Equals(bucket, other.Bucket) &&
-                String.Equals(bucketType, other.BucketType) &&
-                String.Equals(key, other.key);
+
+            return string.Equals(bucket, other.Bucket) &&
+                string.Equals(bucketType, other.BucketType) &&
+                string.Equals(key, other.key);
         }
 
         public override bool Equals(object obj)
@@ -94,21 +99,11 @@ namespace RiakClient.Models
         {
             unchecked
             {
-                int hashCode = (bucket != null ? bucket.GetHashCode() : 0);
+                int hashCode = bucket != null ? bucket.GetHashCode() : 0;
                 hashCode = (hashCode * 397) ^ (bucketType != null ? bucketType.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (key != null ? key.GetHashCode() : 0);
                 return hashCode;
             }
-        }
-
-        public static bool operator ==(RiakObjectId left, RiakObjectId right)
-        {
-            return Equals(left, right);
-        }
-
-        public static bool operator !=(RiakObjectId left, RiakObjectId right)
-        {
-            return !Equals(left, right);
         }
 
         public override string ToString()
@@ -119,6 +114,11 @@ namespace RiakClient.Models
             }
 
             return string.Format("BucketType: {0}, Bucket: {1}, Key: {2}", BucketType, Bucket, Key);
+        }
+
+        internal RiakLink ToRiakLink(string tag)
+        {
+            return new RiakLink(bucket, key, tag);
         }
     }
 }

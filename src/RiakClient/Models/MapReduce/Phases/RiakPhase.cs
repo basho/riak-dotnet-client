@@ -1,4 +1,6 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// <copyright file="RiakPhase.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,18 +15,20 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using RiakClient.Extensions;
-using Newtonsoft.Json;
-using System.IO;
-using System.Text;
+// </copyright>
 
 namespace RiakClient.Models.MapReduce.Phases
 {
+    using System.IO;
+    using System.Text;
+    using Extensions;
+    using Newtonsoft.Json;
+
     internal abstract class RiakPhase
     {
+        private bool keep;
+
         public abstract string PhaseType { get; }
-        private bool _keep;
 
         public override string ToString()
         {
@@ -33,27 +37,30 @@ namespace RiakClient.Models.MapReduce.Phases
 
         public void Keep(bool keep)
         {
-            _keep = keep;
+            this.keep = keep;
         }
 
         public string ToJsonString()
         {
             var sb = new StringBuilder();
 
-            using(var sw = new StringWriter(sb))
-            using(JsonWriter writer = new JsonTextWriter(sw))
+            using (var sw = new StringWriter(sb))
             {
-                writer.WriteStartObject();
-                writer.WritePropertyName(PhaseType);
+                using (JsonWriter writer = new JsonTextWriter(sw))
+                {
+                    writer.WriteStartObject();
+                    writer.WritePropertyName(PhaseType);
 
-                // phase start
-                writer.WriteStartObject();
-                WriteJson(writer);
-                writer.WriteProperty("keep", _keep);
-                writer.WriteEndObject();
-                // phase end
+                    // phase start
+                    writer.WriteStartObject();
 
-                writer.WriteEndObject();
+                    WriteJson(writer);
+                    writer.WriteProperty("keep", keep);
+                    writer.WriteEndObject();
+
+                    // phase end
+                    writer.WriteEndObject();
+                }
             }
 
             return sb.ToString();

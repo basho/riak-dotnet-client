@@ -1,35 +1,37 @@
-﻿// Copyright (c) 2011 - 2014 OJ Reeves & Jeremiah Peschka
-// Copyright (c) 2015 - Basho Technologies, Inc.
-// 
+// <copyright file="RiakBucketInput.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
+//
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
 // except in compliance with the License.  You may obtain
 // a copy of the License at
-// 
+//
 //   http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing,
 // software distributed under the License is distributed on an
 // "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using System.Collections.Generic;
-using Newtonsoft.Json;
-using RiakClient.Models.MapReduce.KeyFilters;
+// </copyright>
 
 namespace RiakClient.Models.MapReduce.Inputs
 {
+    using System.Collections.Generic;
+    using Models.MapReduce.KeyFilters;
+    using Newtonsoft.Json;
+
     public class RiakBucketInput : RiakPhaseInput
     {
-        private readonly string _bucket;
-        private readonly string _type;
+        private readonly string bucket;
+        private readonly string type;
 
         public RiakBucketInput(string bucket, string type = null)
         {
-            _type = type;
-            _bucket = bucket;
+            this.type = type;
+            this.bucket = bucket;
             Filters = new List<IRiakKeyFilterToken>();
         }
 
@@ -40,7 +42,7 @@ namespace RiakClient.Models.MapReduce.Inputs
                 writer.WritePropertyName("inputs");
                 writer.WriteStartObject();
 
-                WriteBucketKeyBucketJson(writer, _type, _bucket);
+                WriteBucketKeyBucketJson(writer, type, bucket);
 
                 writer.WritePropertyName("key_filters");
                 writer.WriteStartArray();
@@ -53,7 +55,7 @@ namespace RiakClient.Models.MapReduce.Inputs
             else
             {
                 writer.WritePropertyName("inputs");
-                writer.WriteValue(_bucket);
+                writer.WriteValue(bucket);
             }
 
             return writer;

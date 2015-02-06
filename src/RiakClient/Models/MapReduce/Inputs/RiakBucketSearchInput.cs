@@ -1,32 +1,34 @@
-﻿// Copyright (c) 2011 - 2014 OJ Reeves & Jeremiah Peschka
-// Copyright (c) 2015 - Basho Technologies, Inc.
-// 
+// <copyright file="RiakBucketSearchInput.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
+//
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
 // except in compliance with the License.  You may obtain
 // a copy of the License at
-// 
+//
 //   http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing,
 // software distributed under the License is distributed on an
 // "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using System;
-using Newtonsoft.Json;
-using RiakClient.Models.Search;
+// </copyright>
 
 namespace RiakClient.Models.MapReduce.Inputs
 {
+    using System;
+    using Models.Search;
+    using Newtonsoft.Json;
+
     [Obsolete("Using Legacy Search as input for MapReduce is depreciated. Please move to Riak 2.0 Search, and use the RiakSearchInput class instead.")]
     public class RiakBucketSearchInput : RiakPhaseInput
     {
-        private readonly string _bucket;
-        private readonly string _query;
-        private string _filter;
+        private readonly string bucket;
+        private readonly string query;
+        private string filter;
 
         public RiakBucketSearchInput(RiakFluentSearch query)
             : this(query.Index, query.ToString())
@@ -35,8 +37,8 @@ namespace RiakClient.Models.MapReduce.Inputs
 
         public RiakBucketSearchInput(string bucket, string query)
         {
-            _bucket = bucket;
-            _query = query;
+            this.bucket = bucket;
+            this.query = query;
         }
 
         public RiakBucketSearchInput Filter(RiakFluentSearch filter)
@@ -46,7 +48,7 @@ namespace RiakClient.Models.MapReduce.Inputs
 
         public RiakBucketSearchInput Filter(string filter)
         {
-            _filter = filter;
+            this.filter = filter;
             return this;
         }
 
@@ -56,15 +58,15 @@ namespace RiakClient.Models.MapReduce.Inputs
             writer.WriteStartObject();
 
             writer.WritePropertyName("bucket");
-            writer.WriteValue(_bucket);
+            writer.WriteValue(bucket);
 
             writer.WritePropertyName("query");
-            writer.WriteValue(_query);
+            writer.WriteValue(query);
 
-            if (!string.IsNullOrEmpty(_filter))
+            if (!string.IsNullOrEmpty(filter))
             {
                 writer.WritePropertyName("filter");
-                writer.WriteValue(_filter);
+                writer.WriteValue(filter);
             }
 
             writer.WriteEndObject();

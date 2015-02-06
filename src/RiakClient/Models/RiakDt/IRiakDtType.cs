@@ -1,4 +1,6 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// <copyright file="IRiakDtType.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,18 +15,23 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using System.Collections.ObjectModel;
-using RiakClient.Messages;
+// </copyright>
 
 namespace RiakClient.Models.RiakDt
 {
+    using System.Collections.ObjectModel;
+    using Messages;
+
     public interface IRiakDtType<T>
     {
         string Bucket { get; }
+
         string BucketType { get; }
+
         string Key { get; }
+
         ReadOnlyCollection<T> Operations { get; }
+
         MapEntry ToMapEntry(string fieldName);
     }
 }

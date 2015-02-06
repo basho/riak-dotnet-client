@@ -1,4 +1,6 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// <copyright file="RiakBucketProperties.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,53 +15,164 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using RiakClient.Extensions;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using RiakClient.Containers;
-using RiakClient.Messages;
-using RiakClient.Models.CommitHook;
-using RiakClient.Models.Rest;
-using RiakClient.Util;
+// </copyright>
 
 namespace RiakClient.Models
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.IO;
+    using System.Linq;
+    using System.Text;
+    using Containers;
+    using Extensions;
+    using Messages;
+    using Models.CommitHook;
+    using Models.Rest;
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
+    using Util;
+
     public class RiakBucketProperties
     {
-        private bool? _addHooks;
+        private bool? addHooks;
+
+        public RiakBucketProperties()
+        {
+        }
+
+        public RiakBucketProperties(RiakRestResponse response)
+        {
+            if (response.ContentType != RiakConstants.ContentTypes.ApplicationJson)
+            {
+                throw new ArgumentOutOfRangeException("response.ContentType must be application/json");
+            }
+
+            var json = JObject.Parse(response.Body);
+            var props = (JObject)json["props"];
+            NVal = props.Value<uint?>("n_val");
+            AllowMultiple = props.Value<bool?>("allow_mult");
+            LastWriteWins = props.Value<bool?>("last_write_wins");
+            Backend = props.Value<string>("backend");
+            NotFoundOk = props.Value<bool?>("notfound_ok");
+            BasicQuorum = props.Value<bool?>("basic_quorum");
+            Consistent = props.Value<bool?>("consistent");
+
+            ReadQuorum(props, "r", v => RVal = v);
+            ReadQuorum(props, "rw", v => RwVal = v);
+            ReadQuorum(props, "dw", v => DwVal = v);
+            ReadQuorum(props, "w", v => WVal = v);
+            ReadQuorum(props, "pr", v => PrVal = v);
+            ReadQuorum(props, "pw", v => PwVal = v);
+
+            var preCommitHooks = props.Value<JArray>("precommit");
+            if (preCommitHooks.Count > 0)
+            {
+                PreCommitHooks = preCommitHooks.Cast<JObject>().Select(LoadPreCommitHook).ToList();
+            }
+
+            var postCommitHooks = props.Value<JArray>("postcommit");
+            if (postCommitHooks.Count > 0)
+            {
+                PostCommitHooks = postCommitHooks.Cast<JObject>().Select(LoadPostCommitHook).ToList();
+            }
+
+            var value = props.Value<int?>("repl");
+            if (value != null)
+            {
+                ReplicationMode = (RiakConstants.RiakEnterprise.ReplicationMode)value;
+            }
+        }
+
+        internal RiakBucketProperties(RpbBucketProps bucketProps)
+            : this()
+        {
+            NVal = bucketProps.n_val;
+            AllowMultiple = bucketProps.allow_mult;
+            LastWriteWins = bucketProps.last_write_wins;
+            Backend = bucketProps.backend.FromRiakString();
+            NotFoundOk = bucketProps.notfound_ok;
+            BasicQuorum = bucketProps.basic_quorum;
+
+            HasPrecommit = bucketProps.has_precommit;
+            HasPostcommit = bucketProps.has_postcommit;
+
+            RVal = bucketProps.r;
+            RwVal = bucketProps.rw;
+            DwVal = bucketProps.dw;
+            WVal = bucketProps.w;
+            PrVal = bucketProps.pr;
+            PwVal = bucketProps.pw;
+
+            LegacySearch = bucketProps.search;
+
+            HasPrecommit = bucketProps.has_precommit;
+            HasPostcommit = bucketProps.has_postcommit;
+
+            var preCommitHooks = bucketProps.precommit;
+            if (preCommitHooks.Count > 0)
+            {
+                PreCommitHooks = preCommitHooks.Select(LoadPreCommitHook).ToList();
+            }
+
+            var postCommitHooks = bucketProps.postcommit;
+            if (postCommitHooks.Count > 0)
+            {
+                PostCommitHooks = postCommitHooks.Select(LoadPostCommitHook).ToList();
+            }
+
+            ReplicationMode = (RiakConstants.RiakEnterprise.ReplicationMode)bucketProps.repl;
+
+            SearchIndex = bucketProps.search_index.FromRiakString();
+            DataType = bucketProps.datatype.FromRiakString();
+
+            Consistent = bucketProps.consistent;
+        }
 
         public bool? LastWriteWins { get; private set; }
+
         public uint? NVal { get; private set; }
+
         public bool? AllowMultiple { get; private set; }
+
         public string Backend { get; private set; }
+
         public List<IRiakPreCommitHook> PreCommitHooks { get; private set; }
+
         public List<IRiakPostCommitHook> PostCommitHooks { get; private set; }
+
         public bool? NotFoundOk { get; private set; }
+
         public bool? BasicQuorum { get; private set; }
+
         /// <summary>
         /// If the length of the vector clock is larger than BigVclock, vector clocks will be pruned.
         /// </summary>
         /// <remarks>See http://docs.basho.com/riak/latest/theory/concepts/Vector-Clocks/#Vector-Clock-Pruning </remarks>
         public uint? BigVclock { get; private set; }
+
         /// <summary>
         /// If the length of the vector clock is smaller than SmallVclock, vector clocks will not be pruned.
         /// </summary>
         /// <remarks>See http://docs.basho.com/riak/latest/theory/concepts/Vector-Clocks/#Vector-Clock-Pruning </remarks>
         public uint? SmallVclock { get; private set; }
-        
+
         public bool? HasPrecommit { get; private set; }
+
         public bool? HasPostcommit { get; private set; }
 
         [Obsolete("Search is deprecated, please use LegacySearch instead.", true)]
-        public bool? Search { get { return LegacySearch; } private set { LegacySearch = value; } }
+        public bool? Search
+        {
+            get { return LegacySearch; }
+            private set { LegacySearch = value; }
+        }
 
-        public bool? LegacySearch { get; private set; }
+        public bool? LegacySearch
+        {
+            get; private set;
+        }
 
         /// <summary>
         /// The number of replicas that must return before a read is considered a succes.
@@ -106,8 +219,11 @@ namespace RiakClient.Models
         public string SearchIndex { get; private set; }
 
         [Obsolete("SearchEnabled is deprecated, please use LegacySearchEnabled instead.", true)]
-        public bool SearchEnabled { get { return LegacySearchEnabled; } }
-        
+        public bool SearchEnabled
+        {
+            get { return LegacySearchEnabled; }
+        }
+
         /// <summary>
         /// An indicator of whether legacy search indexing is enabled on the bucket.
         /// </summary>
@@ -125,7 +241,6 @@ namespace RiakClient.Models
         /// </summary>
         /// <value>A string representation of the DataType assigned to this bucket. Possible values include 'set', 'map', 'counter', or null for no data type </value>
         public string DataType { get; private set; }
-
 
         public RiakBucketProperties SetBasicQuorum(bool value)
         {
@@ -163,11 +278,12 @@ namespace RiakClient.Models
         /// <param name="enable">Set to <i>true</i> to enable legacy search on this bucket, or <i>false</i>
         /// to disable it.</param>
         /// <returns>A reference to the current properties object.</returns>
+        /// <param name="addHooks">Set to <i>true</i> to add pre commit hook</param>
         public RiakBucketProperties SetLegacySearch(bool enable, bool addHooks = false)
         {
-            if (addHooks) 
+            if (addHooks)
             {
-                _addHooks = enable;
+                this.addHooks = enable;
 
                 if (enable)
                 {
@@ -176,12 +292,13 @@ namespace RiakClient.Models
                 else
                 {
                     RemovePreCommitHook(RiakErlangCommitHook.RiakLegacySearchCommitHook);
-                }                  
-            } 
-            else 
+                }
+            }
+            else
             {
                 LegacySearch = enable;
             }
+
             return this;
         }
 
@@ -330,7 +447,7 @@ namespace RiakClient.Models
         public RiakBucketProperties AddPostCommitHook(IRiakPostCommitHook commitHook, bool commitFlags = true)
         {
             var hooks = PostCommitHooks ?? (PostCommitHooks = new List<IRiakPostCommitHook>());
-            
+
             if (!hooks.Any(x => Equals(x, commitHook)))
             {
                 hooks.Add(commitHook);
@@ -358,180 +475,15 @@ namespace RiakClient.Models
             return this;
         }
 
-        private RiakBucketProperties WriteQuorum(string value, Action<uint> setter)
-        {
-            System.Diagnostics.Debug.Assert(new HashSet<string> { "all", "quorum", "one", "default" }.Contains(value), "Incorrect quorum value");
-
-            setter(RiakConstants.QuorumOptionsLookup[value]);
-            return this;
-        }
-
-        private RiakBucketProperties WriteQuorum(uint value, Action<uint> setter)
-        {
-            System.Diagnostics.Debug.Assert(value >= 1);
-
-            setter(value);
-            return this;
-        }
-
-        private RiakBucketProperties WriteQuorum(string value, Action<Either<uint, string>> setter)
-        {
-            System.Diagnostics.Debug.Assert(new HashSet<string> { "all", "quorum", "one", "default" }.Contains(value), "Incorrect quorum value");
-
-            setter(new Either<uint, string>(value));
-            return this;
-        }
-
-        private RiakBucketProperties WriteQuorum(uint value, Action<Either<uint, string>> setter)
-        {
-            System.Diagnostics.Debug.Assert(value >= 1);
-
-            setter(new Either<uint, string>(value));
-            return this;
-        }
-
-        public RiakBucketProperties()
-        {
-        }
-
-        public RiakBucketProperties(RiakRestResponse response)
-        {
-            System.Diagnostics.Debug.Assert(response.ContentType == RiakConstants.ContentTypes.ApplicationJson);
-
-            var json = JObject.Parse(response.Body);
-            var props = (JObject)json["props"];
-            NVal = props.Value<uint?>("n_val");
-            AllowMultiple = props.Value<bool?>("allow_mult");
-            LastWriteWins = props.Value<bool?>("last_write_wins");
-            Backend = props.Value<string>("backend");
-            NotFoundOk = props.Value<bool?>("notfound_ok");
-            BasicQuorum = props.Value<bool?>("basic_quorum");
-            Consistent = props.Value<bool?>("consistent");
-
-            ReadQuorum(props, "r", v => RVal = v);
-            ReadQuorum(props, "rw", v => RwVal = v);
-            ReadQuorum(props, "dw", v => DwVal = v);
-            ReadQuorum(props, "w", v => WVal = v);
-            ReadQuorum(props, "pr", v => PrVal = v);
-            ReadQuorum(props, "pw", v => PwVal = v);
-
-            var preCommitHooks = props.Value<JArray>("precommit");
-            if (preCommitHooks.Count > 0)
-            {
-                PreCommitHooks = preCommitHooks.Cast<JObject>().Select(LoadPreCommitHook).ToList();
-            }
-
-            var postCommitHooks = props.Value<JArray>("postcommit");
-            if (postCommitHooks.Count > 0)
-            {
-                PostCommitHooks = postCommitHooks.Cast<JObject>().Select(LoadPostCommitHook).ToList();
-            }
-
-            var value = props.Value<int?>("repl");
-            if (value != null)
-                ReplicationMode = (RiakConstants.RiakEnterprise.ReplicationMode)value;
-        }
-
-        internal RiakBucketProperties(RpbBucketProps bucketProps)
-            : this()
-        {
-            NVal = bucketProps.n_val;
-            AllowMultiple = bucketProps.allow_mult;
-            LastWriteWins = bucketProps.last_write_wins;
-            Backend = bucketProps.backend.FromRiakString();
-            NotFoundOk = bucketProps.notfound_ok;
-            BasicQuorum = bucketProps.basic_quorum;
-
-            HasPrecommit = bucketProps.has_precommit;
-            HasPostcommit = bucketProps.has_postcommit;
-
-            RVal = bucketProps.r;
-            RwVal = bucketProps.rw;
-            DwVal = bucketProps.dw;
-            WVal = bucketProps.w;
-            PrVal = bucketProps.pr;
-            PwVal = bucketProps.pw;
-
-            LegacySearch = bucketProps.search;
-
-            HasPrecommit = bucketProps.has_precommit;
-            HasPostcommit = bucketProps.has_postcommit;
-
-            var preCommitHooks = bucketProps.precommit;
-            if (preCommitHooks.Count > 0)
-            {
-                PreCommitHooks = preCommitHooks.Select(LoadPreCommitHook).ToList();
-            }
-
-            var postCommitHooks = bucketProps.postcommit;
-            if (postCommitHooks.Count > 0)
-            {
-                PostCommitHooks = postCommitHooks.Select(LoadPostCommitHook).ToList();
-            }
-
-            ReplicationMode = (RiakConstants.RiakEnterprise.ReplicationMode)bucketProps.repl;
-
-            SearchIndex = bucketProps.search_index.FromRiakString();
-            DataType = bucketProps.datatype.FromRiakString();
-
-            Consistent = bucketProps.consistent;
-        }
-
-        private static IRiakPreCommitHook LoadPreCommitHook(RpbCommitHook hook)
-        {
-            if (hook.modfun == null)
-            {
-                return new RiakJavascriptCommitHook(hook.name.FromRiakString());
-            }
-
-            return new RiakErlangCommitHook(hook.modfun.module.FromRiakString(),
-                                            hook.modfun.function.FromRiakString());
-        }
-
-        private static IRiakPreCommitHook LoadPreCommitHook(JObject hook)
-        {
-            JToken token;
-            if (hook.TryGetValue("name", out token))
-            {
-                // must be a javascript hook
-                return new RiakJavascriptCommitHook(token.Value<string>());
-            }
-
-            // otherwise it has to be erlang
-            return new RiakErlangCommitHook(hook.Value<string>("mod"), hook.Value<string>("fun"));
-        }
-
-        private static IRiakPostCommitHook LoadPostCommitHook(JObject hook)
-        {
-            // only erlang hooks are supported
-            return new RiakErlangCommitHook(hook.Value<string>("mod"), hook.Value<string>("fun"));
-        }
-
-        private static IRiakPostCommitHook LoadPostCommitHook(RpbCommitHook hook)
-        {
-            return new RiakErlangCommitHook(hook.modfun.module.FromRiakString(),
-                                            hook.modfun.function.FromRiakString());
-        }
-
-        private static void ReadQuorum(JObject props, string key, Action<uint> setter)
-        {
-            if (props[key] == null) return;
-
-
-            setter(props[key].Type == JTokenType.String
-                       ? RiakConstants.QuorumOptionsLookup[props.Value<string>(key)]
-                       : props.Value<uint>(key));
-        }
-        
         internal RpbBucketProps ToMessage()
         {
             var message = new RpbBucketProps();
-            
+
             if (AllowMultiple.HasValue)
             {
                 message.allow_mult = AllowMultiple.Value;
             }
-            
+
             if (NVal.HasValue)
             {
                 message.n_val = NVal.Value;
@@ -585,9 +537,9 @@ namespace RiakClient.Models
             // Due to the amusing differences between 1.3 and 1.4 we've added
             // this elegant shim to figure out if we should add commit hooks,
             // remove them, or just wander around setting the Search boolean.
-            if (_addHooks.HasValue)
+            if (addHooks.HasValue)
             {
-                if (_addHooks.Value)
+                if (addHooks.Value)
                 {
                     AddPreCommitHook(RiakErlangCommitHook.RiakLegacySearchCommitHook);
                 }
@@ -603,7 +555,9 @@ namespace RiakClient.Models
                     {
                         var hook = h.ToRpbCommitHook();
                         if (!message.precommit.Any(x => Equals(x, hook)))
+                        {
                             message.precommit.Add(hook);
+                        }
                     });
             }
 
@@ -618,12 +572,16 @@ namespace RiakClient.Models
                     {
                         var hook = h.ToRpbCommitHook();
                         if (!message.postcommit.Any(x => Equals(x, hook)))
+                        {
                             message.postcommit.Add(hook);
+                        }
                     });
             }
 
-            if (!String.IsNullOrEmpty(SearchIndex))
+            if (!string.IsNullOrEmpty(SearchIndex))
+            {
                 message.search_index = SearchIndex.ToRiakString();
+            }
 
             return message;
         }
@@ -632,8 +590,8 @@ namespace RiakClient.Models
         {
             var sb = new StringBuilder();
 
-            using(var sw = new StringWriter(sb))
-            using(JsonWriter jw = new JsonTextWriter(sw))
+            using (var sw = new StringWriter(sb))
+            using (JsonWriter jw = new JsonTextWriter(sw))
             {
                 jw.WriteStartObject();
                 jw.WritePropertyName("props");
@@ -669,14 +627,98 @@ namespace RiakClient.Models
                     jw.WriteEndArray();
                 }
 
-                if (!String.IsNullOrEmpty(SearchIndex))
+                if (!string.IsNullOrEmpty(SearchIndex))
+                {
                     jw.WriteNonNullProperty("search_index", SearchIndex);
+                }
 
                 jw.WriteEndObject();
                 jw.WriteEndObject();
             }
 
             return sb.ToString();
+        }
+
+        private static IRiakPreCommitHook LoadPreCommitHook(RpbCommitHook hook)
+        {
+            if (hook.modfun == null)
+            {
+                return new RiakJavascriptCommitHook(hook.name.FromRiakString());
+            }
+
+            return new RiakErlangCommitHook(
+                hook.modfun.module.FromRiakString(),
+                hook.modfun.function.FromRiakString());
+        }
+
+        private static IRiakPreCommitHook LoadPreCommitHook(JObject hook)
+        {
+            JToken token;
+            if (hook.TryGetValue("name", out token))
+            {
+                // must be a javascript hook
+                return new RiakJavascriptCommitHook(token.Value<string>());
+            }
+
+            // otherwise it has to be erlang
+            return new RiakErlangCommitHook(hook.Value<string>("mod"), hook.Value<string>("fun"));
+        }
+
+        private static IRiakPostCommitHook LoadPostCommitHook(JObject hook)
+        {
+            // only erlang hooks are supported
+            return new RiakErlangCommitHook(hook.Value<string>("mod"), hook.Value<string>("fun"));
+        }
+
+        private static IRiakPostCommitHook LoadPostCommitHook(RpbCommitHook hook)
+        {
+            return new RiakErlangCommitHook(
+                hook.modfun.module.FromRiakString(),
+                hook.modfun.function.FromRiakString());
+        }
+
+        private static void ReadQuorum(JObject props, string key, Action<uint> setter)
+        {
+            if (props[key] == null)
+            {
+                return;
+            }
+
+            setter(props[key].Type == JTokenType.String
+                       ? RiakConstants.QuorumOptionsLookup[props.Value<string>(key)]
+                       : props.Value<uint>(key));
+        }
+
+        private RiakBucketProperties WriteQuorum(string value, Action<uint> setter)
+        {
+            Debug.Assert(new HashSet<string> { "all", "quorum", "one", "default" }.Contains(value), "Incorrect quorum value");
+
+            setter(RiakConstants.QuorumOptionsLookup[value]);
+            return this;
+        }
+
+        private RiakBucketProperties WriteQuorum(uint value, Action<uint> setter)
+        {
+            Debug.Assert(value >= 1, "value must be greater than or equal to 1");
+
+            setter(value);
+            return this;
+        }
+
+        private RiakBucketProperties WriteQuorum(string value, Action<Either<uint, string>> setter)
+        {
+            Debug.Assert(new HashSet<string> { "all", "quorum", "one", "default" }.Contains(value), "Incorrect quorum value");
+
+            setter(new Either<uint, string>(value));
+            return this;
+        }
+
+        private RiakBucketProperties WriteQuorum(uint value, Action<Either<uint, string>> setter)
+        {
+            Debug.Assert(value >= 1, "value must be greater than or equal to 1");
+
+            setter(new Either<uint, string>(value));
+            return this;
         }
     }
 }

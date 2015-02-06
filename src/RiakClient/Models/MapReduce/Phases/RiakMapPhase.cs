@@ -1,4 +1,6 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// <copyright file="RiakMapPhase.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,11 +15,12 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using RiakClient.Models.MapReduce.Languages;
+// </copyright>
 
 namespace RiakClient.Models.MapReduce.Phases
 {
+    using Models.MapReduce.Languages;
+
     internal class RiakMapPhase<TLanguage> : RiakActionPhase<TLanguage>
         where TLanguage : IRiakPhaseLanguage, new()
     {

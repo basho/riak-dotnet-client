@@ -1,4 +1,6 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// <copyright file="Either.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,25 +15,41 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
+// </copyright>
 
 namespace RiakClient.Containers
 {
     public class Either<TLeft, TRight>
     {
-        public bool IsLeft { get; private set; }
-        public TLeft Left { get; private set; }
-        public TRight Right { get; private set; }
+        private readonly bool isLeft;
+        private readonly TLeft left;
+        private readonly TRight right;
 
         public Either(TLeft left)
         {
-            Left = left;
-            IsLeft = true;
+            this.left = left;
+            isLeft = true;
         }
 
         public Either(TRight right)
         {
-            Right = right;
-            IsLeft = false;
+            this.right = right;
+            isLeft = false;
+        }
+
+        public bool IsLeft
+        {
+            get { return isLeft; }
+        }
+
+        public TLeft Left
+        {
+            get { return left; }
+        }
+
+        public TRight Right
+        {
+            get { return right; }
         }
     }
 }

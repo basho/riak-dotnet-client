@@ -1,4 +1,6 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// <copyright file="RiakRestResponse.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,20 +15,28 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using System.Collections.Generic;
-using System.Net;
+// </copyright>
 
 namespace RiakClient.Models.Rest
 {
+    using System.Collections.Generic;
+    using System.Net;
+    using System.Text;
+
     public class RiakRestResponse
     {
         public string ContentType { get; set; }
+
         public long ContentLength { get; set; }
-        public System.Text.Encoding ContentEncoding { get; set; }
+
+        public Encoding ContentEncoding { get; set; }
+
         public string Body { get; set; }
+
         public HttpStatusCode StatusCode { get; set; }
+
         public Dictionary<string, string> Headers { get; set; }
+
         public string ErrorMessage { get; set; }
     }
 }

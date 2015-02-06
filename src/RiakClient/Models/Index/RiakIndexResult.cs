@@ -1,4 +1,6 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// <copyright file="RiakIndexResult.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,37 +15,35 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using RiakClient.Extensions;
-using RiakClient.Messages;
+// </copyright>
 
 namespace RiakClient.Models.Index
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using Extensions;
+    using Messages;
+
     public class RiakIndexResult : IRiakIndexResult
     {
-        private readonly IEnumerable<RiakIndexKeyTerm> _indexKeyTerms;
-
-        public IEnumerable<RiakIndexKeyTerm> IndexKeyTerms
-        {
-            get { return _indexKeyTerms; }
-        }
+        private readonly IEnumerable<RiakIndexKeyTerm> indexKeyTerms;
 
         internal RiakIndexResult(bool includeTerms, RiakResult<RpbIndexResp> response)
         {
             if (includeTerms)
             {
-                _indexKeyTerms = response.Value.results.Select(pair =>
-                                                new RiakIndexKeyTerm(pair.value.FromRiakString(),
-                                                                    pair.key.FromRiakString()));
+                indexKeyTerms = response.Value.results.Select(
+                    pair => new RiakIndexKeyTerm(pair.value.FromRiakString(), pair.key.FromRiakString()));
             }
             else
             {
-                _indexKeyTerms = response.Value.keys.Select(key => new RiakIndexKeyTerm(key.FromRiakString()));
+                indexKeyTerms = response.Value.keys.Select(key => new RiakIndexKeyTerm(key.FromRiakString()));
             }
+        }
+
+        public IEnumerable<RiakIndexKeyTerm> IndexKeyTerms
+        {
+            get { return indexKeyTerms; }
         }
     }
 }

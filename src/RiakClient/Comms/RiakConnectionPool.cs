@@ -1,5 +1,6 @@
-﻿// Copyright (c) 2013 - OJ Reeves & Jeremiah Peschka
-// Copyright (c) 2015 - Basho Technologies, Inc.
+// <copyright file="RiakConnectionPool.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -14,45 +15,47 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using RiakClient.Config;
+// </copyright>
 
 namespace RiakClient.Comms
 {
+    using System;
+    using System.Collections.Concurrent;
+    using System.Collections.Generic;
+    using Config;
+
     internal class RiakConnectionPool : IRiakConnectionManager
     {
-        private readonly List<IRiakConnection> _allResources;
-        private readonly ConcurrentStack<IRiakConnection> _resources;
-        private bool _disposing;
+        private readonly ICollection<IRiakConnection> allResources = new List<IRiakConnection>();
+        private readonly ConcurrentStack<IRiakConnection> resources = new ConcurrentStack<IRiakConnection>();
+        private bool disposing;
 
-        public RiakConnectionPool(IRiakNodeConfiguration nodeConfig,
+        public RiakConnectionPool(
+            IRiakNodeConfiguration nodeConfig,
             IRiakAuthenticationConfiguration authConfig,
             IRiakConnectionFactory connFactory)
         {
-            var poolSize = nodeConfig.PoolSize;
-            _allResources = new List<IRiakConnection>();
-            _resources = new ConcurrentStack<IRiakConnection>();
+            int poolSize = nodeConfig.PoolSize;
 
             for (var i = 0; i < poolSize; ++i)
             {
                 var conn = connFactory.CreateConnection(nodeConfig, authConfig);
-                _allResources.Add(conn);
-                _resources.Push(conn);
+                allResources.Add(conn);
+                resources.Push(conn);
             }
         }
 
         public Tuple<bool, TResult> Consume<TResult>(Func<IRiakConnection, TResult> consumer)
         {
-            if (_disposing)
+            if (disposing)
+            {
                 return Tuple.Create(false, default(TResult));
+            }
 
             IRiakConnection instance = null;
             try
             {
-                if (_resources.TryPop(out instance))
+                if (resources.TryPop(out instance))
                 {
                     var result = consumer(instance);
                     return Tuple.Create(true, result);
@@ -66,7 +69,7 @@ namespace RiakClient.Comms
             {
                 if (instance != null)
                 {
-                    _resources.Push(instance);
+                    resources.Push(instance);
                 }
             }
 
@@ -75,19 +78,21 @@ namespace RiakClient.Comms
 
         public Tuple<bool, TResult> DelayedConsume<TResult>(Func<IRiakConnection, Action, TResult> consumer)
         {
-            if (_disposing)
+            if (disposing)
+            {
                 return Tuple.Create(false, default(TResult));
+            }
 
             IRiakConnection instance = null;
             try
             {
-                if (_resources.TryPop(out instance))
+                if (resources.TryPop(out instance))
                 {
                     Action cleanup = () =>
                     {
                         var i = instance;
                         instance = null;
-                        _resources.Push(i);
+                        resources.Push(i);
                     };
 
                     var result = consumer(instance, cleanup);
@@ -98,8 +103,9 @@ namespace RiakClient.Comms
             {
                 if (instance != null)
                 {
-                    _resources.Push(instance);
+                    resources.Push(instance);
                 }
+
                 return Tuple.Create(false, default(TResult));
             }
 
@@ -108,12 +114,14 @@ namespace RiakClient.Comms
 
         public void Dispose()
         {
-            if (_disposing)
+            if (disposing)
+            {
                 return;
+            }
 
-            _disposing = true;
+            disposing = true;
 
-            foreach (var conn in _allResources)
+            foreach (var conn in allResources)
             {
                 conn.Dispose();
             }

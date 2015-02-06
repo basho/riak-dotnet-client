@@ -1,5 +1,6 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
-// Copyright (c) 2015 - Basho Technologies, Inc.
+// <copyright file="RiakNode.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -14,28 +15,21 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using System;
-using System.Collections.Generic;
-using RiakClient.Config;
+// </copyright>
 
 namespace RiakClient.Comms
 {
-    public interface IRiakNode : IDisposable
-    {
-        RiakResult UseConnection(Func<IRiakConnection, RiakResult> useFun);
-        RiakResult<TResult> UseConnection<TResult>(Func<IRiakConnection, RiakResult<TResult>> useFun);
-
-        RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun)
-            where TResult : RiakResult;
-    }
+    using System;
+    using System.Collections.Generic;
+    using Config;
 
     public class RiakNode : IRiakNode
     {
         private readonly IRiakConnectionManager connections;
         private bool disposing;
 
-        public RiakNode(IRiakNodeConfiguration nodeConfig,
+        public RiakNode(
+            IRiakNodeConfiguration nodeConfig,
             IRiakAuthenticationConfiguration authConfig,
             IRiakConnectionFactory connectionFactory)
         {
@@ -61,22 +55,6 @@ namespace RiakClient.Comms
             return UseConnection(useFun, RiakResult<TResult>.Error);
         }
 
-        private TRiakResult UseConnection<TRiakResult>(Func<IRiakConnection, TRiakResult> useFun, Func<ResultCode, string, bool, TRiakResult> onError)
-            where TRiakResult : RiakResult
-        {
-            if (disposing)
-            {
-                return onError(ResultCode.ShuttingDown, "Connection is shutting down", true);
-            }
-
-            var response = connections.Consume(useFun);
-            if (response.Item1)
-            {
-                return response.Item2;
-            }
-            return onError(ResultCode.NoConnections, "Unable to acquire connection", true);
-        }
-
         public RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun)
             where TResult : RiakResult
         {
@@ -90,6 +68,7 @@ namespace RiakClient.Comms
             {
                 return response.Item2;
             }
+
             return RiakResult<IEnumerable<TResult>>.Error(ResultCode.NoConnections, "Unable to acquire connection", true);
         }
 
@@ -97,6 +76,23 @@ namespace RiakClient.Comms
         {
             disposing = true;
             connections.Dispose();
+        }
+
+        private TRiakResult UseConnection<TRiakResult>(Func<IRiakConnection, TRiakResult> useFun, Func<ResultCode, string, bool, TRiakResult> onError)
+            where TRiakResult : RiakResult
+        {
+            if (disposing)
+            {
+                return onError(ResultCode.ShuttingDown, "Connection is shutting down", true);
+            }
+
+            var response = connections.Consume(useFun);
+            if (response.Item1)
+            {
+                return response.Item2;
+            }
+
+            return onError(ResultCode.NoConnections, "Unable to acquire connection", true);
         }
     }
 }
