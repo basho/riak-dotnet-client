@@ -1,4 +1,6 @@
+// <copyright file="Not.cs" company="Basho Technologies, Inc.">
 // Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,35 +15,36 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
+// </copyright>
 
 namespace RiakClient.Models.MapReduce.KeyFilters
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Text;
+    using Newtonsoft.Json;
+
     /// <summary>
     /// Negates the result of key-filter operations.
     /// </summary>
     internal class Not : IRiakKeyFilterToken
     {
-        private readonly Tuple<string, List<IRiakKeyFilterToken>> _kfDefinition;
+        private readonly Tuple<string, List<IRiakKeyFilterToken>> keyFilterDefinition;
+
+        public Not(List<IRiakKeyFilterToken> arg)
+        {
+            keyFilterDefinition = Tuple.Create("not", arg);
+        }
 
         public string FunctionName
         {
-            get { return _kfDefinition.Item1; }
+            get { return keyFilterDefinition.Item1; }
         }
 
         public List<IRiakKeyFilterToken> Argument
         {
-            get { return _kfDefinition.Item2; }
-        }
-
-        public Not(List<IRiakKeyFilterToken> arg)
-        {
-            _kfDefinition = Tuple.Create("not", arg);
+            get { return keyFilterDefinition.Item2; }
         }
 
         public override string ToString()
@@ -53,18 +56,20 @@ namespace RiakClient.Models.MapReduce.KeyFilters
         {
             var sb = new StringBuilder();
 
-            using(var sw = new StringWriter(sb))
-            using(JsonWriter jw = new JsonTextWriter(sw))
+            using (var sw = new StringWriter(sb))
             {
-                jw.WriteStartArray();
+                using (JsonWriter jw = new JsonTextWriter(sw))
+                {
+                    jw.WriteStartArray();
 
-                jw.WriteValue(FunctionName);
-                jw.WriteStartArray();
+                    jw.WriteValue(FunctionName);
+                    jw.WriteStartArray();
 
-                Argument.ForEach(a => jw.WriteRawValue(a.ToString()));
+                    Argument.ForEach(a => jw.WriteRawValue(a.ToString()));
 
-                jw.WriteEndArray();
-                jw.WriteEndArray();
+                    jw.WriteEndArray();
+                    jw.WriteEndArray();
+                }
             }
 
             return sb.ToString();

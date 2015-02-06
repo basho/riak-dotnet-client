@@ -1,4 +1,6 @@
+// <copyright file="Matches.cs" company="Basho Technologies, Inc.">
 // Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,34 +15,35 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using Newtonsoft.Json;
-using System;
-using System.IO;
-using System.Text;
+// </copyright>
 
 namespace RiakClient.Models.MapReduce.KeyFilters
 {
+    using System;
+    using System.IO;
+    using System.Text;
+    using Newtonsoft.Json;
+
     /// <summary>
     /// Tests that the input matches the regular expression given in the argument.
     /// </summary>
     internal class Matches : IRiakKeyFilterToken
     {
-        private readonly Tuple<string, string> _kfDefinition;
+        private readonly Tuple<string, string> keyFilterDefinition;
+
+        public Matches(string arg)
+        {
+            keyFilterDefinition = Tuple.Create("matches", arg);
+        }
 
         public string FunctionName
         {
-            get { return _kfDefinition.Item1; }
+            get { return keyFilterDefinition.Item1; }
         }
 
         public string Argument
         {
-            get { return _kfDefinition.Item2; }
-        }
-
-        public Matches(string arg)
-        {
-            _kfDefinition = Tuple.Create("matches", arg);
+            get { return keyFilterDefinition.Item2; }
         }
 
         public override string ToString()
@@ -52,15 +55,17 @@ namespace RiakClient.Models.MapReduce.KeyFilters
         {
             var sb = new StringBuilder();
 
-            using(var sw = new StringWriter(sb))
-            using(JsonWriter jw = new JsonTextWriter(sw))
+            using (var sw = new StringWriter(sb))
             {
-                jw.WriteStartArray();
+                using (JsonWriter jw = new JsonTextWriter(sw))
+                {
+                    jw.WriteStartArray();
 
-                jw.WriteValue(FunctionName);
-                jw.WriteValue(Argument);
+                    jw.WriteValue(FunctionName);
+                    jw.WriteValue(Argument);
 
-                jw.WriteEndArray();
+                    jw.WriteEndArray();
+                }
             }
 
             return sb.ToString();

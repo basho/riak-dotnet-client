@@ -1,26 +1,28 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
-// Copyright (c) 2015 - Basho Technologies, Inc.
-// 
+// <copyright file="RiakIndex.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
+//
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
 // except in compliance with the License.  You may obtain
 // a copy of the License at
-// 
+//
 //   http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing,
 // software distributed under the License is distributed on an
 // "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using System;
-using System.Numerics;
-using RiakClient.Util;
+// </copyright>
 
 namespace RiakClient.Models.MapReduce.Inputs
 {
+    using System;
+    using System.Numerics;
+    using Util;
+
     public static class RiakIndex
     {
         [Obsolete("Use Match(RiakIndexId, key) instead. This will be revoved in the next version.")]
@@ -79,7 +81,7 @@ namespace RiakClient.Models.MapReduce.Inputs
         /// characters \u000000 and \u10FFFF (16-bit Unicode). This would typically
         /// be used in a stand alone Map phase to return all keys as a List&lt;RiakObjectId&gt;.
         /// See https://gist.github.com/peschkaj/4772825 for a working example.
-        /// </remarks>
+        /// </para></remarks>
         public static RiakIndexInput AllKeys(string bucket)
         {
             return AllKeys(null, bucket);
@@ -98,7 +100,7 @@ namespace RiakClient.Models.MapReduce.Inputs
         /// characters \u000000 and \u10FFFF (16-bit Unicode). This would typically
         /// be used in a stand alone Map phase to return all keys as a List&lt;RiakObjectId&gt;.
         /// See https://gist.github.com/peschkaj/4772825 for a working example.
-        /// </remarks>
+        /// </para></remarks>
         public static RiakIndexInput AllKeys(string bucketType, string bucket)
         {
             return Match(new RiakIndexId(bucketType, bucket, RiakConstants.SystemIndexKeys.RiakBucketIndex), bucket);
@@ -113,6 +115,7 @@ namespace RiakClient.Models.MapReduce.Inputs
         /// <remarks>This is a wrapper around a range query on the $key index
         /// in Riak. Working with secondary indices requires that users enable
         /// the LevelDB backend and restart their cluster.</remarks>
+        /// <returns>List of keys between start and end values</returns>
         public static RiakIndexInput Keys(string bucket, string start, string end)
         {
             return Keys(null, bucket, start, end);
@@ -128,6 +131,7 @@ namespace RiakClient.Models.MapReduce.Inputs
         /// <remarks>This is a wrapper around a range query on the $key index
         /// in Riak. Working with secondary indices requires that users enable
         /// the LevelDB backend and restart their cluster.</remarks>
+        /// <returns>List of keys between the start and end values</returns>
         public static RiakIndexInput Keys(string bucketType, string bucket, string start, string end)
         {
             return Range(new RiakIndexId(bucketType, bucket, RiakConstants.SystemIndexKeys.RiakKeysIndex), start, end);

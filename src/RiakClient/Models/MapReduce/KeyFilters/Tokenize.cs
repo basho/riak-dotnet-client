@@ -1,4 +1,6 @@
+// <copyright file="Tokenize.cs" company="Basho Technologies, Inc.">
 // Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,40 +15,41 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using Newtonsoft.Json;
-using System;
-using System.IO;
-using System.Text;
+// </copyright>
 
 namespace RiakClient.Models.MapReduce.KeyFilters
 {
+    using System;
+    using System.IO;
+    using System.Text;
+    using Newtonsoft.Json;
+
     /// <summary>
     /// Splits the input on the string given as the first argument and returns the nth
     /// token specified by the second argument.
     /// </summary>
     internal class Tokenize : IRiakKeyFilterToken
     {
-        private readonly Tuple<string, string, uint> _kfDefinition;
+        private readonly Tuple<string, string, uint> keyFilterDefinition;
+
+        public Tokenize(string token, uint position)
+        {
+            keyFilterDefinition = Tuple.Create("tokenize", token, position);
+        }
 
         public string FunctionName
         {
-            get { return _kfDefinition.Item1; }
+            get { return keyFilterDefinition.Item1; }
         }
 
         public string Token
         {
-            get { return _kfDefinition.Item2; }
+            get { return keyFilterDefinition.Item2; }
         }
 
         public uint Position
         {
-            get { return _kfDefinition.Item3; }
-        }
-
-        public Tokenize(string token, uint position)
-        {
-            _kfDefinition = Tuple.Create("tokenize", token, position);
+            get { return keyFilterDefinition.Item3; }
         }
 
         public override string ToString()
@@ -58,16 +61,18 @@ namespace RiakClient.Models.MapReduce.KeyFilters
         {
             var sb = new StringBuilder();
 
-            using(var sw = new StringWriter(sb))
-            using(JsonWriter jw = new JsonTextWriter(sw))
+            using (var sw = new StringWriter(sb))
             {
-                jw.WriteStartArray();
+                using (JsonWriter jw = new JsonTextWriter(sw))
+                {
+                    jw.WriteStartArray();
 
-                jw.WriteValue(FunctionName);
-                jw.WriteValue(Token);
-                jw.WriteValue(Position);
+                    jw.WriteValue(FunctionName);
+                    jw.WriteValue(Token);
+                    jw.WriteValue(Position);
 
-                jw.WriteEndArray();
+                    jw.WriteEndArray();
+                }
             }
 
             return sb.ToString();

@@ -1,4 +1,6 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// <copyright file="RiakSearchRequest.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,14 +15,15 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using System.Collections.Generic;
-using System.Linq;
-using RiakClient.Extensions;
-using RiakClient.Messages;
+// </copyright>
 
 namespace RiakClient.Models.Search
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using Extensions;
+    using Messages;
+
     /// <summary>
     /// Specifies the sort order of Riak Search Results
     /// </summary>
@@ -30,6 +33,7 @@ namespace RiakClient.Models.Search
         /// Sort the results by bucket key.
         /// </summary>
         Key,
+
         /// <summary>
         /// Sort the results by search score.
         /// </summary>
@@ -62,7 +66,7 @@ namespace RiakClient.Models.Search
         public DefaultOperation? DefaultOperation { get; set; }
 
         /// <summary>
-        /// Specifies the list of fields that should be returned for each
+        /// Gets or sets the list of fields that should be returned for each
         /// record in the result list.
         /// </summary>
         /// <remarks>

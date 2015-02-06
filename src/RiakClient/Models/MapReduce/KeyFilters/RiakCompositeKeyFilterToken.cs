@@ -1,4 +1,6 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// <copyright file="RiakCompositeKeyFilterToken.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,13 +15,13 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using RiakClient.Extensions;
-using Newtonsoft.Json;
-using System.Linq;
+// </copyright>
 
 namespace RiakClient.Models.MapReduce.KeyFilters
 {
+    using System.Linq;
+    using Newtonsoft.Json;
+
     internal abstract class RiakCompositeKeyFilterToken : RiakKeyFilterToken
     {
         protected RiakCompositeKeyFilterToken(string functionName, params object[] args)
@@ -29,14 +31,22 @@ namespace RiakClient.Models.MapReduce.KeyFilters
 
         protected override void WriteArguments(JsonWriter writer)
         {
-            Arguments.Cast<IRiakKeyFilterToken>().ForEach(v => WriteArgumentAsArray(v, writer));
+            foreach (IRiakKeyFilterToken keyFilterToken in Arguments.Cast<IRiakKeyFilterToken>())
+            {
+                WriteArgumentAsArray(keyFilterToken, writer);
+            }
         }
 
         protected void WriteArgumentAsArray(IRiakKeyFilterToken argument, JsonWriter writer)
         {
-            //writer.WriteStartArray();
+            /*
+             * TODO: is StartArray really not needed? 
+             * writer.WriteStartArray();
+             */
+
             writer.WriteRawValue(argument.ToJsonString());
-            //writer.WriteEndArray();
+
+            // writer.WriteEndArray();
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// <copyright file="JsonExtensions.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,12 +15,12 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using Newtonsoft.Json;
-using RiakClient.Containers;
+// </copyright>
 
 namespace RiakClient.Extensions
 {
+    using Newtonsoft.Json;
+
     public static class JsonExtensions
     {
         public static string ToJson<T>(this T value)
@@ -45,22 +47,7 @@ namespace RiakClient.Extensions
             {
                 writer.WriteProperty(name, value);
             }
-            return writer;
-        }
 
-        public static JsonWriter WriteEither<TLeft, TRight>(this JsonWriter writer, string name, Either<TLeft, TRight> either)
-        {
-            if (either != null)
-            {
-                if (either.IsLeft)
-                {
-                    writer.WriteProperty(name, either.Left);
-                }
-                else
-                {
-                    writer.WriteProperty(name, either.Right);
-                }
-            }
             return writer;
         }
 
@@ -71,6 +58,7 @@ namespace RiakClient.Extensions
             {
                 writer.WriteProperty(name, value.Value);
             }
+
             return writer;
         }
 
@@ -80,6 +68,7 @@ namespace RiakClient.Extensions
             {
                 writer.WriteProperty(name, value);
             }
+
             return writer;
         }
     }

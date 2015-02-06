@@ -1,4 +1,6 @@
-﻿// Copyright (c) 2013 - OJ Reeves & Jeremiah Peschka
+// <copyright file="IRiakConnectionManager.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,14 +15,16 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using System;
+// </copyright>
 
 namespace RiakClient.Comms
 {
+    using System;
+
     internal interface IRiakConnectionManager : IDisposable
     {
         Tuple<bool, TResult> Consume<TResult>(Func<IRiakConnection, TResult> consumer);
+
         Tuple<bool, TResult> DelayedConsume<TResult>(Func<IRiakConnection, Action, TResult> consumer);
     }
 }

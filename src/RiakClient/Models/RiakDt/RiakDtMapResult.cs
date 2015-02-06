@@ -1,4 +1,6 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// <copyright file="RiakDtMapResult.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,27 +15,33 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using System.Collections.Generic;
+// </copyright>
 
 namespace RiakClient.Models.RiakDt
 {
+    using System.Collections.Generic;
+
     public class RiakDtMapResult
     {
-        public RiakResult<RiakObject> Result { get; private set; }
-        public byte[] Context { get; internal set; }
-        public List<RiakDtMapEntry> Values { get; internal set; }
-
-        public RiakDtMapResult(RiakResult<RiakObject> result,
-                               byte[] context = null,
-                               List<RiakDtMapEntry> values = null)
+        public RiakDtMapResult(
+            RiakResult<RiakObject> result,
+            byte[] context = null,
+            List<RiakDtMapEntry> values = null)
         {
             Result = result;
 
             if (context != null)
+            {
                 Context = context;
+            }
 
             Values = values ?? new List<RiakDtMapEntry>();
         }
+
+        public RiakResult<RiakObject> Result { get; private set; }
+
+        public byte[] Context { get; internal set; }
+
+        public List<RiakDtMapEntry> Values { get; internal set; }
     }
 }

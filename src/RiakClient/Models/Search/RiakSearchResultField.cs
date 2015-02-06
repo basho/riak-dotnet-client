@@ -1,4 +1,6 @@
+// <copyright file="RiakSearchResultField.cs" company="Basho Technologies, Inc.">
 // Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,21 +15,32 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using RiakClient.Extensions;
-using RiakClient.Messages;
+// </copyright>
 
 namespace RiakClient.Models.Search
 {
+    using Extensions;
+    using Messages;
+
     public class RiakSearchResultField
     {
-        public string Key { get; private set; }
-        public string Value { get; private set; }
+        private readonly string key;
+        private readonly string value;
 
         internal RiakSearchResultField(RpbPair field)
         {
-            Key = field.key.FromRiakString();
-            Value = field.value.FromRiakString();
+            this.key = field.key.FromRiakString();
+            this.value = field.value.FromRiakString();
+        }
+
+        public string Key
+        {
+            get { return key; }
+        }
+
+        public string Value
+        {
+            get { return value; }
         }
     }
 }

@@ -1,4 +1,6 @@
+// <copyright file="IRiakNodeConfiguration.cs" company="Basho Technologies, Inc.">
 // Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,22 +15,30 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using System;
+// </copyright>
 
 namespace RiakClient.Config
 {
+    using System;
+
     public interface IRiakNodeConfiguration
     {
         string Name { get; }
+
         string HostAddress { get; }
+
         int PbcPort { get; }
+
         string RestScheme { get; }
+
         int RestPort { get; }
+
         int PoolSize { get; }
-        // TimeSpan IdleTimeout { get; }
+
         TimeSpan NetworkReadTimeout { get; }
+
         TimeSpan NetworkWriteTimeout { get; }
+
         TimeSpan NetworkConnectTimeout { get; }
     }
 }

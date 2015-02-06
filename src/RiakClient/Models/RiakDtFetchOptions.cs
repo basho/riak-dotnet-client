@@ -1,4 +1,6 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// <copyright file="RiakDtFetchOptions.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,18 +15,26 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using System;
-using System.Collections.Generic;
-using RiakClient.Extensions;
-using RiakClient.Containers;
-using RiakClient.Messages;
-using RiakClient.Util;
+// </copyright>
 
 namespace RiakClient.Models
 {
+    using System;
+    using System.Collections.Generic;
+    using Containers;
+    using Extensions;
+    using Messages;
+    using Util;
+
     public class RiakDtFetchOptions
     {
+        public RiakDtFetchOptions()
+        {
+            R = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
+            Pr = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
+            IncludeContext = true;
+        }
+
         /// <summary>
         /// The number of replicas that must return before a fetch is considered a success.
         /// </summary>
@@ -137,13 +147,6 @@ namespace RiakClient.Models
             return this;
         }
 
-        public RiakDtFetchOptions()
-        {
-            R = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
-            Pr = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
-            IncludeContext = true;
-        }
-
         internal void Populate(DtFetchReq request)
         {
             request.r = R.IsLeft ? R.Left : R.Right.ToRpbOption();
@@ -187,7 +190,7 @@ namespace RiakClient.Models
 
         private RiakDtFetchOptions WriteQuorum(uint value, Action<Either<uint, string>> setter)
         {
-            System.Diagnostics.Debug.Assert(value >= 1);
+            System.Diagnostics.Debug.Assert(value >= 1, "value must be greater than or equal to 1");
 
             setter(new Either<uint, string>(value));
             return this;

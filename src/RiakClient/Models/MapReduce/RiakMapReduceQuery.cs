@@ -1,5 +1,6 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
-// Copyright (c) 2015 - Basho Technologies, Inc.
+// <copyright file="RiakMapReduceQuery.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -14,88 +15,105 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using RiakClient.Extensions;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using RiakClient.Messages;
-using RiakClient.Models.MapReduce.Fluent;
-using RiakClient.Models.MapReduce.Inputs;
-using RiakClient.Models.MapReduce.KeyFilters;
-using RiakClient.Models.MapReduce.Languages;
-using RiakClient.Models.MapReduce.Phases;
-using RiakClient.Util;
+// </copyright>
 
 namespace RiakClient.Models.MapReduce
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Text;
+    using Extensions;
+    using Messages;
+    using Models.MapReduce.Fluent;
+    using Models.MapReduce.Inputs;
+    using Models.MapReduce.KeyFilters;
+    using Models.MapReduce.Languages;
+    using Models.MapReduce.Phases;
+    using Newtonsoft.Json;
+    using Util;
+
     public class RiakMapReduceQuery
     {
-        private readonly List<RiakPhase> _phases;
+        private readonly List<RiakPhase> phases = new List<RiakPhase>();
+        private readonly string contentType = RiakConstants.ContentTypes.ApplicationJson;
+        private readonly int? timeout = null;
 
-        private string _query;
-        private RiakPhaseInput _inputs;
+        private string query;
+        private RiakPhaseInput inputs;
 
-        public string ContentType { get; set; }
-
-        public int? Timeout { get; set; }
-
-        public RiakMapReduceQuery()
+        public RiakMapReduceQuery() : this(RiakConstants.ContentTypes.ApplicationJson, null)
         {
-            _phases = new List<RiakPhase>();
-            ContentType = RiakConstants.ContentTypes.ApplicationJson;
+        }
+
+        public RiakMapReduceQuery(string contentType, int? timeout = null)
+        {
+            if (string.IsNullOrWhiteSpace(contentType))
+            {
+                throw new ArgumentNullException("contentType");
+            }
+
+            this.contentType = contentType;
+            this.timeout = timeout;
+        }
+
+        public string ContentType
+        {
+            get { return contentType; }
+        }
+
+        public int? Timeout
+        {
+            get { return timeout; }
         }
 
         public RiakMapReduceQuery Inputs(string bucket)
         {
-            _inputs = new RiakBucketInput(bucket);
+            inputs = new RiakBucketInput(bucket);
             return this;
         }
 
         // TODO: Replace the backwardsness of these parameters when we get a Namespace class.
         public RiakMapReduceQuery Inputs(string bucket, string bucketType)
         {
-            _inputs = new RiakBucketInput(bucket, bucketType);
+            inputs = new RiakBucketInput(bucket, bucketType);
             return this;
         }
 
         [Obsolete("Using Legacy Search as input for MapReduce is depreciated. Please move to Riak 2.0 Search, and use the RiakSearchInput class instead.")]
         public RiakMapReduceQuery Inputs(RiakBucketSearchInput riakBucketSearchInput)
         {
-            _inputs = riakBucketSearchInput;
+            inputs = riakBucketSearchInput;
             return this;
         }
 
         public RiakMapReduceQuery Inputs(RiakSearchInput riakSearchInput)
         {
-            _inputs = riakSearchInput;
+            inputs = riakSearchInput;
             return this;
         }
 
         public RiakMapReduceQuery Inputs(RiakBucketKeyInput riakBucketKeyInputs)
         {
-            _inputs = riakBucketKeyInputs;
+            inputs = riakBucketKeyInputs;
             return this;
         }
 
         public RiakMapReduceQuery Inputs(RiakBucketKeyKeyDataInput riakBucketKeyKeyDataInputs)
         {
-            _inputs = riakBucketKeyKeyDataInputs;
+            inputs = riakBucketKeyKeyDataInputs;
             return this;
         }
 
-
         public RiakMapReduceQuery Inputs(RiakModuleFunctionArgInput riakModFunArgsInput)
         {
-            _inputs = riakModFunArgsInput;
+            inputs = riakModFunArgsInput;
             return this;
         }
 
         public RiakMapReduceQuery Inputs(RiakIndexInput riakIndexPhaseInput)
         {
-            _inputs = riakIndexPhaseInput;
+            inputs = riakIndexPhaseInput;
             return this;
         }
 
@@ -104,7 +122,7 @@ namespace RiakClient.Models.MapReduce
             var phase = new RiakMapPhase<RiakPhaseLanguageErlang>();
             var fluent = new RiakFluentActionPhaseErlang(phase);
             setup(fluent);
-            _phases.Add(phase);
+            phases.Add(phase);
             return this;
         }
 
@@ -113,7 +131,7 @@ namespace RiakClient.Models.MapReduce
             var phase = new RiakMapPhase<RiakPhaseLanguageJavascript>();
             var fluent = new RiakFluentActionPhaseJavascript(phase);
             setup(fluent);
-            _phases.Add(phase);
+            phases.Add(phase);
             return this;
         }
 
@@ -122,7 +140,7 @@ namespace RiakClient.Models.MapReduce
             var phase = new RiakReducePhase<RiakPhaseLanguageErlang>();
             var fluent = new RiakFluentActionPhaseErlang(phase);
             setup(fluent);
-            _phases.Add(phase);
+            phases.Add(phase);
             return this;
         }
 
@@ -131,7 +149,7 @@ namespace RiakClient.Models.MapReduce
             var phase = new RiakReducePhase<RiakPhaseLanguageJavascript>();
             var fluent = new RiakFluentActionPhaseJavascript(phase);
             setup(fluent);
-            _phases.Add(phase);
+            phases.Add(phase);
             return this;
         }
 
@@ -140,7 +158,7 @@ namespace RiakClient.Models.MapReduce
             var phase = new RiakLinkPhase();
             var fluent = new RiakFluentLinkPhase(phase);
             setup(fluent);
-            _phases.Add(phase);
+            phases.Add(phase);
             return this;
         }
 
@@ -149,46 +167,49 @@ namespace RiakClient.Models.MapReduce
             var filters = new List<IRiakKeyFilterToken>();
             var fluent = new RiakFluentKeyFilter(filters);
             setup(fluent);
-            _inputs.Filters.AddRange(filters);
+            inputs.Filters.AddRange(filters);
 
             return this;
         }
 
         public void Compile()
         {
-            System.Diagnostics.Debug.Assert(_inputs != null);
-            if (!string.IsNullOrWhiteSpace(_query))
+            System.Diagnostics.Debug.Assert(inputs != null, "Compile inputs must not be null");
+
+            if (!string.IsNullOrWhiteSpace(query))
             {
                 return;
             }
 
             var sb = new StringBuilder();
 
-            using(var sw = new StringWriter(sb))
-            using(JsonWriter writer = new JsonTextWriter(sw))
+            using (var sw = new StringWriter(sb))
             {
-                writer.WriteStartObject();
-
-                if (_inputs != null)
+                using (JsonWriter writer = new JsonTextWriter(sw))
                 {
-                    _inputs.WriteJson(writer);
+                    writer.WriteStartObject();
+
+                    if (inputs != null)
+                    {
+                        inputs.WriteJson(writer);
+                    }
+
+                    writer.WritePropertyName("query");
+
+                    writer.WriteStartArray();
+                    phases.ForEach(p => writer.WriteRawValue(p.ToJsonString()));
+                    writer.WriteEndArray();
+
+                    if (timeout.HasValue)
+                    {
+                        writer.WriteProperty<int>("timeout", timeout.Value);
+                    }
+
+                    writer.WriteEndObject();
                 }
-
-                writer.WritePropertyName("query");
-
-                writer.WriteStartArray();
-                _phases.ForEach(p => writer.WriteRawValue(p.ToJsonString()));
-                writer.WriteEndArray();
-
-                if (Timeout.HasValue)
-                {
-                    writer.WriteProperty<int>("timeout", Timeout.Value);
-                }
-
-                writer.WriteEndObject();
             }
 
-            _query = sb.ToString();
+            query = sb.ToString();
         }
 
         internal RpbMapRedReq ToMessage()
@@ -196,8 +217,8 @@ namespace RiakClient.Models.MapReduce
             Compile();
             var message = new RpbMapRedReq
             {
-                request = _query.ToRiakString(),
-                content_type = ContentType.ToRiakString()
+                request = query.ToRiakString(),
+                content_type = contentType.ToRiakString()
             };
 
             return message;

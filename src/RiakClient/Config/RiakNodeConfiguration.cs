@@ -1,4 +1,6 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// <copyright file="RiakNodeConfiguration.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,15 +15,16 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using System;
-using System.Configuration;
+// </copyright>
 
 namespace RiakClient.Config
 {
+    using System;
+    using System.Configuration;
+
     public class RiakNodeConfiguration : ConfigurationElement, IRiakNodeConfiguration
     {
-        private static readonly TimeSpan s_defaultTimeout = TimeSpan.FromMilliseconds(4000);
+        private static readonly TimeSpan DefaultTimeout = TimeSpan.FromMilliseconds(4000);
 
         [ConfigurationProperty("name", IsRequired = true)]
         public string Name
@@ -65,20 +68,15 @@ namespace RiakClient.Config
             set { this["poolSize"] = value; }
         }
 
-        // TODO: put this back in when we've got the idling stuff figured out
-        // [ConfigurationProperty("idleTimeout", DefaultValue = 15000, IsRequired = false)]
-        // public int IdleTimeout
-        // {
-        //     get { return (int)this["idleTimeout"]; }
-        //     set { this["idleTimeout"] = value; }
-        // }
-
-        [ConfigurationProperty("networkReadTimeout", DefaultValue = "4000", IsRequired = false)]
-        private string NetworkReadTimeoutProperty
-        {
-            get { return (string)this["networkReadTimeout"]; }
-            set { this["networkReadTimeout"] = value; }
-        }
+        /*
+         * TODO: put this back in when we've got the idling stuff figured out
+         * [ConfigurationProperty("idleTimeout", DefaultValue = 15000, IsRequired = false)]
+         * public int IdleTimeout
+         * {
+         *     get { return (int)this["idleTimeout"]; }
+         *     set { this["idleTimeout"] = value; }
+         * }
+         */
 
         public TimeSpan NetworkReadTimeout
         {
@@ -91,10 +89,53 @@ namespace RiakClient.Config
                 }
                 else
                 {
-                    return s_defaultTimeout;
+                    return DefaultTimeout;
                 }
             }
-            set { this["networkReadTimeout"] = value.TotalMilliseconds.ToString(); }
+
+            set
+            {
+                this["networkReadTimeout"] = value.TotalMilliseconds.ToString();
+            }
+        }
+
+        public TimeSpan NetworkWriteTimeout
+        {
+            get
+            {
+                int networkWriteTimeoutMilliseconds;
+                if (int.TryParse(this.NetworkWriteTimeoutProperty, out networkWriteTimeoutMilliseconds))
+                {
+                    return TimeSpan.FromMilliseconds(networkWriteTimeoutMilliseconds);
+                }
+                else
+                {
+                    return DefaultTimeout;
+                }
+            }
+        }
+
+        public TimeSpan NetworkConnectTimeout
+        {
+            get
+            {
+                int networkConnectTimeoutMilliseconds;
+                if (int.TryParse(this.NetworkConnectTimeoutProperty, out networkConnectTimeoutMilliseconds))
+                {
+                    return TimeSpan.FromMilliseconds(networkConnectTimeoutMilliseconds);
+                }
+                else
+                {
+                    return DefaultTimeout;
+                }
+            }
+        }
+
+        [ConfigurationProperty("networkReadTimeout", DefaultValue = "4000", IsRequired = false)]
+        private string NetworkReadTimeoutProperty
+        {
+            get { return (string)this["networkReadTimeout"]; }
+            set { this["networkReadTimeout"] = value; }
         }
 
         [ConfigurationProperty("networkWriteTimeout", DefaultValue = "4000", IsRequired = false)]
@@ -104,43 +145,11 @@ namespace RiakClient.Config
             set { this["networkWriteTimeout"] = value; }
         }
 
-        public TimeSpan NetworkWriteTimeout
-        {
-            get
-            {
-                int networkWriteTimeoutMilliseconds;
-                if (int.TryParse(NetworkWriteTimeoutProperty, out networkWriteTimeoutMilliseconds))
-                {
-                    return TimeSpan.FromMilliseconds(networkWriteTimeoutMilliseconds);
-                }
-                else
-                {
-                    return s_defaultTimeout;
-                }
-            }
-        }
-
         [ConfigurationProperty("networkConnectTimeout", DefaultValue = "4000", IsRequired = false)]
         private string NetworkConnectTimeoutProperty
         {
             get { return (string)this["networkConnectTimeout"]; }
             set { this["networkConnectTimeout"] = value; }
-        }
-
-        public TimeSpan NetworkConnectTimeout
-        {
-            get
-            {
-                int networkConnectTimeoutMilliseconds;
-                if (int.TryParse(NetworkConnectTimeoutProperty, out networkConnectTimeoutMilliseconds))
-                {
-                    return TimeSpan.FromMilliseconds(networkConnectTimeoutMilliseconds);
-                }
-                else
-                {
-                    return s_defaultTimeout;
-                }
-            }
         }
     }
 }
