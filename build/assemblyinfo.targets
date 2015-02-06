@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">$(MSBuildProjectDirectory)\..\</SolutionDir>
+    <BuildPath>$(SolutionDir)build</BuildPath>
+  </PropertyGroup>
+
+  <Import Project="$(BuildPath)\properties.xml" Condition="'$(PropertiesImported)' != 'true'" />
+
+  <Target Name="CleanCommonAssemblyInfo">
+    <Delete Files="$(CommonAssemblyInfoFile)" />
+  </Target>
+
+  <Target Name="PopulateVersionInformation">
+
+    <GitDescribe LocalPath="$(SolutionDir)" Condition="'$(VersionString)' == 'unknown'">
+      <Output TaskParameter="CommitHash" PropertyName="GitCommitHash" />
+      <Output TaskParameter="Tag" PropertyName="VersionString" />
+    </GitDescribe>
+
+    <GitDescribe LocalPath="$(SolutionDir)" Condition="'$(Configuration)' == 'Release' And '$(VersionString)' != 'unknown'">
+      <Output TaskParameter="CommitHash" PropertyName="GitCommitHash" />
+    </GitDescribe>
+
+    <Message Text="Parsing VersionString: $(VersionString)" />
+
+    <!--
+      NB: these regexes are Mono and Windows compatible. "\." to represent literal period
+          does not work on Mono 3.10
+    -->
+    <RegexReplace Input="$(VersionString)" Expression="v([0-9])[.][0-9][.][0-9](-[a-z0-9]+)?" Replacement="$1" Count="1">
+      <Output PropertyName="VMajor" TaskParameter="Output" />
+    </RegexReplace>
+    <RegexReplace Input="$(VersionString)" Expression="v[0-9][.]([0-9])[.][0-9](-[a-z0-9]+)?" Replacement="$1" Count="1">
+      <Output PropertyName="VMinor" TaskParameter="Output" />
+    </RegexReplace>
+    <RegexReplace Input="$(VersionString)" Expression="v[0-9][.][0-9][.]([0-9])(-[a-z0-9]+)?" Replacement="$1" Count="1">
+      <Output PropertyName="VPatch" TaskParameter="Output" />
+    </RegexReplace>
+    <RegexReplace Input="$(VersionString)" Expression="v[0-9][.][0-9][.][0-9]-([a-z0-9]+)?" Replacement="$1" Count="1">
+      <Output PropertyName="VPreRelease" TaskParameter="Output" />
+    </RegexReplace>
+  </Target>
+
+  <Target Name="GenerateCommonAssemblyInfo" DependsOnTargets="PopulateVersionInformation">
+
+    <Message Text="VersionString: $(VersionString) Version: $(VMajor).$(VMinor).$(VPatch) PreRelease: $(VPreRelease) Commit hash: $(GitCommitHash)"/>
+
+    <Time>
+      <Output TaskParameter="Year" PropertyName="Year" />
+    </Time>
+
+    <Attrib Files="$(CommonAssemblyInfoFile)" ReadOnly="False" />
+
+    <!-- http://stackoverflow.com/questions/64602/what-are-differences-between-assemblyversion-assemblyfileversion-and-assemblyin -->
+    <AssemblyInfo CodeLanguage="CS"
+                  OutputFile="$(SolutionDir)src\CommonAssemblyInfo.cs"
+                  GenerateClass="true"
+                  AssemblyCompany="Basho Technologies"
+                  AssemblyCopyright="Copyright Basho Technologies © $(Year). All rights reserved."
+                  AssemblyProduct="riak-dotnet-client"
+                  AssemblyTrademark="riak-dotnet-client"
+                  AssemblyCulture=""
+                  AssemblyConfiguration="$(Configuration)"
+                  AssemblyVersion="$(VMajor).0.0"
+                  AssemblyFileVersion="$(VMajor).$(VMinor).$(VPatch)"
+                  AssemblyInformationalVersion="$(GitCommitHash)" />
+  </Target>
+</Project>
+
