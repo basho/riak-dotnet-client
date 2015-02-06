@@ -1,4 +1,6 @@
+// <copyright file="Token.cs" company="Basho Technologies, Inc.">
 // Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,17 +15,18 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using System.Text.RegularExpressions;
+// </copyright>
 
 namespace RiakClient.Models.Search
 {
+    using System.Text.RegularExpressions;
+
     public class Token
     {
         private static readonly Regex EncodeRegex = new Regex(@"(["" \\'\(\)\[\]\\:\+\-\/\?])");
 
-        private readonly string _value;
-        private readonly string _suffix;
+        private readonly string value;
+        private readonly string suffix;
 
         internal Token(string value)
             : this(value, null)
@@ -32,8 +35,8 @@ namespace RiakClient.Models.Search
 
         internal Token(string value, string suffix)
         {
-            _value = value;
-            _suffix = suffix;
+            this.value = value;
+            this.suffix = suffix;
         }
 
         public static Token Is(string value)
@@ -48,7 +51,7 @@ namespace RiakClient.Models.Search
 
         public override string ToString()
         {
-            return _value != null ? EncodeRegex.Replace(_value, m => "\\" + m.Value) + _suffix : string.Empty;
+            return value != null ? EncodeRegex.Replace(value, m => "\\" + m.Value) + suffix : string.Empty;
         }
     }
 }

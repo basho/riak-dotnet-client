@@ -1,4 +1,6 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// <copyright file="RiakCommitHook.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,37 +15,37 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using Newtonsoft.Json;
-using System.IO;
-using System.Text;
-using RiakClient.Messages;
+// </copyright>
 
 namespace RiakClient.Models.CommitHook
 {
-    public interface IRiakCommitHook
-    {
-        string ToJsonString();
-        void WriteJson(JsonWriter writer);
-        RpbCommitHook ToRpbCommitHook();
-    }
+    using System;
+    using System.IO;
+    using System.Text;
+    using Messages;
+    using Newtonsoft.Json;
 
-    public abstract class RiakCommitHook : IRiakCommitHook
+    public abstract class RiakCommitHook : IRiakCommitHook, IEquatable<RiakCommitHook>
     {
         public string ToJsonString()
         {
             var sb = new StringBuilder();
 
-            using(var sw = new StringWriter(sb))
-            using(JsonWriter writer = new JsonTextWriter(sw))
+            using (var sw = new StringWriter(sb))
             {
-                WriteJson(writer);
+                using (JsonWriter writer = new JsonTextWriter(sw))
+                {
+                    WriteJson(writer);
+                }
             }
 
             return sb.ToString();
         }
 
         public abstract void WriteJson(JsonWriter writer);
+
         public abstract RpbCommitHook ToRpbCommitHook();
+
+        public abstract bool Equals(RiakCommitHook other);
     }
 }

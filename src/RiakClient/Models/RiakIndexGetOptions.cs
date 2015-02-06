@@ -1,4 +1,6 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// <copyright file="RiakIndexGetOptions.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,27 +15,34 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using System.Numerics;
-using RiakClient.Extensions;
-using RiakClient.Messages;
+// </copyright>
 
 namespace RiakClient.Models
 {
+    using System.Numerics;
+    using Extensions;
+    using Messages;
+
     public class RiakIndexGetOptions
     {
-        public bool? ReturnTerms { get; private set; }
-        public bool? Stream { get; private set; }
-        public uint? MaxResults { get; private set; }
-        public string Continuation { get; private set; }
-        public uint? Timeout { get; private set; }
-        public bool? PaginationSort { get; private set; }
-        public string TermRegex { get; private set; }
-
         public RiakIndexGetOptions()
         {
             MaxResults = null;
         }
+
+        public bool? ReturnTerms { get; private set; }
+
+        public bool? Stream { get; private set; }
+
+        public uint? MaxResults { get; private set; }
+
+        public string Continuation { get; private set; }
+
+        public uint? Timeout { get; private set; }
+
+        public bool? PaginationSort { get; private set; }
+
+        public string TermRegex { get; private set; }
 
         public RiakIndexGetOptions SetReturnTerms(bool value)
         {
@@ -86,27 +95,39 @@ namespace RiakClient.Models
         internal void Populate(RpbIndexReq request)
         {
             if (ReturnTerms.HasValue)
+            {
                 request.return_terms = ReturnTerms.Value;
+            }
 
             if (Stream.HasValue)
+            {
                 request.stream = Stream.Value;
+            }
 
             if (MaxResults.HasValue)
+            {
                 request.max_results = MaxResults.Value;
+            }
 
             if (!string.IsNullOrEmpty(Continuation))
+            {
                 request.continuation = Continuation.ToRiakString();
+            }
 
             if (Timeout.HasValue)
+            {
                 request.timeout = Timeout.Value;
+            }
 
             if (!string.IsNullOrEmpty(TermRegex))
+            {
                 request.term_regex = TermRegex.ToRiakString();
+            }
 
             if (PaginationSort.HasValue)
+            {
                 request.pagination_sort = PaginationSort.Value;
+            }
         }
-
-
     }
 }

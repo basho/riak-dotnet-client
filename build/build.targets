@@ -241,12 +241,12 @@
 
   <Target Name="IntegrationTest" DependsOnTargets="Debug">
     <Exec WorkingDirectory="$(SolutionDir)"
-          Command="$(NUnitConsoleRunnerCommand) -work=$(ProjDir)\RiakClient.Tests.Live $(ProjDir)\RiakClient.Tests.Live\RiakClient.Tests.Live.nunit" />
+          Command="$(NUnitConsoleRunnerCommand) -work=$(ProjDir)\RiakClientTests.Live $(ProjDir)\RiakClientTests.Live\RiakClientTests.Live.nunit" />
   </Target>
 
   <Target Name="UnitTest" DependsOnTargets="GitSubmodule;Debug">
     <Exec WorkingDirectory="$(SolutionDir)"
-          Command="$(NUnitConsoleRunnerCommand) -work=$(ProjDir)\RiakClient.Tests $(ProjDir)\RiakClient.Tests\RiakClient.Tests.nunit" />
+          Command="$(NUnitConsoleRunnerCommand) -work=$(ProjDir)\RiakClientTests $(ProjDir)\RiakClientTests\RiakClientTests.nunit" />
   </Target>
 
   <Target Name="TestAll" DependsOnTargets="UnitTest;IntegrationTest" />
@@ -260,7 +260,7 @@
 
   <Target Name="DeprecatedTest" DependsOnTargets="Debug">
     <Exec WorkingDirectory="$(SolutionDir)"
-          Command="$(NUnitConsoleRunnerCommand) -work=$(ProjDir)\RiakClient.Tests.Deprecated $(ProjDir)\RiakClient.Tests.Deprecated\RiakClient.Tests.Deprecated.nunit" />
+          Command="$(NUnitConsoleRunnerCommand) -work=$(ProjDir)\RiakClientTests.Deprecated $(ProjDir)\RiakClientTests.Deprecated\RiakClientTests.Deprecated.nunit" />
   </Target>
 
 </Project>

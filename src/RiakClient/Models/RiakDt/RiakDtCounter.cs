@@ -1,4 +1,6 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// <copyright file="RiakDtCounter.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,65 +15,25 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
-using RiakClient.Extensions;
-using RiakClient.Messages;
+// </copyright>
 
 namespace RiakClient.Models.RiakDt
 {
-    public class CounterOperation : IDtOp
-    {
-        public long Value { get; private set; }
-
-        public CounterOperation(long value)
-        {
-            Value = value;
-        }
-
-        public DtOp ToDtOp()
-        {
-            return new DtOp
-                {
-                    counter_op = new CounterOp
-                        {
-                            increment = Value
-                        }
-                };
-        }
-    }
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.ComponentModel;
+    using System.Linq;
+    using Extensions;
+    using Messages;
 
     public class RiakDtCounter : IRiakDtType<CounterOperation>, IDtOp, IChangeTracking 
     {
-        public bool IsChanged { get; private set; }
-        private long _value;
-        private readonly byte[] _context;
-
-        public long Value 
-        { 
-            get
-            {
-                if (IsChanged)
-                {
-                    return _value + _operations.Sum(op => op.Value);
-                }
-
-                return _value;
-            }
-            internal set { _value = value; }
-        }
-        public string Bucket { get; private set; }
-        public string BucketType { get; private set; }
-        public string Key { get; private set; }
-
-        private readonly List<CounterOperation> _operations = new List<CounterOperation>();
+        private readonly List<CounterOperation> operations = new List<CounterOperation>();
+        private readonly byte[] context;
+        private long value;
 
         public RiakDtCounter()
         {
-            
         }
 
         public RiakDtCounter(string bucket, string bucketType, string key, DtFetchResp response)
@@ -79,25 +41,51 @@ namespace RiakClient.Models.RiakDt
             Bucket = bucket;
             BucketType = bucketType;
             Key = key;
-            Value = response.value.counter_value;
-            _context = response.context;
+            value = response.value.counter_value;
+            context = response.context;
         }
-        
-        public RiakDtCounter Increment(long value = 1)
-        {
-            _operations.Add(new CounterOperation(value));
-            IsChanged = true;
-            return this;
+
+        public bool IsChanged { get; private set; }
+
+        public long Value 
+        { 
+            get
+            {
+                if (IsChanged)
+                {
+                    return value + operations.Sum(op => op.Value);
+                }
+
+                return value;
+            }
+
+            internal set
+            {
+                this.value = value;
+            }
         }
+
+        public string Bucket { get; private set; }
+
+        public string BucketType { get; private set; }
+
+        public string Key { get; private set; }
 
         public ReadOnlyCollection<CounterOperation> Operations
         {
-            get { return _operations.AsReadOnly(); }
+            get { return operations.AsReadOnly(); }
         }
 
         public static RiakDtCounter operator ++(RiakDtCounter counter)
         {
             return counter.Increment();
+        }
+        
+        public RiakDtCounter Increment(long value = 1)
+        {
+            operations.Add(new CounterOperation(value));
+            IsChanged = true;
+            return this;
         }
 
         public MapEntry ToMapEntry(string fieldName)
@@ -115,17 +103,19 @@ namespace RiakClient.Models.RiakDt
 
         public void AcceptChanges()
         {
-            _value = _value + _operations.Sum(op => op.Value);
-            _operations.Clear();
+            value = value + operations.Sum(op => op.Value);
+            operations.Clear();
             IsChanged = false;
         }
 
         public CounterOp ToCounterOp()
         {
-            var sum = _operations.Sum(op => op.Value);
+            var sum = operations.Sum(op => op.Value);
 
             if (sum == 0)
+            {
                 return null;
+            }
 
             return new CounterOp
                 {
@@ -148,7 +138,7 @@ namespace RiakClient.Models.RiakDt
 
             var request = new DtUpdateReq
                 {
-                    op = {counter_op = ToCounterOp()}
+                    op = { counter_op = ToCounterOp() }
                 };
 
             /* We shouldn't send any operations in to Riak in this case.
@@ -156,10 +146,14 @@ namespace RiakClient.Models.RiakDt
              * be aware of possible null values
              */
             if (request.op.counter_op == null || request.op.counter_op.increment == 0)
+            {
                 return null;
+            }
 
-            if (options.IncludeContext && _context != null)
-                request.context = _context;
+            if (options.IncludeContext && context != null)
+            {
+                request.context = context;
+            }
 
             options.Populate(request);
 

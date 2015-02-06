@@ -1,4 +1,6 @@
+// <copyright file="RiakSearchResultDocument.cs" company="Basho Technologies, Inc.">
 // Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,37 +15,19 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using RiakClient.Messages;
-using RiakClient.Util;
+// </copyright>
 
 namespace RiakClient.Models.Search
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using Messages;
+    using Util;
+
     public class RiakSearchResultDocument
     {
-        private RiakObjectId _riakObjectId = null;
-
-        public String Id { get; private set; }
-        public String Score { get; private set; }
-        public String BucketType { get; private set; }
-        public String Bucket { get; private set; }
-        public String Key { get; private set; }
-
-        public RiakObjectId RiakObjectId
-        {
-            get
-            {
-                if (_riakObjectId == null)
-                    _riakObjectId = new RiakObjectId(BucketType, Bucket, Key);
-
-                return _riakObjectId;
-            }
-        }
-
-        public List<RiakSearchResultField> Fields { get; private set; }
+        private RiakObjectId riakObjectId = null;
 
         internal RiakSearchResultDocument(RpbSearchDoc doc)
         {
@@ -73,6 +57,7 @@ namespace RiakClient.Models.Search
                         legacyId = field.Value;
                         break;
                 }
+
                 Fields.Add(field);
             }
 
@@ -81,6 +66,31 @@ namespace RiakClient.Models.Search
                 Id = legacyId;
             }
         }
+
+        public string Id { get; private set; }
+
+        public string Score { get; private set; }
+
+        public string BucketType { get; private set; }
+
+        public string Bucket { get; private set; }
+
+        public string Key { get; private set; }
+
+        public RiakObjectId RiakObjectId
+        {
+            get
+            {
+                if (riakObjectId == null)
+                {
+                    riakObjectId = new RiakObjectId(BucketType, Bucket, Key);
+                }
+
+                return riakObjectId;
+            }
+        }
+
+        public List<RiakSearchResultField> Fields { get; private set; }
 
         private bool CanUseLegacyId(string legacyId)
         {

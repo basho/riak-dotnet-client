@@ -1,4 +1,6 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// <copyright file="RiakStreamedIndexResult.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,45 +15,49 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using RiakClient.Extensions;
-using RiakClient.Messages;
+// </copyright>
 
 namespace RiakClient.Models.Index
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using Extensions;
+    using Messages;
+
     public class RiakStreamedIndexResult : IRiakIndexResult
     {
-        private readonly IEnumerable<RiakResult<RpbIndexResp>> _responseReader;
-        private readonly bool _includeTerms;
+        private readonly IEnumerable<RiakResult<RpbIndexResp>> responseReader;
+        private readonly bool includeTerms;
 
         public RiakStreamedIndexResult(bool includeTerms, IEnumerable<RiakResult<RpbIndexResp>> responseReader)
         {
-            _responseReader = responseReader;
-            _includeTerms = includeTerms;
+            this.responseReader = responseReader;
+            this.includeTerms = includeTerms;
         }
 
-        public IEnumerable<RiakIndexKeyTerm> IndexKeyTerms 
-        { 
+        public IEnumerable<RiakIndexKeyTerm> IndexKeyTerms
+        {
             get
             {
-                return _responseReader.SelectMany(item => GetIndexKeyTerm(item.Value));
+                return responseReader.SelectMany(item => GetIndexKeyTerm(item.Value));
             }
         }
 
         private IEnumerable<RiakIndexKeyTerm> GetIndexKeyTerm(RpbIndexResp response)
         {
-            if (_includeTerms)
+            IEnumerable<RiakIndexKeyTerm> indexKeyTerms = null;
+
+            if (includeTerms)
             {
-                return response.results.Select(pair =>
-                                                new RiakIndexKeyTerm(pair.value.FromRiakString(),
-                                                                    pair.key.FromRiakString()));
+                indexKeyTerms = response.results.Select(
+                    pair => new RiakIndexKeyTerm(pair.value.FromRiakString(), pair.key.FromRiakString()));
+            }
+            else
+            {
+                indexKeyTerms = response.keys.Select(key => new RiakIndexKeyTerm(key.FromRiakString()));
             }
 
-            return response.keys.Select(key => new RiakIndexKeyTerm(key.FromRiakString()));
+            return indexKeyTerms;
         }
     }
 }

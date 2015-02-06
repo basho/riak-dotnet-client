@@ -1,4 +1,6 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// <copyright file="RiakDtMapEntry.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,40 +15,56 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using System.Collections.Generic;
-using System.Linq;
-using RiakClient.Messages;
+// </copyright>
 
 namespace RiakClient.Models.RiakDt
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using Messages;
+
     public class RiakDtMapEntry
     {
-        public RiakDtMapField Field { get; internal set; }
-        public RiakDtCounter Counter { get; internal set; }
-        public List<byte[]> SetValue { get; internal set; }
-        public byte[] RegisterValue { get; internal set; }
-        public bool? FlagValue { get; internal set; }
-        public List<RiakDtMapEntry> MapValue { get; internal set; }
-
         internal RiakDtMapEntry(MapEntry entry)
         {
             Field = new RiakDtMapField(entry.field);
 
             if (Field.Type == RiakDtMapField.RiakDtMapFieldType.Counter)
-                Counter = new RiakDtCounter {Value = entry.counter_value};
+            {
+                Counter = new RiakDtCounter { Value = entry.counter_value };
+            }
 
             if (Field.Type == RiakDtMapField.RiakDtMapFieldType.Flag)
+            {
                 FlagValue = entry.flag_value;
+            }
 
             if (Field.Type == RiakDtMapField.RiakDtMapFieldType.Map)
+            {
                 MapValue = entry.map_value.Select(mv => new RiakDtMapEntry(mv)).ToList();
+            }
 
             if (Field.Type == RiakDtMapField.RiakDtMapFieldType.Register)
+            {
                 RegisterValue = entry.register_value;
+            }
 
             if (Field.Type == RiakDtMapField.RiakDtMapFieldType.Set)
+            {
                 SetValue = entry.set_value;
+            }
         }
+
+        public RiakDtMapField Field { get; internal set; }
+
+        public RiakDtCounter Counter { get; internal set; }
+
+        public List<byte[]> SetValue { get; internal set; }
+
+        public byte[] RegisterValue { get; internal set; }
+
+        public bool? FlagValue { get; internal set; }
+
+        public List<RiakDtMapEntry> MapValue { get; internal set; }
     }
 }

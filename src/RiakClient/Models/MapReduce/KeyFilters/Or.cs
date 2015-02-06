@@ -1,4 +1,6 @@
+// <copyright file="Or.cs" company="Basho Technologies, Inc.">
 // Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,40 +15,41 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
+// </copyright>
 
 namespace RiakClient.Models.MapReduce.KeyFilters
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Text;
+    using Newtonsoft.Json;
+
     /// <summary>
     /// Joins two or more key-filter operations with a logical OR operation.
     /// </summary>
     internal class Or : IRiakKeyFilterToken
     {
-        private readonly Tuple<string, List<IRiakKeyFilterToken>, List<IRiakKeyFilterToken>> _kfDefinition;
+        private readonly Tuple<string, List<IRiakKeyFilterToken>, List<IRiakKeyFilterToken>> keyFilterDefinition;
+
+        public Or(List<IRiakKeyFilterToken> left, List<IRiakKeyFilterToken> right)
+        {
+            keyFilterDefinition = Tuple.Create("or", left, right);
+        }
 
         public string FunctionName
         {
-            get { return _kfDefinition.Item1; }
+            get { return keyFilterDefinition.Item1; }
         }
 
         public List<IRiakKeyFilterToken> Left
         {
-            get { return _kfDefinition.Item2; }
+            get { return keyFilterDefinition.Item2; }
         }
 
         public List<IRiakKeyFilterToken> Right
         {
-            get { return _kfDefinition.Item3; }
-        }
-
-        public Or(List<IRiakKeyFilterToken> left, List<IRiakKeyFilterToken> right)
-        {
-            _kfDefinition = Tuple.Create("or", left, right);
+            get { return keyFilterDefinition.Item3; }
         }
 
         public override string ToString()
@@ -58,22 +61,24 @@ namespace RiakClient.Models.MapReduce.KeyFilters
         {
             var sb = new StringBuilder();
 
-            using(var sw = new StringWriter(sb))
-            using(JsonWriter jw = new JsonTextWriter(sw))
+            using (var sw = new StringWriter(sb))
             {
-                jw.WriteStartArray();
+                using (JsonWriter jw = new JsonTextWriter(sw))
+                {
+                    jw.WriteStartArray();
 
-                jw.WriteValue(FunctionName);
+                    jw.WriteValue(FunctionName);
 
-                jw.WriteStartArray();
-                Left.ForEach(l => jw.WriteRawValue(l.ToString()));
-                jw.WriteEndArray();
+                    jw.WriteStartArray();
+                    Left.ForEach(l => jw.WriteRawValue(l.ToString()));
+                    jw.WriteEndArray();
 
-                jw.WriteStartArray();
-                Right.ForEach(r => jw.WriteRawValue(r.ToString()));
-                jw.WriteEndArray();
+                    jw.WriteStartArray();
+                    Right.ForEach(r => jw.WriteRawValue(r.ToString()));
+                    jw.WriteEndArray();
 
-                jw.WriteEndArray();
+                    jw.WriteEndArray();
+                }
             }
 
             return sb.ToString();

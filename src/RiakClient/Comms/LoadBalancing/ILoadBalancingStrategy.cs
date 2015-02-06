@@ -1,4 +1,6 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// <copyright file="ILoadBalancingStrategy.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,16 +15,20 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using System.Collections.Generic;
+// </copyright>
 
 namespace RiakClient.Comms.LoadBalancing
 {
+    using System.Collections.Generic;
+
     public interface ILoadBalancingStrategy
     {
         void Initialise(IEnumerable<IRiakNode> nodes);
+
         IRiakNode SelectNode();
+
         void RemoveNode(IRiakNode node);
+
         void AddNode(IRiakNode node);
     }
 }

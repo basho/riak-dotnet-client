@@ -1,5 +1,6 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
-// Copyright (c) 2015 - Basho Technologies, Inc.
+// <copyright file="RoundRobinStrategy.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -14,14 +15,15 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using RiakClient.Containers;
+// </copyright>
 
 namespace RiakClient.Comms.LoadBalancing
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using Containers;
+
     public class RoundRobinStrategy : ILoadBalancingStrategy
     {
         private readonly object nodesLock = new object();
@@ -37,10 +39,12 @@ namespace RiakClient.Comms.LoadBalancing
         public IRiakNode SelectNode()
         {
             IRiakNode node = null;
+
             if (roundRobin.TryMoveNext(out node))
             {
                 return node;
             }
+
             return null;
         }
 
@@ -71,10 +75,12 @@ namespace RiakClient.Comms.LoadBalancing
             while (true)
             {
                 IList<IRiakNode> list;
+
                 lock (nodesLock)
                 {
                     list = new List<IRiakNode>(nodes);
                 }
+
                 if (list.Count > 0)
                 {
                     var nodes = list.GetEnumerator();

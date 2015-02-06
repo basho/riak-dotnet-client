@@ -1,5 +1,6 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
-// Copyright (c) 2015 - Basho Technologies, Inc.
+// <copyright file="RiakEndPoint.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -14,16 +15,18 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using System;
-using System.Collections.Generic;
-using RiakClient.Comms;
+// </copyright>
 
 namespace RiakClient
 {
+    using System;
+    using System.Collections.Generic;
+    using Comms;
+
     public abstract class RiakEndPoint : IRiakEndPoint
     {
         public TimeSpan RetryWaitTime { get; set; }
+
         protected abstract int DefaultRetryCount { get; }
 
         /// <summary>
@@ -47,12 +50,12 @@ namespace RiakClient
             return UseConnection(useFun, RiakResult<TResult>.Error, retryAttempts);
         }
 
-        protected abstract TRiakResult UseConnection<TRiakResult>(Func<IRiakConnection, TRiakResult> useFun, Func<ResultCode, string, bool, TRiakResult> onError, int retryAttempts)
-            where TRiakResult : RiakResult;
-
         public abstract RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun, int retryAttempts)
             where TResult : RiakResult;
 
         public abstract void Dispose();
+
+        protected abstract TRiakResult UseConnection<TRiakResult>(Func<IRiakConnection, TRiakResult> useFun, Func<ResultCode, string, bool, TRiakResult> onError, int retryAttempts)
+            where TRiakResult : RiakResult;
     }
 }

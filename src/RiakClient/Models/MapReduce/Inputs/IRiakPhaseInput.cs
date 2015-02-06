@@ -1,5 +1,6 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
-// Copyright (c) 2015 - Basho Technologies, Inc.
+// <copyright file="IRiakPhaseInput.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -14,13 +15,14 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using Newtonsoft.Json;
-using System.Collections.Generic;
-using RiakClient.Models.MapReduce.KeyFilters;
+// </copyright>
 
 namespace RiakClient.Models.MapReduce.Inputs
 {
+    using System.Collections.Generic;
+    using Models.MapReduce.KeyFilters;
+    using Newtonsoft.Json;
+
     public interface IRiakPhaseInput
     {
         JsonWriter WriteJson(JsonWriter writer);
@@ -29,6 +31,7 @@ namespace RiakClient.Models.MapReduce.Inputs
     public abstract class RiakPhaseInput : IRiakPhaseInput
     {
         public List<IRiakKeyFilterToken> Filters { get; set; }
+
         public abstract JsonWriter WriteJson(JsonWriter writer);
 
         protected void WriteBucketKeyBucketJson(JsonWriter writer, string bucketType, string bucketName)

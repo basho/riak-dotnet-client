@@ -1,5 +1,6 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
-// Copyright (c) 2015 - Basho Technologies, Inc.
+// <copyright file="RiakConnection.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -14,74 +15,22 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Text;
-using RiakClient.Config;
-using RiakClient.Exceptions;
-using RiakClient.Extensions;
-using RiakClient.Messages;
-using RiakClient.Models.Rest;
-using RiakClient.Util;
+// </copyright>
 
 namespace RiakClient.Comms
 {
-    public interface IRiakConnection : IDisposable
-    {
-        void Disconnect();
-
-        // PBC interface
-        RiakResult<TResult> PbcRead<TResult>()
-            where TResult : class, ProtoBuf.IExtensible, new();
-
-        RiakResult PbcRead(MessageCode expectedMessageCode);
-
-        RiakResult PbcWrite<TRequest>(TRequest request)
-            where TRequest : class, ProtoBuf.IExtensible;
-
-        RiakResult PbcWrite(MessageCode messageCode);
-
-        RiakResult<TResult> PbcWriteRead<TRequest, TResult>(TRequest request)
-            where TRequest : class, ProtoBuf.IExtensible
-            where TResult : class, ProtoBuf.IExtensible, new();
-
-        RiakResult<TResult> PbcWriteRead<TResult>(MessageCode messageCode)
-            where TResult : class, ProtoBuf.IExtensible, new();
-
-        RiakResult PbcWriteRead<TRequest>(TRequest request, MessageCode expectedMessageCode)
-            where TRequest : class, ProtoBuf.IExtensible;
-
-        RiakResult PbcWriteRead(MessageCode messageCode, MessageCode expectedMessageCode);
-
-        RiakResult<IEnumerable<RiakResult<TResult>>> PbcRepeatRead<TResult>(Func<RiakResult<TResult>, bool> repeatRead)
-            where TResult : class, ProtoBuf.IExtensible, new();
-
-        RiakResult<IEnumerable<RiakResult<TResult>>> PbcWriteRead<TResult>(MessageCode messageCode, Func<RiakResult<TResult>, bool> repeatRead)
-            where TResult : class, ProtoBuf.IExtensible, new();
-
-        RiakResult<IEnumerable<RiakResult<TResult>>> PbcWriteRead<TRequest, TResult>(TRequest request, Func<RiakResult<TResult>, bool> repeatRead)
-            where TRequest : class, ProtoBuf.IExtensible
-            where TResult : class, ProtoBuf.IExtensible, new();
-
-        RiakResult<IEnumerable<RiakResult<TResult>>> PbcStreamRead<TResult>(Func<RiakResult<TResult>, bool> repeatRead, Action onFinish)
-            where TResult : class, ProtoBuf.IExtensible, new();
-
-        RiakResult<IEnumerable<RiakResult<TResult>>> PbcWriteStreamRead<TRequest, TResult>(TRequest request,
-            Func<RiakResult<TResult>, bool> repeatRead, Action onFinish)
-            where TRequest : class, ProtoBuf.IExtensible
-            where TResult : class, ProtoBuf.IExtensible, new();
-
-        RiakResult<IEnumerable<RiakResult<TResult>>> PbcWriteStreamRead<TResult>(MessageCode messageCode,
-            Func<RiakResult<TResult>, bool> repeatRead, Action onFinish)
-            where TResult : class, ProtoBuf.IExtensible, new();
-
-        // REST interface
-        RiakResult<RiakRestResponse> RestRequest(RiakRestRequest request);
-    }
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Net;
+    using System.Text;
+    using Config;
+    using Exceptions;
+    using Extensions;
+    using Messages;
+    using Models.Rest;
+    using Util;
 
     internal class RiakConnection : IRiakConnection
     {
@@ -90,9 +39,7 @@ namespace RiakClient.Comms
 
         public RiakConnection(IRiakNodeConfiguration nodeConfiguration, IRiakAuthenticationConfiguration authConfiguration)
         {
-            restRootUrl = @"{0}://{1}:{2}".Fmt(nodeConfiguration.RestScheme,
-                nodeConfiguration.HostAddress,
-                nodeConfiguration.RestPort);
+            restRootUrl = string.Format(@"{0}://{1}:{2}", nodeConfiguration.RestScheme, nodeConfiguration.HostAddress, nodeConfiguration.RestPort);
 
             socket = new RiakPbcSocket(nodeConfiguration, authConfiguration);
         }
@@ -140,6 +87,7 @@ namespace RiakClient.Comms
                 {
                     Disconnect();
                 }
+
                 return RiakResult.Error(ResultCode.CommunicationError, ex.Message, ex.NodeOffline);
             }
             catch (Exception ex)
@@ -156,11 +104,13 @@ namespace RiakClient.Comms
             try
             {
                 RiakResult<TResult> result;
+
                 do
                 {
                     result = RiakResult<TResult>.Success(socket.Read<TResult>());
                     results.Add(result);
-                } while (repeatRead(result));
+                }
+                while (repeatRead(result));
 
                 return RiakResult<IEnumerable<RiakResult<TResult>>>.Success(results);
             }
@@ -170,6 +120,7 @@ namespace RiakClient.Comms
                 {
                     Disconnect();
                 }
+
                 return RiakResult<IEnumerable<RiakResult<TResult>>>.Error(ResultCode.CommunicationError, ex.Message, ex.NodeOffline);
             }
             catch (Exception ex)
@@ -193,6 +144,7 @@ namespace RiakClient.Comms
                 {
                     Disconnect();
                 }
+
                 return RiakResult.Error(ResultCode.CommunicationError, ex.Message, ex.NodeOffline);
             }
             catch (Exception ex)
@@ -215,6 +167,7 @@ namespace RiakClient.Comms
                 {
                     Disconnect();
                 }
+
                 // TODO: we really should preserve the Exception object
                 return RiakResult.Error(ResultCode.CommunicationError, ex.Message, ex.NodeOffline);
             }
@@ -230,10 +183,12 @@ namespace RiakClient.Comms
             where TResult : class, ProtoBuf.IExtensible, new()
         {
             var writeResult = PbcWrite(request);
+
             if (writeResult.IsSuccess)
             {
                 return PbcRead<TResult>();
             }
+
             return RiakResult<TResult>.Error(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline);
         }
 
@@ -241,10 +196,12 @@ namespace RiakClient.Comms
             where TRequest : class, ProtoBuf.IExtensible
         {
             var writeResult = PbcWrite(request);
+
             if (writeResult.IsSuccess)
             {
                 return PbcRead(expectedMessageCode);
             }
+
             return RiakResult.Error(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline);
         }
 
@@ -252,45 +209,55 @@ namespace RiakClient.Comms
             where TResult : class, ProtoBuf.IExtensible, new()
         {
             var writeResult = PbcWrite(messageCode);
+
             if (writeResult.IsSuccess)
             {
                 return PbcRead<TResult>();
             }
+
             return RiakResult<TResult>.Error(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline);
         }
 
         public RiakResult PbcWriteRead(MessageCode messageCode, MessageCode expectedMessageCode)
         {
             var writeResult = PbcWrite(messageCode);
+
             if (writeResult.IsSuccess)
             {
                 return PbcRead(expectedMessageCode);
             }
+
             return RiakResult.Error(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline);
         }
 
-        public RiakResult<IEnumerable<RiakResult<TResult>>> PbcWriteRead<TRequest, TResult>(TRequest request,
+        public RiakResult<IEnumerable<RiakResult<TResult>>> PbcWriteRead<TRequest, TResult>(
+            TRequest request,
             Func<RiakResult<TResult>, bool> repeatRead)
             where TRequest : class, ProtoBuf.IExtensible
             where TResult : class, ProtoBuf.IExtensible, new()
         {
             var writeResult = PbcWrite(request);
+
             if (writeResult.IsSuccess)
             {
                 return PbcRepeatRead(repeatRead);
             }
+
             return RiakResult<IEnumerable<RiakResult<TResult>>>.Error(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline);
         }
 
-        public RiakResult<IEnumerable<RiakResult<TResult>>> PbcWriteRead<TResult>(MessageCode messageCode,
+        public RiakResult<IEnumerable<RiakResult<TResult>>> PbcWriteRead<TResult>(
+            MessageCode messageCode,
             Func<RiakResult<TResult>, bool> repeatRead)
             where TResult : class, ProtoBuf.IExtensible, new()
         {
             var writeResult = PbcWrite(messageCode);
+
             if (writeResult.IsSuccess)
             {
                 return PbcRepeatRead(repeatRead);
             }
+
             return RiakResult<IEnumerable<RiakResult<TResult>>>.Error(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline);
         }
 
@@ -301,28 +268,10 @@ namespace RiakClient.Comms
             return RiakResult<IEnumerable<RiakResult<TResult>>>.Success(streamer);
         }
 
-        private IEnumerable<RiakResult<TResult>> PbcStreamReadIterator<TResult>(Func<RiakResult<TResult>, bool> repeatRead, Action onFinish)
-            where TResult : class, ProtoBuf.IExtensible, new()
-        {
-            RiakResult<TResult> result;
-
-            do
-            {
-                result = PbcRead<TResult>();
-                if (!result.IsSuccess)
-                    break;
-                yield return result;
-            } while (repeatRead(result));
-
-            // clean up first..
-            onFinish();
-
-            // then return the failure to the client to indicate failure
-            yield return result;
-        }
-
-        public RiakResult<IEnumerable<RiakResult<TResult>>> PbcWriteStreamRead<TRequest, TResult>(TRequest request,
-            Func<RiakResult<TResult>, bool> repeatRead, Action onFinish)
+        public RiakResult<IEnumerable<RiakResult<TResult>>> PbcWriteStreamRead<TRequest, TResult>(
+            TRequest request,
+            Func<RiakResult<TResult>, bool> repeatRead,
+            Action onFinish)
             where TRequest : class, ProtoBuf.IExtensible
             where TResult : class, ProtoBuf.IExtensible, new()
         {
@@ -330,86 +279,69 @@ namespace RiakClient.Comms
             return RiakResult<IEnumerable<RiakResult<TResult>>>.Success(streamer);
         }
 
-        public RiakResult<IEnumerable<RiakResult<TResult>>> PbcWriteStreamRead<TResult>(MessageCode messageCode,
-            Func<RiakResult<TResult>, bool> repeatRead, Action onFinish)
+        public RiakResult<IEnumerable<RiakResult<TResult>>> PbcWriteStreamRead<TResult>(
+            MessageCode messageCode,
+            Func<RiakResult<TResult>, bool> repeatRead,
+            Action onFinish)
             where TResult : class, ProtoBuf.IExtensible, new()
         {
             var streamer = PbcWriteStreamReadIterator(messageCode, repeatRead, onFinish);
             return RiakResult<IEnumerable<RiakResult<TResult>>>.Success(streamer);
         }
 
-        private IEnumerable<RiakResult<TResult>> PbcWriteStreamReadIterator<TRequest, TResult>(TRequest request,
-            Func<RiakResult<TResult>, bool> repeatRead, Action onFinish)
-            where TRequest : class, ProtoBuf.IExtensible
-            where TResult : class, ProtoBuf.IExtensible, new()
+        public RiakResult<RiakRestResponse> RestRequest(RiakRestRequest restRequest)
         {
-            var writeResult = PbcWrite(request);
-            if (writeResult.IsSuccess)
-            {
-                return PbcStreamReadIterator(repeatRead, onFinish);
-            }
-            onFinish();
-            return new[] { RiakResult<TResult>.Error(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline) };
-        }
+            var baseUri = new StringBuilder(restRootUrl).Append(restRequest.Uri);
 
-        private IEnumerable<RiakResult<TResult>> PbcWriteStreamReadIterator<TResult>(MessageCode messageCode,
-            Func<RiakResult<TResult>, bool> repeatRead, Action onFinish)
-            where TResult : class, ProtoBuf.IExtensible, new()
-        {
-            var writeResult = PbcWrite(messageCode);
-            if (writeResult.IsSuccess)
-            {
-                return PbcStreamReadIterator(repeatRead, onFinish);
-            }
-            onFinish();
-            return new[] { RiakResult<TResult>.Error(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline) };
-        }
-
-        public RiakResult<RiakRestResponse> RestRequest(RiakRestRequest request)
-        {
-            var baseUri = new StringBuilder(restRootUrl).Append(request.Uri);
-            if (request.QueryParams.Count > 0)
+            if (restRequest.QueryParams.Count > 0)
             {
                 baseUri.Append("?");
-                var first = request.QueryParams.First();
+                var first = restRequest.QueryParams.First();
                 baseUri.Append(first.Key.UrlEncoded()).Append("=").Append(first.Value.UrlEncoded());
-                request.QueryParams.Skip(1).ForEach(kv => baseUri.Append("&").Append(kv.Key.UrlEncoded()).Append("=").Append(kv.Value.UrlEncoded()));
+                foreach (var queryParam in restRequest.QueryParams.Skip(1))
+                {
+                    baseUri.Append("&").Append(queryParam.Key.UrlEncoded()).Append("=").Append(queryParam.Value.UrlEncoded());
+                }
             }
+
             var targetUri = new Uri(baseUri.ToString());
 
-            var req = (HttpWebRequest)WebRequest.Create(targetUri);
-            req.KeepAlive = true;
-            req.Method = request.Method;
-            req.Credentials = CredentialCache.DefaultCredentials;
+            var httpWebRequest = (HttpWebRequest)WebRequest.Create(targetUri);
+            httpWebRequest.KeepAlive = true;
+            httpWebRequest.Method = restRequest.Method;
+            httpWebRequest.Credentials = CredentialCache.DefaultCredentials;
 
-            if (!string.IsNullOrWhiteSpace(request.ContentType))
+            if (!string.IsNullOrWhiteSpace(restRequest.ContentType))
             {
-                req.ContentType = request.ContentType;
+                httpWebRequest.ContentType = restRequest.ContentType;
             }
 
-            if (!request.Cache)
+            if (!restRequest.Cache)
             {
-                req.Headers.Set(RiakConstants.Rest.HttpHeaders.DisableCacheKey, RiakConstants.Rest.HttpHeaders.DisableCacheValue);
+                httpWebRequest.Headers.Set(RiakConstants.Rest.HttpHeaders.DisableCacheKey, RiakConstants.Rest.HttpHeaders.DisableCacheValue);
             }
 
-            request.Headers.ForEach(h => req.Headers.Set(h.Key, h.Value));
-
-            if (request.Body != null && request.Body.Length > 0)
+            foreach (KeyValuePair<string, string> restRequestHeader in restRequest.Headers)
             {
-                req.ContentLength = request.Body.Length;
-                using (var writer = req.GetRequestStream())
+                httpWebRequest.Headers.Set(restRequestHeader.Key, restRequestHeader.Value);
+            }
+
+            if (!EnumerableUtil.IsNullOrEmpty(restRequest.Body))
+            {
+                httpWebRequest.ContentLength = restRequest.Body.Length;
+                using (var writer = httpWebRequest.GetRequestStream())
                 {
-                    writer.Write(request.Body, 0, request.Body.Length);
+                    writer.Write(restRequest.Body, 0, restRequest.Body.Length);
                 }
             }
             else
             {
-                req.ContentLength = 0;
+                httpWebRequest.ContentLength = 0;
             }
 
             try
             {
-                var response = (HttpWebResponse)req.GetResponse();
+                var response = (HttpWebResponse)httpWebRequest.GetResponse();
 
                 var result = new RiakRestResponse
                 {
@@ -466,6 +398,68 @@ namespace RiakClient.Comms
         public void Disconnect()
         {
             socket.Disconnect();
+        }
+
+        private IEnumerable<RiakResult<TResult>> PbcWriteStreamReadIterator<TResult>(
+            MessageCode messageCode,
+            Func<RiakResult<TResult>, bool> repeatRead,
+            Action onFinish)
+            where TResult : class, ProtoBuf.IExtensible, new()
+        {
+            var writeResult = PbcWrite(messageCode);
+
+            if (writeResult.IsSuccess)
+            {
+                return PbcStreamReadIterator(repeatRead, onFinish);
+            }
+
+            onFinish();
+
+            return new[] { RiakResult<TResult>.Error(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline) };
+        }
+
+        private IEnumerable<RiakResult<TResult>> PbcStreamReadIterator<TResult>(Func<RiakResult<TResult>, bool> repeatRead, Action onFinish)
+            where TResult : class, ProtoBuf.IExtensible, new()
+        {
+            RiakResult<TResult> result;
+
+            do
+            {
+                result = PbcRead<TResult>();
+
+                if (!result.IsSuccess)
+                {
+                    break;
+                }
+
+                yield return result;
+            }
+            while (repeatRead(result));
+
+            // clean up first..
+            onFinish();
+
+            // then return the failure to the client to indicate failure
+            yield return result;
+        }
+
+        private IEnumerable<RiakResult<TResult>> PbcWriteStreamReadIterator<TRequest, TResult>(
+            TRequest request,
+            Func<RiakResult<TResult>, bool> repeatRead,
+            Action onFinish)
+            where TRequest : class, ProtoBuf.IExtensible
+            where TResult : class, ProtoBuf.IExtensible, new()
+        {
+            var writeResult = PbcWrite(request);
+
+            if (writeResult.IsSuccess)
+            {
+                return PbcStreamReadIterator(repeatRead, onFinish);
+            }
+
+            onFinish();
+
+            return new[] { RiakResult<TResult>.Error(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline) };
         }
     }
 }

@@ -1,4 +1,6 @@
+// <copyright file="GroupTerm.cs" company="Basho Technologies, Inc.">
 // Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,28 +15,30 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
+// </copyright>
 
 namespace RiakClient.Models.Search
 {
     public class GroupTerm : Term
     {
-        private readonly Term _term;
+        private readonly Term term;
 
         public GroupTerm(RiakFluentSearch search, string field, Term term)
             : base(search, field)
         {
-            _term = term;
+            this.term = term;
         }
 
         public override string ToString()
         {
-            var term = _term;
-            while (term.Owner != null)
+            Term tmpTerm = term;
+
+            while (tmpTerm.Owner != null)
             {
-                term = term.Owner;
+                tmpTerm = tmpTerm.Owner;
             }
 
-            return Prefix() + "(" + term + ")" + Suffix();
+            return Prefix() + "(" + tmpTerm + ")" + Suffix();
         }
     }
 }

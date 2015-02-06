@@ -1,5 +1,6 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
-// Copyright (c) 2015 - Basho Technologies, Inc.
+// <copyright file="RiakMapReduceResultPhase.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -14,42 +15,57 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using System.Collections.Generic;
-using System.Linq;
-using RiakClient.Extensions;
-using Newtonsoft.Json;
-using RiakClient.Messages;
+// </copyright>
 
 namespace RiakClient.Models.MapReduce
 {
+    using System.Collections.Generic;
+    using System.Linq;
+    using Extensions;
+    using Messages;
+    using Newtonsoft.Json;
+
     public class RiakMapReduceResultPhase
     {
-        public bool Success { get; private set; }
-        public uint Phase { get; private set; }
-        public List<byte[]> Values { get; private set; }
+        private readonly bool success;
+        private readonly uint phase;
+        private readonly IList<byte[]> values;
 
         internal RiakMapReduceResultPhase(uint phase, IEnumerable<RpbMapRedResp> results)
         {
-            Phase = phase;
-            Values = results.Select(r => r.response).Where(b => b != null).ToList();
-            Success = true;
+            this.phase = phase;
+            this.values = results.Select(r => r.response).Where(b => b != null).ToList();
+            this.success = true;
         }
 
         internal RiakMapReduceResultPhase()
         {
-            Success = false;
+            this.success = false;
+        }
+
+        public bool Success
+        {
+            get { return success; }
+        }
+
+        public uint Phase
+        {
+            get { return phase; }
+        }
+
+        public IList<byte[]> Values
+        {
+            get { return values; }
         }
 
         /// <summary>
         /// Deserialize a List of <typeparam name="T">T</typeparam> from the phase results
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T">Entity type</typeparam>
         /// <returns>IList<typeparam name="T">T</typeparam></returns>
         public IList<T> GetObjects<T>()
         {
-            var rVal = Values.Select(v => JsonConvert.DeserializeObject<T>(v.FromRiakString())).ToList();
-            return rVal;
+            return Values.Select(v => JsonConvert.DeserializeObject<T>(v.FromRiakString())).ToList();
         }
 
         /// <summary>
@@ -61,9 +77,8 @@ namespace RiakClient.Models.MapReduce
         /// one of the convenience methods.</remarks>
         public IList<RiakObjectId> GetObjectIds()
         {
-            var rVal = Values.SelectMany(v => JsonConvert.DeserializeObject<string[][]>(v.FromRiakString()).Select(
+            return Values.SelectMany(v => JsonConvert.DeserializeObject<string[][]>(v.FromRiakString()).Select(
                 a => new RiakObjectId(a[0], a[1]))).ToList();
-            return rVal;
         }
     }
 }

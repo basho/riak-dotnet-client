@@ -1,4 +1,6 @@
+// <copyright file="And.cs" company="Basho Technologies, Inc.">
 // Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+// Copyright (c) 2014 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,67 +15,95 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
+// </copyright>
 
 namespace RiakClient.Models.MapReduce.KeyFilters
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Text;
+    using Newtonsoft.Json;
+
     /// <summary>
     /// Joins two or more key-filter operations with a logical AND operation.
     /// </summary>
     internal class And : IRiakKeyFilterToken
     {
-        private readonly Tuple<string, List<IRiakKeyFilterToken>, List<IRiakKeyFilterToken>> _kfDefinition;
+        /// <summary>
+        ///  Collection of key filter definitions.
+        /// </summary>
+        private readonly Tuple<string, List<IRiakKeyFilterToken>, List<IRiakKeyFilterToken>> keyFilterDefinition;
 
-        public string FunctionName
-        {
-            get { return _kfDefinition.Item1; }
-        }
-
-        public List<IRiakKeyFilterToken> Left
-        {
-            get { return _kfDefinition.Item2; }
-        }
-
-        public List<IRiakKeyFilterToken> Right
-        {
-            get { return _kfDefinition.Item3; }
-        }
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="And"/> class.
+        /// </summary>
+        /// <param name="left">left hand token</param>
+        /// <param name="right">right hand token</param>
         public And(List<IRiakKeyFilterToken> left, List<IRiakKeyFilterToken> right)
         {
-            _kfDefinition = Tuple.Create("and", left, right);
+            keyFilterDefinition = Tuple.Create("and", left, right);
         }
 
+        /// <summary>
+        /// Gets the function name
+        /// </summary>
+        public string FunctionName
+        {
+            get { return keyFilterDefinition.Item1; }
+        }
+
+        /// <summary>
+        /// Gets the left hand token
+        /// </summary>
+        public List<IRiakKeyFilterToken> Left
+        {
+            get { return keyFilterDefinition.Item2; }
+        }
+
+        /// <summary>
+        /// Gets the right hand token
+        /// </summary>
+        public List<IRiakKeyFilterToken> Right
+        {
+            get { return keyFilterDefinition.Item3; }
+        }
+
+        /// <summary>
+        /// Converts the current token to JSON
+        /// </summary>
+        /// <returns>JSON representation of the <see cref="And"/> class</returns>
         public override string ToString()
         {
             return ToJsonString();
         }
 
+        /// <summary>
+        /// Converts the current token to JSON
+        /// </summary>
+        /// <returns>JSON representation of the <see cref="And"/> class</returns>
         public string ToJsonString()
         {
             var sb = new StringBuilder();
 
-            using(var sw = new StringWriter(sb))
-            using(JsonWriter jw = new JsonTextWriter(sw))
+            using (var sw = new StringWriter(sb))
             {
-                jw.WriteStartArray();
+                using (JsonWriter jw = new JsonTextWriter(sw))
+                {
+                    jw.WriteStartArray();
 
-                jw.WriteValue(FunctionName);
+                    jw.WriteValue(FunctionName);
 
-                jw.WriteStartArray();
-                Left.ForEach(l => jw.WriteRawValue(l.ToString()));
-                jw.WriteEndArray();
+                    jw.WriteStartArray();
+                    Left.ForEach(l => jw.WriteRawValue(l.ToString()));
+                    jw.WriteEndArray();
 
-                jw.WriteStartArray();
-                Right.ForEach(r => jw.WriteRawValue(r.ToString()));
-                jw.WriteEndArray();
+                    jw.WriteStartArray();
+                    Right.ForEach(r => jw.WriteRawValue(r.ToString()));
+                    jw.WriteEndArray();
 
-                jw.WriteEndArray();
+                    jw.WriteEndArray();
+                }
             }
 
             return sb.ToString();
