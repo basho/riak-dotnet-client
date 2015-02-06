@@ -20,7 +20,9 @@
 namespace RiakClient.Config
 {
     using System.Configuration;
+    using System.Runtime.InteropServices;
 
+    [ComVisible(false)]
     public class RiakAuthenticationConfiguration : ConfigurationElement, IRiakAuthenticationConfiguration
     {
         [ConfigurationProperty("username", DefaultValue = "", IsRequired = true)]

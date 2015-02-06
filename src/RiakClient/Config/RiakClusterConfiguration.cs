@@ -23,7 +23,9 @@ namespace RiakClient.Config
     using System.Collections.Generic;
     using System.Configuration;
     using System.Linq;
+    using System.Runtime.InteropServices;
 
+    [ComVisible(false)]
     public sealed class RiakClusterConfiguration : ConfigurationSection, IRiakClusterConfiguration
     {
         private static readonly TimeSpan DefaultNodePollTime = TimeSpan.FromSeconds(5);

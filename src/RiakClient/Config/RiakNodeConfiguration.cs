@@ -21,7 +21,9 @@ namespace RiakClient.Config
 {
     using System;
     using System.Configuration;
+    using System.Runtime.InteropServices;
 
+    [ComVisible(false)]
     public sealed class RiakNodeConfiguration : ConfigurationElement, IRiakNodeConfiguration
     {
         private static readonly TimeSpan DefaultTimeout = TimeSpan.FromMilliseconds(4000);
