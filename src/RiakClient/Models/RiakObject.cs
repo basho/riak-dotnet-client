@@ -460,7 +460,7 @@ namespace RiakClient.Models
             "Microsoft.Design",
             "CA1033:InterfaceMethodsShouldBeCallableByChildTypes",
             Scope = "member",
-            Target = "RiakClient.Models.RiakObject.#RiakClient.Models.RiakObject.SetVClock()",
+            Target = "RiakClient.Models.RiakObject.#RiakClient.Models.RiakObject.SetVClock(byte[])",
             Justification = "Mucking with a VClock should require casting to IWriteableVClock. TODO - FUTURE: evaluate this decision")]
         void IWriteableVClock.SetVClock(byte[] vclock)
         {
