@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Debug" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">$(MSBuildProjectDirectory)\..\</SolutionDir>
     <BuildPath>$(SolutionDir)build</BuildPath>
@@ -157,7 +157,11 @@
           Command="$(NUnitConsoleRunnerCommand) -work=$(ProjDir)\RiakClientTests.Live $(ProjDir)\RiakClientTests.Live\RiakClientTests.Live.nunit" />
   </Target>
 
-  <Target Name="UnitTest" DependsOnTargets="GitSubmodule;Debug">
+  <Target Name="CodeAnalysis"> <!-- DependsOnTargets="Debug;ResolveReferences;RunCodeAnalysis" -->
+    <MSBuild Projects="$(SolutionFile)" Properties="Configuration=Debug;VisualStudioVersion=12.0;CodeAnalysisTreatWarningsAsErrors=true;CodeAnalysisRuleSet=MinimumRecommendedRules.ruleset;RunCodeAnalysis=true" />
+  </Target>
+
+  <Target Name="UnitTest" DependsOnTargets="GitSubmodule;Debug;CodeAnalysis">
     <Exec WorkingDirectory="$(SolutionDir)"
           Command="$(NUnitConsoleRunnerCommand) -work=$(ProjDir)\RiakClientTests $(ProjDir)\RiakClientTests\RiakClientTests.nunit" />
   </Target>
