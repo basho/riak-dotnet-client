@@ -14,7 +14,11 @@
     <SolutionFile>$(SolutionDir)RiakClient.sln</SolutionFile>
     <ProjDir>$(SolutionDir)src</ProjDir>
 
+    <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
+
     <CommonAssemblyInfoFile>$(SolutionDir)src\CommonAssemblyInfo.cs</CommonAssemblyInfoFile>
+
+    <MonoExe Condition="'$(OS)' != 'Windows_NT'">mono --runtime=v4.0.30319</MonoExe>
 
     <ProtoGenExe>$(SolutionDir)tools\protobuf-net\protogen\protogen.exe</ProtoGenExe>
     <ProtoDir>$(SolutionDir)src\riak_pb\src</ProtoDir>
@@ -54,12 +58,5 @@
     <ProtoFile Include="$(ProtoDir)\*.proto" />
   </ItemGroup>
 
-  <PropertyGroup Condition="'$(OS)' != 'Windows_NT'">
-    <MonoExe>mono --runtime=v4.0.30319</MonoExe>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)' == ''">
-    <Configuration>Release</Configuration>
-  </PropertyGroup>
 </Project>
 
