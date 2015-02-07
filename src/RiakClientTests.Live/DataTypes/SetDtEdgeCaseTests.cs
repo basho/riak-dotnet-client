@@ -26,7 +26,7 @@ namespace RiakClientTests.Live.DataTypes
     [TestFixture]
     public class SetDtEdgeCaseTests : DataTypeTestsBase
     {
-        private static readonly byte[] NO_CONTEXT = null;
+        private static readonly byte[] NoContext = null;
         private static readonly List<string> Adds1 = new List<string> { "foo", "bar", "baz" };
         private static readonly List<string> Removes1 = new List<string> { "foo" };
         private static readonly List<string> Adds2 = new List<string>();
@@ -45,9 +45,9 @@ namespace RiakClientTests.Live.DataTypes
         [Test]
         public void Test1()
         {
-            var id = new RiakObjectId(LiveRiakConnectionTestBase.BucketTypeNames.Sets, Bucket, GetRandomKey("Test1"));
+            var id = new RiakObjectId(BucketTypeNames.Sets, Bucket, GetRandomKey("Test1"));
 
-            Assert.Throws<ArgumentNullException>(() => Client.DtUpdateSet(id, Serializer, NO_CONTEXT, Adds1, Removes1));
+            Assert.Throws<ArgumentNullException>(() => Client.DtUpdateSet(id, Serializer, NoContext, Adds1, Removes1));
         }
 
         [Test]
@@ -56,7 +56,7 @@ namespace RiakClientTests.Live.DataTypes
             IdContext idContext = BuildStartupSet("SetsTest2NoContext");
 
             Assert.Throws<ArgumentNullException>(
-                () => Client.DtUpdateSet(idContext.Id, Serializer, NO_CONTEXT, Adds2, Removes2));
+                () => Client.DtUpdateSet(idContext.Id, Serializer, NoContext, Adds2, Removes2));
         }
 
         [Test]
@@ -75,7 +75,7 @@ namespace RiakClientTests.Live.DataTypes
         public void Test3NoContext()
         {
             IdContext idContext = BuildStartupSet("SetsTest3NoContext");
-            var updatedSet = Client.DtUpdateSet(idContext.Id, Serializer, NO_CONTEXT, Adds3, Removes3);
+            var updatedSet = Client.DtUpdateSet(idContext.Id, Serializer, NoContext, Adds3, Removes3);
             var updatedValues = updatedSet.GetObjects(Deserializer).ToList();
             updatedValues.Count.ShouldEqual(2);
             updatedValues.ShouldContain("bar");
@@ -98,7 +98,7 @@ namespace RiakClientTests.Live.DataTypes
         {
             IdContext idContext = BuildStartupSet("SetsTest4NoContext");
             Assert.Throws<ArgumentNullException>(
-                () => Client.DtUpdateSet(idContext.Id, Serializer, NO_CONTEXT, Adds4, Removes4));
+                () => Client.DtUpdateSet(idContext.Id, Serializer, NoContext, Adds4, Removes4));
         }
 
         [Test]
@@ -117,7 +117,7 @@ namespace RiakClientTests.Live.DataTypes
         {
             IdContext idContext = BuildStartupSet("SetsTest5NoContext");
             Assert.Throws<ArgumentNullException>(
-                () => Client.DtUpdateSet(idContext.Id, Serializer, NO_CONTEXT, Adds5, Removes5));
+                () => Client.DtUpdateSet(idContext.Id, Serializer, NoContext, Adds5, Removes5));
         }
 
         [Test]
@@ -136,6 +136,7 @@ namespace RiakClientTests.Live.DataTypes
         {
             IdContext oldestIdContext = BuildStartupSet("Test6OldContext");
             var update1 = Client.DtUpdateSet(oldestIdContext.Id, Serializer, oldestIdContext.Context, ConcurrentAdds6, ConcurrentRemovess6);
+            update1.Result.IsSuccess.ShouldBeTrue();
             var update2 = Client.DtUpdateSet(oldestIdContext.Id, Serializer, oldestIdContext.Context, Adds6, Removes6);
             var updatedValues = update2.GetObjects(Deserializer).ToList();
             updatedValues.Count.ShouldEqual(3);
@@ -158,7 +159,7 @@ namespace RiakClientTests.Live.DataTypes
 
         private IdContext BuildStartupSet(string name)
         {
-            var id = new RiakObjectId(LiveRiakConnectionTestBase.BucketTypeNames.Sets, Bucket, GetRandomKey(name));
+            var id = new RiakObjectId(BucketTypeNames.Sets, Bucket, GetRandomKey(name));
             var adds = new List<string> { "bar", "baz" };
             var startingSet = Client.DtUpdateSet(id, Serializer, null, adds);
             startingSet.Result.IsSuccess.ShouldBeTrue("Initial set setup failed: " + startingSet.Result.ErrorMessage);
