@@ -226,7 +226,8 @@ namespace RiakClientTests.Live.DataTypes
             // Store
             var updatedMap1 = Client.DtUpdateMap(id, Serializer, NoContext, NoRemovals,
                 new List<MapUpdate> { setMapUpdate });
-
+            updatedMap1.Result.IsSuccess.ShouldBeTrue();
+            
             // Add Z
             var setMapUpdate2 = new MapUpdate
             {
@@ -269,6 +270,7 @@ namespace RiakClientTests.Live.DataTypes
             // Store
             var updatedMap1 = Client.DtUpdateMap(id, Serializer, NoContext, NoRemovals,
                 new List<MapUpdate> { setMapUpdate });
+            updatedMap1.Result.IsSuccess.ShouldBeTrue();
 
             // Remove X from set
             var setMapUpdate2 = new MapUpdate
