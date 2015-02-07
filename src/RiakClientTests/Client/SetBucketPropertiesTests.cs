@@ -1,4 +1,4 @@
-// <copyright file="RiakClientSetBucketPropertiesTests.cs" company="Basho Technologies, Inc.">
+// <copyright file="SetBucketPropertiesTests.cs" company="Basho Technologies, Inc.">
 // Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
 // Copyright (c) 2014 - Basho Technologies, Inc.
 //
@@ -17,80 +17,21 @@
 // under the License.
 // </copyright>
 
-namespace RiakClientTests.RiakClientSetBucketPropertiesTests
+namespace RiakClientTests.Client
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using Moq;
     using NUnit.Framework;
     using RiakClient;
-    using RiakClient.Comms;
     using RiakClient.Messages;
     using RiakClient.Models;
     using RiakClient.Models.Rest;
     using RiakClient.Util;
 
-    public class MockCluster : IRiakEndPoint
-    {
-        public Mock<IRiakConnection> ConnectionMock = new Mock<IRiakConnection>();
-
-        public MockCluster()
-        {
-            RetryWaitTime = TimeSpan.FromMilliseconds(200);
-        }
-
-        public void Dispose()
-        {
-        }
-
-        public IRiakClient CreateClient()
-        {
-            return new Mock<IRiakClient>().Object;
-        }
-
-        public IRiakClient CreateClient(string seed)
-        {
-            return new Mock<IRiakClient>().Object;
-        }
-
-        public TimeSpan RetryWaitTime { get; set; }
-
-        public RiakResult<TResult> UseConnection<TResult>(Func<IRiakConnection, RiakResult<TResult>> useFun, int retryAttempts)
-        {
-            return useFun(ConnectionMock.Object);
-        }
-
-        public RiakResult UseConnection(Func<IRiakConnection, RiakResult> useFun, int retryAttempts)
-        {
-            return useFun(ConnectionMock.Object);
-        }
-
-        public RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun, int retryAttempts)
-            where TResult : RiakResult
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    public abstract class RiakClientSetBucketPropertiesTestBase
-    {
-        protected MockCluster Cluster;
-        protected RiakClient Client;
-        protected byte[] ClientId;
-
-        protected RiakClientSetBucketPropertiesTestBase()
-        {
-            Cluster = new MockCluster();
-            ClientId = System.Text.Encoding.Default.GetBytes("fadjskl").Take(4).ToArray();
-            Client = new RiakClient(Cluster);
-        }
-    }
-
     [TestFixture]
-    public class WhenSettingBucketPropertiesWithExtendedProperties : RiakClientSetBucketPropertiesTestBase
+    public class WhenSettingBucketPropertiesWithExtendedProperties : ClientTestBase
     {
         protected RiakResult Response;
+
         [SetUp]
         public void SetUp()
         {
@@ -110,7 +51,7 @@ namespace RiakClientTests.RiakClientSetBucketPropertiesTests
     }
 
     [TestFixture]
-    public class WhenSettingBucketPropertiesWithoutExtendedProperties : RiakClientSetBucketPropertiesTestBase
+    public class WhenSettingBucketPropertiesWithoutExtendedProperties : ClientTestBase
     {
         protected RiakResult Response;
         [SetUp]
