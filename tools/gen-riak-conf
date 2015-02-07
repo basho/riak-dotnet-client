@@ -34,6 +34,8 @@ check_crl = off
 
 listener.http.internal = 0.0.0.0:$http_port
 listener.protobuf.internal = 0.0.0.0:$pb_port
+search.solr.start_timeout = 60s
+
 EOT
 
 if (( https_port > 0 ))
