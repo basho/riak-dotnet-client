@@ -22,7 +22,6 @@ namespace RiakClient.Models
     using System;
     using Converters;
     using Newtonsoft.Json;
-    using Util;
 
     [JsonConverter(typeof(RiakObjectIdConverter))]
     public class RiakObjectId : IEquatable<RiakObjectId>
@@ -33,7 +32,7 @@ namespace RiakClient.Models
 
         public RiakObjectId(string bucket, string key)
         {
-            if (EnumerableUtil.IsNullOrEmpty(bucket))
+            if (string.IsNullOrWhiteSpace(bucket))
             {
                 throw new ArgumentNullException("bucket");
             }

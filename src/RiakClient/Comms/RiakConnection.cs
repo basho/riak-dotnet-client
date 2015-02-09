@@ -326,7 +326,7 @@ namespace RiakClient.Comms
                 httpWebRequest.Headers.Set(restRequestHeader.Key, restRequestHeader.Value);
             }
 
-            if (!EnumerableUtil.IsNullOrEmpty(restRequest.Body))
+            if (EnumerableUtil.NotNullOrEmpty(restRequest.Body))
             {
                 httpWebRequest.ContentLength = restRequest.Body.Length;
                 using (var writer = httpWebRequest.GetRequestStream())

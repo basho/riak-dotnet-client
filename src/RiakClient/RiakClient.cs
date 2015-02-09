@@ -1096,7 +1096,7 @@ namespace RiakClient
             if (!result.IsSuccess)
             {
                 return new RiakDtSetResult(RiakResult<RiakObject>.Error(
-                                result.ResultCode, 
+                                result.ResultCode,
                                 result.ErrorMessage,
                                 result.NodeOffline));
             }
@@ -1138,7 +1138,7 @@ namespace RiakClient
             List<T> removes = null,
             RiakDtUpdateOptions options = null)
         {
-            if (removes != null && removes.Count > 0 && context == null)
+            if (EnumerableUtil.NotNullOrEmpty(removes) && context == null)
             {
                 throw new ArgumentNullException("context", "Set item removal specified, but context was null");
             }
@@ -1246,10 +1246,10 @@ namespace RiakClient
         {
             return DtUpdateMap(
                 new RiakObjectId(bucketType, bucket, key),
-                serialize, 
-                context, 
-                removes, 
-                updates, 
+                serialize,
+                context,
+                removes,
+                updates,
                 options);
         }
 
@@ -1261,7 +1261,7 @@ namespace RiakClient
             List<MapUpdate> updates = null,
             RiakDtUpdateOptions options = null)
         {
-            if (context == null && removes != null && removes.Count > 0)
+            if (EnumerableUtil.NotNullOrEmpty(removes) && context == null)
             {
                 throw new ArgumentNullException("context", "Map field removal specified, but context was null");
             }
@@ -1680,19 +1680,19 @@ namespace RiakClient
         {
             foreach (var mapUpdate in updates)
             {
-                if (mapUpdate.map_op != null && mapUpdate.map_op.removes != null && mapUpdate.map_op.removes.Count > 0)
+                if (mapUpdate.map_op != null && EnumerableUtil.NotNullOrEmpty(mapUpdate.map_op.removes))
                 {
                     return true;
                 }
 
-                if (mapUpdate.set_op != null && mapUpdate.set_op.removes != null && mapUpdate.set_op.removes.Count > 0)
+                if (mapUpdate.set_op != null && EnumerableUtil.NotNullOrEmpty(mapUpdate.set_op.removes))
                 {
                     return true;
                 }
 
                 if (mapUpdate.map_op != null)
                 {
-                    AnyNestedRemovalsIn(mapUpdate.map_op.updates);
+                    return AnyNestedRemovalsIn(mapUpdate.map_op.updates);
                 }
             }
 
