@@ -25,7 +25,7 @@ namespace RiakClientTests.Client
     using RiakClient;
     using RiakClient.Comms;
 
-    public class MockCluster : IRiakEndPoint
+    public sealed class MockCluster : IRiakEndPoint
     {
         public Mock<IRiakConnection> ConnectionMock = new Mock<IRiakConnection>();
 
