@@ -1138,7 +1138,7 @@ namespace RiakClient
             List<T> removes = null,
             RiakDtUpdateOptions options = null)
         {
-            if (!EnumerableUtil.IsNullOrEmpty(removes) && context == null)
+            if (EnumerableUtil.NotNullOrEmpty(removes) && context == null)
             {
                 throw new ArgumentNullException("context", "Set item removal specified, but context was null");
             }
@@ -1261,7 +1261,7 @@ namespace RiakClient
             List<MapUpdate> updates = null,
             RiakDtUpdateOptions options = null)
         {
-            if (!EnumerableUtil.IsNullOrEmpty(removes) && context == null)
+            if (EnumerableUtil.NotNullOrEmpty(removes) && context == null)
             {
                 throw new ArgumentNullException("context", "Map field removal specified, but context was null");
             }
@@ -1680,12 +1680,12 @@ namespace RiakClient
         {
             foreach (var mapUpdate in updates)
             {
-                if (mapUpdate.map_op != null && !EnumerableUtil.IsNullOrEmpty(mapUpdate.map_op.removes))
+                if (mapUpdate.map_op != null && EnumerableUtil.NotNullOrEmpty(mapUpdate.map_op.removes))
                 {
                     return true;
                 }
 
-                if (mapUpdate.set_op != null && !EnumerableUtil.IsNullOrEmpty(mapUpdate.set_op.removes))
+                if (mapUpdate.set_op != null && EnumerableUtil.NotNullOrEmpty(mapUpdate.set_op.removes))
                 {
                     return true;
                 }
