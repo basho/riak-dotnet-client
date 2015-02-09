@@ -38,8 +38,6 @@ namespace RiakClientTests.Client
         [Test]
         public void DtUpdateMapWithRecursiveDataWithoutContext_ThrowsException()
         {
-            var riakObjectId = new RiakObjectId("foo", "bar");
-
             var nestedRemoves = new List<MapField>
             {
                 new MapField { name = "field_name".ToRiakString(), type = MapField.MapFieldType.SET }
