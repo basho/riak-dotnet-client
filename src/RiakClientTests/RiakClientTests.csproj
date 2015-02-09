@@ -65,6 +65,9 @@
     </Compile>
     <Compile Include="Auth\AuthTestBase.cs" />
     <Compile Include="Auth\RiakSecurityManagerTests.cs" />
+    <Compile Include="Client\ClientTestBase.cs" />
+    <Compile Include="Client\MockCluster.cs" />
+    <Compile Include="Client\DataTypeTests.cs" />
     <Compile Include="Comms\RoundRobinStrategyTests.cs" />
     <Compile Include="Json\RiakObjectConversionTests.cs" />
     <Compile Include="Json\TestObjects.cs" />
@@ -78,7 +81,7 @@
     <Compile Include="Messages\MessageCodeTests.cs" />
     <Compile Include="Models\RiakBucketPropertyTests.cs" />
     <Compile Include="RiakAsyncClientTests.cs" />
-    <Compile Include="RiakClientSetBucketPropertiesTests.cs" />
+    <Compile Include="Client\SetBucketPropertiesTests.cs" />
     <Compile Include="RiakClientTestBase.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Models\MapReduce\RiakMapReduceTests.cs" />
