@@ -43,4 +43,5 @@ CommonAssemblyInfo.cs
 *.DotSettings
 *.dcvr.settings
 StyleCop.Cache
-
+*.dic
+*.GhostDoc.xml
