@@ -126,8 +126,8 @@ namespace RiakClient.Auth
                         {
                             foreach (X509ChainStatus status in chain.ChainStatus)
                             {
-                                if ((status.Status == X509ChainStatusFlags.UntrustedRoot) &&
-                                    (!EnumerableUtil.IsNullOrEmpty(chain.ChainElements)))
+                                if (status.Status == X509ChainStatusFlags.UntrustedRoot &&
+                                    EnumerableUtil.NotNullOrEmpty(chain.ChainElements))
                                 {
                                     // The root cert must not be installed but we provided a file
                                     // See if anything in the chain matches our root cert
@@ -181,9 +181,9 @@ namespace RiakClient.Auth
              * 2nd time in here, targetHost == "riak-test" and acceptableIssues is one element in array:
              *     OU=Development, O=Basho Technologies, L=Bellevue, S=WA, C=US
              */
-            if (!EnumerableUtil.IsNullOrEmpty(localCertificates))
+            if (EnumerableUtil.NotNullOrEmpty(localCertificates))
             {
-                if (!EnumerableUtil.IsNullOrEmpty(acceptableIssuers))
+                if (EnumerableUtil.NotNullOrEmpty(acceptableIssuers))
                 {
                     foreach (X509Certificate cert in localCertificates)
                     {

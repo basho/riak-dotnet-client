@@ -24,6 +24,16 @@ namespace RiakClient.Util
 
     internal static class EnumerableUtil
     {
+        public static bool NotNullOrEmpty(IEnumerable items)
+        {
+            return !EnumerableUtil.IsNullOrEmpty(items);
+        }
+
+        public static bool NotNullOrEmpty<T>(IEnumerable<T> items)
+        {
+            return !EnumerableUtil.IsNullOrEmpty(items);
+        }
+
         public static bool IsNullOrEmpty(IEnumerable items)
         {
             if (items == null)
