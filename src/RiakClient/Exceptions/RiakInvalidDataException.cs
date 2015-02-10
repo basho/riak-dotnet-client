@@ -20,17 +20,39 @@
 namespace RiakClient.Exceptions
 {
     using System;
+    using System.Runtime.Serialization;
+    using System.Security.Permissions;
 
-    /*
-     * TODO: should be subclass of RiakException
-     */
-    public class RiakInvalidDataException : Exception
+    [Serializable]
+    public class RiakInvalidDataException : RiakException
     {
         private readonly byte messageCode;
 
+        public RiakInvalidDataException()
+        {
+        }
+
+        public RiakInvalidDataException(string message)
+            : base(message)
+        {
+        }
+
+        public RiakInvalidDataException(string message, Exception innerException)
+            : base(message, innerException)
+        {
+        }
+
         public RiakInvalidDataException(byte messageCode)
+            : this(string.Format("Unexpected message code: {0}", messageCode))
         {
             this.messageCode = messageCode;
+        }
+
+        [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
+        protected RiakInvalidDataException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+            this.messageCode = info.GetByte("MessageCode");
         }
 
         public byte MessageCode
@@ -41,12 +63,17 @@ namespace RiakClient.Exceptions
             }
         }
 
-        public override string Message
+        [SecurityPermissionAttribute(SecurityAction.Demand, SerializationFormatter = true)]
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            get
+            if (info == null)
             {
-                return string.Format("Unexpected message code returned from Riak: {0}", messageCode);
+                throw new ArgumentNullException("info");
             }
+
+            info.AddValue("MessageCode", messageCode);
+
+            base.GetObjectData(info, context);
         }
     }
 }
