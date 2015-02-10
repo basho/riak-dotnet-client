@@ -30,9 +30,9 @@ namespace RiakClient.Models.MapReduce.Inputs
 
         public static RiakBucketKeyInput FromRiakObjectIds(IEnumerable<RiakObjectId> riakObjectIds)
         {
-            var rbki = new RiakBucketKeyInput();
-            rbki.Add(riakObjectIds);
-            return rbki;
+            var bucketKeyInput = new RiakBucketKeyInput();
+            bucketKeyInput.Add(riakObjectIds);
+            return bucketKeyInput;
         }
 
         [Obsolete("Use the Add() that accepts a RiakIndexId instead. This will be removed in the next version.")]

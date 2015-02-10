@@ -30,26 +30,26 @@ namespace RiakClient.Models.MapReduce.KeyFilters
     /// <typeparam name="T">Type of key filter token</typeparam>
     internal class SimilarTo<T> : IRiakKeyFilterToken
     {
-        private readonly Tuple<string, T, int> keyFilterDefintion;
+        private readonly Tuple<string, T, int> keyFilterDefinition;
 
         public SimilarTo(T arg, int distance)
         {
-            keyFilterDefintion = Tuple.Create("similar_to", arg, distance);
+            keyFilterDefinition = Tuple.Create("similar_to", arg, distance);
         }
 
         public string FunctionName
         {
-            get { return keyFilterDefintion.Item1; }
+            get { return keyFilterDefinition.Item1; }
         }
 
         public T Argument
         {
-            get { return keyFilterDefintion.Item2; }
+            get { return keyFilterDefinition.Item2; }
         }
 
         public int Distance
         {
-            get { return keyFilterDefintion.Item3; }
+            get { return keyFilterDefinition.Item3; }
         }
 
         public override string ToString()

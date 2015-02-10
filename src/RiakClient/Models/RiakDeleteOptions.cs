@@ -56,7 +56,7 @@ namespace RiakClient.Models
         public byte[] Vclock { get; set; }
 
         /// <summary>
-        /// The number of replicas that must return before a delete is considered a succes.
+        /// The number of replicas that must return before a delete is considered a success.
         /// </summary>
         /// <value>
         /// The R value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.

@@ -171,7 +171,7 @@ namespace RiakClient.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="RiakObject"/> class.
         /// </summary>
-        /// <param name="bucketType">Riak bucket type - a collection of buckets with similar configuraiton</param> 
+        /// <param name="bucketType">Riak bucket type - a collection of buckets with similar configuration</param> 
         /// <param name="bucket">Object bucket name</param>
         /// <param name="key">Object key</param>
         /// <param name="value">Object value</param>
@@ -527,7 +527,7 @@ namespace RiakClient.Models
 
             if (ContentType == RiakConstants.ContentTypes.ProtocolBuffers)
             {
-                var soba = new SerializeObjectToByteArray<T>(theObject =>
+                var objectToByteArrayFunc = new SerializeObjectToByteArray<T>(theObject =>
                 {
                     using (var ms = new MemoryStream())
                     {
@@ -536,14 +536,14 @@ namespace RiakClient.Models
                     }
                 });
 
-                SetObject(value, ContentType, soba);
+                SetObject(value, ContentType, objectToByteArrayFunc);
 
                 return;
             }
 
             if (ContentType == RiakConstants.ContentTypes.Xml)
             {
-                var soba = new SerializeObjectToByteArray<T>(theObject =>
+                var objectToByteArrayFunc = new SerializeObjectToByteArray<T>(theObject =>
                 {
                     var ms = new MemoryStream();
                     var serde = new XmlSerializer(typeof(T));
@@ -551,7 +551,7 @@ namespace RiakClient.Models
                     return ms.ToArray();
                 });
 
-                SetObject(value, ContentType, soba);
+                SetObject(value, ContentType, objectToByteArrayFunc);
 
                 return;
             }

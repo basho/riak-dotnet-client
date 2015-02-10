@@ -33,7 +33,7 @@ namespace RiakClient.Models
         public uint? PrVal { get; private set; }
 
         /// <summary>
-        /// The number of replicas that must return before a read is considered a succes.
+        /// The number of replicas that must return before a read is considered a success.
         /// </summary>
         /// <value>
         /// The R value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.

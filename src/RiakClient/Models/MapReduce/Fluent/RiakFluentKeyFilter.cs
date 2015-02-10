@@ -37,8 +37,8 @@ namespace RiakClient.Models.MapReduce.Fluent
         public RiakFluentKeyFilter And(Action<RiakFluentKeyFilter> left, Action<RiakFluentKeyFilter> right)
         {
             var leftFilters = new List<IRiakKeyFilterToken>();
-            var leftfluent = new RiakFluentKeyFilter(leftFilters);
-            left(leftfluent);
+            var leftFluent = new RiakFluentKeyFilter(leftFilters);
+            left(leftFluent);
 
             var rightFilters = new List<IRiakKeyFilterToken>();
             var rightFluent = new RiakFluentKeyFilter(rightFilters);
@@ -133,8 +133,8 @@ namespace RiakClient.Models.MapReduce.Fluent
         public RiakFluentKeyFilter Or(Action<RiakFluentKeyFilter> left, Action<RiakFluentKeyFilter> right)
         {
             var leftFilters = new List<IRiakKeyFilterToken>();
-            var leftfluent = new RiakFluentKeyFilter(leftFilters);
-            left(leftfluent);
+            var leftFluent = new RiakFluentKeyFilter(leftFilters);
+            left(leftFluent);
 
             var rightFilters = new List<IRiakKeyFilterToken>();
             var rightFluent = new RiakFluentKeyFilter(rightFilters);

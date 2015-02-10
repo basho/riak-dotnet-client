@@ -73,7 +73,7 @@ namespace RiakClient.Models.MapReduce
             return this;
         }
 
-        // TODO: Replace the backwardsness of these parameters when we get a Namespace class.
+        // TODO: Replace the backwardness of these parameters when we get a Namespace class.
         public RiakMapReduceQuery Inputs(string bucket, string bucketType)
         {
             inputs = new RiakBucketInput(bucket, bucketType);

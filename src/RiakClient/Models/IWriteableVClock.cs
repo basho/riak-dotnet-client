@@ -20,7 +20,7 @@
 namespace RiakClient.Models
 {
     /// <summary>
-    /// <para>Implements a writeable vector clock interface. Callers must explictly use the
+    /// <para>Implements a writeable vector clock interface. Callers must explicitly use the
     /// IWriteableVClock interface to set the vector clock value. This is by design and
     /// is implemented in an attempt to prevent developers new to Riak from causing themselves
     /// more pain. This trade off should present developers with a reliable way to explicitly

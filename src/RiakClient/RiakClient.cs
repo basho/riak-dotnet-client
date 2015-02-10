@@ -191,7 +191,7 @@ namespace RiakClient
         /// </param>
         /// <remarks>If a node does not respond, that does not necessarily mean that the 
         /// <paramref name="bucket"/>/<paramref name="key"/> combination is not available. It simply means
-        /// that fewer than the default number nodes responded to the read request. Unfortunatley, 
+        /// that fewer than the default number nodes responded to the read request. Unfortunately, 
         /// the Riak API does not allow us to distinguish between a 404 resulting from less than <paramref name="rVal"/>
         /// nodes successfully responding and a <paramref name="bucket"/>/<paramref name="key"/> combination
         /// not being found in Riak.
@@ -214,7 +214,7 @@ namespace RiakClient
         /// defined bucket configuration properties.</param>
         /// <remarks>If a node does not respond, that does not necessarily mean that the 
         /// <paramref name="objectId"/> is not available. It simply means
-        /// that fewer than <paramref name="rVal" /> nodes responded to the read request. Unfortunatley, 
+        /// that fewer than <paramref name="rVal" /> nodes responded to the read request. Unfortunately, 
         /// the Riak API does not allow us to distinguish between a 404 resulting from less than <paramref name="rVal"/>
         /// nodes successfully responding and an <paramref name="objectId"/> not being found in Riak.
         /// </remarks>
@@ -827,9 +827,9 @@ namespace RiakClient
 
                 // var linkResultStrings = linkResults.SelectMany(g => g.Select(r => r.Values.Value.FromRiakString()));
                 var rawLinks = linkResultStrings.SelectMany(RiakLink.ParseArrayFromJsonString).Distinct();
-                var oids = rawLinks.Select(l => new RiakObjectId(l.Bucket, l.Key)).ToList();
+                var objectIds = rawLinks.Select(l => new RiakObjectId(l.Bucket, l.Key)).ToList();
 
-                var objects = Get(oids, new RiakGetOptions());
+                var objects = Get(objectIds, new RiakGetOptions());
 
                 // FIXME
                 // we could be discarding results here. Not good?

@@ -77,8 +77,8 @@ namespace RiakClientTests.Live.Search
             var getIndexResult = func.WaitUntil();
 
             Assert.True(getIndexResult.IsSuccess, "Index Not Fetched: {0}", getIndexResult.ErrorMessage);
-            Assert.AreEqual(1, getIndexResult.Value.Indices.Count);
-            var fetchedIndex = getIndexResult.Value.Indices.First();
+            Assert.AreEqual(1, getIndexResult.Value.Indexes.Count);
+            var fetchedIndex = getIndexResult.Value.Indexes.First();
             Assert.AreEqual(indexName, fetchedIndex.Name);
             Assert.AreEqual(2, fetchedIndex.NVal);
         }
