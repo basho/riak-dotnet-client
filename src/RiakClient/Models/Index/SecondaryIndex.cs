@@ -22,7 +22,9 @@ namespace RiakClient.Models.Index
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
+    using System.Runtime.InteropServices;
 
+    [ComVisible(false)]
     public abstract class SecondaryIndex<TClass, TIndex>
     {
         protected readonly RiakObject Container;
