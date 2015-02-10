@@ -20,12 +20,14 @@
 namespace RiakClient.Converters
 {
     using System;
+    using System.Runtime.InteropServices;
     using Models;
     using Newtonsoft.Json;
 
     /*
      * TODO: FUTURE - Figure out if this is still needed
      */
+    [ComVisible(false)]
     public class RiakObjectIdConverter : JsonConverter
     {
         public override bool CanRead

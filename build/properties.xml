@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <!-- NB: necessary to avoid MSB4011 warning -->
+    <PropertiesImported>true</PropertiesImported>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">$(MSBuildProjectDirectory)\..\</SolutionDir>
+    <MSBuildCommunityTasksPath>$(SolutionDir)build</MSBuildCommunityTasksPath>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildCommunityTasksPath)\MSBuild.Community.Tasks.targets" />
+
+  <PropertyGroup>
+
+    <SolutionFile>$(SolutionDir)RiakClient.sln</SolutionFile>
+    <ProjDir>$(SolutionDir)src</ProjDir>
+
+    <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
+
+    <CommonAssemblyInfoFile>$(SolutionDir)src\CommonAssemblyInfo.cs</CommonAssemblyInfoFile>
+
+    <MonoExe Condition="'$(OS)' != 'Windows_NT'">mono --runtime=v4.0.30319</MonoExe>
+
+    <ProtoGenExe>$(SolutionDir)tools\protobuf-net\protogen\protogen.exe</ProtoGenExe>
+    <ProtoDir>$(SolutionDir)src\riak_pb\src</ProtoDir>
+    <ProtoMsgDir>$(SolutionDir)src\RiakClient\Messages</ProtoMsgDir>
+    <ProtoMsgCsvFile>$(ProtoDir)\riak_pb_messages.csv</ProtoMsgCsvFile>
+    <NuGetExe>$(SolutionDir).nuget\NuGet.exe</NuGetExe>
+    <NuGetDir>$(ProjDir)\NuGet</NuGetDir>
+    <NuGetSpecTemplate>$(NuGetDir)\RiakClient.nuspec.template</NuGetSpecTemplate>
+    <NuGetSpecFile>$(NuGetDir)\RiakClient.nuspec</NuGetSpecFile>
+
+    <NUnitConsoleRunnerExe Condition="'$(Verbose)' != 'true'">$(SolutionDir)packages\NUnit.Runners.2.6.3\tools\nunit-console.exe -nologo -nodots</NUnitConsoleRunnerExe>
+    <NUnitConsoleRunnerExe Condition="'$(Verbose)' == 'true'">$(SolutionDir)packages\NUnit.Runners.2.6.3\tools\nunit-console.exe -labels</NUnitConsoleRunnerExe>
+    <NUnitConsoleRunnerCommand Condition="'$(OS)' == 'Windows_NT'">$(NUnitConsoleRunnerExe) -config Debug</NUnitConsoleRunnerCommand>
+    <NUnitConsoleRunnerCommand Condition="'$(OS)' != 'Windows_NT'">$(MonoExe) $(NUnitConsoleRunnerExe) -config Debug-Mono</NUnitConsoleRunnerCommand>
+
+    <RiakClientPackagesConfig>$(ProjDir)\RiakClient\packages.config</RiakClientPackagesConfig>
+
+    <PowerShellExe Condition="'$(PowerShellExe)'== ''">$(WINDIR)\System32\WindowsPowerShell\v1.0\powershell.exe</PowerShellExe>
+
+    <VersionString Condition="'$(Configuration)' == 'Release'">unknown</VersionString>
+    <!-- NB: Hard-coded for non-Release builds to skip querying git for information.
+         Increment this manually for non-Release builds -->
+    <VersionString Condition="'$(Configuration)' != 'Release'">v2.0.0</VersionString>
+    <GitRemoteName>basho-labs</GitRemoteName>
+    <GitCommitHash>unknown</GitCommitHash>
+    <MasterBranchName>master</MasterBranchName>
+    <DevelopBranchName>develop</DevelopBranchName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectToBuild Include="$(SolutionFile)">
+      <Properties>Configuration=Debug</Properties>
+    </ProjectToBuild>
+    <ProjectToBuild Include="$(SolutionFile)">
+      <Properties>Configuration=Release</Properties>
+    </ProjectToBuild>
+    <ProtoFile Include="$(ProtoDir)\*.proto" />
+  </ItemGroup>
+
+</Project>
+

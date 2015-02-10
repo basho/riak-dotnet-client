@@ -75,7 +75,16 @@ namespace RiakClient.Comms
         public void Dispose()
         {
             disposing = true;
-            connections.Dispose();
+            Dispose(disposing);
+            GC.SuppressFinalize(disposing);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                connections.Dispose();
+            }
         }
 
         private TRiakResult UseConnection<TRiakResult>(Func<IRiakConnection, TRiakResult> useFun, Func<ResultCode, string, bool, TRiakResult> onError)

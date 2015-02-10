@@ -20,8 +20,10 @@
 namespace RiakClient.Config
 {
     using System.Configuration;
+    using System.Runtime.InteropServices;
 
-    public class RiakNodeConfigurationCollection : ConfigurationElementCollection
+    [ComVisible(false)]
+    public sealed class RiakNodeConfigurationCollection : ConfigurationElementCollection
     {
         protected override ConfigurationElement CreateNewElement()
         {

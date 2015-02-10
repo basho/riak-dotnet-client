@@ -1,66 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Debug" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">$(MSBuildProjectDirectory)\..\</SolutionDir>
-    <MSBuildCommunityTasksPath>$(SolutionDir)build</MSBuildCommunityTasksPath>
+    <BuildPath>$(SolutionDir)build</BuildPath>
   </PropertyGroup>
 
-  <Import Project="$(MSBuildCommunityTasksPath)\MSBuild.Community.Tasks.targets"/>
-
-  <PropertyGroup>
-    <CommonAssemblyInfoFile>$(SolutionDir)src\CommonAssemblyInfo.cs</CommonAssemblyInfoFile>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(OS)' != 'Windows_NT'">
-    <MonoExe>mono --runtime=v4.0.30319</MonoExe>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)' == ''">
-    <Configuration>Release</Configuration>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <VersionString Condition="'$(Configuration)' == 'Release'">unknown</VersionString>
-    <VersionString Condition="'$(Configuration)' != 'Release'">v0.0.0</VersionString>
-    <GitRemoteName>basho-labs</GitRemoteName>
-    <GitCommitHash>unknown</GitCommitHash>
-    <MasterBranchName>master</MasterBranchName>
-    <DevelopBranchName>develop</DevelopBranchName>
-  </PropertyGroup>
+  <Import Project="$(BuildPath)\properties.xml" Condition="'$(PropertiesImported)' != 'true'" />
+  <Import Project="$(BuildPath)\assemblyinfo.targets" />
 
   <Target Name="CleanCommonAssemblyInfo">
     <Delete Files="$(CommonAssemblyInfoFile)" />
-  </Target>
-
-  <Target Name="PopulateVersionInformation">
-
-    <GitDescribe LocalPath="$(SolutionDir)" Condition="'$(VersionString)' == 'unknown'">
-      <Output TaskParameter="CommitHash" PropertyName="GitCommitHash" />
-      <Output TaskParameter="Tag" PropertyName="VersionString" />
-    </GitDescribe>
-
-    <GitDescribe LocalPath="$(SolutionDir)" Condition="'$(Configuration)' == 'Release' And '$(VersionString)' != 'unknown'">
-      <Output TaskParameter="CommitHash" PropertyName="GitCommitHash" />
-    </GitDescribe>
-
-    <Message Text="Parsing VersionString: $(VersionString)" />
-
-    <!--
-      NB: these regexes are Mono and Windows compatible. "\." to represent literal period
-          does not work on Mono 3.10
-    -->
-    <RegexReplace Input="$(VersionString)" Expression="v([0-9])[.][0-9][.][0-9](-[a-z0-9]+)?" Replacement="$1" Count="1">
-      <Output PropertyName="VMajor" TaskParameter="Output" />
-    </RegexReplace>
-    <RegexReplace Input="$(VersionString)" Expression="v[0-9][.]([0-9])[.][0-9](-[a-z0-9]+)?" Replacement="$1" Count="1">
-      <Output PropertyName="VMinor" TaskParameter="Output" />
-    </RegexReplace>
-    <RegexReplace Input="$(VersionString)" Expression="v[0-9][.][0-9][.]([0-9])(-[a-z0-9]+)?" Replacement="$1" Count="1">
-      <Output PropertyName="VPatch" TaskParameter="Output" />
-    </RegexReplace>
-    <RegexReplace Input="$(VersionString)" Expression="v[0-9][.][0-9][.][0-9]-([a-z0-9]+)?" Replacement="$1" Count="1">
-      <Output PropertyName="VPreRelease" TaskParameter="Output" />
-    </RegexReplace>
   </Target>
 
   <Target Name="PublishValidateOnDevelopBranch">
@@ -142,42 +91,6 @@
                   AssemblyInformationalVersion="$(GitCommitHash)" />
   </Target>
 
-  <PropertyGroup>
-    <SolutionFile>$(SolutionDir)RiakClient.sln</SolutionFile>
-    <ProjDir>$(SolutionDir)src</ProjDir>
-
-    <ProtoGenExe>$(SolutionDir)tools\protobuf-net\protogen\protogen.exe</ProtoGenExe>
-    <ProtoDir>$(SolutionDir)src\riak_pb\src</ProtoDir>
-    <ProtoMsgDir>$(SolutionDir)src\RiakClient\Messages</ProtoMsgDir>
-    <ProtoMsgCsvFile>$(ProtoDir)\riak_pb_messages.csv</ProtoMsgCsvFile>
-    <NuGetExe>$(SolutionDir).nuget\NuGet.exe</NuGetExe>
-    <NuGetDir>$(ProjDir)\NuGet</NuGetDir>
-    <NuGetSpecTemplate>$(NuGetDir)\RiakClient.nuspec.template</NuGetSpecTemplate>
-    <NuGetSpecFile>$(NuGetDir)\RiakClient.nuspec</NuGetSpecFile>
-
-    <NUnitConsoleRunnerExe Condition="'$(Verbose)' != 'true'">$(SolutionDir)packages\NUnit.Runners.2.6.3\tools\nunit-console.exe -nologo -nodots</NUnitConsoleRunnerExe>
-    <NUnitConsoleRunnerExe Condition="'$(Verbose)' == 'true'">$(SolutionDir)packages\NUnit.Runners.2.6.3\tools\nunit-console.exe -labels</NUnitConsoleRunnerExe>
-    <NUnitConsoleRunnerCommand Condition="'$(OS)' == 'Windows_NT'">$(NUnitConsoleRunnerExe) -config Debug</NUnitConsoleRunnerCommand>
-    <NUnitConsoleRunnerCommand Condition="'$(OS)' != 'Windows_NT'">$(MonoExe) $(NUnitConsoleRunnerExe) -config Debug-Mono</NUnitConsoleRunnerCommand>
-
-    <RiakClientPackagesConfig>$(ProjDir)\RiakClient\packages.config</RiakClientPackagesConfig>
-
-    <PowerShellExe Condition="'$(PowerShellExe)'== ''">$(WINDIR)\System32\WindowsPowerShell\v1.0\powershell.exe</PowerShellExe>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <ProjectToBuild Include="$(SolutionFile)">
-      <Properties>Configuration=Debug</Properties>
-    </ProjectToBuild>
-    <ProjectToBuild Include="$(SolutionFile)">
-      <Properties>Configuration=Release</Properties>
-    </ProjectToBuild>
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProtoFile Include="$(ProtoDir)\*.proto" />
-  </ItemGroup>
-
   <Target Name="ProtoGen">
     <Exec WorkingDirectory="$(ProtoDir)"
           Command="$(ProtoGenExe) -ns:RiakClient.Messages -i:%(ProtoFile.Identity) -o:$(ProtoMsgDir)\@(ProtoFile->'%(filename)').cs" />
@@ -244,7 +157,12 @@
           Command="$(NUnitConsoleRunnerCommand) -work=$(ProjDir)\RiakClientTests.Live $(ProjDir)\RiakClientTests.Live\RiakClientTests.Live.nunit" />
   </Target>
 
-  <Target Name="UnitTest" DependsOnTargets="GitSubmodule;Debug">
+  <Target Name="CodeAnalysis">
+    <MSBuild Projects="$(SolutionFile)"
+             Properties="Configuration=Debug;VisualStudioVersion=12.0;CodeAnalysisTreatWarningsAsErrors=true;CodeAnalysisRuleSet=MinimumRecommendedRules.ruleset;RunCodeAnalysis=true" />
+  </Target>
+
+  <Target Name="UnitTest" DependsOnTargets="GitSubmodule;Debug;CodeAnalysis">
     <Exec WorkingDirectory="$(SolutionDir)"
           Command="$(NUnitConsoleRunnerCommand) -work=$(ProjDir)\RiakClientTests $(ProjDir)\RiakClientTests\RiakClientTests.nunit" />
   </Target>

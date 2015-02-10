@@ -6,6 +6,7 @@
     <SourceFile>riak_kv.cs</SourceFile>
     <SourceFile>riak_search.cs</SourceFile>
     <SourceFile>riak_yokozuna.cs</SourceFile>
+    <SourceFile>RpbClasses.cs</SourceFile>
     <Settings>
       <GlobalSettings>
         <BooleanProperty Name="RulesEnabledByDefault">False</BooleanProperty>
