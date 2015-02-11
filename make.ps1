@@ -42,6 +42,12 @@ Param(
 
 Set-StrictMode -Version Latest
 
+trap
+{
+    Write-Error -ErrorRecord $_
+    exit 1
+}
+
 if ([System.Environment]::Version.Major -ne 4) {
     throw "The build depends on CLR version 4"
 }
