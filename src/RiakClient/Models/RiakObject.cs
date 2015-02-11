@@ -286,9 +286,9 @@ namespace RiakClient.Models
 
         public IDictionary<string, string> UserMetaData { get; set; }
 
-        public uint LastModified { get; internal set; }
+        public long LastModified { get; internal set; }
 
-        public uint LastModifiedUsec { get; internal set; }
+        public long LastModifiedUsec { get; internal set; }
 
         public IList<RiakLink> Links { get; private set; }
 

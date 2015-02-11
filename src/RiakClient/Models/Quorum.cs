@@ -102,6 +102,16 @@ namespace RiakClient.Models
             return new Quorum(quorum);
         }
 
+        public static implicit operator string(Quorum quorum)
+        {
+            return quorum.ToString();
+        }
+
+        public static explicit operator Quorum(string quorum)
+        {
+            return new Quorum(quorum);
+        }
+
         [CLSCompliant(false)]
         public static implicit operator uint(Quorum quorum)
         {
@@ -110,16 +120,6 @@ namespace RiakClient.Models
 
         [CLSCompliant(false)]
         public static explicit operator Quorum(uint quorum)
-        {
-            return new Quorum(quorum);
-        }
-
-        public static implicit operator string(Quorum quorum)
-        {
-            return quorum.ToString();
-        }
-
-        public static explicit operator Quorum(string quorum)
         {
             return new Quorum(quorum);
         }

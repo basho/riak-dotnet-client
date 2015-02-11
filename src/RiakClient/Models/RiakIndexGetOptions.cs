@@ -36,7 +36,7 @@ namespace RiakClient.Models
 
         public bool? Stream { get; private set; }
 
-        public uint? MaxResults { get; private set; }
+        public int? MaxResults { get; private set; }
 
         public string Continuation { get; private set; }
 
@@ -56,7 +56,7 @@ namespace RiakClient.Models
             return this;
         }
 
-        public RiakIndexGetOptions SetMaxResults(uint value)
+        public RiakIndexGetOptions SetMaxResults(int value)
         {
             MaxResults = value;
             return this;
@@ -100,7 +100,7 @@ namespace RiakClient.Models
 
             if (MaxResults.HasValue)
             {
-                request.max_results = MaxResults.Value;
+                request.max_results = (uint)MaxResults.Value;
             }
 
             if (!string.IsNullOrEmpty(Continuation))

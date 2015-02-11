@@ -21,7 +21,6 @@ namespace RiakClient
 {
     using System.Collections.Generic;
     using Messages;
-    using Models;
 
     public static class RiakConstants
     {
