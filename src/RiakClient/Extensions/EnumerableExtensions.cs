@@ -22,9 +22,9 @@ namespace RiakClient.Extensions
     using System;
     using System.Collections.Generic;
 
-    public static class EnumerableExtensions
+    internal static class EnumerableExtensions
     {
-        public static IEnumerable<T> Times<T>(this int count, Func<T> generator)
+        internal static IEnumerable<T> Times<T>(this int count, Func<T> generator)
         {
             while (count-- > 0)
             {

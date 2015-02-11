@@ -25,7 +25,10 @@ namespace RiakClient.Extensions
     using System.Web;
     using Util;
 
-    internal static class StringExtensions
+    /// <summary>
+    /// Extension methods to assist with conversion between Riak byte[] and strings.
+    /// </summary>
+    public static class StringExtensions
     {
         // + - && || ! ( ) { } [ ] ^ " ~ * ? : \
         private const string SearchTermPattern = @"[\+\-!\(\)\{\}\[\]^\""~\*\?\:\\]{1}";
@@ -33,60 +36,70 @@ namespace RiakClient.Extensions
         private static readonly Encoding RiakEncoding = new UTF8Encoding(false);
         private static readonly Regex SearchTermRegex = new Regex(SearchTermPattern, RegexOptions.Compiled);
 
+        /// <summary>
+        /// Converts a string object to a UTF-8 encoded byte array.
+        /// </summary>
+        /// <param name="value">The string to encode.</param>
+        /// <returns>The encoded string.</returns>
         public static byte[] ToRiakString(this string value)
         {
             return value == null ? null : RiakEncoding.GetBytes(value);
         }
 
+        /// <summary>
+        /// Converts a UTF-8 encoded byte array to a string object.
+        /// </summary>
+        /// <param name="value">The byte[] to decode.</param>
+        /// <returns>The decoded byte[].</returns>
         public static string FromRiakString(this byte[] value)
         {
             return value == null ? null : RiakEncoding.GetString(value);
         }
 
-        public static string UrlEncoded(this string value)
+        internal static string UrlEncoded(this string value)
         {
             return HttpUtility.UrlEncode(value);
         }
 
-        public static bool IsUserIntegerKey(this string value)
+        internal static bool IsUserIntegerKey(this string value)
         {
             return RiakConstants.SystemIndexKeys.SystemIntKeys.Contains(value)
                 || value.EndsWith(RiakConstants.IndexSuffix.Integer);
         }
 
-        public static bool IsUserBinaryKey(this string value)
+        internal static bool IsUserBinaryKey(this string value)
         {
             return RiakConstants.SystemIndexKeys.SystemBinKeys.Contains(value)
                 || value.EndsWith(RiakConstants.IndexSuffix.Binary);
         }
 
-        public static bool IsSystemIntegerKey(this string value)
+        internal static bool IsSystemIntegerKey(this string value)
         {
             return RiakConstants.SystemIndexKeys.SystemIntKeys.Contains(value);
         }
 
-        public static bool IsSystemBinaryKey(this string value)
+        internal static bool IsSystemBinaryKey(this string value)
         {
             return RiakConstants.SystemIndexKeys.SystemBinKeys.Contains(value);
         }
 
-        public static bool IsSystemKey(this string value)
+        internal static bool IsSystemKey(this string value)
         {
             return RiakConstants.SystemIndexKeys.SystemBinKeys.Contains(value)
                 || RiakConstants.SystemIndexKeys.SystemIntKeys.Contains(value);
         }
 
-        public static string ToIntegerKey(this string value)
+        internal static string ToIntegerKey(this string value)
         {
             return value.IsSystemIntegerKey() ? value : value + RiakConstants.IndexSuffix.Integer;
         }
 
-        public static string ToBinaryKey(this string value)
+        internal static string ToBinaryKey(this string value)
         {
             return value.IsSystemBinaryKey() ? value : value + RiakConstants.IndexSuffix.Binary;
         }
 
-        public static string ToRiakSearchTerm(this string value)
+        internal static string ToRiakSearchTerm(this string value)
         {
             var result = SearchTermRegex.Replace(value, SearchTermReplacement);
 
@@ -107,7 +120,7 @@ namespace RiakClient.Extensions
             return result;
         }
 
-        public static uint ToRpbOption(this string value)
+        internal static uint ToRpbOption(this string value)
         {
             System.Diagnostics.Debug.Assert(new HashSet<string> { "all", "quorum", "one", "default" }.Contains(value), "Incorrect quorum value");
 

@@ -17,6 +17,7 @@
 // under the License.
 // </copyright>
 
+#pragma warning disable 1591
 namespace RiakClient.Messages
 {
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"RpbErrorResp")]
