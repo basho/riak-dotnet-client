@@ -22,35 +22,30 @@ namespace RiakClient.Models
     using System;
     using System.Collections.Generic;
 
-    public class Quorum
+    public class Quorum : IEquatable<Quorum>
     {
-        private const int OneI = 1;
-        private const int QuorumI = 2;
-        private const int AllI = 3;
-        private const int DefaultI = 4;
+        private const int One = -2;
+        private const int QuorumI = -3;
+        private const int All = -4;
+        private const int Default = -5;
 
-        private const uint OneU = uint.MaxValue - OneI;
-        private const uint QuorumU = uint.MaxValue - QuorumI;
-        private const uint AllU = uint.MaxValue - AllI;
-        private const uint DefaultU = uint.MaxValue - DefaultI;
-
-        private static readonly IDictionary<string, uint> QuorumStrMap = new Dictionary<string, uint>
+        private static readonly IDictionary<string, int> QuorumStrMap = new Dictionary<string, int>
         {
-            { "one", OneU },
-            { "quorum", QuorumU },
-            { "all", AllU },
-            { "default", DefaultU }
+            { "one", One },
+            { "quorum", QuorumI },
+            { "all", All },
+            { "default", Default }
         };
 
-        private static readonly IDictionary<int, uint> QuorumIntMap = new Dictionary<int, uint>
+        private static readonly IDictionary<int, string> QuorumIntMap = new Dictionary<int, string>
         {
-            { OneI, OneU },
-            { QuorumI, QuorumU },
-            { AllI, AllU },
-            { DefaultI, DefaultU }
+            { One, "one" },
+            { QuorumI, "quorum" },
+            { All, "all" },
+            { Default, "default" }
         };
 
-        private readonly uint quorumValue = 0;
+        private readonly int quorumValue = 0;
 
         public Quorum(string quorum)
         {
@@ -59,7 +54,7 @@ namespace RiakClient.Models
                 throw new ArgumentNullException("quorum");
             }
 
-            uint tmp;
+            int tmp;
             if (QuorumStrMap.TryGetValue(quorum.ToLowerInvariant(), out tmp))
             {
                 quorumValue = tmp;
@@ -72,16 +67,15 @@ namespace RiakClient.Models
 
         public Quorum(int quorum)
         {
-            uint tmp;
-            if (QuorumIntMap.TryGetValue(quorum, out tmp))
+            if (quorum >= 0)
             {
-                quorumValue = tmp;
+                quorumValue = quorum;
             }
             else
             {
-                if (quorum >= 0)
+                if (quorum >= -5 && quorum <= -2)
                 {
-                    quorumValue = (uint)Math.Abs(quorum);
+                    quorumValue = quorum;
                 }
                 else
                 {
@@ -92,18 +86,56 @@ namespace RiakClient.Models
 
         public static implicit operator int(Quorum quorum)
         {
-            return 1;
+            return (int)quorum.quorumValue;
         }
 
         [CLSCompliant(false)]
         public static implicit operator uint(Quorum quorum)
         {
-            return quorum.quorumValue;
+            return (uint)quorum.quorumValue;
         }
 
         public static implicit operator string(Quorum quorum)
         {
             return quorum.ToString();
+        }
+
+        public override string ToString()
+        {
+            string tmp;
+            if (QuorumIntMap.TryGetValue(quorumValue, out tmp))
+            {
+                return tmp;
+            }
+            else
+            {
+                return quorumValue.ToString();
+            }
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as Quorum);
+        }
+
+        public bool Equals(Quorum other)
+        {
+            if (object.ReferenceEquals(other, null))
+            {
+                return false;
+            }
+
+            if (object.ReferenceEquals(other, this))
+            {
+                return true;
+            }
+
+            return this.GetHashCode() == other.GetHashCode();
+        }
+
+        public override int GetHashCode()
+        {
+            return quorumValue.GetHashCode();
         }
     }
 }
