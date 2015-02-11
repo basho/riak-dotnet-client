@@ -38,7 +38,7 @@ namespace RiakClient.Models
 
         public bool SloppyQuorum { get; private set; }
 
-        public uint? NVal { get; private set; }
+        public NVal NVal { get; private set; }
 
         public bool IncludeContext { get; private set; }
 
@@ -54,7 +54,7 @@ namespace RiakClient.Models
             return this;
         }
 
-        public RiakDtUpdateOptions SetNVal(uint value)
+        public RiakDtUpdateOptions SetNVal(NVal value)
         {
             NVal = value;
             return this;
@@ -81,9 +81,9 @@ namespace RiakClient.Models
 
             request.sloppy_quorum = SloppyQuorum;
 
-            if (NVal.HasValue)
+            if (NVal != null)
             {
-                request.n_val = NVal.Value;
+                request.n_val = NVal;
             }
 
             request.include_context = IncludeContext;

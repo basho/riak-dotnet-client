@@ -28,10 +28,10 @@ namespace RiakClient.Models.MapReduce
     public class RiakMapReduceResultPhase
     {
         private readonly bool success;
-        private readonly uint phase;
+        private readonly long phase;
         private readonly IList<byte[]> values;
 
-        internal RiakMapReduceResultPhase(uint phase, IEnumerable<RpbMapRedResp> results)
+        internal RiakMapReduceResultPhase(long phase, IEnumerable<RpbMapRedResp> results)
         {
             this.phase = phase;
             this.values = results.Select(r => r.response).Where(b => b != null).ToList();
@@ -48,7 +48,7 @@ namespace RiakClient.Models.MapReduce
             get { return success; }
         }
 
-        public uint Phase
+        public long Phase
         {
             get { return phase; }
         }

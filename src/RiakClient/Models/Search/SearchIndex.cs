@@ -20,24 +20,21 @@
 namespace RiakClient.Models.Search
 {
     using System;
-    using System.Collections.ObjectModel;
-    using System.Linq;
     using Extensions;
     using Messages;
-    using Util;
 
     public class SearchIndex
     {
         private readonly string name;
         private readonly string schemaName;
-        private readonly uint nval;
+        private readonly NVal nval;
 
         public SearchIndex(string name)
-            : this(name, RiakConstants.Defaults.YokozunaIndex.IndexName, RiakConstants.Defaults.YokozunaIndex.NVal)
+            : this(name, RiakConstants.Defaults.YokozunaIndex.IndexName, new NVal(RiakConstants.Defaults.YokozunaIndex.NVal))
         {
         }
 
-        public SearchIndex(string name, string schemaName, uint nval)
+        public SearchIndex(string name, string schemaName, NVal nval)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -49,9 +46,9 @@ namespace RiakClient.Models.Search
                 throw new ArgumentException("Schema Name cannot be null, zero length, or whitespace");
             }
 
-            if (nval == default(uint))
+            if (nval == null)
             {
-                throw new ArgumentException("nval must be greater than 0");
+                throw new ArgumentNullException("nval must be greater than 0");
             }
 
             this.name = name;
@@ -63,7 +60,7 @@ namespace RiakClient.Models.Search
         {
             this.name = index.name.FromRiakString();
             this.schemaName = index.schema.FromRiakString();
-            this.nval = index.n_val;
+            this.nval = new NVal(index.n_val);
         }
 
         public string Name
@@ -76,7 +73,7 @@ namespace RiakClient.Models.Search
             get { return schemaName; }
         }
 
-        public uint NVal
+        public NVal NVal
         {
             get { return nval; }
         }

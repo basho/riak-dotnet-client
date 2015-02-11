@@ -40,7 +40,7 @@ namespace RiakClient.Models.Search
             private set;
         }
 
-        public uint NumFound
+        public long NumFound
         {
             get;
             private set;

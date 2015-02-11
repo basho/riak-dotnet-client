@@ -50,7 +50,12 @@ namespace RiakClient.Models
 
             var json = JObject.Parse(response.Body);
             var props = (JObject)json["props"];
-            NVal = props.Value<uint?>("n_val");
+
+            if (props.Value<uint?>("n_val").HasValue)
+            {
+                NVal = new NVal(props.Value<uint>("n_val"));
+            }
+
             AllowMultiple = props.Value<bool?>("allow_mult");
             LastWriteWins = props.Value<bool?>("last_write_wins");
             Backend = props.Value<string>("backend");
@@ -86,7 +91,7 @@ namespace RiakClient.Models
 
         internal RiakBucketProperties(RpbBucketProps bucketProps)
         {
-            NVal = bucketProps.n_val;
+            NVal = new NVal(bucketProps.n_val);
             AllowMultiple = bucketProps.allow_mult;
             LastWriteWins = bucketProps.last_write_wins;
             Backend = bucketProps.backend.FromRiakString();
@@ -130,7 +135,7 @@ namespace RiakClient.Models
 
         public bool? LastWriteWins { get; private set; }
 
-        public uint? NVal { get; private set; }
+        public NVal NVal { get; private set; }
 
         public bool? AllowMultiple { get; private set; }
 
@@ -148,13 +153,13 @@ namespace RiakClient.Models
         /// If the length of the vector clock is larger than BigVclock, vector clocks will be pruned.
         /// </summary>
         /// <remarks>See http://docs.basho.com/riak/latest/theory/concepts/Vector-Clocks/#Vector-Clock-Pruning </remarks>
-        public uint? BigVclock { get; private set; }
+        public int? BigVclock { get; private set; }
 
         /// <summary>
         /// If the length of the vector clock is smaller than SmallVclock, vector clocks will not be pruned.
         /// </summary>
         /// <remarks>See http://docs.basho.com/riak/latest/theory/concepts/Vector-Clocks/#Vector-Clock-Pruning </remarks>
-        public uint? SmallVclock { get; private set; }
+        public int? SmallVclock { get; private set; }
 
         public bool? HasPrecommit { get; private set; }
 
@@ -263,7 +268,7 @@ namespace RiakClient.Models
             return this;
         }
 
-        public RiakBucketProperties SetNVal(uint value)
+        public RiakBucketProperties SetNVal(NVal value)
         {
             NVal = value;
             return this;
@@ -275,13 +280,13 @@ namespace RiakClient.Models
             return this;
         }
 
-        public RiakBucketProperties SetBigVclock(uint? bigVclock)
+        public RiakBucketProperties SetBigVclock(int? bigVclock)
         {
             BigVclock = bigVclock;
             return this;
         }
 
-        public RiakBucketProperties SetSmallVclock(uint? smallVclock)
+        public RiakBucketProperties SetSmallVclock(int? smallVclock)
         {
             SmallVclock = smallVclock;
             return this;
@@ -385,9 +390,9 @@ namespace RiakClient.Models
                 message.allow_mult = AllowMultiple.Value;
             }
 
-            if (NVal.HasValue)
+            if (NVal != null)
             {
-                message.n_val = NVal.Value;
+                message.n_val = NVal;
             }
 
             if (LastWriteWins.HasValue)
@@ -497,7 +502,7 @@ namespace RiakClient.Models
                 jw.WriteStartObject();
                 jw.WritePropertyName("props");
                 jw.WriteStartObject();
-                jw.WriteNullableProperty("n_val", NVal)
+                jw.WriteNonNullProperty("n_val", NVal)
                   .WriteNullableProperty("allow_mult", AllowMultiple)
                   .WriteNullableProperty("last_write_wins", LastWriteWins)
                   .WriteNonNullProperty("r", R)

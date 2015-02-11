@@ -133,7 +133,7 @@ namespace RiakClient.Comms
             {
                 var error = DeserializeInstance<RpbErrorResp>(size);
                 string errorMessage = error.errmsg.FromRiakString();
-                throw new RiakException(error.errcode, errorMessage, false);
+                throw new RiakException((int)error.errcode, errorMessage, false);
             }
 
             if (expectedCode != messageCode)
@@ -156,7 +156,7 @@ namespace RiakClient.Comms
             {
                 var error = DeserializeInstance<RpbErrorResp>(size);
                 string errorMessage = error.errmsg.FromRiakString();
-                throw new RiakException(error.errcode, errorMessage, false);
+                throw new RiakException((int)error.errcode, errorMessage, false);
             }
 
             if (!MessageCodeTypeMapBuilder.Contains(messageCode))

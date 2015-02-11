@@ -59,7 +59,7 @@ namespace RiakClient.Models
         /// <para>Refer to http://lists.basho.com/pipermail/riak-users_lists.basho.com/2012-January/007157.html for additional details.</para></remarks>
         public bool? SloppyQuorum { get; private set; }
 
-        public uint? NVal { get; private set; }
+        public NVal NVal { get; private set; }
 
         /// <summary>
         /// Determines whether or not the context will be returned. For read-only requests or context-free operations, you can set this to false to reduce the size of the response payload.
@@ -84,7 +84,7 @@ namespace RiakClient.Models
             return this;
         }
 
-        public RiakDtFetchOptions SetNVal(uint value)
+        public RiakDtFetchOptions SetNVal(NVal value)
         {
             NVal = value;
             return this;
@@ -121,9 +121,9 @@ namespace RiakClient.Models
                 request.sloppy_quorum = SloppyQuorum.Value;
             }
 
-            if (NVal.HasValue)
+            if (NVal != null)
             {
-                request.n_val = NVal.Value;
+                request.n_val = NVal;
             }
 
             request.include_context = IncludeContext;

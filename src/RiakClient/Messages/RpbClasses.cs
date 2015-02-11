@@ -18,6 +18,9 @@
 
 namespace RiakClient.Messages
 {
+    using System;
+
+    [CLSCompliant(false)]
     public sealed partial class RpbErrorResp { }
 
     public sealed partial class RpbGetServerInfoResp { }
@@ -26,20 +29,24 @@ namespace RiakClient.Messages
 
     public sealed partial class RpbGetBucketReq { }
 
+    [CLSCompliant(false)]
     public sealed partial class RpbGetBucketResp { }
 
+    [CLSCompliant(false)]
     public sealed partial class RpbSetBucketReq { }
 
     public sealed partial class RpbResetBucketReq { }
 
     public sealed partial class RpbGetBucketTypeReq { }
 
+    [CLSCompliant(false)]
     public sealed partial class RpbSetBucketTypeReq { }
 
     public sealed partial class RpbModFun { }
 
     public sealed partial class RpbCommitHook { }
 
+    [CLSCompliant(false)]
     public sealed partial class RpbBucketProps { }
 
     public sealed partial class RpbAuthReq { }
@@ -48,6 +55,7 @@ namespace RiakClient.Messages
 
     public sealed partial class MapEntry { }
 
+    [CLSCompliant(false)]
     public sealed partial class DtFetchReq { }
 
     public sealed partial class DtValue { }
@@ -64,6 +72,7 @@ namespace RiakClient.Messages
 
     public sealed partial class DtOp { }
 
+    [CLSCompliant(false)]
     public sealed partial class DtUpdateReq { }
 
     public sealed partial class DtUpdateResp { }
@@ -72,62 +81,82 @@ namespace RiakClient.Messages
 
     public sealed partial class RpbSetClientIdReq { }
 
+    [CLSCompliant(false)]
     public sealed partial class RpbGetReq { }
 
+    [CLSCompliant(false)]
     public sealed partial class RpbGetResp { }
 
+    [CLSCompliant(false)]
     public sealed partial class RpbPutReq { }
 
+    [CLSCompliant(false)]
     public sealed partial class RpbPutResp { }
 
+    [CLSCompliant(false)]
     public sealed partial class RpbDelReq { }
 
+    [CLSCompliant(false)]
     public sealed partial class RpbListBucketsReq { }
 
     public sealed partial class RpbListBucketsResp { }
 
+    [CLSCompliant(false)]
     public sealed partial class RpbListKeysReq { }
 
     public sealed partial class RpbListKeysResp { }
 
     public sealed partial class RpbMapRedReq { }
 
+    [CLSCompliant(false)]
     public sealed partial class RpbMapRedResp { }
 
+    [CLSCompliant(false)]
     public sealed partial class RpbIndexReq { }
 
     public sealed partial class RpbIndexResp { }
 
+    [CLSCompliant(false)]
     public sealed partial class RpbCSBucketReq { }
 
+    [CLSCompliant(false)]
     public sealed partial class RpbCSBucketResp { }
 
+    [CLSCompliant(false)]
     public sealed partial class RpbIndexObject { }
 
+    [CLSCompliant(false)]
     public sealed partial class RpbContent { }
 
     public sealed partial class RpbLink { }
 
+    [CLSCompliant(false)]
     public sealed partial class RpbCounterUpdateReq { }
 
     public sealed partial class RpbCounterUpdateResp { }
 
+    [CLSCompliant(false)]
     public sealed partial class RpbCounterGetReq { }
 
     public sealed partial class RpbCounterGetResp { }
 
     public sealed partial class RpbSearchDoc { }
 
+    [CLSCompliant(false)]
     public sealed partial class RpbSearchQueryReq { }
 
+    [CLSCompliant(false)]
     public sealed partial class RpbSearchQueryResp { }
 
+    [CLSCompliant(false)]
     public sealed partial class RpbYokozunaIndex { }
 
     public sealed partial class RpbYokozunaIndexGetReq { }
 
+    [CLSCompliant(false)]
     public sealed partial class RpbYokozunaIndexGetResp { }
 
+    [CLSCompliant(false)]
     public sealed partial class RpbYokozunaIndexPutReq { }
 
     public sealed partial class RpbYokozunaIndexDeleteReq { }

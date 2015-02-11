@@ -175,7 +175,7 @@ namespace RiakClient.Models.MapReduce.Fluent
             return this;
         }
 
-        public RiakFluentKeyFilter Tokenize(string token, uint position)
+        public RiakFluentKeyFilter Tokenize(string token, int position)
         {
             filters.Add(new Tokenize(token, position));
             return this;
