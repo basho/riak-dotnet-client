@@ -40,6 +40,16 @@ namespace RiakClient.Models
             this.nval = (uint)nval;
         }
 
+        public static explicit operator NVal(int nval)
+        {
+            return new NVal(nval);
+        }
+
+        public static explicit operator int(NVal nval)
+        {
+            return (int)nval.nval;
+        }
+
         [CLSCompliant(false)]
         public static implicit operator uint(NVal nval)
         {
@@ -53,7 +63,17 @@ namespace RiakClient.Models
 
         public bool Equals(NVal other)
         {
-            throw new NotImplementedException();
+            if (object.ReferenceEquals(other, null))
+            {
+                return false;
+            }
+
+            if (object.ReferenceEquals(other, this))
+            {
+                return true;
+            }
+
+            return this.GetHashCode() == other.GetHashCode();
         }
 
         public override int GetHashCode()

@@ -47,7 +47,7 @@ namespace RiakClientTests.Live.BucketPropertyTests
         {
             var bucketName = Guid.NewGuid().ToString();
             RiakBucketProperties props = new RiakBucketProperties()
-                .SetNVal(4)
+                .SetNVal((NVal)4)
                 .SetLegacySearch(true)
                 .SetW((Quorum)"all")
                 .SetR((Quorum)"quorum");
@@ -59,8 +59,8 @@ namespace RiakClientTests.Live.BucketPropertyTests
             getResult.IsSuccess.ShouldBeTrue(getResult.ErrorMessage);
 
             props = getResult.Value;
-            props.NVal.HasValue.ShouldBeTrue();
-            props.NVal.Value.ShouldEqual(4U);
+            props.NVal.ShouldNotBeNull();
+            ((int)props.NVal).ShouldEqual(4);
             props.LegacySearch.ShouldNotEqual(null);
             props.LegacySearch.Value.ShouldBeTrue();
             props.W.ShouldEqual(Quorum.WellKnown.All);
@@ -73,7 +73,7 @@ namespace RiakClientTests.Live.BucketPropertyTests
             var result = Client.GetBucketProperties(PropertiesTestBucket);
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
             result.Value.AllowMultiple.HasValue.ShouldBeTrue();
-            result.Value.NVal.HasValue.ShouldBeTrue();
+            result.Value.NVal.ShouldNotBeNull();
             result.Value.LastWriteWins.HasValue.ShouldBeTrue();
             result.Value.R.ShouldNotEqual(null);
             result.Value.Rw.ShouldNotEqual(null);

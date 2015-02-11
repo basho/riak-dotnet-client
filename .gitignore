@@ -25,11 +25,12 @@ _Re*
 *.userprefs
 *.pidb
 *.zip
-test-results/*
 *.dotCover
 *.nupkg
 *.nuspec
 test-results
+test-results/
+TestResults/
 
 *.ncrunchproject
 *.ncrunchsolution

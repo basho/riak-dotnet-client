@@ -87,7 +87,7 @@ namespace RiakClient.Comms
             NetworkStream.Write(messageBody, 0, PbMsgHeaderSize);
         }
 
-        public void Write<T>(T message) where T : class, ProtoBuf.IExtensible
+        public void Write<T>(T message) where T : class
         {
             byte[] messageBody;
             int messageLength = 0;
@@ -145,7 +145,7 @@ namespace RiakClient.Comms
             return messageCode;
         }
 
-        public T Read<T>() where T : ProtoBuf.IExtensible, new()
+        public T Read<T>() where T : new()
         {
             var header = ReceiveAll(new byte[5]);
 
