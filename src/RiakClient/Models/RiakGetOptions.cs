@@ -102,22 +102,22 @@ namespace RiakClient.Models
 
         public RiakGetOptions SetR(uint value)
         {
-            return WriteQuorum(value, var => R = var);
+            return (RiakGetOptions)WriteQuorum(value, var => R = var);
         }
 
         public RiakGetOptions SetR(string value)
         {
-            return WriteQuorum(value, var => R = var);
+            return (RiakGetOptions)WriteQuorum(value, var => R = var);
         }
 
         public RiakGetOptions SetPr(uint value)
         {
-            return WriteQuorum(value, var => Pr = var);
+            return (RiakGetOptions)WriteQuorum(value, var => Pr = var);
         }
 
         public RiakGetOptions SetPr(string value)
         {
-            return WriteQuorum(value, var => Pr = var);
+            return (RiakGetOptions)WriteQuorum(value, var => Pr = var);
         }
 
         public RiakGetOptions SetTimeout(uint value)
