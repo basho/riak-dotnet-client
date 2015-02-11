@@ -19,6 +19,7 @@
 
 namespace RiakClient.Models
 {
+    using System;
     using System.Collections.Generic;
 
     public class Quorum
@@ -33,16 +34,76 @@ namespace RiakClient.Models
         private const uint AllU = uint.MaxValue - AllI;
         private const uint DefaultU = uint.MaxValue - DefaultI;
 
-        /*
-        private static readonly HashSet<string> validQuorumStrings = new HashSet<string> { "all", "quorum", "one", "default" };
-
-        private static readonly Dictionary<string, int> QuorumOptionsLookup = new Dictionary<string, int>
+        private static readonly IDictionary<string, uint> QuorumStrMap = new Dictionary<string, uint>
         {
-            { "one",     One },
-            { "quorum",  Quorum },
-            { "all",     All },
-            { "default", Default }
+            { "one", OneU },
+            { "quorum", QuorumU },
+            { "all", AllU },
+            { "default", DefaultU }
         };
-         */
+
+        private static readonly IDictionary<int, uint> QuorumIntMap = new Dictionary<int, uint>
+        {
+            { OneI, OneU },
+            { QuorumI, QuorumU },
+            { AllI, AllU },
+            { DefaultI, DefaultU }
+        };
+
+        private readonly uint quorumValue = 0;
+
+        public Quorum(string quorum)
+        {
+            if (string.IsNullOrWhiteSpace(quorum))
+            {
+                throw new ArgumentNullException("quorum");
+            }
+
+            uint tmp;
+            if (QuorumStrMap.TryGetValue(quorum.ToLowerInvariant(), out tmp))
+            {
+                quorumValue = tmp;
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException("quorum");
+            }
+        }
+
+        public Quorum(int quorum)
+        {
+            uint tmp;
+            if (QuorumIntMap.TryGetValue(quorum, out tmp))
+            {
+                quorumValue = tmp;
+            }
+            else
+            {
+                if (quorum >= 0)
+                {
+                    quorumValue = (uint)Math.Abs(quorum);
+                }
+                else
+                {
+                    throw new ArgumentOutOfRangeException("quorum");
+                }
+            }
+        }
+
+        public static implicit operator int(Quorum quorum)
+        {
+            return 1;
+        }
+
+        [CLSCompliant(false)]
+        public static implicit operator uint(Quorum quorum)
+        {
+            return quorum.quorumValue;
+        }
+
+        public static implicit operator string(Quorum quorum)
+        {
+            return quorum.ToString();
+        }
     }
 }
