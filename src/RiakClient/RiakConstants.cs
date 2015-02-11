@@ -17,35 +17,15 @@
 // under the License.
 // </copyright>
 
-namespace RiakClient.Util
+namespace RiakClient
 {
     using System.Collections.Generic;
-    using System.Diagnostics;
     using Messages;
+    using Models;
 
     public static class RiakConstants
     {
         public const string DefaultBucketType = null;
-
-        internal static readonly Dictionary<string, uint> QuorumOptionsLookup = new Dictionary<string, uint>
-            {
-                { "one", QuorumOptions.One },
-                { "quorum", QuorumOptions.Quorum },
-                { "all", QuorumOptions.All },
-                { "default", QuorumOptions.Default }
-            };
-
-        private static readonly HashSet<string> ValidQuorumStrings = new HashSet<string> { "all", "quorum", "one", "default" };
-
-        internal static void ValidateQuorumValue(string value)
-        {
-            Debug.Assert(ValidQuorumStrings.Contains(value), "Incorrect quorum value");
-        }
-
-        internal static void ValidateQuorumValue(uint value)
-        {
-            Debug.Assert(value >= 1, "Value must be greater than or equal to 1");
-        }
 
         public static class RiakEnterprise
         {
@@ -100,17 +80,8 @@ namespace RiakClient.Util
             public const string Binary = null;
         }
 
-        public static class QuorumOptions
-        {
-            public const uint One     = uint.MaxValue - 1;
-            public const uint Quorum  = uint.MaxValue - 2;
-            public const uint All     = uint.MaxValue - 3;
-            public const uint Default = uint.MaxValue - 4;
-        }
-
         public static class Defaults
         {
-            public const uint RVal = QuorumOptions.Default;
             public const string ContentType = ContentTypes.ApplicationJson;
             public const string CharSet = CharSets.Utf8;
 

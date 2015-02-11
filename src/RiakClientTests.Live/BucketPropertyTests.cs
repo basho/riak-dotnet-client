@@ -22,6 +22,7 @@ namespace RiakClientTests.Live.BucketPropertyTests
     using System;
     using System.Linq;
     using NUnit.Framework;
+    using RiakClient;
     using RiakClient.Extensions;
     using RiakClient.Models;
     using RiakClient.Models.CommitHook;
@@ -45,11 +46,11 @@ namespace RiakClientTests.Live.BucketPropertyTests
         public void SettingPropertiesOnNewBucketWorksCorrectly()
         {
             var bucketName = Guid.NewGuid().ToString();
-            var props = new RiakBucketProperties()
+            RiakBucketProperties props = new RiakBucketProperties()
                 .SetNVal(4)
                 .SetLegacySearch(true)
-                .SetWVal("all")
-                .SetRVal("quorum");
+                .SetW((Quorum)"all")
+                .SetR((Quorum)"quorum");
 
             var setResult = Client.SetBucketProperties(bucketName, props);
             setResult.IsSuccess.ShouldBeTrue(setResult.ErrorMessage);
@@ -62,8 +63,8 @@ namespace RiakClientTests.Live.BucketPropertyTests
             props.NVal.Value.ShouldEqual(4U);
             props.LegacySearch.ShouldNotEqual(null);
             props.LegacySearch.Value.ShouldBeTrue();
-            props.WVal.ShouldEqual(RiakConstants.QuorumOptionsLookup["all"]);
-            props.RVal.ShouldEqual(RiakConstants.QuorumOptionsLookup["quorum"]);
+            props.W.ShouldEqual(Quorum.WellKnown.All);
+            props.R.ShouldEqual(Quorum.WellKnown.Quorum);
         }
 
         [Test]
@@ -74,10 +75,10 @@ namespace RiakClientTests.Live.BucketPropertyTests
             result.Value.AllowMultiple.HasValue.ShouldBeTrue();
             result.Value.NVal.HasValue.ShouldBeTrue();
             result.Value.LastWriteWins.HasValue.ShouldBeTrue();
-            result.Value.RVal.ShouldNotEqual(null);
-            result.Value.RwVal.ShouldNotEqual(null);
-            result.Value.DwVal.ShouldNotEqual(null);
-            result.Value.WVal.ShouldNotEqual(null);
+            result.Value.R.ShouldNotEqual(null);
+            result.Value.Rw.ShouldNotEqual(null);
+            result.Value.Dw.ShouldNotEqual(null);
+            result.Value.W.ShouldNotEqual(null);
         }
 
         [Test]
@@ -211,8 +212,8 @@ namespace RiakClientTests.Live.BucketPropertyTests
 
             var props = new RiakBucketProperties()
                 .SetAllowMultiple(true)
-                .SetDwVal(10)
-                .SetWVal(5)
+                .SetDw(10)
+                .SetW(5)
                 .SetLastWriteWins(true);
 
             var setPropsResult = Client.SetBucketProperties(bucket, props);
@@ -227,8 +228,8 @@ namespace RiakClientTests.Live.BucketPropertyTests
             var resetProps = getPropsResult.Value;
 
             resetProps.AllowMultiple.ShouldNotEqual(props.AllowMultiple);
-            resetProps.DwVal.ShouldNotEqual(props.DwVal);
-            resetProps.WVal.ShouldNotEqual(props.WVal);
+            resetProps.Dw.ShouldNotEqual(props.Dw);
+            resetProps.W.ShouldNotEqual(props.W);
             resetProps.LastWriteWins.ShouldNotEqual(props.LastWriteWins);
         }
 
@@ -239,9 +240,13 @@ namespace RiakClientTests.Live.BucketPropertyTests
             var getInitialPropsResponse = Client.GetBucketProperties(bucket);
 
             if (Client.GetServerStatus().Value.Contains("riak_repl_version"))
+            {
                 getInitialPropsResponse.Value.ReplicationMode.ShouldEqual(RiakConstants.RiakEnterprise.ReplicationMode.True);
+            }
             else
+            {
                 getInitialPropsResponse.Value.ReplicationMode.ShouldEqual(RiakConstants.RiakEnterprise.ReplicationMode.False);
+            }
         }
 
         [Test]

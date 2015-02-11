@@ -19,31 +19,19 @@
 
 namespace RiakClient.Models
 {
-    using Containers;
-    using Extensions;
+    using System.Runtime.InteropServices;
     using Messages;
-    using Util;
 
-    public class RiakDtUpdateOptions : RiakQuorumOptionsBase
+    [ComVisible(false)]
+    public class RiakDtUpdateOptions : RiakOptions<RiakDtUpdateOptions>
     {
         public RiakDtUpdateOptions()
         {
-            W = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
-            Dw = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
-            Pw = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
             ReturnBody = true;
             IncludeContext = true;
         }
 
-        public Either<uint, string> W { get; private set; }
-
-        public Either<uint, string> Dw { get; private set; }
-
-        public Either<uint, string> Pw { get; private set; }
-
         public bool ReturnBody { get; private set; }
-
-        public uint? Timeout { get; private set; }
 
         public bool SloppyQuorum { get; private set; }
 
@@ -51,45 +39,9 @@ namespace RiakClient.Models
 
         public bool IncludeContext { get; private set; }
 
-        public RiakDtUpdateOptions SetW(uint value)
-        {
-            return (RiakDtUpdateOptions)WriteQuorum(value, var => W = var);
-        }
-
-        public RiakDtUpdateOptions SetW(string value)
-        {
-            return (RiakDtUpdateOptions)WriteQuorum(value, var => W = var);
-        }
-
-        public RiakDtUpdateOptions SetDw(uint value)
-        {
-            return (RiakDtUpdateOptions)WriteQuorum(value, var => Dw = var);
-        }
-
-        public RiakDtUpdateOptions SetDw(string value)
-        {
-            return (RiakDtUpdateOptions)WriteQuorum(value, var => Dw = var);
-        }
-
-        public RiakDtUpdateOptions SetPw(uint value)
-        {
-            return (RiakDtUpdateOptions)WriteQuorum(value, var => Pw = var);
-        }
-
-        public RiakDtUpdateOptions SetPw(string value)
-        {
-            return (RiakDtUpdateOptions)WriteQuorum(value, var => Pw = var);
-        }
-
         public RiakDtUpdateOptions SetReturnBody(bool value)
         {
             ReturnBody = value;
-            return this;
-        }
-
-        public RiakDtUpdateOptions SetTimeout(uint value)
-        {
-            Timeout = value;
             return this;
         }
 
@@ -113,15 +65,15 @@ namespace RiakClient.Models
 
         internal void Populate(DtUpdateReq request)
         {
-            request.w = W.IsLeft ? W.Left : W.Right.ToRpbOption();
-            request.dw = Dw.IsLeft ? Dw.Left : Dw.Right.ToRpbOption();
-            request.pw = Pw.IsLeft ? Pw.Left : Pw.Right.ToRpbOption();
+            request.w = W;
+            request.dw = Dw;
+            request.pw = Pw;
 
             request.return_body = ReturnBody;
 
             if (Timeout.HasValue)
             {
-                request.timeout = Timeout.Value;
+                request.timeout = (uint)Timeout.Value;
             }
 
             request.sloppy_quorum = SloppyQuorum;

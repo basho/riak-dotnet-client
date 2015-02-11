@@ -84,9 +84,22 @@ namespace RiakClient.Models
             }
         }
 
+#pragma warning disable 3019
+        [CLSCompliant(false)]
+        internal Quorum(uint quorum)
+            : this((int)quorum)
+        {
+        }
+#pragma warning restore 3019
+
         public static implicit operator int(Quorum quorum)
         {
             return (int)quorum.quorumValue;
+        }
+
+        public static explicit operator Quorum(int quorum)
+        {
+            return new Quorum(quorum);
         }
 
         [CLSCompliant(false)]
@@ -95,9 +108,20 @@ namespace RiakClient.Models
             return (uint)quorum.quorumValue;
         }
 
+        [CLSCompliant(false)]
+        public static explicit operator Quorum(uint quorum)
+        {
+            return new Quorum(quorum);
+        }
+
         public static implicit operator string(Quorum quorum)
         {
             return quorum.ToString();
+        }
+
+        public static explicit operator Quorum(string quorum)
+        {
+            return new Quorum(quorum);
         }
 
         public override string ToString()

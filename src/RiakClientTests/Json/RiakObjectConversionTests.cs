@@ -24,6 +24,7 @@ namespace RiakClientTests.Json.RiakObjectConversionTests
     using System.Diagnostics;
     using Newtonsoft.Json;
     using NUnit.Framework;
+    using RiakClient;
     using RiakClient.Extensions;
     using RiakClient.Models;
     using RiakClient.Util;

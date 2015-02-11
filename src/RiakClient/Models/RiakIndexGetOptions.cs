@@ -20,10 +20,12 @@
 namespace RiakClient.Models
 {
     using System.Numerics;
+    using System.Runtime.InteropServices;
     using Extensions;
     using Messages;
 
-    public class RiakIndexGetOptions
+    [ComVisible(false)]
+    public class RiakIndexGetOptions : RiakOptions<RiakIndexGetOptions>
     {
         public RiakIndexGetOptions()
         {
@@ -37,8 +39,6 @@ namespace RiakClient.Models
         public uint? MaxResults { get; private set; }
 
         public string Continuation { get; private set; }
-
-        public uint? Timeout { get; private set; }
 
         public bool? PaginationSort { get; private set; }
 
@@ -71,12 +71,6 @@ namespace RiakClient.Models
         public RiakIndexGetOptions SetContinuation(string value)
         {
             Continuation = value;
-            return this;
-        }
-
-        public RiakIndexGetOptions SetTimeout(uint value)
-        {
-            Timeout = value;
             return this;
         }
 
@@ -116,7 +110,7 @@ namespace RiakClient.Models
 
             if (Timeout.HasValue)
             {
-                request.timeout = Timeout.Value;
+                request.timeout = (uint)Timeout.Value;
             }
 
             if (!string.IsNullOrEmpty(TermRegex))

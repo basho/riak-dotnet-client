@@ -38,7 +38,8 @@ namespace RiakClientTests.Client
             var result = RiakResult<RiakRestResponse>.Success(new RiakRestResponse { StatusCode = System.Net.HttpStatusCode.NoContent });
             Cluster.ConnectionMock.Setup(m => m.RestRequest(It.IsAny<RiakRestRequest>())).Returns(result);
 
-            Response = Client.SetBucketProperties("foo", new RiakBucketProperties().SetAllowMultiple(true).SetRVal("one"));
+            var properties = (RiakBucketProperties)(new RiakBucketProperties().SetAllowMultiple(true).SetR((Quorum)"one"));
+            Response = Client.SetBucketProperties("foo", properties);
         }
 
         [Test]

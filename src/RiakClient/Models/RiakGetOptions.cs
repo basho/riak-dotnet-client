@@ -19,38 +19,30 @@
 
 namespace RiakClient.Models
 {
-    using Containers;
-    using Extensions;
+    using System.Runtime.InteropServices;
     using Messages;
-    using Util;
 
-    public class RiakGetOptions : RiakQuorumOptionsBase
+    [ComVisible(false)]
+    public class RiakGetOptions : RiakOptions<RiakGetOptions>
     {
+        private static readonly RiakGetOptions DefaultGetOptions = new RiakGetOptions();
+
         public RiakGetOptions()
         {
-            R = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
-            Pr = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
+            R = Quorum.WellKnown.Default;
+            Pr = Quorum.WellKnown.Default;
+            /*
+            W = Quorum.WellKnown.Default;
+            Pw = Quorum.WellKnown.Default;
+            Dw = Quorum.WellKnown.Default;
+            Rw = Quorum.WellKnown.Default;
+             */
         }
 
-        /// <summary>
-        /// The number of replicas that must return before a delete is considered a success.
-        /// </summary>
-        /// <value>
-        /// The R value. Possible values include any integer as well as magic numbers
-        /// to indicate 'quorum', 'one', 'all', or 'default'. 
-        /// </value>
-        /// <remarks>Developers looking for an easy way to set this can look at <see cref="RiakConstants.QuorumOptions"/></remarks>
-        public Either<uint, string> R { get; private set; }
-
-        /// <summary>
-        /// Primary Read Quorum - the number of replicas that need to be available when retrieving the object.
-        /// </summary>
-        /// <value>
-        /// The primary read quorum. Possible values include any integer as well as magic numbers
-        /// to indicate 'quorum', 'one', 'all', or 'default'. 
-        /// </value>
-        /// <remarks>Developers looking for an easy way to set this can look at <see cref="RiakConstants.QuorumOptions"/></remarks>
-        public Either<uint, string> Pr { get; private set; }
+        public static RiakGetOptions Default
+        {
+            get { return DefaultGetOptions; }
+        }
 
         /// <summary>
         /// Basic Quorum semantics - whether to return early in some failure cases (eg. when r=1 and you get 2 errors and a success basic_quorum=true would return an error)
@@ -95,41 +87,10 @@ namespace RiakClient.Models
         /// </value>
         public byte[] IfModified { get; set; }
 
-        /// <summary>
-        /// Query timeout parameter. If a request to Riak exceeds the query timeout, Riak should stop processing the request.
-        /// </summary>
-        public uint? Timeout { get; set; }
-
-        public RiakGetOptions SetR(uint value)
-        {
-            return (RiakGetOptions)WriteQuorum(value, var => R = var);
-        }
-
-        public RiakGetOptions SetR(string value)
-        {
-            return (RiakGetOptions)WriteQuorum(value, var => R = var);
-        }
-
-        public RiakGetOptions SetPr(uint value)
-        {
-            return (RiakGetOptions)WriteQuorum(value, var => Pr = var);
-        }
-
-        public RiakGetOptions SetPr(string value)
-        {
-            return (RiakGetOptions)WriteQuorum(value, var => Pr = var);
-        }
-
-        public RiakGetOptions SetTimeout(uint value)
-        {
-            Timeout = value;
-            return this;
-        }
-
         internal void Populate(RpbGetReq request)
         {
-            request.r = R.IsLeft ? R.Left : R.Right.ToRpbOption();
-            request.pr = Pr.IsLeft ? Pr.Left : Pr.Right.ToRpbOption();
+            request.r = R;
+            request.pr = Pr;
 
             if (BasicQuorum.HasValue)
             {
@@ -158,7 +119,7 @@ namespace RiakClient.Models
 
             if (Timeout.HasValue)
             {
-                request.timeout = Timeout.Value;
+                request.timeout = (uint)Timeout.Value;
             }
         }
     }

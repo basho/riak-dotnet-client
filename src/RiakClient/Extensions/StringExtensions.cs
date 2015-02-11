@@ -105,11 +105,5 @@ namespace RiakClient.Extensions
 
             return result;
         }
-
-        public static uint ToRpbOption(this string value)
-        {
-            RiakConstants.ValidateQuorumValue(value);
-            return RiakConstants.QuorumOptionsLookup[value];
-        }
     }
 }

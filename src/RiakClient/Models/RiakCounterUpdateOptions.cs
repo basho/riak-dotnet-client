@@ -19,59 +19,16 @@
 
 namespace RiakClient.Models
 {
+    using System.Runtime.InteropServices;
     using Messages;
 
-    public class RiakCounterUpdateOptions : RiakQuorumOptionsBase
+    [ComVisible(false)]
+    public class RiakCounterUpdateOptions : RiakOptions<RiakCounterUpdateOptions>
     {
-        /// <summary>
-        /// The number of replicas that must respond before a write is considered a success.
-        /// </summary>
-        public uint? WVal { get; private set; }
-
-        /// <summary>
-        /// The number of replicas that must commit to durable storage and respond before a write is considered a success. 
-        /// </summary>
-        public uint? DwVal { get; private set; }
-
-        /// <summary>
-        /// The number of primary replicas that must respond before a write is considered a success.
-        /// </summary>
-        public uint? PwVal { get; private set; }
-
         /// <summary>
         /// Whether or not the updated value should be returned from the counter
         /// </summary>
         public bool? ReturnValue { get; private set; }
-
-        public RiakCounterUpdateOptions SetWVal(string value)
-        {
-            return (RiakCounterUpdateOptions)WriteQuorum(value, v => WVal = v);
-        }
-
-        public RiakCounterUpdateOptions SetWVal(uint value)
-        {
-            return (RiakCounterUpdateOptions)WriteQuorum(value, v => WVal = v);
-        }
-
-        public RiakCounterUpdateOptions SetDwVal(string value)
-        {
-            return (RiakCounterUpdateOptions)WriteQuorum(value, v => DwVal = v);
-        }
-
-        public RiakCounterUpdateOptions SetDwVal(uint value)
-        {
-            return (RiakCounterUpdateOptions)WriteQuorum(value, v => DwVal = v);
-        }
-
-        public RiakCounterUpdateOptions SetPwVal(string value)
-        {
-            return (RiakCounterUpdateOptions)WriteQuorum(value, v => PwVal = v);
-        }
-
-        public RiakCounterUpdateOptions SetPwVal(uint value)
-        {
-            return (RiakCounterUpdateOptions)WriteQuorum(value, v => PwVal = v);
-        }
 
         public RiakCounterUpdateOptions SetReturnValue(bool value)
         {
@@ -81,19 +38,19 @@ namespace RiakClient.Models
 
         internal void Populate(RpbCounterUpdateReq request)
         {
-            if (WVal.HasValue)
+            if (W != null)
             {
-                request.w = WVal.Value;
+                request.w = W;
             }
 
-            if (DwVal.HasValue)
+            if (Dw != null)
             {
-                request.dw = DwVal.Value;
+                request.dw = Dw;
             }
 
-            if (PwVal.HasValue)
+            if (Pw != null)
             {
-                request.pw = PwVal.Value;
+                request.pw = Pw;
             }
 
             if (ReturnValue.HasValue)

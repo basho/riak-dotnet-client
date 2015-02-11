@@ -148,7 +148,7 @@ namespace RiakClient
 
         public RiakResult<RiakObject> Get(string bucketType, string bucket, string key, RiakGetOptions options = null)
         {
-            options = options ?? DefaultGetOptions();
+            options = options ?? RiakGetOptions.Default;
             return Get(new RiakObjectId(bucketType, bucket, key), options);
         }
 
@@ -174,8 +174,7 @@ namespace RiakClient
         /// <returns>An indication of success or failure.</returns>
         public RiakResult<RiakObject> Get(string bucket, string key, RiakGetOptions options = null)
         {
-            options = options ?? DefaultGetOptions();
-            return Get(null, bucket, key, options);
+            return Get(null, bucket, key, RiakGetOptions.Default);
         }
 
         /// <summary>
@@ -199,8 +198,7 @@ namespace RiakClient
         /// <returns>An indication of success or failure.</returns>
         public RiakResult<RiakObject> Get(string bucket, string key)
         {
-            var options = new RiakGetOptions().SetR(RiakConstants.Defaults.RVal);
-            return Get(null, bucket, key, options);
+            return Get(null, bucket, key, RiakGetOptions.Default);
         }
 
         /// <summary>
@@ -1380,11 +1378,6 @@ namespace RiakClient
             }
 
             return RiakResult<string>.Success(result.Value.Body);
-        }
-
-        internal static RiakGetOptions DefaultGetOptions()
-        {
-            return (new RiakGetOptions()).SetR(RiakConstants.Defaults.RVal);
         }
 
         internal RiakResult SetHttpBucketProperties(string bucket, RiakBucketProperties properties)
