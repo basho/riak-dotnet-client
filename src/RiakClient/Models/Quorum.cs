@@ -24,25 +24,25 @@ namespace RiakClient.Models
 
     public class Quorum : IEquatable<Quorum>
     {
-        private const int One = -2;
-        private const int QuorumI = -3;
-        private const int All = -4;
-        private const int Default = -5;
+        private const int OneAsInt = -2;
+        private const int QuorumAsInt = -3;
+        private const int AllAsInt = -4;
+        private const int DefaultAsInt = -5;
 
         private static readonly IDictionary<string, int> QuorumStrMap = new Dictionary<string, int>
         {
-            { "one", One },
-            { "quorum", QuorumI },
-            { "all", All },
-            { "default", Default }
+            { "one", OneAsInt },
+            { "quorum", QuorumAsInt },
+            { "all", AllAsInt },
+            { "default", DefaultAsInt }
         };
 
         private static readonly IDictionary<int, string> QuorumIntMap = new Dictionary<int, string>
         {
-            { One, "one" },
-            { QuorumI, "quorum" },
-            { All, "all" },
-            { Default, "default" }
+            { OneAsInt, "one" },
+            { QuorumAsInt, "quorum" },
+            { AllAsInt, "all" },
+            { DefaultAsInt, "default" }
         };
 
         private readonly int quorumValue = 0;
@@ -136,6 +136,34 @@ namespace RiakClient.Models
         public override int GetHashCode()
         {
             return quorumValue.GetHashCode();
+        }
+
+        public static class WellKnown
+        {
+            private static readonly Quorum OneStatic = new Quorum(Models.Quorum.OneAsInt);
+            private static readonly Quorum QuorumStatic = new Quorum(Models.Quorum.QuorumAsInt);
+            private static readonly Quorum AllStatic = new Quorum(Models.Quorum.AllAsInt);
+            private static readonly Quorum DefaultStatic = new Quorum(Models.Quorum.DefaultAsInt);
+
+            public static Quorum One
+            {
+                get { return OneStatic; }
+            }
+
+            public static Quorum Quorum
+            {
+                get { return QuorumStatic; }
+            }
+
+            public static Quorum All
+            {
+                get { return AllStatic; }
+            }
+
+            public static Quorum Default
+            {
+                get { return DefaultStatic; }
+            }
         }
     }
 }
