@@ -26,11 +26,6 @@ namespace RiakClient.Models
         private readonly uint nval = 0;
 
         public NVal(int nval)
-            : this((uint)nval)
-        {
-        }
-
-        internal NVal(uint nval)
         {
             if (nval <= 0)
             {
@@ -38,6 +33,11 @@ namespace RiakClient.Models
             }
 
             this.nval = (uint)nval;
+        }
+
+        internal NVal(uint nval)
+        {
+            this.nval = nval;
         }
 
         public static explicit operator NVal(int nval)
