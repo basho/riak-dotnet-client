@@ -25,6 +25,7 @@ namespace RiakClientTests.Live
     using Extensions;
     using MapReduce;
     using NUnit.Framework;
+    using RiakClient;
     using RiakClient.Models;
     using RiakClient.Models.Index;
     using RiakClient.Models.MapReduce;
@@ -302,8 +303,8 @@ namespace RiakClientTests.Live
             {
                 var o = CreateIntKeyedRiakObject("StreamingIndex", true, i);
                 o.IntIndex("position").Set(i % 2);
-                Client.Put(o, new RiakPutOptions().SetW(RiakConstants.QuorumOptions.All)
-                    .SetDw(RiakConstants.QuorumOptions.All));
+                Client.Put(o, new RiakPutOptions().SetW(Quorum.WellKnown.All)
+                    .SetDw(Quorum.WellKnown.All));
             }
 
             var results = Client.StreamGetSecondaryIndex(new RiakIndexId(Bucket, "position"), 0);

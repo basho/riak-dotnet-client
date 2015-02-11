@@ -19,39 +19,18 @@
 
 namespace RiakClient.Models
 {
-    using Containers;
-    using Extensions;
+    using System.Runtime.InteropServices;
     using Messages;
-    using Util;
 
-    public class RiakDtFetchOptions : RiakQuorumOptionsBase
+    [ComVisible(false)]
+    public class RiakDtFetchOptions : RiakOptions<RiakDtFetchOptions>
     {
         public RiakDtFetchOptions()
         {
-            R = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
-            Pr = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
+            R = Quorum.WellKnown.Default;
+            Pr = Quorum.WellKnown.Default;
             IncludeContext = true;
         }
-
-        /// <summary>
-        /// The number of replicas that must return before a fetch is considered a success.
-        /// </summary>
-        /// <value>
-        /// The R value. Possible values include any integer as well as 
-        /// a string value of 'quorum', 'one', 'all', or 'default'. 
-        /// </value>
-        /// <remarks>Developers looking for an easy way to set this can look at <see cref="RiakConstants.QuorumOptions"/></remarks>
-        public Either<uint, string> R { get; private set; }
-
-        /// <summary>
-        /// Primary Read Quorum - the number of replicas that need to be available when retrieving the object.
-        /// </summary>
-        /// <value>
-        /// The primary read quorum. Possible values include any integer as well as 
-        /// a string value of 'quorum', 'one', 'all', or 'default'. 
-        /// </value>
-        /// <remarks>Developers looking for an easy way to set this can look at <see cref="RiakConstants.QuorumOptions"/></remarks>
-        public Either<uint, string> Pr { get; private set; }
 
         /// <summary>
         /// Basic Quorum semantics - whether to return early in some failure cases (eg. when r=1 and you get 2 errors and a success basic_quorum=true would return an error)
@@ -68,8 +47,6 @@ namespace RiakClient.Models
         /// The notfound_ok value.
         /// </value>
         public bool? NotFoundOk { get; private set; }
-
-        public uint? Timeout { get; private set; }
 
         /// <summary>
         /// Whether a sloppy quorum should be used.
@@ -89,26 +66,6 @@ namespace RiakClient.Models
         /// </summary>
         public bool IncludeContext { get; private set; }
 
-        public RiakDtFetchOptions SetR(uint value)
-        {
-            return (RiakDtFetchOptions)WriteQuorum(value, var => R = var);
-        }
-
-        public RiakDtFetchOptions SetR(string value)
-        {
-            return (RiakDtFetchOptions)WriteQuorum(value, var => R = var);
-        }
-
-        public RiakDtFetchOptions SetPr(uint value)
-        {
-            return (RiakDtFetchOptions)WriteQuorum(value, var => Pr = var);
-        }
-
-        public RiakDtFetchOptions SetPr(string value)
-        {
-            return (RiakDtFetchOptions)WriteQuorum(value, var => Pr = var);
-        }
-
         public RiakDtFetchOptions SetBasicQuorum(bool value)
         {
             BasicQuorum = value;
@@ -118,12 +75,6 @@ namespace RiakClient.Models
         public RiakDtFetchOptions SetNotFoundOk(bool value)
         {
             NotFoundOk = value;
-            return this;
-        }
-
-        public RiakDtFetchOptions SetTimeout(uint value)
-        {
-            Timeout = value;
             return this;
         }
 
@@ -147,8 +98,8 @@ namespace RiakClient.Models
 
         internal void Populate(DtFetchReq request)
         {
-            request.r = R.IsLeft ? R.Left : R.Right.ToRpbOption();
-            request.pr = Pr.IsLeft ? Pr.Left : Pr.Right.ToRpbOption();
+            request.r = R;
+            request.pr = Pr;
 
             if (BasicQuorum.HasValue)
             {
@@ -162,7 +113,7 @@ namespace RiakClient.Models
 
             if (Timeout.HasValue)
             {
-                request.timeout = Timeout.Value;
+                request.timeout = (uint)Timeout.Value;
             }
 
             if (SloppyQuorum.HasValue)

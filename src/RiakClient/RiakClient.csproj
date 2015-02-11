@@ -82,7 +82,6 @@
     <Compile Include="Containers\ConcurrentEnumerable.cs" />
     <Compile Include="Containers\ConcurrentEnumerator.cs" />
     <Compile Include="Comms\RiakConnectionPool.cs" />
-    <Compile Include="Containers\Either.cs" />
     <Compile Include="Containers\IConcurrentEnumerable.cs" />
     <Compile Include="Containers\IConcurrentEnumerator.cs" />
     <Compile Include="IRiakAsyncClient.cs" />
@@ -94,7 +93,7 @@
     <Compile Include="Models\RiakDt\CounterOperation.cs" />
     <Compile Include="Models\RiakDt\MapOperation.cs" />
     <Compile Include="Models\RiakIntIndexId.cs" />
-    <Compile Include="Models\RiakQuorumOptionsBase.cs" />
+    <Compile Include="Models\RiakOptions.cs" />
     <Compile Include="Models\Search\SearchIndex.cs" />
     <Compile Include="Models\Search\SearchSchema.cs" />
     <Compile Include="ResultCode.cs" />
@@ -270,7 +269,7 @@
     <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="Extensions\JsonExtensions.cs" />
     <Compile Include="Util\MonoUtil.cs" />
-    <Compile Include="Util\RiakConstants.cs" />
+    <Compile Include="RiakConstants.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Messages\MessageCodeTypeMapBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

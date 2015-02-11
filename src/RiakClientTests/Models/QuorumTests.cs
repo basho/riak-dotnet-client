@@ -57,6 +57,46 @@ namespace RiakClientTests.Models
         }
 
         [Test]
+        public void WellKnownUnsignedIntValues_AreValidQuorums()
+        {
+            uint quorum_uint = uint.MaxValue - 1;
+            var quorum = new Quorum(quorum_uint);
+            Assert.AreEqual(Quorum.WellKnown.One, quorum);
+
+            quorum_uint = uint.MaxValue - 2;
+            quorum = new Quorum(quorum_uint);
+            Assert.AreEqual(Quorum.WellKnown.Quorum, quorum);
+
+            quorum_uint = uint.MaxValue - 3;
+            quorum = new Quorum(quorum_uint);
+            Assert.AreEqual(Quorum.WellKnown.All, quorum);
+
+            quorum_uint = uint.MaxValue - 4;
+            quorum = new Quorum(quorum_uint);
+            Assert.AreEqual(Quorum.WellKnown.Default, quorum);
+        }
+
+        [Test]
+        public void WellKnownUnsignedIntValues_CastToValidQuorums()
+        {
+            uint quorum_uint = uint.MaxValue - 1;
+            var quorum = (Quorum)quorum_uint;
+            Assert.AreEqual(Quorum.WellKnown.One, quorum);
+
+            quorum_uint = uint.MaxValue - 2;
+            quorum = (Quorum)quorum_uint;
+            Assert.AreEqual(Quorum.WellKnown.Quorum, quorum);
+
+            quorum_uint = uint.MaxValue - 3;
+            quorum = (Quorum)quorum_uint;
+            Assert.AreEqual(Quorum.WellKnown.All, quorum);
+
+            quorum_uint = uint.MaxValue - 4;
+            quorum = (Quorum)quorum_uint;
+            Assert.AreEqual(Quorum.WellKnown.Default, quorum);
+        }
+
+        [Test]
         public void OtherNegValues_AreInvalidQuorums()
         {
             Assert.Catch<ArgumentOutOfRangeException>(() => new Quorum(-32));
