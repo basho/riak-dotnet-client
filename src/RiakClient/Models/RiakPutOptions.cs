@@ -21,26 +21,27 @@ namespace RiakClient.Models
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using Containers;
     using Extensions;
     using Messages;
     using Util;
 
-    public class RiakPutOptions
+    public class RiakPutOptions : RiakQuorumOptionsBase
     {
         public RiakPutOptions()
         {
             ReturnBody = true;
-            W = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
-            Dw = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
-            Pw = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
+            W = new Either<int, string>(RiakConstants.QuorumOptions.Default);
+            Dw = new Either<int, string>(RiakConstants.QuorumOptions.Default);
+            Pw = new Either<int, string>(RiakConstants.QuorumOptions.Default);
         }
 
-        public Either<uint, string> W { get; private set; }
+        public Either<int, string> W { get; private set; }
 
-        public Either<uint, string> Dw { get; private set; }
+        public Either<int, string> Dw { get; private set; }
 
-        public Either<uint, string> Pw { get; private set; }
+        public Either<int, string> Pw { get; private set; }
 
         public bool ReturnBody { get; set; }
 
@@ -50,9 +51,9 @@ namespace RiakClient.Models
 
         public bool ReturnHead { get; set; }
 
-        public uint? Timeout { get; set; }
+        public int? Timeout { get; set; }
 
-        public RiakPutOptions SetW(uint value)
+        public RiakPutOptions SetW(int value)
         {
             return WriteQuorum(value, var => W = var);
         }
@@ -62,7 +63,7 @@ namespace RiakClient.Models
             return WriteQuorum(value, var => W = var);
         }
 
-        public RiakPutOptions SetDw(uint value)
+        public RiakPutOptions SetDw(int value)
         {
             return WriteQuorum(value, var => Dw = var);
         }
@@ -72,7 +73,7 @@ namespace RiakClient.Models
             return WriteQuorum(value, var => Dw = var);
         }
 
-        public RiakPutOptions SetPw(uint value)
+        public RiakPutOptions SetPw(int value)
         {
             return WriteQuorum(value, var => Pw = var);
         }
@@ -82,7 +83,7 @@ namespace RiakClient.Models
             return WriteQuorum(value, var => Pw = var);
         }
 
-        public RiakPutOptions SetTimeout(uint value)
+        public RiakPutOptions SetTimeout(int value)
         {
             Timeout = value;
             return this;
@@ -127,22 +128,6 @@ namespace RiakClient.Models
             {
                 request.timeout = Timeout.Value;
             }
-        }
-
-        private RiakPutOptions WriteQuorum(string value, Action<Either<uint, string>> setter)
-        {
-            System.Diagnostics.Debug.Assert(new HashSet<string> { "all", "quorum", "one", "default" }.Contains(value), "Incorrect quorum value");
-
-            setter(new Either<uint, string>(value));
-            return this;
-        }
-
-        private RiakPutOptions WriteQuorum(uint value, Action<Either<uint, string>> setter)
-        {
-            System.Diagnostics.Debug.Assert(value >= 1, "value must be greater than or equal to 1");
-
-            setter(new Either<uint, string>(value));
-            return this;
         }
     }
 }

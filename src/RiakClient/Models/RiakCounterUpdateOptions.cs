@@ -19,12 +19,9 @@
 
 namespace RiakClient.Models
 {
-    using System;
-    using System.Collections.Generic;
     using Messages;
-    using Util;
 
-    public class RiakCounterUpdateOptions
+    public class RiakCounterUpdateOptions : RiakQuorumOptionsBase
     {
         /// <summary>
         /// The number of replicas that must respond before a write is considered a success.
@@ -103,22 +100,6 @@ namespace RiakClient.Models
             {
                 request.returnvalue = ReturnValue.Value;
             }
-        }
-
-        private RiakCounterUpdateOptions WriteQuorum(string value, Action<uint> setter)
-        {
-            System.Diagnostics.Debug.Assert(new HashSet<string> { "all", "quorum", "one", "default" }.Contains(value), "Incorrect quorum value");
-
-            setter(RiakConstants.QuorumOptionsLookup[value]);
-            return this;
-        }
-
-        private RiakCounterUpdateOptions WriteQuorum(uint value, Action<uint> setter)
-        {
-            System.Diagnostics.Debug.Assert(value >= 1, "value must be greater than or equal to 1");
-
-            setter(value);
-            return this;
         }
     }
 }

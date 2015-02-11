@@ -19,8 +19,6 @@
 
 namespace RiakClient.Models
 {
-    using System;
-    using System.Collections.Generic;
     using Containers;
     using Extensions;
     using Messages;
@@ -178,22 +176,6 @@ namespace RiakClient.Models
             }
 
             request.include_context = IncludeContext;
-        }
-
-        private RiakDtFetchOptions WriteQuorum(string value, Action<Either<uint, string>> setter)
-        {
-            System.Diagnostics.Debug.Assert(new HashSet<string> { "all", "quorum", "one", "default" }.Contains(value), "Incorrect quorum value");
-
-            setter(new Either<uint, string>(value));
-            return this;
-        }
-
-        private RiakDtFetchOptions WriteQuorum(uint value, Action<Either<uint, string>> setter)
-        {
-            System.Diagnostics.Debug.Assert(value >= 1, "value must be greater than or equal to 1");
-
-            setter(new Either<uint, string>(value));
-            return this;
         }
     }
 }
