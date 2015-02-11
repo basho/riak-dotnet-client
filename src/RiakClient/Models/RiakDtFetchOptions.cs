@@ -24,7 +24,7 @@ namespace RiakClient.Models
     using Messages;
     using Util;
 
-    public class RiakDtFetchOptions
+    public class RiakDtFetchOptions : RiakQuorumOptionsBase
     {
         public RiakDtFetchOptions()
         {
@@ -91,22 +91,22 @@ namespace RiakClient.Models
 
         public RiakDtFetchOptions SetR(uint value)
         {
-            return WriteQuorum(value, var => R = var);
+            return (RiakDtFetchOptions)WriteQuorum(value, var => R = var);
         }
 
         public RiakDtFetchOptions SetR(string value)
         {
-            return WriteQuorum(value, var => R = var);
+            return (RiakDtFetchOptions)WriteQuorum(value, var => R = var);
         }
 
         public RiakDtFetchOptions SetPr(uint value)
         {
-            return WriteQuorum(value, var => Pr = var);
+            return (RiakDtFetchOptions)WriteQuorum(value, var => Pr = var);
         }
 
         public RiakDtFetchOptions SetPr(string value)
         {
-            return WriteQuorum(value, var => Pr = var);
+            return (RiakDtFetchOptions)WriteQuorum(value, var => Pr = var);
         }
 
         public RiakDtFetchOptions SetBasicQuorum(bool value)

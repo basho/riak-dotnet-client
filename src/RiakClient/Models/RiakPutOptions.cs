@@ -32,16 +32,16 @@ namespace RiakClient.Models
         public RiakPutOptions()
         {
             ReturnBody = true;
-            W = new Either<int, string>(RiakConstants.QuorumOptions.Default);
-            Dw = new Either<int, string>(RiakConstants.QuorumOptions.Default);
-            Pw = new Either<int, string>(RiakConstants.QuorumOptions.Default);
+            W = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
+            Dw = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
+            Pw = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
         }
 
-        public Either<int, string> W { get; private set; }
+        public Either<uint, string> W { get; private set; }
 
-        public Either<int, string> Dw { get; private set; }
+        public Either<uint, string> Dw { get; private set; }
 
-        public Either<int, string> Pw { get; private set; }
+        public Either<uint, string> Pw { get; private set; }
 
         public bool ReturnBody { get; set; }
 
@@ -51,39 +51,39 @@ namespace RiakClient.Models
 
         public bool ReturnHead { get; set; }
 
-        public int? Timeout { get; set; }
+        public uint? Timeout { get; set; }
 
-        public RiakPutOptions SetW(int value)
+        public RiakPutOptions SetW(uint value)
         {
-            return WriteQuorum(value, var => W = var);
+            return (RiakPutOptions)WriteQuorum(value, var => W = var);
         }
 
         public RiakPutOptions SetW(string value)
         {
-            return WriteQuorum(value, var => W = var);
+            return (RiakPutOptions)WriteQuorum(value, var => W = var);
         }
 
-        public RiakPutOptions SetDw(int value)
+        public RiakPutOptions SetDw(uint value)
         {
-            return WriteQuorum(value, var => Dw = var);
+            return (RiakPutOptions)WriteQuorum(value, var => Dw = var);
         }
 
         public RiakPutOptions SetDw(string value)
         {
-            return WriteQuorum(value, var => Dw = var);
+            return (RiakPutOptions)WriteQuorum(value, var => Dw = var);
         }
 
-        public RiakPutOptions SetPw(int value)
+        public RiakPutOptions SetPw(uint value)
         {
-            return WriteQuorum(value, var => Pw = var);
+            return (RiakPutOptions)WriteQuorum(value, var => Pw = var);
         }
 
         public RiakPutOptions SetPw(string value)
         {
-            return WriteQuorum(value, var => Pw = var);
+            return (RiakPutOptions)WriteQuorum(value, var => Pw = var);
         }
 
-        public RiakPutOptions SetTimeout(int value)
+        public RiakPutOptions SetTimeout(uint value)
         {
             Timeout = value;
             return this;

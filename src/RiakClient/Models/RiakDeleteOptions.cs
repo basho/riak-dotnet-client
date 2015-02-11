@@ -100,62 +100,62 @@ namespace RiakClient.Models
 
         public RiakDeleteOptions SetRw(uint value)
         {
-            return WriteQuorum(value, var => Rw = var);
+            return (RiakDeleteOptions)WriteQuorum(value, var => Rw = var);
         }
 
         public RiakDeleteOptions SetRw(string value)
         {
-            return WriteQuorum(value, var => Rw = var);
+            return (RiakDeleteOptions)WriteQuorum(value, var => Rw = var);
         }
 
         public RiakDeleteOptions SetR(uint value)
         {
-            return WriteQuorum(value, var => R = var);
+            return (RiakDeleteOptions)WriteQuorum(value, var => R = var);
         }
 
         public RiakDeleteOptions SetR(string value)
         {
-            return WriteQuorum(value, var => R = var);
+            return (RiakDeleteOptions)WriteQuorum(value, var => R = var);
         }
 
         public RiakDeleteOptions SetW(uint value)
         {
-            return WriteQuorum(value, var => W = var);
+            return (RiakDeleteOptions)WriteQuorum(value, var => W = var);
         }
 
         public RiakDeleteOptions SetW(string value)
         {
-            return WriteQuorum(value, var => W = var);
+            return (RiakDeleteOptions)WriteQuorum(value, var => W = var);
         }
 
         public RiakDeleteOptions SetPr(uint value)
         {
-            return WriteQuorum(value, var => Pr = var);
+            return (RiakDeleteOptions)WriteQuorum(value, var => Pr = var);
         }
 
         public RiakDeleteOptions SetPr(string value)
         {
-            return WriteQuorum(value, var => Pr = var);
+            return (RiakDeleteOptions)WriteQuorum(value, var => Pr = var);
         }
 
         public RiakDeleteOptions SetPw(uint value)
         {
-            return WriteQuorum(value, var => Pw = var);
+            return (RiakDeleteOptions)WriteQuorum(value, var => Pw = var);
         }
 
         public RiakDeleteOptions SetPw(string value)
         {
-            return WriteQuorum(value, var => Pw = var);
+            return (RiakDeleteOptions)WriteQuorum(value, var => Pw = var);
         }
 
         public RiakDeleteOptions SetDw(uint value)
         {
-            return WriteQuorum(value, var => Dw = var);
+            return (RiakDeleteOptions)WriteQuorum(value, var => Dw = var);
         }
 
         public RiakDeleteOptions SetDw(string value)
         {
-            return WriteQuorum(value, var => Dw = var);
+            return (RiakDeleteOptions)WriteQuorum(value, var => Dw = var);
         }
 
         public RiakDeleteOptions SetTimeout(uint? value)

@@ -309,62 +309,62 @@ namespace RiakClient.Models
 
         public RiakBucketProperties SetRVal(string value)
         {
-            return WriteQuorum(value, v => RVal = v);
+            return (RiakBucketProperties)WriteQuorum(value, v => RVal = v);
         }
 
         public RiakBucketProperties SetRVal(uint value)
         {
-            return WriteQuorum(value, v => RVal = v);
+            return (RiakBucketProperties)WriteQuorum(value, v => RVal = v);
         }
 
         public RiakBucketProperties SetRwVal(string value)
         {
-            return WriteQuorum(value, v => RwVal = v);
+            return (RiakBucketProperties)WriteQuorum(value, v => RwVal = v);
         }
 
         public RiakBucketProperties SetRwVal(uint value)
         {
-            return WriteQuorum(value, v => RwVal = v);
+            return (RiakBucketProperties)WriteQuorum(value, v => RwVal = v);
         }
 
         public RiakBucketProperties SetDwVal(string value)
         {
-            return WriteQuorum(value, v => DwVal = v);
+            return (RiakBucketProperties)WriteQuorum(value, v => DwVal = v);
         }
 
         public RiakBucketProperties SetDwVal(uint value)
         {
-            return WriteQuorum(value, v => DwVal = v);
+            return (RiakBucketProperties)WriteQuorum(value, v => DwVal = v);
         }
 
         public RiakBucketProperties SetWVal(string value)
         {
-            return WriteQuorum(value, v => WVal = v);
+            return (RiakBucketProperties)WriteQuorum(value, v => WVal = v);
         }
 
         public RiakBucketProperties SetWVal(uint value)
         {
-            return WriteQuorum(value, v => WVal = v);
+            return (RiakBucketProperties)WriteQuorum(value, v => WVal = v);
         }
 
         public RiakBucketProperties SetPrVal(string value)
         {
-            return WriteQuorum(value, v => PrVal = v);
+            return (RiakBucketProperties)WriteQuorum(value, v => PrVal = v);
         }
 
         public RiakBucketProperties SetPrVal(uint value)
         {
-            return WriteQuorum(value, v => PrVal = v);
+            return (RiakBucketProperties)WriteQuorum(value, v => PrVal = v);
         }
 
         public RiakBucketProperties SetPwVal(string value)
         {
-            return WriteQuorum(value, var => PwVal = var);
+            return (RiakBucketProperties)WriteQuorum(value, var => PwVal = var);
         }
 
         public RiakBucketProperties SetPwVal(uint value)
         {
-            return WriteQuorum(value, var => PwVal = var);
+            return (RiakBucketProperties)WriteQuorum(value, var => PwVal = var);
         }
 
         public RiakBucketProperties SetBackend(string backend)

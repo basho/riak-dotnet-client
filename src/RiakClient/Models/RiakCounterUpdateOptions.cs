@@ -45,32 +45,32 @@ namespace RiakClient.Models
 
         public RiakCounterUpdateOptions SetWVal(string value)
         {
-            return WriteQuorum(value, v => WVal = v);
+            return (RiakCounterUpdateOptions)WriteQuorum(value, v => WVal = v);
         }
 
         public RiakCounterUpdateOptions SetWVal(uint value)
         {
-            return WriteQuorum(value, v => WVal = v);
+            return (RiakCounterUpdateOptions)WriteQuorum(value, v => WVal = v);
         }
 
         public RiakCounterUpdateOptions SetDwVal(string value)
         {
-            return WriteQuorum(value, v => DwVal = v);
+            return (RiakCounterUpdateOptions)WriteQuorum(value, v => DwVal = v);
         }
 
         public RiakCounterUpdateOptions SetDwVal(uint value)
         {
-            return WriteQuorum(value, v => DwVal = v);
+            return (RiakCounterUpdateOptions)WriteQuorum(value, v => DwVal = v);
         }
 
         public RiakCounterUpdateOptions SetPwVal(string value)
         {
-            return WriteQuorum(value, v => PwVal = v);
+            return (RiakCounterUpdateOptions)WriteQuorum(value, v => PwVal = v);
         }
 
         public RiakCounterUpdateOptions SetPwVal(uint value)
         {
-            return WriteQuorum(value, v => PwVal = v);
+            return (RiakCounterUpdateOptions)WriteQuorum(value, v => PwVal = v);
         }
 
         public RiakCounterUpdateOptions SetReturnValue(bool value)

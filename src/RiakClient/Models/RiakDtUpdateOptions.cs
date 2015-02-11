@@ -53,32 +53,32 @@ namespace RiakClient.Models
 
         public RiakDtUpdateOptions SetW(uint value)
         {
-            return WriteQuorum(value, var => W = var);
+            return (RiakDtUpdateOptions)WriteQuorum(value, var => W = var);
         }
 
         public RiakDtUpdateOptions SetW(string value)
         {
-            return WriteQuorum(value, var => W = var);
+            return (RiakDtUpdateOptions)WriteQuorum(value, var => W = var);
         }
 
         public RiakDtUpdateOptions SetDw(uint value)
         {
-            return WriteQuorum(value, var => Dw = var);
+            return (RiakDtUpdateOptions)WriteQuorum(value, var => Dw = var);
         }
 
         public RiakDtUpdateOptions SetDw(string value)
         {
-            return WriteQuorum(value, var => Dw = var);
+            return (RiakDtUpdateOptions)WriteQuorum(value, var => Dw = var);
         }
 
         public RiakDtUpdateOptions SetPw(uint value)
         {
-            return WriteQuorum(value, var => Pw = var);
+            return (RiakDtUpdateOptions)WriteQuorum(value, var => Pw = var);
         }
 
         public RiakDtUpdateOptions SetPw(string value)
         {
-            return WriteQuorum(value, var => Pw = var);
+            return (RiakDtUpdateOptions)WriteQuorum(value, var => Pw = var);
         }
 
         public RiakDtUpdateOptions SetReturnBody(bool value)
