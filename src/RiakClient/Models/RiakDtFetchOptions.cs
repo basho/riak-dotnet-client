@@ -27,9 +27,9 @@ namespace RiakClient.Models
     {
         public RiakDtFetchOptions()
         {
+            IncludeContext = true;
             R = Quorum.WellKnown.Default;
             Pr = Quorum.WellKnown.Default;
-            IncludeContext = true;
         }
 
         /// <summary>

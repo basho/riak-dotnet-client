@@ -23,12 +23,10 @@ namespace RiakClientTests.Live
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
-    using Extensions;
     using NUnit.Framework;
     using RiakClient;
     using RiakClient.Extensions;
     using RiakClient.Models;
-    using RiakClient.Util;
 
     [TestFixture]
     public class RiakClientTests : LiveRiakConnectionTestBase
