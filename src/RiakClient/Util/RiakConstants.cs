@@ -19,12 +19,14 @@
 
 namespace RiakClient.Util
 {
-    using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using Messages;
 
     public static class RiakConstants
     {
+        private static readonly HashSet<string> validQuorumStrings = new HashSet<string> { "all", "quorum", "one", "default" };
+
         public const string DefaultBucketType = null;
 
         internal static readonly Dictionary<string, uint> QuorumOptionsLookup = new Dictionary<string, uint>
@@ -90,12 +92,10 @@ namespace RiakClient.Util
 
         public static class QuorumOptions
         {
-            public const uint One = UintMax - 1;
-            public const uint Quorum = UintMax - 2;
-            public const uint All = UintMax - 3;
-            public const uint Default = UintMax - 4;
-
-            private const uint UintMax = uint.MaxValue;
+            private const uint One     = uint.MaxValue - 1;
+            private const uint Quorum  = uint.MaxValue - 2;
+            private const uint All     = uint.MaxValue - 3;
+            private const uint Default = uint.MaxValue - 4;
         }
 
         public static class Defaults
@@ -187,6 +187,16 @@ namespace RiakClient.Util
             public const string Score = "score";
 
             public const string LegacySearchId = "id";
+        }
+
+        internal static void ValidateQuorumValue(string value)
+        {
+            Debug.Assert(validQuorumStrings.Contains(value), "Incorrect quorum value");
+        }
+
+        internal static void ValidateQuorumValue(uint value)
+        {
+            Debug.Assert(value >= 1, "Value must be greater than or equal to 1");
         }
     }
 }

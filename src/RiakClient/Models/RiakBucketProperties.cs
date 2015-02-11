@@ -21,11 +21,9 @@ namespace RiakClient.Models
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Text;
-    using Containers;
     using Extensions;
     using Messages;
     using Models.CommitHook;
@@ -34,7 +32,7 @@ namespace RiakClient.Models
     using Newtonsoft.Json.Linq;
     using Util;
 
-    public class RiakBucketProperties
+    public class RiakBucketProperties : RiakQuorumOptionsBase
     {
         private bool? addHooks;
 
@@ -171,7 +169,8 @@ namespace RiakClient.Models
 
         public bool? LegacySearch
         {
-            get; private set;
+            get;
+            private set;
         }
 
         /// <summary>
@@ -687,38 +686,6 @@ namespace RiakClient.Models
             setter(props[key].Type == JTokenType.String
                        ? RiakConstants.QuorumOptionsLookup[props.Value<string>(key)]
                        : props.Value<uint>(key));
-        }
-
-        private RiakBucketProperties WriteQuorum(string value, Action<uint> setter)
-        {
-            Debug.Assert(new HashSet<string> { "all", "quorum", "one", "default" }.Contains(value), "Incorrect quorum value");
-
-            setter(RiakConstants.QuorumOptionsLookup[value]);
-            return this;
-        }
-
-        private RiakBucketProperties WriteQuorum(uint value, Action<uint> setter)
-        {
-            Debug.Assert(value >= 1, "value must be greater than or equal to 1");
-
-            setter(value);
-            return this;
-        }
-
-        private RiakBucketProperties WriteQuorum(string value, Action<Either<uint, string>> setter)
-        {
-            Debug.Assert(new HashSet<string> { "all", "quorum", "one", "default" }.Contains(value), "Incorrect quorum value");
-
-            setter(new Either<uint, string>(value));
-            return this;
-        }
-
-        private RiakBucketProperties WriteQuorum(uint value, Action<Either<uint, string>> setter)
-        {
-            Debug.Assert(value >= 1, "value must be greater than or equal to 1");
-
-            setter(new Either<uint, string>(value));
-            return this;
         }
     }
 }

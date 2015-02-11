@@ -19,12 +19,9 @@
 
 namespace RiakClient.Models
 {
-    using System;
-    using System.Collections.Generic;
     using Messages;
-    using Util;
 
-    public class RiakCounterGetOptions
+    public class RiakCounterGetOptions : RiakQuorumOptionsBase
     {
         /// <summary>
         /// The number of primary replicas that must respond before a read is considered a success.
@@ -70,22 +67,22 @@ namespace RiakClient.Models
 
         public RiakCounterGetOptions SetRVal(uint value)
         {
-            return WriteQuorum(value, v => RVal = v);
+            return (RiakCounterGetOptions)WriteQuorum(value, v => RVal = v);
         }
 
         public RiakCounterGetOptions SetRVal(string value)
         {
-            return WriteQuorum(value, v => RVal = v);
+            return (RiakCounterGetOptions)WriteQuorum(value, v => RVal = v);
         }
 
         public RiakCounterGetOptions SetPrVal(uint value)
         {
-            return WriteQuorum(value, v => RVal = v);
+            return (RiakCounterGetOptions)WriteQuorum(value, v => RVal = v);
         }
 
         public RiakCounterGetOptions SetPrVal(string value)
         {
-            return WriteQuorum(value, v => RVal = v);
+            return (RiakCounterGetOptions)WriteQuorum(value, v => RVal = v);
         }
 
         internal void Populate(RpbCounterGetReq request)
@@ -109,22 +106,6 @@ namespace RiakClient.Models
             {
                 request.notfound_ok = NotFoundOk.Value;
             }
-        }
-
-        private RiakCounterGetOptions WriteQuorum(string value, Action<uint> setter)
-        {
-            System.Diagnostics.Debug.Assert(new HashSet<string> { "all", "quorum", "one", "default" }.Contains(value), "Incorrect quorum value");
-
-            setter(RiakConstants.QuorumOptionsLookup[value]);
-            return this;
-        }
-
-        private RiakCounterGetOptions WriteQuorum(uint value, Action<uint> setter)
-        {
-            System.Diagnostics.Debug.Assert(value >= 1, "value must be greater than or equal to 1");
-
-            setter(value);
-            return this;
         }
     }
 }

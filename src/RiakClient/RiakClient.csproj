@@ -93,6 +93,7 @@
     <Compile Include="Models\RiakDt\CounterOperation.cs" />
     <Compile Include="Models\RiakDt\MapOperation.cs" />
     <Compile Include="Models\RiakIntIndexId.cs" />
+    <Compile Include="Models\RiakQuorumOptionsBase.cs" />
     <Compile Include="Models\Search\SearchIndex.cs" />
     <Compile Include="Models\Search\SearchSchema.cs" />
     <Compile Include="ResultCode.cs" />

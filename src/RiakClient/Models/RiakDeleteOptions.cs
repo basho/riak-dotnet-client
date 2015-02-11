@@ -19,14 +19,12 @@
 
 namespace RiakClient.Models
 {
-    using System;
-    using System.Collections.Generic;
     using Containers;
     using Extensions;
     using Messages;
     using Util;
 
-    public class RiakDeleteOptions
+    public class RiakDeleteOptions : RiakQuorumOptionsBase
     {
         public RiakDeleteOptions()
         {
@@ -184,22 +182,6 @@ namespace RiakClient.Models
             {
                 request.vclock = Vclock;
             }
-        }
-
-        private RiakDeleteOptions WriteQuorum(string value, Action<Either<uint, string>> setter)
-        {
-            System.Diagnostics.Debug.Assert(new HashSet<string> { "all", "quorum", "one", "default" }.Contains(value), "Incorrect quorum value");
-
-            setter(new Either<uint, string>(value));
-            return this;
-        }
-
-        private RiakDeleteOptions WriteQuorum(uint value, Action<Either<uint, string>> setter)
-        {
-            System.Diagnostics.Debug.Assert(value >= 1, "value must be greater than equal to 1");
-
-            setter(new Either<uint, string>(value));
-            return this;
         }
     }
 }
