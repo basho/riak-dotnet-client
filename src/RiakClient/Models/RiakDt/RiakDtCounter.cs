@@ -123,6 +123,13 @@ namespace RiakClient.Models.RiakDt
                 };
         }
 
+        public DtOp ToDtOp()
+        {
+            var co = ToCounterOp();
+
+            return co == null ? null : new DtOp { counter_op = ToCounterOp() };
+        }
+
         /// <summary>
         /// Compress all operations in a RiakDtCounter into a single DtUpdateReq
         /// </summary>
@@ -158,13 +165,6 @@ namespace RiakClient.Models.RiakDt
             options.Populate(request);
 
             return request;
-        }
-
-        public DtOp ToDtOp()
-        {
-            var co = ToCounterOp();
-
-            return co == null ? null : new DtOp { counter_op = ToCounterOp() };
         }
     }
 }
