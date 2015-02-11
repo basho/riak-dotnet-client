@@ -31,12 +31,6 @@ namespace RiakClient.Models
         {
             R = Quorum.WellKnown.Default;
             Pr = Quorum.WellKnown.Default;
-            /*
-            W = Quorum.WellKnown.Default;
-            Pw = Quorum.WellKnown.Default;
-            Dw = Quorum.WellKnown.Default;
-            Rw = Quorum.WellKnown.Default;
-             */
         }
 
         public static RiakGetOptions Default

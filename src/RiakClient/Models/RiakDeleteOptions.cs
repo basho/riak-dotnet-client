@@ -25,6 +25,16 @@ namespace RiakClient.Models
     [ComVisible(false)]
     public class RiakDeleteOptions : RiakOptions<RiakDeleteOptions>
     {
+        public RiakDeleteOptions()
+        {
+            R = Quorum.WellKnown.Default;
+            W = Quorum.WellKnown.Default;
+            Pr = Quorum.WellKnown.Default;
+            Pw = Quorum.WellKnown.Default;
+            Dw = Quorum.WellKnown.Default;
+            Rw = Quorum.WellKnown.Default;
+        }
+
         /// <summary>
         /// The Vclock of the version that is being deleted. Use this to prevent deleting objects that have been modified since the last get request.
         /// </summary>

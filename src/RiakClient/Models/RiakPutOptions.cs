@@ -70,7 +70,6 @@ namespace RiakClient.Models
             request.w = W;
             request.pw = Pw;
             request.dw = Dw;
-
             request.if_not_modified = IfNotModified;
             request.if_none_match = IfNoneMatch;
             request.return_head = ReturnHead;

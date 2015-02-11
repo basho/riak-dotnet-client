@@ -29,6 +29,9 @@ namespace RiakClient.Models
         {
             ReturnBody = true;
             IncludeContext = true;
+            W = Quorum.WellKnown.Default;
+            Dw = Quorum.WellKnown.Default;
+            Pw = Quorum.WellKnown.Default;
         }
 
         public bool ReturnBody { get; private set; }
