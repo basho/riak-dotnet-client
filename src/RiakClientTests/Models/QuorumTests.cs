@@ -68,22 +68,22 @@ namespace RiakClientTests.Models
         {
             var validQuorumData = new Dictionary<string, int[]>
             {
-                { "one", new[] { 1, -2 } },
-                { "One", new[] { 1, -2 } },
-                { "ONE", new[] { 1, -2 } },
-                { "onE", new[] { 1, -2 } },
-                { "quorum", new[] { 2, -3 } },
-                { "Quorum", new[] { 2, -3 } },
-                { "QUORUM", new[] { 2, -3 } },
-                { "quOrUm", new[] { 2, -3 } },
-                { "all", new[] { 3, -4 } },
-                { "All", new[] { 3, -4 } },
-                { "ALL", new[] { 3, -4 } },
-                { "alL", new[] { 3, -4 } },
-                { "default", new[] { 4, -5 } },
-                { "Default", new[] { 4, -5 } },
-                { "DEFAULT", new[] { 4, -5 } },
-                { "deFaulT", new[] { 4, -5 } }
+                { "one", new[] { 1, Quorum.WellKnown.One } },
+                { "One", new[] { 1, Quorum.WellKnown.One } },
+                { "ONE", new[] { 1, Quorum.WellKnown.One } },
+                { "onE", new[] { 1, Quorum.WellKnown.One } },
+                { "quorum", new[] { 2, Quorum.WellKnown.Quorum } },
+                { "Quorum", new[] { 2, Quorum.WellKnown.Quorum } },
+                { "QUORUM", new[] { 2, Quorum.WellKnown.Quorum } },
+                { "quOrUm", new[] { 2, Quorum.WellKnown.Quorum } },
+                { "all", new[] { 3, Quorum.WellKnown.All } },
+                { "All", new[] { 3, Quorum.WellKnown.All } },
+                { "ALL", new[] { 3, Quorum.WellKnown.All } },
+                { "alL", new[] { 3, Quorum.WellKnown.All } },
+                { "default", new[] { 4, Quorum.WellKnown.Default } },
+                { "Default", new[] { 4, Quorum.WellKnown.Default } },
+                { "DEFAULT", new[] { 4, Quorum.WellKnown.Default } },
+                { "deFaulT", new[] { 4, Quorum.WellKnown.Default } }
             };
 
             foreach (var vqd in validQuorumData)
