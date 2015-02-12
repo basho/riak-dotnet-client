@@ -59,7 +59,7 @@
     <Message Text="Checking out '$(MasterBranchName)' branch" />
     <GitClient Command="checkout" Arguments="$(MasterBranchName)" LocalPath="$(SolutionDir)" />
     <Message Text="Cleaning '$(MasterBranchName)' branch" />
-    <GitClient Command="clean" Arguments="-fxd" LocalPath="$(SolutionDir)" />
+    <GitClient Command="clean" Arguments="-fxd --exclude packages/StyleCop.*" LocalPath="$(SolutionDir)" />
     <Message Text="Merging '$(DevelopBranchName)' into '$(MasterBranchName)' NOTE: this will fail if the merge can't be done via fast-forward!" />
     <GitClient Command="merge" Arguments="--no-ff --commit --ff-only $(DevelopBranchName)" LocalPath="$(SolutionDir)" />
     <GitClient Command="tag" Arguments="--message &quot;riak-dotnet-client $(NuGetVersion)&quot; &quot;$(GitTagVersion)&quot;" LocalPath="$(SolutionDir)" />
