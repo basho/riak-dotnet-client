@@ -29,14 +29,14 @@ namespace RiakClient.Models
         /// <value>
         /// The R value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.
         /// </value>
-        /// <remarks>Developers looking for an easy way to set this can look at <see cref="RiakConstants.QuorumOptions"/></remarks>
+        /// <remarks>Developers looking for an easy way to set this can look at <see cref="Quorum.WellKnown"/></remarks>
         public Quorum R { get; protected set; }
 
         /// <summary>
         /// The number of replicas that must respond before a write is considered a success.
         /// </summary>
         /// <value>The W value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.</value>
-        /// <remarks>Developers looking for an easy way to set this can look at <see cref="RiakConstants.QuorumOptions"/></remarks>
+        /// <remarks>Developers looking for an easy way to set this can look at <see cref="Quorum.WellKnown"/></remarks>
         public Quorum W { get; protected set; }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace RiakClient.Models
         /// <value>
         /// The primary read quorum. Possible values include 'default', 'one', 'quorum', 'all', or any integer.
         /// </value>
-        /// <remarks>Developers looking for an easy way to set this can look at <see cref="RiakConstants.QuorumOptions"/></remarks>
+        /// <remarks>Developers looking for an easy way to set this can look at <see cref="Quorum.WellKnown"/></remarks>
         public Quorum Pr { get; protected set; }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace RiakClient.Models
         /// <value>
         /// The primary write quorum. Possible values include 'default', 'one', 'quorum', 'all', or any integer.
         /// </value>
-        /// <remarks>Developers looking for an easy way to set this can look at <see cref="RiakConstants.QuorumOptions"/></remarks>
+        /// <remarks>Developers looking for an easy way to set this can look at <see cref="Quorum.WellKnown"/></remarks>
         public Quorum Pw { get; protected set; }
 
         /// <summary>
@@ -63,14 +63,14 @@ namespace RiakClient.Models
         /// <value>
         /// The durable write value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.
         /// </value>
-        /// <remarks>Developers looking for an easy way to set this can look at <see cref="RiakConstants.QuorumOptions"/></remarks>
+        /// <remarks>Developers looking for an easy way to set this can look at <see cref="Quorum.WellKnown"/></remarks>
         public Quorum Dw { get; protected set; }
 
         /// <summary>
         /// The number of replicas that need to agree when retrieving the object.
         /// </summary>
         /// <value>The RW Value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.</value>
-        /// <remarks>Developers looking for an easy way to set this can look at <see cref="RiakConstants.QuorumOptions"/></remarks>
+        /// <remarks>Developers looking for an easy way to set this can look at <see cref="Quorum.WellKnown"/></remarks>
         public Quorum Rw { get; protected set; }
 
         public Timeout Timeout { get; protected set; }
