@@ -297,7 +297,7 @@ namespace RiakClientTests.Live
             }
 
             var result = Client.Get(bucket, "2",
-                new RiakGetOptions().SetTimeout(0).SetPr(Quorum.WellKnown.All));
+                new RiakGetOptions().SetTimeout(new Timeout(0)).SetPr(Quorum.WellKnown.All));
 
             result.IsSuccess.ShouldBeFalse();
         }
