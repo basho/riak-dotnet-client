@@ -111,9 +111,9 @@ namespace RiakClient.Models
                 request.notfound_ok = NotFoundOk.Value;
             }
 
-            if (Timeout.HasValue)
+            if (Timeout != null)
             {
-                request.timeout = (uint)Timeout.Value;
+                request.timeout = (uint)Timeout;
             }
 
             if (SloppyQuorum.HasValue)

@@ -86,7 +86,7 @@ namespace RiakClient
 
             public static class Rest
             {
-                public const int Timeout = 30000;
+                public static readonly Timeout Timeout = new Timeout(30000);
             }
 
             public static class YokozunaIndex

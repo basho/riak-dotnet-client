@@ -39,9 +39,9 @@ namespace RiakClient.Comms
 
         private readonly string server;
         private readonly int port;
-        private readonly TimeSpan connectTimeout;
-        private readonly TimeSpan readTimeout;
-        private readonly TimeSpan writeTimeout;
+        private readonly Timeout connectTimeout;
+        private readonly Timeout readTimeout;
+        private readonly Timeout writeTimeout;
         private readonly RiakSecurityManager securityManager;
         private readonly bool checkCertificateRevocation = false;
 
@@ -224,8 +224,8 @@ namespace RiakClient.Comms
                 throw new RiakException(errorMessage, true);
             }
 
-            socket.ReceiveTimeout = (int)readTimeout.TotalMilliseconds;
-            socket.SendTimeout = (int)writeTimeout.TotalMilliseconds;
+            socket.ReceiveTimeout = (int)readTimeout;
+            socket.SendTimeout = (int)writeTimeout;
             this.networkStream = new NetworkStream(socket, true);
             SetUpSslStream(this.networkStream);
         }
@@ -250,8 +250,8 @@ namespace RiakClient.Comms
                 securityManager.ServerCertificateValidationCallback,
                 securityManager.ClientCertificateSelectionCallback);
 
-            sslStream.ReadTimeout = (int)readTimeout.TotalMilliseconds;
-            sslStream.WriteTimeout = (int)writeTimeout.TotalMilliseconds;
+            sslStream.ReadTimeout = (int)readTimeout;
+            sslStream.WriteTimeout = (int)writeTimeout;
 
             if (securityManager.ClientCertificatesConfigured)
             {

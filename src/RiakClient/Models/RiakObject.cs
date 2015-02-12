@@ -231,6 +231,8 @@ namespace RiakClient.Models
             UserMetaData = content.usermeta.ToDictionary(p => p.key.FromRiakString(), p => p.value.FromRiakString());
             Links = content.links.Select(l => new RiakLink(l)).ToList();
             Siblings = new List<RiakObject>();
+
+            // TODO - FUTURE: look at how other clients use this data
             LastModified = content.last_mod;
             LastModifiedUsec = content.last_mod_usecs;
 

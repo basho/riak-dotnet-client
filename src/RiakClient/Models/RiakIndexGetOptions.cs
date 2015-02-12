@@ -108,9 +108,9 @@ namespace RiakClient.Models
                 request.continuation = Continuation.ToRiakString();
             }
 
-            if (Timeout.HasValue)
+            if (Timeout != null)
             {
-                request.timeout = (uint)Timeout.Value;
+                request.timeout = (uint)Timeout;
             }
 
             if (!string.IsNullOrEmpty(TermRegex))

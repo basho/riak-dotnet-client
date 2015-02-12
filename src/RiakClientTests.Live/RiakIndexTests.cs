@@ -322,7 +322,7 @@ namespace RiakClientTests.Live
             GenerateGuidKeyObjects("Timeout", (o, i) => o.IntIndex("position").Set(i), keyCount);
 
             var results = Client.GetSecondaryIndex(new RiakIndexId(Bucket, "position"), 1, 500,
-                new RiakIndexGetOptions().SetTimeout(1));
+                new RiakIndexGetOptions().SetTimeout((Timeout)1));
 
             results.IsSuccess.ShouldBeFalse();
             results.ErrorMessage.Contains("timeout").ShouldBeTrue(results.ErrorMessage);

@@ -73,7 +73,7 @@ namespace RiakClient.Models
         /// <remarks>Developers looking for an easy way to set this can look at <see cref="RiakConstants.QuorumOptions"/></remarks>
         public Quorum Rw { get; protected set; }
 
-        public int? Timeout { get; protected set; }
+        public Timeout Timeout { get; protected set; }
 
         public T SetR(Quorum value)
         {
@@ -147,7 +147,7 @@ namespace RiakClient.Models
             return (T)this;
         }
 
-        public T SetTimeout(int? value)
+        public T SetTimeout(Timeout value)
         {
             Timeout = value;
             return (T)this;
