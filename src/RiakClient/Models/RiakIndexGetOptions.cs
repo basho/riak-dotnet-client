@@ -20,10 +20,12 @@
 namespace RiakClient.Models
 {
     using System.Numerics;
+    using System.Runtime.InteropServices;
     using Extensions;
     using Messages;
 
-    public class RiakIndexGetOptions
+    [ComVisible(false)]
+    public class RiakIndexGetOptions : RiakOptions<RiakIndexGetOptions>
     {
         public RiakIndexGetOptions()
         {
@@ -34,11 +36,9 @@ namespace RiakClient.Models
 
         public bool? Stream { get; private set; }
 
-        public uint? MaxResults { get; private set; }
+        public int? MaxResults { get; private set; }
 
         public string Continuation { get; private set; }
-
-        public uint? Timeout { get; private set; }
 
         public bool? PaginationSort { get; private set; }
 
@@ -56,7 +56,7 @@ namespace RiakClient.Models
             return this;
         }
 
-        public RiakIndexGetOptions SetMaxResults(uint value)
+        public RiakIndexGetOptions SetMaxResults(int value)
         {
             MaxResults = value;
             return this;
@@ -71,12 +71,6 @@ namespace RiakClient.Models
         public RiakIndexGetOptions SetContinuation(string value)
         {
             Continuation = value;
-            return this;
-        }
-
-        public RiakIndexGetOptions SetTimeout(uint value)
-        {
-            Timeout = value;
             return this;
         }
 
@@ -106,7 +100,7 @@ namespace RiakClient.Models
 
             if (MaxResults.HasValue)
             {
-                request.max_results = MaxResults.Value;
+                request.max_results = (uint)MaxResults.Value;
             }
 
             if (!string.IsNullOrEmpty(Continuation))
@@ -114,9 +108,9 @@ namespace RiakClient.Models
                 request.continuation = Continuation.ToRiakString();
             }
 
-            if (Timeout.HasValue)
+            if (Timeout != null)
             {
-                request.timeout = Timeout.Value;
+                request.timeout = (uint)Timeout;
             }
 
             if (!string.IsNullOrEmpty(TermRegex))

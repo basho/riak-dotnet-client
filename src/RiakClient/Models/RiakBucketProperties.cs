@@ -21,20 +21,19 @@ namespace RiakClient.Models
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.IO;
     using System.Linq;
+    using System.Runtime.InteropServices;
     using System.Text;
-    using Containers;
     using Extensions;
     using Messages;
     using Models.CommitHook;
     using Models.Rest;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
-    using Util;
 
-    public class RiakBucketProperties
+    [ComVisible(false)]
+    public class RiakBucketProperties : RiakOptions<RiakBucketProperties>
     {
         private bool? addHooks;
 
@@ -51,7 +50,12 @@ namespace RiakClient.Models
 
             var json = JObject.Parse(response.Body);
             var props = (JObject)json["props"];
-            NVal = props.Value<uint?>("n_val");
+
+            if (props.Value<uint?>("n_val").HasValue)
+            {
+                NVal = new NVal(props.Value<uint>("n_val"));
+            }
+
             AllowMultiple = props.Value<bool?>("allow_mult");
             LastWriteWins = props.Value<bool?>("last_write_wins");
             Backend = props.Value<string>("backend");
@@ -59,12 +63,12 @@ namespace RiakClient.Models
             BasicQuorum = props.Value<bool?>("basic_quorum");
             Consistent = props.Value<bool?>("consistent");
 
-            ReadQuorum(props, "r", v => RVal = v);
-            ReadQuorum(props, "rw", v => RwVal = v);
-            ReadQuorum(props, "dw", v => DwVal = v);
-            ReadQuorum(props, "w", v => WVal = v);
-            ReadQuorum(props, "pr", v => PrVal = v);
-            ReadQuorum(props, "pw", v => PwVal = v);
+            ReadQuorum(props, "r", v => this.SetR(new Quorum(v)));
+            ReadQuorum(props, "rw", v => this.SetRw(new Quorum(v)));
+            ReadQuorum(props, "dw", v => this.SetDw(new Quorum(v)));
+            ReadQuorum(props, "w", v => this.SetW(new Quorum(v)));
+            ReadQuorum(props, "pr", v => this.SetPr(new Quorum(v)));
+            ReadQuorum(props, "pw", v => this.SetPw(new Quorum(v)));
 
             var preCommitHooks = props.Value<JArray>("precommit");
             if (preCommitHooks.Count > 0)
@@ -86,9 +90,8 @@ namespace RiakClient.Models
         }
 
         internal RiakBucketProperties(RpbBucketProps bucketProps)
-            : this()
         {
-            NVal = bucketProps.n_val;
+            NVal = new NVal(bucketProps.n_val);
             AllowMultiple = bucketProps.allow_mult;
             LastWriteWins = bucketProps.last_write_wins;
             Backend = bucketProps.backend.FromRiakString();
@@ -98,12 +101,12 @@ namespace RiakClient.Models
             HasPrecommit = bucketProps.has_precommit;
             HasPostcommit = bucketProps.has_postcommit;
 
-            RVal = bucketProps.r;
-            RwVal = bucketProps.rw;
-            DwVal = bucketProps.dw;
-            WVal = bucketProps.w;
-            PrVal = bucketProps.pr;
-            PwVal = bucketProps.pw;
+            R = (Quorum)bucketProps.r;
+            Rw = (Quorum)bucketProps.rw;
+            Dw = (Quorum)bucketProps.dw;
+            W = (Quorum)bucketProps.w;
+            Pr = (Quorum)bucketProps.pr;
+            Pw = (Quorum)bucketProps.pw;
 
             LegacySearch = bucketProps.search;
 
@@ -132,7 +135,7 @@ namespace RiakClient.Models
 
         public bool? LastWriteWins { get; private set; }
 
-        public uint? NVal { get; private set; }
+        public NVal NVal { get; private set; }
 
         public bool? AllowMultiple { get; private set; }
 
@@ -150,13 +153,13 @@ namespace RiakClient.Models
         /// If the length of the vector clock is larger than BigVclock, vector clocks will be pruned.
         /// </summary>
         /// <remarks>See http://docs.basho.com/riak/latest/theory/concepts/Vector-Clocks/#Vector-Clock-Pruning </remarks>
-        public uint? BigVclock { get; private set; }
+        public int? BigVclock { get; private set; }
 
         /// <summary>
         /// If the length of the vector clock is smaller than SmallVclock, vector clocks will not be pruned.
         /// </summary>
         /// <remarks>See http://docs.basho.com/riak/latest/theory/concepts/Vector-Clocks/#Vector-Clock-Pruning </remarks>
-        public uint? SmallVclock { get; private set; }
+        public int? SmallVclock { get; private set; }
 
         public bool? HasPrecommit { get; private set; }
 
@@ -171,46 +174,9 @@ namespace RiakClient.Models
 
         public bool? LegacySearch
         {
-            get; private set;
+            get;
+            private set;
         }
-
-        /// <summary>
-        /// The number of replicas that must return before a read is considered a succes.
-        /// </summary>
-        /// <value>
-        /// The R value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.
-        /// </value>
-        public uint? RVal { get; private set; }
-
-        /// <summary>
-        /// The number of replicas that must return before a delete is considered a success.
-        /// </summary>
-        /// <value>The RW Value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.</value>
-        public uint? RwVal { get; private set; }
-
-        /// <summary>
-        /// The number of replicas that must commit to durable storage and respond before a write is considered a success. 
-        /// </summary>
-        /// <value>The DW value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.</value>
-        public uint? DwVal { get; private set; }
-
-        /// <summary>
-        /// The number of replicas that must respond before a write is considered a success.
-        /// </summary>
-        /// <value>The W value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.</value>
-        public uint? WVal { get; private set; }
-
-        /// <summary>
-        /// The number of primary replicas that must respond before a read is considered a success.
-        /// </summary>
-        /// <value>The PR value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.</value>
-        public uint? PrVal { get; private set; }
-
-        /// <summary>
-        /// The number of primary replicas that must respond before a write is considered a success.
-        /// </summary>
-        /// <value>The PW value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.</value>
-        public uint? PwVal { get; private set; }
 
         public bool? Consistent { get; private set; }
 
@@ -302,70 +268,10 @@ namespace RiakClient.Models
             return this;
         }
 
-        public RiakBucketProperties SetNVal(uint value)
+        public RiakBucketProperties SetNVal(NVal value)
         {
             NVal = value;
             return this;
-        }
-
-        public RiakBucketProperties SetRVal(string value)
-        {
-            return WriteQuorum(value, v => RVal = v);
-        }
-
-        public RiakBucketProperties SetRVal(uint value)
-        {
-            return WriteQuorum(value, v => RVal = v);
-        }
-
-        public RiakBucketProperties SetRwVal(string value)
-        {
-            return WriteQuorum(value, v => RwVal = v);
-        }
-
-        public RiakBucketProperties SetRwVal(uint value)
-        {
-            return WriteQuorum(value, v => RwVal = v);
-        }
-
-        public RiakBucketProperties SetDwVal(string value)
-        {
-            return WriteQuorum(value, v => DwVal = v);
-        }
-
-        public RiakBucketProperties SetDwVal(uint value)
-        {
-            return WriteQuorum(value, v => DwVal = v);
-        }
-
-        public RiakBucketProperties SetWVal(string value)
-        {
-            return WriteQuorum(value, v => WVal = v);
-        }
-
-        public RiakBucketProperties SetWVal(uint value)
-        {
-            return WriteQuorum(value, v => WVal = v);
-        }
-
-        public RiakBucketProperties SetPrVal(string value)
-        {
-            return WriteQuorum(value, v => PrVal = v);
-        }
-
-        public RiakBucketProperties SetPrVal(uint value)
-        {
-            return WriteQuorum(value, v => PrVal = v);
-        }
-
-        public RiakBucketProperties SetPwVal(string value)
-        {
-            return WriteQuorum(value, var => PwVal = var);
-        }
-
-        public RiakBucketProperties SetPwVal(uint value)
-        {
-            return WriteQuorum(value, var => PwVal = var);
         }
 
         public RiakBucketProperties SetBackend(string backend)
@@ -374,13 +280,13 @@ namespace RiakClient.Models
             return this;
         }
 
-        public RiakBucketProperties SetBigVclock(uint? bigVclock)
+        public RiakBucketProperties SetBigVclock(int? bigVclock)
         {
             BigVclock = bigVclock;
             return this;
         }
 
-        public RiakBucketProperties SetSmallVclock(uint? smallVclock)
+        public RiakBucketProperties SetSmallVclock(int? smallVclock)
         {
             SmallVclock = smallVclock;
             return this;
@@ -484,9 +390,9 @@ namespace RiakClient.Models
                 message.allow_mult = AllowMultiple.Value;
             }
 
-            if (NVal.HasValue)
+            if (NVal != null)
             {
-                message.n_val = NVal.Value;
+                message.n_val = NVal;
             }
 
             if (LastWriteWins.HasValue)
@@ -494,34 +400,34 @@ namespace RiakClient.Models
                 message.last_write_wins = LastWriteWins.Value;
             }
 
-            if (RVal.HasValue)
+            if (R != null)
             {
-                message.r = RVal.Value;
+                message.r = R;
             }
 
-            if (RwVal.HasValue)
+            if (Rw != null)
             {
-                message.rw = RwVal.Value;
+                message.rw = Rw;
             }
 
-            if (DwVal.HasValue)
+            if (Dw != null)
             {
-                message.dw = DwVal.Value;
+                message.dw = Dw;
             }
 
-            if (WVal.HasValue)
+            if (W != null)
             {
-                message.w = WVal.Value;
+                message.w = W;
             }
 
-            if (PrVal.HasValue)
+            if (Pr != null)
             {
-                message.pr = PrVal.Value;
+                message.pr = Pr;
             }
 
-            if (PwVal.HasValue)
+            if (Pw != null)
             {
-                message.pw = PwVal.Value;
+                message.pw = Pw;
             }
 
             if (LegacySearch.HasValue)
@@ -596,15 +502,15 @@ namespace RiakClient.Models
                 jw.WriteStartObject();
                 jw.WritePropertyName("props");
                 jw.WriteStartObject();
-                jw.WriteNullableProperty("n_val", NVal)
+                jw.WriteNonNullProperty("n_val", NVal)
                   .WriteNullableProperty("allow_mult", AllowMultiple)
                   .WriteNullableProperty("last_write_wins", LastWriteWins)
-                  .WriteNullableProperty("r", RVal)
-                  .WriteNullableProperty("rw", RwVal)
-                  .WriteNullableProperty("dw", DwVal)
-                  .WriteNullableProperty("w", WVal)
-                  .WriteNullableProperty("pr", PrVal)
-                  .WriteNullableProperty("pw", PwVal)
+                  .WriteNonNullProperty("r", R)
+                  .WriteNonNullProperty("rw", Rw)
+                  .WriteNonNullProperty("dw", Dw)
+                  .WriteNonNullProperty("w", W)
+                  .WriteNonNullProperty("pr", Pr)
+                  .WriteNonNullProperty("pw", Pw)
                   .WriteNonNullProperty("backend", Backend)
                   .WriteNullableProperty("notfound_ok", NotFoundOk)
                   .WriteNullableProperty("basic_quorum", BasicQuorum)
@@ -684,41 +590,9 @@ namespace RiakClient.Models
                 return;
             }
 
-            setter(props[key].Type == JTokenType.String
-                       ? RiakConstants.QuorumOptionsLookup[props.Value<string>(key)]
-                       : props.Value<uint>(key));
-        }
+            uint quorumValue = props[key].Type == JTokenType.String ? uint.Parse(props.Value<string>(key)) : props.Value<uint>(key);
 
-        private RiakBucketProperties WriteQuorum(string value, Action<uint> setter)
-        {
-            Debug.Assert(new HashSet<string> { "all", "quorum", "one", "default" }.Contains(value), "Incorrect quorum value");
-
-            setter(RiakConstants.QuorumOptionsLookup[value]);
-            return this;
-        }
-
-        private RiakBucketProperties WriteQuorum(uint value, Action<uint> setter)
-        {
-            Debug.Assert(value >= 1, "value must be greater than or equal to 1");
-
-            setter(value);
-            return this;
-        }
-
-        private RiakBucketProperties WriteQuorum(string value, Action<Either<uint, string>> setter)
-        {
-            Debug.Assert(new HashSet<string> { "all", "quorum", "one", "default" }.Contains(value), "Incorrect quorum value");
-
-            setter(new Either<uint, string>(value));
-            return this;
-        }
-
-        private RiakBucketProperties WriteQuorum(uint value, Action<Either<uint, string>> setter)
-        {
-            Debug.Assert(value >= 1, "value must be greater than or equal to 1");
-
-            setter(new Either<uint, string>(value));
-            return this;
+            setter(quorumValue);
         }
     }
 }

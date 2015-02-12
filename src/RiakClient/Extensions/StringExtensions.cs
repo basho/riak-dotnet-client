@@ -19,7 +19,6 @@
 
 namespace RiakClient.Extensions
 {
-    using System.Collections.Generic;
     using System.Text;
     using System.Text.RegularExpressions;
     using System.Web;
@@ -105,13 +104,6 @@ namespace RiakClient.Extensions
             }
 
             return result;
-        }
-
-        public static uint ToRpbOption(this string value)
-        {
-            System.Diagnostics.Debug.Assert(new HashSet<string> { "all", "quorum", "one", "default" }.Contains(value), "Incorrect quorum value");
-
-            return RiakConstants.QuorumOptionsLookup[value];
         }
     }
 }

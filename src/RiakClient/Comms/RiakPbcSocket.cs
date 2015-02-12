@@ -39,9 +39,9 @@ namespace RiakClient.Comms
 
         private readonly string server;
         private readonly int port;
-        private readonly TimeSpan connectTimeout;
-        private readonly TimeSpan readTimeout;
-        private readonly TimeSpan writeTimeout;
+        private readonly Timeout connectTimeout;
+        private readonly Timeout readTimeout;
+        private readonly Timeout writeTimeout;
         private readonly RiakSecurityManager securityManager;
         private readonly bool checkCertificateRevocation = false;
 
@@ -87,7 +87,7 @@ namespace RiakClient.Comms
             NetworkStream.Write(messageBody, 0, PbMsgHeaderSize);
         }
 
-        public void Write<T>(T message) where T : class, ProtoBuf.IExtensible
+        public void Write<T>(T message) where T : class
         {
             byte[] messageBody;
             int messageLength = 0;
@@ -133,7 +133,7 @@ namespace RiakClient.Comms
             {
                 var error = DeserializeInstance<RpbErrorResp>(size);
                 string errorMessage = error.errmsg.FromRiakString();
-                throw new RiakException(error.errcode, errorMessage, false);
+                throw new RiakException((int)error.errcode, errorMessage, false);
             }
 
             if (expectedCode != messageCode)
@@ -145,7 +145,7 @@ namespace RiakClient.Comms
             return messageCode;
         }
 
-        public T Read<T>() where T : ProtoBuf.IExtensible, new()
+        public T Read<T>() where T : new()
         {
             var header = ReceiveAll(new byte[5]);
 
@@ -156,7 +156,7 @@ namespace RiakClient.Comms
             {
                 var error = DeserializeInstance<RpbErrorResp>(size);
                 string errorMessage = error.errmsg.FromRiakString();
-                throw new RiakException(error.errcode, errorMessage, false);
+                throw new RiakException((int)error.errcode, errorMessage, false);
             }
 
             if (!MessageCodeTypeMapBuilder.Contains(messageCode))
@@ -224,8 +224,8 @@ namespace RiakClient.Comms
                 throw new RiakException(errorMessage, true);
             }
 
-            socket.ReceiveTimeout = (int)readTimeout.TotalMilliseconds;
-            socket.SendTimeout = (int)writeTimeout.TotalMilliseconds;
+            socket.ReceiveTimeout = (int)readTimeout;
+            socket.SendTimeout = (int)writeTimeout;
             this.networkStream = new NetworkStream(socket, true);
             SetUpSslStream(this.networkStream);
         }
@@ -250,8 +250,8 @@ namespace RiakClient.Comms
                 securityManager.ServerCertificateValidationCallback,
                 securityManager.ClientCertificateSelectionCallback);
 
-            sslStream.ReadTimeout = (int)readTimeout.TotalMilliseconds;
-            sslStream.WriteTimeout = (int)writeTimeout.TotalMilliseconds;
+            sslStream.ReadTimeout = (int)readTimeout;
+            sslStream.WriteTimeout = (int)writeTimeout;
 
             if (securityManager.ClientCertificatesConfigured)
             {

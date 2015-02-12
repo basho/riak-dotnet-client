@@ -19,79 +19,32 @@
 
 namespace RiakClient.Models
 {
-    using System;
-    using System.Collections.Generic;
-    using Containers;
-    using Extensions;
+    using System.Runtime.InteropServices;
     using Messages;
-    using Util;
 
-    public class RiakDtUpdateOptions
+    [ComVisible(false)]
+    public class RiakDtUpdateOptions : RiakOptions<RiakDtUpdateOptions>
     {
         public RiakDtUpdateOptions()
         {
-            W = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
-            Dw = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
-            Pw = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
             ReturnBody = true;
             IncludeContext = true;
+            W = Quorum.WellKnown.Default;
+            Dw = Quorum.WellKnown.Default;
+            Pw = Quorum.WellKnown.Default;
         }
-
-        public Either<uint, string> W { get; private set; }
-
-        public Either<uint, string> Dw { get; private set; }
-
-        public Either<uint, string> Pw { get; private set; }
 
         public bool ReturnBody { get; private set; }
 
-        public uint? Timeout { get; private set; }
-
         public bool SloppyQuorum { get; private set; }
 
-        public uint? NVal { get; private set; }
+        public NVal NVal { get; private set; }
 
         public bool IncludeContext { get; private set; }
-
-        public RiakDtUpdateOptions SetW(uint value)
-        {
-            return WriteQuorum(value, var => W = var);
-        }
-
-        public RiakDtUpdateOptions SetW(string value)
-        {
-            return WriteQuorum(value, var => W = var);
-        }
-
-        public RiakDtUpdateOptions SetDw(uint value)
-        {
-            return WriteQuorum(value, var => Dw = var);
-        }
-
-        public RiakDtUpdateOptions SetDw(string value)
-        {
-            return WriteQuorum(value, var => Dw = var);
-        }
-
-        public RiakDtUpdateOptions SetPw(uint value)
-        {
-            return WriteQuorum(value, var => Pw = var);
-        }
-
-        public RiakDtUpdateOptions SetPw(string value)
-        {
-            return WriteQuorum(value, var => Pw = var);
-        }
 
         public RiakDtUpdateOptions SetReturnBody(bool value)
         {
             ReturnBody = value;
-            return this;
-        }
-
-        public RiakDtUpdateOptions SetTimeout(uint value)
-        {
-            Timeout = value;
             return this;
         }
 
@@ -101,7 +54,7 @@ namespace RiakClient.Models
             return this;
         }
 
-        public RiakDtUpdateOptions SetNVal(uint value)
+        public RiakDtUpdateOptions SetNVal(NVal value)
         {
             NVal = value;
             return this;
@@ -115,41 +68,25 @@ namespace RiakClient.Models
 
         internal void Populate(DtUpdateReq request)
         {
-            request.w = W.IsLeft ? W.Left : W.Right.ToRpbOption();
-            request.dw = Dw.IsLeft ? Dw.Left : Dw.Right.ToRpbOption();
-            request.pw = Pw.IsLeft ? Pw.Left : Pw.Right.ToRpbOption();
+            request.w = W;
+            request.dw = Dw;
+            request.pw = Pw;
 
             request.return_body = ReturnBody;
 
-            if (Timeout.HasValue)
+            if (Timeout != null)
             {
-                request.timeout = Timeout.Value;
+                request.timeout = (uint)Timeout;
             }
 
             request.sloppy_quorum = SloppyQuorum;
 
-            if (NVal.HasValue)
+            if (NVal != null)
             {
-                request.n_val = NVal.Value;
+                request.n_val = NVal;
             }
 
             request.include_context = IncludeContext;
-        }
-
-        private RiakDtUpdateOptions WriteQuorum(string value, Action<Either<uint, string>> setter)
-        {
-            System.Diagnostics.Debug.Assert(new HashSet<string> { "all", "quorum", "one", "default" }.Contains(value), "Incorrect quorum value");
-
-            setter(new Either<uint, string>(value));
-            return this;
-        }
-
-        private RiakDtUpdateOptions WriteQuorum(uint value, Action<Either<uint, string>> setter)
-        {
-            System.Diagnostics.Debug.Assert(value >= 1, "value must be greater than or equal to 1");
-
-            setter(new Either<uint, string>(value));
-            return this;
         }
     }
 }
