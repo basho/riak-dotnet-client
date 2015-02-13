@@ -842,7 +842,6 @@ namespace RiakClient
         /// </param>
         /// <param name="useHttp">When true, RiakClient will use the HTTP interface</param>
         /// <remarks>There is, as of RiakClient 2.0, no reason to use the HTTP interface. This is kept for legacy reasons.</remarks>
-        [Obsolete("This overload will be removed in the next version.")]
         public RiakResult SetBucketProperties(string bucket, RiakBucketProperties properties, bool useHttp = false)
         {
             return useHttp ? SetHttpBucketProperties(bucket, properties) : SetBucketProperties(null, bucket, properties);
@@ -854,6 +853,7 @@ namespace RiakClient
         /// <returns>
         /// A <see cref="RiakResult"/> detailing the success or failure of the operation.
         /// </returns>
+        /// <param name="bucketType">The name of the bucket type containing the <paramref name="bucket"/>.</param>
         /// <param name="bucket">The name of the bucket to set the properties on.</param>
         /// <param name="properties">
         /// The properties to set. Note that only those properties explicitly set in the 
@@ -964,7 +964,6 @@ namespace RiakClient
 
             return RiakResult<RiakServerInfo>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
-
 
         public RiakResult<RiakStreamedIndexResult> StreamGetSecondaryIndex(RiakIndexId index, BigInteger value, RiakIndexGetOptions options = null)
         {
