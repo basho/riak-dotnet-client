@@ -19,16 +19,15 @@
 
 namespace RiakClient.Config
 {
-    using System;
     using System.Collections.Generic;
 
     public interface IRiakClusterConfiguration
     {
         IList<IRiakNodeConfiguration> RiakNodes { get; }
 
-        TimeSpan NodePollTime { get; }
+        Timeout NodePollTime { get; }
 
-        TimeSpan DefaultRetryWaitTime { get; }
+        Timeout DefaultRetryWaitTime { get; }
 
         int DefaultRetryCount { get; }
 

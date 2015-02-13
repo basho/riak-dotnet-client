@@ -23,6 +23,7 @@ namespace RiakClientTests.Live
     using System.Linq;
     using NUnit.Framework;
     using ProtoBuf;
+    using RiakClient;
     using RiakClient.Extensions;
     using RiakClient.Models;
     using RiakClient.Models.MapReduce;

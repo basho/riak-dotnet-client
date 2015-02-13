@@ -53,9 +53,9 @@ namespace RiakClient.Models.Search
     {
         public RiakFluentSearch Query { get; set; }
 
-        public uint Rows { get; set; }
+        public long Rows { get; set; }
 
-        public uint Start { get; set; }
+        public long Start { get; set; }
 
         public RiakFluentSearch Filter { get; set; }
 
@@ -80,8 +80,8 @@ namespace RiakClient.Models.Search
             {
                 index = Query.Index.ToRiakString(),
                 q = Query.ToString().ToRiakString(),
-                rows = Rows,
-                start = Start,
+                rows = (uint)Rows,
+                start = (uint)Start,
                 sort = Sort.ToRiakString(),
                 filter = Filter == null ? null : Filter.ToString().ToRiakString(),
                 presort = PreSort.HasValue ? PreSort.Value.ToString().ToLower().ToRiakString() : null,

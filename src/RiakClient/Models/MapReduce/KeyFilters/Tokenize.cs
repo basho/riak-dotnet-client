@@ -30,9 +30,9 @@ namespace RiakClient.Models.MapReduce.KeyFilters
     /// </summary>
     internal class Tokenize : IRiakKeyFilterToken
     {
-        private readonly Tuple<string, string, uint> keyFilterDefinition;
+        private readonly Tuple<string, string, int> keyFilterDefinition;
 
-        public Tokenize(string token, uint position)
+        public Tokenize(string token, int position)
         {
             keyFilterDefinition = Tuple.Create("tokenize", token, position);
         }
@@ -47,7 +47,7 @@ namespace RiakClient.Models.MapReduce.KeyFilters
             get { return keyFilterDefinition.Item2; }
         }
 
-        public uint Position
+        public int Position
         {
             get { return keyFilterDefinition.Item3; }
         }

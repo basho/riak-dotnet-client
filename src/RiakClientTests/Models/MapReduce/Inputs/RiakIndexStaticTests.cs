@@ -21,6 +21,7 @@ namespace RiakClientTests.Models.MapReduce.Inputs
 {
     using System.Numerics;
     using NUnit.Framework;
+    using RiakClient;
     using RiakClient.Models;
     using RiakClient.Models.MapReduce.Inputs;
     using RiakClient.Util;

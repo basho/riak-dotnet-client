@@ -19,8 +19,6 @@
 
 namespace RiakClient.Config
 {
-    using System;
-
     public interface IRiakNodeConfiguration
     {
         string Name { get; }
@@ -35,10 +33,10 @@ namespace RiakClient.Config
 
         int PoolSize { get; }
 
-        TimeSpan NetworkReadTimeout { get; }
+        Timeout NetworkReadTimeout { get; }
 
-        TimeSpan NetworkWriteTimeout { get; }
+        Timeout NetworkWriteTimeout { get; }
 
-        TimeSpan NetworkConnectTimeout { get; }
+        Timeout NetworkConnectTimeout { get; }
     }
 }

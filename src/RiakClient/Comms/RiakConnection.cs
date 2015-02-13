@@ -45,7 +45,7 @@ namespace RiakClient.Comms
         }
 
         public RiakResult<TResult> PbcRead<TResult>()
-            where TResult : class, ProtoBuf.IExtensible, new()
+            where TResult : class, new()
         {
             try
             {
@@ -98,7 +98,7 @@ namespace RiakClient.Comms
         }
 
         public RiakResult<IEnumerable<RiakResult<TResult>>> PbcRepeatRead<TResult>(Func<RiakResult<TResult>, bool> repeatRead)
-            where TResult : class, ProtoBuf.IExtensible, new()
+            where TResult : class, new()
         {
             var results = new List<RiakResult<TResult>>();
             try
@@ -131,7 +131,7 @@ namespace RiakClient.Comms
         }
 
         public RiakResult PbcWrite<TRequest>(TRequest request)
-            where TRequest : class, ProtoBuf.IExtensible
+            where TRequest : class
         {
             try
             {
@@ -179,8 +179,8 @@ namespace RiakClient.Comms
         }
 
         public RiakResult<TResult> PbcWriteRead<TRequest, TResult>(TRequest request)
-            where TRequest : class, ProtoBuf.IExtensible
-            where TResult : class, ProtoBuf.IExtensible, new()
+            where TRequest : class
+            where TResult : class, new()
         {
             var writeResult = PbcWrite(request);
 
@@ -193,7 +193,7 @@ namespace RiakClient.Comms
         }
 
         public RiakResult PbcWriteRead<TRequest>(TRequest request, MessageCode expectedMessageCode)
-            where TRequest : class, ProtoBuf.IExtensible
+            where TRequest : class
         {
             var writeResult = PbcWrite(request);
 
@@ -206,7 +206,7 @@ namespace RiakClient.Comms
         }
 
         public RiakResult<TResult> PbcWriteRead<TResult>(MessageCode messageCode)
-            where TResult : class, ProtoBuf.IExtensible, new()
+            where TResult : class, new()
         {
             var writeResult = PbcWrite(messageCode);
 
@@ -233,8 +233,8 @@ namespace RiakClient.Comms
         public RiakResult<IEnumerable<RiakResult<TResult>>> PbcWriteRead<TRequest, TResult>(
             TRequest request,
             Func<RiakResult<TResult>, bool> repeatRead)
-            where TRequest : class, ProtoBuf.IExtensible
-            where TResult : class, ProtoBuf.IExtensible, new()
+            where TRequest : class
+            where TResult : class, new()
         {
             var writeResult = PbcWrite(request);
 
@@ -249,7 +249,7 @@ namespace RiakClient.Comms
         public RiakResult<IEnumerable<RiakResult<TResult>>> PbcWriteRead<TResult>(
             MessageCode messageCode,
             Func<RiakResult<TResult>, bool> repeatRead)
-            where TResult : class, ProtoBuf.IExtensible, new()
+            where TResult : class, new()
         {
             var writeResult = PbcWrite(messageCode);
 
@@ -262,7 +262,7 @@ namespace RiakClient.Comms
         }
 
         public RiakResult<IEnumerable<RiakResult<TResult>>> PbcStreamRead<TResult>(Func<RiakResult<TResult>, bool> repeatRead, Action onFinish)
-            where TResult : class, ProtoBuf.IExtensible, new()
+            where TResult : class, new()
         {
             var streamer = PbcStreamReadIterator(repeatRead, onFinish);
             return RiakResult<IEnumerable<RiakResult<TResult>>>.Success(streamer);
@@ -272,8 +272,8 @@ namespace RiakClient.Comms
             TRequest request,
             Func<RiakResult<TResult>, bool> repeatRead,
             Action onFinish)
-            where TRequest : class, ProtoBuf.IExtensible
-            where TResult : class, ProtoBuf.IExtensible, new()
+            where TRequest : class
+            where TResult : class, new()
         {
             var streamer = PbcWriteStreamReadIterator(request, repeatRead, onFinish);
             return RiakResult<IEnumerable<RiakResult<TResult>>>.Success(streamer);
@@ -283,7 +283,7 @@ namespace RiakClient.Comms
             MessageCode messageCode,
             Func<RiakResult<TResult>, bool> repeatRead,
             Action onFinish)
-            where TResult : class, ProtoBuf.IExtensible, new()
+            where TResult : class, new()
         {
             var streamer = PbcWriteStreamReadIterator(messageCode, repeatRead, onFinish);
             return RiakResult<IEnumerable<RiakResult<TResult>>>.Success(streamer);
@@ -402,7 +402,7 @@ namespace RiakClient.Comms
             MessageCode messageCode,
             Func<RiakResult<TResult>, bool> repeatRead,
             Action onFinish)
-            where TResult : class, ProtoBuf.IExtensible, new()
+            where TResult : class, new()
         {
             var writeResult = PbcWrite(messageCode);
 
@@ -417,7 +417,7 @@ namespace RiakClient.Comms
         }
 
         private IEnumerable<RiakResult<TResult>> PbcStreamReadIterator<TResult>(Func<RiakResult<TResult>, bool> repeatRead, Action onFinish)
-            where TResult : class, ProtoBuf.IExtensible, new()
+            where TResult : class, new()
         {
             RiakResult<TResult> result;
 
@@ -445,8 +445,8 @@ namespace RiakClient.Comms
             TRequest request,
             Func<RiakResult<TResult>, bool> repeatRead,
             Action onFinish)
-            where TRequest : class, ProtoBuf.IExtensible
-            where TResult : class, ProtoBuf.IExtensible, new()
+            where TRequest : class
+            where TResult : class, new()
         {
             var writeResult = PbcWrite(request);
 

@@ -23,12 +23,10 @@ namespace RiakClientTests.Live
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
-    using Extensions;
     using NUnit.Framework;
     using RiakClient;
     using RiakClient.Extensions;
     using RiakClient.Models;
-    using RiakClient.Util;
 
     [TestFixture]
     public class RiakClientTests : LiveRiakConnectionTestBase
@@ -299,7 +297,7 @@ namespace RiakClientTests.Live
             }
 
             var result = Client.Get(bucket, "2",
-                new RiakGetOptions().SetTimeout(0).SetPr(RiakConstants.QuorumOptions.All));
+                new RiakGetOptions().SetTimeout(new Timeout(0)).SetPr(Quorum.WellKnown.All));
 
             result.IsSuccess.ShouldBeFalse();
         }

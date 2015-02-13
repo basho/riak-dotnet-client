@@ -23,6 +23,7 @@ namespace RiakClientTests.Live.MapReduce
     using RiakClient.Extensions;
     using Newtonsoft.Json;
     using NUnit.Framework;
+    using RiakClient;
     using RiakClient.Models;
     using RiakClient.Models.MapReduce;
     using RiakClient.Util;

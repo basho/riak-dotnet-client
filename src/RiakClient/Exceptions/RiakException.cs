@@ -27,7 +27,7 @@ namespace RiakClient.Exceptions
     [Serializable]
     public class RiakException : Exception
     {
-        private readonly uint errorCode;
+        private readonly int errorCode;
         private readonly bool nodeOffline;
 
         public RiakException()
@@ -44,7 +44,7 @@ namespace RiakClient.Exceptions
         {
         }
 
-        public RiakException(uint errorCode, string message, bool nodeOffline)
+        public RiakException(int errorCode, string message, bool nodeOffline)
             : this(string.Format("Riak returned an error. Code '{0}'. Message: {1}", errorCode, message))
         {
             this.nodeOffline = nodeOffline;
@@ -61,11 +61,11 @@ namespace RiakClient.Exceptions
         protected RiakException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-            this.errorCode = info.GetUInt32("ErrorCode");
+            this.errorCode = info.GetInt32("ErrorCode");
             this.nodeOffline = info.GetBoolean("NodeOffline");
         }
 
-        public uint ErrorCode
+        public int ErrorCode
         {
             get { return errorCode; }
         }

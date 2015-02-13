@@ -19,11 +19,10 @@
 
 namespace RiakClientTests.Live.RiakConfigurationTests
 {
-    using System;
     using System.IO;
     using NUnit.Framework;
+    using RiakClient;
     using RiakClient.Config;
-    using Extensions;
 
     [TestFixture]
     public class WhenLoadingFromExternalConfiguration
@@ -46,9 +45,9 @@ namespace RiakClientTests.Live.RiakConfigurationTests
         [Test]
         public void ConfigurationLoadsProperly()
         {
-            var twoHundredMillis = TimeSpan.FromMilliseconds(200);
-            var fourSecsAsMillis = TimeSpan.FromMilliseconds(4000);
-            var fiveSecsAsMillis = TimeSpan.FromMilliseconds(5000);
+            int twoHundredMillis = 200;
+            int fourSecsAsMillis = 4000;
+            int fiveSecsAsMillis = 5000;
 
             var fileName = Path.GetTempFileName();
             try
@@ -57,8 +56,8 @@ namespace RiakClientTests.Live.RiakConfigurationTests
 
                 var config = RiakClusterConfiguration.LoadFromConfig("riakConfig", fileName);
                 config.DefaultRetryCount.ShouldEqual(3);
-                config.DefaultRetryWaitTime.ShouldEqual(twoHundredMillis);
-                config.NodePollTime.ShouldEqual(fiveSecsAsMillis);
+                config.DefaultRetryWaitTime.ShouldEqual((Timeout)twoHundredMillis);
+                config.NodePollTime.ShouldEqual((Timeout)fiveSecsAsMillis);
                 config.RiakNodes.Count.ShouldEqual(2);
 
                 IRiakNodeConfiguration node1 = config.RiakNodes[0];
@@ -68,9 +67,9 @@ namespace RiakClientTests.Live.RiakConfigurationTests
                 node1.RestScheme.ShouldEqual("http");
                 node1.RestPort.ShouldEqual(8091);
                 node1.PoolSize.ShouldEqual(5);
-                node1.NetworkConnectTimeout.ShouldEqual(fourSecsAsMillis);
-                node1.NetworkReadTimeout.ShouldEqual(fourSecsAsMillis);
-                node1.NetworkWriteTimeout.ShouldEqual(fourSecsAsMillis);
+                node1.NetworkConnectTimeout.ShouldEqual((Timeout)fourSecsAsMillis);
+                node1.NetworkReadTimeout.ShouldEqual((Timeout)fourSecsAsMillis);
+                node1.NetworkWriteTimeout.ShouldEqual((Timeout)fourSecsAsMillis);
 
                 IRiakNodeConfiguration node2 = config.RiakNodes[1];
                 node2.Name.ShouldEqual("node2");
@@ -79,9 +78,9 @@ namespace RiakClientTests.Live.RiakConfigurationTests
                 node2.RestScheme.ShouldEqual("http");
                 node2.RestPort.ShouldEqual(8091);
                 node2.PoolSize.ShouldEqual(6);
-                node2.NetworkConnectTimeout.ShouldEqual(fiveSecsAsMillis);
-                node2.NetworkReadTimeout.ShouldEqual(fiveSecsAsMillis);
-                node2.NetworkWriteTimeout.ShouldEqual(fiveSecsAsMillis);
+                node2.NetworkConnectTimeout.ShouldEqual((Timeout)fiveSecsAsMillis);
+                node2.NetworkReadTimeout.ShouldEqual((Timeout)fiveSecsAsMillis);
+                node2.NetworkWriteTimeout.ShouldEqual((Timeout)fiveSecsAsMillis);
             }
             finally
             {

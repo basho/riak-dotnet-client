@@ -74,7 +74,7 @@ namespace RiakClient.Models.Rest
             get { return queryParams; }
         }
 
-        public int Timeout { get; set; }
+        public Timeout Timeout { get; set; }
 
         public bool Cache { get; set; }
 
