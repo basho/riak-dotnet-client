@@ -123,6 +123,13 @@ namespace RiakClient.Models.RiakDt
                 };
         }
 
+        public DtOp ToDtOp()
+        {
+            var co = ToCounterOp();
+
+            return co == null ? null : new DtOp { counter_op = ToCounterOp() };
+        }
+
         /// <summary>
         /// Compress all operations in a RiakDtCounter into a single DtUpdateReq
         /// </summary>
@@ -132,7 +139,7 @@ namespace RiakClient.Models.RiakDt
         /// operations will produce no change to the counter value. That is:
         /// when the sum of all operations is 0, null will be returned. In these
         /// situations, the caller should not submit any changes to Riak. </remarks>
-        public DtUpdateReq ToDtUpdateRequest(RiakDtUpdateOptions options)
+        internal DtUpdateReq ToDtUpdateRequest(RiakDtUpdateOptions options)
         {
             options = options ?? new RiakDtUpdateOptions();
 
@@ -158,13 +165,6 @@ namespace RiakClient.Models.RiakDt
             options.Populate(request);
 
             return request;
-        }
-
-        public DtOp ToDtOp()
-        {
-            var co = ToCounterOp();
-
-            return co == null ? null : new DtOp { counter_op = ToCounterOp() };
         }
     }
 }

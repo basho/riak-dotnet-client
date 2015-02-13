@@ -20,6 +20,7 @@
 namespace RiakClientTests.Models.MapReduce
 {
     using NUnit.Framework;
+    using RiakClient;
     using RiakClient.Extensions;
     using RiakClient.Models;
     using RiakClient.Models.MapReduce;

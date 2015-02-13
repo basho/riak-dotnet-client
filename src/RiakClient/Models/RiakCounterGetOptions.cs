@@ -19,27 +19,12 @@
 
 namespace RiakClient.Models
 {
-    using System;
-    using System.Collections.Generic;
+    using System.Runtime.InteropServices;
     using Messages;
-    using Util;
 
-    public class RiakCounterGetOptions
+    [ComVisible(false)]
+    public class RiakCounterGetOptions : RiakOptions<RiakCounterGetOptions>
     {
-        /// <summary>
-        /// The number of primary replicas that must respond before a read is considered a success.
-        /// </summary>
-        /// <value>The PR value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.</value>
-        public uint? PrVal { get; private set; }
-
-        /// <summary>
-        /// The number of replicas that must return before a read is considered a success.
-        /// </summary>
-        /// <value>
-        /// The R value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.
-        /// </value>
-        public uint? RVal { get; private set; }
-
         /// <summary>
         /// Gets or sets basic quorum semantics - whether to return early in some failure cases (eg. when r=1 and you get 2 errors and a success basic_quorum=true would return an error)
         /// </summary>
@@ -68,36 +53,16 @@ namespace RiakClient.Models
             return this;
         }
 
-        public RiakCounterGetOptions SetRVal(uint value)
-        {
-            return WriteQuorum(value, v => RVal = v);
-        }
-
-        public RiakCounterGetOptions SetRVal(string value)
-        {
-            return WriteQuorum(value, v => RVal = v);
-        }
-
-        public RiakCounterGetOptions SetPrVal(uint value)
-        {
-            return WriteQuorum(value, v => RVal = v);
-        }
-
-        public RiakCounterGetOptions SetPrVal(string value)
-        {
-            return WriteQuorum(value, v => RVal = v);
-        }
-
         internal void Populate(RpbCounterGetReq request)
         {
-            if (RVal.HasValue)
+            if (R != null)
             {
-                request.r = RVal.Value;
+                request.r = R;
             }
 
-            if (PrVal.HasValue)
+            if (Pr != null)
             {
-                request.pr = PrVal.Value;
+                request.pr = Pr;
             }
 
             if (BasicQuorum.HasValue)
@@ -109,22 +74,6 @@ namespace RiakClient.Models
             {
                 request.notfound_ok = NotFoundOk.Value;
             }
-        }
-
-        private RiakCounterGetOptions WriteQuorum(string value, Action<uint> setter)
-        {
-            System.Diagnostics.Debug.Assert(new HashSet<string> { "all", "quorum", "one", "default" }.Contains(value), "Incorrect quorum value");
-
-            setter(RiakConstants.QuorumOptionsLookup[value]);
-            return this;
-        }
-
-        private RiakCounterGetOptions WriteQuorum(uint value, Action<uint> setter)
-        {
-            System.Diagnostics.Debug.Assert(value >= 1, "value must be greater than or equal to 1");
-
-            setter(value);
-            return this;
         }
     }
 }

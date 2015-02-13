@@ -17,9 +17,10 @@
 // under the License.
 // </copyright>
 
-using RiakClient.Util;
 namespace RiakClientTests.Live.MapReduce
 {
+    using RiakClient;
+
     public abstract class RiakMapReduceTestBase : LiveRiakConnectionTestBase
     {
         protected const string MrContentType = RiakConstants.ContentTypes.ApplicationJson;
@@ -27,4 +28,3 @@ namespace RiakClientTests.Live.MapReduce
         protected string Bucket = "fluent_key_bucket";
     }
 }
-

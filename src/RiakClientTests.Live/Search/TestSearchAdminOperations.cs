@@ -23,6 +23,7 @@ namespace RiakClientTests.Live.Search
     using System.Linq;
     using NUnit.Framework;
     using RiakClient;
+    using RiakClient.Models;
     using RiakClient.Models.Search;
     using RiakClient.Util;
 
@@ -68,7 +69,7 @@ namespace RiakClientTests.Live.Search
         public void TestStoreAndFetchIndex()
         {
             var indexName = "index" + Random.Next();
-            var index = new SearchIndex(indexName, RiakConstants.Defaults.YokozunaIndex.IndexName, 2);
+            var index = new SearchIndex(indexName, RiakConstants.Defaults.YokozunaIndex.IndexName, (NVal)2);
 
             var putIndexResult = Client.PutSearchIndex(index);
 

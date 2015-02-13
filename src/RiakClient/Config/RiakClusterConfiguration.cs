@@ -28,8 +28,8 @@ namespace RiakClient.Config
     [ComVisible(false)]
     public sealed class RiakClusterConfiguration : ConfigurationSection, IRiakClusterConfiguration
     {
-        private static readonly TimeSpan DefaultNodePollTime = TimeSpan.FromSeconds(5);
-        private static readonly TimeSpan DefaultDefaultRetryWaitTime = TimeSpan.FromMilliseconds(200);
+        private static readonly Timeout DefaultNodePollTime = new Timeout(TimeSpan.FromSeconds(5));
+        private static readonly Timeout DefaultDefaultRetryWaitTime = new Timeout(200);
 
         [ConfigurationProperty("nodes", IsDefaultCollection = true, IsRequired = true)]
         [ConfigurationCollection(typeof(RiakNodeConfigurationCollection), AddItemName = "node")]
@@ -44,14 +44,14 @@ namespace RiakClient.Config
             get { return this.Nodes.Cast<IRiakNodeConfiguration>().ToList(); }
         }
 
-        public TimeSpan NodePollTime
+        public Timeout NodePollTime
         {
             get
             {
                 int nodePollTimeMilliseconds;
                 if (int.TryParse(this.NodePollTimeProperty, out nodePollTimeMilliseconds))
                 {
-                    return TimeSpan.FromMilliseconds(nodePollTimeMilliseconds);
+                    return new Timeout(nodePollTimeMilliseconds);
                 }
                 else
                 {
@@ -60,14 +60,14 @@ namespace RiakClient.Config
             }
         }
 
-        public TimeSpan DefaultRetryWaitTime
+        public Timeout DefaultRetryWaitTime
         {
             get
             {
                 int defaultRetryWaitTimeMilliseconds;
                 if (int.TryParse(this.DefaultRetryWaitTimeProperty, out defaultRetryWaitTimeMilliseconds))
                 {
-                    return TimeSpan.FromMilliseconds(defaultRetryWaitTimeMilliseconds);
+                    return new Timeout(defaultRetryWaitTimeMilliseconds);
                 }
                 else
                 {

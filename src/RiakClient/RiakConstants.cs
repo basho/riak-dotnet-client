@@ -17,23 +17,14 @@
 // under the License.
 // </copyright>
 
-namespace RiakClient.Util
+namespace RiakClient
 {
-    using System;
     using System.Collections.Generic;
     using Messages;
 
     public static class RiakConstants
     {
         public const string DefaultBucketType = null;
-
-        internal static readonly Dictionary<string, uint> QuorumOptionsLookup = new Dictionary<string, uint>
-            {
-                { "one", QuorumOptions.One },
-                { "quorum", QuorumOptions.Quorum },
-                { "all", QuorumOptions.All },
-                { "default", QuorumOptions.Default }
-            };
 
         public static class RiakEnterprise
         {
@@ -88,25 +79,14 @@ namespace RiakClient.Util
             public const string Binary = null;
         }
 
-        public static class QuorumOptions
-        {
-            public const uint One = UintMax - 1;
-            public const uint Quorum = UintMax - 2;
-            public const uint All = UintMax - 3;
-            public const uint Default = UintMax - 4;
-
-            private const uint UintMax = uint.MaxValue;
-        }
-
         public static class Defaults
         {
-            public const uint RVal = QuorumOptions.Default;
             public const string ContentType = ContentTypes.ApplicationJson;
             public const string CharSet = CharSets.Utf8;
 
             public static class Rest
             {
-                public const int Timeout = 30000;
+                public static readonly Timeout Timeout = new Timeout(30000);
             }
 
             public static class YokozunaIndex

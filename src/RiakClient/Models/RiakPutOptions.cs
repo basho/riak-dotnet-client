@@ -19,28 +19,19 @@
 
 namespace RiakClient.Models
 {
-    using System;
-    using System.Collections.Generic;
-    using Containers;
-    using Extensions;
+    using System.Runtime.InteropServices;
     using Messages;
-    using Util;
 
-    public class RiakPutOptions
+    [ComVisible(false)]
+    public class RiakPutOptions : RiakOptions<RiakPutOptions>
     {
         public RiakPutOptions()
         {
             ReturnBody = true;
-            W = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
-            Dw = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
-            Pw = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
+            W = Quorum.WellKnown.Default;
+            Dw = Quorum.WellKnown.Default;
+            Pw = Quorum.WellKnown.Default;
         }
-
-        public Either<uint, string> W { get; private set; }
-
-        public Either<uint, string> Dw { get; private set; }
-
-        public Either<uint, string> Pw { get; private set; }
 
         public bool ReturnBody { get; set; }
 
@@ -49,44 +40,6 @@ namespace RiakClient.Models
         public bool IfNoneMatch { get; set; }
 
         public bool ReturnHead { get; set; }
-
-        public uint? Timeout { get; set; }
-
-        public RiakPutOptions SetW(uint value)
-        {
-            return WriteQuorum(value, var => W = var);
-        }
-
-        public RiakPutOptions SetW(string value)
-        {
-            return WriteQuorum(value, var => W = var);
-        }
-
-        public RiakPutOptions SetDw(uint value)
-        {
-            return WriteQuorum(value, var => Dw = var);
-        }
-
-        public RiakPutOptions SetDw(string value)
-        {
-            return WriteQuorum(value, var => Dw = var);
-        }
-
-        public RiakPutOptions SetPw(uint value)
-        {
-            return WriteQuorum(value, var => Pw = var);
-        }
-
-        public RiakPutOptions SetPw(string value)
-        {
-            return WriteQuorum(value, var => Pw = var);
-        }
-
-        public RiakPutOptions SetTimeout(uint value)
-        {
-            Timeout = value;
-            return this;
-        }
 
         public RiakPutOptions SetIfNotModified(bool value)
         {
@@ -114,35 +67,18 @@ namespace RiakClient.Models
 
         internal void Populate(RpbPutReq request)
         {
-            request.w = W.IsLeft ? W.Left : W.Right.ToRpbOption();
-            request.pw = Pw.IsLeft ? Pw.Left : Pw.Right.ToRpbOption();
-            request.dw = Dw.IsLeft ? Dw.Left : Dw.Right.ToRpbOption();
-
+            request.w = W;
+            request.pw = Pw;
+            request.dw = Dw;
             request.if_not_modified = IfNotModified;
             request.if_none_match = IfNoneMatch;
             request.return_head = ReturnHead;
             request.return_body = ReturnBody;
 
-            if (Timeout.HasValue)
+            if (Timeout != null)
             {
-                request.timeout = Timeout.Value;
+                request.timeout = (uint)Timeout;
             }
-        }
-
-        private RiakPutOptions WriteQuorum(string value, Action<Either<uint, string>> setter)
-        {
-            System.Diagnostics.Debug.Assert(new HashSet<string> { "all", "quorum", "one", "default" }.Contains(value), "Incorrect quorum value");
-
-            setter(new Either<uint, string>(value));
-            return this;
-        }
-
-        private RiakPutOptions WriteQuorum(uint value, Action<Either<uint, string>> setter)
-        {
-            System.Diagnostics.Debug.Assert(value >= 1, "value must be greater than or equal to 1");
-
-            setter(new Either<uint, string>(value));
-            return this;
         }
     }
 }

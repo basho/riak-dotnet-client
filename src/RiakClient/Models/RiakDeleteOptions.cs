@@ -19,31 +19,21 @@
 
 namespace RiakClient.Models
 {
-    using System;
-    using System.Collections.Generic;
-    using Containers;
-    using Extensions;
+    using System.Runtime.InteropServices;
     using Messages;
-    using Util;
 
-    public class RiakDeleteOptions
+    [ComVisible(false)]
+    public class RiakDeleteOptions : RiakOptions<RiakDeleteOptions>
     {
         public RiakDeleteOptions()
         {
-            Rw = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
-            R = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
-            W = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
-            Pr = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
-            Pw = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
-            Dw = new Either<uint, string>(RiakConstants.QuorumOptions.Default);
+            R = Quorum.WellKnown.Default;
+            W = Quorum.WellKnown.Default;
+            Pr = Quorum.WellKnown.Default;
+            Pw = Quorum.WellKnown.Default;
+            Dw = Quorum.WellKnown.Default;
+            Rw = Quorum.WellKnown.Default;
         }
-
-        /// <summary>
-        /// The number of replicas that need to agree when retrieving the object.
-        /// </summary>
-        /// <value>The RW Value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.</value>
-        /// <remarks>Developers looking for an easy way to set this can look at <see cref="RiakConstants.QuorumOptions"/></remarks>
-        public Either<uint, string> Rw { get; private set; }
 
         /// <summary>
         /// The Vclock of the version that is being deleted. Use this to prevent deleting objects that have been modified since the last get request.
@@ -55,151 +45,24 @@ namespace RiakClient.Models
         /// are used in Riak.</remarks>
         public byte[] Vclock { get; set; }
 
-        /// <summary>
-        /// The number of replicas that must return before a delete is considered a success.
-        /// </summary>
-        /// <value>
-        /// The R value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.
-        /// </value>
-        /// <remarks>Developers looking for an easy way to set this can look at <see cref="RiakConstants.QuorumOptions"/></remarks>
-        public Either<uint, string> R { get; private set; }
-
-        /// <summary>
-        /// The number of replicas that must respond before a write is considered a success.
-        /// </summary>
-        /// <value>The W value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.</value>
-        /// <remarks>Developers looking for an easy way to set this can look at <see cref="RiakConstants.QuorumOptions"/></remarks>
-        public Either<uint, string> W { get; private set; }
-
-        /// <summary>
-        /// Primary Read Quorum - the number of replicas that need to be available when retrieving the object.
-        /// </summary>
-        /// <value>
-        /// The primary read quorum. Possible values include 'default', 'one', 'quorum', 'all', or any integer.
-        /// </value>
-        /// <remarks>Developers looking for an easy way to set this can look at <see cref="RiakConstants.QuorumOptions"/></remarks>
-        public Either<uint, string> Pr { get; private set; }
-
-        /// <summary>
-        /// Primary Write Quorum - the number of replicas need to be available when the write is attempted.
-        /// </summary>
-        /// <value>
-        /// The primary write quorum. Possible values include 'default', 'one', 'quorum', 'all', or any integer.
-        /// </value>
-        /// <remarks>Developers looking for an easy way to set this can look at <see cref="RiakConstants.QuorumOptions"/></remarks>
-        public Either<uint, string> Pw { get; private set; }
-
-        /// <summary>
-        /// Durable writes - the number of replicas that must commit to durable storage before returning a successful response.
-        /// </summary>
-        /// <value>
-        /// The durable write value. Possible values include 'default', 'one', 'quorum', 'all', or any integer.
-        /// </value>
-        /// <remarks>Developers looking for an easy way to set this can look at <see cref="RiakConstants.QuorumOptions"/></remarks>
-        public Either<uint, string> Dw { get; private set; }
-
-        public uint? Timeout { get; set; }
-
-        public RiakDeleteOptions SetRw(uint value)
-        {
-            return WriteQuorum(value, var => Rw = var);
-        }
-
-        public RiakDeleteOptions SetRw(string value)
-        {
-            return WriteQuorum(value, var => Rw = var);
-        }
-
-        public RiakDeleteOptions SetR(uint value)
-        {
-            return WriteQuorum(value, var => R = var);
-        }
-
-        public RiakDeleteOptions SetR(string value)
-        {
-            return WriteQuorum(value, var => R = var);
-        }
-
-        public RiakDeleteOptions SetW(uint value)
-        {
-            return WriteQuorum(value, var => W = var);
-        }
-
-        public RiakDeleteOptions SetW(string value)
-        {
-            return WriteQuorum(value, var => W = var);
-        }
-
-        public RiakDeleteOptions SetPr(uint value)
-        {
-            return WriteQuorum(value, var => Pr = var);
-        }
-
-        public RiakDeleteOptions SetPr(string value)
-        {
-            return WriteQuorum(value, var => Pr = var);
-        }
-
-        public RiakDeleteOptions SetPw(uint value)
-        {
-            return WriteQuorum(value, var => Pw = var);
-        }
-
-        public RiakDeleteOptions SetPw(string value)
-        {
-            return WriteQuorum(value, var => Pw = var);
-        }
-
-        public RiakDeleteOptions SetDw(uint value)
-        {
-            return WriteQuorum(value, var => Dw = var);
-        }
-
-        public RiakDeleteOptions SetDw(string value)
-        {
-            return WriteQuorum(value, var => Dw = var);
-        }
-
-        public RiakDeleteOptions SetTimeout(uint? value)
-        {
-            Timeout = value;
-            return this;
-        }
-
         internal void Populate(RpbDelReq request)
         {
-            request.r = R.IsLeft ? R.Left : R.Right.ToRpbOption();
-            request.pr = Pr.IsLeft ? Pr.Left : Pr.Right.ToRpbOption();
-            request.rw = Rw.IsLeft ? Rw.Left : Rw.Right.ToRpbOption();
-            request.w = W.IsLeft ? W.Left : W.Right.ToRpbOption();
-            request.pw = Pw.IsLeft ? Pw.Left : Pw.Right.ToRpbOption();
-            request.dw = Dw.IsLeft ? Dw.Left : Dw.Right.ToRpbOption();
+            request.r = R;
+            request.pr = Pr;
+            request.rw = Rw;
+            request.w = W;
+            request.pw = Pw;
+            request.dw = Dw;
 
-            if (Timeout.HasValue)
+            if (Timeout != null)
             {
-                request.timeout = Timeout.Value;
+                request.timeout = (uint)Timeout;
             }
 
             if (Vclock != null)
             {
                 request.vclock = Vclock;
             }
-        }
-
-        private RiakDeleteOptions WriteQuorum(string value, Action<Either<uint, string>> setter)
-        {
-            System.Diagnostics.Debug.Assert(new HashSet<string> { "all", "quorum", "one", "default" }.Contains(value), "Incorrect quorum value");
-
-            setter(new Either<uint, string>(value));
-            return this;
-        }
-
-        private RiakDeleteOptions WriteQuorum(uint value, Action<Either<uint, string>> setter)
-        {
-            System.Diagnostics.Debug.Assert(value >= 1, "value must be greater than equal to 1");
-
-            setter(new Either<uint, string>(value));
-            return this;
         }
     }
 }

@@ -19,14 +19,13 @@
 
 namespace RiakClient.Config
 {
-    using System;
     using System.Configuration;
     using System.Runtime.InteropServices;
 
     [ComVisible(false)]
     public sealed class RiakNodeConfiguration : ConfigurationElement, IRiakNodeConfiguration
     {
-        private static readonly TimeSpan DefaultTimeout = TimeSpan.FromMilliseconds(4000);
+        private static readonly Timeout DefaultTimeout = new Timeout(4000);
 
         [ConfigurationProperty("name", IsRequired = true)]
         public string Name
@@ -80,35 +79,30 @@ namespace RiakClient.Config
          * }
          */
 
-        public TimeSpan NetworkReadTimeout
+        public Timeout NetworkReadTimeout
         {
             get
             {
                 int networkReadTimeoutMilliseconds;
                 if (int.TryParse(NetworkReadTimeoutProperty, out networkReadTimeoutMilliseconds))
                 {
-                    return TimeSpan.FromMilliseconds(networkReadTimeoutMilliseconds);
+                    return new Timeout(networkReadTimeoutMilliseconds);
                 }
                 else
                 {
                     return DefaultTimeout;
                 }
             }
-
-            set
-            {
-                this["networkReadTimeout"] = value.TotalMilliseconds.ToString();
-            }
         }
 
-        public TimeSpan NetworkWriteTimeout
+        public Timeout NetworkWriteTimeout
         {
             get
             {
                 int networkWriteTimeoutMilliseconds;
                 if (int.TryParse(this.NetworkWriteTimeoutProperty, out networkWriteTimeoutMilliseconds))
                 {
-                    return TimeSpan.FromMilliseconds(networkWriteTimeoutMilliseconds);
+                    return new Timeout(networkWriteTimeoutMilliseconds);
                 }
                 else
                 {
@@ -117,14 +111,14 @@ namespace RiakClient.Config
             }
         }
 
-        public TimeSpan NetworkConnectTimeout
+        public Timeout NetworkConnectTimeout
         {
             get
             {
                 int networkConnectTimeoutMilliseconds;
                 if (int.TryParse(this.NetworkConnectTimeoutProperty, out networkConnectTimeoutMilliseconds))
                 {
-                    return TimeSpan.FromMilliseconds(networkConnectTimeoutMilliseconds);
+                    return new Timeout(networkConnectTimeoutMilliseconds);
                 }
                 else
                 {

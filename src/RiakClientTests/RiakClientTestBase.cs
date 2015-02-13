@@ -68,7 +68,7 @@ namespace RiakClientTests.RiakClientTests
             NodeConfigMock.SetupGet(m => m.PoolSize).Returns(1);
             ClusterConfigMock.SetupGet(m => m.RiakNodes).Returns(new List<IRiakNodeConfiguration> { NodeConfigMock.Object });
             ClusterConfigMock.SetupGet(m => m.DefaultRetryCount).Returns(100);
-            ClusterConfigMock.SetupGet(m => m.DefaultRetryWaitTime).Returns(TimeSpan.FromMilliseconds(100));
+            ClusterConfigMock.SetupGet(m => m.DefaultRetryWaitTime).Returns(new Timeout(100));
 
             Cluster = new RiakCluster(ClusterConfigMock.Object, ConnFactoryMock.Object);
             Client = Cluster.CreateClient();
