@@ -11,6 +11,7 @@ release
 Release
 RELEASE
 packages/
+Help
 
 *.orig
 *.ncb
