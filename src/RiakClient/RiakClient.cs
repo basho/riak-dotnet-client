@@ -38,8 +38,8 @@ namespace RiakClient
     using Util;
 
     /// <summary>
-    /// Provides methods for interacting with a Riak database. 
-    /// The primary implementation of <see cref="IRiakClient"/>. 
+    /// Provides methods for interacting with a Riak database.
+    /// The primary implementation of <see cref="IRiakClient"/>.
     /// </summary>
     public class RiakClient : IRiakClient
     {
@@ -963,36 +963,82 @@ namespace RiakClient
             return RiakResult<RiakServerInfo>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
 
+        /// <summary>
+        /// Query a secondary index for a specific integer value, and stream the results back.
+        /// </summary>
+        /// <param name="index">The <see cref="RiakIndexId"/> identifying the index to query.</param>
+        /// <param name="value">The integer value to query for.</param>
+        /// <param name="options">The <see cref="RiakIndexGetOptions"/> responsible for configuring the semantics of this single index request.</param>
+        /// <returns>A <see cref="RiakResult{T}"/> of <see cref="RiakStreamedIndexResult"/>.</returns>
         public RiakResult<RiakStreamedIndexResult> StreamGetSecondaryIndex(RiakIndexId index, BigInteger value, RiakIndexGetOptions options = null)
         {
             var intIndex = index.ToIntIndexId();
             return StreamGetSecondaryIndexEquals(intIndex, value.ToString(), options);
         }
 
+        /// <summary>
+        /// Query a secondary index for a specific string value, and stream the results back.
+        /// </summary>
+        /// <param name="index">The <see cref="RiakIndexId"/> identifying the index to query.</param>
+        /// <param name="value">The string value to query for.</param>
+        /// <param name="options">The <see cref="RiakIndexGetOptions"/> responsible for configuring the semantics of this single index request.</param>
+        /// <returns>A <see cref="RiakResult{T}"/> of <see cref="RiakStreamedIndexResult"/>.</returns>
         public RiakResult<RiakStreamedIndexResult> StreamGetSecondaryIndex(RiakIndexId index, string value, RiakIndexGetOptions options = null)
         {
             var binIndex = index.ToBinIndexId();
             return StreamGetSecondaryIndexEquals(binIndex, value, options);
         }
 
+        /// <summary>
+        /// Query a secondary index for a range of integer values, and stream the results back.
+        /// </summary>
+        /// <param name="index">The <see cref="RiakIndexId"/> identifying the index to query.</param>
+        /// <param name="min">The inclusive min integer value for the query range.</param>
+        /// <param name="max">The inclusive max integer value for the query range.</param>
+        /// <param name="options">The <see cref="RiakIndexGetOptions"/> responsible for configuring the semantics of this single index request.</param>
+        /// <returns>A <see cref="RiakResult{T}"/> of <see cref="RiakStreamedIndexResult"/>.</returns>
         public RiakResult<RiakStreamedIndexResult> StreamGetSecondaryIndex(RiakIndexId index, BigInteger min, BigInteger max, RiakIndexGetOptions options = null)
         {
             var intIndex = index.ToIntIndexId();
             return StreamGetSecondaryIndexRange(intIndex, min.ToString(), max.ToString(), options);
         }
 
+        /// <summary>
+        /// Query a secondary index for a range of string values, and stream the results back.
+        /// </summary>
+        /// <param name="index">The <see cref="RiakIndexId"/> identifying the index to query.</param>
+        /// <param name="min">The inclusive min string value for the query range.</param>
+        /// <param name="max">The inclusive max string value for the query range.</param>
+        /// <param name="options">The <see cref="RiakIndexGetOptions"/> responsible for configuring the semantics of this single index request.</param>
+        /// <returns>A <see cref="RiakResult{T}"/> of <see cref="RiakStreamedIndexResult"/>.</returns>
         public RiakResult<RiakStreamedIndexResult> StreamGetSecondaryIndex(RiakIndexId index, string min, string max, RiakIndexGetOptions options = null)
         {
             var binIndex = index.ToBinIndexId();
             return StreamGetSecondaryIndexRange(binIndex, min, max, options);
         }
 
+        /// <summary>
+        /// Query a secondary index for a range of integer values.
+        /// </summary>
+        /// <param name="index">The <see cref="RiakIndexId"/> identifying the index to query.</param>
+        /// <param name="minValue">The inclusive min integer value for the query range.</param>
+        /// <param name="maxValue">The inclusive max integer value for the query range.</param>
+        /// <param name="options">The <see cref="RiakIndexGetOptions"/> responsible for configuring the semantics of this single index request.</param>
+        /// <returns>A <see cref="RiakResult{T}"/> of <see cref="RiakIndexResult"/>.</returns>
         public RiakResult<RiakIndexResult> GetSecondaryIndex(RiakIndexId index, BigInteger minValue, BigInteger maxValue, RiakIndexGetOptions options = null)
         {
             var intIndex = index.ToIntIndexId();
             return GetSecondaryIndexRange(intIndex, minValue.ToString(), maxValue.ToString(), options);
         }
 
+        /// <summary>
+        /// Query a secondary index for a range of string values.
+        /// </summary>
+        /// <param name="index">The <see cref="RiakIndexId"/> identifying the index to query.</param>
+        /// <param name="minValue">The inclusive min string value for the query range.</param>
+        /// <param name="maxValue">The inclusive max string value for the query range.</param>
+        /// <param name="options">The <see cref="RiakIndexGetOptions"/> responsible for configuring the semantics of this single index request.</param>
+        /// <returns>A <see cref="RiakResult{T}"/> of <see cref="RiakIndexResult"/>.</returns>
         public RiakResult<RiakIndexResult> GetSecondaryIndex(RiakIndexId index, string minValue, string maxValue, RiakIndexGetOptions options = null)
         {
             var binIndex = index.ToBinIndexId();
@@ -1000,12 +1046,12 @@ namespace RiakClient
         }
 
         /// <summary>
-        /// Retrieve an indexed values
+        /// Query a secondary index for a specific integer value.
         /// </summary>
-        /// <param name="index">The bucket type, bucket, index combination representing the index</param>
-        /// <param name="value">The indexed value to search for</param>
-        /// <param name="options">The <see cref="RiakIndexGetOptions"/></param>
-        /// <returns>A <see cref="RiakResult{T}"/> of <see cref="RiakIndexResult"/></returns>
+        /// <param name="index">The <see cref="RiakIndexId"/> identifying the index to query.</param>
+        /// <param name="value">The integer value to query for.</param>
+        /// <param name="options">The <see cref="RiakIndexGetOptions"/> responsible for configuring the semantics of this single index request.</param>
+        /// <returns>A <see cref="RiakResult{T}"/> of <see cref="RiakIndexResult"/>.</returns>
         public RiakResult<RiakIndexResult> GetSecondaryIndex(RiakIndexId index, BigInteger value, RiakIndexGetOptions options = null)
         {
             var intIndex = index.ToIntIndexId();
@@ -1013,12 +1059,12 @@ namespace RiakClient
         }
 
         /// <summary>
-        /// Retrieve an indexed values
+        /// Query a secondary index for a specific string value.
         /// </summary>
-        /// <param name="index">The bucket type, bucket, index combination representing the index</param>
-        /// <param name="value">The indexed value to search for</param>
-        /// <param name="options">The <see cref="RiakIndexGetOptions"/></param>
-        /// <returns>A <see cref="RiakResult{T}"/> of <see cref="RiakIndexResult"/></returns>
+        /// <param name="index">The <see cref="RiakIndexId"/> identifying the index to query.</param>
+        /// <param name="value">The string value to query for.</param>
+        /// <param name="options">The <see cref="RiakIndexGetOptions"/> responsible for configuring the semantics of this single index request.</param>
+        /// <returns>A <see cref="RiakResult{T}"/> of <see cref="RiakIndexResult"/>.</returns>
         public RiakResult<RiakIndexResult> GetSecondaryIndex(RiakIndexId index, string value, RiakIndexGetOptions options = null)
         {
             var binIndex = index.ToBinIndexId();
@@ -1026,19 +1072,20 @@ namespace RiakClient
         }
 
         /// <summary>
-        /// Used to create a batched set of actions to be sent to a Riak cluster. This guarantees some level of serialized activity.
+        /// Used to create a batched set of actions to be sent to a Riak cluster.
         /// </summary>
-        /// <param name="batchAction">
-        /// Batch action.
-        /// </param>
-        /// <exception cref="Exception">
-        /// Represents errors that occur during application execution.
-        /// </exception>
+        /// <param name="batchAction">An action that wraps all the operations to batch together.</param>
         public void Batch(Action<IRiakBatchClient> batchAction)
         {
             Batch<object>(c => { batchAction(c); return null; });
         }
 
+        /// <summary>
+        /// Used to create a batched set of actions to be sent to a Riak cluster.
+        /// </summary>
+        /// <typeparam name="T">The <paramref name="batchFun"/>'s return type.</typeparam>
+        /// <param name="batchFun">A func that wraps all the operations to batch together.</param>
+        /// <returns>The return value of <paramref name="batchFun"/>.</returns>
         public T Batch<T>(Func<IRiakBatchClient, T> batchFun)
         {
             var funResult = default(T);
