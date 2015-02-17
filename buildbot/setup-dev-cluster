@@ -1,0 +1,3 @@
+#!/bin/sh
+
+exec ../tools/setup-dev-cluster -s -c
