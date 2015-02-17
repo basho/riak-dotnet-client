@@ -1,3 +1,8 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-exec ../tools/setup-dev-cluster -s -c
+if [[ -d ./tools ]]
+then
+    exec ./tools/setup-dev-cluster -s -c
+else
+    exec ../tools/setup-dev-cluster -s -c
+fi
