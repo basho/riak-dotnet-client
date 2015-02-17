@@ -13,6 +13,7 @@ ring_size = 16
 search = on
 storage_backend = multi
 multi_backend.default = bitcask_backend
+strong_consistency = on
 
 multi_backend.bitcask_backend.storage_backend = bitcask
 multi_backend.bitcask_backend.bitcask.data_root = \$(platform_data_dir)/bitcask
