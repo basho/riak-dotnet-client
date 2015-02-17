@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
 
-if [[ -d ./tools ]]
+tools_path=''
+if hash realpath 2>/dev/null
 then
-    exec ./tools/setup-dev-cluster -s -c
+    script_dir="$(dirname $0)"
+    tools_path="$(realpath $script_dir/../tools)"
 else
-    exec ../tools/setup-dev-cluster -s -c
+    tools_path="$(perl -e 'use File::Basename;use Cwd q(abs_path);$d = dirname(shift);print abs_path("$d/../tools")' $0)"
 fi
+
+exec "$tools_path/setup-dev-cluster" -s -c
