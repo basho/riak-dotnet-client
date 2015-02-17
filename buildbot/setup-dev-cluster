@@ -9,4 +9,4 @@ else
     tools_path="$(perl -e 'use File::Basename;use Cwd q(abs_path);$d = dirname(shift);print abs_path("$d/../tools")' $0)"
 fi
 
-exec "$tools_path/setup-dev-cluster" -s -c
+exec "$tools_path/setup-dev-cluster" -s
