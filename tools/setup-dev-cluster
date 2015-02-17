@@ -4,6 +4,7 @@ set -o errexit
 set -o nounset
 
 # Defaults
+declare -i i=0
 declare -r riak_admin=dev1/bin/riak-admin
 declare -r default_dev_cluster_path="$HOME/Projects/basho/riak/dev"
 declare -ir default_node_count=4
@@ -106,7 +107,7 @@ Usage: setup-dev-cluster [-p <riak dev path>] [-n <node count>] [-l] [-c]
 -n      Node count (Default: $default_node_count)
 -l      Set up cluster to use Legacy Search instead of Yokozuna Search
 -c      Set up cluster for Strong Consistency
-        Note: overrides -n setting and uses 4 nodes
+        Note: overrides -n setting and requires at least 5 nodes
 -s      Set up cluster to use Riak Security
 "
       exit 0
@@ -147,8 +148,13 @@ fi
 trap onexit EXIT
 
 declare -r dev_cluster_path="${opt_dev_cluster_path:-$default_dev_cluster_path}"
-declare -ir node_count="${opt_node_count:-$default_node_count}"
-declare -i i=0
+
+if [[ $opt_strong_consistency == 'true' ]]
+then
+    declare -ir node_count=5
+else
+    declare -ir node_count="${opt_node_count:-$default_node_count}"
+fi
 
 if [[ -d $dev_cluster_path ]]
 then
@@ -157,16 +163,10 @@ else
     errexit "Dev cluster path $dev_cluster_path does not exist!"
 fi
 
-if [[ $opt_legacy_search == 'true' ]]
-then
-    pinfo "Setting up dev cluster with Legacy Search"
-fi
-
 if [[ $opt_strong_consistency == 'true' ]]
 then
-    pinfo 'Setting up four-node dev cluster with Strong Consistency'
-    opt_node_count=4
-    for ((i = 1; i <= 4; ++i))
+    pinfo 'Setting up five-node dev cluster with Strong Consistency'
+    for ((i = 1; i <= node_count; ++i))
     do
         dev_node_path="$dev_cluster_path/dev$i"
         if [[ ! -d $dev_node_path ]]
@@ -174,6 +174,11 @@ then
             errexit "Dev node directory $dev_node_path does not exist!"
         fi
     done
+fi
+
+if [[ $opt_legacy_search == 'true' ]]
+then
+    pinfo "Setting up dev cluster with Legacy Search"
 fi
 
 pushd $dev_cluster_path > /dev/null
