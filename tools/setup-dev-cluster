@@ -7,7 +7,7 @@ set -o nounset
 declare -i i=0
 declare -r riak_admin=dev1/bin/riak-admin
 declare -r default_dev_cluster_path="$HOME/Projects/basho/riak/dev"
-declare -ir default_node_count=4
+declare -ir default_node_count=3
 
 # Option vars
 opt_strong_consistency='false'
@@ -107,7 +107,7 @@ Usage: setup-dev-cluster [-p <riak dev path>] [-n <node count>] [-l] [-c]
 -n      Node count (Default: $default_node_count)
 -l      Set up cluster to use Legacy Search instead of Yokozuna Search
 -c      Set up cluster for Strong Consistency
-        Note: overrides -n setting and requires at least 4 nodes
+        Note: overrides -n setting and requires at least 3 nodes
 -s      Set up cluster to use Riak Security
 "
       exit 0
@@ -151,7 +151,7 @@ declare -r dev_cluster_path="${opt_dev_cluster_path:-$default_dev_cluster_path}"
 
 if [[ $opt_strong_consistency == 'true' ]]
 then
-    declare -ir node_count=4
+    declare -ir node_count=3
     if (( opt_node_count > node_count ))
     then
         node_count=opt_node_count
@@ -170,14 +170,6 @@ fi
 if [[ $opt_strong_consistency == 'true' ]]
 then
     pinfo 'Setting up dev cluster with Strong Consistency'
-    for ((i = 1; i <= node_count; ++i))
-    do
-        dev_node_path="$dev_cluster_path/dev$i"
-        if [[ ! -d $dev_node_path ]]
-        then
-            errexit "Dev node directory $dev_node_path does not exist!"
-        fi
-    done
 fi
 
 if [[ $opt_legacy_search == 'true' ]]
@@ -186,6 +178,15 @@ then
 fi
 
 pushd $dev_cluster_path > /dev/null
+
+for ((i = 1; i <= node_count; ++i))
+do
+    dev_node_path="dev$i"
+    if [[ ! -d $dev_node_path ]]
+    then
+        errexit "Dev node directory $dev_node_path does not exist!"
+    fi
+done
 
 pinfo "Stopping Riak"
 
@@ -196,20 +197,6 @@ do
 done
 set -o errexit
 
-pinfo "Removing Riak data"
-
-rm -rf dev*/log/* \
-       dev*/data/ring/* \
-       dev*/data/bitcask/* \
-       dev*/data/leveldb/* \
-       dev*/data/kv_vnode/* \
-       dev*/data/leveldb/* \
-       dev*/data/anti_entropy/* \
-       dev*/data/yz/* \
-       dev*/data/yz_anti_entropy/* \
-       dev*/data/cluster_meta/* \
-       dev*/data/generated.configs/*
-
 declare -i pb_port=10017
 declare -i http_port=10018
 declare -i https_port=10418
@@ -219,6 +206,20 @@ pinfo "Configuring riak.conf"
 for ((i = 1; i <= node_count; ++i))
 do
     devdir="dev$i"
+
+    pinfo "Removing $devdir Riak data"
+
+    rm -rf $devdir/log/* \
+        $devdir/data/ring/* \
+        $devdir/data/bitcask/* \
+        $devdir/data/leveldb/* \
+        $devdir/data/kv_vnode/* \
+        $devdir/data/leveldb/* \
+        $devdir/data/anti_entropy/* \
+        $devdir/data/yz/* \
+        $devdir/data/yz_anti_entropy/* \
+        $devdir/data/cluster_meta/* \
+        $devdir/data/generated.configs/*
 
     adv_conf="$devdir/etc/advanced.config"
     riak_conf="$devdir/etc/riak.conf"
