@@ -14,7 +14,7 @@ preconfigure:
 	$(TOOLS_DIR)/gen-adv-conf $(ADV_CONF)
 
 configure:
-	$(TOOLS_DIR)/riak-cluster-config $(RIAK_ADMIN) 8098
+	$(TOOLS_DIR)/riak-cluster-config $(RIAK_ADMIN) 8098 true false
 
 compile: install-deps debug
 
