@@ -209,17 +209,10 @@ do
 
     pinfo "Removing $devdir Riak data"
 
-    rm -rf $devdir/log/* \
-        $devdir/data/ring/* \
-        $devdir/data/bitcask/* \
-        $devdir/data/leveldb/* \
-        $devdir/data/kv_vnode/* \
-        $devdir/data/leveldb/* \
-        $devdir/data/anti_entropy/* \
-        $devdir/data/yz/* \
-        $devdir/data/yz_anti_entropy/* \
-        $devdir/data/cluster_meta/* \
-        $devdir/data/generated.configs/*
+    for datadir in $devdir/data/*
+    do
+        rm -rf $datadir/*
+    done
 
     adv_conf="$devdir/etc/advanced.config"
     riak_conf="$devdir/etc/riak.conf"
@@ -271,7 +264,7 @@ done
 
 $riak_admin cluster plan
 $riak_admin cluster commit
-$riak_admin transfer-limit 8
+$riak_admin transfer-limit 16
 
 wait_for_transfers
 
