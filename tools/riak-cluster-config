@@ -25,7 +25,7 @@ $riak_admin bucket-type activate memory_type
 
 if [[ $strong_consistency == 'true' ]]
 then
-  $riak_admin bucket-type create consistent '{"props":{"consistent":true,"n_val":5}}'
+  $riak_admin bucket-type create consistent '{"props":{"consistent":true,"n_val":3}}'
   $riak_admin bucket-type activate consistent
 fi
 
