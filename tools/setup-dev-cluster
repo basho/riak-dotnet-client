@@ -107,7 +107,7 @@ Usage: setup-dev-cluster [-p <riak dev path>] [-n <node count>] [-l] [-c]
 -n      Node count (Default: $default_node_count)
 -l      Set up cluster to use Legacy Search instead of Yokozuna Search
 -c      Set up cluster for Strong Consistency
-        Note: overrides -n setting and requires at least 5 nodes
+        Note: overrides -n setting and requires at least 4 nodes
 -s      Set up cluster to use Riak Security
 "
       exit 0
@@ -151,7 +151,11 @@ declare -r dev_cluster_path="${opt_dev_cluster_path:-$default_dev_cluster_path}"
 
 if [[ $opt_strong_consistency == 'true' ]]
 then
-    declare -ir node_count=5
+    declare -ir node_count=4
+    if (( opt_node_count > node_count ))
+    then
+        node_count=opt_node_count
+    fi
 else
     declare -ir node_count="${opt_node_count:-$default_node_count}"
 fi
@@ -165,7 +169,7 @@ fi
 
 if [[ $opt_strong_consistency == 'true' ]]
 then
-    pinfo 'Setting up five-node dev cluster with Strong Consistency'
+    pinfo 'Setting up dev cluster with Strong Consistency'
     for ((i = 1; i <= node_count; ++i))
     do
         dev_node_path="$dev_cluster_path/dev$i"
