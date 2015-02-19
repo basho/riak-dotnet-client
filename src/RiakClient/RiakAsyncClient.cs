@@ -140,6 +140,7 @@ namespace RiakClient
             return Task.Factory.StartNew(() => client.GetBucketProperties(bucket));
         }
 
+        [Obsolete("This overload will be removed in the next version.")]
         public Task<RiakResult> SetBucketProperties(string bucket, RiakBucketProperties properties, bool useHttp = false)
         {
             return Task.Factory.StartNew(() => client.SetBucketProperties(bucket, properties, useHttp));
@@ -147,7 +148,9 @@ namespace RiakClient
 
         public Task<RiakResult> ResetBucketProperties(string bucket, bool useHttp = false)
         {
+#pragma warning disable 618
             return Task.Factory.StartNew(() => client.ResetBucketProperties(bucket, useHttp));
+#pragma warning restore 618
         }
 
         public Task<RiakResult<IList<string>>> ListKeysFromIndex(string bucket)
@@ -155,9 +158,12 @@ namespace RiakClient
             return Task.Factory.StartNew(() => client.ListKeysFromIndex(bucket));
         }
 
+        [Obsolete("Linkwalking has been depreciated as of Riak 2.0. This method will be removed in the next major version.")]
         public Task<RiakResult<IList<RiakObject>>> WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks)
         {
+#pragma warning disable 618
             return Task.Factory.StartNew(() => client.WalkLinks(riakObject, riakLinks));
+#pragma warning restore 618
         }
 
         public Task<RiakResult<RiakServerInfo>> GetServerInfo()
@@ -302,11 +308,6 @@ namespace RiakClient
         public void SetBucketProperties(string bucket, RiakBucketProperties properties, Action<RiakResult> callback)
         {
             ExecAsync(() => callback(client.SetBucketProperties(bucket, properties)));
-        }
-
-        public void WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks, Action<RiakResult<IList<RiakObject>>> callback)
-        {
-            ExecAsync(() => callback(client.WalkLinks(riakObject, riakLinks)));
         }
 
         public void GetServerInfo(Action<RiakResult<RiakServerInfo>> callback)

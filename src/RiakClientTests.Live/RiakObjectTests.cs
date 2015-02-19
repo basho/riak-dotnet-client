@@ -275,7 +275,9 @@ namespace RiakClientTests.Live
                 RiakLink.AllLinks
             };
 
+#pragma warning disable 618
             var linkPeople = Client.WalkLinks(oj, linkPhases);
+#pragma warning restore 618
             linkPeople.IsSuccess.ShouldBeTrue();
             linkPeople.Value.Count.ShouldEqual(6);
         }
