@@ -70,10 +70,12 @@ namespace RiakClient
 
         Task<RiakResult<RiakBucketProperties>> GetBucketProperties(string bucket);
 
+        [Obsolete("This overload will be removed in the next version.")]
         Task<RiakResult> SetBucketProperties(string bucket, RiakBucketProperties properties, bool useHttp = false);
 
         Task<RiakResult> ResetBucketProperties(string bucket, bool useHttp = false);
 
+        [Obsolete("Linkwalking has been depreciated as of Riak 2.0. This method will be removed in the next major version.")]
         Task<RiakResult<IList<RiakObject>>> WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks);
 
         Task<RiakResult<RiakServerInfo>> GetServerInfo();
