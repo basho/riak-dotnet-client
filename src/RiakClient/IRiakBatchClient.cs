@@ -633,10 +633,10 @@ namespace RiakClient
         /// <param name="bucketType">The name of the bucket type containing the <paramref name="bucket"/>.</param>
         /// <param name="bucket">The name of the bucket containing the <paramref name="key"/>.</param>
         /// <param name="key">The key of the data type object.</param>
-        /// <param name="serialize">A delegate to serialize the <paramref name="adds"/> and <paramref name="removes"/> lists from objects of type <typeparamref name="T"/> to <see cref="byte[]"/>.</param>
-        /// <param name="context">The most recent known <see cref="byte[]"/> data type context for this object, to base this operation off of for causality merging.</param>
-        /// <param name="adds">A <see cref="List"/> of items to add to the set.</param>
-        /// <param name="removes">A <see cref="List"/> of items to remove from the set.</param>
+        /// <param name="serialize">A delegate to serialize the <paramref name="adds"/> and <paramref name="removes"/> lists from objects of type <typeparamref name="T"/> to a byte[].</param>
+        /// <param name="context">The most recent known byte[] data type context for this object, to base this operation off of for causality merging.</param>
+        /// <param name="adds">A <see cref="List{T}"/> of items to add to the set.</param>
+        /// <param name="removes">A <see cref="List{T}"/> of items to remove from the set.</param>
         /// <param name="options">The <see cref="RiakDtUpdateOptions"/> responsible for configuring the semantics of this data type update request.</param>
         /// <returns>A <see cref="RiakDtSetResult"/> detailing the operation result, current context, and set values.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="context"/> cannot be null if removing any item from the set.</exception>
@@ -647,10 +647,10 @@ namespace RiakClient
         /// </summary>
         /// <typeparam name="T">The type of the objects being stored in the set.</typeparam>
         /// <param name="objectId">The <see cref="RiakObjectId"/> of the set to update.</param>
-        /// <param name="serialize">A delegate to serialize the <paramref name="adds"/> and <paramref name="removes"/> lists from objects of type <typeparamref name="T"/> to <see cref="byte[]"/>.</param>
-        /// <param name="context">The most recent known <see cref="byte[]"/> data type context for this object, to base this operation off of for causality merging.</param>
-        /// <param name="adds">A <see cref="List"/> of items to add to the set.</param>
-        /// <param name="removes">A <see cref="List"/> of items to remove from the set.</param>
+        /// <param name="serialize">A delegate to serialize the <paramref name="adds"/> and <paramref name="removes"/> lists from objects of type <typeparamref name="T"/> to a byte[].</param>
+        /// <param name="context">The most recent known byte[] data type context for this object, to base this operation off of for causality merging.</param>
+        /// <param name="adds">A <see cref="List{T}"/> of items to add to the set.</param>
+        /// <param name="removes">A <see cref="List{T}"/> of items to remove from the set.</param>
         /// <param name="options">The <see cref="RiakDtUpdateOptions"/> responsible for configuring the semantics of this data type update request.</param>
         /// <returns>A <see cref="RiakDtSetResult"/> detailing the operation result, current context, and set values.</returns>
         /// <remarks>Removal of any item from the set requires that the <paramref name="context"/> be non-null, or else an <see cref="ArgumentNullException"/> will be thrown.</remarks>
@@ -682,8 +682,8 @@ namespace RiakClient
         /// <param name="bucketType">The name of the bucket type containing the <paramref name="bucket"/>.</param>
         /// <param name="bucket">The name of the bucket containing the <paramref name="key"/>.</param>
         /// <param name="key">The key of the data type object.</param>
-        /// <param name="serialize">A delegate to serialize the <paramref name="updates"/> and <paramref name="removes"/> operation lists from objects of type <typeparamref name="T"/> to <see cref="byte[]"/>.</param>
-        /// <param name="context">The most recent known <see cref="byte[]"/> data type context for this object, to base this operation off of for causality merging.</param>
+        /// <param name="serialize">A delegate to serialize the <paramref name="updates"/> and <paramref name="removes"/> operation lists from objects of type <typeparamref name="T"/> to a byte[].</param>
+        /// <param name="context">The most recent known byte[] data type context for this object, to base this operation off of for causality merging.</param>
         /// <param name="removes">A <see cref="List{T}"/> of <see cref="RiakDtMapField"/> to specify which fields to remove.</param>
         /// <param name="updates">A <see cref="List{T}"/> of <see cref="MapUpdate"/> to specify what updates to perform on the map.</param>
         /// <param name="options">The <see cref="RiakDtUpdateOptions"/> responsible for configuring the semantics of this data type update request.</param>
@@ -696,8 +696,8 @@ namespace RiakClient
         /// </summary>
         /// <typeparam name="T">The type of the objects being stored in the map.</typeparam>
         /// <param name="objectId">The <see cref="RiakObjectId"/> of the map to update.</param>
-        /// <param name="serialize">A delegate to serialize the <paramref name="updates"/> and <paramref name="removes"/> operation lists from objects of type <typeparamref name="T"/> to <see cref="byte[]"/>.</param>
-        /// <param name="context">The most recent known <see cref="byte[]"/> data type context for this object, to base this operation off of for causality merging.</param>
+        /// <param name="serialize">A delegate to serialize the <paramref name="updates"/> and <paramref name="removes"/> operation lists from objects of type <typeparamref name="T"/> to a byte[].</param>
+        /// <param name="context">The most recent known byte[] data type context for this object, to base this operation off of for causality merging.</param>
         /// <param name="removes">A <see cref="List{T}"/> of <see cref="RiakDtMapField"/> to specify which fields to remove.</param>
         /// <param name="updates">A <see cref="List{T}"/> of <see cref="MapUpdate"/> to specify what updates to perform on the map.</param>
         /// <param name="options">The <see cref="RiakDtUpdateOptions"/> responsible for configuring the semantics of this data type update request.</param>
