@@ -12,6 +12,7 @@ Release
 RELEASE
 packages/
 Help
+Doc
 
 *.orig
 *.ncb
