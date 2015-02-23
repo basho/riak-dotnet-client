@@ -21,6 +21,7 @@ namespace RiakClient.Exceptions
 {
     using System;
 
+    [Serializable]
     public class RiakUnsupportedException : RiakException
     {
         public RiakUnsupportedException()
