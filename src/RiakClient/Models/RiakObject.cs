@@ -30,16 +30,44 @@ namespace RiakClient.Models
     using Models.Index;
     using Newtonsoft.Json;
     using ProtoBuf;
-    using Util;
 
+    /// <summary>
+    /// A delegate to handle serialization of an object to a string.
+    /// </summary>
+    /// <typeparam name="T">The type of the object to serialize.</typeparam>
+    /// <param name="theObject">The object to serialize.</param>
+    /// <returns>A string containing the serialized object.</returns>
     public delegate string SerializeObjectToString<in T>(T theObject);
 
+    /// <summary>
+    /// A delegate to handle serialization of an object to a byte[].
+    /// </summary>
+    /// <typeparam name="T">The type of the object to serialize.</typeparam>
+    /// <param name="theObject">The object to serialize.</param>
+    /// <returns>A byte[] containing the serialized object.</returns>
     public delegate byte[] SerializeObjectToByteArray<in T>(T theObject);
 
+    /// <summary>
+    /// A delegate to handle deserialization of an byte[] serialized object to it's original type.
+    /// </summary>
+    /// <typeparam name="T">The destination type of the object.</typeparam>
+    /// <param name="theObject">The serialized object.</param>
+    /// <param name="contentType">Content type of the object.</param>
+    /// <returns>The deserialized object.</returns>
     public delegate T DeserializeObject<out T>(byte[] theObject, string contentType = null);
 
+    /// <summary>
+    /// A delegate to handle resolution of sibling objects. 
+    /// Takes all the sibling objects as input and returns one "resolved" object.
+    /// </summary>
+    /// <typeparam name="T">The type of the objects.</typeparam>
+    /// <param name="conflictedObjects">The conflicting sibling objects.</param>
+    /// <returns>A single resolved object.</returns>
     public delegate T ResolveConflict<T>(List<T> conflictedObjects);
 
+    /// <summary>
+    /// Contains all the information about a single object in Riak.
+    /// </summary>
     public class RiakObject : IWriteableVClock
     {
         private readonly int hashCode;
@@ -51,29 +79,22 @@ namespace RiakClient.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="RiakObject"/> class.
         /// </summary>
-        /// <param name="bucket">Object bucket name</param>
-        /// <param name="key">Object key</param>
-        /// <remarks>When saving a binary object to Riak, one of the appropriate binary 
-        /// <see cref="RiakConstants.ContentTypes"/> should be used.
-        /// If the content type is not know, fall back to application/octet-stream. In addition,
-        /// when saving binary data to Riak, a charSet of null/empty string should be used. The 
-        /// constant CharSets.Binary should be used.</remarks>
+        /// <param name="bucket">The object's bucket name.</param>
+        /// <param name="key">The object's key.</param>
         public RiakObject(string bucket, string key)
             : this(bucket, key, null, RiakConstants.Defaults.ContentType)
         {
         }
 
+        // TODO: Fix this? - String value & JSON content type
         /// <summary>
         /// Initializes a new instance of the <see cref="RiakObject"/> class.
         /// </summary>
-        /// <param name="bucket">Object bucket name</param>
-        /// <param name="key">Object key</param>
-        /// <param name="value">Object value</param>
-        /// <remarks>When saving a binary object to Riak, one of the appropriate binary 
-        /// <see cref="RiakConstants.ContentTypes"/> should be used.
-        /// If the content type is not know, fall back to application/octet-stream. In addition,
-        /// when saving binary data to Riak, a charSet of null/empty string should be used. The 
-        /// constant CharSets.Binary should be used.</remarks>
+        /// <param name="bucket">The object's bucket name.</param>
+        /// <param name="key">The object's key.</param>
+        /// <param name="value">The object's value.</param>
+        /// <remarks>Uses the default (JSON) content-type.</remarks>
+
         public RiakObject(string bucket, string key, string value)
             : this(bucket, key, value, RiakConstants.Defaults.ContentType)
         {
@@ -82,14 +103,13 @@ namespace RiakClient.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="RiakObject"/> class.
         /// </summary>
-        /// <param name="bucket">Object bucket name</param>
-        /// <param name="key">Object key</param>
-        /// <param name="value">Object value</param>
-        /// <remarks>When saving a binary object to Riak, one of the appropriate binary 
-        /// <see cref="RiakConstants.ContentTypes"/> should be used.
-        /// If the content type is not know, fall back to application/octet-stream. In addition,
-        /// when saving binary data to Riak, a charSet of null/empty string should be used. The 
-        /// constant CharSets.Binary should be used.</remarks>
+        /// <param name="bucket">The object's bucket name.</param>
+        /// <param name="key">The object's key.</param>
+        /// <param name="value">The object's value.</param>
+        /// <remarks>
+        /// This overload expects that <paramref name="value"/> be serializable to JSON. 
+        /// Uses the default (JSON) content-type.
+        /// </remarks>
         public RiakObject(string bucket, string key, object value)
             : this(new RiakObjectId(bucket, key), value.ToJson(), RiakConstants.ContentTypes.ApplicationJson)
         {
@@ -97,9 +117,11 @@ namespace RiakClient.Models
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RiakObject"/> class.
+        /// Uses an "application/json" content type.
         /// </summary>
-        /// <param name="objectId">Object ID</param>
-        /// <param name="value">Object value</param>
+        /// <param name="objectId">The object's Id.</param>
+        /// <param name="value">The object's value.</param>
+        /// <remarks>Uses the default (JSON) content-type.</remarks>
         public RiakObject(RiakObjectId objectId, object value)
             : this(objectId, value.ToJson(), RiakConstants.ContentTypes.ApplicationJson)
         {
@@ -108,43 +130,71 @@ namespace RiakClient.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="RiakObject"/> class.
         /// </summary>
-        /// <param name="bucket">Object bucket name</param>
-        /// <param name="key">Object key</param>
-        /// <param name="value">Object value</param>
-        /// <param name="contentType">Content type of the object. These should be MIME compliant content types.</param>
-        /// <remarks>When saving a binary object to Riak, one of the appropriate binary 
-        /// <see cref="RiakConstants.ContentTypes"/> should be used.
-        /// If the content type is not know, fall back to application/octet-stream. In addition,
-        /// when saving binary data to Riak, a charSet of null/empty string should be used. The 
-        /// constant CharSets.Binary should be used.</remarks>
+        /// <param name="bucket">The object's bucket name.</param>
+        /// <param name="key">The object's key.</param>
+        /// <param name="value">The object's value.</param>
+        /// <param name="contentType">
+        /// The content-type of the object, must be a MIME compliant content-type.
+        /// See <see cref="RiakConstants.ContentTypes"/> for common options.
+        /// If the content type is not know, fall back to application/octet-stream.
+        /// </param>
         public RiakObject(string bucket, string key, string value, string contentType)
             : this(new RiakObjectId(bucket, key), value, contentType, RiakConstants.Defaults.CharSet)
-        {
-        }
-
-        public RiakObject(RiakObjectId objectId, string value, string contentType)
-            : this(objectId, value, contentType, RiakConstants.Defaults.CharSet)
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RiakObject"/> class.
         /// </summary>
-        /// <param name="bucket">Object bucket name</param>
-        /// <param name="key">Object key</param>
-        /// <param name="value">Object value</param>
-        /// <param name="contentType">Content type of the object. These should be MIME compliant content types.</param>
-        /// <param name="charSet">Character set used to encode saved data.</param>
-        /// <remarks>When saving a binary object to Riak, one of the appropriate binary 
-        /// <see cref="RiakConstants.ContentTypes"/> should be used.
-        /// If the content type is not know, fall back to application/octet-stream. In addition,
-        /// when saving binary data to Riak, a charSet of null/empty string should be used. The 
-        /// constant CharSets.Binary should be used.</remarks>
+        /// <param name="objectId">The object's Id.</param>
+        /// <param name="value">The object's value.</param>
+        /// <param name="contentType">
+        /// The content-type of the object, must be a MIME compliant content-type.
+        /// See <see cref="RiakConstants.ContentTypes"/> for common options.
+        /// If the content type is not know, fall back to application/octet-stream.
+        /// </param>
+        public RiakObject(RiakObjectId objectId, string value, string contentType)
+            : this(objectId, value, contentType, RiakConstants.Defaults.CharSet)
+        {
+        }
+
+        // TODO: Fix?  Takes charset parameter, but encodes with UTF8
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RiakObject"/> class.
+        /// </summary>
+        /// <param name="bucket">The object's bucket name.</param>
+        /// <param name="key">The object's key.</param>
+        /// <param name="value">The object's value.</param>
+        /// <param name="contentType">
+        /// The content-type of the object, must be a MIME compliant content-type.
+        /// See <see cref="RiakConstants.ContentTypes"/> for common options.
+        /// If the content type is not know, fall back to application/octet-stream.
+        /// </param>
+        /// <param name="charSet">The character set used to encode saved data.</param>
+        /// <remarks>
+        /// When saving binary data to Riak, the constant 
+        /// <see cref="RiakConstants.CharSets.Binary"/> should be used.
+        /// </remarks>
         public RiakObject(string bucket, string key, string value, string contentType, string charSet)
             : this(new RiakObjectId(bucket, key), value.ToRiakString(), contentType, charSet)
         {
         }
 
+        // TODO: Fix?  Takes charset parameter, but encodes with UTF8
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RiakObject"/> class.
+        /// </summary>
+        /// <param name="objectId">The object's Id.</param>
+        /// <param name="value">The object's value.</param>
+        /// <param name="contentType">
+        /// The content-type of the object, must be a MIME compliant content-type.
+        /// See <see cref="RiakConstants.ContentTypes"/> for common options.
+        /// If the content type is not know, fall back to application/octet-stream.
+        /// </param>
+        /// <param name="charSet">The character set used to encode saved data.</param>
+        /// <exception cref="ArgumentNullException">
+        /// The value of 'objectId', cannot be null. 
+        /// </exception>
         public RiakObject(RiakObjectId objectId, string value, string contentType, string charSet)
             : this(objectId, value.ToRiakString(), contentType, charSet)
         {
@@ -153,40 +203,42 @@ namespace RiakClient.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="RiakObject"/> class.
         /// </summary>
-        /// <param name="bucket">Object bucket name</param>
-        /// <param name="key">Object key</param>
-        /// <param name="value">Object value</param>
-        /// <param name="contentType">Content type of the object. These should be MIME compliant content types.</param>
-        /// <param name="charSet">Character set used to encode saved data.</param>
-        /// <remarks>When saving a binary object to Riak, one of the appropriate binary 
-        /// <see cref="RiakConstants.ContentTypes"/> should be used.
-        /// If the content type is not know, fall back to application/octet-stream. In addition,
-        /// when saving binary data to Riak, a charSet of null/empty string should be used. The 
-        /// constant CharSets.Binary should be used.</remarks>
+        /// <param name="bucket">The object's bucket name.</param>
+        /// <param name="key">The object's key.</param>
+        /// <param name="value">The object's value.</param>
+        /// <param name="contentType">
+        /// The content-type of the object, must be a MIME compliant content-type.
+        /// See <see cref="RiakConstants.ContentTypes"/> for common options.
+        /// If the content type is not know, fall back to application/octet-stream.
+        /// </param>
+        /// <param name="charSet">The character set used to encode saved data.</param>
+        /// <remarks>
+        /// When saving binary data to Riak, the constant 
+        /// <see cref="RiakConstants.CharSets.Binary"/> should be used.
+        /// </remarks>
         public RiakObject(string bucket, string key, byte[] value, string contentType, string charSet)
-            : this(null, bucket, key, value, contentType, charSet)
+            : this(new RiakObjectId(bucket, key), value, contentType, charSet)
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RiakObject"/> class.
         /// </summary>
-        /// <param name="bucketType">Riak bucket type - a collection of buckets with similar configuration</param> 
-        /// <param name="bucket">Object bucket name</param>
-        /// <param name="key">Object key</param>
-        /// <param name="value">Object value</param>
-        /// <param name="contentType">Content type of the object. These should be MIME compliant content types.</param>
-        /// <param name="charSet">Character set used to encode saved data.</param>
-        /// <remarks>When saving a binary object to Riak, one of the appropriate binary 
-        /// <see cref="RiakConstants.ContentTypes"/> should be used.
-        /// If the content type is not know, fall back to application/octet-stream. In addition,
-        /// when saving binary data to Riak, a charSet of null/empty string should be used. The 
-        /// constant CharSets.Binary should be used.</remarks>
-        public RiakObject(string bucketType, string bucket, string key, byte[] value, string contentType, string charSet)
-            : this(new RiakObjectId(bucketType, bucket, key), value, contentType, charSet)
-        {
-        }
-
+        /// <param name="objectId">The object's Id.</param>
+        /// <param name="value">The object's value.</param>
+        /// <param name="contentType">
+        /// The content-type of the object, must be a MIME compliant content-type.
+        /// See <see cref="RiakConstants.ContentTypes"/> for common options.
+        /// If the content type is not know, fall back to application/octet-stream.
+        /// </param>
+        /// <param name="charSet">The character set used to encode saved data.</param>
+        /// <remarks>
+        /// When saving binary data to Riak, the constant 
+        /// <see cref="RiakConstants.CharSets.Binary"/> should be used.
+        /// </remarks>
+        /// <exception cref="ArgumentNullException">
+        /// The value of 'objectId', cannot be null. 
+        /// </exception>
         public RiakObject(RiakObjectId objectId, byte[] value, string contentType, string charSet)
         {
             if (objectId == null)
@@ -194,14 +246,9 @@ namespace RiakClient.Models
                 throw new ArgumentNullException("objectId");
             }
 
-            // NB: BucketType is *not* required due to legacy bucket.
             BucketType = objectId.BucketType;
 
             Bucket = objectId.Bucket;
-            if (string.IsNullOrWhiteSpace(Bucket))
-            {
-                throw new ArgumentNullException("objectId.Bucket");
-            }
 
             // TODO: FUTURE - should Key be required?
             Key = objectId.Key;
@@ -268,55 +315,114 @@ namespace RiakClient.Models
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public string BucketType { get; private set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public string Bucket { get; private set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public string Key { get; private set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public byte[] Value { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public string ContentEncoding { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public string ContentType { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public string CharSet { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public byte[] VectorClock { get; private set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public string VTag { get; private set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public IDictionary<string, string> UserMetaData { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public long LastModified { get; internal set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public long LastModifiedUsec { get; internal set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public IList<RiakLink> Links { get; private set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public IList<RiakObject> Siblings { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public IDictionary<string, IntIndex> IntIndexes
         {
             get { return intIndexes; }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public IDictionary<string, BinIndex> BinIndexes
         {
             get { return binIndexes; }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public bool HasChanged
         {
             get { return hashCode != CalculateHashCode(); }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public List<string> VTags
         {
             // TODO: this is too complex
             get { return vtags ?? (vtags = Siblings.Count == 0 ? new List<string> { VTag } : Siblings.Select(s => s.VTag).ToList()); }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public IntIndex IntIndex(string name)
         {
             var index = default(IntIndex);
@@ -330,6 +436,11 @@ namespace RiakClient.Models
             return index;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public BinIndex BinIndex(string name)
         {
             var index = default(BinIndex);
@@ -343,49 +454,93 @@ namespace RiakClient.Models
             return index;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="bucket"></param>
+        /// <param name="key"></param>
+        /// <param name="tag"></param>
         public void LinkTo(string bucket, string key, string tag)
         {
             Links.Add(new RiakLink(bucket, key, tag));
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="riakObjectId"></param>
+        /// <param name="tag"></param>
         public void LinkTo(RiakObjectId riakObjectId, string tag)
         {
             Links.Add(riakObjectId.ToRiakLink(tag));
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="riakObject"></param>
+        /// <param name="tag"></param>
         public void LinkTo(RiakObject riakObject, string tag)
         {
             Links.Add(riakObject.ToRiakLink(tag));
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="bucket"></param>
+        /// <param name="key"></param>
+        /// <param name="tag"></param>
         public void RemoveLink(string bucket, string key, string tag)
         {
             var link = new RiakLink(bucket, key, tag);
             RemoveLink(link);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="riakObjectId"></param>
+        /// <param name="tag"></param>
         public void RemoveLink(RiakObjectId riakObjectId, string tag)
         {
             var link = new RiakLink(riakObjectId.Bucket, riakObjectId.Key, tag);
             RemoveLink(link);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="riakObject"></param>
+        /// <param name="tag"></param>
         public void RemoveLink(RiakObject riakObject, string tag)
         {
             var link = new RiakLink(riakObject.Bucket, riakObject.Key, tag);
             RemoveLink(link);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="link"></param>
         public void RemoveLink(RiakLink link)
         {
             Links.Remove(link);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="riakObject"></param>
         public void RemoveLinks(RiakObject riakObject)
         {
             RemoveLinks(new RiakObjectId(riakObject.Bucket, riakObject.Key));
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="riakObjectId"></param>
         public void RemoveLinks(RiakObjectId riakObjectId)
         {
             var linksToRemove = Links.Where(l => l.Bucket == riakObjectId.Bucket && l.Key == riakObjectId.Key);
@@ -394,6 +549,7 @@ namespace RiakClient.Models
                 Links.Remove(linkToRemove);
             }
         }
+
 
         public RiakObjectId ToRiakObjectId()
         {
@@ -469,6 +625,12 @@ namespace RiakClient.Models
             VectorClock = vclock;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <param name="serializeObject"></param>
         public void SetObject<T>(T value, SerializeObjectToString<T> serializeObject)
             where T : class
         {
@@ -480,6 +642,13 @@ namespace RiakClient.Models
             Value = serializeObject(value).ToRiakString();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <param name="contentType"></param>
+        /// <param name="serializeObject"></param>
         public void SetObject<T>(T value, string contentType, SerializeObjectToString<T> serializeObject)
             where T : class
         {
@@ -493,6 +662,12 @@ namespace RiakClient.Models
             SetObject(value, serializeObject);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <param name="serializeObject"></param>
         public void SetObject<T>(T value, SerializeObjectToByteArray<T> serializeObject)
         {
             if (serializeObject == null)
@@ -503,6 +678,13 @@ namespace RiakClient.Models
             Value = serializeObject(value);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <param name="contentType"></param>
+        /// <param name="serializeObject"></param>
         public void SetObject<T>(T value, string contentType, SerializeObjectToByteArray<T> serializeObject)
         {
             if (string.IsNullOrEmpty(contentType))
@@ -516,6 +698,12 @@ namespace RiakClient.Models
         }
 
         // setting content type of SetObject changes content type
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <param name="contentType"></param>
         public void SetObject<T>(T value, string contentType = null)
             where T : class
         {
@@ -573,6 +761,13 @@ namespace RiakClient.Models
             throw new NotSupportedException(string.Format("Your current ContentType ({0}), is not supported.", ContentType));
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="deserializeObject"></param>
+        /// <param name="resolveConflict"></param>
+        /// <returns></returns>
         public T GetObject<T>(DeserializeObject<T> deserializeObject, ResolveConflict<T> resolveConflict = null)
         {
             if (deserializeObject == null)
@@ -590,6 +785,11 @@ namespace RiakClient.Models
             return deserializeObject(Value, ContentType);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         public T GetObject<T>()
         {
             if (ContentType == RiakConstants.ContentTypes.ApplicationJson)
