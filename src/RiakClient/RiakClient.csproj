@@ -85,6 +85,7 @@
     <Compile Include="Comms\RiakConnectionPool.cs" />
     <Compile Include="Containers\IConcurrentEnumerable.cs" />
     <Compile Include="Containers\IConcurrentEnumerator.cs" />
+    <Compile Include="Exceptions\RiakUnsupportedException.cs" />
     <Compile Include="IRiakAsyncClient.cs" />
     <Compile Include="IRiakClient.cs" />
     <Compile Include="Messages\RpbClasses.cs" />

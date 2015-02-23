@@ -25,6 +25,7 @@ namespace RiakClient.Models
     using System.Linq;
     using System.Xml;
     using System.Xml.Serialization;
+    using Exceptions;
     using Extensions;
     using Messages;
     using Models.Index;
@@ -86,7 +87,8 @@ namespace RiakClient.Models
         {
         }
 
-        // TODO: Fix this? - String value & JSON content type
+        // TODO: Fix?  String value & JSON content type
+
         /// <summary>
         /// Initializes a new instance of the <see cref="RiakObject"/> class.
         /// </summary>
@@ -94,7 +96,6 @@ namespace RiakClient.Models
         /// <param name="key">The object's key.</param>
         /// <param name="value">The object's value.</param>
         /// <remarks>Uses the default (JSON) content-type.</remarks>
-
         public RiakObject(string bucket, string key, string value)
             : this(bucket, key, value, RiakConstants.Defaults.ContentType)
         {
@@ -159,6 +160,7 @@ namespace RiakClient.Models
         }
 
         // TODO: Fix?  Takes charset parameter, but encodes with UTF8
+
         /// <summary>
         /// Initializes a new instance of the <see cref="RiakObject"/> class.
         /// </summary>
@@ -181,6 +183,7 @@ namespace RiakClient.Models
         }
 
         // TODO: Fix?  Takes charset parameter, but encodes with UTF8
+
         /// <summary>
         /// Initializes a new instance of the <see cref="RiakObject"/> class.
         /// </summary>
@@ -316,77 +319,77 @@ namespace RiakClient.Models
         }
 
         /// <summary>
-        /// 
+        /// Get the Bucket Type (if any). 
         /// </summary>
         public string BucketType { get; private set; }
 
         /// <summary>
-        /// 
+        /// Get the Bucket name.
         /// </summary>
         public string Bucket { get; private set; }
 
         /// <summary>
-        /// 
+        /// Get the Key.
         /// </summary>
         public string Key { get; private set; }
 
         /// <summary>
-        /// 
+        /// Get the raw value, as a byte[].
         /// </summary>
         public byte[] Value { get; set; }
 
         /// <summary>
-        /// 
+        /// Get the ContentEncoding. 
         /// </summary>
         public string ContentEncoding { get; set; }
 
         /// <summary>
-        /// 
+        /// Get the Content Type (MIME Type).
         /// </summary>
         public string ContentType { get; set; }
 
         /// <summary>
-        /// 
+        /// Get the CharSet encoding, if set.
         /// </summary>
         public string CharSet { get; set; }
 
         /// <summary>
-        /// 
+        /// Get the Vector Clock.
         /// </summary>
         public byte[] VectorClock { get; private set; }
 
         /// <summary>
-        /// 
+        /// Get the VTag.
         /// </summary>
         public string VTag { get; private set; }
 
         /// <summary>
-        /// 
+        /// Get any user set MetaData.
         /// </summary>
         public IDictionary<string, string> UserMetaData { get; set; }
 
         /// <summary>
-        /// 
+        /// Get the Last Modified unix timestamp. 
         /// </summary>
         public long LastModified { get; internal set; }
 
         /// <summary>
-        /// 
+        /// Get the Last Modified unix timestamp in microseconds.
         /// </summary>
         public long LastModifiedUsec { get; internal set; }
 
         /// <summary>
-        /// 
+        /// Get the list of Links to other Riak objects. 
         /// </summary>
         public IList<RiakLink> Links { get; private set; }
 
         /// <summary>
-        /// 
+        /// Get a list of conflicting Sibling objects. 
         /// </summary>
         public IList<RiakObject> Siblings { get; set; }
 
         /// <summary>
-        /// 
+        /// Get the collection of Integer secondary indexes for this object.
         /// </summary>
         public IDictionary<string, IntIndex> IntIndexes
         {
@@ -394,7 +397,7 @@ namespace RiakClient.Models
         }
 
         /// <summary>
-        /// 
+        /// Get the collection of string (binary) secondary indexes for this object.
         /// </summary>
         public IDictionary<string, BinIndex> BinIndexes
         {
@@ -402,7 +405,7 @@ namespace RiakClient.Models
         }
 
         /// <summary>
-        /// 
+        /// Check to see if the object has changed since it was fetched.
         /// </summary>
         public bool HasChanged
         {
@@ -410,7 +413,7 @@ namespace RiakClient.Models
         }
 
         /// <summary>
-        /// 
+        /// Get the VTags.
         /// </summary>
         public List<string> VTags
         {
@@ -419,10 +422,10 @@ namespace RiakClient.Models
         }
 
         /// <summary>
-        /// 
+        /// Fetch a single integer secondary index to work with.
         /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
+        /// <param name="name">The name of the index to fetch.</param>
+        /// <returns>The index.</returns>
         public IntIndex IntIndex(string name)
         {
             var index = default(IntIndex);
@@ -437,10 +440,10 @@ namespace RiakClient.Models
         }
 
         /// <summary>
-        /// 
+        /// Fetch a single string (binary) secondary idnex to work with.
         /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
+        /// <param name="name">The name of the index to fetch.</param>
+        /// <returns>The index.</returns>
         public BinIndex BinIndex(string name)
         {
             var index = default(BinIndex);
@@ -455,42 +458,54 @@ namespace RiakClient.Models
         }
 
         /// <summary>
-        /// 
+        /// Create a link from this object to another using a tag.
         /// </summary>
-        /// <param name="bucket"></param>
-        /// <param name="key"></param>
-        /// <param name="tag"></param>
+        /// <param name="bucket">The other object's bucket name.</param>
+        /// <param name="key">The other object's key.</param>
+        /// <param name="tag">The tag to use.</param>
+        [Obsolete("Linkwalking has been depreciated as of Riak 2.0. This method will be removed in the next major version.")]
         public void LinkTo(string bucket, string key, string tag)
         {
             Links.Add(new RiakLink(bucket, key, tag));
         }
 
         /// <summary>
-        /// 
+        /// Create a link from this object to another using a tag.
         /// </summary>
-        /// <param name="riakObjectId"></param>
-        /// <param name="tag"></param>
+        /// <param name="riakObjectId">The other's object's Id.</param>
+        /// <param name="tag">The tag to use.</param>
+        /// <exception cref="RiakUnsupportedException">
+        /// Thrown if RiakObjectId has a bucket type. 
+        /// Combining linkwalking and bucket types is not supported.
+        /// </exception>
+        [Obsolete("Linkwalking has been depreciated as of Riak 2.0. This method will be removed in the next major version.")]
         public void LinkTo(RiakObjectId riakObjectId, string tag)
         {
             Links.Add(riakObjectId.ToRiakLink(tag));
         }
 
         /// <summary>
-        /// 
+        /// Create a link from this object to another using a tag.
         /// </summary>
-        /// <param name="riakObject"></param>
-        /// <param name="tag"></param>
+        /// <param name="riakObject">The other object.</param>
+        /// <param name="tag">The tag to use.</param>
+        /// <exception cref="RiakUnsupportedException">
+        /// Thrown if RiakObjectId has a bucket type. 
+        /// Combining linkwalking and bucket types is not supported.
+        /// </exception>
+        [Obsolete("Linkwalking has been depreciated as of Riak 2.0. This method will be removed in the next major version.")]
         public void LinkTo(RiakObject riakObject, string tag)
         {
             Links.Add(riakObject.ToRiakLink(tag));
         }
 
         /// <summary>
-        /// 
+        /// Remove a link, that goes from this object to another.
         /// </summary>
-        /// <param name="bucket"></param>
-        /// <param name="key"></param>
-        /// <param name="tag"></param>
+        /// <param name="bucket">The other object's bucket.</param>
+        /// <param name="key">The other object's key.</param>
+        /// <param name="tag">The tag for the link to remove.</param>
+        [Obsolete("Linkwalking has been depreciated as of Riak 2.0. This method will be removed in the next major version.")]
         public void RemoveLink(string bucket, string key, string tag)
         {
             var link = new RiakLink(bucket, key, tag);
@@ -498,51 +513,92 @@ namespace RiakClient.Models
         }
 
         /// <summary>
-        /// 
+        /// Remove a link, that goes from this object to another.
         /// </summary>
-        /// <param name="riakObjectId"></param>
-        /// <param name="tag"></param>
+        /// <param name="riakObjectId">The other object's Id.</param>
+        /// <param name="tag">The tag for the link to remove.</param>
+        /// <exception cref="RiakUnsupportedException">
+        /// Thrown if RiakObjectId has a bucket type. 
+        /// Combining linkwalking and bucket types is not supported.
+        /// </exception>
+        [Obsolete("Linkwalking has been depreciated as of Riak 2.0. This method will be removed in the next major version.")]
         public void RemoveLink(RiakObjectId riakObjectId, string tag)
         {
+            if (!string.IsNullOrWhiteSpace(riakObjectId.BucketType))
+            {
+                throw new RiakUnsupportedException("Combining linkwalking and bucket types is not supported.");
+            }
+
             var link = new RiakLink(riakObjectId.Bucket, riakObjectId.Key, tag);
             RemoveLink(link);
         }
 
         /// <summary>
-        /// 
+        /// Remove a link, that goes from this object to another.
         /// </summary>
-        /// <param name="riakObject"></param>
-        /// <param name="tag"></param>
+        /// <param name="riakObject">The other object.</param>
+        /// <param name="tag">The tag for the link to remove.</param>
+        /// <exception cref="RiakUnsupportedException">
+        /// Thrown if RiakObjectId has a bucket type. 
+        /// Combining linkwalking and bucket types is not supported.
+        /// </exception>
+        [Obsolete("Linkwalking has been depreciated as of Riak 2.0. This method will be removed in the next major version.")]
         public void RemoveLink(RiakObject riakObject, string tag)
         {
+            if (!string.IsNullOrWhiteSpace(riakObject.BucketType))
+            {
+                throw new RiakUnsupportedException("Combining linkwalking and bucket types is not supported.");
+            }
+
             var link = new RiakLink(riakObject.Bucket, riakObject.Key, tag);
             RemoveLink(link);
         }
 
         /// <summary>
-        /// 
+        /// Remove a link, that goes from this object to another.
         /// </summary>
-        /// <param name="link"></param>
+        /// <param name="link">The link to remove.</param>
+        [Obsolete("Linkwalking has been depreciated as of Riak 2.0. This method will be removed in the next major version.")]
         public void RemoveLink(RiakLink link)
         {
             Links.Remove(link);
         }
 
         /// <summary>
-        /// 
+        /// Remove all links from this object that link to <paramref name="riakObject"/>.
         /// </summary>
-        /// <param name="riakObject"></param>
+        /// <param name="riakObject">The other object.</param>
+        /// <exception cref="RiakUnsupportedException">
+        /// Thrown if RiakObjectId has a bucket type. 
+        /// Combining linkwalking and bucket types is not supported.
+        /// </exception>
+        [Obsolete("Linkwalking has been depreciated as of Riak 2.0. This method will be removed in the next major version.")]
         public void RemoveLinks(RiakObject riakObject)
         {
+            if (!string.IsNullOrWhiteSpace(riakObject.BucketType))
+            {
+                throw new RiakUnsupportedException("Combining linkwalking and bucket types is not supported.");
+            }
+
             RemoveLinks(new RiakObjectId(riakObject.Bucket, riakObject.Key));
         }
 
         /// <summary>
-        /// 
+        /// Remove all links from this object that link to <paramref name="riakObjectId"/>.
         /// </summary>
-        /// <param name="riakObjectId"></param>
+        /// <param name="riakObjectId">The other object's Id.</param>
+        /// <exception cref="RiakUnsupportedException">
+        /// Thrown if RiakObjectId has a bucket type. 
+        /// Combining linkwalking and bucket types is not supported.
+        /// </exception>
+        [Obsolete("Linkwalking has been depreciated as of Riak 2.0. This method will be removed in the next major version.")]
         public void RemoveLinks(RiakObjectId riakObjectId)
         {
+            if (!string.IsNullOrWhiteSpace(riakObjectId.BucketType))
+            {
+                throw new RiakUnsupportedException("Combining linkwalking and bucket types is not supported.");
+            }
+
             var linksToRemove = Links.Where(l => l.Bucket == riakObjectId.Bucket && l.Key == riakObjectId.Key);
             foreach (RiakLink linkToRemove in linksToRemove)
             {
@@ -550,7 +606,10 @@ namespace RiakClient.Models
             }
         }
 
-
+        /// <summary>
+        /// Get the Id for this object.
+        /// </summary>
+        /// <returns>The object Id.</returns>
         public RiakObjectId ToRiakObjectId()
         {
             return new RiakObjectId(BucketType, Bucket, Key);
@@ -626,11 +685,11 @@ namespace RiakClient.Models
         }
 
         /// <summary>
-        /// 
+        /// Set the object's value, after serializing it with the provided serializer.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="value"></param>
-        /// <param name="serializeObject"></param>
+        /// <typeparam name="T">The type of the value.</typeparam>
+        /// <param name="value">The unserialized value.</param>
+        /// <param name="serializeObject">A delegate to handle serialization of an object to a string.</param>
         public void SetObject<T>(T value, SerializeObjectToString<T> serializeObject)
             where T : class
         {
@@ -643,12 +702,12 @@ namespace RiakClient.Models
         }
 
         /// <summary>
-        /// 
+        /// Set the object's value, after serializing it with the provided serializer.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="value"></param>
-        /// <param name="contentType"></param>
-        /// <param name="serializeObject"></param>
+        /// <typeparam name="T">The type of the value.</typeparam>
+        /// <param name="value">The unserialized value.</param>
+        /// <param name="contentType">The content type of the object.</param>
+        /// <param name="serializeObject">A delegate to handle serialization of an object to a string.</param>
         public void SetObject<T>(T value, string contentType, SerializeObjectToString<T> serializeObject)
             where T : class
         {
@@ -663,11 +722,11 @@ namespace RiakClient.Models
         }
 
         /// <summary>
-        /// 
+        /// Set the object's value, after serializing it with the provided serializer.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="value"></param>
-        /// <param name="serializeObject"></param>
+        /// <typeparam name="T">The type of the value.</typeparam>
+        /// <param name="value">The unserialized value.</param>
+        /// <param name="serializeObject">A delegate to handle serialization of an object to a string.</param>
         public void SetObject<T>(T value, SerializeObjectToByteArray<T> serializeObject)
         {
             if (serializeObject == null)
@@ -679,12 +738,12 @@ namespace RiakClient.Models
         }
 
         /// <summary>
-        /// 
+        /// Set the object's value, after serializing it with the provided serializer.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="value"></param>
-        /// <param name="contentType"></param>
-        /// <param name="serializeObject"></param>
+        /// <typeparam name="T">The type of the value.</typeparam>
+        /// <param name="value">The unserialized value.</param>
+        /// <param name="contentType">The content type of the object.</param>
+        /// <param name="serializeObject">A delegate to handle serialization of an object to a string.</param>
         public void SetObject<T>(T value, string contentType, SerializeObjectToByteArray<T> serializeObject)
         {
             if (string.IsNullOrEmpty(contentType))
@@ -697,13 +756,19 @@ namespace RiakClient.Models
             SetObject(value, serializeObject);
         }
 
-        // setting content type of SetObject changes content type
         /// <summary>
-        /// 
+        /// Set the object's value, after serializing it.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="value"></param>
-        /// <param name="contentType"></param>
+        /// <typeparam name="T">The type of the value.</typeparam>
+        /// <param name="value">The unserialized value.</param>
+        /// <param name="contentType">The content type of the object.</param>
+        /// <remarks>
+        /// This overload will choose its serializer based on the <paramref name="contentType"/>.
+        /// Supported types for this overload are: <see cref="RiakConstants.ContentTypes.ApplicationJson"/>,
+        /// <see cref="RiakConstants.ContentTypes.ProtocolBuffers"/>
+        /// <see cref="RiakConstants.ContentTypes.Xml"/>
+        /// and text.
+        /// </remarks>
         public void SetObject<T>(T value, string contentType = null)
             where T : class
         {
@@ -762,12 +827,15 @@ namespace RiakClient.Models
         }
 
         /// <summary>
-        /// 
+        /// Deserializes and returns the object's value, using the provided deserializer. 
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="deserializeObject"></param>
-        /// <param name="resolveConflict"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">The value's target type.</typeparam>
+        /// <param name="deserializeObject">A delegate to handle deserialization of an byte[] serialized object to it's original type.</param>
+        /// <param name="resolveConflict">
+        /// A delegate to handle resolution of sibling objects. 
+        /// Takes all the sibling objects as input and returns one "resolved" object.
+        /// </param>
+        /// <returns>The deserialized value.</returns>
         public T GetObject<T>(DeserializeObject<T> deserializeObject, ResolveConflict<T> resolveConflict = null)
         {
             if (deserializeObject == null)
@@ -785,11 +853,20 @@ namespace RiakClient.Models
             return deserializeObject(Value, ContentType);
         }
 
+        // TODO: mismatch between Get/SetObject with auto-serialization/deserialization.
+        // SetObject can serialize anything with a content-type of "text*", but 
+        // GetObject will not deserialize it.
+
         /// <summary>
-        /// 
+        /// Deserializes and returns the object's value.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
+        /// <typeparam name="T">The value's target type.</typeparam>
+        /// <returns>The deserialized value.</returns>
+        /// <remarks>
+        /// This overload will choose its deserializer based on the object's <see cref="ContentType"/> property.
+        /// Supported types for this overload are: <see cref="RiakConstants.ContentTypes.ApplicationJson"/>,
+        /// <see cref="RiakConstants.ContentTypes.ProtocolBuffers"/>, and <see cref="RiakConstants.ContentTypes.Xml"/>.
+        /// </remarks>
         public T GetObject<T>()
         {
             if (ContentType == RiakConstants.ContentTypes.ApplicationJson)
