@@ -945,6 +945,7 @@ namespace RiakClient.Models
         /// Helper method to check if we're mixing bucket types and links.
         /// Throws exception if we are.
         /// </summary>
+        /// <param name="otherBucketType">The other bucket type parameter to check.</param>
         /// <exception cref="RiakUnsupportedException">
         /// Thrown if RiakObjectId has a bucket type. 
         /// Combining linkwalking and bucket types is not supported.
