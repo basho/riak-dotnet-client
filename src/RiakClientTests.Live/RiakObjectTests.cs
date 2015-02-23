@@ -17,6 +17,8 @@
 // under the License.
 // </copyright>
 
+using RiakClient.Exceptions;
+
 namespace RiakClientTests.Live
 {
     using System.Collections.Generic;
@@ -287,9 +289,7 @@ namespace RiakClientTests.Live
             linkPeople.Value.Count.ShouldEqual(6);
         }
     }
-
-
-
+    
     [TestFixture]
     public class WhenSerializingObjects : RiakObjectTestBase
     {

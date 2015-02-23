@@ -481,6 +481,8 @@ namespace RiakClient.Models
         [Obsolete("Linkwalking has been depreciated as of Riak 2.0. This method will be removed in the next major version.")]
         public void LinkTo(RiakObjectId riakObjectId, string tag)
         {
+            ThrowIfMixingBucketTypesAndLinks(riakObjectId.BucketType);
+
             Links.Add(riakObjectId.ToRiakLink(tag));
         }
 
@@ -496,6 +498,8 @@ namespace RiakClient.Models
         [Obsolete("Linkwalking has been depreciated as of Riak 2.0. This method will be removed in the next major version.")]
         public void LinkTo(RiakObject riakObject, string tag)
         {
+            ThrowIfMixingBucketTypesAndLinks(riakObject.BucketType);
+
             Links.Add(riakObject.ToRiakLink(tag));
         }
 
@@ -524,10 +528,7 @@ namespace RiakClient.Models
         [Obsolete("Linkwalking has been depreciated as of Riak 2.0. This method will be removed in the next major version.")]
         public void RemoveLink(RiakObjectId riakObjectId, string tag)
         {
-            if (!string.IsNullOrWhiteSpace(riakObjectId.BucketType))
-            {
-                throw new RiakUnsupportedException("Combining linkwalking and bucket types is not supported.");
-            }
+            ThrowIfMixingBucketTypesAndLinks(riakObjectId.BucketType);
 
             var link = new RiakLink(riakObjectId.Bucket, riakObjectId.Key, tag);
             RemoveLink(link);
@@ -545,10 +546,7 @@ namespace RiakClient.Models
         [Obsolete("Linkwalking has been depreciated as of Riak 2.0. This method will be removed in the next major version.")]
         public void RemoveLink(RiakObject riakObject, string tag)
         {
-            if (!string.IsNullOrWhiteSpace(riakObject.BucketType))
-            {
-                throw new RiakUnsupportedException("Combining linkwalking and bucket types is not supported.");
-            }
+            ThrowIfMixingBucketTypesAndLinks(riakObject.BucketType);
 
             var link = new RiakLink(riakObject.Bucket, riakObject.Key, tag);
             RemoveLink(link);
@@ -575,10 +573,7 @@ namespace RiakClient.Models
         [Obsolete("Linkwalking has been depreciated as of Riak 2.0. This method will be removed in the next major version.")]
         public void RemoveLinks(RiakObject riakObject)
         {
-            if (!string.IsNullOrWhiteSpace(riakObject.BucketType))
-            {
-                throw new RiakUnsupportedException("Combining linkwalking and bucket types is not supported.");
-            }
+            ThrowIfMixingBucketTypesAndLinks(riakObject.BucketType);
 
             RemoveLinks(new RiakObjectId(riakObject.Bucket, riakObject.Key));
         }
@@ -594,10 +589,7 @@ namespace RiakClient.Models
         [Obsolete("Linkwalking has been depreciated as of Riak 2.0. This method will be removed in the next major version.")]
         public void RemoveLinks(RiakObjectId riakObjectId)
         {
-            if (!string.IsNullOrWhiteSpace(riakObjectId.BucketType))
-            {
-                throw new RiakUnsupportedException("Combining linkwalking and bucket types is not supported.");
-            }
+            ThrowIfMixingBucketTypesAndLinks(riakObjectId.BucketType);
 
             var linksToRemove = Links.Where(l => l.Bucket == riakObjectId.Bucket && l.Key == riakObjectId.Key);
             foreach (RiakLink linkToRemove in linksToRemove)
@@ -947,6 +939,22 @@ namespace RiakClient.Models
                     })));
 
             return message;
+        }
+
+        /// <summary>
+        /// Helper method to check if we're mixing bucket types and links.
+        /// Throws exception if we are.
+        /// </summary>
+        /// <exception cref="RiakUnsupportedException">
+        /// Thrown if RiakObjectId has a bucket type. 
+        /// Combining linkwalking and bucket types is not supported.
+        /// </exception>
+        private void ThrowIfMixingBucketTypesAndLinks(string otherBucketType)
+        {
+            if (!string.IsNullOrWhiteSpace(BucketType) || !string.IsNullOrWhiteSpace(otherBucketType))
+            {
+                throw new RiakUnsupportedException("Combining linkwalking and bucket types is not supported.");
+            }
         }
 
         /// <summary>

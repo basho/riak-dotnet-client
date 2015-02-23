@@ -113,13 +113,13 @@ namespace RiakClientTests.Live.GeneralIntegrationTests
         [Test]
         public void GetWithInvalidBucketReturnsInvalidRequest()
         {
-            Assert.Throws<ArgumentNullException>(() => Client.Get("", "key"));
+            Assert.Throws<ArgumentOutOfRangeException>(() => Client.Get("", "key"));
 
-            Assert.Throws<ArgumentNullException>(() => Client.Get(null, "key"));
-            Assert.Throws<ArgumentNullException>(() => Client.Get(string.Empty, "key"));
+            Assert.Throws<ArgumentOutOfRangeException>(() => Client.Get(null, "key"));
+            Assert.Throws<ArgumentOutOfRangeException>(() => Client.Get(string.Empty, "key"));
 
-            Assert.Throws<ArgumentNullException>(() => Client.Get(null, null, "key"));
-            Assert.Throws<ArgumentNullException>(() => Client.Get(null, string.Empty, "key"));
+            Assert.Throws<ArgumentOutOfRangeException>(() => Client.Get(null, null, "key"));
+            Assert.Throws<ArgumentOutOfRangeException>(() => Client.Get(null, string.Empty, "key"));
         }
 
         [Test]
@@ -137,7 +137,7 @@ namespace RiakClientTests.Live.GeneralIntegrationTests
             writeResult.IsSuccess.ShouldBeTrue();
             writeResult.Value.ShouldNotBeNull();
 
-            Assert.Throws<ArgumentNullException>(() =>
+            Assert.Throws<ArgumentOutOfRangeException>(() =>
             {
                 var getResults = Client.Get(new List<RiakObjectId>
                 {
