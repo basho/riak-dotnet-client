@@ -250,7 +250,7 @@ namespace RiakClient.Auth
         /// <summary>
         /// Returns a collection of client certificates from the configuration setting and local stores
         /// </summary>
-        /// <returns>Returns <see cref="X509CertificateCollection "/> representing available client certificates</returns>
+        /// <returns>Returns <see cref="X509CertificateCollection"/> representing available client certificates</returns>
         private X509CertificateCollection GetClientCertificates()
         {
             var clientCertificates = new X509CertificateCollection();
