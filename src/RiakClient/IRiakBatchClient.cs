@@ -29,6 +29,9 @@ namespace RiakClient
     using Models.RiakDt;
     using Models.Search;
 
+    /// <summary>
+    /// Interface for most Riak client operations.
+    /// </summary>
     public interface IRiakBatchClient
     {
         /// <summary>
