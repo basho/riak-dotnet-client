@@ -47,8 +47,7 @@ namespace RiakClient
         /// Do not use this method to determine individual node health.
         /// </description>
         /// <returns>
-        /// Returns true if the Riak instance has returned a 'pong' response. 
-        /// Returns false if Riak is unavailable or returns a 'pang' response. 
+        /// Returns a <see cref="RiakResult"/>. Check <see cref="RiakResult.IsSuccess"/> to see if the operation was a success.
         /// </returns>
         RiakResult Ping();
 
@@ -70,8 +69,7 @@ namespace RiakClient
         /// nodes successfully responding and an <paramref name="objectId"/> not being found in Riak.
         /// </remarks>
         /// <returns>
-        /// The found <see cref="RiakObject"/> wrapped in a <see cref="RiakResult{RiakObject}"/> for a 
-        /// successful get, or a <see cref="RiakResult"/> in case of failure.
+        /// A <see cref="RiakResult{RiakObject}"/>, which will contain the found <see cref="RiakObject"/>.
         /// </returns>
         RiakResult<RiakObject> Get(RiakObjectId objectId, RiakGetOptions options = null);
 
@@ -92,8 +90,7 @@ namespace RiakClient
         /// See <see cref="RiakGetOptions" /> for information on how different options change Riak's default behavior.
         /// </remarks>
         /// <returns>
-        /// The found <see cref="RiakObject"/> wrapped in a <see cref="RiakResult&lt;RiakObject&gt;"/> for a 
-        /// successful get, or a <see cref="RiakResult"/> in case of failure.
+        /// A <see cref="RiakResult{RiakObject}"/>, which will contain the found <see cref="RiakObject"/>.
         /// </returns>
         RiakResult<RiakObject> Get(string bucket, string key, RiakGetOptions options = null);
 
@@ -114,8 +111,7 @@ namespace RiakClient
         /// for information on how different options change Riak's default behavior.
         /// </remarks>
         /// <returns>
-        /// The found <see cref="RiakObject"/> wrapped in a <see cref="RiakResult&lt;RiakObject&gt;"/> for a 
-        /// successful get, or a <see cref="RiakResult"/> in case of failure.
+        /// A <see cref="RiakResult{RiakObject}"/>, which will contain the found <see cref="RiakObject"/>.
         /// </returns>
         RiakResult<RiakObject> Get(string bucketType, string bucket, string key, RiakGetOptions options = null);
 
@@ -409,8 +405,24 @@ namespace RiakClient
         /// <see cref="RiakBucketProperties"/> will be set on the bucket. 
         /// Those not set in the object will retain their values on Riak's side.
         /// </param>
+        /// <remarks>There is, as of RiakClient 2.0, no reason to use the HTTP interface. This is kept for legacy reasons.</remarks>
+        RiakResult SetBucketProperties(string bucket, RiakBucketProperties properties);
+
+        /// <summary>
+        /// Sets the <see cref="RiakBucketProperties"/> properties of a <paramref name="bucket"/>.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="RiakResult"/> detailing the success or failure of the operation.
+        /// </returns>
+        /// <param name="bucket">The name of the bucket to set the properties on.</param>
+        /// <param name="properties">
+        /// The properties to set. Note that only those properties explicitly set in the 
+        /// <see cref="RiakBucketProperties"/> will be set on the bucket. 
+        /// Those not set in the object will retain their values on Riak's side.
+        /// </param>
         /// <param name="useHttp">When true, RiakClient will use the HTTP interface</param>
         /// <remarks>There is, as of RiakClient 2.0, no reason to use the HTTP interface. This is kept for legacy reasons.</remarks>
+        [Obsolete("This overload will be removed in the next version. Please remove any usages of the \"useHttp\" parameter.")]
         RiakResult SetBucketProperties(string bucket, RiakBucketProperties properties, bool useHttp = false);
 
         /// <summary>
@@ -432,10 +444,18 @@ namespace RiakClient
         /// Reset the properties on a bucket back to their defaults.
         /// </summary>
         /// <param name="bucket">The name of the bucket to reset the properties on.</param>
+        /// <returns>A <see cref="RiakResult"/> detailing the success or failure of the operation.</returns>
+        /// <remarks>There is, as of RiakClient 2.0, no reason to use the HTTP interface. This is kept for legacy reasons.</remarks>
+        RiakResult ResetBucketProperties(string bucket);
+
+        /// <summary>
+        /// Reset the properties on a bucket back to their defaults.
+        /// </summary>
+        /// <param name="bucket">The name of the bucket to reset the properties on.</param>
         /// <param name="useHttp">Whether or not to use the HTTP interface to Riak. Set to true for Riak 1.3 and earlier</param> 
         /// <returns>A <see cref="RiakResult"/> detailing the success or failure of the operation.</returns>
         /// <remarks>There is, as of RiakClient 2.0, no reason to use the HTTP interface. This is kept for legacy reasons.</remarks>
-        [Obsolete("This overload will be removed in the next version.")]
+        [Obsolete("This overload will be removed in the next version. Please remove any usages of the \"useHttp\" parameter.")]
         RiakResult ResetBucketProperties(string bucket, bool useHttp = false);
 
         /// <summary>
