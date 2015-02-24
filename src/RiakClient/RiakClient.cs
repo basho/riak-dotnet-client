@@ -499,9 +499,18 @@ namespace RiakClient
         }
 
         /// <inheritdoc/>
+        public RiakResult SetBucketProperties(string bucket, RiakBucketProperties properties)
+        {
+            return SetBucketProperties(RiakConstants.DefaultBucketType, bucket, properties);
+        }
+
+        /// <inheritdoc/>
+        [Obsolete("This overload will be removed in the next version. Please remove any usages of the \"useHttp\" parameter.")]
         public RiakResult SetBucketProperties(string bucket, RiakBucketProperties properties, bool useHttp = false)
         {
-            return useHttp ? SetHttpBucketProperties(bucket, properties) : SetBucketProperties(null, bucket, properties);
+            return useHttp ? 
+                SetHttpBucketProperties(bucket, properties) : 
+                SetBucketProperties(RiakConstants.DefaultBucketType, bucket, properties);
         }
 
         /// <inheritdoc/>
@@ -511,10 +520,18 @@ namespace RiakClient
         }
 
         /// <inheritdoc/>
-        [Obsolete("This overload will be removed in the next version.")]
+        public RiakResult ResetBucketProperties(string bucket)
+        {
+            return ResetPbcBucketProperties(RiakConstants.DefaultBucketType, bucket);
+        }
+
+        /// <inheritdoc/>
+        [Obsolete("This overload will be removed in the next version. Please remove any usages of the \"useHttp\" parameter.")]
         public RiakResult ResetBucketProperties(string bucket, bool useHttp = false)
         {
-            return useHttp ? ResetHttpBucketProperties(bucket) : ResetPbcBucketProperties(null, bucket);
+            return useHttp ? 
+                ResetHttpBucketProperties(bucket) : 
+                ResetPbcBucketProperties(RiakConstants.DefaultBucketType, bucket);
         }
 
         /// <inheritdoc/>
