@@ -21,6 +21,10 @@ namespace RiakClient
 {
     using System;
 
+    /// <summary>
+    /// Subinterface of <see cref="IRiakBatchClient"/>. 
+    /// Adds properties for the Async client and batch operators.
+    /// </summary>
     public interface IRiakClient : IRiakBatchClient
     {
         /// <summary>
