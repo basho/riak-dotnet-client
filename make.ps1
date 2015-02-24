@@ -37,10 +37,15 @@ Param(
     [string]$Verbosity = 'Normal',
     [Parameter(Mandatory=$False)]
     [ValidatePattern("^v[1-9]\.[0-9]\.[0-9](-[a-z0-9]+)?")]
-    [string]$VersionString
+    [string]$VersionString,
+    [Parameter(Mandatory=$False)]
+    [switch]$UpdateDependencies
 )
 
 Set-StrictMode -Version Latest
+# Note:
+# Set to Continue to see DEBUG messages
+# $DebugPreference = 'Continue'
 
 trap
 {
@@ -124,9 +129,55 @@ function Get-PathToNuGetExe {
     return $nuget_exe_path
 }
 
-# Note:
-# Set to Continue to see DEBUG messages
-# $DebugPreference = 'Continue'
+function Get-NuGetData {
+    $script_path = Get-ScriptPath
+
+    $nuget_dir = Join-Path -Path $script_path -ChildPath '.nuget'
+    $nuget_config = Join-Path -Path $nuget_dir -ChildPath 'NuGet.config'
+    $nuget_exe = Get-PathToNuGetExe -NuGetDir $nuget_dir
+    $nuget_packages_dir = Join-Path -Path $script_path -ChildPath 'packages'
+    $nuget_packages_config = Join-Path -Path $nuget_dir -ChildPath 'packages.config'
+
+    $props = @{
+        ScriptPath = $script_path
+        Dir = $nuget_dir
+        Config = $nuget_config
+        Exe = $nuget_exe
+        PackagesDir = $nuget_packages_dir
+        PackagesConfig = $nuget_packages_config
+    }
+    return New-Object PSObject -Property $props
+}
+
+function Update-Dependencies {
+    $nuget_data = Get-NuGetData
+    $build_dir = Join-Path -Path $nuget_data.ScriptPath -ChildPath 'build'
+    & $nuget_data.Exe install MSBuildTasks -OutputDirectory $build_dir -ConfigFile $nuget_data.Config -ExcludeVersion
+    if ($? -ne $True) {
+        throw "$nuget_data install MSBuildTasks failed: $LastExitCode"
+    }
+    Write-Debug "$nuget_data install MSBuildTasks exit code: $LastExitCode"
+
+    & $nuget_data.Exe update $nuget_data.PackagesConfig -RepositoryPath $nuget_data.PackagesDir -ConfigFile $nuget_data.Config -NonInteractive
+    if ($? -ne $True) {
+        throw "$nuget_data install MSBuildTasks failed: $LastExitCode"
+    }
+    Write-Debug "$nuget_data update exit code: $LastExitCode"
+}
+
+function Restore-Dependencies {
+    $nuget_data = Get-NuGetData
+    & $nuget_data.Exe restore $nuget_data.PackagesConfig -PackagesDirectory $nuget_data.PackagesDir -ConfigFile $nuget_data.Config -NonInteractive
+    if ($? -ne $True) {
+        throw "$nuget_data restore failed: $LastExitCode"
+    }
+    Write-Debug "$nuget_data restore exit code: $LastExitCode"
+}
+
+if ($UpdateDependencies) {
+    Update-Dependencies
+    exit 0
+}
 
 Write-Debug "Target: $Target"
 
@@ -144,16 +195,7 @@ $build_targets_file = Get-BuildTargetsFile -ScriptPath $script_path
 
 $msbuild_exe = Get-PathToMSBuildExe
 
-$nuget_dir = Join-Path -Path $script_path -ChildPath '.nuget'
-$nuget_exe = Get-PathToNuGetExe -NuGetDir $nuget_dir
-$nuget_packages_dir = Join-Path -Path $script_path -ChildPath 'packages'
-$nuget_packages_config = Join-Path -Path $nuget_dir -ChildPath 'packages.config'
-Write-Debug "NuGet command: $nuget_exe restore -PackagesDirectory $nuget_packages_dir $nuget_packages_config"
-& $nuget_exe restore -PackagesDirectory $nuget_packages_dir $nuget_packages_config
-if ($? -ne $True) {
-    throw "$nuget_exe failed: $LastExitCode"
-}
-Write-Debug "$nuget_exe exit code: $LastExitCode"
+Restore-Dependencies
 
 $verbose_property = ''
 if ($Verbosity -eq 'detailed' -or $Verbosity -eq 'd' -or

@@ -152,7 +152,20 @@
     <MSBuild Projects="$(SolutionFile)" Properties="Configuration=Debug" />
   </Target>
 
-  <Target Name="IntegrationTest" DependsOnTargets="Debug">
+  <Target Name="SetupTests">
+    <XmlQuery XmlFileName="$(NuGetPackagesConfig)" XPath="/packages/package[@id='NUnit.Runners']/@version">
+      <Output TaskParameter="Values" PropertyName="NUnitRunnersVersion" />
+    </XmlQuery>
+    <PropertyGroup>
+      <NUnitConsoleRunnerExe>$(SolutionDir)packages\NUnit.Runners.$(NunitRunnersVersion)\tools\nunit-console.exe </NUnitConsoleRunnerExe>
+      <NUnitConsoleRunnerArgs Condition="'$(Verbose)' != 'true'">-nologo -nodots</NUnitConsoleRunnerArgs>
+      <NUnitConsoleRunnerArgs Condition="'$(Verbose)' == 'true'">-labels</NUnitConsoleRunnerArgs>
+      <NUnitConsoleRunnerCommand Condition="'$(OS)' == 'Windows_NT'">$(NUnitConsoleRunnerExe) $(NUnitConsoleRunnerArgs) -config Debug</NUnitConsoleRunnerCommand>
+      <NUnitConsoleRunnerCommand Condition="'$(OS)' != 'Windows_NT'">$(MonoExe) $(NUnitConsoleRunnerExe) $(NUnitConsoleRunnerArgs) -config Debug-Mono</NUnitConsoleRunnerCommand>
+    </PropertyGroup>
+  </Target>
+
+  <Target Name="IntegrationTest" DependsOnTargets="SetupTests;Debug">
     <Exec WorkingDirectory="$(SolutionDir)"
           Command="$(NUnitConsoleRunnerCommand) -work=$(ProjDir)\RiakClientTests.Live $(ProjDir)\RiakClientTests.Live\RiakClientTests.Live.nunit" />
   </Target>
@@ -162,7 +175,7 @@
              Properties="Configuration=Debug;VisualStudioVersion=12.0;CodeAnalysisTreatWarningsAsErrors=true;CodeAnalysisRuleSet=MinimumRecommendedRules.ruleset;RunCodeAnalysis=true" />
   </Target>
 
-  <Target Name="UnitTest" DependsOnTargets="GitSubmodule;Debug;CodeAnalysis">
+  <Target Name="UnitTest" DependsOnTargets="GitSubmodule;SetupTests;Debug;CodeAnalysis">
     <Exec WorkingDirectory="$(SolutionDir)"
           Command="$(NUnitConsoleRunnerCommand) -work=$(ProjDir)\RiakClientTests $(ProjDir)\RiakClientTests\RiakClientTests.nunit" />
   </Target>
@@ -176,7 +189,7 @@
     Do NOT create a 'Clean' target - that will screw up VS
   -->
 
-  <Target Name="DeprecatedTest" DependsOnTargets="Debug">
+  <Target Name="DeprecatedTest" DependsOnTargets="SetupTests;Debug">
     <Exec WorkingDirectory="$(SolutionDir)"
           Command="$(NUnitConsoleRunnerCommand) -work=$(ProjDir)\RiakClientTests.Deprecated $(ProjDir)\RiakClientTests.Deprecated\RiakClientTests.Deprecated.nunit" />
   </Target>
