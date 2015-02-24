@@ -6,6 +6,9 @@ cat > $out_file <<'EOT'
 [
     {riak_kv, [
         {delete_mode, immediate}
+    ]},
+    {riak_core, [
+        {target_n_val, 5}
     ]}
 ].
 EOT
