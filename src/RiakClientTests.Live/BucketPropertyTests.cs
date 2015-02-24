@@ -20,13 +20,10 @@
 namespace RiakClientTests.Live.BucketPropertyTests
 {
     using System;
-    using System.Linq;
     using NUnit.Framework;
     using RiakClient;
-    using RiakClient.Extensions;
     using RiakClient.Models;
     using RiakClient.Models.CommitHook;
-    using RiakClient.Util;
 
     [TestFixture]
     public class WhenDealingWithBucketProperties : LiveRiakConnectionTestBase
@@ -275,7 +272,6 @@ namespace RiakClientTests.Live.BucketPropertyTests
         }
 
         [Test]
-        [Ignore("Test will only pass if you have a bucket type named \"consistent\" with SC enabled on it.")]
         public void TestConsistentPropertyOnSCBucketType()
         {
             var regProps = Client.GetBucketProperties("consistent", "bucket");
