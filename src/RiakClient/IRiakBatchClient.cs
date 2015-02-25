@@ -479,7 +479,7 @@ namespace RiakClient
         /// <param name="riakObject">The initial object to use for the beginning of the link walking.</param>
         /// <param name="riakLinks">A list of link definitions.</param>
         /// <remarks>Refer to http://wiki.basho.com/Links-and-Link-Walking.html for more information.</remarks>
-        [Obsolete("Linkwalking has been depreciated as of Riak 2.0. This method will be removed in the next major version.")]
+        [Obsolete("Linkwalking has been deprecated as of Riak 2.0. This method will be removed in the next major version.")]
         RiakResult<IList<RiakObject>> WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks);
 
         /// <summary>

@@ -80,7 +80,7 @@ namespace RiakClient.Models.MapReduce
             return this;
         }
 
-        [Obsolete("Using Legacy Search as input for MapReduce is depreciated. Please move to Riak 2.0 Search, and use the RiakSearchInput class instead.")]
+        [Obsolete("Using Legacy Search as input for MapReduce is deprecated. Please move to Riak 2.0 Search, and use the RiakSearchInput class instead.")]
         public RiakMapReduceQuery Inputs(RiakBucketSearchInput riakBucketSearchInput)
         {
             inputs = riakBucketSearchInput;
