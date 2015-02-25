@@ -1,8 +1,8 @@
 #!/bin/sh
 
-out_file=$1
+out_file="$1"
 
-cat >> $out_file <<'EOT'
+cat >> "$out_file" <<'EOT'
 strong_consistency = on
 EOT
 

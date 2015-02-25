@@ -1,0 +1,7 @@
+*.nupkg
+content/
+*.xml
+*.xsd
+*.psm1
+*.proj
+*.ps1
