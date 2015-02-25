@@ -35,8 +35,8 @@
     <HelpTitle>Riak .NET Client Documentation</HelpTitle>
     <ContentPlacement>AboveNamespaces</ContentPlacement>
     <DocumentationSources>
-      <DocumentationSource sourceFile="RiakClient\bin\Debug\RiakClient.dll" />
-      <DocumentationSource sourceFile="RiakClient\bin\Debug\RiakClient.XML" />
+      <DocumentationSource sourceFile="RiakClient\bin\Release\RiakClient.dll" />
+      <DocumentationSource sourceFile="RiakClient\bin\Release\RiakClient.XML" />
     </DocumentationSources>
     <CopyrightText>Copyright %28c%29 2014 - Basho Technologies, Inc.</CopyrightText>
     <NamespaceSummaries>

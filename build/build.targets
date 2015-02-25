@@ -165,6 +165,19 @@
     </PropertyGroup>
   </Target>
 
+  <Target Name="Documentation" DependsOnTargets="Release">
+    <Error Condition="'$(OS)' != 'Windows_NT'" Text="Documentation can only be built on Windows via Sandcasle!" />
+    <Error Condition="'$(SHFBROOT)' == ''" Text="Ensure Sandcastle is installed and that the SHFBROOT environment variable is set!" />
+    <PropertyGroup>
+      <SandcastleProjFile>$(ProjDir)\RiakClient.shfbproj</SandcastleProjFile>
+      <SandcastleDocSourcePath>$(RiakClientProjDir)\bin\Release</SandcastleDocSourcePath>
+      <SandcastleDocOutputPath>$(RiakClientProjDir)\docs</SandcastleDocOutputPath>
+    </PropertyGroup>
+    <MSBuild Projects="$(SandcastleProjFile)"
+             Targets="Clean;Rebuild"
+             Properties="Configuration=Release;DocumentationSourcePath=$(SandcastleDocSourcePath);OutputPath=$(SandcastleDocOutputPath)" />
+  </Target>
+
   <Target Name="IntegrationTest" DependsOnTargets="SetupTests;Debug">
     <Exec WorkingDirectory="$(SolutionDir)"
           Command="$(NUnitConsoleRunnerCommand) -work=$(ProjDir)\RiakClientTests.Live $(ProjDir)\RiakClientTests.Live\RiakClientTests.Live.nunit" />

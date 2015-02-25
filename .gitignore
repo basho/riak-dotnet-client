@@ -13,6 +13,7 @@ RELEASE
 packages/
 Help
 Doc
+src/RiakClient/docs/
 
 *.orig
 *.ncb
