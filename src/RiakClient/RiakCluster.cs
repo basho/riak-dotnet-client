@@ -30,6 +30,11 @@ namespace RiakClient
     using Config;
     using Messages;
 
+    /// <summary>
+    /// Represents a collection of <see cref="RiakEndPoint"/>s. 
+    /// Allows operations to be performed using an endpoint's connection.
+    /// Also supported rudimentary load balancing between multiple nodes.
+    /// </summary>
     public class RiakCluster : RiakEndPoint
     {
         private readonly RoundRobinStrategy loadBalancer;
@@ -40,6 +45,12 @@ namespace RiakClient
 
         private bool disposing = false;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RiakCluster"/> class.
+        /// </summary>
+        /// <param name="clusterConfig">The <see cref="IRiakClusterConfiguration"/> to use for this RiakCluster.</param>
+        /// <param name="connectionFactory">The <see cref="IRiakConnectionFactory"/> instance to use for this RiakCluster.</param>
+        /// <exception cref="ArgumentNullException">If <paramref name="clusterConfig" /> contains no node information.</exception>
         public RiakCluster(IRiakClusterConfiguration clusterConfig, IRiakConnectionFactory connectionFactory)
         {
             nodePollTime = clusterConfig.NodePollTime;
@@ -82,6 +93,18 @@ namespace RiakClient
             return new RiakCluster(RiakClusterConfiguration.LoadFromConfig(configSectionName, configFileName), new RiakConnectionFactory());
         }
 
+        /// <summary>
+        /// Executes a delegate function using a <see cref="IRiakConnection"/>, and returns the results.
+        /// Can retry up to "<paramref name="retryAttempts"/>" times for <see cref="ResultCode.NoRetries"/> and <see cref="ResultCode.ShuttingDown"/> error states.
+        /// This method is used over <see cref="UseConnection"/> to keep a connection open to receive streaming results.
+        /// </summary>
+        /// <typeparam name="TResult">The type of the result from the <paramref name="useFun"/> parameter.</typeparam>
+        /// <param name="useFun">
+        /// The delegate function to execute. Takes an <see cref="IRiakConnection"/> and an <see cref="Action"/> continuation as input, and returns a 
+        /// <see cref="RiakResult{T}"/> containing an <see cref="IEnumerable{TResult}"/> as the results of the operation.
+        /// </param>
+        /// <param name="retryAttempts">The number of times to retry an operation.</param>
+        /// <returns>The results of the <paramref name="useFun"/> delegate.</returns>
         public override RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun, int retryAttempts)
         {
             if (retryAttempts < 0)

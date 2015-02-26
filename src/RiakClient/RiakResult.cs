@@ -19,16 +19,28 @@
 
 namespace RiakClient
 {
+    /// <summary>
+    /// Represents the collection of result information for a Riak operation that has no specific return value.
+    /// </summary>
     public class RiakResult
     {
         protected RiakResult()
         {
         }
 
+        /// <summary>
+        /// <b>true</b> if the Riak operation was a success, otherwise, <b>false</b>.
+        /// </summary>
         public bool IsSuccess { get; protected set; }
         
+        /// <summary>
+        /// The error message returned from the Riak operation, in the case that the operation was not a success.
+        /// </summary>
         public string ErrorMessage { get; protected set; }
 
+        /// <summary>
+        /// The <see cref="ResultCode"/> returned from the operation.
+        /// </summary>
         public ResultCode ResultCode { get; protected set; }
 
         internal bool NodeOffline { get; set; }

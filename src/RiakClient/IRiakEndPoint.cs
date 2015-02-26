@@ -24,7 +24,7 @@ namespace RiakClient
     using Comms;
 
     /// <summary>
-    /// Represents the connections to a Riak node.
+    /// Represents a connection to a Riak node, and allows operations to be performed with that connection.
     /// </summary>
     public interface IRiakEndPoint : IDisposable
     {
