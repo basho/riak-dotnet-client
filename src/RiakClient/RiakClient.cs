@@ -37,6 +37,10 @@ namespace RiakClient
     using Models.Search;
     using Util;
 
+    /// <summary>
+    /// Provides methods for interacting with a Riak database.
+    /// The primary implementation of <see cref="IRiakClient"/>.
+    /// </summary>
     public class RiakClient : IRiakClient
     {
         private const string ListBucketsWarning = "*** [CI] -> ListBuckets has serious performance implications and should not be used in production applications. ***";
@@ -60,8 +64,10 @@ namespace RiakClient
             Async = new RiakAsyncClient(this);
         }
 
+        /// <inheritdoc/>
         public int RetryCount { get; set; }
 
+        /// <inheritdoc/>
         public IRiakAsyncClient Async { get; private set; }
 
         /*
@@ -71,29 +77,13 @@ namespace RiakClient
 
         internal static bool DisableListKeysWarning { get; set; }
 
-        /// <summary>
-        /// Ping this instance of Riak
-        /// </summary>
-        /// <description>Ping can be used to ensure that there is an operational Riak node
-        /// present at the other end of the client. It's important to note that this will ping
-        /// any Riak node in the cluster and a specific node cannot be specified by the user.
-        /// Do not use this method to determine individual node health.</description>
-        /// <returns>Returns true if the Riak instance has returned a 'pong' response. 
-        /// Returns false if Riak is unavailable or returns a 'pang' response. </returns>
+        /// <inheritdoc/>
         public RiakResult Ping()
         {
             return UseConnection(conn => conn.PbcWriteRead(MessageCode.RpbPingReq, MessageCode.RpbPingResp));
         }
 
-        /// <summary>
-        /// Increments a Riak counter. 
-        /// </summary>
-        /// <param name="bucket">The bucket</param>
-        /// <param name="counter">The name of the counter</param>
-        /// <param name="amount">The amount to increment/decrement the counter</param>
-        /// <param name="options">The <see cref="RiakCounterUpdateOptions"/></param>
-        /// <returns><see cref="RiakCounterResult"/></returns>
-        /// <remarks>Only available in Riak 1.4+. If the counter is not initialized, then the counter will be initialized to 0 and then incremented.</remarks>
+        /// <inheritdoc/>
         public RiakCounterResult IncrementCounter(string bucket, string counter, long amount, RiakCounterUpdateOptions options = null)
         {
             var request = new RpbCounterUpdateReq { bucket = bucket.ToRiakString(), key = counter.ToRiakString(), amount = amount };
@@ -118,14 +108,7 @@ namespace RiakClient
             return new RiakCounterResult(RiakResult<RiakObject>.Success(o), parseResult ? (long?)counterValue : null);
         }
 
-        /// <summary>
-        /// Returns the value of a counter
-        /// </summary>
-        /// <param name="bucket">The bucket</param>
-        /// <param name="counter">The counter</param>
-        /// <param name="options"><see cref="RiakCounterGetOptions"/> describing how to read the counter.</param>
-        /// <returns><see cref="RiakCounterResult"/></returns>
-        /// <remarks>Only available in Riak 1.4+.</remarks>
+        /// <inheritdoc/>
         public RiakCounterResult GetCounter(string bucket, string counter, RiakCounterGetOptions options = null)
         {
             var request = new RpbCounterGetReq { bucket = bucket.ToRiakString(), key = counter.ToRiakString() };
@@ -146,77 +129,20 @@ namespace RiakClient
             return new RiakCounterResult(RiakResult<RiakObject>.Success(o), parseResult ? (long?)counterValue : null);
         }
 
+        /// <inheritdoc/>
         public RiakResult<RiakObject> Get(string bucketType, string bucket, string key, RiakGetOptions options = null)
         {
             options = options ?? RiakGetOptions.Default;
             return Get(new RiakObjectId(bucketType, bucket, key), options);
         }
 
-        /// <summary>
-        /// Get the specified <paramref name="key"/> from the <paramref name="bucket"/>.
-        /// Optionally can be read from rVal instances. By default, the server's
-        /// r-value will be used, but can be overridden by rVal.
-        /// </summary>
-        /// <param name='bucket'>
-        /// The name of the bucket containing the <paramref name="key"/>
-        /// </param>
-        /// <param name='key'>
-        /// The key.
-        /// </param>
-        /// <param name='options'>The <see cref="RiakGetOptions" /> responsible for 
-        /// configuring the semantics of this single get request. These options will override any previously 
-        /// defined bucket configuration properties.</param>
-        /// <remarks>If a node does not respond, that does not necessarily mean that the 
-        /// <paramref name="bucket"/>/<paramref name="key"/> combination is not available. It simply means
-        /// that fewer than R/PR nodes responded to the read request. See <see cref="RiakGetOptions" />
-        /// for information on how different options change Riak's default behavior.
-        /// </remarks>
-        /// <returns>An indication of success or failure.</returns>
+        /// <inheritdoc/>
         public RiakResult<RiakObject> Get(string bucket, string key, RiakGetOptions options = null)
         {
             return Get(null, bucket, key, RiakGetOptions.Default);
         }
 
-        /// <summary>
-        /// Get the specified <paramref name="key"/> from the <paramref name="bucket"/>.
-        /// Optionally can be read from <paramref name="rVal"/> instances. By default, the server's
-        /// r-value will be used, but can be overridden by <paramref name="rVal"/>.
-        /// </summary>
-        /// <param name='bucket'>
-        /// The name of the bucket containing the <paramref name="key"/>
-        /// </param>
-        /// <param name='key'>
-        /// The key.
-        /// </param>
-        /// <remarks>If a node does not respond, that does not necessarily mean that the 
-        /// <paramref name="bucket"/>/<paramref name="key"/> combination is not available. It simply means
-        /// that fewer than the default number nodes responded to the read request. Unfortunatley, 
-        /// the Riak API does not allow us to distinguish between a 404 resulting from less than <paramref name="rVal"/>
-        /// nodes successfully responding and a <paramref name="bucket"/>/<paramref name="key"/> combination
-        /// not being found in Riak.
-        /// </remarks>
-        /// <returns>An indication of success or failure.</returns>
-        public RiakResult<RiakObject> Get(string bucket, string key)
-        {
-            return Get(null, bucket, key, RiakGetOptions.Default);
-        }
-
-        /// <summary>
-        /// Retrieve the specified object from Riak.
-        /// </summary>
-        /// <param name='objectId'>
-        /// Object identifier made up of a key and bucket. <see cref="RiakObjectId"/>
-        /// </param>
-        /// <param name='options'>The <see cref="RiakGetOptions" /> responsible for 
-        /// configuring the semantics of this single get request. These options will override any previously 
-        /// defined bucket configuration properties.</param>
-        /// <remarks>If a node does not respond, that does not necessarily mean that the 
-        /// <paramref name="objectId"/> is not available. It simply means
-        /// that fewer than <paramref name="rVal" /> nodes responded to the read request. Unfortunatley, 
-        /// the Riak API does not allow us to distinguish between a 404 resulting from less than <paramref name="rVal"/>
-        /// nodes successfully responding and an <paramref name="objectId"/> not being found in Riak.
-        /// </remarks>
-        /// <returns>An indication of success or failure.</returns>
+        /// <inheritdoc/>
         public RiakResult<RiakObject> Get(RiakObjectId objectId, RiakGetOptions options = null)
         {
             var request = new RpbGetReq
@@ -246,21 +172,7 @@ namespace RiakClient
             return RiakResult<RiakObject>.Success(o);
         }
 
-        /// <summary>
-        /// Retrieve multiple objects from Riak.
-        /// </summary>
-        /// <param name='objectIds'>
-        /// An <see href="System.Collections.Generic.IEnumerable&lt;T&gt;"/> of <see cref="RiakObjectId"/> to be retrieved
-        /// </param>
-        /// <param name='options'>The <see cref="RiakGetOptions" /> responsible for 
-        /// configuring the semantics of this single get request. These options will override any previously 
-        /// defined bucket configuration properties.</param>
-        /// <returns>An <see cref="System.Collections.Generic.IEnumerable{T}"/> of <see cref="RiakResult{T}"/>
-        /// is returned. You should verify the success or failure of each result separately.</returns>
-        /// <remarks>Riak does not support multi get behavior. RiakClient's multi get functionality wraps multiple
-        /// get requests and returns results as an IEnumerable{RiakResult{RiakObject}}. Callers should be aware that
-        /// this may result in partial success - all results should be evaluated individually in the calling application.
-        /// In addition, applications should plan for multiple failures or multiple cases of siblings being present.</remarks>
+        /// <inheritdoc/>
         public IEnumerable<RiakResult<RiakObject>> Get(
             IEnumerable<RiakObjectId> objectIds, RiakGetOptions options = null)
         {
@@ -312,16 +224,7 @@ namespace RiakClient
             });
         }
 
-        /// <summary>
-        /// Persist a <see cref="RiakObject"/> to Riak using the specific <see cref="RiakPutOptions" />.
-        /// </summary>
-        /// <param name='value'>
-        /// The <see cref="RiakObject"/> to save.
-        /// </param>
-        /// <param name='options'>
-        /// Put options
-        /// </param>
-        /// <returns>An indication of success or failure.</returns>
+        /// <inheritdoc/>
         public RiakResult<RiakObject> Put(RiakObject value, RiakPutOptions options = null)
         {
             options = options ?? new RiakPutOptions();
@@ -349,21 +252,7 @@ namespace RiakClient
             return RiakResult<RiakObject>.Success(finalResult);
         }
 
-        /// <summary>
-        /// Persist an <see href="System.Collections.Generic.IEnumerable{T}"/> of <see cref="RiakObjectId"/> to Riak.
-        /// </summary>
-        /// <param name='values'>
-        /// The <see href="System.Collections.Generic.IEnumerable{T}"/> of <see cref="RiakObjectId"/> to save.
-        /// </param>
-        /// <param name='options'>
-        /// Put options.
-        /// </param>
-        /// <returns>An <see cref="System.Collections.Generic.IEnumerable{T}"/> of <see cref="RiakResult{T}"/>
-        /// is returned. You should verify the success or failure of each result separately.</returns>
-        /// <remarks>Riak does not support multi put behavior. RiakClient's multi put functionality wraps multiple
-        /// put requests and returns results as an IEnumerable{RiakResult{RiakObject}}. Callers should be aware that
-        /// this may result in partial success - all results should be evaluated individually in the calling application.
-        /// In addition, applications should plan for multiple failures or multiple cases of siblings being present.</remarks>
+        /// <inheritdoc/>
         public IEnumerable<RiakResult<RiakObject>> Put(IEnumerable<RiakObject> values, RiakPutOptions options = null)
         {
             options = options ?? new RiakPutOptions();
@@ -402,64 +291,25 @@ namespace RiakClient
             });
         }
 
-        /// <summary>
-        /// Delete the data identified by the <paramref name="riakObject"/>
-        /// </summary>
-        /// <param name='riakObject'>The object to delete</param>
-        /// <param name="options">Deletion options</param>
-        /// <returns>An indication of success or failure.</returns>
+        /// <inheritdoc/>
         public RiakResult Delete(RiakObject riakObject, RiakDeleteOptions options = null)
         {
             return Delete(riakObject.BucketType, riakObject.Bucket, riakObject.Key, options);
         }
 
-        /// <summary>
-        /// Delete the record identified by <paramref name="key"/> from a <paramref name="bucket"/>.
-        /// </summary>
-        /// <param name='bucket'>
-        /// The name of the bucket that contains the record to be deleted.
-        /// </param>
-        /// <param name='key'>
-        /// The key identifying the record to be deleted.
-        /// </param>
-        /// <param name='options'>
-        /// Delete options
-        /// </param>
-        /// <returns>An indication of success or failure.</returns>
+        /// <inheritdoc/>
         public RiakResult Delete(string bucket, string key, RiakDeleteOptions options = null)
         {
             return Delete(null, bucket, key, options);
         }
 
-        /// <summary>
-        /// Delete the record identified by <paramref name="key"/> from a <paramref name="bucket"/>.
-        /// </summary>
-        /// <param name='bucketType'>The bucket type</param>
-        /// <param name='bucket'>
-        /// The name of the bucket that contains the record to be deleted.
-        /// </param>
-        /// <param name='key'>
-        /// The key identifying the record to be deleted.
-        /// </param>
-        /// <param name='options'>
-        /// Delete options
-        /// </param>
-        /// <returns>An indication of success or failure.</returns>
+        /// <inheritdoc/>
         public RiakResult Delete(string bucketType, string bucket, string key, RiakDeleteOptions options = null)
         {
             return Delete(new RiakObjectId(bucketType, bucket, key), options);
         }
 
-        /// <summary>
-        /// Delete the record identified by the <paramref name="objectId"/>.
-        /// </summary>
-        /// <param name='objectId'>
-        /// A <see cref="RiakObjectId"/> identifying the bucket/key combination for the record to be deleted.
-        /// </param>
-        /// <param name='options'>
-        /// Delete options
-        /// </param>
-        /// <returns>An indication of success or failure.</returns>
+        /// <inheritdoc/>
         public RiakResult Delete(RiakObjectId objectId, RiakDeleteOptions options = null)
         {
             options = options ?? new RiakDeleteOptions();
@@ -477,27 +327,14 @@ namespace RiakClient
             return result;
         }
 
-        /// <summary>
-        /// Delete multiple objects identified by a <see cref="System.Collections.Generic.IEnumerable&lt;T&gt;"/> of <see cref="RiakObjectId"/>.
-        /// </summary>
-        /// <param name='objectIds'>
-        /// A <see cref="System.Collections.Generic.IEnumerable&lt;T&gt;"/> of <see cref="RiakObjectId"/>.
-        /// </param>
-        /// <param name='options'>
-        /// Delete options.
-        /// </param>    
-        /// <returns>An indication of success or failure.</returns>
+        /// <inheritdoc/>
         public IEnumerable<RiakResult> Delete(IEnumerable<RiakObjectId> objectIds, RiakDeleteOptions options = null)
         {
             var results = UseConnection(conn => Delete(conn, objectIds, options));
             return results.Value;
         }
 
-        /// <summary>
-        /// Execute a map reduce query.
-        /// </summary>
-        /// <param name="query">A <see cref="RiakMapReduceQuery"/></param>
-        /// <returns>A <see cref="RiakResult"/> of <see cref="RiakMapReduceResult"/></returns>
+        /// <inheritdoc/>
         public RiakResult<RiakMapReduceResult> MapReduce(RiakMapReduceQuery query)
         {
             var request = query.ToMessage();
@@ -511,11 +348,7 @@ namespace RiakClient
             return RiakResult<RiakMapReduceResult>.Error(response.ResultCode, response.ErrorMessage, response.NodeOffline);
         }
 
-        /// <summary>
-        /// Perform a Riak Search query
-        /// </summary>
-        /// <param name="search">The <see cref="RiakSearchRequest"/></param>
-        /// <returns>A <see cref="RiakResult"/> of <see cref="RiakSearchResult"/></returns>
+        /// <inheritdoc/>
         public RiakResult<RiakSearchResult> Search(RiakSearchRequest search)
         {
             var request = search.ToMessage();
@@ -529,12 +362,7 @@ namespace RiakClient
             return RiakResult<RiakSearchResult>.Error(response.ResultCode, response.ErrorMessage, response.NodeOffline);
         }
 
-        /// <summary>
-        /// Perform a map reduce query and stream the results.
-        /// </summary>
-        /// <param name="query">The query</param>
-        /// <returns>A <see cref="RiakResult"/> of <see cref="RiakStreamedMapReduceResult"/></returns>
-        /// <remarks>Make sure to fully enumerate the <see cref="RiakStreamedMapReduceResult"/> or connections may be left open.</remarks>
+        /// <inheritdoc/>
         public RiakResult<RiakStreamedMapReduceResult> StreamMapReduce(RiakMapReduceQuery query)
         {
             var request = query.ToMessage();
@@ -549,30 +377,13 @@ namespace RiakClient
             return RiakResult<RiakStreamedMapReduceResult>.Error(response.ResultCode, response.ErrorMessage, response.NodeOffline);
         }
 
-        /// <summary>
-        /// Lists all buckets in the default Bucket Type.
-        /// </summary>
-        /// <returns>
-        /// An <see cref="System.Collections.Generic.IEnumerable&lt;T&gt;"/> of <see cref="string"/> bucket names.
-        /// </returns>
-        /// <remarks>Buckets provide a logical namespace for keys. Listing buckets requires folding over all keys in a cluster and 
-        /// reading a list of buckets from disk. This operation, while non-blocking in Riak 1.0 and newer, still produces considerable
-        /// physical I/O and can take a long time.</remarks>
+        /// <inheritdoc/>
         public RiakResult<IEnumerable<string>> ListBuckets()
         {
             return ListBuckets(RiakConstants.DefaultBucketType);
         }
 
-        /// <summary>
-        /// Lists all buckets in the specified Bucket Type.
-        /// </summary>
-        /// <param name="bucketType">The name of the Bucket Type to list buckets for.</param>
-        /// <returns>
-        /// An <see cref="System.Collections.Generic.IEnumerable&lt;T&gt;"/> of <see cref="string"/> bucket names.
-        /// </returns>
-        /// <remarks>Buckets provide a logical namespace for keys. Listing buckets requires folding over all keys in a cluster and 
-        /// reading a list of buckets from disk. This operation, while non-blocking in Riak 1.0 and newer, still produces considerable
-        /// physical I/O and can take a long time.</remarks>
+        /// <inheritdoc/>
         public RiakResult<IEnumerable<string>> ListBuckets(string bucketType)
         {
             WarnAboutListBuckets();
@@ -593,16 +404,7 @@ namespace RiakClient
             return RiakResult<IEnumerable<string>>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
 
-        /// <summary>
-        /// Lists all buckets available on the Riak cluster. This uses an <see cref="System.Collections.Generic.IEnumerable&lt;T&gt;"/> 
-        /// of <see cref="string"/> to lazy initialize the collection of bucket names. 
-        /// </summary>
-        /// <returns>
-        /// An <see cref="System.Collections.Generic.IEnumerable&lt;T&gt;"/> of <see cref="string"/> bucket names.
-        /// </returns>
-        /// <remarks>Buckets provide a logical namespace for keys. Listing buckets requires folding over all keys in a cluster and 
-        /// reading a list of buckets from disk. This operation, while non-blocking in Riak 1.0 and newer, still produces considerable
-        /// physical I/O and can take a long time. Callers should fully enumerate the collection or else close the connection when finished.</remarks>
+        /// <inheritdoc/>
         public RiakResult<IEnumerable<string>> StreamListBuckets()
         {
             var listBucketsRequest = new RpbListBucketsReq { stream = true };
@@ -619,52 +421,25 @@ namespace RiakClient
             return RiakResult<IEnumerable<string>>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
 
-        /// <summary>
-        /// Lists all keys in the specified <paramref name="bucket"/>.
-        /// </summary>
-        /// <returns>
-        /// The keys.
-        /// </returns>
-        /// <param name='bucket'>
-        /// The bucket.
-        /// </param>
-        /// <remarks>ListKeys is an expensive operation that requires folding over all data in the Riak cluster to produce
-        /// a list of keys. This operation, while cheaper in Riak 1.0 than in earlier versions of Riak, should be avoided.</remarks>
+        /// <inheritdoc/>
         public RiakResult<IEnumerable<string>> ListKeys(string bucket)
         {
             return UseConnection(conn => ListKeys(conn, null, bucket));
         }
 
-        /// <summary>
-        /// Lists all keys in the specified <paramref name="bucket"/>.
-        /// </summary>
-        /// <returns>
-        /// The keys.
-        /// </returns>
-        /// <param name="bucketType">The bucket type - the default value is null. Riak 1.4 users should use null.</param>
-        /// <param name='bucket'>
-        /// The bucket.
-        /// </param>
-        /// <remarks>ListKeys is an expensive operation that requires folding over all data in the Riak cluster to produce
-        /// a list of keys. This operation, while cheaper in Riak 1.0 than in earlier versions of Riak, should be avoided.</remarks>
+        /// <inheritdoc/>
         public RiakResult<IEnumerable<string>> ListKeys(string bucketType, string bucket)
         {
             return UseConnection(conn => ListKeys(conn, bucketType, bucket));
         }
 
-        /// <summary>
-        /// Performs a streaming list keys operation.
-        /// </summary>
-        /// <param name="bucket">The bucket</param>
-        /// <returns>An <see cref="System.Collections.Generic.IEnumerable{T}"/></returns>
-        /// <remarks>While this streams results back to the client, alleviating pressure on Riak, this still relies on
-        /// folding over all keys present in the Riak cluster. Use at your own risk. A better approach would be to
-        /// use <see cref="ListKeysFromIndex"/></remarks>
+        /// <inheritdoc/>
         public RiakResult<IEnumerable<string>> StreamListKeys(string bucket)
         {
             return StreamListKeys(null, bucket);
         }
 
+        /// <inheritdoc/>
         public RiakResult<IEnumerable<string>> StreamListKeys(string bucketType, string bucket)
         {
             WarnAboutListKeys();
@@ -688,38 +463,26 @@ namespace RiakClient
             return RiakResult<IEnumerable<string>>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
 
-        /// <summary>
-        /// Return a list of keys from the given bucket.
-        /// </summary>
-        /// <param name="bucket">Riak bucket from which to list keys</param>
-        /// <returns>List of keys</returns>
-        /// <remarks>This uses the $key special index instead of the list keys API to 
-        /// quickly return an unsorted list of keys from Riak.</remarks>
+        /// <inheritdoc/>
         public RiakResult<IList<string>> ListKeysFromIndex(string bucket)
         {
             return ListKeysFromIndex(null, bucket);
         }
 
+        /// <inheritdoc/>
         public RiakResult<IList<string>> ListKeysFromIndex(string bucketType, string bucket)
         {
             var result = GetSecondaryIndex(new RiakIndexId(bucketType, bucket, RiakConstants.SystemIndexKeys.RiakBucketIndex), bucket);
             return RiakResult<IList<string>>.Success(result.Value.IndexKeyTerms.Select(ikt => ikt.Key).ToList());
         }
 
-        /// <summary>
-        /// Returns all properties for a <paramref name="bucket"/>.
-        /// </summary>
-        /// <returns>
-        /// The bucket properties.
-        /// </returns>
-        /// <param name='bucket'>
-        /// The Riak bucket.
-        /// </param>
+        /// <inheritdoc/>
         public RiakResult<RiakBucketProperties> GetBucketProperties(string bucket)
         {
             return GetBucketProperties(null, bucket);
         }
 
+        /// <inheritdoc/>
         public RiakResult<RiakBucketProperties> GetBucketProperties(string bucketType, string bucket)
         {
             var getBucketRequest = new RpbGetBucketReq { type = bucketType.ToRiakString(), bucket = bucket.ToRiakString() };
@@ -735,66 +498,50 @@ namespace RiakClient
             return RiakResult<RiakBucketProperties>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
 
-        /// <summary>
-        /// Sets the <see cref="RiakBucketProperties"/> properties of a <paramref name="bucket"/>.
-        /// </summary>
-        /// <returns>
-        /// A <see cref="RiakResult"/> detailing the success or failure of the operation.
-        /// </returns>
-        /// <param name='bucket'>
-        /// The Bucket.
-        /// </param>
-        /// <param name='properties'>
-        /// The Properties.
-        /// </param>
-        /// <param name='useHttp'>When true, RiakClient will use the HTTP interface</param>
-        /// <remarks>There is, as of RiakClient 2.0, no reason to use the HTTP interface. This is kept for legacy reasons.</remarks>
-        public RiakResult SetBucketProperties(string bucket, RiakBucketProperties properties, bool useHttp = false)
+        /// <inheritdoc/>
+        public RiakResult SetBucketProperties(string bucket, RiakBucketProperties properties)
         {
-            return useHttp ? SetHttpBucketProperties(bucket, properties) : SetBucketProperties(null, bucket, properties);
+            return SetBucketProperties(RiakConstants.DefaultBucketType, bucket, properties);
         }
 
+        /// <inheritdoc/>
+        [Obsolete("This overload will be removed in the next version. Please remove any usages of the \"useHttp\" parameter.")]
+        public RiakResult SetBucketProperties(string bucket, RiakBucketProperties properties, bool useHttp = false)
+        {
+            return useHttp ? 
+                SetHttpBucketProperties(bucket, properties) : 
+                SetBucketProperties(RiakConstants.DefaultBucketType, bucket, properties);
+        }
+
+        /// <inheritdoc/>
         public RiakResult SetBucketProperties(string bucketType, string bucket, RiakBucketProperties properties)
         {
             return SetPbcBucketProperties(bucketType, bucket, properties);
         }
 
-        /// <summary>
-        /// Reset the properties on a bucket back to their defaults.
-        /// </summary>
-        /// <param name="bucket">The name of the bucket to reset the properties on.</param>
-        /// <param name="useHttp">Whether or not to use the HTTP interface to Riak. Set to true for Riak 1.3 and earlier</param> 
-        /// <returns>An indication of success or failure.</returns>
-        /// <remarks>There is, as of RiakClient 2.0, no reason to use the HTTP interface. This is kept for legacy reasons.</remarks>
-        public RiakResult ResetBucketProperties(string bucket, bool useHttp = false)
+        /// <inheritdoc/>
+        public RiakResult ResetBucketProperties(string bucket)
         {
-            return useHttp ? ResetHttpBucketProperties(bucket) : ResetPbcBucketProperties(null, bucket);
+            return ResetPbcBucketProperties(RiakConstants.DefaultBucketType, bucket);
         }
 
-        /// <summary>
-        /// Reset the properties on a bucket back to their defaults.
-        /// </summary>
-        /// <param name="bucketType">The bucket type. Bucket types are a Riak 2.0 feature and do not apply to Riak 1.4 and earlier</param>
-        /// <param name="bucket">The name of the bucket on which to reset properties</param>
-        /// <returns>An indication of success or failure.</returns>
+        /// <inheritdoc/>
+        [Obsolete("This overload will be removed in the next version. Please remove any usages of the \"useHttp\" parameter.")]
+        public RiakResult ResetBucketProperties(string bucket, bool useHttp = false)
+        {
+            return useHttp ? 
+                ResetHttpBucketProperties(bucket) : 
+                ResetPbcBucketProperties(RiakConstants.DefaultBucketType, bucket);
+        }
+
+        /// <inheritdoc/>
         public RiakResult ResetBucketProperties(string bucketType, string bucket)
         {
             return ResetPbcBucketProperties(bucketType, bucket);
         }
 
-        /// <summary>
-        /// Retrieve arbitrarily deep list of links for a <see cref="RiakObject"/>
-        /// </summary>
-        /// <returns>
-        /// A list of <see cref="RiakObject"/> identified by the list of links.
-        /// </returns>
-        /// <param name='riakObject'>
-        /// The initial object to use for the beginning of the link walking.
-        /// </param>
-        /// <param name='riakLinks'>
-        /// A list of link definitions
-        /// </param>
-        /// <remarks>Refer to http://wiki.basho.com/Links-and-Link-Walking.html for more information.</remarks>
+        /// <inheritdoc/>
+        [Obsolete("Linkwalking has been deprecated as of Riak 2.0. This method will be removed in the next major version.")]
         public RiakResult<IList<RiakObject>> WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks)
         {
             System.Diagnostics.Debug.Assert(riakLinks.Count > 0, "Link walking requires at least one link");
@@ -825,9 +572,9 @@ namespace RiakClient
 
                 // var linkResultStrings = linkResults.SelectMany(g => g.Select(r => r.Values.Value.FromRiakString()));
                 var rawLinks = linkResultStrings.SelectMany(RiakLink.ParseArrayFromJsonString).Distinct();
-                var oids = rawLinks.Select(l => new RiakObjectId(l.Bucket, l.Key)).ToList();
+                var objectIds = rawLinks.Select(l => new RiakObjectId(l.Bucket, l.Key)).ToList();
 
-                var objects = Get(oids, new RiakGetOptions());
+                var objects = Get(objectIds, new RiakGetOptions());
 
                 // FIXME
                 // we could be discarding results here. Not good?
@@ -838,14 +585,7 @@ namespace RiakClient
             return RiakResult<IList<RiakObject>>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
 
-        /// <summary>
-        /// Get the server information from the connected cluster.
-        /// </summary>
-        /// <returns>Model containing information gathered from a node in the cluster.</returns>
-        /// <remarks>This function will assume that all of the nodes in the cluster are running
-        /// the same version of Riak. It will only get executed on a single node, and the content
-        /// that is returned technically only relates to that node. All nodes in a cluster should
-        /// run on the same version of Riak.</remarks>
+        /// <inheritdoc/>
         public RiakResult<RiakServerInfo> GetServerInfo()
         {
             var result = UseConnection(conn => conn.PbcWriteRead<RpbGetServerInfoResp>(MessageCode.RpbGetServerInfoReq));
@@ -858,83 +598,70 @@ namespace RiakClient
             return RiakResult<RiakServerInfo>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
         }
 
+        /// <inheritdoc/>
         public RiakResult<RiakStreamedIndexResult> StreamGetSecondaryIndex(RiakIndexId index, BigInteger value, RiakIndexGetOptions options = null)
         {
             var intIndex = index.ToIntIndexId();
             return StreamGetSecondaryIndexEquals(intIndex, value.ToString(), options);
         }
 
+        /// <inheritdoc/>
         public RiakResult<RiakStreamedIndexResult> StreamGetSecondaryIndex(RiakIndexId index, string value, RiakIndexGetOptions options = null)
         {
             var binIndex = index.ToBinIndexId();
             return StreamGetSecondaryIndexEquals(binIndex, value, options);
         }
 
+        /// <inheritdoc/>
         public RiakResult<RiakStreamedIndexResult> StreamGetSecondaryIndex(RiakIndexId index, BigInteger min, BigInteger max, RiakIndexGetOptions options = null)
         {
             var intIndex = index.ToIntIndexId();
             return StreamGetSecondaryIndexRange(intIndex, min.ToString(), max.ToString(), options);
         }
 
+        /// <inheritdoc/>
         public RiakResult<RiakStreamedIndexResult> StreamGetSecondaryIndex(RiakIndexId index, string min, string max, RiakIndexGetOptions options = null)
         {
             var binIndex = index.ToBinIndexId();
             return StreamGetSecondaryIndexRange(binIndex, min, max, options);
         }
 
-        public RiakResult<RiakIndexResult> GetSecondaryIndex(RiakIndexId index, BigInteger minValue, BigInteger maxValue, RiakIndexGetOptions options = null)
+        /// <inheritdoc/>
+        public RiakResult<RiakIndexResult> GetSecondaryIndex(RiakIndexId index, BigInteger min, BigInteger max, RiakIndexGetOptions options = null)
         {
             var intIndex = index.ToIntIndexId();
-            return GetSecondaryIndexRange(intIndex, minValue.ToString(), maxValue.ToString(), options);
+            return GetSecondaryIndexRange(intIndex, min.ToString(), max.ToString(), options);
         }
 
-        public RiakResult<RiakIndexResult> GetSecondaryIndex(RiakIndexId index, string minValue, string maxValue, RiakIndexGetOptions options = null)
+        /// <inheritdoc/>
+        public RiakResult<RiakIndexResult> GetSecondaryIndex(RiakIndexId index, string min, string max, RiakIndexGetOptions options = null)
         {
             var binIndex = index.ToBinIndexId();
-            return GetSecondaryIndexRange(binIndex, minValue, maxValue, options);
+            return GetSecondaryIndexRange(binIndex, min, max, options);
         }
 
-        /// <summary>
-        /// Retrieve an indexed values
-        /// </summary>
-        /// <param name="index">The bucket type, bucket, index combination representing the index</param>
-        /// <param name="value">The indexed value to search for</param>
-        /// <param name="options">The <see cref="RiakIndexGetOptions"/></param>
-        /// <returns>A <see cref="RiakResult{T}"/> of <see cref="RiakIndexResult"/></returns>
+        /// <inheritdoc/>
         public RiakResult<RiakIndexResult> GetSecondaryIndex(RiakIndexId index, BigInteger value, RiakIndexGetOptions options = null)
         {
             var intIndex = index.ToIntIndexId();
             return GetSecondaryIndexEquals(intIndex, value.ToString(), options);
         }
 
-        /// <summary>
-        /// Retrieve an indexed values
-        /// </summary>
-        /// <param name="index">The bucket type, bucket, index combination representing the index</param>
-        /// <param name="value">The indexed value to search for</param>
-        /// <param name="options">The <see cref="RiakIndexGetOptions"/></param>
-        /// <returns>A <see cref="RiakResult{T}"/> of <see cref="RiakIndexResult"/></returns>
+        /// <inheritdoc/>
         public RiakResult<RiakIndexResult> GetSecondaryIndex(RiakIndexId index, string value, RiakIndexGetOptions options = null)
         {
             var binIndex = index.ToBinIndexId();
             return GetSecondaryIndexEquals(binIndex, value, options);
         }
 
-        /// <summary>
-        /// Used to create a batched set of actions to be sent to a Riak cluster. This guarantees some level of serialized activity.
-        /// </summary>
-        /// <param name='batchAction'>
-        /// Batch action.
-        /// </param>
-        /// <exception cref='Exception'>
-        /// Represents errors that occur during application execution.
-        /// </exception>
+        /// <inheritdoc/>
         public void Batch(Action<IRiakBatchClient> batchAction)
         {
             Batch<object>(c => { batchAction(c); return null; });
         }
 
-        public T Batch<T>(Func<IRiakBatchClient, T> batchFun)
+        /// <inheritdoc />
+        public T Batch<T>(Func<IRiakBatchClient, T> batchFunction)
         {
             var funResult = default(T);
 
@@ -942,7 +669,7 @@ namespace RiakClient
             {
                 try
                 {
-                    funResult = batchFun(new RiakClient(conn));
+                    funResult = batchFunction(new RiakClient(conn));
                     return RiakResult<IEnumerable<RiakResult<object>>>.Success(null);
                 }
                 catch (Exception ex)
@@ -968,38 +695,14 @@ namespace RiakClient
             return funResult;
         }
 
-        public RiakResult<RiakObject> DtFetch(
-            string bucketType, string bucket, string key, RiakDtFetchOptions options = null)
-        {
-            return DtFetch(new RiakObjectId(bucketType, bucket, key), options);
-        }
-
-        public RiakResult<RiakObject> DtFetch(RiakObjectId riakObject, RiakDtFetchOptions options = null)
-        {
-            var message = new DtFetchReq
-            {
-                type = riakObject.BucketType.ToRiakString(),
-                bucket = riakObject.Bucket.ToRiakString(),
-                key = riakObject.Key.ToRiakString()
-            };
-
-            options = options ?? new RiakDtFetchOptions();
-
-            options.Populate(message);
-
-            var result = UseConnection(conn => conn.PbcWriteRead<DtFetchReq, DtFetchResp>(message));
-
-            return result.IsSuccess ?
-                RiakResult<RiakObject>.Success(new RiakObject(new RiakObjectId(riakObject.BucketType, riakObject.Bucket, riakObject.Key), result))
-                : RiakResult<RiakObject>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
-        }
-
+        /// <inheritdoc/>
         public RiakCounterResult DtFetchCounter(
             string bucketType, string bucket, string key, RiakDtFetchOptions options = null)
         {
             return DtFetchCounter(new RiakObjectId(bucketType, bucket, key), options);
         }
 
+        /// <inheritdoc/>
         public RiakCounterResult DtFetchCounter(RiakObjectId objectId, RiakDtFetchOptions options = null)
         {
             var message = new DtFetchReq
@@ -1032,12 +735,14 @@ namespace RiakClient
             return rcr;
         }
 
+        /// <inheritdoc/>
         public RiakCounterResult DtUpdateCounter(
             string bucketType, string bucket, string key, long amount, RiakDtUpdateOptions options = null)
         {
             return DtUpdateCounter(new RiakObjectId(bucketType, bucket, key), amount, options);
         }
 
+        /// <inheritdoc/>
         public RiakCounterResult DtUpdateCounter(
             RiakObjectId objectId, long amount, RiakDtUpdateOptions options = null)
         {
@@ -1071,11 +776,13 @@ namespace RiakClient
             return rcr;
         }
 
+        /// <inheritdoc/>
         public RiakDtSetResult DtFetchSet(string bucketType, string bucket, string key, RiakDtFetchOptions options = null)
         {
             return DtFetchSet(new RiakObjectId(bucketType, bucket, key), options);
         }
 
+        /// <inheritdoc/>
         public RiakDtSetResult DtFetchSet(RiakObjectId objectId, RiakDtFetchOptions options = null)
         {
             var message = new DtFetchReq
@@ -1115,6 +822,7 @@ namespace RiakClient
             return rsr;
         }
 
+        /// <inheritdoc/>
         public RiakDtSetResult DtUpdateSet<T>(
             string bucketType,
             string bucket,
@@ -1128,6 +836,7 @@ namespace RiakClient
             return DtUpdateSet(new RiakObjectId(bucketType, bucket, key), serialize, context, adds, removes, options);
         }
 
+        /// <inheritdoc/>
         public RiakDtSetResult DtUpdateSet<T>(
             RiakObjectId objectId,
             SerializeObjectToByteArray<T> serialize,
@@ -1181,6 +890,7 @@ namespace RiakClient
             return resultSet;
         }
 
+        /// <inheritdoc/>
         public RiakDtMapResult DtFetchMap(
             string bucket,
             string key,
@@ -1227,6 +937,7 @@ namespace RiakClient
             return riakMapResult;
         }
 
+        /// <inheritdoc/>
         public RiakDtMapResult DtUpdateMap<T>(
             string bucketType,
             string bucket,
@@ -1251,6 +962,9 @@ namespace RiakClient
                 options);
         }
 
+        // TODO: We don't use the serialize parameter, remove it.
+
+        /// <inheritdoc/>
         public RiakDtMapResult DtUpdateMap<T>(
             RiakObjectId objectId,
             SerializeObjectToByteArray<T> serialize,
@@ -1319,6 +1033,7 @@ namespace RiakClient
             return riakMapResult;
         }
 
+        /// <inheritdoc/>
         public RiakResult<SearchIndexResult> GetSearchIndex(string indexName)
         {
             var request = new RpbYokozunaIndexGetReq { name = indexName.ToRiakString() };
@@ -1333,18 +1048,21 @@ namespace RiakClient
             return RiakResult<SearchIndexResult>.Success(new SearchIndexResult(result.Value));
         }
 
+        /// <inheritdoc/>
         public RiakResult PutSearchIndex(SearchIndex searchIndex)
         {
             var request = new RpbYokozunaIndexPutReq { index = searchIndex.ToMessage() };
             return UseConnection(conn => conn.PbcWriteRead(request, MessageCode.RpbPutResp));
         }
 
+        /// <inheritdoc/>
         public RiakResult DeleteSearchIndex(string indexName)
         {
             var request = new RpbYokozunaIndexDeleteReq { name = indexName.ToRiakString() };
             return UseConnection(conn => conn.PbcWriteRead(request, MessageCode.RpbDelResp));
         }
 
+        /// <inheritdoc/>
         public RiakResult<SearchSchema> GetSearchSchema(string schemaName)
         {
             var request = new RpbYokozunaSchemaGetReq { name = schemaName.ToRiakString() };
@@ -1359,12 +1077,14 @@ namespace RiakClient
             return RiakResult<SearchSchema>.Success(new SearchSchema(result.Value.schema));
         }
 
+        /// <inheritdoc/>
         public RiakResult PutSearchSchema(SearchSchema searchSchema)
         {
             var request = new RpbYokozunaSchemaPutReq { schema = searchSchema.ToMessage() };
             return UseConnection(conn => conn.PbcWriteRead(request, MessageCode.RpbPutResp));
         }
 
+        /// <inheritdoc/>
         public RiakResult<string> GetServerStatus()
         {
             var request = new RiakRestRequest(RiakConstants.Rest.Uri.StatsRoot, RiakConstants.Rest.HttpMethod.Get);
@@ -1456,11 +1176,11 @@ namespace RiakClient
             options = options ?? new RiakDeleteOptions();
 
             var responses = objectIds.Select(id =>
-                {
-                    var req = new RpbDelReq { bucket = id.Bucket.ToRiakString(), key = id.Key.ToRiakString() };
-                    options.Populate(req);
-                    return conn.PbcWriteRead(req, MessageCode.RpbDelResp);
-                }).ToList();
+            {
+                var req = new RpbDelReq { bucket = id.Bucket.ToRiakString(), key = id.Key.ToRiakString() };
+                options.Populate(req);
+                return conn.PbcWriteRead(req, MessageCode.RpbDelResp);
+            }).ToList();
 
             return RiakResult<IEnumerable<RiakResult>>.Success(responses);
         }

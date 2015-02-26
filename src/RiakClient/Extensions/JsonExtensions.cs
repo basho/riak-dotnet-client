@@ -21,18 +21,42 @@ namespace RiakClient.Extensions
 {
     using Newtonsoft.Json;
 
+    /// <summary>
+    /// Helper extension methods to use common Newtonsoft.Json methods with less code. 
+    /// </summary>
     public static class JsonExtensions
     {
+        /// <summary>
+        /// Serializes the specified object to a JSON string.
+        /// </summary>
+        /// <typeparam name="T">A value or reference type.</typeparam>
+        /// <param name="value">The object to serialize.</param>
+        /// <returns>The object serialized as a JSON string.</returns>
         public static string ToJson<T>(this T value)
         {
             return JsonConvert.SerializeObject(value);
         }
 
+        /// <summary>
+        /// Serializes the specified object to a JSON string.
+        /// </summary>
+        /// <typeparam name="T">A reference type.</typeparam>
+        /// <param name="obj">The object to serialize.</param>
+        /// <returns>The object serialized as a JSON string.</returns>
         public static string Serialize<T>(this T obj) where T : class
         {
             return JsonConvert.SerializeObject(obj);
         }
 
+        /// <summary>
+        /// Writes the property name and the value as a name/value pair.
+        /// An error will be raised if the value cannot be written as a single JSON token.
+        /// </summary>
+        /// <typeparam name="T">A value or reference type</typeparam>
+        /// <param name="writer">The JsonWriter to write the property to.</param>
+        /// <param name="name">The name of the property.</param>
+        /// <param name="value">The value of the property, writes a System.Object value.</param>
+        /// <returns>The original JsonWriter, not modified but useful for call chaining.</returns>
         public static JsonWriter WriteProperty<T>(this JsonWriter writer, string name, T value)
         {
             writer.WritePropertyName(name);
@@ -40,6 +64,15 @@ namespace RiakClient.Extensions
             return writer;
         }
 
+        /// <summary>
+        /// If the value is non null, this method will write the property name and the value as a name/value pair.
+        /// An error will be raised if the value cannot be written as a single JSON token.
+        /// </summary>
+        /// <typeparam name="T">A reference type</typeparam>
+        /// <param name="writer">The JsonWriter to write the property to.</param>
+        /// <param name="name">The name of the property.</param>
+        /// <param name="value">The value of the property, writes a System.Object value.</param>
+        /// <returns>The original JsonWriter, not modified but useful for call chaining.</returns>
         public static JsonWriter WriteNonNullProperty<T>(this JsonWriter writer, string name, T value)
             where T : class
         {
@@ -51,6 +84,15 @@ namespace RiakClient.Extensions
             return writer;
         }
 
+        /// <summary>
+        /// If the nullable value type is non null, this method will write the property name and the value as a name/value pair.
+        /// An error will be raised if the value cannot be written as a single JSON token.
+        /// </summary>
+        /// <typeparam name="T">A nullable value type</typeparam>
+        /// <param name="writer">The JsonWriter to write the property to.</param>
+        /// <param name="name">The name of the property.</param>
+        /// <param name="value">The value of the property, writes a System.Object value.</param>
+        /// <returns>The original JsonWriter, not modified but useful for call chaining.</returns>
         public static JsonWriter WriteNullableProperty<T>(this JsonWriter writer, string name, T? value)
             where T : struct
         {
@@ -62,6 +104,14 @@ namespace RiakClient.Extensions
             return writer;
         }
 
+        /// <summary>
+        /// If the string value is non-empty, this method will write the property name and the value as a name/value pair.
+        /// An error will be raised if the value cannot be written as a single JSON token.
+        /// </summary>
+        /// <param name="writer">The JsonWriter to write the property to.</param>
+        /// <param name="name">The name of the property.</param>
+        /// <param name="value">The value of the property, writes a System.Object value.</param>
+        /// <returns>The original JsonWriter, not modified but useful for call chaining.</returns>
         public static JsonWriter WriteSpecifiedProperty(this JsonWriter writer, string name, string value)
         {
             if (!string.IsNullOrWhiteSpace(value))

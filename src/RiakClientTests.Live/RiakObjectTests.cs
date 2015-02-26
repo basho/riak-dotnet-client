@@ -17,6 +17,8 @@
 // under the License.
 // </copyright>
 
+using RiakClient.Exceptions;
+
 namespace RiakClientTests.Live
 {
     using System.Collections.Generic;
@@ -79,6 +81,7 @@ namespace RiakClientTests.Live
             brent.ContentType = RiakConstants.ContentTypes.ApplicationJson;
             rob.ContentType = RiakConstants.ContentTypes.ApplicationJson;
 
+#pragma warning disable 618
             oj.LinkTo(jeremiah, "friends");
             oj.LinkTo(jeremiah, "coworkers");
 
@@ -91,7 +94,7 @@ namespace RiakClientTests.Live
 
             brent.LinkTo(jeremiah, "coworkers");
             brent.LinkTo(jeremiah, "friends");
-
+#pragma warning restore 618
             Client.Put(new[] { oj, jeremiah, brent, rob });
         }
     }
@@ -228,7 +231,9 @@ namespace RiakClientTests.Live
             var jeremiah = Client.Get(TestBucket, Jeremiah).Value;
             var linkToRemove = new RiakLink(TestBucket, OJ, "ozzies");
 
+#pragma warning disable 618
             jeremiah.RemoveLink(linkToRemove);
+#pragma warning restore 618
 
             var ojLinks = new List<RiakLink>
             {
@@ -247,7 +252,9 @@ namespace RiakClientTests.Live
             var jeremiah = Client.Get(TestBucket, Jeremiah).Value;
             var linkToRemove = new RiakLink(TestBucket, OJ, "ozzies");
 
+#pragma warning disable 618
             jeremiah.RemoveLink(linkToRemove);
+#pragma warning restore 618
 
             var result = Client.Put(jeremiah, new RiakPutOptions { ReturnBody = true });
             result.IsSuccess.ShouldBeTrue();
@@ -275,14 +282,14 @@ namespace RiakClientTests.Live
                 RiakLink.AllLinks
             };
 
+#pragma warning disable 618
             var linkPeople = Client.WalkLinks(oj, linkPhases);
+#pragma warning restore 618
             linkPeople.IsSuccess.ShouldBeTrue();
             linkPeople.Value.Count.ShouldEqual(6);
         }
     }
-
-
-
+    
     [TestFixture]
     public class WhenSerializingObjects : RiakObjectTestBase
     {

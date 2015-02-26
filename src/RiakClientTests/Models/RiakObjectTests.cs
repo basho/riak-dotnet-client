@@ -22,6 +22,7 @@ namespace RiakClientTests.Models
     using System;
     using System.Linq;
     using NUnit.Framework;
+    using RiakClient.Exceptions;
     using RiakClient.Models;
 
     [TestFixture]
@@ -33,17 +34,17 @@ namespace RiakClientTests.Models
         [Test]
         public void RiakObject_RequiresNonNullNonEmptyBucketName()
         {
-            Assert.Catch<ArgumentNullException>(
+            Assert.Catch<ArgumentOutOfRangeException>(
                 () => new RiakObject((string)null, Key, "value"),
-                "Expected ArgumentNullException");
+                "Expected ArgumentOutOfRangeException");
         }
 
         [Test]
         public void RiakObjectId_RequiresNonNullNonEmptyBucketName()
         {
-            Assert.Catch<ArgumentNullException>(
+            Assert.Catch<ArgumentOutOfRangeException>(
                 () => new RiakObjectId((string)null, Key),
-                "Expected ArgumentNullException");
+                "Expected ArgumentOutOfRangeException");
         }
 
         [Test]
@@ -51,7 +52,7 @@ namespace RiakClientTests.Models
         {
             Assert.Catch<ArgumentNullException>(
                 () => new RiakObject((RiakObjectId)null, Key, "value"),
-                "Expected ArgumentNullException");
+                "Expected ArgumentOutOfRangeException");
         }
 
         [Test]
@@ -129,7 +130,7 @@ namespace RiakClientTests.Models
             riakObject.IntIndex("years").Delete();
             riakObject.IntIndexes.ContainsKey("years").ShouldBeFalse();
         }
-
+        
         [Test]
         public void VectorClocksCanBeSetThroughInterface()
         {
@@ -156,6 +157,75 @@ namespace RiakClientTests.Models
             obj.BinIndex("uppercase").Values.First().ShouldEqual("foo");
             obj.IntIndex("MixedCase").Values.First().ShouldEqual(10);
             obj.IntIndex("mixedcase").Values.First().ShouldEqual(10);
+        }
+
+        [Test]
+        public void ExceptionThrownWhenMixingLinkWalkingAndBucketTypes()
+        {
+            var oldId = new RiakObjectId(Bucket, Key);
+            var newId = new RiakObjectId("Type", Bucket, Key);
+            
+            var oldObject = new RiakObject(oldId, "value");
+            var newObject = new RiakObject(newId, "value");
+
+            const string LinkTag = "badlinktag";
+
+#pragma warning disable 618
+            Assert.Throws<RiakUnsupportedException>(
+                () => oldObject.LinkTo(newId, LinkTag),
+                "RiakUnsupportedException was expected.");
+            
+            Assert.Throws<RiakUnsupportedException>(
+                () => oldObject.LinkTo(newObject, LinkTag),
+                "RiakUnsupportedException was expected.");
+            
+            Assert.Throws<RiakUnsupportedException>(
+                () => oldObject.RemoveLink(newId, LinkTag),
+                "RiakUnsupportedException was expected.");
+            
+            Assert.Throws<RiakUnsupportedException>(
+                () => oldObject.RemoveLink(newObject, LinkTag),
+                "RiakUnsupportedException was expected.");
+            
+            Assert.Throws<RiakUnsupportedException>(
+                () => oldObject.RemoveLinks(newId),
+                "RiakUnsupportedException was expected.");
+            
+            Assert.Throws<RiakUnsupportedException>(
+                () => oldObject.RemoveLinks(newObject),
+                "RiakUnsupportedException was expected.");
+            
+            Assert.Throws<RiakUnsupportedException>(
+                () => newObject.LinkTo(oldId, LinkTag),
+                "RiakUnsupportedException was expected.");
+            
+            Assert.Throws<RiakUnsupportedException>(
+                () => newObject.LinkTo(oldObject, LinkTag),
+                "RiakUnsupportedException was expected.");
+            
+            Assert.Throws<RiakUnsupportedException>(
+                () => newObject.RemoveLink(oldId, LinkTag),
+                "RiakUnsupportedException was expected.");
+            
+            Assert.Throws<RiakUnsupportedException>(
+                () => newObject.RemoveLink(oldObject, LinkTag),
+                "RiakUnsupportedException was expected.");
+            
+            Assert.Throws<RiakUnsupportedException>(
+                () => newObject.RemoveLinks(oldId),
+                "RiakUnsupportedException was expected.");
+            
+            Assert.Throws<RiakUnsupportedException>(
+                () => newObject.RemoveLinks(oldObject),
+                "RiakUnsupportedException was expected.");
+
+            Assert.DoesNotThrow(() => oldObject.LinkTo(oldId, LinkTag));
+            Assert.DoesNotThrow(() => oldObject.LinkTo(oldObject, LinkTag));
+            Assert.DoesNotThrow(() => oldObject.RemoveLink(oldId, LinkTag));
+            Assert.DoesNotThrow(() => oldObject.RemoveLink(oldObject, LinkTag));
+            Assert.DoesNotThrow(() => oldObject.RemoveLinks(oldId));
+            Assert.DoesNotThrow(() => oldObject.RemoveLinks(oldObject));
+#pragma warning restore 618
         }
     }
 }

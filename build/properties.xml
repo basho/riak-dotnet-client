@@ -13,6 +13,7 @@
 
     <SolutionFile>$(SolutionDir)RiakClient.sln</SolutionFile>
     <ProjDir>$(SolutionDir)src</ProjDir>
+    <RiakClientProjDir>$(ProjDir)\RiakClient</RiakClientProjDir>
 
     <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
 
@@ -22,7 +23,7 @@
 
     <ProtoGenExe>$(SolutionDir)tools\protobuf-net\protogen\protogen.exe</ProtoGenExe>
     <ProtoDir>$(SolutionDir)src\riak_pb\src</ProtoDir>
-    <ProtoMsgDir>$(SolutionDir)src\RiakClient\Messages</ProtoMsgDir>
+    <ProtoMsgDir>$(RiakClientProjDir)\Messages</ProtoMsgDir>
     <ProtoMsgCsvFile>$(ProtoDir)\riak_pb_messages.csv</ProtoMsgCsvFile>
     <NuGetExe>$(SolutionDir).nuget\NuGet.exe</NuGetExe>
     <NuGetPackagesConfig>$(SolutionDir).nuget\packages.config</NuGetPackagesConfig>
@@ -30,7 +31,7 @@
     <NuGetSpecTemplate>$(NuGetDir)\RiakClient.nuspec.template</NuGetSpecTemplate>
     <NuGetSpecFile>$(NuGetDir)\RiakClient.nuspec</NuGetSpecFile>
 
-    <RiakClientPackagesConfig>$(ProjDir)\RiakClient\packages.config</RiakClientPackagesConfig>
+    <RiakClientPackagesConfig>$(RiakClientProjDir)\packages.config</RiakClientPackagesConfig>
 
     <PowerShellExe Condition="'$(PowerShellExe)'== ''">$(WINDIR)\System32\WindowsPowerShell\v1.0\powershell.exe</PowerShellExe>
 

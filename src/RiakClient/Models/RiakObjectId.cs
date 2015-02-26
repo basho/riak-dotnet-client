@@ -23,6 +23,9 @@ namespace RiakClient.Models
     using Converters;
     using Newtonsoft.Json;
 
+    /// <summary>
+    /// An Id that specifies where an object lives in Riak. Immutable once created. 
+    /// </summary>
     [JsonConverter(typeof(RiakObjectIdConverter))]
     public class RiakObjectId : IEquatable<RiakObjectId>
     {
@@ -30,33 +33,56 @@ namespace RiakClient.Models
         private readonly string bucketType;
         private readonly string key;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RiakObjectId" /> class.
+        /// Build an Id using the default (pre-2.0) Bucket Type, and the specified Bucket and Key.
+        /// </summary>
+        /// <param name="bucket">The bucket name to use.</param>
+        /// <param name="key">The key to use.</param>
+        /// <exception cref="ArgumentOutOfRangeException">The value of 'bucket' cannot be null, an empty string, or whitespace.</exception>
         public RiakObjectId(string bucket, string key)
         {
             if (string.IsNullOrWhiteSpace(bucket))
             {
-                throw new ArgumentNullException("bucket");
+                throw new ArgumentOutOfRangeException("bucket");
             }
 
             this.bucket = bucket;
             this.key = key;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RiakObjectId" /> class.
+        /// Build an Id using the specified Bucket Type, Bucket, and Key.
+        /// </summary>
+        /// <param name="bucketType">The bucket type to use.</param>
+        /// <param name="bucket">The bucket name to use.</param>
+        /// <param name="key">The key to use.</param>
         public RiakObjectId(string bucketType, string bucket, string key)
             : this(bucket, key)
         {
             this.bucketType = bucketType;
         }
 
+        /// <summary>
+        /// Get the bucket name
+        /// </summary>
         public string Bucket
         {
             get { return bucket; }
         }
 
+        /// <summary>
+        /// Get the bucket type
+        /// </summary>
         public string BucketType
         {
             get { return bucketType; }
         }
 
+        /// <summary>
+        /// Get the key
+        /// </summary>
         public string Key
         {
             get { return key; }

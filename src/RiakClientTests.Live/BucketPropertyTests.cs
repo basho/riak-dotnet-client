@@ -216,7 +216,9 @@ namespace RiakClientTests.Live.BucketPropertyTests
             var setPropsResult = Client.SetBucketProperties(bucket, props);
             setPropsResult.IsSuccess.ShouldBeTrue(setPropsResult.ErrorMessage);
 
+#pragma warning disable 618
             var resetResult = Client.ResetBucketProperties(bucket);
+#pragma warning restore 618
             resetResult.IsSuccess.ShouldBeTrue(resetResult.ErrorMessage);
 
             var getPropsResult = Client.GetBucketProperties(bucket);

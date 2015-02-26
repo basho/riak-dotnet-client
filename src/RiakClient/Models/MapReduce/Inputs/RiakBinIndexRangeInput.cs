@@ -24,7 +24,7 @@ namespace RiakClient.Models.MapReduce.Inputs
 
     public class RiakBinIndexRangeInput : RiakIndexInput
     {
-        [Obsolete("Use the constructor that accepts a RiakIndexId instead. This will be revoved in the next version.")]
+        [Obsolete("Use the constructor that accepts a RiakIndexId instead. This will be removed in the next version.")]
         public RiakBinIndexRangeInput(string bucket, string index, string start, string end)
             : this(new RiakIndexId(bucket, index), start, end)
         {

@@ -25,7 +25,7 @@ namespace RiakClient.Models.MapReduce.Inputs
 
     public class RiakIntIndexEqualityInput : RiakIndexInput
     {
-        [Obsolete("Use the constructor that accepts a RiakIndexId instead. This will be revoved in the next version.")]
+        [Obsolete("Use the constructor that accepts a RiakIndexId instead. This will be removed in the next version.")]
         public RiakIntIndexEqualityInput(string bucket, string index, BigInteger key)
             : this(new RiakIndexId(bucket, index), key)
         {
