@@ -25,17 +25,17 @@ namespace RiakClient.Models.Search
 
     public class SearchIndexResult
     {
-        private readonly ReadOnlyCollection<SearchIndex> indices;
+        private readonly ReadOnlyCollection<SearchIndex> indexes;
 
         internal SearchIndexResult(RpbYokozunaIndexGetResp getResponse)
         {
-            var searchIndices = getResponse.index.Select(i => new SearchIndex(i));
-            this.indices = new ReadOnlyCollection<SearchIndex>(searchIndices.ToList());
+            var searchIndexes = getResponse.index.Select(i => new SearchIndex(i));
+            this.indexes = new ReadOnlyCollection<SearchIndex>(searchIndexes.ToList());
         }
 
-        public ReadOnlyCollection<SearchIndex> Indices
+        public ReadOnlyCollection<SearchIndex> Indexes
         {
-            get { return indices; }
+            get { return indexes; }
         }
     }
 }

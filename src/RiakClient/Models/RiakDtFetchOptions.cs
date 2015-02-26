@@ -54,7 +54,7 @@ namespace RiakClient.Models
         /// <remarks><para>Sloppy quorum defers to the first N healthy nodes from the pref list,
         /// which may not always be the first N nodes encountered in the consistent hash ring.
         /// In effect - sloppy quorum allows us to trust hand off nodes in the event of a network
-        /// partition or other similarily amusing event.</para>
+        /// partition or other similarly amusing event.</para>
         /// <para>Specifying PR will override Sloppy Quorum settings.</para>
         /// <para>Refer to http://lists.basho.com/pipermail/riak-users_lists.basho.com/2012-January/007157.html for additional details.</para></remarks>
         public bool? SloppyQuorum { get; private set; }

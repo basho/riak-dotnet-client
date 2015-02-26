@@ -69,7 +69,7 @@ namespace RiakClient.Models
         /// Should tombstone vclocks be returned?
         /// </summary>
         /// <value>
-        /// deletedvclock. A boolean.
+        /// Deleted vclock. A boolean.
         /// </value>
         public bool? DeletedVclock { get; set; }
 

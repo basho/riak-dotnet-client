@@ -231,8 +231,8 @@ namespace RiakClient.Models.Search
 
         public Term AndProximity(string field, double proximity, params string[] words)
         {
-            var prox = new ProximityTerm(search, field, proximity, words);
-            return new BinaryTerm(search, field, BinaryTerm.Op.And, this, prox);
+            var term = new ProximityTerm(search, field, proximity, words);
+            return new BinaryTerm(search, field, BinaryTerm.Op.And, this, term);
         }
 
         public Term OrProximity(double proximity, params string[] words)
@@ -242,8 +242,8 @@ namespace RiakClient.Models.Search
 
         public Term OrProximity(string field, double proximity, params string[] words)
         {
-            var prox = new ProximityTerm(search, field, proximity, words);
-            return new BinaryTerm(search, field, BinaryTerm.Op.Or, this, prox);
+            var term = new ProximityTerm(search, field, proximity, words);
+            return new BinaryTerm(search, field, BinaryTerm.Op.Or, this, term);
         }
 
         internal string Suffix()

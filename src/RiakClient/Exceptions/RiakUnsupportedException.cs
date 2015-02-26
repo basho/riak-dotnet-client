@@ -1,4 +1,4 @@
-// <copyright file="EnumerableExtensions.cs" company="Basho Technologies, Inc.">
+﻿// <copyright file="RiakUnsupportedException.cs" company="Basho Technologies, Inc.">
 // Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
 // Copyright (c) 2014 - Basho Technologies, Inc.
 //
@@ -17,19 +17,25 @@
 // under the License.
 // </copyright>
 
-namespace RiakClient.Extensions
+namespace RiakClient.Exceptions
 {
     using System;
-    using System.Collections.Generic;
 
-    internal static class EnumerableExtensions
+    [Serializable]
+    public class RiakUnsupportedException : RiakException
     {
-        internal static IEnumerable<T> Times<T>(this int count, Func<T> generator)
+        public RiakUnsupportedException()
         {
-            while (count-- > 0)
-            {
-                yield return generator();
-            }
+        }
+
+        public RiakUnsupportedException(string message)
+            : base(message)
+        {
+        }
+
+        public RiakUnsupportedException(string message, Exception innerException)
+            : base(message, innerException)
+        {
         }
     }
 }

@@ -74,15 +74,15 @@ namespace RiakClient.Models.MapReduce.Inputs
 
             var s = new JsonSerializer();
 
-            foreach (var bkkd in bucketKeyKeyData)
+            foreach (var keyData in bucketKeyKeyData)
             {
                 writer.WriteStartArray();
-                writer.WriteValue(bkkd.ObjectId.Bucket);
-                writer.WriteValue(bkkd.ObjectId.Key);
-                s.Serialize(writer, bkkd.KeyData);
-                if (bkkd.ObjectId.BucketType != null)
+                writer.WriteValue(keyData.ObjectId.Bucket);
+                writer.WriteValue(keyData.ObjectId.Key);
+                s.Serialize(writer, keyData.KeyData);
+                if (keyData.ObjectId.BucketType != null)
                 {
-                    writer.WriteValue(bkkd.ObjectId.BucketType);
+                    writer.WriteValue(keyData.ObjectId.BucketType);
                 }
 
                 writer.WriteEndArray();

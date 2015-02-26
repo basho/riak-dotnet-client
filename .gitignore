@@ -11,6 +11,9 @@ release
 Release
 RELEASE
 packages/
+Help
+Doc
+src/RiakClient/docs/
 
 *.orig
 *.ncb
@@ -44,5 +47,3 @@ CommonAssemblyInfo.cs
 *.DotSettings
 *.dcvr.settings
 StyleCop.Cache
-*.dic
-*.GhostDoc.xml
