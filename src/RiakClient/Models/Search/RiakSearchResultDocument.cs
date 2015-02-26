@@ -53,9 +53,11 @@ namespace RiakClient.Models.Search
                     case RiakConstants.SearchFieldKeys.Key:
                         Key = field.Value;
                         break;
+#pragma warning disable 618
                     case RiakConstants.SearchFieldKeys.LegacySearchId:
                         legacyId = field.Value;
                         break;
+#pragma warning restore 618
                 }
 
                 Fields.Add(field);

@@ -28,10 +28,17 @@ namespace RiakClient
     using Models.MapReduce;
     using Models.Search;
 
+    /// <summary>
+    /// An asyncronous version of <see cref="RiakClient"/>.
+    /// </summary>
     internal class RiakAsyncClient : IRiakAsyncClient
     {
         private readonly IRiakClient client;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RiakAsyncClient"/> class from the specified <see cref="IRiakClient"/>.
+        /// </summary>
+        /// <param name="client">The <see cref="RiakClient"/> to use for all operations.</param>
         public RiakAsyncClient(IRiakClient client)
         {
             this.client = client;
