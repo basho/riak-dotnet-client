@@ -40,7 +40,10 @@ Param(
     [ValidatePattern("^v[1-9]\.[0-9]\.[0-9](-[a-z0-9]+)?")]
     [string]$VersionString,
     [Parameter(Mandatory=$False)]
-    [switch]$UpdateDependencies
+    [switch]$UpdateDependencies,
+    [Parameter(Mandatory=$False)]
+    [ValidatePattern("^[a-zA-Z0-9-]+$")]
+    [string]$GitRemoteName
 )
 
 Set-StrictMode -Version Latest
@@ -204,6 +207,11 @@ if ($Verbosity -eq 'detailed' -or $Verbosity -eq 'd' -or
     $verbose_property = '/property:Verbose=true'
 }
 
+$git_remote_property = ''
+if (! ([String]::IsNullOrEmpty($GitRemoteName))) {
+    $git_remote_property = "/property:GitRemoteName=$GitRemoteName"
+}
+
 # Fix up Target to use CleanAll in build.targets file
 if ($Target -eq 'Clean') {
     $Target = 'CleanAll'
@@ -221,8 +229,8 @@ else
     $maxcpu_property = '/maxcpucount'
 }
 
-Write-Debug "MSBuild command: $msbuild_exe ""/verbosity:$Verbosity"" /nologo /m ""/property:SolutionDir=$script_path\"" ""$maxcpu_property"" ""$version_property"" ""$verbose_property"" ""/target:$Target"" ""$build_targets_file"""
-& $msbuild_exe "/verbosity:$Verbosity" /nologo /m "/property:SolutionDir=$script_path\" "$maxcpu_property" "$version_property" "$verbose_property" "/target:$Target" "$build_targets_file"
+Write-Debug "MSBuild command: $msbuild_exe ""/verbosity:$Verbosity"" /nologo /m ""/property:SolutionDir=$script_path\"" ""$maxcpu_property"" ""$version_property"" ""$verbose_property"" ""$git_remote_property"" ""/target:$Target"" ""$build_targets_file"""
+& $msbuild_exe "/verbosity:$Verbosity" /nologo /m "/property:SolutionDir=$script_path\" "$maxcpu_property" "$version_property" "$verbose_property" "$git_remote_property" "/target:$Target" "$build_targets_file"
 if ($? -ne $True) {
     throw "$msbuild_exe failed: $LastExitCode"
 }
