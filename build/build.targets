@@ -53,13 +53,16 @@
     <PropertyGroup>
       <GitTagVersion>v$(NuGetVersion)</GitTagVersion>
     </PropertyGroup>
+
+    <Message Text="Cleaning branch" />
+    <GitClient Command="clean" Arguments="-fxd" LocalPath="$(SolutionDir)" />
   </Target>
 
   <Target Name="PublishMergeMasterAndTag" DependsOnTargets="PublishValidateOnDevelopBranch">
     <Message Text="Checking out '$(MasterBranchName)' branch" />
     <GitClient Command="checkout" Arguments="$(MasterBranchName)" LocalPath="$(SolutionDir)" />
     <Message Text="Cleaning '$(MasterBranchName)' branch" />
-    <GitClient Command="clean" Arguments="-fxd --exclude packages/StyleCop.*" LocalPath="$(SolutionDir)" />
+    <GitClient Command="clean" Arguments="-fxd" LocalPath="$(SolutionDir)" />
     <Message Text="Merging '$(DevelopBranchName)' into '$(MasterBranchName)' NOTE: this will fail if the merge can't be done via fast-forward!" />
     <GitClient Command="merge" Arguments="--no-ff --commit --ff-only $(DevelopBranchName)" LocalPath="$(SolutionDir)" />
     <GitClient Command="tag" Arguments="--message &quot;riak-dotnet-client $(NuGetVersion)&quot; &quot;$(GitTagVersion)&quot;" LocalPath="$(SolutionDir)" />
@@ -130,7 +133,7 @@
   </Target>
 
   <Target Name="Publish"
-          DependsOnTargets="PublishValidation;TestAll;PublishMergeMasterAndTag;Release;PublishNuGetPackage;PublishGitHubRelease" />
+          DependsOnTargets="PublishValidation;PublishMergeMasterAndTag;Release;PublishNuGetPackage;PublishGitHubRelease" />
 
   <Target Name="GitSubmodule" Condition="!Exists('$(ProtoMsgCsvFile)')">
     <GitClient Command="submodule" Arguments="update --init" LocalPath="$(SolutionDir)" />

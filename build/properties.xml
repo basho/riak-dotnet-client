@@ -39,7 +39,7 @@
     <!-- NB: Hard-coded for non-Release builds to skip querying git for information.
          Increment this manually for non-Release builds -->
     <VersionString Condition="'$(Configuration)' != 'Release'">v2.0.0</VersionString>
-    <GitRemoteName>basho-labs</GitRemoteName>
+    <GitRemoteName Condition="'$(GitRemoteName)' == ''">origin</GitRemoteName>
     <GitCommitHash>unknown</GitCommitHash>
     <MasterBranchName>master</MasterBranchName>
     <DevelopBranchName>develop</DevelopBranchName>
