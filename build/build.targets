@@ -54,19 +54,53 @@
       <GitTagVersion>v$(NuGetVersion)</GitTagVersion>
     </PropertyGroup>
 
-    <Message Text="Cleaning branch" />
+    <!-- Since we're cloning to a TEMP dir, these properties must be set and/or modified -->
+    <PropertyGroup>
+      <GitTagMessage>&quot;riak-dotnet-client $(NuGetVersion)&quot; &quot;$(GitTagVersion)&quot;</GitTagMessage>
+      <SolutionDir>$(TEMP)\$(VersionString)\</SolutionDir>
+      <SolutionFile>$(SolutionDir)$(SolutionFileName)</SolutionFile>
+      <ProjDir>$(SolutionDir)src</ProjDir>
+      <CommonAssemblyInfoFile>$(SolutionDir)src\CommonAssemblyInfo.cs</CommonAssemblyInfoFile>
+      <NuGetExe>$(SolutionDir).nuget\NuGet.exe</NuGetExe>
+      <NuGetPackagesConfig>$(SolutionDir).nuget\packages.config</NuGetPackagesConfig>
+      <NuGetDir>$(ProjDir)\NuGet</NuGetDir>
+      <NuGetSpecTemplate>$(NuGetDir)\RiakClient.nuspec.template</NuGetSpecTemplate>
+      <NuGetSpecFile>$(NuGetDir)\RiakClient.nuspec</NuGetSpecFile>
+      <RiakClientProjDir>$(ProjDir)\RiakClient</RiakClientProjDir>
+      <RiakClientPackagesConfig>$(RiakClientProjDir)\packages.config</RiakClientPackagesConfig>
+    </PropertyGroup>
+    <Message Text="Solution Dir: '$(SolutionDir)'" />
+    <Message Text="Solution File: '$(SolutionFile)'" />
+    <Message Text="Proj Dir: '$(ProjDir)'" />
+    <Message Text="NuGet Dir: '$(NuGetDir)'" />
+    <Message Text="CommonAssemblyInfo.cs File: '$(CommonAssemblyInfoFile)'" />
+  </Target>
+
+  <Target Name="PublishCloneToTemp" DependsOnTargets="PublishValidation">
+    <RemoveDir Directories="$(SolutionDir)"/>
+    <MakeDir Directories="$(SolutionDir)"/>
+
+    <Message Text="Cloning '$(MasterBranchName)' branch from $(GitRemoteUrl)" />
+    <GitClient Command="clone" Arguments="--branch $(MasterBranchName) $(GitRemoteUrl) $(SolutionDir)" LocalPath="$(TEMP)" />
+
+    <Message Text="Cleaning '$(MasterBranchName)' branch" />
     <GitClient Command="clean" Arguments="-fxd" LocalPath="$(SolutionDir)" />
   </Target>
 
-  <Target Name="PublishMergeMasterAndTag" DependsOnTargets="PublishValidateOnDevelopBranch">
-    <Message Text="Checking out '$(MasterBranchName)' branch" />
-    <GitClient Command="checkout" Arguments="$(MasterBranchName)" LocalPath="$(SolutionDir)" />
-    <Message Text="Cleaning '$(MasterBranchName)' branch" />
-    <GitClient Command="clean" Arguments="-fxd" LocalPath="$(SolutionDir)" />
+  <Target Name="PublishMergeMasterAndTag" DependsOnTargets="PublishCloneToTemp">
     <Message Text="Merging '$(DevelopBranchName)' into '$(MasterBranchName)' NOTE: this will fail if the merge can't be done via fast-forward!" />
-    <GitClient Command="merge" Arguments="--no-ff --commit --ff-only $(DevelopBranchName)" LocalPath="$(SolutionDir)" />
-    <GitClient Command="tag" Arguments="--message &quot;riak-dotnet-client $(NuGetVersion)&quot; &quot;$(GitTagVersion)&quot;" LocalPath="$(SolutionDir)" />
+    <GitClient Command="merge" Arguments="--no-ff --commit --ff-only $(DevelopRemoteBranchName)" LocalPath="$(SolutionDir)" />
+
+    <Message Text="Tagging with $(GitTagMessage)" />
+    <GitClient Command="tag" Arguments="--message $(GitTagMessage)" LocalPath="$(SolutionDir)" />
+
+    <Message Text="Pushing tag $(GitTagVersion)" />
     <GitClient Command="push" Arguments="$(GitRemoteName) &quot;$(GitTagVersion)&quot;" LocalPath="$(SolutionDir)" />
+  </Target>
+
+  <Target Name="PublishRelease" DependsOnTargets="GenerateCommonAssemblyInfo">
+    <Message Text="MSBuild properties: Configuration=Release;SolutionDir=$(SolutionDir)" />
+    <MSBuild Projects="$(SolutionFile)" Properties="Configuration=Release;SolutionDir=$(SolutionDir)" />
   </Target>
 
   <Target Name="GenerateCommonAssemblyInfo" DependsOnTargets="PopulateVersionInformation">
@@ -118,7 +152,9 @@
         <ReplacementValue>$(ProtobufNetVersion)</ReplacementValue>
       </Tokens>
     </ItemGroup>
+
     <TemplateFile Template="$(NuGetSpecTemplate)" OutputFileName="$(NuGetSpecFile)" Tokens="@(Tokens)" />
+
     <Exec WorkingDirectory="$(NuGetDir)"
           Command="$(NuGetExe) pack -Symbols -Verbosity normal $(NuGetSpecFile)" />
     <Exec WorkingDirectory="$(NuGetDir)"
@@ -133,7 +169,7 @@
   </Target>
 
   <Target Name="Publish"
-          DependsOnTargets="PublishValidation;PublishMergeMasterAndTag;Release;PublishNuGetPackage;PublishGitHubRelease" />
+          DependsOnTargets="PublishValidation;PublishCloneToTemp;PublishMergeMasterAndTag;PublishRelease;PublishNuGetPackage;PublishGitHubRelease" />
 
   <Target Name="GitSubmodule" Condition="!Exists('$(ProtoMsgCsvFile)')">
     <GitClient Command="submodule" Arguments="update --init" LocalPath="$(SolutionDir)" />
