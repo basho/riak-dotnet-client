@@ -15,6 +15,7 @@
     <SolutionFile>$(SolutionDir)$(SolutionFileName)</SolutionFile>
     <ProjDir>$(SolutionDir)src</ProjDir>
     <RiakClientProjDir>$(ProjDir)\RiakClient</RiakClientProjDir>
+    <NuGetPackagesConfig>$(SolutionDir).nuget\packages.config</NuGetPackagesConfig>
 
     <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
 
