@@ -96,6 +96,9 @@
 
     <Message Text="Pushing tag $(GitTagVersion)" />
     <GitClient Command="push" Arguments="$(GitRemoteName) &quot;$(GitTagVersion)&quot;" LocalPath="$(SolutionDir)" />
+
+    <Message Text="Pushing master branch" />
+    <GitClient Command="push" Arguments="$(GitRemoteName) &quot;$(MasterBranchName)&quot;" LocalPath="$(SolutionDir)" />
   </Target>
 
   <Target Name="PublishRelease" DependsOnTargets="GenerateCommonAssemblyInfo">
