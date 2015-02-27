@@ -22,7 +22,7 @@ namespace RiakClient.Models
     using System;
 
     /// <summary>
-    /// Represents the positive NVal values for Riak operation Quorum options.
+    /// Represents the possible values for the NVal Riak operation parameter.
     /// </summary>
     public class NVal : IEquatable<NVal>
     {
@@ -31,7 +31,7 @@ namespace RiakClient.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="NVal"/> class.
         /// </summary>
-        /// <param name="nval">The positive int value to use for quorum option.</param>
+        /// <param name="nval">The positive int value to use for NVal option.</param>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="nval"/> must be greater than zero.</exception>
         public NVal(int nval)
         {

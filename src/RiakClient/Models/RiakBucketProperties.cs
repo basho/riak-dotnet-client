@@ -32,16 +32,29 @@ namespace RiakClient.Models
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
+    /// <summary>
+    /// Represents the collection of properties for a Riak bucket.
+    /// </summary>
+    /// <remarks>
+    /// When creating new objects, any properties not set will default to the server default values upon saving.
+    /// </remarks>
     [ComVisible(false)]
     public class RiakBucketProperties : RiakOptions<RiakBucketProperties>
     {
         private bool? addHooks;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RiakBucketProperties" /> class.
+        /// </summary>
+        /// <remarks>
+        /// This constructor will create a new <see cref="RiakBucketProperties"/> instance with no properties set.
+        /// </remarks>
         public RiakBucketProperties()
         {
         }
 
-        public RiakBucketProperties(RiakRestResponse response)
+        [Obsolete("REST Interfaces are deprecated, and this will be removed in the next version.")]
+        internal RiakBucketProperties(RiakRestResponse response)
         {
             if (response.ContentType != RiakConstants.ContentTypes.ApplicationJson)
             {
@@ -133,20 +146,85 @@ namespace RiakClient.Models
             Consistent = bucketProps.consistent;
         }
 
+        /// <summary>
+        /// The option to ignore object history (vector clock) when updating an object.
+        /// </summary>
+        /// <remarks>
+        /// Cannot be set to true while <see cref="AllowMultiple"/> is also set to true.
+        /// Riak will default this property to <b>false</b>.
+        /// See http://docs.basho.com/riak/latest/dev/using/conflict-resolution/ for more information.
+        /// </remarks>
         public bool? LastWriteWins { get; private set; }
 
+        /// <summary>
+        /// The number of replicas to create when storing data.
+        /// </summary>
+        /// <remarks>
+        /// Riak will default this property to an <see cref="NVal"/> equivalent of <b>3</b>.
+        /// See http://docs.basho.com/riak/latest/theory/concepts/Replication/ for more information.
+        /// </remarks>
         public NVal NVal { get; private set; }
 
+        /// <summary>
+        /// The option to allow sibling objects to be created (concurrent updates) when updating an object.
+        /// </summary>
+        /// <remarks>
+        /// Cannot be set to true while <see cref="LastWriteWins"/> is also set to true.
+        /// Riak will default this property to <b>true</b> for buckets within a 
+        /// bucket type (other than the default one) in <b>Riak 2.0+</b>.
+        /// Riak will default this property to <b>false</b> for buckets within <b>the default bucket type</b> in <b>Riak 2.0+</b>.
+        /// Riak will default this property to <b>false</b> for all buckets in <b>Riak 1.0</b>.
+        /// See http://docs.basho.com/riak/latest/dev/using/conflict-resolution/ for more information.
+        /// </remarks>
         public bool? AllowMultiple { get; private set; }
 
+        /// <summary>
+        /// The named backend being used for this bucket when using riak_kv_multi_backend.
+        /// Can be the named backend <i>to use</i> when creating bucket properties for new buckets,
+        /// or the named backend <i>in use</i> for existing buckets &amp; bucket properties.
+        /// </summary>
+        /// <remarks>
+        /// See http://docs.basho.com/riak/latest/ops/advanced/backends/multi/ for more information.
+        /// </remarks>
         public string Backend { get; private set; }
-
+        
+        /// <summary>
+        /// A <see cref="List{T}"/> of <see cref="IRiakPreCommitHook"/> pre-commit hooks.
+        /// </summary>
+        /// <remarks>
+        /// See http://docs.basho.com/riak/latest/dev/using/commit-hooks/ for more information.
+        /// </remarks>
         public List<IRiakPreCommitHook> PreCommitHooks { get; private set; }
 
+        /// <summary>
+        /// A <see cref="List{T}"/> of <see cref="IRiakPreCommitHook"/> post-commit hooks.
+        /// </summary>
+        /// <remarks>
+        /// See http://docs.basho.com/riak/latest/dev/using/commit-hooks/ for more information.
+        /// </remarks>
         public List<IRiakPostCommitHook> PostCommitHooks { get; private set; }
 
+        /// <summary>
+        /// When set to true, an object not being found on a Riak node will count towards the R count. 
+        ///  </summary>
+        /// <remarks>
+        /// Riak will default this property to <b>true</b>.
+        /// See http://docs.basho.com/riak/latest/dev/advanced/replication-properties/#The-Implications-of-code-notfound_ok-code-
+        /// for more information.
+        /// </remarks>
         public bool? NotFoundOk { get; private set; }
 
+        /// <summary>
+        /// When set to true, Riak will return early in some failure cases.
+        /// (eg. when r=1 and you get 2 errors and a success basic_quorum=true would return an error).
+        /// Can be used in conjunction when <see cref="NotFoundOk"/>=<b>false</b> to speed up the case an object 
+        /// does not exist, thereby only reading a "quorum" of not-founds instead of "N" not-founds.
+        /// </summary>
+        /// <remarks>
+        /// Riak will default this property to <b>false</b>.
+        /// See http://docs.basho.com/riak/latest/dev/advanced/replication-properties/#Early-Failure-Return-with-code-basic_quorum-code-
+        /// for more information.
+        /// </remarks>
         public bool? BasicQuorum { get; private set; }
 
         /// <summary>
@@ -161,10 +239,19 @@ namespace RiakClient.Models
         /// <remarks>See http://docs.basho.com/riak/latest/theory/concepts/Vector-Clocks/#Vector-Clock-Pruning </remarks>
         public int? SmallVclock { get; private set; }
 
+        /// <summary>
+        /// Indicates whether the bucket properties have any pre-commit hooks.
+        /// </summary>
         public bool? HasPrecommit { get; private set; }
 
+        /// <summary>
+        /// Indicates whether the bucket properties have any post-commit hooks.
+        /// </summary>
         public bool? HasPostcommit { get; private set; }
 
+        /// <summary>
+        /// Indicates whether Legacy (Riak 1.0) Search is enabled for this bucket.
+        /// </summary>
         [Obsolete("Search is deprecated, please use LegacySearch instead.", true)]
         public bool? Search
         {
@@ -172,18 +259,33 @@ namespace RiakClient.Models
             private set { LegacySearch = value; }
         }
 
+        /// <summary>
+        /// Indicates whether Legacy (Riak 1.0) Search is enabled for this bucket.
+        /// </summary>
         public bool? LegacySearch
         {
             get;
             private set;
         }
 
+        /// <summary>
+        /// Indicates whether strong consistency is enabled on this bucket.
+        /// </summary>
         public bool? Consistent { get; private set; }
 
+        /// <summary>
+        /// Indicates which Riak Enterprise Edition replication modes are active for this bucket.
+        /// </summary>
         public RiakConstants.RiakEnterprise.ReplicationMode ReplicationMode { get; private set; }
 
+        /// <summary>
+        /// Indicates whether Riak Search (2.0+) is enabled for this bucket, and which Search Index is assigned to it.
+        /// </summary>
         public string SearchIndex { get; private set; }
 
+        /// <summary>
+        /// An indicator of whether legacy search indexing is enabled on the bucket. Please use <see cref="LegacySearchEnabled"/> instead.
+        /// </summary>
         [Obsolete("SearchEnabled is deprecated, please use LegacySearchEnabled instead.", true)]
         public bool SearchEnabled
         {
@@ -205,33 +307,83 @@ namespace RiakClient.Models
         /// <summary>
         /// The DataType (if any) associated with this bucket.
         /// </summary>
-        /// <value>A string representation of the DataType assigned to this bucket. Possible values include 'set', 'map', 'counter', or null for no data type </value>
+        /// <remarks>
+        /// A string representation of the DataType assigned to this bucket. 
+        /// Possible values include 'set', 'map', 'counter', or null for no data type.
+        /// </remarks>
         public string DataType { get; private set; }
 
+        /// <summary>
+        /// Fluent setter for the <see cref="BasicQuorum"/> property.
+        /// When set to true, Riak will return early in some failure cases.
+        /// (eg. when r=1 and you get 2 errors and a success basic_quorum=true would return an error).
+        /// Can be used in conjunction when <see cref="NotFoundOk"/>=<b>false</b> to speed up the case an object 
+        /// does not exist, thereby only reading a "quorum" of not-founds instead of "N" not-founds.
+        /// </summary>
+        /// <param name="value">The value to set the property to.</param>
+        /// <returns>A reference to the current properties object.</returns>
+        /// <remarks>
+        /// This property is not typically modified.
+        /// See http://docs.basho.com/riak/latest/dev/advanced/replication-properties/#Early-Failure-Return-with-code-basic_quorum-code-
+        /// for more information.
+        /// </remarks>
         public RiakBucketProperties SetBasicQuorum(bool value)
         {
             BasicQuorum = value;
             return this;
         }
 
+        /// <summary>
+        /// Fluent setter for the <see cref="NotFoundOk"/> property.
+        /// Enable or disable notfound_ok on a bucket.
+        /// When set to true, an object not being found on a Riak node will count towards the R count. 
+        /// </summary>
+        /// <param name="value">The value to set the property to.</param>
+        /// <returns>A reference to the current properties object.</returns>
+        /// <remarks>
+        /// This property is not typically modified.
+        /// See http://docs.basho.com/riak/latest/dev/advanced/replication-properties/#The-Implications-of-code-notfound_ok-code-
+        /// for more information.
+        /// </remarks>
         public RiakBucketProperties SetNotFoundOk(bool value)
         {
             NotFoundOk = value;
             return this;
         }
 
+        /// <summary>
+        /// Fluent setter for the <see cref="AllowMultiple"/> property.
+        /// Enable or disable allow_mult on a bucket.
+        /// </summary>
+        /// <param name="value">The value to set the property to.</param>
+        /// <returns>A reference to the current properties object.</returns>
         public RiakBucketProperties SetAllowMultiple(bool value)
         {
             AllowMultiple = value;
             return this;
         }
 
+        /// <summary>
+        /// Fluent setter for the <see cref="LastWriteWins"/> property.
+        /// Enable or disable last_write_wins on a bucket.
+        /// </summary>
+        /// <param name="value">The value to set the property to.</param>
+        /// <returns>A reference to the current properties object.</returns>
         public RiakBucketProperties SetLastWriteWins(bool value)
         {
             LastWriteWins = value;
             return this;
         }
 
+        /// <summary>
+        /// Fluent setter for the <see cref="LegacySearch"/> property.
+        /// Enable or disable legacy search on a bucket.
+        /// </summary>
+        /// <param name="enable">
+        /// Set to <i>true</i> to enable legacy search on this bucket, or <i>false</i> to disable it.
+        /// </param>
+        /// <param name="addHooks">Set to <i>true</i> to add pre commit hook.</param>
+        /// <returns>A reference to the current properties object.</returns>
         [Obsolete("SetSearch is deprecated, please use SetLegacySearch instead.", true)]
         public RiakBucketProperties SetSearch(bool enable, bool addHooks = false)
         {
@@ -239,12 +391,14 @@ namespace RiakClient.Models
         }
 
         /// <summary>
+        /// Fluent setter for the <see cref="LegacySearch"/> property.
         /// Enable or disable legacy search on a bucket.
         /// </summary>
-        /// <param name="enable">Set to <i>true</i> to enable legacy search on this bucket, or <i>false</i>
-        /// to disable it.</param>
+        /// <param name="enable">
+        /// Set to <i>true</i> to enable legacy search on this bucket, or <i>false</i> to disable it.
+        /// </param>
         /// <returns>A reference to the current properties object.</returns>
-        /// <param name="addHooks">Set to <i>true</i> to add pre commit hook</param>
+        /// <param name="addHooks">Set to <i>true</i> to add pre commit hook.</param>
         public RiakBucketProperties SetLegacySearch(bool enable, bool addHooks = false)
         {
             if (addHooks)
@@ -268,36 +422,86 @@ namespace RiakClient.Models
             return this;
         }
 
+        /// <summary>
+        /// Fluent setter for the <see cref="NVal"/> property.
+        /// The number of replicas to create when storing data.
+        /// </summary>
+        /// <param name="value">The value to set the property to.</param>
+        /// <returns>A reference to the current properties object.</returns>
+        /// <remarks>
+        /// This property is not typically modified.
+        /// </remarks>
         public RiakBucketProperties SetNVal(NVal value)
         {
             NVal = value;
             return this;
         }
 
+        /// <summary>
+        /// Fluent setter for the <see cref="Backend"/> property.
+        /// Sets the named backend being used for this bucket when using riak_kv_multi_backend.
+        /// </summary>
+        /// <param name="backend">The backend to set the property to.</param>
+        /// <returns>A reference to the current properties object.</returns>
+        /// <remarks>
+        /// This property is not typically modified.
+        /// </remarks>
         public RiakBucketProperties SetBackend(string backend)
         {
             Backend = backend;
             return this;
         }
 
+        /// <summary>
+        /// Fluent setter for the <see cref="BigVclock"/> property.
+        /// If the length of the vector clock is larger than BigVclock, vector clocks will be pruned.
+        /// </summary>
+        /// <param name="bigVclock">The value to set the property to.</param>
+        /// <returns>A reference to the current properties object.</returns>
+        /// <remarks>
+        /// This property is not typically modified.
+        /// </remarks>
         public RiakBucketProperties SetBigVclock(int? bigVclock)
         {
             BigVclock = bigVclock;
             return this;
         }
 
+        /// <summary>
+        /// Fluent setter for the <see cref="SmallVclock"/> property.
+        /// If the length of the vector clock is smaller than SmallVclock, vector clocks will not be pruned.
+        /// </summary>
+        /// <param name="smallVclock">The value to set the property to.</param>
+        /// <returns>A reference to the current properties object.</returns>
+        /// <remarks>
+        /// This property is not typically modified.
+        /// </remarks>
         public RiakBucketProperties SetSmallVclock(int? smallVclock)
         {
             SmallVclock = smallVclock;
             return this;
         }
 
+        /// <summary>
+        /// Fluent setter for the <see cref="SearchIndex"/> property.
+        /// Sets the Search Index to use when indexing data for search.
+        /// </summary>
+        /// <param name="searchIndex">The name of the index to set the property to.</param>
+        /// <returns>A reference to the current properties object.</returns>
         public RiakBucketProperties SetSearchIndex(string searchIndex)
         {
             SearchIndex = searchIndex;
             return this;
         }
 
+        /// <summary>
+        /// Remove a pre-commit hook from the bucket properties.
+        /// </summary>
+        /// <param name="commitHook">The <see cref="IRiakPreCommitHook"/> to remove.</param>
+        /// <returns>A reference to the current properties object.</returns>
+        /// <remarks>
+        /// Pre/Post-commit hooks are not typically modified.
+        /// </remarks>
         public RiakBucketProperties RemovePreCommitHook(IRiakPreCommitHook commitHook)
         {
             if (PreCommitHooks != null)
@@ -313,6 +517,14 @@ namespace RiakClient.Models
             return this;
         }
 
+        /// <summary>
+        /// Remove a post-commit hook from the bucket properties.
+        /// </summary>
+        /// <param name="commitHook">The <see cref="IRiakPreCommitHook"/> to remove.</param>
+        /// <returns>A reference to the current properties object.</returns>
+        /// <remarks>
+        /// Pre/Post-commit hooks are not typically modified.
+        /// </remarks>
         public RiakBucketProperties RemovePostCommitHook(IRiakPostCommitHook commitHook)
         {
             if (PostCommitHooks != null)
@@ -328,6 +540,15 @@ namespace RiakClient.Models
             return this;
         }
 
+        /// <summary>
+        /// Add a pre-commit hook to the bucket properties.
+        /// </summary>
+        /// <param name="commitHook">The <see cref="IRiakPreCommitHook"/> to add.</param>
+        /// <param name="commitFlags">The option to set <see cref="HasPrecommit"/> to true at the same time.</param>
+        /// <returns>A reference to the current properties object.</returns>
+        /// <remarks>
+        /// Pre/Post-commit hooks are not typically modified.
+        /// </remarks>
         public RiakBucketProperties AddPreCommitHook(IRiakPreCommitHook commitHook, bool commitFlags = true)
         {
             var hooks = PreCommitHooks ?? (PreCommitHooks = new List<IRiakPreCommitHook>());
@@ -350,6 +571,15 @@ namespace RiakClient.Models
             return this;
         }
 
+        /// <summary>
+        /// Add a post-commit hook to the bucket properties.
+        /// </summary>
+        /// <param name="commitHook">The commit hook to add.</param>
+        /// <param name="commitFlags">The option to set <see cref="HasPostcommit"/> to true at the same time.</param>
+        /// <returns>A reference to the current properties object.</returns>
+        /// <remarks>
+        /// Pre/Post-commit hooks are not typically modified.
+        /// </remarks>
         public RiakBucketProperties AddPostCommitHook(IRiakPostCommitHook commitHook, bool commitFlags = true)
         {
             var hooks = PostCommitHooks ?? (PostCommitHooks = new List<IRiakPostCommitHook>());
@@ -367,6 +597,14 @@ namespace RiakClient.Models
             return this;
         }
 
+        /// <summary>
+        /// Clear any pre-commit hooks from the bucket properties.
+        /// </summary>
+        /// <param name="commitFlags">Not used.</param>
+        /// <returns>A reference to the current properties object.</returns>
+        /// <remarks>
+        /// Pre/Post-commit hooks are not typically modified.
+        /// </remarks>
         public RiakBucketProperties ClearPreCommitHooks(bool commitFlags = true)
         {
             (PreCommitHooks ?? (PreCommitHooks = new List<IRiakPreCommitHook>())).Clear();
@@ -374,6 +612,14 @@ namespace RiakClient.Models
             return this;
         }
 
+        /// <summary>
+        /// Clear any post-commit hooks from the bucket properties.
+        /// </summary>
+        /// <param name="commitFlags">Not used.</param>
+        /// <returns>A reference to the current properties object.</returns>
+        /// <remarks>
+        /// Pre/Postcommit hooks are not typically modified.
+        /// </remarks>
         public RiakBucketProperties ClearPostCommitHooks(bool commitFlags = true)
         {
             (PostCommitHooks ?? (PostCommitHooks = new List<IRiakPostCommitHook>())).Clear();

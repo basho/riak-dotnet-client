@@ -19,7 +19,6 @@
 
 namespace RiakClient.Models
 {
-    using System;
     using Extensions;
 
     internal class RiakBinIndexId : RiakIndexId
