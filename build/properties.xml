@@ -11,7 +11,8 @@
 
   <PropertyGroup>
 
-    <SolutionFile>$(SolutionDir)RiakClient.sln</SolutionFile>
+    <SolutionFileName>RiakClient.sln</SolutionFileName>
+    <SolutionFile>$(SolutionDir)$(SolutionFileName)</SolutionFile>
     <ProjDir>$(SolutionDir)src</ProjDir>
     <RiakClientProjDir>$(ProjDir)\RiakClient</RiakClientProjDir>
 
@@ -25,13 +26,6 @@
     <ProtoDir>$(SolutionDir)src\riak_pb\src</ProtoDir>
     <ProtoMsgDir>$(RiakClientProjDir)\Messages</ProtoMsgDir>
     <ProtoMsgCsvFile>$(ProtoDir)\riak_pb_messages.csv</ProtoMsgCsvFile>
-    <NuGetExe>$(SolutionDir).nuget\NuGet.exe</NuGetExe>
-    <NuGetPackagesConfig>$(SolutionDir).nuget\packages.config</NuGetPackagesConfig>
-    <NuGetDir>$(ProjDir)\NuGet</NuGetDir>
-    <NuGetSpecTemplate>$(NuGetDir)\RiakClient.nuspec.template</NuGetSpecTemplate>
-    <NuGetSpecFile>$(NuGetDir)\RiakClient.nuspec</NuGetSpecFile>
-
-    <RiakClientPackagesConfig>$(RiakClientProjDir)\packages.config</RiakClientPackagesConfig>
 
     <PowerShellExe Condition="'$(PowerShellExe)'== ''">$(WINDIR)\System32\WindowsPowerShell\v1.0\powershell.exe</PowerShellExe>
 
@@ -40,9 +34,11 @@
          Increment this manually for non-Release builds -->
     <VersionString Condition="'$(Configuration)' != 'Release'">v2.0.0</VersionString>
     <GitRemoteName Condition="'$(GitRemoteName)' == ''">origin</GitRemoteName>
+    <GitRemoteUrl Condition="'$(GitRemoteUrl)' == ''">git@github.com:basho-labs/riak-dotnet-client.git</GitRemoteUrl>
     <GitCommitHash>unknown</GitCommitHash>
     <MasterBranchName>master</MasterBranchName>
     <DevelopBranchName>develop</DevelopBranchName>
+    <DevelopRemoteBranchName>$(GitRemoteName)/$(DevelopBranchName)</DevelopRemoteBranchName>
   </PropertyGroup>
 
   <ItemGroup>
