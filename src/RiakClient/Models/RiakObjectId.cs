@@ -65,7 +65,7 @@ namespace RiakClient.Models
         }
 
         /// <summary>
-        /// Get the bucket name
+        /// Get the bucket name.
         /// </summary>
         public string Bucket
         {
@@ -73,7 +73,7 @@ namespace RiakClient.Models
         }
 
         /// <summary>
-        /// Get the bucket type
+        /// Get the bucket type.
         /// </summary>
         public string BucketType
         {
@@ -81,7 +81,7 @@ namespace RiakClient.Models
         }
 
         /// <summary>
-        /// Get the key
+        /// Get the key.
         /// </summary>
         public string Key
         {
