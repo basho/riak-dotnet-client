@@ -22,9 +22,16 @@ namespace RiakClient.Models
     using System.Runtime.InteropServices;
     using Messages;
 
+    /// <summary>
+    /// A collection of optional settings for deleting objects from Riak.
+    /// </summary>
     [ComVisible(false)]
     public class RiakDeleteOptions : RiakOptions<RiakDeleteOptions>
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RiakDeleteOptions" /> class.
+        /// Uses the "default" quorum settings for R, W, PR, PW, DW, and RW settings.
+        /// </summary>
         public RiakDeleteOptions()
         {
             R = Quorum.WellKnown.Default;
@@ -36,13 +43,16 @@ namespace RiakClient.Models
         }
 
         /// <summary>
-        /// The Vclock of the version that is being deleted. Use this to prevent deleting objects that have been modified since the last get request.
+        /// The Vclock of the version that is being deleted. 
+        /// Use this to prevent deleting objects that have been modified since the last get request.
         /// </summary>
         /// <value>
         /// The vclock.
         /// </value>
-        /// <remarks>Review the information at http://wiki.basho.com/Vector-Clocks.html for additional information on how vector clocks 
-        /// are used in Riak.</remarks>
+        /// <remarks>
+        /// Review the information at http://wiki.basho.com/Vector-Clocks.html for additional information on how vector clocks 
+        /// are used in Riak.
+        /// </remarks>
         public byte[] Vclock { get; set; }
 
         internal void Populate(RpbDelReq request)
