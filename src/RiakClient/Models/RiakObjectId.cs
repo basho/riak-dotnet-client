@@ -88,16 +88,33 @@ namespace RiakClient.Models
             get { return key; }
         }
 
+        /// <summary>
+        /// Determines whether the one object is equal to another object.
+        /// </summary>
+        /// <param name="left">The first <see cref="RiakObjectId"/> to compare.</param>
+        /// <param name="right">The other <see cref="RiakObjectId"/> to compare.</param>
+        /// <returns><b>true</b> if the specified object is equal to the current object, otherwise, <b>false</b>.</returns>
         public static bool operator ==(RiakObjectId left, RiakObjectId right)
         {
             return Equals(left, right);
         }
 
+        /// <summary>
+        /// Determines whether the one object is <b>not</b> equal to another object.
+        /// </summary>
+        /// <param name="left">The first <see cref="RiakObjectId"/> to compare.</param>
+        /// <param name="right">The other <see cref="RiakObjectId"/> to compare.</param>
+        /// <returns><b>true</b> if the specified object is <b>not</b> equal to the current object, otherwise, <b>false</b>.</returns>
         public static bool operator !=(RiakObjectId left, RiakObjectId right)
         {
             return !Equals(left, right);
         }
 
+        /// <summary>
+        /// Determines whether the specified object is equal to the current object.
+        /// </summary>
+        /// <param name="other">The object to compare with the current object.</param>
+        /// <returns><b>true</b> if the specified object is equal to the current object, otherwise, <b>false</b>.</returns>
         public bool Equals(RiakObjectId other)
         {
             if (ReferenceEquals(null, other))
@@ -115,11 +132,21 @@ namespace RiakClient.Models
                 string.Equals(key, other.key);
         }
 
+        /// <summary>
+        /// Determines whether the specified object is equal to the current object.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current object.</param>
+        /// <returns><b>true</b> if the specified object is equal to the current object, otherwise, <b>false</b>.</returns>
         public override bool Equals(object obj)
         {
             return Equals(obj as RiakObjectId);
         }
 
+        /// <summary>
+        /// Returns a hash code for the current object.
+        /// Uses a combination of the public properties to generate a unique hash code.
+        /// </summary>
+        /// <returns>A hash code for the current object.</returns>
         public override int GetHashCode()
         {
             unchecked
@@ -131,6 +158,10 @@ namespace RiakClient.Models
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>A string representation of the Bucket Type, Bucket Name, and Key.</returns>
         public override string ToString()
         {
             if (string.IsNullOrEmpty(BucketType))

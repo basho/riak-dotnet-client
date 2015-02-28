@@ -21,16 +21,33 @@ namespace RiakClient.Models
 {
     using System;
 
+    /// <summary>
+    /// An Id that specifies a specific index in Riak. Immutable once created. 
+    /// </summary>
     public class RiakIndexId : IEquatable<RiakIndexId>
     {
         private readonly string bucketName;
         private readonly string bucketType;
         private readonly string indexName;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RiakIndexId" /> class.
+        /// </summary>
+        /// <param name="bucketName">TThe bucket name to use.</param>
+        /// <param name="indexName">The index name to use.</param>
         public RiakIndexId(string bucketName, string indexName)
             : this(null, bucketName, indexName)
         {
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RiakIndexId" /> class.
+        /// </summary>
+        /// <param name="bucketType">The bucket type to use.</param>
+        /// <param name="bucketName">The bucket name to use.</param>
+        /// <param name="indexName">The index name to use.</param>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="bucketName"/> cannot be null, empty, or whitespace.</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="indexName"/> cannot be null, empty, or whitespace.</exception>
 
         public RiakIndexId(string bucketType, string bucketName, string indexName)
         {
@@ -49,31 +66,57 @@ namespace RiakClient.Models
             this.indexName = indexName;
         }
 
+        /// <summary>
+        /// Get the Bucket Type of the Index Id.
+        /// </summary>
         public string BucketType
         {
             get { return bucketType; }
         }
 
+        /// <summary>
+        /// Get the Bucket Name of the Index Id.
+        /// </summary>
         public string BucketName
         {
             get { return bucketName; }
         }
 
+        /// <summary>
+        /// Get the Index Name of the Index Id.
+        /// </summary>
         public string IndexName
         {
             get { return indexName; }
         }
 
+        /// <summary>
+        /// Determines whether the one object is equal to another object.
+        /// </summary>
+        /// <param name="left">The first <see cref="RiakIndexId"/> to compare.</param>
+        /// <param name="right">The other <see cref="RiakIndexId"/> to compare.</param>
+        /// <returns><b>true</b> if the specified object is equal to the current object, otherwise, <b>false</b>.</returns>
         public static bool operator ==(RiakIndexId left, RiakIndexId right)
         {
             return Equals(left, right);
         }
 
+        /// <summary>
+        /// Determines whether the one object is <b>not</b> equal to another object.
+        /// </summary>
+        /// <param name="left">The first <see cref="RiakObjectId"/> to compare.</param>
+        /// <param name="right">The other <see cref="RiakObjectId"/> to compare.</param>
+        /// <returns><b>true</b> if the specified object is <b>not</b> equal to the current object, otherwise, <b>false</b>.</returns>
         public static bool operator !=(RiakIndexId left, RiakIndexId right)
         {
             return !Equals(left, right);
         }
 
+        /// <summary>
+        /// Determines whether the specified object is equal to the current object.
+        /// </summary>
+        /// <param name="other">The object to compare with the current object.</param>
+        /// <returns><b>true</b> if the specified object is equal to the current object, otherwise, <b>false</b>.</returns>
         public bool Equals(RiakIndexId other)
         {
             if (ReferenceEquals(null, other))
@@ -91,6 +134,11 @@ namespace RiakClient.Models
                    string.Equals(indexName, other.indexName);
         }
 
+        /// <summary>
+        /// Determines whether the specified object is equal to the current object.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current object.</param>
+        /// <returns><b>true</b> if the specified object is equal to the current object, otherwise, <b>false</b>.</returns>
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj))
@@ -106,6 +154,11 @@ namespace RiakClient.Models
             return Equals(obj as RiakIndexId);
         }
 
+        /// <summary>
+        /// Returns a hash code for the current object.
+        /// Uses a combination of the public properties to generate a unique hash code.
+        /// </summary>
+        /// <returns>A hash code for the current object.</returns>
         public override int GetHashCode()
         {
             unchecked
