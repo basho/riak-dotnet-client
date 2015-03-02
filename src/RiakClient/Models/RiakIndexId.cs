@@ -48,7 +48,6 @@ namespace RiakClient.Models
         /// <param name="indexName">The index name to use.</param>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="bucketName"/> cannot be null, empty, or whitespace.</exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="indexName"/> cannot be null, empty, or whitespace.</exception>
-
         public RiakIndexId(string bucketType, string bucketName, string indexName)
         {
             if (string.IsNullOrEmpty(bucketName))

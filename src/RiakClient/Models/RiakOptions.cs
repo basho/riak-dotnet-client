@@ -78,7 +78,7 @@ namespace RiakClient.Models
         public Quorum Rw { get; protected set; }
 
         /// <summary>
-        /// The <see cref="RiakClient.Timout"/> period for an operation.
+        /// The <see cref="Timeout"/> period for an operation.
         /// </summary>
         /// <remarks>Developers can leave this unset by default.</remarks>
         public Timeout Timeout { get; protected set; }
