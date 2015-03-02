@@ -64,7 +64,7 @@ namespace RiakClient.Models
         public bool? SloppyQuorum { get; private set; }
 
         /// <summary>
-        /// The number of replicas to create when storing data.
+        /// The number of replicas to read when fetching data.
         /// </summary>
         /// <remarks>
         /// Riak will default this property to an <see cref="NVal"/> equivalent of <b>3</b>.

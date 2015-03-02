@@ -24,62 +24,146 @@ namespace RiakClient.Models
     using Extensions;
     using Messages;
 
+    /// <summary>
+    /// Represents a collection of optional properties when executing secondary index queries.
+    /// Each property changes the semantics of the operation slightly. 
+    /// </summary>
     [ComVisible(false)]
     public class RiakIndexGetOptions : RiakOptions<RiakIndexGetOptions>
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RiakIndexGetOptions" /> class.
+        /// </summary>
         public RiakIndexGetOptions()
         {
             MaxResults = null;
         }
 
+        /// <summary>
+        /// The option to return the index keys with the Riak object keys.
+        /// </summary>
         public bool? ReturnTerms { get; private set; }
 
+        /// <summary>
+        /// The option to stream results back as they are available, instead of letting Riak
+        /// aggregate the entire result set before returning them.
+        /// </summary>
+        /// <remarks>
+        /// This property is not typically modified, please use the "Stream" version of any 
+        /// SecondaryIndex interface to stream queries.
+        /// </remarks>
         public bool? Stream { get; private set; }
 
+        /// <summary>
+        /// The maximum number of results returned by the query.
+        /// </summary>
         public int? MaxResults { get; private set; }
 
+        /// <summary>
+        /// The continuation string for this query. 
+        /// Used to page results when combined with <see cref="MaxResults"/>.
+        /// </summary>
         public string Continuation { get; private set; }
 
+        /// <summary>
+        /// The option to sort, or not sort, the results of a non-paginated secondary index query.
+        /// If <see cref="MaxResults"/> is set, this property is ignored.
+        /// By default results are sorted first by index value, then by key value.
+        /// </summary>
         public bool? PaginationSort { get; private set; }
 
+        /// <summary>
+        /// The option to filter result terms with a Regex.
+        /// </summary>
         public string TermRegex { get; private set; }
 
+        /// <summary>
+        /// Fluent setter for the <see cref="ReturnTerms"/> property.
+        /// The option to return the index keys with the Riak object keys.
+        /// </summary>
+        /// <param name="value">The value to set the property to.</param>
+        /// <returns>A reference to the current options object.</returns>
         public RiakIndexGetOptions SetReturnTerms(bool value)
         {
             ReturnTerms = value;
             return this;
         }
 
+        /// <summary>
+        /// Fluent setter for the <see cref="Stream"/> property.
+        /// The option to stream results back as they are available, instead of letting Riak
+        /// aggregate the entire result set before returning them.
+        /// </summary>
+        /// <param name="value">The value to set the property to.</param>
+        /// <returns>A reference to the current options object.</returns>
+        /// <remarks>
+        /// This property is not typically modified by the end user, 
+        /// please use the "Stream" version of any SecondaryIndex interface to stream queries.
+        /// </remarks>
         public RiakIndexGetOptions SetStream(bool value)
         {
             Stream = value;
             return this;
         }
 
+        /// <summary>
+        /// Fluent setter for the <see cref="MaxResults"/> property.
+        /// The maximum number of results returned by the query.
+        /// </summary>
+        /// <param name="value">The value to set the property to.</param>
+        /// <returns>A reference to the current options object.</returns>
         public RiakIndexGetOptions SetMaxResults(int value)
         {
             MaxResults = value;
             return this;
         }
 
+        /// <summary>
+        /// Fluent setter for the <see cref="Continuation"/> property.
+        /// The continuation string for this query. 
+        /// Used to page results when combined with <see cref="MaxResults"/>.
+        /// </summary>
+        /// <param name="value">The value to set the property to.</param>
+        /// <returns>A reference to the current options object.</returns>
         public RiakIndexGetOptions SetContinuation(BigInteger value)
         {
             Continuation = value.ToString();
             return this;
         }
 
+        /// <summary>
+        /// Fluent setter for the <see cref="Continuation"/> property.
+        /// The continuation string for this query. 
+        /// Used to page results when combined with <see cref="MaxResults"/>.
+        /// </summary>
+        /// <param name="value">The value to set the property to.</param>
+        /// <returns>A reference to the current options object.</returns>
         public RiakIndexGetOptions SetContinuation(string value)
         {
             Continuation = value;
             return this;
         }
 
+        /// <summary>
+        /// Fluent setter for the <see cref="TermRegex"/> property.
+        /// The option to filter result terms with a Regex.
+        /// </summary>
+        /// <param name="value">The value to set the property to.</param>
+        /// <returns>A reference to the current options object.</returns>
         public RiakIndexGetOptions SetTermRegex(string value)
         {
             TermRegex = value;
             return this;
         }
 
+        /// <summary>
+        /// Fluent setter for the <see cref="PaginationSort"/> property.
+        /// The option to sort, or not sort, the results of a non-paginated secondary index query.
+        /// If <see cref="MaxResults"/> is set, this property is ignored.
+        /// By default results are sorted first by index value, then by key value.
+        /// </summary>
+        /// <param name="value">The value to set the property to.</param>
+        /// <returns>A reference to the current options object.</returns>
         public RiakIndexGetOptions SetPaginationSort(bool value)
         {
             PaginationSort = value;
