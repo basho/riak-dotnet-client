@@ -96,7 +96,7 @@ namespace RiakClient
         /// <summary>
         /// Executes a delegate function using a <see cref="IRiakConnection"/>, and returns the results.
         /// Can retry up to "<paramref name="retryAttempts"/>" times for <see cref="ResultCode.NoRetries"/> and <see cref="ResultCode.ShuttingDown"/> error states.
-        /// This method is used over <see cref="UseConnection"/> to keep a connection open to receive streaming results.
+        /// This method is used over <see cref="RiakEndPoint.UseConnection"/> to keep a connection open to receive streaming results.
         /// </summary>
         /// <typeparam name="TResult">The type of the result from the <paramref name="useFun"/> parameter.</typeparam>
         /// <param name="useFun">
