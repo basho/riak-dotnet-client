@@ -33,7 +33,7 @@ namespace RiakClient.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="RiakIndexId" /> class.
         /// </summary>
-        /// <param name="bucketName">TThe bucket name to use.</param>
+        /// <param name="bucketName">The bucket name to use.</param>
         /// <param name="indexName">The index name to use.</param>
         public RiakIndexId(string bucketName, string indexName)
             : this(null, bucketName, indexName)

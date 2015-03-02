@@ -22,8 +22,10 @@ namespace RiakClient.Models.Index
     using System.Collections.Generic;
     using System.Linq;
     using System.Runtime.InteropServices;
-    using Util;
 
+    /// <summary>
+    /// A binary secondary index for a <see cref="RiakObject"/>.
+    /// </summary>
     [ComVisible(false)]
     public class BinIndex : SecondaryIndex<BinIndex, string>
     {
@@ -42,17 +44,25 @@ namespace RiakClient.Models.Index
             get { return RiakConstants.IndexSuffix.Binary; }
         }
 
+        /// <summary>
+        /// Delete this index from it's parent <see cref="RiakObject"/>.
+        /// </summary>
+        /// <returns>
+        /// A reference to the updated parent <see cref="RiakObject"/>.
+        /// </returns>
         public RiakObject Delete()
         {
             Container.BinIndexes.Remove(Name);
             return Container;
         }
 
+        /// <inheritdoc/>
         public override BinIndex Add(IEnumerable<string> values)
         {
             return base.Add(values.Where(value => !string.IsNullOrEmpty(value)).ToArray());
         }
 
+        /// <inheritdoc/>
         public override BinIndex Add(params string[] values)
         {
             return base.Add(values.Where(value => !string.IsNullOrEmpty(value)).ToArray());
