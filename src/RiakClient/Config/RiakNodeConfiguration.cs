@@ -41,7 +41,7 @@ namespace RiakClient.Config
             set { this["hostAddress"] = value; }
         }
 
-        [ConfigurationProperty("pbcPort", DefaultValue = 8088, IsRequired = false)]
+        [ConfigurationProperty("pbcPort", DefaultValue = 8087, IsRequired = false)]
         public int PbcPort
         {
             get { return (int)this["pbcPort"]; }
