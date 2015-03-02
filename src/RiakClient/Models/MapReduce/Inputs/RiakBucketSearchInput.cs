@@ -23,7 +23,7 @@ namespace RiakClient.Models.MapReduce.Inputs
     using Models.Search;
     using Newtonsoft.Json;
 
-    [Obsolete("Using Legacy Search as input for MapReduce is depreciated. Please move to Riak 2.0 Search, and use the RiakSearchInput class instead.")]
+    [Obsolete("Using Legacy Search as input for MapReduce is deprecated. Please move to Riak 2.0 Search, and use the RiakSearchInput class instead.")]
     public class RiakBucketSearchInput : RiakPhaseInput
     {
         private readonly string bucket;

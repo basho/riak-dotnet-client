@@ -56,30 +56,6 @@ License
 
 **Riak .NET Client** is Open Source software released under the Apache 2.0 License. Please see the [LICENSE](LICENSE) file for full license details.
 
-Regenerating .proto files
-=========================
-
-* Ensure submodules are checked out
-* In Powershell: `.\make.ps1 -Target ProtoGen`
-
-Riak .NET Client Deployment Process
-===================================
-
-* Merge all required feature branches into develop.
-* Verify that all tests succeed.
-* Make sure that the TravisCI build succeeds.
-* run `git flow release start vA.B.C`
-* Edit RiakClient.nuspec and VersionInfo.cs so that the version numbers are up to date.
-* To produce a new `release` build open a command prompt, change to the CI folder and run: `make`
-* Verify that two nupkg files were created, one for the library and one for the symbols. The version number should match that which you are releasing.
-* Finish the release by running: `git flow release finish vA.B.C`
-* Push all the branches/tags up: `git push origin master:master && git push origin develop:develop && git push --tags`
-* Push to Nuget by running (from the same command prompt): `.nuget\Nuget.exe push RiakClient.VERSION.nupkg` (it should also push up the symbols).
-* Make any changes to samples that might be required.
-* Make any changes to documentation that might be required.
-
-Give yourself a pat on the back and have some tea.
-
 Riak .NET Client Roadmap
 ======================
 
@@ -108,3 +84,4 @@ The following people have contributed to Riak .NET Client, it's predecessor Corr
 * James Newton-King (Json.NET)
 * Alex Moore
 * Luke Bakken
+

@@ -54,7 +54,7 @@ Write-Debug "GitHub API Key '$github_api_key'"
 $release_info = New-Object PSObject -Property @{
         tag_name = $VersionString
         name = $VersionString
-        body ="riak-dotnet-client $VersionString"
+        body ="riak-dotnet-client $VersionString`nhttps://github.com/basho-labs/riak-dotnet-client/blob/master/RELNOTES.md"
         draft = $false
         prerelease = $true
     }

@@ -463,7 +463,7 @@ namespace RiakClient.Models
         /// <param name="bucket">The other object's bucket name.</param>
         /// <param name="key">The other object's key.</param>
         /// <param name="tag">The tag to use.</param>
-        [Obsolete("Linkwalking has been depreciated as of Riak 2.0. This method will be removed in the next major version.")]
+        [Obsolete("Linkwalking has been deprecated as of Riak 2.0. This method will be removed in the next major version.")]
         public void LinkTo(string bucket, string key, string tag)
         {
             Links.Add(new RiakLink(bucket, key, tag));
@@ -478,7 +478,7 @@ namespace RiakClient.Models
         /// Thrown if RiakObjectId has a bucket type. 
         /// Combining linkwalking and bucket types is not supported.
         /// </exception>
-        [Obsolete("Linkwalking has been depreciated as of Riak 2.0. This method will be removed in the next major version.")]
+        [Obsolete("Linkwalking has been deprecated as of Riak 2.0. This method will be removed in the next major version.")]
         public void LinkTo(RiakObjectId riakObjectId, string tag)
         {
             ThrowIfMixingBucketTypesAndLinks(riakObjectId.BucketType);
@@ -495,7 +495,7 @@ namespace RiakClient.Models
         /// Thrown if RiakObjectId has a bucket type. 
         /// Combining linkwalking and bucket types is not supported.
         /// </exception>
-        [Obsolete("Linkwalking has been depreciated as of Riak 2.0. This method will be removed in the next major version.")]
+        [Obsolete("Linkwalking has been deprecated as of Riak 2.0. This method will be removed in the next major version.")]
         public void LinkTo(RiakObject riakObject, string tag)
         {
             ThrowIfMixingBucketTypesAndLinks(riakObject.BucketType);
@@ -509,7 +509,7 @@ namespace RiakClient.Models
         /// <param name="bucket">The other object's bucket.</param>
         /// <param name="key">The other object's key.</param>
         /// <param name="tag">The tag for the link to remove.</param>
-        [Obsolete("Linkwalking has been depreciated as of Riak 2.0. This method will be removed in the next major version.")]
+        [Obsolete("Linkwalking has been deprecated as of Riak 2.0. This method will be removed in the next major version.")]
         public void RemoveLink(string bucket, string key, string tag)
         {
             var link = new RiakLink(bucket, key, tag);
@@ -525,7 +525,7 @@ namespace RiakClient.Models
         /// Thrown if RiakObjectId has a bucket type. 
         /// Combining linkwalking and bucket types is not supported.
         /// </exception>
-        [Obsolete("Linkwalking has been depreciated as of Riak 2.0. This method will be removed in the next major version.")]
+        [Obsolete("Linkwalking has been deprecated as of Riak 2.0. This method will be removed in the next major version.")]
         public void RemoveLink(RiakObjectId riakObjectId, string tag)
         {
             ThrowIfMixingBucketTypesAndLinks(riakObjectId.BucketType);
@@ -543,7 +543,7 @@ namespace RiakClient.Models
         /// Thrown if RiakObjectId has a bucket type. 
         /// Combining linkwalking and bucket types is not supported.
         /// </exception>
-        [Obsolete("Linkwalking has been depreciated as of Riak 2.0. This method will be removed in the next major version.")]
+        [Obsolete("Linkwalking has been deprecated as of Riak 2.0. This method will be removed in the next major version.")]
         public void RemoveLink(RiakObject riakObject, string tag)
         {
             ThrowIfMixingBucketTypesAndLinks(riakObject.BucketType);
@@ -556,7 +556,7 @@ namespace RiakClient.Models
         /// Remove a link, that goes from this object to another.
         /// </summary>
         /// <param name="link">The link to remove.</param>
-        [Obsolete("Linkwalking has been depreciated as of Riak 2.0. This method will be removed in the next major version.")]
+        [Obsolete("Linkwalking has been deprecated as of Riak 2.0. This method will be removed in the next major version.")]
         public void RemoveLink(RiakLink link)
         {
             Links.Remove(link);
@@ -570,7 +570,7 @@ namespace RiakClient.Models
         /// Thrown if RiakObjectId has a bucket type. 
         /// Combining linkwalking and bucket types is not supported.
         /// </exception>
-        [Obsolete("Linkwalking has been depreciated as of Riak 2.0. This method will be removed in the next major version.")]
+        [Obsolete("Linkwalking has been deprecated as of Riak 2.0. This method will be removed in the next major version.")]
         public void RemoveLinks(RiakObject riakObject)
         {
             ThrowIfMixingBucketTypesAndLinks(riakObject.BucketType);
@@ -586,7 +586,7 @@ namespace RiakClient.Models
         /// Thrown if RiakObjectId has a bucket type. 
         /// Combining linkwalking and bucket types is not supported.
         /// </exception>
-        [Obsolete("Linkwalking has been depreciated as of Riak 2.0. This method will be removed in the next major version.")]
+        [Obsolete("Linkwalking has been deprecated as of Riak 2.0. This method will be removed in the next major version.")]
         public void RemoveLinks(RiakObjectId riakObjectId)
         {
             ThrowIfMixingBucketTypesAndLinks(riakObjectId.BucketType);

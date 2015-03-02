@@ -19,6 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{439A3CE3-A
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
 		RELNOTES.md = RELNOTES.md
+		src\RiakClient.shfbproj = src\RiakClient.shfbproj
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{FD5F81AF-F8DA-4A49-BCF9-8CC9BC5BB8BA}"

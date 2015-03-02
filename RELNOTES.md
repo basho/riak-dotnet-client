@@ -4,9 +4,14 @@ Release Notes
 v2.0.0
 ------
 
+### Overview ###
+
 * Renamed project to "Riak .NET Client".
 * Renamed namespaces from "CorrugatedIron.*" to "RiakClient.*"
 * Removed checks for slashes in key and bucket names (#184).
+* Add extensive list of Riak 2.0 features [GH Issue 200](https://github.com/basho-labs/riak-dotnet-client/issues/200)
+* Many modifications due to source code checking by StyleCop and FxCop.
+* Added `Quorum` class to represent quorums rather than `uint` / `string` types.
 
 v1.4.2
 ------
@@ -37,7 +42,6 @@ v1.4.0
 * Created `RiakIndexResult` to deal with new possible riak index results containing either a list of keys or list of key + term pairs. (#142, #128) **N.B.** this will break CI 1.3.x and earlier range query operations. 
     * Existing queries will need to use `results.Value.IndexKeyTerms` to enumerate through the results of an 2i query.
     * An `IndexKeyTerm` contains a `key` and `term`. `term` will be empty unless the `return_terms` query option is used.
-
 
 v1.3.3
 ------
