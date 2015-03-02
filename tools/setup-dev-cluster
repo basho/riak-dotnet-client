@@ -244,7 +244,7 @@ do
     then
         gen-riak-conf "$riak_conf" $http_port $pb_port $https_port "$security_cacert_file" "$security_cert_file" "$security_key_file" "$default_backend"
     else
-        gen-riak-conf "$riak_conf" $http_port $pb_port
+        gen-riak-conf "$riak_conf" $http_port $pb_port 0 '' '' '' "$default_backend"
     fi
 
     gen-adv-conf $adv_conf
