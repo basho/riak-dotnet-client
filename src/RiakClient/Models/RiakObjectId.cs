@@ -159,7 +159,7 @@ namespace RiakClient.Models
         }
 
         /// <summary>
-        /// 
+        /// Returns a string that represents the RiakObjectId value.
         /// </summary>
         /// <returns>A string representation of the Bucket Type, Bucket Name, and Key.</returns>
         public override string ToString()
