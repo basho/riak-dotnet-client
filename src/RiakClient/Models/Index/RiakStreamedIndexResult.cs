@@ -24,17 +24,21 @@ namespace RiakClient.Models.Index
     using Extensions;
     using Messages;
 
+    /// <summary>
+    /// Represents a result to a streaming index query.
+    /// </summary>
     public class RiakStreamedIndexResult : IRiakIndexResult
     {
         private readonly IEnumerable<RiakResult<RpbIndexResp>> responseReader;
         private readonly bool includeTerms;
 
-        public RiakStreamedIndexResult(bool includeTerms, IEnumerable<RiakResult<RpbIndexResp>> responseReader)
+        internal RiakStreamedIndexResult(bool includeTerms, IEnumerable<RiakResult<RpbIndexResp>> responseReader)
         {
             this.responseReader = responseReader;
             this.includeTerms = includeTerms;
         }
 
+        /// <inheritdoc/>
         public IEnumerable<RiakIndexKeyTerm> IndexKeyTerms
         {
             get

@@ -22,8 +22,14 @@ namespace RiakClient.Models.Index
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
+    using System.Numerics;
     using System.Runtime.InteropServices;
 
+    /// <summary>
+    /// Represents an abstract secondary index for a <see cref="RiakObject"/>.
+    /// </summary>
+    /// <typeparam name="TClass">The concrete type of the implementing class.</typeparam>
+    /// <typeparam name="TIndex">The type of the index (<see cref="BigInteger"/> or <see cref="string"/>).</typeparam>
     [ComVisible(false)]
     public abstract class SecondaryIndex<TClass, TIndex>
     {
@@ -38,11 +44,17 @@ namespace RiakClient.Models.Index
             this.name = name.ToLower();
         }
 
+        /// <summary>
+        /// The term values for the index.
+        /// </summary>
         public ReadOnlyCollection<TIndex> Values
         {
             get { return new ReadOnlyCollection<TIndex>(values.ToList()); }
         }
 
+        /// <summary>
+        /// The name of the index.
+        /// </summary>
         public string Name
         {
             get { return name; }
@@ -57,17 +69,31 @@ namespace RiakClient.Models.Index
 
         protected abstract string IndexSuffix { get; }
 
+        /// <summary>
+        /// Clear the terms for this index instance.
+        /// </summary>
+        /// <returns>A reference to this updated instance, for fluent chaining.</returns>
         public TClass Clear()
         {
             values.Clear();
             return TypedThis;
         }
 
+        /// <summary>
+        /// Add the <see cref="IEnumerable{TIndex}"/> collection of term values to the index.
+        /// </summary>
+        /// <param name="valuesToAdd">An <see cref="IEnumerable{TIndex}"/> of new terms to add.</param>
+        /// <returns>A reference to this updated instance, for fluent chaining.</returns>
         public virtual TClass Add(IEnumerable<TIndex> valuesToAdd)
         {
             return Add(valuesToAdd.ToArray());
         }
 
+        /// <summary>
+        /// Adds the params array collection of term values to the index.
+        /// </summary>
+        /// <param name="valuesToAdd">A params array of term values to add.</param>
+        /// <returns>A reference to this updated instance, for fluent chaining.</returns>
         public virtual TClass Add(params TIndex[] valuesToAdd)
         {
             foreach (var val in valuesToAdd)
@@ -78,11 +104,21 @@ namespace RiakClient.Models.Index
             return TypedThis;
         }
 
+        /// <summary>
+        /// Removes the params array <paramref name="valuesToRemove"/> of term values from the index.
+        /// </summary>
+        /// <param name="valuesToRemove">An <see cref="IEnumerable{TIndex}"/> of terms values to remove.</param>
+        /// <returns>A reference to this updated instance, for fluent chaining.</returns>
         public TClass Remove(IEnumerable<TIndex> valuesToRemove)
         {
             return Remove(valuesToRemove.ToArray());
         }
 
+        /// <summary>
+        /// Removes the collection <paramref name="valuesToRemove"/> of term values from the index.
+        /// </summary>
+        /// <param name="valuesToRemove">A params array of term values to remove.</param>
+        /// <returns>A reference to this updated instance, for fluent chaining.</returns>
         public TClass Remove(params TIndex[] valuesToRemove)
         {
             foreach (var val in valuesToRemove)
@@ -92,19 +128,38 @@ namespace RiakClient.Models.Index
 
             return TypedThis;
         }
-
-        public TClass Set(params TIndex[] values)
-        {
-            Clear();
-            return Add(values);
-        }
-
+        
+        /// <summary>
+        /// Sets the term collection to those terms in <paramref name="values"/> collection.
+        /// Deletes any existing terms in the collection.
+        /// Similar to an overwriting assignment.
+        /// </summary>
+        /// <param name="values">An <see cref="IEnumerable{TIndex}"/> of new term values to add.</param>
+        /// <returns>A reference to this updated instance, for fluent chaining.</returns>
         public TClass Set(IEnumerable<TIndex> values)
         {
             Clear();
             return Add(values);
         }
 
+        /// <summary>
+        /// Sets the term collection to those terms in <paramref name="values"/> params array.
+        /// Deletes any existing terms in the collection.
+        /// Similar to an overwriting assignment.
+        /// </summary>
+        /// <param name="values">A params array of new term values to add.</param>
+        /// <returns>A reference to this updated instance, for fluent chaining.</returns>
+        public TClass Set(params TIndex[] values)
+        {
+            Clear();
+            return Add(values);
+        }
+
+        /// <summary>
+        /// Determines whether an element is in the terms collection.
+        /// </summary>
+        /// <param name="value">Determines whether an element is in the terms collection.</param>
+        /// <returns><b>true</b> if the terms collection contains <paramref name="value"/>, <b>false</b>, otherwise.</returns>
         public bool HasValue(TIndex value)
         {
             return values.Contains(value);
