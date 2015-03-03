@@ -34,11 +34,14 @@
 
       Riak Client 2.0 requires Riak 2.0, or Riak 1.4. 
     </description>
+    <releaseNotes>
+    Please see: https://github.com/basho-labs/riak-dotnet-client/blob/master/RELNOTES.md
+    </releaseNotes>
     <summary>
       Riak .NET Client - the .NET client for Riak.
     </summary>
     <projectUrl>https://github.com/basho-labs/riak-dotnet-client</projectUrl>
-    <iconUrl>http://basho.com/design-assets/Basho-Logos/png/basho-logo-color-horiz.png</iconUrl>
+    <iconUrl>http://basho.com/design-assets/Basho-Logos/png/basho-logo-color-vert.png</iconUrl>
     <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <tags>Riak .NET Client riak-dotnet-client CorrugatedIron Corrugated Iron NoSQL Client Driver Distributed</tags>
