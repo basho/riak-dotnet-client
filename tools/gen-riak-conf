@@ -7,12 +7,19 @@ declare -ir https_port="${4:-0}"
 declare -r security_cacert_file="$5"
 declare -r security_cert_file="$6"
 declare -r security_key_file="$7"
+declare -r default_backend="${8:-bitcask}"
+
+default_backend_name='bitcask_backend'
+if [[ $default_backend == 'leveldb' ]]
+then
+    default_backend_name='leveldb_backend'
+fi
 
 cat >> $out_file <<EOT
 ring_size = 16
 search = on
 storage_backend = multi
-multi_backend.default = bitcask_backend
+multi_backend.default = $default_backend_name
 
 multi_backend.bitcask_backend.storage_backend = bitcask
 multi_backend.bitcask_backend.bitcask.data_root = \$(platform_data_dir)/bitcask
