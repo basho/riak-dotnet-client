@@ -35,7 +35,7 @@ namespace RiakClient.Models.MapReduce.Inputs
             return bucketKeyInput;
         }
 
-        [Obsolete("Use the Add() that accepts a RiakIndexId instead. This will be removed in the next version.")]
+        [Obsolete("Use the Add() that accepts a RiakObjectId instead. This will be removed in the next version.")]
         public RiakBucketKeyInput Add(string bucket, string key)
         {
             riakObjectIdList.Add(new RiakObjectId(bucket, key));
@@ -60,14 +60,14 @@ namespace RiakClient.Models.MapReduce.Inputs
             return this;
         }
 
-        [Obsolete("Use the Add() that accepts RiakIndexId[] instead. This will be removed in the next version.")]
+        [Obsolete("Use the Add() that accepts RiakObjectId[] instead. This will be removed in the next version.")]
         public RiakBucketKeyInput Add(params Tuple<string, string>[] pairs)
         {
             riakObjectIdList.AddRange(pairs.Select(p => new RiakObjectId(p.Item1, p.Item2)));
             return this;
         }
 
-        [Obsolete("Use the Add() that accepts an IEnumerable<RiakIndexId> instead. This will be removed in the next version.")]
+        [Obsolete("Use the Add() that accepts an IEnumerable<RiakObjectId> instead. This will be removed in the next version.")]
         public RiakBucketKeyInput Add(IEnumerable<Tuple<string, string>> pairs)
         {
             riakObjectIdList.AddRange(pairs.Select(p => new RiakObjectId(p.Item1, p.Item2)));

@@ -25,7 +25,6 @@ namespace RiakClientTests.Models.MapReduce
     using RiakClient.Models;
     using RiakClient.Models.MapReduce;
     using RiakClient.Models.MapReduce.Inputs;
-    using RiakClient.Util;
 
     [TestFixture]
     public class RiakMapReduceTests
@@ -59,7 +58,7 @@ namespace RiakClientTests.Models.MapReduce
         [Test]
         public void BuildingSimpleMapReduceJobsWithTheApiProducesByteArrays()
         {
-            var query = new RiakMapReduceQuery(MrContentType)
+            var query = new RiakMapReduceQuery()
                 .Inputs("animals")
                 .MapJs(m => m.Source("function(v) { return [v]; }").Keep(true));
 
@@ -71,7 +70,7 @@ namespace RiakClientTests.Models.MapReduce
         [Test]
         public void BuildingSimpleMapReduceJobsWithTimeoutProducesTheCorrectCommand()
         {
-            var query = new RiakMapReduceQuery(MrContentType, 100200)
+            var query = new RiakMapReduceQuery(100200)
                 .Inputs("animals")
                 .MapJs(m => m.Source("function(v) { return [v]; }").Keep(true));
 
@@ -83,7 +82,7 @@ namespace RiakClientTests.Models.MapReduce
         [Test]
         public void BuildingComplexMapReduceJobsWithTheApiProducesTheCorrectCommand()
         {
-            var query = new RiakMapReduceQuery(MrContentType)
+            var query = new RiakMapReduceQuery()
                 .Inputs("animals")
                 .MapJs(m => m.Source("function(o) { if (o.key.indexOf('spider') != -1) return [1]; return []; }"))
                 .ReduceJs(r => r.Name("Riak.reduceSum").Keep(true));
@@ -95,7 +94,7 @@ namespace RiakClientTests.Models.MapReduce
         [Test]
         public void BuildingComplexMapReduceJobsWithFiltersProducesTheCorrectCommand()
         {
-            var query = new RiakMapReduceQuery(MrContentType)
+            var query = new RiakMapReduceQuery()
                 .Inputs("animals")
                 //.Filter(new Matches<string>("spider"))
                 .Filter(f => f.Matches("spider"))
@@ -109,7 +108,7 @@ namespace RiakClientTests.Models.MapReduce
         [Test]
         public void BuildingComplexMapReduceJobsWithFiltersAndTypesProducesTheCorrectCommand()
         {
-            var query = new RiakMapReduceQuery(MrContentType)
+            var query = new RiakMapReduceQuery()
                 .Inputs("animals", "zoo")
                 //.Filter(new Matches<string>("spider"))
                 .Filter(f => f.Matches("spider"))
@@ -123,7 +122,7 @@ namespace RiakClientTests.Models.MapReduce
         [Test]
         public void QueryingDollarKeyDoesNotAppendBinIndexSuffix()
         {
-            var query = new RiakMapReduceQuery(MrContentType)
+            var query = new RiakMapReduceQuery()
                 .Inputs(RiakIndex.Range(new RiakIndexId("animals", "$key"), "0", "zzzzz"));
 
             var request = query.ToMessage();
@@ -136,7 +135,7 @@ namespace RiakClientTests.Models.MapReduce
         [Test]
         public void BuildingMapReducePhaseWithArgumentsArrayProducesCorrectResult()
         {
-            var query = new RiakMapReduceQuery(MrContentType)
+            var query = new RiakMapReduceQuery()
                 .Inputs("animals")
                 .ReduceJs(c => c.Name("Riak.reduceSlice").Keep(true).Argument(new[] { 1, 10 }));
 
@@ -147,7 +146,7 @@ namespace RiakClientTests.Models.MapReduce
         [Test]
         public void BuildingMapReducePhaseWithObjectArgumentProducesCorrectResult()
         {
-            var query = new RiakMapReduceQuery(MrContentType)
+            var query = new RiakMapReduceQuery()
                 .Inputs("animals")
                 .ReduceJs(c => c.Name("Riak.reduceSlice").Keep(true).Argument(new { reduce_phase_only_1 = true }));
 
@@ -158,7 +157,7 @@ namespace RiakClientTests.Models.MapReduce
         [Test]
         public void BuildingMapReducePhaseWithVaueTypeArgumentProducesCorrectResult()
         {
-            var query = new RiakMapReduceQuery(MrContentType)
+            var query = new RiakMapReduceQuery()
                 .Inputs("animals")
                 .ReduceJs(c => c.Name("Riak.reduceSlice").Keep(true).Argument("slartibartfast"));
 

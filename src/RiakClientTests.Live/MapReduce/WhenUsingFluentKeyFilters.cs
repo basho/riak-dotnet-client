@@ -20,13 +20,12 @@
 namespace RiakClientTests.Live.MapReduce
 {
     using System.Linq;
-    using RiakClient.Extensions;
     using Newtonsoft.Json;
     using NUnit.Framework;
     using RiakClient;
+    using RiakClient.Extensions;
     using RiakClient.Models;
     using RiakClient.Models.MapReduce;
-    using RiakClient.Util;
 
     [TestFixture]
     public class WhenUsingFluentKeyFilters : RiakMapReduceTestBase
@@ -46,7 +45,7 @@ namespace RiakClientTests.Live.MapReduce
                     RiakConstants.ContentTypes.ApplicationJson));
             }
 
-            var mr = new RiakMapReduceQuery(MrContentType);
+            var mr = new RiakMapReduceQuery();
 
             mr.Inputs(Bucket)
                 .Filter(f => f.Equal("time_8"))
@@ -85,7 +84,7 @@ namespace RiakClientTests.Live.MapReduce
                     RiakConstants.ContentTypes.ApplicationJson));
             }
 
-            var mr = new RiakMapReduceQuery(MrContentType);
+            var mr = new RiakMapReduceQuery();
 
             mr.Inputs(Bucket)
                 .Filter(f => f.StartsWith("time"))
@@ -119,7 +118,7 @@ namespace RiakClientTests.Live.MapReduce
                     RiakConstants.ContentTypes.ApplicationJson));
             }
 
-            var mr = new RiakMapReduceQuery(MrContentType);
+            var mr = new RiakMapReduceQuery();
 
             mr.Inputs(Bucket)
                 .Filter(f => f.And(l => l.StartsWith("time"),
