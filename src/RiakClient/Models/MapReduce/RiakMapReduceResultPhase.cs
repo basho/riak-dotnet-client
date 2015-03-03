@@ -25,6 +25,9 @@ namespace RiakClient.Models.MapReduce
     using Messages;
     using Newtonsoft.Json;
 
+    /// <summary>
+    /// The collection of results for a single mapreduce phase.
+    /// </summary>
     public class RiakMapReduceResultPhase
     {
         private readonly bool success;
@@ -43,16 +46,26 @@ namespace RiakClient.Models.MapReduce
             this.success = false;
         }
 
+        /// <summary>
+        /// Indicates whether the phase was a success or not.
+        /// <b>true</b> if the phase was a success, <b>false</b>, otherwise.
+        /// </summary>
         public bool Success
         {
             get { return success; }
         }
 
+        /// <summary>
+        /// The phase number.
+        /// </summary>
         public long Phase
         {
             get { return phase; }
         }
 
+        /// <summary>
+        /// The collection of raw result values for this phase.
+        /// </summary>
         public IList<byte[]> Values
         {
             get { return values; }
