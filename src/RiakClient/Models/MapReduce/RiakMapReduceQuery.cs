@@ -70,8 +70,8 @@ namespace RiakClient.Models.MapReduce
             this.timeout = timeout;
         }
 
-
         // TODO: Remove this overload - contentType is always json.
+
         /// <summary>
         /// Initializes a new instance of the <see cref="RiakMapReduceQuery"/> class.
         /// </summary>
@@ -320,7 +320,7 @@ namespace RiakClient.Models.MapReduce
         /// Configure the phase with a lambda similar to:
         /// <code>new RiakMapReduceQuery().Inputs("Bucketname").Filter(f => f.StartsWith("time"));</code>
         /// The example above will filter out all keys that don't start with the string "time".
-        /// Please see the <see cref="RiakClient.Models.MapReduce.Fluent.RiakFluentKeyFilter"/> for
+        /// Please see the <see cref="Fluent.RiakFluentKeyFilter"/> for
         /// more built-in filters.
         /// </remarks>
         public RiakMapReduceQuery Filter(Action<RiakFluentKeyFilter> setup)
