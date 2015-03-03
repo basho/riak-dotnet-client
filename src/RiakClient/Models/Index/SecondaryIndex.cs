@@ -158,7 +158,7 @@ namespace RiakClient.Models.Index
         /// <summary>
         /// Determines whether an element is in the terms collection.
         /// </summary>
-        /// <param name="value">Determines whether an element is in the terms collection.</param>
+        /// <param name="value">The element to check membership for.</param>
         /// <returns><b>true</b> if the terms collection contains <paramref name="value"/>, <b>false</b>, otherwise.</returns>
         public bool HasValue(TIndex value)
         {
