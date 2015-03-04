@@ -211,9 +211,11 @@ namespace RiakClientTests.Live
         public void LinksAreRetrievedWithAMapReducePhase()
         {
             var query = new RiakMapReduceQuery()
-                .Inputs(TestBucket)
-                //.Filter(new Matches<string>(Jeremiah))
+                    .Inputs(TestBucket)
+                    //.Filter(new Matches<string>(Jeremiah))
+#pragma warning disable 618
                     .Filter(f => f.Matches(Jeremiah))
+#pragma warning restore 618
                     .Link(l => l.Tag("friends").Bucket(TestBucket).Keep(false))
                     .ReduceErlang(r => r.ModFun("riak_kv_mapreduce", "reduce_set_union").Keep(true));
 
