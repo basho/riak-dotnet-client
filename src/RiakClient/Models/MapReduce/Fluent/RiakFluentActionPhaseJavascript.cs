@@ -59,7 +59,7 @@ namespace RiakClient.Models.MapReduce.Fluent
         }
 
         /// <summary>
-        /// The known JavaScript function to execute for this phase.
+        /// Specify a name of the known JavaScript function to execute for this phase.
         /// </summary>
         /// <param name="name">The name of the function to execute.</param>
         /// <returns>A reference to this updated instance, for fluent chaining.</returns>
@@ -70,7 +70,7 @@ namespace RiakClient.Models.MapReduce.Fluent
         }
 
         /// <summary>
-        /// Dynamically load and execute a JavaScript function for this phase.
+        /// Specify the source code of the JavaScript function to dynamically load and execute for this phase.
         /// </summary>
         /// <param name="source">The source code of the function to execute.</param>
         /// <returns>A reference to this updated instance, for fluent chaining.</returns>
@@ -81,7 +81,7 @@ namespace RiakClient.Models.MapReduce.Fluent
         }
 
         /// <summary>
-        /// Execute a JavaScript function stored as a object in Riak, at a specific Bucket/Key for this phase.
+        /// Specify a bucket and key where a stored JavaScript function can be dynamically loaded from Riak and executed for this phase.
         /// </summary>
         /// <param name="bucket">The bucket name of the JavaScript function's address.</param>
         /// <param name="key">The key of the JavaScript function's address.</param>
