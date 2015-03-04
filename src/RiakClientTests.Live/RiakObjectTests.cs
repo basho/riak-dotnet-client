@@ -187,7 +187,9 @@ namespace RiakClientTests.Live
 
             var query = new RiakMapReduceQuery()
                 .Inputs(input)
+#pragma warning disable 618
                     .Link(l => l.AllLinks().Keep(true));
+#pragma warning restore 618
 
             var mrResult = Client.MapReduce(query);
             mrResult.IsSuccess.ShouldBeTrue();
@@ -215,8 +217,8 @@ namespace RiakClientTests.Live
                     //.Filter(new Matches<string>(Jeremiah))
 #pragma warning disable 618
                     .Filter(f => f.Matches(Jeremiah))
-#pragma warning restore 618
                     .Link(l => l.Tag("friends").Bucket(TestBucket).Keep(false))
+#pragma warning restore 618
                     .ReduceErlang(r => r.ModFun("riak_kv_mapreduce", "reduce_set_union").Keep(true));
 
             var result = Client.MapReduce(query);

@@ -299,6 +299,7 @@ namespace RiakClient.Models.MapReduce
         /// <code>.Link(l => l.Tag("friends");</code>
         /// The code above will walk links with a tag of "friends".
         /// </remarks>
+        [Obsolete("Linkwalking is a deprecated feature of Riak and will eventually be removed.")]
         public RiakMapReduceQuery Link(Action<RiakFluentLinkPhase> setup)
         {
             var phase = new RiakLinkPhase();
