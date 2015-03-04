@@ -97,7 +97,9 @@ namespace RiakClientTests.Models.MapReduce
             var query = new RiakMapReduceQuery()
                 .Inputs("animals")
                 //.Filter(new Matches<string>("spider"))
+#pragma warning disable 618
                 .Filter(f => f.Matches("spider"))
+#pragma warning restore 618
                 .MapJs(m => m.Source("function(o) { return [1]; }"))
                 .ReduceJs(r => r.Name("Riak.reduceSum").Keep(true));
 
@@ -111,7 +113,9 @@ namespace RiakClientTests.Models.MapReduce
             var query = new RiakMapReduceQuery()
                 .Inputs("zoo", "animals")
                 //.Filter(new Matches<string>("spider"))
+#pragma warning disable 618
                 .Filter(f => f.Matches("spider"))
+#pragma warning restore 618
                 .MapJs(m => m.Source("function(o) { return [1]; }"))
                 .ReduceJs(r => r.Name("Riak.reduceSum").Keep(true));
 

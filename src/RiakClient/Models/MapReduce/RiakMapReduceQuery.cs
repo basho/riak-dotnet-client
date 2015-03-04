@@ -308,6 +308,7 @@ namespace RiakClient.Models.MapReduce
             return this;
         }
 
+#pragma warning disable 618
         /// <summary>
         /// Add a key filter input to the inputs.
         /// </summary>
@@ -323,6 +324,7 @@ namespace RiakClient.Models.MapReduce
         /// Please see the <see cref="Fluent.RiakFluentKeyFilter"/> for
         /// more built-in filters.
         /// </remarks>
+        [Obsolete("Key Filters are a deprecated feature of Riak and will eventually be removed.")]
         public RiakMapReduceQuery Filter(Action<RiakFluentKeyFilter> setup)
         {
             var filters = new List<IRiakKeyFilterToken>();
@@ -332,6 +334,7 @@ namespace RiakClient.Models.MapReduce
 
             return this;
         }
+#pragma warning restore 618
 
         /// <summary>
         /// Compile the mapreduce query.
