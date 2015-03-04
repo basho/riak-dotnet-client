@@ -22,9 +22,10 @@ namespace RiakClient.Models.MapReduce.Fluent
     using System;
     using System.Collections.Generic;
     using Models.MapReduce.KeyFilters;
-
-    // TODO: Add summary info to public methods
-    // TODO: Switch RiakClient.Models.MapReduce.KeyFilters classes to internal
+    
+    /// <summary>
+    /// A fluent builder class for defining input key filters.
+    /// </summary>
     public class RiakFluentKeyFilter
     {
         private readonly List<IRiakKeyFilterToken> filters;

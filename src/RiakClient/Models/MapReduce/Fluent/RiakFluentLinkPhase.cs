@@ -21,6 +21,9 @@ namespace RiakClient.Models.MapReduce.Fluent
 {
     using Models.MapReduce.Phases;
 
+    /// <summary>
+    /// A fluent builder class for defining input linkwalking phases.
+    /// </summary>
     public class RiakFluentLinkPhase
     {
         private readonly RiakLinkPhase phase;

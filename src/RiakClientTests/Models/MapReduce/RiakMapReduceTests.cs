@@ -109,7 +109,7 @@ namespace RiakClientTests.Models.MapReduce
         public void BuildingComplexMapReduceJobsWithFiltersAndTypesProducesTheCorrectCommand()
         {
             var query = new RiakMapReduceQuery()
-                .Inputs("animals", "zoo")
+                .Inputs("zoo", "animals")
                 //.Filter(new Matches<string>("spider"))
                 .Filter(f => f.Matches("spider"))
                 .MapJs(m => m.Source("function(o) { return [1]; }"))
