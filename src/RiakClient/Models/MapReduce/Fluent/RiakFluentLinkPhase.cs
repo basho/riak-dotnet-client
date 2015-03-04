@@ -47,9 +47,9 @@ namespace RiakClient.Models.MapReduce.Fluent
         }
 
         /// <summary>
-        /// Follow links that are linked to objects in the bucket parameter <paramref name="bucket"/>.
+        /// Configure this Link phase to follow only links that go to a certain <paramref name="bucket"/>.
         /// </summary>
-        /// <param name="bucket">The bucket name to follow links to.</param>
+        /// <param name="bucket">The bucket to limit linkwalking to.</param>
         /// <returns>A reference to this updated instance, for fluent chaining.</returns>
         public RiakFluentLinkPhase Bucket(string bucket)
         {
@@ -58,9 +58,9 @@ namespace RiakClient.Models.MapReduce.Fluent
         }
 
         /// <summary>
-        /// Follow links that are only tagged with the parameter <paramref name="tag"/>.
+        /// Configure this Link phase to follow only links with a certain <paramref name="tag"/>.
         /// </summary>
-        /// <param name="tag">The tag to follow links to.</param>
+        /// <param name="tag">The tag to limit linkwalking to.</param>
         /// <returns>A reference to this updated instance, for fluent chaining.</returns>
         public RiakFluentLinkPhase Tag(string tag)
         {
@@ -69,9 +69,12 @@ namespace RiakClient.Models.MapReduce.Fluent
         }
 
         /// <summary>
-        /// Specify a <see cref="RiakFluentLinkPhase"/> based on the bucket and tag of a <see cref="RiakLink"/>.
+        /// Configure this Link phase to follow only links with buckets and tags that match those in <paramref name="link"/>.
         /// </summary>
-        /// <param name="link">The <see cref="RiakLink"/> to constrain the <see cref="Bucket"/> and <see cref="Tag"/> to.</param>
+        /// <param name="link">
+        /// The <see cref="RiakLink"/> containing a bucket and tag to limit linkwalking to.
+        /// If the <see cref="RiakLink"/>'s Bucket, Key, and Tag are all null or whitespace, then this phase will follow all links.
+        /// </param>
         /// <returns>A reference to this updated instance, for fluent chaining.</returns>
         public RiakFluentLinkPhase FromRiakLink(RiakLink link)
         {
@@ -80,7 +83,7 @@ namespace RiakClient.Models.MapReduce.Fluent
         }
 
         /// <summary>
-        /// Linkwalk all links for each object.
+        /// Configure this Link phase to follow all Links found on input objects.
         /// </summary>
         /// <returns>A reference to this updated instance, for fluent chaining.</returns>
         public RiakFluentLinkPhase AllLinks()
