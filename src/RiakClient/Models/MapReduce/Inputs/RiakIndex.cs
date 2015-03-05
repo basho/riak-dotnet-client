@@ -21,8 +21,10 @@ namespace RiakClient.Models.MapReduce.Inputs
 {
     using System;
     using System.Numerics;
-    using Util;
 
+    /// <summary>
+    /// Helps create secondary index mapreduce input queries. 
+    /// </summary>
     public static class RiakIndex
     {
         [Obsolete("Use Match(RiakIndexId, key) instead. This will be removed in the next version.")]

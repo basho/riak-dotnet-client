@@ -24,10 +24,19 @@ namespace RiakClient.Models.MapReduce.Inputs
     using System.Linq;
     using Newtonsoft.Json;
 
+    /// <summary>
+    /// Represents a Bucket/Key collection based mapreduce input.
+    /// </summary>
     public class RiakBucketKeyInput : RiakPhaseInput
     {
         private readonly List<RiakObjectId> riakObjectIdList = new List<RiakObjectId>();
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RiakBucketKeyInput"/> class, 
+        /// and adds the attached <paramref name="riakObjectIds"/> to the collection of inputs.
+        /// </summary>
+        /// <param name="riakObjectIds">The object ids to add to the input collection.</param>
+        /// <returns>The newly created <see cref="RiakBucketKeyInput"/>.</returns>
         public static RiakBucketKeyInput FromRiakObjectIds(IEnumerable<RiakObjectId> riakObjectIds)
         {
             var bucketKeyInput = new RiakBucketKeyInput();
@@ -35,6 +44,12 @@ namespace RiakClient.Models.MapReduce.Inputs
             return bucketKeyInput;
         }
 
+        /// <summary>
+        /// Adds a (bucket, key) pair to the mapreduce inputs collection.
+        /// </summary>
+        /// <param name="bucket">The bucket of the object address to add to the input collection.</param>
+        /// <param name="key">The key of the object address to add to the input collection.</param>
+        /// <returns>A reference to this updated instance, for fluent chaining.</returns>
         [Obsolete("Use the Add() that accepts a RiakObjectId instead. This will be removed in the next version.")]
         public RiakBucketKeyInput Add(string bucket, string key)
         {
@@ -42,24 +57,44 @@ namespace RiakClient.Models.MapReduce.Inputs
             return this;
         }
 
+        /// <summary>
+        /// Adds a <see cref="RiakObjectId"/> to the mapreduce inputs collection
+        /// </summary>
+        /// <param name="objectId">The <see cref="RiakObjectId"/> to add to the input collection.</param>
+        /// <returns>A reference to this updated instance, for fluent chaining.</returns>
         public RiakBucketKeyInput Add(RiakObjectId objectId)
         {
             riakObjectIdList.Add(objectId);
             return this;
         }
 
+        /// <summary>
+        /// Adds a collection of <see cref="RiakObjectId"/> to the mapreduce inputs collection.
+        /// </summary>
+        /// <param name="objectIds">The <see cref="RiakObjectId"/> params array to add to the input collection.</param>
+        /// <returns>A reference to this updated instance, for fluent chaining.</returns>
         public RiakBucketKeyInput Add(params RiakObjectId[] objectIds)
         {
             riakObjectIdList.AddRange(objectIds);
             return this;
         }
 
+        /// <summary>
+        /// Adds a collection of <see cref="RiakObjectId"/> to the mapreduce inputs collection.
+        /// </summary>
+        /// <param name="objectIds">The <see cref="RiakObjectId"/> collection to add to the input collection.</param>
+        /// <returns>A reference to this updated instance, for fluent chaining.</returns>
         public RiakBucketKeyInput Add(IEnumerable<RiakObjectId> objectIds)
         {
             riakObjectIdList.AddRange(objectIds);
             return this;
         }
 
+        /// <summary>
+        /// Adds a collection of (bucket, key) pairs to the mapreduce inputs collection.
+        /// </summary>
+        /// <param name="pairs">The (bucket, key) pairs to add to the input collection.</param>
+        /// <returns>A reference to this updated instance, for fluent chaining.</returns>
         [Obsolete("Use the Add() that accepts RiakObjectId[] instead. This will be removed in the next version.")]
         public RiakBucketKeyInput Add(params Tuple<string, string>[] pairs)
         {
@@ -67,6 +102,11 @@ namespace RiakClient.Models.MapReduce.Inputs
             return this;
         }
 
+        /// <summary>
+        /// Adds a collection of (bucket, key) pairs to the mapreduce inputs collection.
+        /// </summary>
+        /// <param name="pairs">The (bucket, key) pairs to add to the input collection.</param>
+        /// <returns>A reference to this updated instance, for fluent chaining.</returns>
         [Obsolete("Use the Add() that accepts an IEnumerable<RiakObjectId> instead. This will be removed in the next version.")]
         public RiakBucketKeyInput Add(IEnumerable<Tuple<string, string>> pairs)
         {
@@ -74,6 +114,7 @@ namespace RiakClient.Models.MapReduce.Inputs
             return this;
         }
 
+        /// <inheritdoc/>
         public override JsonWriter WriteJson(JsonWriter writer)
         {
             writer.WritePropertyName("inputs");
