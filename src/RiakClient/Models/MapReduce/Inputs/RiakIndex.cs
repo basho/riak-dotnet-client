@@ -30,10 +30,10 @@ namespace RiakClient.Models.MapReduce.Inputs
         /// <summary>
         /// Create a mapreduce input from a string secondary index match query.
         /// </summary>
-        /// <param name="bucket">The bucket containing the <see cref="index"/> to query.</param>
+        /// <param name="bucket">The bucket containing the <paramref name="index"/> to query.</param>
         /// <param name="index">The index to query.</param>
         /// <param name="key">The index key to match for the query.</param>
-        /// <returns></returns>
+        /// <returns>A newly initialized and configured <see cref="RiakIndexInput"/>.</returns>
         [Obsolete("Use Match(RiakIndexId, key) instead. This will be removed in the next version.")]
         public static RiakIndexInput Match(string bucket, string index, string key)
         {
@@ -43,11 +43,11 @@ namespace RiakClient.Models.MapReduce.Inputs
         /// <summary>
         /// Create a mapreduce input from a string secondary index range query.
         /// </summary>
-        /// <param name="bucket">The bucket containing the <see cref="index"/> to query.</param>
+        /// <param name="bucket">The bucket containing the <paramref name="index"/> to query.</param>
         /// <param name="index">The index to query.</param>
         /// <param name="start">The lower bound of the key range for the query.</param>
         /// <param name="end">The upper bound of the key range for the query.</param>
-        /// <returns></returns>
+        /// <returns>A newly initialized and configured <see cref="RiakIndexInput"/>.</returns>
         [Obsolete("Use Range(RiakIndexId, start, end) instead. This will be removed in the next version.")]
         public static RiakIndexInput Range(string bucket, string index, string start, string end)
         {
@@ -57,10 +57,10 @@ namespace RiakClient.Models.MapReduce.Inputs
         /// <summary>
         /// Create a mapreduce input from an integer secondary index match query.
         /// </summary>
-        /// <param name="bucket">The bucket containing the <see cref="index"/> to query.</param>
+        /// <param name="bucket">The bucket containing the <paramref name="index"/> to query.</param>
         /// <param name="index">The index to query.</param>
         /// <param name="key">The index key to match for the query.</param>
-        /// <returns></returns>
+        /// <returns>A newly initialized and configured <see cref="RiakIndexInput"/>.</returns>
         [Obsolete("Use Match(RiakIndexId, key) instead. This will be removed in the next version.")]
         public static RiakIndexInput Match(string bucket, string index, BigInteger key)
         {
@@ -70,11 +70,11 @@ namespace RiakClient.Models.MapReduce.Inputs
         /// <summary>
         /// Create a mapreduce input from an integer secondary index range query.
         /// </summary>
-        /// <param name="bucket">The bucket containing the <see cref="index"/> to query.</param>
+        /// <param name="bucket">The bucket containing the <paramref name="index"/> to query.</param>
         /// <param name="index">The index to query.</param>
         /// <param name="start">The lower bound of the key range for the query.</param>
         /// <param name="end">The upper bound of the key range for the query.</param>
-        /// <returns></returns>
+        /// <returns>A newly initialized and configured <see cref="RiakIndexInput"/>.</returns>
         [Obsolete("Use Range(RiakIndexId, start, end) instead. This will be removed in the next version.")]
         public static RiakIndexInput Range(string bucket, string index, BigInteger start, BigInteger end)
         {
@@ -86,7 +86,7 @@ namespace RiakClient.Models.MapReduce.Inputs
         /// </summary>
         /// <param name="indexId">The <see cref="RiakIndexId"/> identifying the index to query.</param>
         /// <param name="key">The index key to match for the query.</param>
-        /// <returns></returns>
+        /// <returns>A newly initialized and configured <see cref="RiakIndexInput"/>.</returns>
         public static RiakIndexInput Match(RiakIndexId indexId, string key)
         {
             return new RiakBinIndexEqualityInput(indexId, key);
@@ -98,7 +98,7 @@ namespace RiakClient.Models.MapReduce.Inputs
         /// <param name="indexId">The <see cref="RiakIndexId"/> identifying the index to query.</param>
         /// <param name="start">The lower bound of the key range for the query.</param>
         /// <param name="end">The upper bound of the key range for the query.</param>
-        /// <returns></returns>
+        /// <returns>A newly initialized and configured <see cref="RiakIndexInput"/>.</returns>
         public static RiakIndexInput Range(RiakIndexId indexId, string start, string end)
         {
             return new RiakBinIndexRangeInput(indexId, start, end);
@@ -109,7 +109,7 @@ namespace RiakClient.Models.MapReduce.Inputs
         /// </summary>
         /// <param name="indexId">The <see cref="RiakIndexId"/> identifying the index to query.</param>
         /// <param name="key">The index key to match for the query.</param>
-        /// <returns></returns>
+        /// <returns>A newly initialized and configured <see cref="RiakIndexInput"/>.</returns>
         public static RiakIndexInput Match(RiakIndexId indexId, BigInteger key)
         {
             return new RiakIntIndexEqualityInput(indexId, key);
@@ -121,7 +121,7 @@ namespace RiakClient.Models.MapReduce.Inputs
         /// <param name="indexId">The <see cref="RiakIndexId"/> identifying the index to query.</param>
         /// <param name="start">The lower bound of the key range for the query.</param>
         /// <param name="end">The upper bound of the key range for the query.</param>
-        /// <returns></returns>
+        /// <returns>A newly initialized and configured <see cref="RiakIndexInput"/>.</returns>
         public static RiakIndexInput Range(RiakIndexId indexId, BigInteger start, BigInteger end)
         {
             return new RiakIntIndexRangeInput(indexId, start, end);
