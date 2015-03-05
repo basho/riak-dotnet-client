@@ -126,7 +126,7 @@ namespace RiakClient.Models.MapReduce
         /// <returns>A reference to this updated instance, for fluent chaining.</returns>
         public RiakMapReduceQuery Inputs(string bucketType, string bucket)
         {
-            inputs = new RiakBucketInput(bucket, bucketType);
+            inputs = new RiakBucketInput(bucketType, bucket);
             return this;
         }
 
