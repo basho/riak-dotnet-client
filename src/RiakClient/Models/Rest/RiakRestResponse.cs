@@ -23,20 +23,45 @@ namespace RiakClient.Models.Rest
     using System.Net;
     using System.Text;
 
+    /// <summary>
+    /// Represents a Riak HTTP REST Response
+    /// </summary>
     public class RiakRestResponse
     {
+        /// <summary>
+        /// The content-type of the HTTP response.
+        /// </summary>
         public string ContentType { get; set; }
 
+        /// <summary>
+        /// The content length of the HTTP response.
+        /// </summary>
         public long ContentLength { get; set; }
 
+        /// <summary>
+        /// The content-encoding of the HTTP response.
+        /// </summary>
         public Encoding ContentEncoding { get; set; }
 
+        /// <summary>
+        /// The body of the HTTP response.
+        /// </summary>
         public string Body { get; set; }
 
+        /// <summary>
+        /// The <see cref="HttpStatusCode"/> of the HTTP response.
+        /// </summary>
         public HttpStatusCode StatusCode { get; set; }
 
+        /// <summary>
+        /// The headers of the HTTP response.
+        /// </summary>
         public Dictionary<string, string> Headers { get; set; }
 
+        /// <summary>
+        /// The error message (if any) of the HTTP response.
+        /// </summary>
+        /// <remarks>Not used anymore.</remarks>
         public string ErrorMessage { get; set; }
     }
 }
