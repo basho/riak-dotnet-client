@@ -21,8 +21,10 @@ namespace RiakClient.Models.Rest
 {
     using System;
     using System.Collections.Generic;
-    using Util;
 
+    /// <summary>
+    /// Represents a Riak HTTP REST Request
+    /// </summary>
     public class RiakRestRequest
     {
         private readonly string uri;
@@ -30,6 +32,11 @@ namespace RiakClient.Models.Rest
         private readonly IDictionary<string, string> headers = new Dictionary<string, string>();
         private readonly IDictionary<string, string> queryParams = new Dictionary<string, string>();
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RiakRestRequest"/> class.
+        /// </summary>
+        /// <param name="uri">The URI to make the request to.</param>
+        /// <param name="method">A string representing the HTTP method to make the request with.</param>
         public RiakRestRequest(string uri, string method)
         {
             if (string.IsNullOrWhiteSpace(uri))
@@ -50,40 +57,77 @@ namespace RiakClient.Models.Rest
             Cache = false;
         }
 
+        /// <summary>
+        /// The URI to make the request to.
+        /// </summary>
         public string Uri
         {
             get { return uri; }
         }
 
+        /// <summary>
+        /// A string representing the HTTP method to make the request with.
+        /// </summary>
         public string Method
         {
             get { return method; }
         }
 
+        /// <summary>
+        /// The content-type of the request.
+        /// </summary>
         public string ContentType { get; set; }
 
+        /// <summary>
+        /// The body of the HTTP request, if any.
+        /// </summary>
         public byte[] Body { get; set; }
 
+        /// <summary>
+        /// The HTTP headers of the request.
+        /// </summary>
         public IDictionary<string, string> Headers
         {
             get { return headers; }
         }
 
+        /// <summary>
+        /// The query parameters of the HTTP request.
+        /// </summary>
         public IDictionary<string, string> QueryParams
         {
             get { return queryParams; }
         }
 
+        /// <summary>
+        /// The timeout for the request.
+        /// </summary>
         public Timeout Timeout { get; set; }
 
+        /// <summary>
+        /// The option to accept a cached version or not.
+        /// </summary>
+        /// <remarks>Not used.</remarks>
         public bool Cache { get; set; }
 
+        /// <summary>
+        /// Add a query parameter to the <see cref="QueryParams"/> collection.
+        /// </summary>
+        /// <param name="key">The query parameter key.</param>
+        /// <param name="value">The query parameter value.</param>
+        /// <returns>A reference to this updated instance, for fluent chaining.</returns>
         public RiakRestRequest AddQueryParam(string key, string value)
         {
             queryParams.Add(key, value);
             return this;
         }
 
+        /// <summary>
+        /// Add a header to the <see cref="Headers"/> collection.
+        /// </summary>
+        /// <param name="key">The header key.</param>
+        /// <param name="value">The header value.</param>
+        /// <returns>A reference to this updated instance, for fluent chaining.</returns>
         public RiakRestRequest AddHeader(string key, string value)
         {
             headers.Add(key, value);
