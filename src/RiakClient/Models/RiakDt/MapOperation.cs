@@ -21,8 +21,12 @@ namespace RiakClient.Models.RiakDt
 {
     using Messages;
 
+    /// <summary>
+    /// Represents an operation on a Riak Map data type.
+    /// </summary>
     public class MapOperation : IDtOp
     {
+        /// <inheritdoc/>
         public DtOp ToDtOp()
         {
             return new DtOp
