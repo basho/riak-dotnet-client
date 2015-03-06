@@ -23,6 +23,9 @@ namespace RiakClient.Models.RiakDt
     using System.Linq;
     using Messages;
 
+    /// <summary>
+    /// Represents a Riak Map DataType Entry
+    /// </summary>
     public class RiakDtMapEntry
     {
         internal RiakDtMapEntry(MapEntry entry)
@@ -55,16 +58,35 @@ namespace RiakClient.Models.RiakDt
             }
         }
 
+        /// <summary>
+        /// The <see cref="RiakDtMapField"/> field summary. 
+        /// Contains the field name and type.
+        /// </summary>
         public RiakDtMapField Field { get; internal set; }
 
+        /// <summary>
+        /// Contains the counter value if this field is a counter type.
+        /// </summary>
         public RiakDtCounter Counter { get; internal set; }
 
+        /// <summary>
+        /// Contains the set value if this field is a set type.
+        /// </summary>
         public List<byte[]> SetValue { get; internal set; }
 
+        /// <summary>
+        /// Contains the register value if this field is a register type.
+        /// </summary>
         public byte[] RegisterValue { get; internal set; }
 
+        /// <summary>
+        /// Contains the flag value if this field is a flag type.
+        /// </summary>
         public bool? FlagValue { get; internal set; }
 
+        /// <summary>
+        /// Contains the sub-map value if this field is a map type.
+        /// </summary>
         public List<RiakDtMapEntry> MapValue { get; internal set; }
     }
 }
