@@ -239,14 +239,20 @@ namespace RiakClient
                 return RiakResult<RiakObject>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
             }
 
+            string key = value.Key;
+            if (key == null)
+            {
+                key = result.Value.key.FromRiakString();
+            }
+
             var finalResult = options.ReturnBody
-                ? new RiakObject(value.BucketType, value.Bucket, value.Key, result.Value.content.First(), result.Value.vclock)
-                : value;
+                ? new RiakObject(value.BucketType, value.Bucket, key, result.Value.content.First(), result.Value.vclock)
+                : new RiakObject(value.BucketType, value.Bucket, key, (RpbContent)null, result.Value.vclock);
 
             if (options.ReturnBody && result.Value.content.Count > 1)
             {
                 finalResult.Siblings = result.Value.content.Select(c =>
-                    new RiakObject(value.BucketType, value.Bucket, value.Key, c, result.Value.vclock)).ToList();
+                    new RiakObject(value.BucketType, value.Bucket, key, c, result.Value.vclock)).ToList();
             }
 
             return RiakResult<RiakObject>.Success(finalResult);

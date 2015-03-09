@@ -27,6 +27,7 @@ namespace RiakClient.Models
     {
         public RiakPutOptions()
         {
+            // TODO - FUTURE: this should probably not default to true
             ReturnBody = true;
             W = Quorum.WellKnown.Default;
             Dw = Quorum.WellKnown.Default;
