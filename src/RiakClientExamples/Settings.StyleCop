@@ -1,6 +1,6 @@
 <StyleCopSettings Version="105">
   <GlobalSettings>
-    <BooleanProperty Name="RulesEnabledByDefault">True</BooleanProperty>
+    <!-- TODO: enable StyleCop on test projects -->
+    <BooleanProperty Name="RulesEnabledByDefault">False</BooleanProperty>
   </GlobalSettings>
 </StyleCopSettings>
-
