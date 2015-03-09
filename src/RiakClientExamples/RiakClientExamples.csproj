@@ -63,6 +63,7 @@
     <None Include="..\RiakClient.snk">
       <Link>RiakClient.snk</Link>
     </None>
+    <None Include="App.config" />
     <None Include="packages.config" />
     <None Include="Settings.StyleCop" />
   </ItemGroup>
@@ -71,6 +72,9 @@
       <Project>{a2ca0cdc-85bb-489d-99d0-3ee1d135be17}</Project>
       <Name>RiakClient</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
