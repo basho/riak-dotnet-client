@@ -18,72 +18,84 @@
 
 namespace RiakClientExamples
 {
-    using NUnit;
+    using System;
+    using System.Text;
     using NUnit.Framework;
     using RiakClient;
     using RiakClient.Models;
 
-    public class Dev_Using_Basics_Tests
+    // http://docs.basho.com/riak/latest/dev/using/basics/
+    public class DevUsingBasicsExamples : IDisposable
     {
-        public void Example1()
-        {
-            using (IRiakEndPoint endpoint = RiakCluster.FromConfig(@"riakConfig", @"riak-test-app.config"))
-            {
-                IRiakClient client = endpoint.CreateClient();
+        private readonly IRiakEndPoint endpoint;
+        private IRiakClient client;
 
-                // ex1
-                var ex1_id = new RiakObjectId("animals", "dogs", "rufus");
-                Assert.AreEqual("animals", ex1_id.BucketType);
-                Assert.AreEqual("dogs", ex1_id.Bucket);
-                Assert.AreEqual("rufus", ex1_id.Key);
-                
-                var ex1_rslt = client.Get(ex1_id);
-                Assert.IsFalse(ex1_rslt.IsSuccess);
-                Assert.AreEqual(ResultCode.NotFound, ex1_rslt.ResultCode);
-                
-                // ex2
-                var ex2_id = new RiakObjectId("animals", "dogs", "rufus");
-                var ex2_obj = new RiakObject(ex2_id, "WOOF!", RiakConstants.ContentTypes.TextPlain);
-                var ex2_rslt = client.Put(ex2_obj);
-                
-                // IntIndex intIdx = riakObject.IntIndex("test-int-idx");
-                // intIdx.Add(9000);
-                // var id = new RiakObjectId("users", null);
-                ///var obj = new RiakObject(id, @"{'user':'data'}", "application/json");
-                /// var  result = client.Put(obj);
-                // result.Value.Dump();
-                // Console.WriteLine(result.Value.Key);
-                
-                /*
-                var id = new RiakObjectId("orders", "4");
-                var result = client.Get(id);
-                var vclock = result.Value.VectorClock;
-                Console.WriteLine(Convert.ToBase64String(vclock));
-                */
-                
-                /*
-                var riakIndexId = new RiakIndexId("orders", "test-int-idx");
-                var indexRiakResult = client.StreamGetSecondaryIndex(riakIndexId, 9000);
-                var indexResult = indexRiakResult.Value;
-                foreach (var key in indexResult.IndexKeyTerms)
-                {
-                    key.Dump();
-                }
-                */
-                
-                /*
-                var id = new RiakObjectId("sets", "travel", "cities");
-                var citiesSet = client.DtFetchSet(id);
-                var adds = new List<string> { "Toronto", "Montreal" };
-                var result = client.DtUpdateSet(id, obj => Encoding.UTF8.GetBytes(obj), citiesSet.Context, adds);
-                result.Dump();
-                
-                var fetchResult = client.DtFetchSet(id);
-                foreach (var value in fetchResult.Values)
-                {
-                    Encoding.UTF8.GetString(value).Dump();
-                }
-                */
+        public DevUsingBasicsExamples()
+        {
+            endpoint = RiakCluster.FromConfig("riakConfig");
+        }
+
+        [TestFixtureSetUp]
+        public void CreateClient()
+        {
+            client = endpoint.CreateClient();
+        }
+
+        [Test]
+        public void Example1_ReadingObjects()
+        {
+            var id = new RiakObjectId("animals", "dogs", "rufus");
+            Assert.AreEqual("animals", id.BucketType);
+            Assert.AreEqual("dogs", id.Bucket);
+            Assert.AreEqual("rufus", id.Key);
+
+            var rslt = client.Get(id);
+            Assert.IsFalse(rslt.IsSuccess);
+            Assert.AreEqual(ResultCode.NotFound, rslt.ResultCode);
+        }
+
+        [Test]
+        public void Example2_WritingObjects()
+        {
+            var id = new RiakObjectId("animals", "dogs", "rufus");
+            var obj = new RiakObject(id, "WOOF!", RiakConstants.ContentTypes.TextPlain);
+            var rslt = client.Put(obj);
+            Assert.IsTrue(rslt.IsSuccess);
+
+            DeleteObject(id);
+        }
+
+        [Test]
+        public void Example3_ContentTypes()
+        {
+            var id = new RiakObjectId("animals", "dogs", "fido");
+            var fido = new { breed = "dalmatian", size = "large" };
+            var obj = new RiakObject(id, fido);
+            var rslt = client.Put(obj);
+            Assert.IsTrue(rslt.IsSuccess);
+
+            rslt = client.Get(id);
+            Assert.IsTrue(rslt.IsSuccess);
+            Assert.NotNull(rslt.Value);
+            Assert.AreEqual(RiakConstants.ContentTypes.ApplicationJson, rslt.Value.ContentType);
+
+            string json = Encoding.UTF8.GetString(rslt.Value.Value);
+            Assert.AreEqual(@"{""breed"":""dalmatian"",""size"":""large""}", json);
+
+            DeleteObject(id);
+        }
+
+        private void DeleteObject(RiakObjectId id)
+        {
+            IRiakClient client = endpoint.CreateClient();
+            client.Delete(id);
+        }
+
+        public void Dispose()
+        {
+            if (endpoint != null)
+            {
+                endpoint.Dispose();
             }
         }
     }
