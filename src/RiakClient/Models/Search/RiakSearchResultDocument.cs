@@ -19,12 +19,13 @@
 
 namespace RiakClient.Models.Search
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using Messages;
-    using Util;
 
+    /// <summary>
+    /// Represents a single Riak Search result document.
+    /// </summary>
     public class RiakSearchResultDocument
     {
         private RiakObjectId riakObjectId = null;
@@ -69,16 +70,39 @@ namespace RiakClient.Models.Search
             }
         }
 
+        /// <summary>
+        /// The Id field of the Lucene document.
+        /// </summary>
+        /// <remarks>You will also find this value in the <see cref="Fields"/> collection.</remarks>
         public string Id { get; private set; }
 
+        /// <summary>
+        /// The document match score field.
+        /// </summary>
+        /// <remarks>You will also find this value in the <see cref="Fields"/> collection.</remarks>
         public string Score { get; private set; }
 
+        /// <summary>
+        /// The Bucket Type field. Contains the Bucket Type of the matching riak object.
+        /// </summary>
+        /// <remarks>You will also find this value in the <see cref="Fields"/> collection.</remarks>
         public string BucketType { get; private set; }
 
+        /// <summary>
+        /// The Bucket Name field. Contains the Bucket Name of the matching riak object.
+        /// </summary>
+        /// <remarks>You will also find this value in the <see cref="Fields"/> collection.</remarks>
         public string Bucket { get; private set; }
 
+        /// <summary>
+        /// The Key field. Contains the Key of the matching riak object.
+        /// </summary>
+        /// <remarks>You will also find this value in the <see cref="Fields"/> collection.</remarks>
         public string Key { get; private set; }
 
+        /// <summary>
+        /// The <see cref="RiakObjectId"/> of the matching riak object.
+        /// </summary>
         public RiakObjectId RiakObjectId
         {
             get
@@ -92,6 +116,9 @@ namespace RiakClient.Models.Search
             }
         }
 
+        /// <summary>
+        /// The collection of <see cref="RiakSearchResultField"/>s returned by the search. 
+        /// </summary>
         public List<RiakSearchResultField> Fields { get; private set; }
 
         private bool CanUseLegacyId(string legacyId)

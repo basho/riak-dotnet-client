@@ -21,6 +21,9 @@ namespace RiakClient.Models.Search
 {
     using System;
 
+    /// <summary>
+    /// Represents an abstract Lucene search term.
+    /// </summary>
     public abstract class Term
     {
         private readonly string field;
@@ -41,6 +44,10 @@ namespace RiakClient.Models.Search
             get { return search; }
         }
 
+        /// <summary>
+        /// Builds the term into a new <see cref="RiakFluentSearch"/> object.
+        /// </summary>
+        /// <returns>A configured <see cref="RiakFluentSearch"/> object.</returns>
         public RiakFluentSearch Build()
         {
             return search;

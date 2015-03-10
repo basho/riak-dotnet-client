@@ -150,6 +150,17 @@ namespace RiakClientTests
         }
 
         [Test]
+        public void InitialGroupedTermsSerializeCorrectly2()
+        {
+            var s = new RiakFluentSearch("bucket", "key")
+                .Group(Token.Is("foo"), t => t.Or("bar").And("baz", x => x.And("schmoopy")))
+                .Or("bar", t => t.And("slop"))
+                .Build();
+            var q = s.ToString();
+            Assert.AreEqual("key:(key:foo OR key:bar AND (key:baz AND key:schmoopy)) OR (key:bar AND key:slop)", q);
+        }
+
+        [Test]
         public void GroupedTermsSerializeCorrectly()
         {
             var s = new RiakFluentSearch("bucket", "key")

@@ -22,18 +22,26 @@ namespace RiakClient.Models.Search
     using System.Collections.Generic;
     using System.Linq;
 
+    /// <summary>
+    /// Represents a Lucene "proximity" search term.
+    /// </summary>
     public class ProximityTerm : Term
     {
         private readonly List<Token> words;
         private readonly double proximity;
 
-        public ProximityTerm(RiakFluentSearch search, string field, double proximity, params string[] words)
+        internal ProximityTerm(RiakFluentSearch search, string field, double proximity, params string[] words)
             : base(search, field)
         {
             this.words = new List<Token>(words.Select(Token.Is));
             this.proximity = proximity;
         }
 
+        /// <summary>
+        /// Returns the term in a Lucene query string format.
+        /// </summary>
+        /// <returns>
+        /// A string that represents the query term.</returns>
         public override string ToString()
         {
             return Prefix() + Field() + "\"" + string.Join(" ", words.Select(w => w.ToString()).ToArray()) + "\"~" + proximity + Suffix();
