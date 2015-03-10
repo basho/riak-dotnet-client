@@ -84,11 +84,18 @@ fi
 
 pushd $dev_cluster_path > /dev/null
 
+set +o errexit
+
 for bucket_type in animals quotes sports cars users
 do
     $riak_admin bucket-type create "$bucket_type"
     $riak_admin bucket-type activate "$bucket_type"
 done
+
+$riak_admin bucket-type create n_val_of_5 '{"props":{"n_val":5}}'
+$riak_admin bucket-type activate n_val_of_5
+
+set -o errexit
 
 pinfo "Done!"
 
