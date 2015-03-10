@@ -57,7 +57,9 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="DevUsingBasicsExamples.cs" />
+    <Compile Include="Dev\Using\SecondaryIndexes.cs" />
+    <Compile Include="Dev\Using\ExampleBase.cs" />
+    <Compile Include="Dev\Using\Basics.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
