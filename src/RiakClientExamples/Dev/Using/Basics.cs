@@ -1,4 +1,4 @@
-﻿// <copyright file="DevUsingBasicsExamples.cs" company="Basho Technologies, Inc.">
+﻿// <copyright file="Basics.cs" company="Basho Technologies, Inc.">
 // Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
@@ -16,9 +16,8 @@
 // under the License.
 // </copyright>
 
-namespace RiakClientExamples
+namespace RiakClientExamples.Dev.Using
 {
-    using System;
     using System.Diagnostics;
     using System.Text;
     using NUnit.Framework;
@@ -36,35 +35,10 @@ namespace RiakClientExamples
      * riak-admin bucket-type create cars; riak-admin bucket-type activate cars
      * riak-admin bucket-type create users; riak-admin bucket-type activate users
      */
-    public sealed class DevUsingBasicsExamples : IDisposable
+    public sealed class Basics : ExampleBase
     {
-        private readonly IRiakEndPoint endpoint;
-        private IRiakClient client;
-        private RiakObjectId id;
-
-        public DevUsingBasicsExamples()
-        {
-            endpoint = RiakCluster.FromConfig("riakConfig");
-        }
-
-        [SetUp]
-        public void CreateClient()
-        {
-            client = endpoint.CreateClient();
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            if (id != null)
-            {
-                var rslt = client.Delete(id);
-                Assert.IsTrue(rslt.IsSuccess);
-            }
-        }
-
         [Test]
-        public void Example_ReadingObjects()
+        public void ReadingObjects()
         {
             id = new RiakObjectId("animals", "dogs", "rufus");
             Assert.AreEqual("animals", id.BucketType);
@@ -77,13 +51,13 @@ namespace RiakClientExamples
         }
 
         [Test]
-        public void Example_WritingObjects()
+        public void WritingObjects()
         {
             id = PutRufus();
         }
 
         [Test]
-        public void Example_ContentTypes()
+        public void ContentTypes()
         {
             id = new RiakObjectId("animals", "dogs", "fido");
             var fido = new { breed = "dalmatian", size = "large" };
@@ -101,7 +75,7 @@ namespace RiakClientExamples
         }
 
         [Test]
-        public void Example_ReadParameters()
+        public void ReadParameters()
         {
             RiakObjectId id = PutRufus();
 
@@ -113,7 +87,7 @@ namespace RiakClientExamples
         }
 
         [Test]
-        public void Example_StoringAndSpecifyingContentType()
+        public void StoringAndSpecifyingContentType()
         {
             id = new RiakObjectId("quotes", "oscar_wilde", "genius");
             var obj = new RiakObject(
@@ -125,7 +99,7 @@ namespace RiakClientExamples
         }
 
         [Test]
-        public void Example_CausalContext()
+        public void CausalContext()
         {
             id = new RiakObjectId("sports", "nba", "champion");
             var obj = new RiakObject(id, "Washington Generals",
@@ -143,6 +117,43 @@ namespace RiakClientExamples
             Assert.AreEqual("Harlem Globetrotters", Encoding.UTF8.GetString(rslt.Value.Value));
         }
 
+        [Test]
+        public void RandomKeyGeneratedByRiak()
+        {
+            id = new RiakObjectId("users", "random_user_keys", null);
+            var obj = new RiakObject(id, @"{'user':'data'}",
+                RiakConstants.ContentTypes.ApplicationJson);
+            var rslt = client.Put(obj);
+            Assert.IsTrue(rslt.IsSuccess, "Error: {0}", rslt.ErrorMessage);
+            Debug.WriteLine(format: "Generated key: {0}", args: rslt.Value.Key);
+        }
+
+        [Test]
+        public void DeleteAnObject()
+        {
+            id = new RiakObjectId("users", "random_user_keys", null);
+            var obj = new RiakObject(id, @"{'user':'data'}",
+                RiakConstants.ContentTypes.ApplicationJson);
+            var rslt = client.Put(obj);
+            Assert.IsTrue(rslt.IsSuccess, "Error: {0}", rslt.ErrorMessage);
+
+            string key = rslt.Value.Key;
+            Debug.WriteLine(format: "Generated key: {0}", args: key);
+
+            id = new RiakObjectId("users", "random_user_keys", key);
+            var del_rslt = client.Delete(id);
+            Assert.IsTrue(rslt.IsSuccess, "Error: {0}", rslt.ErrorMessage);
+        }
+
+        [Test]
+        public void GetBucketTypeProperties()
+        {
+            var rslt = client.GetBucketProperties("n_val_of_5", "any_bucket_name");
+            Assert.IsTrue(rslt.IsSuccess, "Error: {0}", rslt.ErrorMessage);
+            RiakBucketProperties props = rslt.Value;
+            Assert.AreEqual(5, props.NVal);
+        }
+
         private RiakObjectId PutRufus()
         {
             id = new RiakObjectId("animals", "dogs", "rufus");
@@ -150,14 +161,6 @@ namespace RiakClientExamples
             var rslt = client.Put(obj);
             Assert.IsTrue(rslt.IsSuccess, "Error: {0}", rslt.ErrorMessage);
             return id;
-        }
-
-        public void Dispose()
-        {
-            if (endpoint != null)
-            {
-                endpoint.Dispose();
-            }
         }
     }
 }
