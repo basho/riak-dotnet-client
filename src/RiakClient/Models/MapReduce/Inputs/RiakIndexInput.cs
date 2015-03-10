@@ -54,7 +54,7 @@ namespace RiakClient.Models.MapReduce.Inputs
         /// <summary>
         /// The name of the index to query.
         /// </summary>
-        [Obsolete("Use IndexId.IndexName instead. This will be removed in the next version.")]
+        [Obsolete("Use IndexId.SchemaName instead. This will be removed in the next version.")]
         public string Index
         {
             get { return IndexId != null ? IndexId.IndexName : null; }

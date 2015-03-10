@@ -237,9 +237,9 @@ namespace RiakClient
             public static class YokozunaIndex
             {
                 /// <summary>
-                /// The default Index Name to use for 2.0+ search.
+                /// The default Schema Name to use for 2.0+ search.
                 /// </summary>
-                public const string IndexName = "_yz_default";
+                public const string DefaultSchemaName = "_yz_default";
                 
                 /// <summary>
                 /// The default NVal to use for 2.0+ search index operations.

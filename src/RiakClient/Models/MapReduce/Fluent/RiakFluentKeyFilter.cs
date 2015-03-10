@@ -204,7 +204,7 @@ namespace RiakClient.Models.MapReduce.Fluent
         /// <summary>
         /// Negates the result of key-filter operations.
         /// </summary>
-        /// <param name="setup">Setup action
+        /// <param name="setup">
         /// An <see cref="Action{T}"/> that accepts a <see cref="RiakFluentKeyFilter"/>,
         /// which the <see cref="Not"/> function will logically negate it's output. 
         /// </param>
