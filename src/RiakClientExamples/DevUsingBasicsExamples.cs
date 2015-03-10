@@ -36,7 +36,7 @@ namespace RiakClientExamples
      * riak-admin bucket-type create cars; riak-admin bucket-type activate cars
      * riak-admin bucket-type create users; riak-admin bucket-type activate users
      */
-    public class DevUsingBasicsExamples : IDisposable
+    public sealed class DevUsingBasicsExamples : IDisposable
     {
         private readonly IRiakEndPoint endpoint;
         private IRiakClient client;
