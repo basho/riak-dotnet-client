@@ -86,7 +86,7 @@ pushd $dev_cluster_path > /dev/null
 
 set +o errexit
 
-for bucket_type in animals quotes sports cars users
+for bucket_type in animals quotes sports cars users indexes
 do
     $riak_admin bucket-type create "$bucket_type"
     $riak_admin bucket-type activate "$bucket_type"
