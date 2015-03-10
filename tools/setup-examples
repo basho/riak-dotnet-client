@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o nounset
+
+# Defaults
+declare -r riak_admin=dev1/bin/riak-admin
+declare -r default_dev_cluster_path="$HOME/Projects/basho/riak/dev"
+
+script_dir=''
+script_path=''
+if hash realpath 2>/dev/null
+then
+    script_dir="$(dirname $0)"
+    script_path="$(realpath $script_dir)"
+else
+    script_path="$(perl -e 'use File::Basename;use Cwd q(abs_path);print dirname(abs_path(shift))' $0)"
+fi
+PATH="$PATH:$script_path"
+
+function now
+{
+    date '+%Y-%m-%d %H:%M:%S'
+}
+
+function pwarn
+{
+    echo "$(now) [warning]: $@" 1>&2
+}
+
+function perr
+{
+    echo "$(now) [error]: $@" 1>&2
+}
+
+function pinfo
+{
+    echo "$(now) [info]: $@"
+}
+
+function errexit
+{
+    perr "$@"
+    exit 1
+}
+
+function onexit
+{
+    echo Exiting!
+    (( ${#DIRSTACK[*]} > 1 )) && popd
+}
+
+function usage
+{
+      echo "
+setup-examples: Set up your dev cluster to run RiakClientExamples project
+
+Usage: setup-dev-cluster [-p <riak dev path>]
+
+-p      Riak dev path (Default: \"$default_dev_cluster_path\")
+"
+      exit 0
+}
+
+while getopts "p:" opt; do
+    case $opt in
+        p)
+            opt_dev_cluster_path="$OPTARG";;
+        *)
+            usage;;
+    esac
+done
+
+trap onexit EXIT
+
+declare -r dev_cluster_path="${opt_dev_cluster_path:-$default_dev_cluster_path}"
+
+if [[ -d $dev_cluster_path ]]
+then
+    pinfo "Setting up dev cluster in $dev_cluster_path for RiakClientExamples"
+else
+    errexit "Dev cluster path $dev_cluster_path does not exist!"
+fi
+
+pushd $dev_cluster_path > /dev/null
+
+for bucket_type in animals quotes sports cars users
+do
+    $riak_admin bucket-type create "$bucket_type"
+    $riak_admin bucket-type activate "$bucket_type"
+done
+
+pinfo "Done!"
+
