@@ -19,18 +19,41 @@
 
 namespace RiakClient.Config
 {
+    /// <summary>
+    /// Represents a configuration element interface for Riak authentication.
+    /// </summary>
     public interface IRiakAuthenticationConfiguration
     {
+        /// <summary>
+        /// The username to authenticate with.
+        /// </summary>
         string Username { get; }
 
+        /// <summary>
+        /// The password to authenticate with.
+        /// </summary>
         string Password { get; }
 
+        /// <summary>
+        /// A client certificate file to load and use.
+        /// Must be a valid file path.
+        /// </summary>
         string ClientCertificateFile { get; }
 
+        /// <summary>
+        /// A client certificate subject, used to find and use a certificate from the local store.
+        /// </summary>
         string ClientCertificateSubject { get; }
 
+        /// <summary>
+        /// A client certificate authority certificate to load and use. 
+        /// Must be a valid file path.
+        /// </summary>
         string CertificateAuthorityFile { get; }
 
+        /// <summary>
+        /// The option to check the certificate revocation list during authentication.
+        /// </summary>
         bool CheckCertificateRevocation { get; }
     }
 }

@@ -23,11 +23,15 @@ namespace RiakClient.Config
     using System.Configuration;
     using System.Runtime.InteropServices;
 
+    /// <summary>
+    /// Represents a configuration element for a Riak Node.
+    /// </summary>
     [ComVisible(false)]
     public sealed class RiakNodeConfiguration : ConfigurationElement, IRiakNodeConfiguration
     {
         private static readonly Timeout DefaultTimeout = new Timeout(4000);
 
+        /// <inheritdoc/>
         [ConfigurationProperty("name", IsRequired = true)]
         public string Name
         {
@@ -35,6 +39,7 @@ namespace RiakClient.Config
             set { this["name"] = value; }
         }
 
+        /// <inheritdoc/>
         [ConfigurationProperty("hostAddress", IsRequired = true)]
         public string HostAddress
         {
@@ -42,6 +47,8 @@ namespace RiakClient.Config
             set { this["hostAddress"] = value; }
         }
 
+        /// <inheritdoc/>
+        /// <remarks>Defaults to 8087 if omitted from the configuration file.</remarks>
         [ConfigurationProperty("pbcPort", DefaultValue = 8087, IsRequired = false)]
         public int PbcPort
         {
@@ -49,6 +56,11 @@ namespace RiakClient.Config
             set { this["pbcPort"] = value; }
         }
 
+        /// <inheritdoc/>
+        /// <remarks>
+        /// Can be "HTTP" or "HTTPS".
+        /// Legacy, not used anymore.
+        /// </remarks>
         [ConfigurationProperty("restScheme", DefaultValue = "http", IsRequired = false)]
         [Obsolete("The Rest properties are no longer used.")]
         public string RestScheme
@@ -57,6 +69,8 @@ namespace RiakClient.Config
             set { this["restScheme"] = value; }
         }
 
+        /// <inheritdoc/>
+        /// <remarks>Legacy, not used anymore.</remarks>
         [ConfigurationProperty("restPort", DefaultValue = 8098, IsRequired = false)]
         [Obsolete("The Rest properties are no longer used.")]
         public int RestPort
@@ -65,6 +79,8 @@ namespace RiakClient.Config
             set { this["restPort"] = value; }
         }
 
+        /// <inheritdoc/>
+        /// <remarks>Defaults to 30 if omitted from the configuration file.</remarks>
         [ConfigurationProperty("poolSize", DefaultValue = 30, IsRequired = false)]
         public int PoolSize
         {
@@ -82,6 +98,8 @@ namespace RiakClient.Config
          * }
          */
 
+        /// <inheritdoc/>
+        /// <remarks>Defaults to 4000ms if omitted from the configuration file.</remarks>
         public Timeout NetworkReadTimeout
         {
             get
@@ -98,6 +116,8 @@ namespace RiakClient.Config
             }
         }
 
+        /// <inheritdoc/>
+        /// <remarks>Defaults to 4000ms if omitted from the configuration file.</remarks>
         public Timeout NetworkWriteTimeout
         {
             get
@@ -114,6 +134,8 @@ namespace RiakClient.Config
             }
         }
 
+        /// <inheritdoc/>
+        /// <remarks>Defaults to 4000ms if omitted from the configuration file.</remarks>
         public Timeout NetworkConnectTimeout
         {
             get
