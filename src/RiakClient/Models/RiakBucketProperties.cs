@@ -21,15 +21,11 @@ namespace RiakClient.Models
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
     using System.Linq;
     using System.Runtime.InteropServices;
-    using System.Text;
+    using CommitHook;
     using Extensions;
     using Messages;
-    using Models.CommitHook;
-    using Models.Rest;
-    using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
     /// <summary>
@@ -51,55 +47,6 @@ namespace RiakClient.Models
         /// </remarks>
         public RiakBucketProperties()
         {
-        }
-
-        [Obsolete("REST Interfaces are deprecated, and this will be removed in the next version.")]
-        internal RiakBucketProperties(RiakRestResponse response)
-        {
-            if (response.ContentType != RiakConstants.ContentTypes.ApplicationJson)
-            {
-                throw new ArgumentOutOfRangeException("response.ContentType must be application/json");
-            }
-
-            var json = JObject.Parse(response.Body);
-            var props = (JObject)json["props"];
-
-            if (props.Value<uint?>("n_val").HasValue)
-            {
-                NVal = new NVal(props.Value<uint>("n_val"));
-            }
-
-            AllowMultiple = props.Value<bool?>("allow_mult");
-            LastWriteWins = props.Value<bool?>("last_write_wins");
-            Backend = props.Value<string>("backend");
-            NotFoundOk = props.Value<bool?>("notfound_ok");
-            BasicQuorum = props.Value<bool?>("basic_quorum");
-            Consistent = props.Value<bool?>("consistent");
-
-            ReadQuorum(props, "r", v => this.SetR(new Quorum(v)));
-            ReadQuorum(props, "rw", v => this.SetRw(new Quorum(v)));
-            ReadQuorum(props, "dw", v => this.SetDw(new Quorum(v)));
-            ReadQuorum(props, "w", v => this.SetW(new Quorum(v)));
-            ReadQuorum(props, "pr", v => this.SetPr(new Quorum(v)));
-            ReadQuorum(props, "pw", v => this.SetPw(new Quorum(v)));
-
-            var preCommitHooks = props.Value<JArray>("precommit");
-            if (preCommitHooks.Count > 0)
-            {
-                PreCommitHooks = preCommitHooks.Cast<JObject>().Select(LoadPreCommitHook).ToList();
-            }
-
-            var postCommitHooks = props.Value<JArray>("postcommit");
-            if (postCommitHooks.Count > 0)
-            {
-                PostCommitHooks = postCommitHooks.Cast<JObject>().Select(LoadPostCommitHook).ToList();
-            }
-
-            var value = props.Value<int?>("repl");
-            if (value != null)
-            {
-                ReplicationMode = (RiakConstants.RiakEnterprise.ReplicationMode)value;
-            }
         }
 
         internal RiakBucketProperties(RpbBucketProps bucketProps)
@@ -736,59 +683,6 @@ namespace RiakClient.Models
             }
 
             return message;
-        }
-
-        internal string ToJsonString()
-        {
-            var sb = new StringBuilder();
-
-            using (var sw = new StringWriter(sb))
-            using (JsonWriter jw = new JsonTextWriter(sw))
-            {
-                jw.WriteStartObject();
-                jw.WritePropertyName("props");
-                jw.WriteStartObject();
-                jw.WriteNonNullProperty("n_val", NVal)
-                  .WriteNullableProperty("allow_mult", AllowMultiple)
-                  .WriteNullableProperty("last_write_wins", LastWriteWins)
-                  .WriteNonNullProperty("r", R)
-                  .WriteNonNullProperty("rw", Rw)
-                  .WriteNonNullProperty("dw", Dw)
-                  .WriteNonNullProperty("w", W)
-                  .WriteNonNullProperty("pr", Pr)
-                  .WriteNonNullProperty("pw", Pw)
-                  .WriteNonNullProperty("backend", Backend)
-                  .WriteNullableProperty("notfound_ok", NotFoundOk)
-                  .WriteNullableProperty("basic_quorum", BasicQuorum)
-                  .WriteNullableProperty("has_precommit", HasPrecommit)
-                  .WriteNullableProperty("has_postcommit", HasPostcommit);
-
-                if (PreCommitHooks != null)
-                {
-                    jw.WritePropertyName("precommit");
-                    jw.WriteStartArray();
-                    PreCommitHooks.ForEach(hook => hook.WriteJson(jw));
-                    jw.WriteEndArray();
-                }
-
-                if (PostCommitHooks != null)
-                {
-                    jw.WritePropertyName("postcommit");
-                    jw.WriteStartArray();
-                    PostCommitHooks.ForEach(hook => hook.WriteJson(jw));
-                    jw.WriteEndArray();
-                }
-
-                if (!string.IsNullOrEmpty(SearchIndex))
-                {
-                    jw.WriteNonNullProperty("search_index", SearchIndex);
-                }
-
-                jw.WriteEndObject();
-                jw.WriteEndObject();
-            }
-
-            return sb.ToString();
         }
 
         private static IRiakPreCommitHook LoadPreCommitHook(RpbCommitHook hook)
