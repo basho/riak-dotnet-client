@@ -23,9 +23,7 @@ namespace RiakClient
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
-    using System.Net;
     using System.Numerics;
-    using System.Web;
     using Comms;
     using Extensions;
     using Messages;
@@ -45,9 +43,6 @@ namespace RiakClient
     {
         private const string ListBucketsWarning = "*** [CI] -> ListBuckets has serious performance implications and should not be used in production applications. ***";
         private const string ListKeysWarning = "*** [CI] -> ListKeys has serious performance implications and should not be used in production applications. ***";
-        private const string InvalidBucketErrorMessage = "Bucket cannot be blank or contain forward-slashes";
-        private const string InvalidKeyErrorMessage = "Key cannot be blank or contain forward-slashes";
-        private const string InvalidBucketTypeErrorMessage = "Bucket type cannot be blank or contain forward-slashes";
 
         private readonly IRiakEndPoint endPoint;
         private readonly IRiakConnection batchConnection;
