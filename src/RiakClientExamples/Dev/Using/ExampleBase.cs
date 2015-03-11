@@ -19,9 +19,11 @@
 namespace RiakClientExamples
 {
     using System;
+    using System.Collections.Generic;
     using NUnit.Framework;
     using RiakClient;
     using RiakClient.Models;
+    using RiakClient.Util;
 
     public abstract class ExampleBase : IDisposable
     {
@@ -29,6 +31,7 @@ namespace RiakClientExamples
 
         protected IRiakClient client;
         protected RiakObjectId id;
+        protected IEnumerable<RiakObjectId> ids;
 
         public ExampleBase()
         {
@@ -47,6 +50,10 @@ namespace RiakClientExamples
             if (id != null)
             {
                 DeleteObject(id);
+            }
+            if (EnumerableUtil.NotNullOrEmpty(ids))
+            {
+                DeleteObjects(ids);
             }
         }
 
@@ -71,6 +78,14 @@ namespace RiakClientExamples
         protected void DeleteObject(RiakObjectId id)
         {
             CheckResult(client.Delete(id));
+        }
+
+        protected void DeleteObjects(IEnumerable<RiakObjectId> ids)
+        {
+            foreach (var id in ids)
+            {
+                DeleteObject(id);
+            }
         }
     }
 }
