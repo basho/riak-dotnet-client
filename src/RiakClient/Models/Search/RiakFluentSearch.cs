@@ -122,7 +122,7 @@ namespace RiakClient.Models.Search
         /// </summary>
         /// <param name="value">The token to search values for.</param>
         /// <param name="groupSetup">
-        /// An <see cref="Func{T1,T2}"/> that accepts a <see cref="Term"/> for fluent configuration,
+        /// A <see cref="Func{T1,T2}"/> that accepts a <see cref="Term"/> for fluent configuration,
         /// and returns that configured <see cref="Term"/>. 
         /// </param>
         /// <returns>A constructed search <see cref="Term"/>.</returns>
