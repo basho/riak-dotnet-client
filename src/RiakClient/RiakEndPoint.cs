@@ -23,8 +23,13 @@ namespace RiakClient
     using System.Collections.Generic;
     using Comms;
 
+    /// <summary>
+    /// Represents a connection to a Riak node, and allows operations to be performed with that connection.
+    /// Partial abstract implementation of <see cref="IRiakEndPoint"/>.
+    /// </summary>
     public abstract class RiakEndPoint : IRiakEndPoint
     {
+        /// <inheritdoc />
         public TimeSpan RetryWaitTime { get; set; }
 
         protected abstract int DefaultRetryCount { get; }
@@ -40,22 +45,28 @@ namespace RiakClient
             return new RiakClient(this) { RetryCount = DefaultRetryCount };
         }
 
+        /// <inheritdoc />
         public RiakResult UseConnection(Func<IRiakConnection, RiakResult> useFun, int retryAttempts)
         {
             return UseConnection(useFun, RiakResult.Error, retryAttempts);
         }
 
+        /// <inheritdoc />
         public RiakResult<TResult> UseConnection<TResult>(Func<IRiakConnection, RiakResult<TResult>> useFun, int retryAttempts)
         {
             return UseConnection(useFun, RiakResult<TResult>.Error, retryAttempts);
         }
 
+        /// <summary>
+        /// Releases all resources used by the <see cref="RiakEndPoint"/> class.
+        /// </summary>
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
+        /// <inheritdoc />
         public abstract RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun, int retryAttempts)
             where TResult : RiakResult;
 

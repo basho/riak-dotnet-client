@@ -23,6 +23,9 @@ namespace RiakClient.Models.Search
     using System.Linq;
     using Messages;
 
+    /// <summary>
+    /// Represents the result of a Riak Search operation.
+    /// </summary>
     public class RiakSearchResult
     {
         internal RiakSearchResult(RpbSearchQueryResp response)
@@ -34,18 +37,27 @@ namespace RiakClient.Models.Search
             Documents = new ReadOnlyCollection<RiakSearchResultDocument>(docs.ToList());
         }
 
+        /// <summary>
+        /// The maximum score of all the matching documents.
+        /// </summary>
         public float MaxScore
         {
             get;
             private set;
         }
 
+        /// <summary>
+        /// The total number of matching documents found.
+        /// </summary>
         public long NumFound
         {
             get;
             private set;
         }
 
+        /// <summary>
+        /// The collection of matching documents, represented as a collection of <see cref="RiakSearchResultDocument"/>s.
+        /// </summary>
         public ReadOnlyCollection<RiakSearchResultDocument> Documents
         {
             get;

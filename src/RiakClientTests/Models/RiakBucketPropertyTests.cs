@@ -107,9 +107,7 @@ namespace RiakClientTests.Models
             var props = new RiakBucketProperties().SetSearchIndex("foo");
             Assert.AreEqual("foo", props.SearchIndex);
 
-            var jsonProps = props.ToJsonString();
             var rpbMessageProps = props.ToMessage();
-            Assert.IsTrue(jsonProps.Contains("\"search_index\":\"foo\""));
             Assert.AreEqual("foo", rpbMessageProps.search_index.FromRiakString());
         }
     }

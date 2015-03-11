@@ -23,6 +23,9 @@ namespace RiakClient.Models.MapReduce
     using System.Linq;
     using Messages;
 
+    /// <summary>
+    /// Represents a Riak streaming mapreduce result.
+    /// </summary>
     public class RiakStreamedMapReduceResult : IRiakMapReduceResult
     {
         private readonly IEnumerable<RiakResult<RpbMapRedResp>> responseReader;
@@ -32,6 +35,7 @@ namespace RiakClient.Models.MapReduce
             this.responseReader = responseReader;
         }
 
+        /// <inheritdoc/>
         public IEnumerable<RiakMapReduceResultPhase> PhaseResults
         {
             get

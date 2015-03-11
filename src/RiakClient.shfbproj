@@ -57,7 +57,6 @@
       <NamespaceSummaryItem name="RiakClient.Models.MapReduce.Fluent" isDocumented="False" xmlns="" />
       <NamespaceSummaryItem name="RiakClient.Models.MapReduce.Inputs" isDocumented="False" xmlns="" />
       <NamespaceSummaryItem name="RiakClient.Models.MapReduce.KeyFilters" isDocumented="False" xmlns="" />
-      <NamespaceSummaryItem name="RiakClient.Models.Rest" isDocumented="False" xmlns="" />
       <NamespaceSummaryItem name="RiakClient.Models.RiakDt" isDocumented="False" xmlns="" />
       <NamespaceSummaryItem name="RiakClient.Models.Search" isDocumented="False" xmlns="" />
       <NamespaceSummaryItem name="RiakClient.Util" isDocumented="False" xmlns="" />

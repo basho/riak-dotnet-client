@@ -19,25 +19,34 @@
 
 namespace RiakClient.Models
 {
+    /// <summary>
+    /// Represents the data returned from a counter operation.
+    /// </summary>
     public class RiakCounterResult
     {
         private readonly RiakResult<RiakObject> result;
 
-        public RiakCounterResult(RiakResult<RiakObject> result)
+        internal RiakCounterResult(RiakResult<RiakObject> result)
         {
             this.result = result;
         }
 
-        public RiakCounterResult(RiakResult<RiakObject> result, long? value) : this(result)
+        internal RiakCounterResult(RiakResult<RiakObject> result, long? value) : this(result)
         {
             this.Value = value;
         }
 
+        /// <summary>
+        /// The <see cref="RiakResult{T}"/> of the counter operation.
+        /// </summary>
         public RiakResult<RiakObject> Result
         {
             get { return result; }
         }
 
+        /// <summary>
+        /// The value of the counter (if the operation returned it).
+        /// </summary>
         public long? Value
         {
             get; set;

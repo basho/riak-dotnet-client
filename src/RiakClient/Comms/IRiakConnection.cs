@@ -22,7 +22,6 @@ namespace RiakClient.Comms
     using System;
     using System.Collections.Generic;
     using Messages;
-    using Models.Rest;
 
     public interface IRiakConnection : IDisposable
     {
@@ -76,8 +75,5 @@ namespace RiakClient.Comms
             Func<RiakResult<TResult>, bool> repeatRead,
             Action onFinish)
             where TResult : class, new();
-
-        // REST interface
-        RiakResult<RiakRestResponse> RestRequest(RiakRestRequest request);
     }
 }

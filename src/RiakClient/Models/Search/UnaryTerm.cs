@@ -19,21 +19,29 @@
 
 namespace RiakClient.Models.Search
 {
+    /// <summary>
+    /// Represents a Lucene "unary" search term.
+    /// </summary>
     public class UnaryTerm : Term
     {
         private readonly Token value;
 
-        public UnaryTerm(RiakFluentSearch search, string field, string value)
+        internal UnaryTerm(RiakFluentSearch search, string field, string value)
             : this(search, field, Token.Is(value))
         {
         }
 
-        public UnaryTerm(RiakFluentSearch search, string field, Token value)
+        internal UnaryTerm(RiakFluentSearch search, string field, Token value)
             : base(search, field)
         {
             this.value = value;
         }
 
+        /// <summary>
+        /// Returns the term in a Lucene query string format.
+        /// </summary>
+        /// <returns>
+        /// A string that represents the query term.</returns>
         public override string ToString()
         {
             return Prefix() + Field() + value + Suffix();

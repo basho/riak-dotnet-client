@@ -19,6 +19,9 @@
 
 namespace RiakClient.Models.Search
 {
+    /// <summary>
+    /// Represents a Lucene "binary" search term, such as AND &amp; OR.
+    /// </summary>
     public class BinaryTerm : Term
     {
         private readonly Term left;
@@ -57,6 +60,11 @@ namespace RiakClient.Models.Search
             Or
         }
 
+        /// <summary>
+        /// Returns the term in a Lucene query string format.
+        /// </summary>
+        /// <returns>
+        /// A string that represents the query term.</returns>
         public override string ToString()
         {
             return left + " " + op.ToString().ToUpper() + " "

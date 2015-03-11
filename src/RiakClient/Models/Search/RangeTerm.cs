@@ -19,13 +19,16 @@
 
 namespace RiakClient.Models.Search
 {
+    /// <summary>
+    /// Represents a Lucene "range" search term.
+    /// </summary>
     public class RangeTerm : Term
     {
         private readonly Token from;
         private readonly Token to;
         private readonly bool inclusive;
 
-        public RangeTerm(RiakFluentSearch search, string field, Token from, Token to, bool inclusive)
+        internal RangeTerm(RiakFluentSearch search, string field, Token from, Token to, bool inclusive)
             : base(search, field)
         {
             this.from = from;
@@ -33,6 +36,10 @@ namespace RiakClient.Models.Search
             this.inclusive = inclusive;
         }
 
+        /// <summary>
+        /// Returns the term in a Lucene query string format.
+        /// </summary>
+        /// <returns>A string that represents the query term.</returns>
         public override string ToString()
         {
             var brackets = inclusive ? new[] { "[", "]" } : new[] { "{", "}" };

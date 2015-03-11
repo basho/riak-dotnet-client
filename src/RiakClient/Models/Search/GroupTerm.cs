@@ -19,16 +19,24 @@
 
 namespace RiakClient.Models.Search
 {
+    /// <summary>
+    /// Represents a Lucene grouped search term.
+    /// </summary>
     public class GroupTerm : Term
     {
         private readonly Term term;
 
-        public GroupTerm(RiakFluentSearch search, string field, Term term)
+        internal GroupTerm(RiakFluentSearch search, string field, Term term)
             : base(search, field)
         {
             this.term = term;
         }
 
+        /// <summary>
+        /// Returns the term in a Lucene query string format.
+        /// </summary>
+        /// <returns>
+        /// A string that represents the query term.</returns>
         public override string ToString()
         {
             Term tmpTerm = term;

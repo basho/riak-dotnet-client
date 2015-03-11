@@ -20,10 +20,13 @@
 namespace RiakClient.Models.RiakDt
 {
     using System.Collections.Generic;
-
+    
+    /// <summary>
+    /// Represents an operation result for a Riak Map data type.
+    /// </summary>
     public class RiakDtMapResult
     {
-        public RiakDtMapResult(
+        internal RiakDtMapResult(
             RiakResult<RiakObject> result,
             byte[] context = null,
             List<RiakDtMapEntry> values = null)
@@ -38,10 +41,19 @@ namespace RiakClient.Models.RiakDt
             Values = values ?? new List<RiakDtMapEntry>();
         }
 
+        /// <summary>
+        /// The operation result.
+        /// </summary>
         public RiakResult<RiakObject> Result { get; private set; }
 
+        /// <summary>
+        /// The updated data type context.
+        /// </summary>
         public byte[] Context { get; internal set; }
 
+        /// <summary>
+        /// A collection of <see cref="RiakDtMapEntry"/>, which represent the updated map fields.
+        /// </summary>
         public List<RiakDtMapEntry> Values { get; internal set; }
     }
 }
