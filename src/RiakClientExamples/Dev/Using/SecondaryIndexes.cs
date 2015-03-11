@@ -28,17 +28,11 @@ namespace RiakClientExamples.Dev.Using
     using RiakClient.Models;
     using RiakClient.Models.Index;
 
+    /*
+     * http://docs.basho.com/riak/latest/dev/using/2i/
+     */
     public sealed class SecondaryIndexes : ExampleBase
     {
-        /*
-         * Note: Before running these examples, be sure to set up your
-         * cluster to use the leveldb backend as the default and create
-         * expected bucket types.
-         * 
-         * These commands will set up your devrel:
-         * tools/setup-dev-cluster -b leveldb
-         * tools/setup-examples
-         */
         [Test]
         public void InsertingObjectsWithSecondaryIndexes()
         {
