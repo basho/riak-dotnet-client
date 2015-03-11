@@ -34,8 +34,8 @@ namespace RiakClientTests.Live.RiakConfigurationTests
               </configSections>
               <riakConfig nodePollTime=""5000"" defaultRetryWaitTime=""200"" defaultRetryCount=""3"">
                 <nodes>
-                  <node name=""node1"" hostAddress=""host1"" pbcPort=""8081"" restScheme=""http"" restPort=""8091"" poolSize=""5"" />
-                  <node name=""node2"" hostAddress=""host2"" pbcPort=""8081"" restScheme=""http"" restPort=""8091"" poolSize=""6""
+                  <node name=""node1"" hostAddress=""host1"" pbcPort=""8081"" poolSize=""5"" />
+                  <node name=""node2"" hostAddress=""host2"" pbcPort=""8081"" poolSize=""6""
                         networkReadTimeout=""5000"" networkWriteTimeout=""5000"" networkConnectTimeout=""5000"" />
                 </nodes>
               </riakConfig>
@@ -64,8 +64,6 @@ namespace RiakClientTests.Live.RiakConfigurationTests
                 node1.Name.ShouldEqual("node1");
                 node1.HostAddress.ShouldEqual("host1");
                 node1.PbcPort.ShouldEqual(8081);
-                node1.RestScheme.ShouldEqual("http");
-                node1.RestPort.ShouldEqual(8091);
                 node1.PoolSize.ShouldEqual(5);
                 node1.NetworkConnectTimeout.ShouldEqual((Timeout)fourSecsAsMillis);
                 node1.NetworkReadTimeout.ShouldEqual((Timeout)fourSecsAsMillis);
@@ -75,8 +73,6 @@ namespace RiakClientTests.Live.RiakConfigurationTests
                 node2.Name.ShouldEqual("node2");
                 node2.HostAddress.ShouldEqual("host2");
                 node2.PbcPort.ShouldEqual(8081);
-                node2.RestScheme.ShouldEqual("http");
-                node2.RestPort.ShouldEqual(8091);
                 node2.PoolSize.ShouldEqual(6);
                 node2.NetworkConnectTimeout.ShouldEqual((Timeout)fiveSecsAsMillis);
                 node2.NetworkReadTimeout.ShouldEqual((Timeout)fiveSecsAsMillis);

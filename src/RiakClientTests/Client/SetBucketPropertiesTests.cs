@@ -24,32 +24,6 @@ namespace RiakClientTests.Client
     using RiakClient;
     using RiakClient.Messages;
     using RiakClient.Models;
-    using RiakClient.Models.Rest;
-    using RiakClient.Util;
-
-    [TestFixture]
-    public class WhenSettingBucketPropertiesWithExtendedProperties : ClientTestBase
-    {
-        protected RiakResult Response;
-
-        [SetUp]
-        public void SetUp()
-        {
-            var result = RiakResult<RiakRestResponse>.Success(new RiakRestResponse { StatusCode = System.Net.HttpStatusCode.NoContent });
-            Cluster.ConnectionMock.Setup(m => m.RestRequest(It.IsAny<RiakRestRequest>())).Returns(result);
-
-            var properties = (RiakBucketProperties)(new RiakBucketProperties().SetAllowMultiple(true).SetR((Quorum)"one"));
-            Response = Client.SetBucketProperties("foo", properties);
-        }
-
-        [Test]
-        [Ignore]
-        public void RestInterfaceIsInvokedWithAppropriateValues()
-        {
-            Cluster.ConnectionMock.Verify(m => m.RestRequest(It.Is<RiakRestRequest>(r => r.ContentType == RiakConstants.ContentTypes.ApplicationJson
-                && r.Method == RiakConstants.Rest.HttpMethod.Put)), Times.Once());
-        }
-    }
 
     [TestFixture]
     public class WhenSettingBucketPropertiesWithoutExtendedProperties : ClientTestBase

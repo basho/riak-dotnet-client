@@ -174,27 +174,9 @@ namespace RiakClient
         }
 
         /// <inheritdoc/>
-        [Obsolete("This overload will be removed in the next version. Please remove any usages of the \"useHttp\" parameter.")]
-        public Task<RiakResult> SetBucketProperties(string bucket, RiakBucketProperties properties, bool useHttp = false)
-        {
-#pragma warning disable 618
-            return Task.Factory.StartNew(() => client.SetBucketProperties(bucket, properties, useHttp));
-#pragma warning restore 618
-        }
-
-        /// <inheritdoc/>
         public Task<RiakResult> ResetBucketProperties(string bucket)
         {
             return Task.Factory.StartNew(() => client.ResetBucketProperties(bucket));
-        }
-
-        /// <inheritdoc/>
-        [Obsolete("This overload will be removed in the next version. Please remove any usages of the \"useHttp\" parameter.")]
-        public Task<RiakResult> ResetBucketProperties(string bucket, bool useHttp = false)
-        {
-#pragma warning disable 618
-            return Task.Factory.StartNew(() => client.ResetBucketProperties(bucket, useHttp));
-#pragma warning restore 618
         }
 
         /// <inheritdoc/>
