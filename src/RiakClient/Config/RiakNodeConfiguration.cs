@@ -19,6 +19,7 @@
 
 namespace RiakClient.Config
 {
+    using System;
     using System.Configuration;
     using System.Runtime.InteropServices;
 
@@ -49,6 +50,7 @@ namespace RiakClient.Config
         }
 
         [ConfigurationProperty("restScheme", DefaultValue = "http", IsRequired = false)]
+        [Obsolete("The Rest properties are no longer used.")]
         public string RestScheme
         {
             get { return (string)this["restScheme"]; }
@@ -56,6 +58,7 @@ namespace RiakClient.Config
         }
 
         [ConfigurationProperty("restPort", DefaultValue = 8098, IsRequired = false)]
+        [Obsolete("The Rest properties are no longer used.")]
         public int RestPort
         {
             get { return (int)this["restPort"]; }
