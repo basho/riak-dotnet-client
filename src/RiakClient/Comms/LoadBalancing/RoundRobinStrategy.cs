@@ -19,7 +19,6 @@
 
 namespace RiakClient.Comms.LoadBalancing
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using Containers;
