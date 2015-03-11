@@ -21,7 +21,7 @@ namespace RiakClient.Containers
 {
     using System.Collections.Generic;
 
-    public class ConcurrentEnumerable<T> : IConcurrentEnumerable<T>
+    internal class ConcurrentEnumerable<T> : IConcurrentEnumerable<T>
     {
         private readonly IEnumerable<T> wrapped;
 
