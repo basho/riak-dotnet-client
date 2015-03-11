@@ -64,7 +64,7 @@ namespace RiakClient.Models.MapReduce.Inputs
         public string Start { get; set; }
 
         /// <summary>
-        /// The inclusive lower bound of the string range to query for.
+        /// The inclusive upper bound of the string range to query for.
         /// </summary>
         public string End { get; set; }
         
