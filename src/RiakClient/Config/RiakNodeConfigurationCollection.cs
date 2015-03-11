@@ -22,6 +22,9 @@ namespace RiakClient.Config
     using System.Configuration;
     using System.Runtime.InteropServices;
 
+    /// <summary>
+    /// Represents a configuration element containing a collection of <see cref="RiakNodeConfiguration"/>s.
+    /// </summary>
     [ComVisible(false)]
     public sealed class RiakNodeConfigurationCollection : ConfigurationElementCollection
     {

@@ -21,16 +21,35 @@ namespace RiakClient.Config
 {
     using System.Collections.Generic;
 
+    /// <summary>
+    /// Represents a configuration element interface for a Riak Cluster.
+    /// </summary>
     public interface IRiakClusterConfiguration
     {
+        /// <summary>
+        /// A collection of <see cref="IRiakNodeConfiguration"/> configurations detailing the Riak nodes that can be connected to.
+        /// </summary>
         IList<IRiakNodeConfiguration> RiakNodes { get; }
 
+        /// <summary>
+        /// The period of time to poll nodes for health/liveness checks.
+        /// </summary>
         Timeout NodePollTime { get; }
 
+        /// <summary>
+        /// The period of time to wait inbetween operation retries.
+        /// </summary>
         Timeout DefaultRetryWaitTime { get; }
 
+        /// <summary>
+        /// The max number of retry attempts to make when the client encounters 
+        /// <see cref="E:ResultCode.NoConnections"/> or <see cref="E:ResultCode.CommunicationError"/> errors.
+        /// </summary>
         int DefaultRetryCount { get; }
 
+        /// <summary>
+        /// A <see cref="IRiakAuthenticationConfiguration"/> configuration that details any authentication information.
+        /// </summary>
         IRiakAuthenticationConfiguration Authentication { get; }
     }
 }

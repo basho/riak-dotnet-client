@@ -25,12 +25,16 @@ namespace RiakClient.Config
     using System.Linq;
     using System.Runtime.InteropServices;
 
+    /// <summary>
+    /// Represents the configuration file section for a Riak Cluster.
+    /// </summary>
     [ComVisible(false)]
     public sealed class RiakClusterConfiguration : ConfigurationSection, IRiakClusterConfiguration
     {
         private static readonly Timeout DefaultNodePollTime = new Timeout(TimeSpan.FromSeconds(5));
         private static readonly Timeout DefaultDefaultRetryWaitTime = new Timeout(200);
 
+        /// <inheritdoc/>
         [ConfigurationProperty("nodes", IsDefaultCollection = true, IsRequired = true)]
         [ConfigurationCollection(typeof(RiakNodeConfigurationCollection), AddItemName = "node")]
         public RiakNodeConfigurationCollection Nodes
@@ -44,6 +48,7 @@ namespace RiakClient.Config
             get { return this.Nodes.Cast<IRiakNodeConfiguration>().ToList(); }
         }
 
+        /// <inheritdoc/>
         public Timeout NodePollTime
         {
             get
@@ -60,6 +65,7 @@ namespace RiakClient.Config
             }
         }
 
+        /// <inheritdoc/>
         public Timeout DefaultRetryWaitTime
         {
             get
@@ -76,6 +82,8 @@ namespace RiakClient.Config
             }
         }
 
+        /// <inheritdoc/>
+        /// <remarks>Defaults to 3 if omitted from the configuration file.</remarks>
         [ConfigurationProperty("defaultRetryCount", DefaultValue = 3, IsRequired = false)]
         public int DefaultRetryCount
         {
@@ -83,6 +91,7 @@ namespace RiakClient.Config
             set { this["defaultRetryCount"] = value; }
         }
 
+        /// <inheritdoc/>
         [ConfigurationProperty("authentication", IsRequired = false)]
         public RiakAuthenticationConfiguration Authentication
         {
@@ -94,6 +103,8 @@ namespace RiakClient.Config
             get { return this.Authentication; }
         }
 
+        /// <inheritdoc/>
+        /// <remarks>Defaults to 200ms if omitted from the configuration file.</remarks>
         [ConfigurationProperty("defaultRetryWaitTime", DefaultValue = "200", IsRequired = false)]
         private string DefaultRetryWaitTimeProperty
         {
@@ -101,6 +112,8 @@ namespace RiakClient.Config
             set { this["defaultRetryWaitTime"] = value; }
         }
 
+        /// <inheritdoc/>
+        /// <remarks>Defaults to 5000ms if omitted from the configuration file.</remarks>
         [ConfigurationProperty("nodePollTime", DefaultValue = "5000", IsRequired = false)]
         private string NodePollTimeProperty
         {
@@ -108,11 +121,24 @@ namespace RiakClient.Config
             set { this["nodePollTime"] = value; }
         }
 
+        /// <summary>
+        /// Load a <see cref="RiakClusterConfiguration"/> from the local configuration file,
+        /// and return a new <see cref="IRiakClusterConfiguration"/>. 
+        /// </summary>
+        /// <param name="sectionName">The section to load the configuration from.</param>
+        /// <returns>An initialized and configured <see cref="IRiakClusterConfiguration"/>.</returns>
         public static IRiakClusterConfiguration LoadFromConfig(string sectionName)
         {
             return (IRiakClusterConfiguration)ConfigurationManager.GetSection(sectionName);
         }
 
+        /// <summary>
+        /// Load a <see cref="RiakClusterConfiguration"/> from a specified configuration file,
+        /// and return a new <see cref="IRiakClusterConfiguration"/>.
+        /// </summary>
+        /// <param name="sectionName">The section to load the configuration from.</param>
+        /// <param name="fileName">The file containing the configuration section.</param>
+        /// <returns>An initialized and configured <see cref="IRiakClusterConfiguration"/>.</returns>
         public static IRiakClusterConfiguration LoadFromConfig(string sectionName, string fileName)
         {
             var map = new ConfigurationFileMap(fileName);
