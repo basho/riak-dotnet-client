@@ -63,10 +63,10 @@ namespace RiakClientExamples.Dev.Using
             var fido = new { breed = "dalmatian", size = "large" };
             var obj = new RiakObject(id, fido);
             var rslt = client.Put(obj);
-            Assert.IsTrue(rslt.IsSuccess, "Error: {0}", rslt.ErrorMessage);
+            CheckResult(rslt);
 
             rslt = client.Get(id);
-            Assert.IsTrue(rslt.IsSuccess, "Error: {0}", rslt.ErrorMessage);
+            CheckResult(rslt);
             Assert.NotNull(rslt.Value);
             Assert.AreEqual(RiakConstants.ContentTypes.ApplicationJson, rslt.Value.ContentType);
 
@@ -82,8 +82,8 @@ namespace RiakClientExamples.Dev.Using
             var opts = new RiakGetOptions();
             opts.SetR(3);
             var rslt = client.Get(id, opts);
+            CheckResult(rslt);
             Debug.WriteLine(Encoding.UTF8.GetString(rslt.Value.Value));
-            Assert.IsTrue(rslt.IsSuccess, "Error: {0}", rslt.ErrorMessage);
         }
 
         [Test]
@@ -94,8 +94,7 @@ namespace RiakClientExamples.Dev.Using
                 id,
                 "I have nothing to declare but my genius",
                 RiakConstants.ContentTypes.TextPlain);
-            var rslt = client.Put(obj);
-            Assert.IsTrue(rslt.IsSuccess, "Error: {0}", rslt.ErrorMessage);
+            CheckResult(client.Put(obj));
         }
 
         [Test]
@@ -104,15 +103,16 @@ namespace RiakClientExamples.Dev.Using
             id = new RiakObjectId("sports", "nba", "champion");
             var obj = new RiakObject(id, "Washington Generals",
                 RiakConstants.ContentTypes.TextPlain);
-            var rslt = client.Put(obj);
-            Assert.IsTrue(rslt.IsSuccess, "Error: {0}", rslt.ErrorMessage);
+            CheckResult(client.Put(obj));
 
-            rslt = client.Get(id);
-            Assert.IsTrue(rslt.IsSuccess);
+            var rslt = client.Get(id);
+            CheckResult(rslt);
+
             obj = rslt.Value;
             obj.SetObject("Harlem Globetrotters", RiakConstants.ContentTypes.TextPlain);
             rslt = client.Put(obj);
-            Assert.IsTrue(rslt.IsSuccess, "Error: {0}", rslt.ErrorMessage);
+            CheckResult(rslt);
+
             Assert.IsTrue(EnumerableUtil.IsNullOrEmpty(rslt.Value.Siblings));
             Assert.AreEqual("Harlem Globetrotters", Encoding.UTF8.GetString(rslt.Value.Value));
         }
@@ -124,7 +124,7 @@ namespace RiakClientExamples.Dev.Using
             var obj = new RiakObject(id, @"{'user':'data'}",
                 RiakConstants.ContentTypes.ApplicationJson);
             var rslt = client.Put(obj);
-            Assert.IsTrue(rslt.IsSuccess, "Error: {0}", rslt.ErrorMessage);
+            CheckResult(rslt);
             Debug.WriteLine(format: "Generated key: {0}", args: rslt.Value.Key);
         }
 
@@ -135,21 +135,21 @@ namespace RiakClientExamples.Dev.Using
             var obj = new RiakObject(id, @"{'user':'data'}",
                 RiakConstants.ContentTypes.ApplicationJson);
             var rslt = client.Put(obj);
-            Assert.IsTrue(rslt.IsSuccess, "Error: {0}", rslt.ErrorMessage);
+            CheckResult(rslt);
 
             string key = rslt.Value.Key;
             Debug.WriteLine(format: "Generated key: {0}", args: key);
 
             id = new RiakObjectId("users", "random_user_keys", key);
             var del_rslt = client.Delete(id);
-            Assert.IsTrue(rslt.IsSuccess, "Error: {0}", rslt.ErrorMessage);
+            CheckResult(del_rslt);
         }
 
         [Test]
         public void GetBucketTypeProperties()
         {
             var rslt = client.GetBucketProperties("n_val_of_5", "any_bucket_name");
-            Assert.IsTrue(rslt.IsSuccess, "Error: {0}", rslt.ErrorMessage);
+            CheckResult(rslt);
             RiakBucketProperties props = rslt.Value;
             Assert.AreEqual(5, props.NVal);
         }
@@ -158,8 +158,7 @@ namespace RiakClientExamples.Dev.Using
         {
             id = new RiakObjectId("animals", "dogs", "rufus");
             var obj = new RiakObject(id, "WOOF!", RiakConstants.ContentTypes.TextPlain);
-            var rslt = client.Put(obj);
-            Assert.IsTrue(rslt.IsSuccess, "Error: {0}", rslt.ErrorMessage);
+            CheckResult(client.Put(obj));
             return id;
         }
     }

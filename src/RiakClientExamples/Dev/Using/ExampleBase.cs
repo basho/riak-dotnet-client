@@ -46,8 +46,7 @@ namespace RiakClientExamples
         {
             if (id != null)
             {
-                var rslt = client.Delete(id);
-                Assert.IsTrue(rslt.IsSuccess);
+                DeleteObject(id);
             }
         }
 
@@ -62,6 +61,16 @@ namespace RiakClientExamples
             {
                 endpoint.Dispose();
             }
+        }
+
+        protected void CheckResult(RiakResult riakResult)
+        {
+            Assert.IsTrue(riakResult.IsSuccess, "Error: {0}", riakResult.ErrorMessage);
+        }
+
+        protected void DeleteObject(RiakObjectId id)
+        {
+            CheckResult(client.Delete(id));
         }
     }
 }
