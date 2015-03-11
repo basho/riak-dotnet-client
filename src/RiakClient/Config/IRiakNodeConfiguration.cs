@@ -19,6 +19,8 @@
 
 namespace RiakClient.Config
 {
+    using System;
+
     public interface IRiakNodeConfiguration
     {
         string Name { get; }
@@ -27,8 +29,10 @@ namespace RiakClient.Config
 
         int PbcPort { get; }
 
+        [Obsolete("The Rest properties are no longer used.")]
         string RestScheme { get; }
 
+        [Obsolete("The Rest properties are no longer used.")]
         int RestPort { get; }
 
         int PoolSize { get; }

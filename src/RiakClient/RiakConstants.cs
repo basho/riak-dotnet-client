@@ -221,17 +221,6 @@ namespace RiakClient
             public const string CharSet = CharSets.Utf8;
 
             /// <summary>
-            /// Represents the defaults for REST/HTTP operations.
-            /// </summary>
-            public static class Rest
-            {
-                /// <summary>
-                /// The default timeout to use with any REST/HTTP operations.
-                /// </summary>
-                public static readonly Timeout Timeout = new Timeout(30000);
-            }
-
-            /// <summary>
             /// Represents some Riak Search 2.0+ (Yokozuna) defaults.
             /// </summary>
             public static class YokozunaIndex
@@ -317,118 +306,6 @@ namespace RiakClient
             /// A collection of all the system integer index names.
             /// </summary>
             public static readonly HashSet<string> SystemIntKeys = new HashSet<string>();
-        }
-
-        /// <summary>
-        /// A collection of Riak REST interface string constants.
-        /// </summary>
-        public static class Rest
-        {
-            /// <summary>
-            /// The default User-Agent value.
-            /// </summary>
-            public const string UserAgent = "RiakClient v2.0 (REST)";
-
-            /// <summary>
-            /// A collection of Riak REST interface query parameter constants.
-            /// </summary>
-            public static class QueryParameters
-            {
-                /// <summary>
-                /// A collection of Bucket query related constants.
-                /// </summary>
-                public static class Bucket
-                {
-                    /// <summary>
-                    /// The Riak bucket properties query string key.
-                    /// </summary>
-                    public const string GetPropertiesKey = @"props";
-                    
-                    /// <summary>
-                    /// The Riak bucket properties query string value.
-                    /// </summary>
-                    public const string GetPropertiesValue = @"true";
-                }
-            }
-
-            /// <summary>
-            /// A collection of Riak REST interface URI patterns
-            /// </summary>
-            public static class Uri
-            {
-                /// <summary>
-                /// The Riak root path constant.
-                /// </summary>
-                public const string RiakRoot = "/riak";
-                
-                /// <summary>
-                /// The Riak mapreduce path constant.
-                /// </summary>
-                public const string MapReduce = "/mapred";
-                
-                /// <summary>
-                /// The Riak bucket properties path format string.
-                /// </summary>
-                public const string BucketPropsFmt = "/buckets/{0}/props";
-                
-                /// <summary>
-                /// The Riak statistics path constant.
-                /// </summary>
-                public const string StatsRoot = "/stats";
-            }
-
-            /// <summary>
-            /// A collection of different REST communication schemes
-            /// </summary>
-            public static class Scheme
-            {
-                /// <summary>
-                /// The "HTTPS" / REST SSL constant. 
-                /// </summary>
-                public const string Ssl = @"https";
-            }
-
-            /// <summary>
-            /// A collection of Riak-related HTTP header keys and values.
-            /// </summary>
-            public static class HttpHeaders
-            {
-                /// <summary>
-                /// The "Disable Cache" header key.
-                /// </summary>
-                public const string DisableCacheKey = @"Pragma";
-                
-                /// <summary>
-                /// The "Disable Cache" header value.
-                /// </summary>
-                public const string DisableCacheValue = @"no-cache";
-            }
-
-            /// <summary>
-            /// A collection of string constants for common HTTP methods.
-            /// </summary>
-            public static class HttpMethod
-            {
-                /// <summary>
-                /// The GET string constant.
-                /// </summary>
-                public const string Get = "GET";
-                
-                /// <summary>
-                /// The POST string constant.
-                /// </summary>
-                public const string Post = "POST";
-                
-                /// <summary>
-                /// The PUT string constant.
-                /// </summary>
-                public const string Put = "PUT";
-                
-                /// <summary>
-                /// The DELETE string constant.
-                /// </summary>
-                public const string Delete = "DELETE";
-            }
         }
 
         /// <summary>
