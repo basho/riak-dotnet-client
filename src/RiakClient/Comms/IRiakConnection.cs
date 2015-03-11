@@ -23,11 +23,13 @@ namespace RiakClient.Comms
     using System.Collections.Generic;
     using Messages;
 
+    /// <summary>
+    /// The public interface for connections to Riak.
+    /// </summary>
     public interface IRiakConnection : IDisposable
     {
         void Disconnect();
 
-        // PBC interface
         RiakResult<TResult> PbcRead<TResult>()
             where TResult : class, new();
 
