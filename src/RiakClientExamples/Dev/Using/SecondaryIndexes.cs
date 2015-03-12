@@ -197,7 +197,7 @@ namespace RiakClientExamples.Dev.Using
             CheckResult(client.Put(obj));
         }
 
-        private IEnumerable<RiakObjectId> PutObjectsWithIndexValues()
+        private ICollection<RiakObjectId> PutObjectsWithIndexValues()
         {
             var ids = new List<RiakObjectId>();
 

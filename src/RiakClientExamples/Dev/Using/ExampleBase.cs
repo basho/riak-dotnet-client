@@ -31,7 +31,8 @@ namespace RiakClientExamples
 
         protected IRiakClient client;
         protected RiakObjectId id;
-        protected IEnumerable<RiakObjectId> ids;
+        protected ICollection<RiakObjectId> ids;
+        protected RiakResult rslt;
 
         public ExampleBase()
         {
@@ -47,14 +48,22 @@ namespace RiakClientExamples
         [TearDown]
         public void TearDown()
         {
+            if (rslt != null)
+            {
+                CheckResult(rslt);
+            }
+
+#if CLEANUP
             if (id != null)
             {
                 DeleteObject(id);
             }
+
             if (EnumerableUtil.NotNullOrEmpty(ids))
             {
                 DeleteObjects(ids);
             }
+#endif
         }
 
         public void Dispose()

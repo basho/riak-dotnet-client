@@ -45,8 +45,7 @@ namespace RiakClientExamples.Dev.Using
             Assert.AreEqual("dogs", id.Bucket);
             Assert.AreEqual("rufus", id.Key);
 
-            var rslt = client.Get(id);
-            Assert.IsFalse(rslt.IsSuccess, "Error: {0}", rslt.ErrorMessage);
+            rslt = client.Get(id);
             Assert.AreEqual(ResultCode.NotFound, rslt.ResultCode);
         }
 
@@ -94,7 +93,7 @@ namespace RiakClientExamples.Dev.Using
                 id,
                 "I have nothing to declare but my genius",
                 RiakConstants.ContentTypes.TextPlain);
-            CheckResult(client.Put(obj));
+            rslt = client.Put(obj);
         }
 
         [Test]
