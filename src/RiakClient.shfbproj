@@ -49,8 +49,8 @@
 <NamespaceSummaryItem name="RiakClient.Exceptions" isDocumented="True">The &lt;b&gt;RiakClient.Exceptions&lt;/b&gt; namespace contains custom exceptions that are raised during use of the library.</NamespaceSummaryItem>
 <NamespaceSummaryItem name="RiakClient.Extensions" isDocumented="True">The &lt;b&gt;RiakClient.Exceptions&lt;/b&gt; namespace contains some useful extension methods for interacting with the client.</NamespaceSummaryItem>
 <NamespaceSummaryItem name="RiakClient.Messages" isDocumented="True">The &lt;b&gt;RiakClient.Messages&lt;/b&gt; namespace contains classes related to the protocol buffers API messages.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="RiakClient.Models (Group)" isGroup="True" isDocumented="True">The &lt;b&gt;RiakClient.Models&lt;/b&gt; base namespace contains many Identity, Options, and Results models used in most Riak operations.</NamespaceSummaryItem>
-<NamespaceSummaryItem name="RiakClient.Models" isDocumented="True">The &lt;b&gt;RiakClient.Models&lt;/b&gt; namespace contains all the models used within the library.</NamespaceSummaryItem>
+<NamespaceSummaryItem name="RiakClient.Models (Group)" isGroup="True" isDocumented="True">The &lt;b&gt;RiakClient.Models&lt;/b&gt; namespace contains all the models used within the library.</NamespaceSummaryItem>
+<NamespaceSummaryItem name="RiakClient.Models" isDocumented="True">The &lt;b&gt;RiakClient.Models&lt;/b&gt; base namespace contains many Identity, Options, and Results models used in most Riak operations.</NamespaceSummaryItem>
 <NamespaceSummaryItem name="RiakClient.Models.CommitHook" isDocumented="True">The &lt;b&gt;RiakClient.Models.CommitHook&lt;/b&gt; namespace contains all the models used for Riak commit hooks.</NamespaceSummaryItem>
 <NamespaceSummaryItem name="RiakClient.Models.Index" isDocumented="True">The &lt;b&gt;RiakClient.Models.Index&lt;/b&gt; namespace contains all the models used for Secondary Indexes.</NamespaceSummaryItem>
 <NamespaceSummaryItem name="RiakClient.Models.MapReduce" isDocumented="True">The &lt;b&gt;RiakClient.Models.MapReduce&lt;/b&gt; namespace contains all the models used for map reduce.</NamespaceSummaryItem>
