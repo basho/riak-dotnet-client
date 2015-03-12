@@ -28,7 +28,7 @@ else
         sudo apt-add-repository --yes 'deb http://download.mono-project.com/repo/debian wheezy main'
         sudo apt-add-repository --yes 'deb http://download.mono-project.com/repo/debian wheezy-libtiff-compat main'
         sudo apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' update
-        sudo apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install mono-devel mono-tools-devel
+        sudo apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install mono-devel
     fi
 fi
 
