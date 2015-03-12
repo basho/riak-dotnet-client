@@ -56,13 +56,21 @@ namespace RiakClient.Models.Index
             return Container;
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Add the <see cref="IEnumerable{TIndex}"/> collection of term values to the index.
+        /// </summary>
+        /// <param name="values">An <see cref="IEnumerable{TIndex}"/> of new terms to add.</param>
+        /// <returns>A reference to this updated instance, for fluent chaining.</returns>
         public override BinIndex Add(IEnumerable<string> values)
         {
             return base.Add(values.Where(value => !string.IsNullOrEmpty(value)).ToArray());
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Adds the params array collection of term values to the index.
+        /// </summary>
+        /// <param name="values">A params array of term values to add.</param>
+        /// <returns>A reference to this updated instance, for fluent chaining.</returns>
         public override BinIndex Add(params string[] values)
         {
             return base.Add(values.Where(value => !string.IsNullOrEmpty(value)).ToArray());

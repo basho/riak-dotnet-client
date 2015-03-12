@@ -30,6 +30,9 @@ namespace RiakClient.Models
     /// </summary>
     public class RiakLink
     {
+        /// <summary>
+        /// Represents the <see cref="RiakLink"/> that will follow all links during linkwalking.
+        /// </summary>
         public static readonly RiakLink AllLinks = new RiakLink(string.Empty, string.Empty, string.Empty);
 
         private readonly string bucket;

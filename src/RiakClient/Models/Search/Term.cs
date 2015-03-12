@@ -39,6 +39,10 @@ namespace RiakClient.Models.Search
 
         internal Term Owner { get; set; }
 
+        /// <summary>
+        /// Returns a new <see cref="RiakFluentSearch"/> object based on this Term.
+        /// </summary>
+        /// <returns>A configured <see cref="RiakFluentSearch"/> object.</returns>
         protected RiakFluentSearch Search
         {
             get { return search; }

@@ -108,7 +108,7 @@ namespace RiakClient.Models.Search
         /// <summary>
         /// The default operator for parsing queries.
         /// </summary>
-        /// <remarks>Defaults to <see cref="E:DefaultOperation.And"/> if not specified.</remarks>
+        /// <remarks>Defaults to <see cref="DefaultOperation"/>.And if not specified.</remarks>
         public DefaultOperation? DefaultOperation { get; set; }
 
         /// <summary>

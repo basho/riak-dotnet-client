@@ -32,6 +32,10 @@ namespace RiakClient
         /// <inheritdoc />
         public TimeSpan RetryWaitTime { get; set; }
 
+        /// <summary>
+        /// The max number of retry attempts to make when the client encounters 
+        /// <see cref="ResultCode"/>.NoConnections or <see cref="ResultCode"/>.CommunicationError errors.
+        /// </summary>
         protected abstract int DefaultRetryCount { get; }
 
         /// <summary>

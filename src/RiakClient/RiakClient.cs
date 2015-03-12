@@ -877,6 +877,7 @@ namespace RiakClient
             return DtFetchMap(new RiakObjectId(bucketType, bucket, key), options);
         }
 
+        /// <inheritdoc/>
         public RiakDtMapResult DtFetchMap(RiakObjectId objectId, RiakDtFetchOptions options = null)
         {
             var message = new DtFetchReq
