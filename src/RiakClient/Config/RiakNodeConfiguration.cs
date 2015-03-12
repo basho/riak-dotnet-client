@@ -57,29 +57,6 @@ namespace RiakClient.Config
         }
 
         /// <inheritdoc/>
-        /// <remarks>
-        /// Can be "HTTP" or "HTTPS".
-        /// Legacy, not used anymore.
-        /// </remarks>
-        [ConfigurationProperty("restScheme", DefaultValue = "http", IsRequired = false)]
-        [Obsolete("The Rest properties are no longer used.")]
-        public string RestScheme
-        {
-            get { return (string)this["restScheme"]; }
-            set { this["restScheme"] = value; }
-        }
-
-        /// <inheritdoc/>
-        /// <remarks>Legacy, not used anymore.</remarks>
-        [ConfigurationProperty("restPort", DefaultValue = 8098, IsRequired = false)]
-        [Obsolete("The Rest properties are no longer used.")]
-        public int RestPort
-        {
-            get { return (int)this["restPort"]; }
-            set { this["restPort"] = value; }
-        }
-
-        /// <inheritdoc/>
         /// <remarks>Defaults to 30 if omitted from the configuration file.</remarks>
         [ConfigurationProperty("poolSize", DefaultValue = 30, IsRequired = false)]
         public int PoolSize

@@ -43,18 +43,6 @@ namespace RiakClient.Config
         int PbcPort { get; }
 
         /// <summary>
-        /// The Scheme to use when connecting to the HTTP API.
-        /// </summary>
-        [Obsolete("The Rest properties are no longer used.")]
-        string RestScheme { get; }
-
-        /// <summary>
-        /// The port to use when connecting to the HTTP API.
-        /// </summary>
-        [Obsolete("The Rest properties are no longer used.")]
-        int RestPort { get; }
-
-        /// <summary>
         /// The worker pool size to use for this node.
         /// This many workers (and connections) will be available for concurrent use.
         /// </summary>
