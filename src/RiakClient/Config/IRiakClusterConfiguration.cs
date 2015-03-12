@@ -43,7 +43,7 @@ namespace RiakClient.Config
 
         /// <summary>
         /// The max number of retry attempts to make when the client encounters 
-        /// <see cref="E:ResultCode.NoConnections"/> or <see cref="E:ResultCode.CommunicationError"/> errors.
+        /// <see cref="ResultCode"/>.NoConnections or <see cref="ResultCode"/>.CommunicationError errors.
         /// </summary>
         int DefaultRetryCount { get; }
 

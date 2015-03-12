@@ -30,7 +30,7 @@ namespace RiakClient
 
     /// <summary>
     /// An asyncronous interface of <see cref="IRiakClient"/>. 
-    /// Wraps all methods with <see cref="M:Task.Factory.StartNew"/>.
+    /// Wraps all methods with a version of <see cref="TaskFactory.StartNew{TResult}(Func{TResult})"/>.
     /// </summary>
     public interface IRiakAsyncClient
     {

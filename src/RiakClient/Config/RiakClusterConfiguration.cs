@@ -34,7 +34,9 @@ namespace RiakClient.Config
         private static readonly Timeout DefaultNodePollTime = new Timeout(TimeSpan.FromSeconds(5));
         private static readonly Timeout DefaultDefaultRetryWaitTime = new Timeout(200);
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// A collection of <see cref="IRiakNodeConfiguration"/> configurations detailing the Riak nodes that can be connected to.
+        /// </summary>
         [ConfigurationProperty("nodes", IsDefaultCollection = true, IsRequired = true)]
         [ConfigurationCollection(typeof(RiakNodeConfigurationCollection), AddItemName = "node")]
         public RiakNodeConfigurationCollection Nodes
@@ -43,12 +45,14 @@ namespace RiakClient.Config
             set { this["nodes"] = value; }
         }
 
+        /// <inheritdoc/>
         IList<IRiakNodeConfiguration> IRiakClusterConfiguration.RiakNodes
         {
             get { return this.Nodes.Cast<IRiakNodeConfiguration>().ToList(); }
         }
 
         /// <inheritdoc/>
+        /// <remarks>Defaults to 5000ms if omitted from the configuration file.</remarks>
         public Timeout NodePollTime
         {
             get
@@ -66,6 +70,7 @@ namespace RiakClient.Config
         }
 
         /// <inheritdoc/>
+        /// <remarks>Defaults to 200ms if omitted from the configuration file.</remarks>
         public Timeout DefaultRetryWaitTime
         {
             get
@@ -91,20 +96,21 @@ namespace RiakClient.Config
             set { this["defaultRetryCount"] = value; }
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// A <see cref="IRiakAuthenticationConfiguration"/> configuration that details any authentication information.
+        /// </summary>
         [ConfigurationProperty("authentication", IsRequired = false)]
         public RiakAuthenticationConfiguration Authentication
         {
             get { return (RiakAuthenticationConfiguration)this["authentication"]; }
         }
 
+        /// <inheritdoc/>
         IRiakAuthenticationConfiguration IRiakClusterConfiguration.Authentication
         {
             get { return this.Authentication; }
         }
 
-        /// <inheritdoc/>
-        /// <remarks>Defaults to 200ms if omitted from the configuration file.</remarks>
         [ConfigurationProperty("defaultRetryWaitTime", DefaultValue = "200", IsRequired = false)]
         private string DefaultRetryWaitTimeProperty
         {
@@ -112,8 +118,6 @@ namespace RiakClient.Config
             set { this["defaultRetryWaitTime"] = value; }
         }
 
-        /// <inheritdoc/>
-        /// <remarks>Defaults to 5000ms if omitted from the configuration file.</remarks>
         [ConfigurationProperty("nodePollTime", DefaultValue = "5000", IsRequired = false)]
         private string NodePollTimeProperty
         {

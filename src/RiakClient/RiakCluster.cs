@@ -65,6 +65,7 @@ namespace RiakClient
             Task.Factory.StartNew(NodeMonitor);
         }
 
+        /// <inheritdoc/>
         protected override int DefaultRetryCount
         {
             get { return defaultRetryCount; }
