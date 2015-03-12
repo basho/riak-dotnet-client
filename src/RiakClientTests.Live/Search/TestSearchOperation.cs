@@ -27,7 +27,6 @@ namespace RiakClientTests.Live.Search
     using RiakClient.Extensions;
     using RiakClient.Models;
     using RiakClient.Models.Search;
-    using RiakClient.Util;
 
     [TestFixture]
     public class TestSearchOperation : LiveRiakConnectionTestBase
