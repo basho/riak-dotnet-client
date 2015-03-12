@@ -34,6 +34,11 @@ namespace RiakClient.Models.Search
         {
         }
 
+        public SearchIndex(string name, string schemaName)
+            : this(name, schemaName, new NVal(RiakConstants.Defaults.YokozunaIndex.NVal))
+        {
+        }
+
         public SearchIndex(string name, string schemaName, NVal nval)
         {
             if (string.IsNullOrWhiteSpace(name))
