@@ -27,13 +27,6 @@ namespace RiakClientExamples.Dev.Using
 
     /*
      * http://docs.basho.com/riak/latest/dev/using/basics/
-     * 
-     * Note: You must create the following bucket types before running:
-     * riak-admin bucket-type create animals; riak-admin bucket-type activate animals
-     * riak-admin bucket-type create quotes; riak-admin bucket-type activate quotes
-     * riak-admin bucket-type create sports; riak-admin bucket-type activate sports
-     * riak-admin bucket-type create cars; riak-admin bucket-type activate cars
-     * riak-admin bucket-type create users; riak-admin bucket-type activate users
      */
     public sealed class Basics : ExampleBase
     {
