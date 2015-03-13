@@ -19,6 +19,7 @@
 
 namespace RiakClient.Models.Search
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using Extensions;
@@ -51,13 +52,52 @@ namespace RiakClient.Models.Search
 
     public class RiakSearchRequest
     {
+        private readonly string solrIndex;
+        private readonly string solrQuery;
+        private readonly string solrFilter;
+
+        public RiakSearchRequest()
+        {
+        }
+
+        public RiakSearchRequest(string solrIndex, string solrQuery, string solrFilter = null)
+        {
+            if (string.IsNullOrWhiteSpace(solrIndex))
+            {
+                throw new ArgumentNullException("solrIndex");
+            }
+
+            this.solrIndex = solrIndex;
+
+            if (string.IsNullOrWhiteSpace(solrQuery))
+            {
+                throw new ArgumentNullException("solrQuery");
+            }
+
+            this.solrQuery = solrQuery;
+            this.solrFilter = solrFilter;
+        }
+
+        public RiakSearchRequest(
+            RiakFluentSearch solrQuery,
+            RiakFluentSearch solrFilter = null)
+        {
+            if (solrQuery == null)
+            {
+                throw new ArgumentNullException("solrQuery");
+            }
+
+            this.Query = solrQuery;
+            this.Filter = solrFilter;
+        }
+
         public RiakFluentSearch Query { get; set; }
+
+        public RiakFluentSearch Filter { get; set; }
 
         public long Rows { get; set; }
 
         public long Start { get; set; }
-
-        public RiakFluentSearch Filter { get; set; }
 
         public string Sort { get; set; }
 
@@ -78,12 +118,12 @@ namespace RiakClient.Models.Search
         {
             var msg = new RpbSearchQueryReq
             {
-                index = Query.Index.ToRiakString(),
-                q = Query.ToString().ToRiakString(),
+                index = GetIndexRiakString(),
+                q = GetQueryRiakString(),
                 rows = (uint)Rows,
                 start = (uint)Start,
                 sort = Sort.ToRiakString(),
-                filter = Filter == null ? null : Filter.ToString().ToRiakString(),
+                filter = GetFilterRiakString(),
                 presort = PreSort.HasValue ? PreSort.Value.ToString().ToLower().ToRiakString() : null,
                 op = DefaultOperation.HasValue ? DefaultOperation.Value.ToString().ToLower().ToRiakString() : null
             };
@@ -94,6 +134,54 @@ namespace RiakClient.Models.Search
             }
 
             return msg;
+        }
+
+        private byte[] GetIndexRiakString()
+        {
+            byte[] indexRiakString = null;
+
+            if (solrIndex != null)
+            {
+                indexRiakString = solrIndex.ToRiakString();
+            }
+            else
+            {
+                indexRiakString = Query.Index.ToRiakString();
+            }
+
+            return indexRiakString;
+        }
+
+        private byte[] GetQueryRiakString()
+        {
+            byte[] queryRiakString = null;
+
+            if (solrQuery != null)
+            {
+                queryRiakString = solrQuery.ToRiakString();
+            }
+            else
+            {
+                queryRiakString = Query.ToString().ToRiakString();
+            }
+
+            return queryRiakString;
+        }
+
+        private byte[] GetFilterRiakString()
+        {
+            byte[] filterRiakString = null;
+
+            if (solrFilter != null)
+            {
+                filterRiakString = solrFilter.ToRiakString();
+            }
+            else if (Filter != null)
+            {
+                filterRiakString = Filter.ToString().ToRiakString();
+            }
+
+            return filterRiakString;
         }
     }
 }
