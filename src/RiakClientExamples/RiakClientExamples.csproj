@@ -62,6 +62,7 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Dev\Using\ConflictResolution\ResolutionExamples.cs" />
     <Compile Include="Dev\Using\Updates.cs" />
     <Compile Include="Dev\Using\Search.cs" />
     <Compile Include="Dev\Using\DataTypes.cs" />
