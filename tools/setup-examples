@@ -99,6 +99,8 @@ $riak_admin bucket-type create maps '{"props":{"datatype":"map"}}'
 $riak_admin bucket-type create sets '{"props":{"datatype":"set"}}'
 $riak_admin bucket-type create counters '{"props":{"datatype":"counter"}}'
 
+$riak_admin bucket-type create siblings '{"props":{"allow_mult":"true"}}'
+
 set -o errexit
 
 pinfo "Done!"
