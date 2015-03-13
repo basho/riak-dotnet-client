@@ -28,6 +28,14 @@ namespace RiakClient.Models.Search
         private readonly Token to;
         private readonly bool inclusive;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RangeTerm"/> class.
+        /// </summary>
+        /// <param name="search">The fluent search to add this term to.</param>
+        /// <param name="field">The field to search.</param>
+        /// <param name="from">The lower bound of values to search the <paramref name="field"/> for.</param>
+        /// <param name="to">The upper bound of values to search the <paramref name="field"/> for.</param>
+        /// <param name="inclusive">The option to include the bounds in the range or not.</param>
         internal RangeTerm(RiakFluentSearch search, string field, Token from, Token to, bool inclusive)
             : base(search, field)
         {

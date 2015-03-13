@@ -32,7 +32,12 @@ namespace RiakClient.Models.Index
         private readonly IEnumerable<RiakResult<RpbIndexResp>> responseReader;
         private readonly bool includeTerms;
 
-        internal RiakStreamedIndexResult(bool includeTerms, IEnumerable<RiakResult<RpbIndexResp>> responseReader)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RiakStreamedIndexResult"/> class.
+        /// </summary>
+        /// <param name="includeTerms">The option to include the terms in the results.</param>
+        /// <param name="responseReader">The <see cref="IEnumerable{T}"/> to read results from.</param>
+        public RiakStreamedIndexResult(bool includeTerms, IEnumerable<RiakResult<RpbIndexResp>> responseReader)
         {
             this.responseReader = responseReader;
             this.includeTerms = includeTerms;
