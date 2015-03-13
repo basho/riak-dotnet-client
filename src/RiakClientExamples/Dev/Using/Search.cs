@@ -66,13 +66,7 @@ namespace RiakClientExamples.Dev.Using
         {
             ids = PutAnimals();
 
-            var search = new RiakSearchRequest
-            {
-                Query = new RiakFluentSearch("famous", "name_s")
-                    .Search("Lion*")
-                    .Build()
-            };
-
+            var search = new RiakSearchRequest("famous", "name_s:Lion*");
             var rslt = client.Search(search);
             CheckResult(rslt);
 
@@ -123,12 +117,18 @@ namespace RiakClientExamples.Dev.Using
         {
             ids = PutAnimals();
 
+            var search = new RiakSearchRequest("famous", "age_i:[30 TO *]");
+
+            /*
+             * Fluent interface:
+             * 
             var search = new RiakSearchRequest
             {
                 Query = new RiakFluentSearch("famous", "age_i")
                     .Between("30", "*")
                     .Build()
             };
+             */
 
             var rslt = client.Search(search);
             CheckResult(rslt);
