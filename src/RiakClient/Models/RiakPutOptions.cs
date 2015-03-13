@@ -22,9 +22,16 @@ namespace RiakClient.Models
     using System.Runtime.InteropServices;
     using Messages;
 
+    /// <summary>
+    /// A collection of optional settings for updating objects from Riak.
+    /// </summary>
     [ComVisible(false)]
     public class RiakPutOptions : RiakOptions<RiakPutOptions>
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RiakPutOptions" /> class.
+        /// Uses the "default" quorum settings for W, PW, and DW settings.
+        /// </summary>
         public RiakPutOptions()
         {
             ReturnBody = true;
@@ -33,32 +40,82 @@ namespace RiakClient.Models
             Pw = Quorum.WellKnown.Default;
         }
 
+        /// <summary>
+        /// After an update, return the body along with the metadata when set to <b>true</b>. 
+        /// Default is <b>false</b>.
+        /// </summary>
+        /// <remarks>
+        /// Note that when set to <b>true</b>, Riak will also return all siblings.
+        /// </remarks>
         public bool ReturnBody { get; set; }
 
+        /// <summary>
+        /// Update the value only if the local vclock matches the server vclock.
+        /// </summary>
+        /// <remarks>
+        /// Note: This does not guarantee any linearizable properties, as a concurrent update could occur
+        /// on a different node, which would result in siblings or an overwritten object depending on
+        /// your last_write_wins and allow_mult settings.
+        /// </remarks>
         public bool IfNotModified { get; set; }
 
+        /// <summary>
+        /// Store the value only if there is no object already present with the same <see cref="RiakObjectId"/>.
+        /// </summary>
+        /// <remarks>
+        /// Note: This does not guarantee any linearizable properties, as a concurrent update could occur
+        /// on a different node, which would result in siblings or an overwritten object depending on
+        /// your last_write_wins and allow_mult settings.
+        /// </remarks>
         public bool IfNoneMatch { get; set; }
 
+        /// <summary>
+        /// Return the metadata only.
+        /// When set to <b>true</b>, Riak will only return the updated object's metadata, and omit its body.
+        /// </summary>
+        /// <remarks>
+        /// This allows you to get the updated metadata back without also returning a potentially large value.
+        /// </remarks>
         public bool ReturnHead { get; set; }
 
+        /// <summary>
+        /// Fluent setter for the <see cref="IfNotModified"/> property.
+        /// </summary>
+        /// <param name="value">The value to set the property to.</param>
+        /// <returns>A reference to the current properties object.</returns>
         public RiakPutOptions SetIfNotModified(bool value)
         {
             IfNotModified = value;
             return this;
         }
 
+        /// <summary>
+        /// Fluent setter for the <see cref="SetIfNoneMatch"/> property.
+        /// </summary>
+        /// <param name="value">The value to set the property to.</param>
+        /// <returns>A reference to the current properties object.</returns>
         public RiakPutOptions SetIfNoneMatch(bool value)
         {
             IfNoneMatch = value;
             return this;
         }
 
+        /// <summary>
+        /// Fluent setter for the <see cref="SetReturnBody"/> property.
+        /// </summary>
+        /// <param name="value">The value to set the property to.</param>
+        /// <returns>A reference to the current properties object.</returns>
         public RiakPutOptions SetReturnBody(bool value)
         {
             ReturnBody = value;
             return this;
         }
 
+        /// <summary>
+        /// Fluent setter for the <see cref="SetReturnHead"/> property.
+        /// </summary>
+        /// <param name="value">The value to set the property to.</param>
+        /// <returns>A reference to the current properties object.</returns>
         public RiakPutOptions SetReturnHead(bool value)
         {
             ReturnHead = value;

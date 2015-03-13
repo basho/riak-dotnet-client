@@ -24,6 +24,7 @@ namespace RiakClient.Models.MapReduce.Phases
     internal class RiakMapPhase<TLanguage> : RiakActionPhase<TLanguage>
         where TLanguage : IRiakPhaseLanguage, new()
     {
+        /// <inheritdoc/>
         public override string PhaseType
         {
             get { return "map"; }

@@ -30,38 +30,36 @@
     <SdkLinkTarget>Blank</SdkLinkTarget>
     <RootNamespaceContainer>True</RootNamespaceContainer>
     <PresentationStyle>VS2013</PresentationStyle>
-    <Preliminary>True</Preliminary>
+    <Preliminary>False</Preliminary>
     <NamingMethod>MemberName</NamingMethod>
     <HelpTitle>Riak .NET Client Documentation</HelpTitle>
     <ContentPlacement>AboveNamespaces</ContentPlacement>
     <DocumentationSources>
       <DocumentationSource sourceFile="RiakClient\bin\Release\RiakClient.dll" />
-      <DocumentationSource sourceFile="RiakClient\bin\Release\RiakClient.XML" />
+      <DocumentationSource sourceFile="RiakClient\bin\Release\RiakClient.xml" />
     </DocumentationSources>
     <CopyrightText>Copyright %28c%29 2014 - Basho Technologies, Inc.</CopyrightText>
     <NamespaceSummaries>
-      <NamespaceSummaryItem name="RiakClient" isDocumented="True" xmlns="">The &lt;b&gt;RiakClient&lt;/b&gt; namespace provides some of the commonly used classes of the framework.</NamespaceSummaryItem>
-      <NamespaceSummaryItem name="RiakClient.Comms" isDocumented="False" xmlns="" />
-      <NamespaceSummaryItem name="RiakClient.Comms.LoadBalancing" isDocumented="False" xmlns="" />
-      <NamespaceSummaryItem name="RiakClient.Config" isDocumented="False" xmlns="" />
-      <NamespaceSummaryItem name="RiakClient.Containers" isDocumented="False" xmlns="" />
-      <NamespaceSummaryItem name="RiakClient.Converters" isDocumented="False" xmlns="" />
-      <NamespaceSummaryItem name="RiakClient.Exceptions" isDocumented="False" xmlns="" />
-      <NamespaceSummaryItem name="RiakClient.Extensions" isDocumented="False" xmlns="" />
-      <NamespaceSummaryItem name="RiakClient.Messages" isDocumented="False" xmlns="" />
-      <NamespaceSummaryItem name="RiakClient.Models (Group)" isGroup="True" isDocumented="False" xmlns="" />
-      <NamespaceSummaryItem name="RiakClient.Models" isDocumented="False" xmlns="" />
-      <NamespaceSummaryItem name="RiakClient.Models.CommitHook" isDocumented="False" xmlns="" />
-      <NamespaceSummaryItem name="RiakClient.Models.Index" isDocumented="False" xmlns="" />
-      <NamespaceSummaryItem name="RiakClient.Models.MapReduce" isDocumented="False" xmlns="" />
-      <NamespaceSummaryItem name="RiakClient.Models.MapReduce.Fluent" isDocumented="False" xmlns="" />
-      <NamespaceSummaryItem name="RiakClient.Models.MapReduce.Inputs" isDocumented="False" xmlns="" />
-      <NamespaceSummaryItem name="RiakClient.Models.MapReduce.KeyFilters" isDocumented="False" xmlns="" />
-      <NamespaceSummaryItem name="RiakClient.Models.Rest" isDocumented="False" xmlns="" />
-      <NamespaceSummaryItem name="RiakClient.Models.RiakDt" isDocumented="False" xmlns="" />
-      <NamespaceSummaryItem name="RiakClient.Models.Search" isDocumented="False" xmlns="" />
-      <NamespaceSummaryItem name="RiakClient.Util" isDocumented="False" xmlns="" />
-    </NamespaceSummaries>
+      <NamespaceSummaryItem name="RiakClient" isDocumented="True">The &lt;b&gt;RiakClient&lt;/b&gt; namespace provides some of the commonly used classes of the framework.</NamespaceSummaryItem>
+<NamespaceSummaryItem name="RiakClient.Comms" isDocumented="True">The &lt;b&gt;RiakClient.Comms&lt;/b&gt; namespace provides network communication related classes.</NamespaceSummaryItem>
+<NamespaceSummaryItem name="RiakClient.Comms.LoadBalancing" isDocumented="True">The &lt;b&gt;RiakClient.Comms.LoadBalancing&lt;/b&gt; namespace provides classes that are related to load balancing between Riak nodes.</NamespaceSummaryItem>
+<NamespaceSummaryItem name="RiakClient.Config" isDocumented="True">The &lt;b&gt;RiakClient.Config&lt;/b&gt; namespace provides classes for interacting with XML configuration files.</NamespaceSummaryItem>
+<NamespaceSummaryItem name="RiakClient.Containers" isDocumented="False" />
+<NamespaceSummaryItem name="RiakClient.Converters" isDocumented="False" />
+<NamespaceSummaryItem name="RiakClient.Exceptions" isDocumented="True">The &lt;b&gt;RiakClient.Exceptions&lt;/b&gt; namespace contains custom exceptions that are raised during use of the library.</NamespaceSummaryItem>
+<NamespaceSummaryItem name="RiakClient.Extensions" isDocumented="True">The &lt;b&gt;RiakClient.Exceptions&lt;/b&gt; namespace contains some useful extension methods for interacting with the client.</NamespaceSummaryItem>
+<NamespaceSummaryItem name="RiakClient.Messages" isDocumented="True">The &lt;b&gt;RiakClient.Messages&lt;/b&gt; namespace contains classes related to the protocol buffers API messages.</NamespaceSummaryItem>
+<NamespaceSummaryItem name="RiakClient.Models (Group)" isGroup="True" isDocumented="True">The &lt;b&gt;RiakClient.Models&lt;/b&gt; namespace contains all the models used within the library.</NamespaceSummaryItem>
+<NamespaceSummaryItem name="RiakClient.Models" isDocumented="True">The &lt;b&gt;RiakClient.Models&lt;/b&gt; base namespace contains many Identity, Options, and Results models used in most Riak operations.</NamespaceSummaryItem>
+<NamespaceSummaryItem name="RiakClient.Models.CommitHook" isDocumented="True">The &lt;b&gt;RiakClient.Models.CommitHook&lt;/b&gt; namespace contains all the models used for Riak commit hooks.</NamespaceSummaryItem>
+<NamespaceSummaryItem name="RiakClient.Models.Index" isDocumented="True">The &lt;b&gt;RiakClient.Models.Index&lt;/b&gt; namespace contains all the models used for Secondary Indexes.</NamespaceSummaryItem>
+<NamespaceSummaryItem name="RiakClient.Models.MapReduce" isDocumented="True">The &lt;b&gt;RiakClient.Models.MapReduce&lt;/b&gt; namespace contains all the models used for map reduce.</NamespaceSummaryItem>
+<NamespaceSummaryItem name="RiakClient.Models.MapReduce.Fluent" isDocumented="True">The &lt;b&gt;RiakClient.Models.MapReduce.Fluent&lt;/b&gt; namespace contains all the models used for fluent map reduce configuration.</NamespaceSummaryItem>
+<NamespaceSummaryItem name="RiakClient.Models.MapReduce.Inputs" isDocumented="True">The &lt;b&gt;RiakClient.Models.MapReduce.Input&lt;/b&gt; namespace contains all the models used for map reduce inputs.</NamespaceSummaryItem>
+<NamespaceSummaryItem name="RiakClient.Models.MapReduce.KeyFilters" isDocumented="True">The &lt;b&gt;RiakClient.Models.MapReduce.KeyFilters&lt;/b&gt; namespace contains all the models used for map reduce key filters.</NamespaceSummaryItem>
+<NamespaceSummaryItem name="RiakClient.Models.RiakDt" isDocumented="True">The &lt;b&gt;RiakClient.Models.RiakDt&lt;/b&gt; namespace contains all the models used for Riak Data Types (CRDT's).</NamespaceSummaryItem>
+<NamespaceSummaryItem name="RiakClient.Models.Search" isDocumented="True">The &lt;b&gt;RiakClient.Models.Search&lt;/b&gt; namespace contains all the models used for Riak Search.</NamespaceSummaryItem>
+<NamespaceSummaryItem name="RiakClient.Util" isDocumented="False" /></NamespaceSummaries>
     <RootNamespaceTitle>API Reference</RootNamespaceTitle>
     <VisibleItems>InheritedMembers, InheritedFrameworkMembers, Protected, SealedProtected, ProtectedInternalAsProtected</VisibleItems>
   </PropertyGroup>

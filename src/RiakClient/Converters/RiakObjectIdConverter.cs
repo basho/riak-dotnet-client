@@ -28,7 +28,7 @@ namespace RiakClient.Converters
      * TODO: FUTURE - Figure out if this is still needed
      */
     [ComVisible(false)]
-    public class RiakObjectIdConverter : JsonConverter
+    internal class RiakObjectIdConverter : JsonConverter
     {
         public override bool CanRead
         {

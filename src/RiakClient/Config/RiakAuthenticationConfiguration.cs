@@ -22,9 +22,13 @@ namespace RiakClient.Config
     using System.Configuration;
     using System.Runtime.InteropServices;
 
+    /// <summary>
+    /// Represents a configuration file element for configuring Riak Authentication.
+    /// </summary>
     [ComVisible(false)]
     public class RiakAuthenticationConfiguration : ConfigurationElement, IRiakAuthenticationConfiguration
     {
+        /// <inheritdoc/>
         [ConfigurationProperty("username", DefaultValue = "", IsRequired = true)]
         public string Username
         {
@@ -32,6 +36,7 @@ namespace RiakClient.Config
             set { this["username"] = value; }
         }
 
+        /// <inheritdoc/>
         [ConfigurationProperty("password", DefaultValue = "", IsRequired = false)]
         public string Password
         {
@@ -39,6 +44,7 @@ namespace RiakClient.Config
             set { this["password"] = value; }
         }
 
+        /// <inheritdoc/>
         [ConfigurationProperty("clientCertificateFile", DefaultValue = "", IsRequired = false)]
         public string ClientCertificateFile
         {
@@ -46,6 +52,7 @@ namespace RiakClient.Config
             set { this["clientCertificateFile"] = value; }
         }
 
+        /// <inheritdoc/>
         [ConfigurationProperty("clientCertificateSubject", DefaultValue = "", IsRequired = false)]
         public string ClientCertificateSubject
         {
@@ -53,6 +60,7 @@ namespace RiakClient.Config
             set { this["clientCertificateSubject"] = value; }
         }
 
+        /// <inheritdoc/>
         [ConfigurationProperty("certificateAuthorityFile", DefaultValue = "", IsRequired = false)]
         public string CertificateAuthorityFile
         {
@@ -60,6 +68,7 @@ namespace RiakClient.Config
             set { this["certificateAuthorityFile"] = value; }
         }
 
+        /// <inheritdoc/>
         [ConfigurationProperty("checkCertificateRevocation", DefaultValue = false, IsRequired = false)]
         public bool CheckCertificateRevocation
         {

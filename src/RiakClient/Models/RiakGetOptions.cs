@@ -22,63 +22,78 @@ namespace RiakClient.Models
     using System.Runtime.InteropServices;
     using Messages;
 
+    /// <summary>
+    /// A collection of optional settings for fetching objects from Riak.
+    /// </summary>
     [ComVisible(false)]
     public class RiakGetOptions : RiakOptions<RiakGetOptions>
     {
         private static readonly RiakGetOptions DefaultGetOptions = new RiakGetOptions();
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RiakGetOptions" /> class.
+        /// Uses the "default" quorum settings for R and PR settings.
+        /// </summary>
         public RiakGetOptions()
         {
             R = Quorum.WellKnown.Default;
             Pr = Quorum.WellKnown.Default;
         }
 
+        /// <summary>
+        /// Returns a static readonly instance of the default <see cref="RiakGetOptions"/> option set.
+        /// </summary>
+        /// <returns>A static readonly instance of the default <see cref="RiakGetOptions"/> option set.</returns>
         public static RiakGetOptions Default
         {
             get { return DefaultGetOptions; }
         }
 
         /// <summary>
-        /// Basic Quorum semantics - whether to return early in some failure cases (eg. when r=1 and you get 2 errors and a success basic_quorum=true would return an error)
+        /// Gets or sets basic quorum semantics.
+        /// When set to true, Riak will return early in some failure cases.
+        /// (eg. when r=1 and you get 2 errors and a success basic_quorum=true would return an error).
+        /// Can be used in conjunction when <see cref="NotFoundOk"/>=<b>false</b> to speed up the case an object 
+        /// does not exist, thereby only reading a "quorum" of not-founds instead of "N" not-founds.
         /// </summary>
-        /// <value>
-        /// Whether basic quorum semantics will be used.
-        /// </value>
+        /// <remarks>
+        /// This property is not typically modified.
+        /// See http://docs.basho.com/riak/latest/dev/advanced/replication-properties/#Early-Failure-Return-with-code-basic_quorum-code-
+        /// for more information.
+        /// </remarks>
         public bool? BasicQuorum { get; set; }
 
         /// <summary>
-        /// Should not found responses from Riak be treated as an OK result for a find operation. 
+        /// Gets or sets notfound_ok semantics.
+        /// When set to true, an object not being found on a Riak node will count towards the R count.
         /// </summary>
-        /// <value>
-        /// The notfound_ok value.
-        /// </value>
+        /// <remarks>
+        /// This property is not typically modified.
+        /// See http://docs.basho.com/riak/latest/dev/advanced/replication-properties/#The-Implications-of-code-notfound_ok-code-
+        /// for more information.
+        /// </remarks>
         public bool? NotFoundOk { get; set; }
 
         /// <summary>
-        /// Should Riak only return object metadata
+        /// Return only the object metadata, analogous to an HTTP HEAD request.
+        /// When set to <b>true</b>, Riak will return the object minus its value.
         /// </summary>
-        /// <value>
-        /// The head value.
-        /// </value>
         /// <remarks>
-        /// This allows the user to retrieve the metadata for an otherwise large object value.
+        /// This allows you to get the metadata without a potentially large value.
         /// </remarks>            
         public bool? Head { get; set; }
 
         /// <summary>
-        /// Should tombstone vclocks be returned?
+        /// By default single tombstones are not returned by a fetch operations. 
+        /// When set to <b>true</b>, this will return a Tombstone if it is present.
         /// </summary>
-        /// <value>
-        /// Deleted vclock. A boolean.
-        /// </value>
+        /// <remarks>This property is not typically modified.</remarks>
         public bool? DeletedVclock { get; set; }
 
         /// <summary>
-        /// The reference vclock is supplied results will only returned if the vclocks do not match. 
+        /// When a vector clock is supplied with this option, only return the object if the vector clocks don't match.
         /// </summary>
-        /// <value>
-        /// The reference vclock.
-        /// </value>
+        /// <remarks>This property is not typically modified.</remarks>
         public byte[] IfModified { get; set; }
 
         internal void Populate(RpbGetReq request)

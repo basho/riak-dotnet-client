@@ -22,7 +22,6 @@ namespace RiakClient.Extensions
     using System.Text;
     using System.Text.RegularExpressions;
     using System.Web;
-    using Util;
 
     /// <summary>
     /// Extension methods to assist with conversion between Riak byte[] and strings.

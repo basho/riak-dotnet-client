@@ -22,6 +22,9 @@ namespace RiakClient.Models
     using System.Runtime.InteropServices;
     using Messages;
 
+    /// <summary>
+    /// A collection of options that can be modified when updating a 1.4-style counter in Riak.
+    /// </summary>
     [ComVisible(false)]
     public class RiakCounterUpdateOptions : RiakOptions<RiakCounterUpdateOptions>
     {
@@ -30,6 +33,12 @@ namespace RiakClient.Models
         /// </summary>
         public bool? ReturnValue { get; private set; }
 
+        /// <summary>
+        /// A fluent setter for the <see cref="ReturnValue"/> property.
+        /// Sets whether or not the updated value should be returned from the counter.
+        /// </summary>
+        /// <param name="value">The value to set the property to.</param>
+        /// <returns>A reference to the current options object.</returns>
         public RiakCounterUpdateOptions SetReturnValue(bool value)
         {
             ReturnValue = value;

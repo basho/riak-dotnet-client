@@ -21,8 +21,12 @@ namespace RiakClient.Models.RiakDt
 {
     using Messages;
 
+    /// <summary>
+    /// Represents an operation on a Riak Set data type.
+    /// </summary>
     public class SetOperation : IDtOp
     {
+        /// <inheritdoc/>
         public DtOp ToDtOp()
         {
             return new DtOp

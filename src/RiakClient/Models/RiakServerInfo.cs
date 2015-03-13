@@ -22,6 +22,9 @@ namespace RiakClient.Models
     using Extensions;
     using Messages;
 
+    /// <summary>
+    /// A collection of server info that can be queried from a single Riak node.
+    /// </summary>
     public class RiakServerInfo
     {
         private readonly string node;
@@ -33,11 +36,17 @@ namespace RiakClient.Models
             this.version = resp.server_version.FromRiakString();
         }
 
+        /// <summary>
+        /// The Riak node's "name".
+        /// </summary>
         public string Node
         {
             get { return node; }
         }
 
+        /// <summary>
+        /// The Riak node's version string.
+        /// </summary>
         public string Version
         {
             get { return version; }
