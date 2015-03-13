@@ -29,7 +29,7 @@ namespace RiakClientExamples.Dev.Using
     public sealed class Updates : ExampleBase
     {
         [Test]
-        public void ExampleUpdate()
+        public void ExamplePut()
         {
             id = PutCoach("seahawks", "Pete Carroll");
         }
@@ -64,13 +64,14 @@ namespace RiakClientExamples.Dev.Using
 
         private void UpdateCoach(string team, string newCoach)
         {
-            id = new RiakObjectId("siblings", "coaches", team);
+            var id = new RiakObjectId("siblings", "coaches", team);
             var getResult = client.Get(id);
             CheckResult(getResult);
 
             RiakObject obj = getResult.Value;
             obj.SetObject<string>(newCoach, RiakConstants.ContentTypes.TextPlain);
-            rslt = client.Put(obj);
+            var rslt = client.Put(obj);
+            CheckResult(rslt);
         }
     }
 }
