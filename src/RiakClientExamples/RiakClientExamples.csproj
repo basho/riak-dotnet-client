@@ -62,12 +62,13 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Dev\Advanced\BucketTypes.cs" />
     <Compile Include="Dev\Using\ConflictResolution\ResolutionExamples.cs" />
     <Compile Include="Dev\Using\Updates.cs" />
     <Compile Include="Dev\Using\Search.cs" />
     <Compile Include="Dev\Using\DataTypes.cs" />
     <Compile Include="Dev\Using\SecondaryIndexes.cs" />
-    <Compile Include="Dev\Using\ExampleBase.cs" />
+    <Compile Include="ExampleBase.cs" />
     <Compile Include="Dev\Using\Basics.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
