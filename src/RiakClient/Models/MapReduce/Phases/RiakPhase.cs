@@ -28,18 +28,33 @@ namespace RiakClient.Models.MapReduce.Phases
     {
         private bool keep;
 
+        /// <summary>
+        /// Property to hold this phase's type string.
+        /// </summary>
         public abstract string PhaseType { get; }
 
+        /// <summary>
+        /// Returns a JSON string that represents the RiakPhase.
+        /// </summary>
+        /// <returns>A JSON string representation of the phase.</returns>
         public override string ToString()
         {
             return ToJsonString();
         }
 
+        /// <summary>
+        /// The option to keep the results of this phase, or just pass them onto the next phase.
+        /// </summary>
+        /// <param name="keep"><b>true</b> to keep the phase results for the final result set, <b>false</b> to omit them. </param>
         public void Keep(bool keep)
         {
             this.keep = keep;
         }
 
+        /// <summary>
+        /// Serialize this phase to JSON.
+        /// </summary>
+        /// <returns>The phase as a JSON string.</returns>
         public string ToJsonString()
         {
             /*

@@ -23,7 +23,7 @@ namespace RiakClient.Comms
     using System.Collections.Generic;
     using Config;
 
-    public class RiakNode : IRiakNode
+    internal class RiakNode : IRiakNode
     {
         private readonly IRiakConnectionManager connections;
         private bool disposing;

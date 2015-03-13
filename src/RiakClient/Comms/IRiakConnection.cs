@@ -22,13 +22,14 @@ namespace RiakClient.Comms
     using System;
     using System.Collections.Generic;
     using Messages;
-    using Models.Rest;
 
+    /// <summary>
+    /// The public interface for connections to Riak.
+    /// </summary>
     public interface IRiakConnection : IDisposable
     {
         void Disconnect();
 
-        // PBC interface
         RiakResult<TResult> PbcRead<TResult>()
             where TResult : class, new();
 
@@ -76,8 +77,5 @@ namespace RiakClient.Comms
             Func<RiakResult<TResult>, bool> repeatRead,
             Action onFinish)
             where TResult : class, new();
-
-        // REST interface
-        RiakResult<RiakRestResponse> RestRequest(RiakRestRequest request);
     }
 }

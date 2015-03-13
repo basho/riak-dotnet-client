@@ -33,11 +33,20 @@ namespace RiakClient.Models.MapReduce.Phases
             this.language = new TLanguage();
         }
 
+        /// <summary>
+        /// The language type of the phase.
+        /// (<see cref="RiakPhaseLanguageErlang"/> or <see cref="RiakPhaseLanguageJavascript"/>).
+        /// </summary>
         public TLanguage Language
         {
             get { return language; }
         }
 
+        /// <summary>
+        /// The optional arguments to pass onto the phase function.
+        /// </summary>
+        /// <typeparam name="T">The type of the <paramref name="argument"/> parameter.</typeparam>
+        /// <param name="argument">The argument to pass on.</param>
         public void Argument<T>(T argument)
         {
             this.argument = argument;

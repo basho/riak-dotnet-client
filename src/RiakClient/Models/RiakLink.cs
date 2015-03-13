@@ -25,14 +25,30 @@ namespace RiakClient.Models
     using Messages;
     using Newtonsoft.Json;
 
+    /// <summary>
+    /// Represents a link to another Riak object. Used for simple graph database mechanisms.
+    /// </summary>
     public class RiakLink
     {
+        /// <summary>
+        /// Represents the <see cref="RiakLink"/> that will follow all links during linkwalking.
+        /// </summary>
         public static readonly RiakLink AllLinks = new RiakLink(string.Empty, string.Empty, string.Empty);
 
         private readonly string bucket;
         private readonly string key;
         private readonly string tag;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RiakLink" /> class.
+        /// </summary>
+        /// <param name="bucket">The target bucket name for the link.</param>
+        /// <param name="key">The target key for the link.</param>
+        /// <param name="tag">The link tag.</param>
+        /// <remarks>
+        /// Can only be used with objects in the Default Bucket Type.
+        /// Linkwalking is depreciated, and this class may be removed in the future.
+        /// </remarks>
         public RiakLink(string bucket, string key, string tag)
         {
             this.bucket = bucket;
@@ -47,21 +63,40 @@ namespace RiakClient.Models
             this.tag = link.tag.FromRiakString();
         }
 
+        /// <summary>
+        /// Get the target bucket name.
+        /// </summary>
         public string Bucket
         {
             get { return bucket; }
         }
 
+        /// <summary>
+        /// Get the target key.
+        /// </summary>
         public string Key
         {
             get { return key; }
         }
 
+        /// <summary>
+        /// Get the link tag.
+        /// </summary>
         public string Tag
         {
             get { return tag; }
         }
 
+        /// <summary>
+        /// Parse the <paramref name="jsonString"/> parameter into a string array,  
+        /// and initialize a new instance of the <see cref="RiakLink" /> class using the
+        /// information it contains.
+        /// </summary>
+        /// <param name="jsonString">
+        /// A string containing a JSON-formatted array of 3 strings in the following order:
+        /// ["Bucket", "Key", "Tag"].
+        /// </param>
+        /// <returns>A new instance of the <see cref="RiakLink"/> class.</returns>
         public static RiakLink FromJsonString(string jsonString)
         {
             var rawLink = JsonConvert.DeserializeObject<string[]>(jsonString);
@@ -69,15 +104,11 @@ namespace RiakClient.Models
             return new RiakLink(rawLink[0], rawLink[1], rawLink[2]);
         }
 
-        public static IList<RiakLink> ParseArrayFromJsonString(string jsonString)
-        {
-            // FIXME HAX!
-            jsonString = jsonString.Replace("]][[", "],[");
-            var rawLinks = JsonConvert.DeserializeObject<IList<IList<string>>>(jsonString);
-
-            return rawLinks.Select(FromArray).ToList();
-        }
-
+        /// <summary>
+        /// Determines whether the specified object is equal to the current object.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current object.</param>
+        /// <returns><b>true</b> if the specified object is equal to the current object, otherwise, <b>false</b>.</returns>
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj))
@@ -93,6 +124,11 @@ namespace RiakClient.Models
             return Equals(obj as RiakLink);
         }
 
+        /// <summary>
+        /// Determines whether the specified object is equal to the current object.
+        /// </summary>
+        /// <param name="other">The object to compare with the current object.</param>
+        /// <returns><b>true</b> if the specified object is equal to the current object, otherwise, <b>false</b>.</returns>
         public bool Equals(RiakLink other)
         {
             if (ReferenceEquals(null, other))
@@ -108,6 +144,11 @@ namespace RiakClient.Models
             return Equals(other.Bucket, bucket) && Equals(other.Key, key) && Equals(other.Tag, tag);
         }
 
+        /// <summary>
+        /// Returns a hash code for the current object.
+        /// Uses a combination of the public properties to generate a unique hash code.
+        /// </summary>
+        /// <returns>A hash code for the current object.</returns>
         public override int GetHashCode()
         {
             unchecked
@@ -117,6 +158,16 @@ namespace RiakClient.Models
                 result = (result * 397) ^ (tag != null ? tag.GetHashCode() : 0);
                 return result;
             }
+        }
+
+        // TODO: Document this better.
+        internal static IList<RiakLink> ParseArrayFromJsonString(string jsonString)
+        {
+            // FIXME HAX!
+            jsonString = jsonString.Replace("]][[", "],[");
+            var rawLinks = JsonConvert.DeserializeObject<IList<IList<string>>>(jsonString);
+
+            return rawLinks.Select(FromArray).ToList();
         }
 
         internal RpbLink ToMessage()

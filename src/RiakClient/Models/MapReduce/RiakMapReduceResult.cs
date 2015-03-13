@@ -21,9 +21,11 @@ namespace RiakClient.Models.MapReduce
 {
     using System.Collections.Generic;
     using System.Linq;
-    using Extensions;
     using Messages;
 
+    /// <summary>
+    /// Represents a Riak mapreduce result.
+    /// </summary>
     public class RiakMapReduceResult : IRiakMapReduceResult
     {
         private readonly IEnumerable<RiakMapReduceResultPhase> phaseResults;
@@ -43,6 +45,7 @@ namespace RiakClient.Models.MapReduce
             phaseResults = phases.OrderBy(p => p.Phase).Select(p => p.Success ? new RiakMapReduceResultPhase(p.Phase, p.PhaseResults) : new RiakMapReduceResultPhase()).ToList();
         }
 
+        /// <inheritdoc/>
         public IEnumerable<RiakMapReduceResultPhase> PhaseResults
         {
             get { return phaseResults; }

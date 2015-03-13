@@ -607,6 +607,11 @@ namespace RiakClient.Models
             return new RiakObjectId(BucketType, Bucket, Key);
         }
 
+        /// <summary>
+        /// Determines whether the specified object is equal to the current object.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current object.</param>
+        /// <returns><b>true</b> if the specified object is equal to the current object, otherwise, <b>false</b>.</returns>
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj))
@@ -627,6 +632,11 @@ namespace RiakClient.Models
             return Equals((RiakObject)obj);
         }
 
+        /// <summary>
+        /// Determines whether the specified object is equal to the current object.
+        /// </summary>
+        /// <param name="other">The object to compare with the current object.</param>
+        /// <returns><b>true</b> if the specified object is equal to the current object, otherwise, <b>false</b>.</returns>
         public bool Equals(RiakObject other)
         {
             if (ReferenceEquals(null, other))
@@ -660,6 +670,11 @@ namespace RiakClient.Models
                 && other.IntIndexes.SequenceEqual(IntIndexes);
         }
 
+        /// <summary>
+        /// Returns a hash code for the current object.
+        /// Uses a combination of the public properties to generate a unique hash code.
+        /// </summary>
+        /// <returns>A hash code for the current object.</returns>
         public override int GetHashCode()
         {
             return CalculateHashCode();

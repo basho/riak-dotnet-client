@@ -19,7 +19,7 @@
 
 namespace RiakClient.Containers
 {
-    public interface IConcurrentEnumerable<T>
+    internal interface IConcurrentEnumerable<T>
     {
         IConcurrentEnumerator<T> GetEnumerator();
     }

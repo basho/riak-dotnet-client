@@ -19,15 +19,22 @@
 
 namespace RiakClient.Models.Search
 {
-    using System;
     using Extensions;
     using Messages;
 
+    /// <summary>
+    /// Represents a Lucene search schema.
+    /// </summary>
     public class SearchSchema
     {
         private readonly string name;
         private readonly string content;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SearchSchema"/> class.
+        /// </summary>
+        /// <param name="name">The name of the schema.</param>
+        /// <param name="content">A string containing the schema.</param>
         public SearchSchema(string name, string content)
         {
             this.name = name;
@@ -40,11 +47,17 @@ namespace RiakClient.Models.Search
             this.content = schema.content.FromRiakString();
         }
 
+        /// <summary>
+        /// The name of the search schema.
+        /// </summary>
         public string Name
         {
             get { return name; }
         }
 
+        /// <summary>
+        /// A string containing the schema.
+        /// </summary>
         public string Content
         {
             get { return content; }

@@ -19,23 +19,27 @@
 
 namespace RiakClient.Comms.LoadBalancing
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using Containers;
 
+    /// <summary>
+    /// Represents a Round-Robin based load balancing strategy.
+    /// </summary>
     public class RoundRobinStrategy : ILoadBalancingStrategy
     {
         private readonly object nodesLock = new object();
         private IList<IRiakNode> nodes;
         private IConcurrentEnumerator<IRiakNode> roundRobin;
 
+        /// <inheritdoc/>
         public void Initialise(IEnumerable<IRiakNode> nodes)
         {
             this.nodes = nodes.ToList();
             this.roundRobin = new ConcurrentEnumerable<IRiakNode>(RoundRobin()).GetEnumerator();
         }
 
+        /// <inheritdoc/>
         public IRiakNode SelectNode()
         {
             IRiakNode node = null;
@@ -48,6 +52,7 @@ namespace RiakClient.Comms.LoadBalancing
             return null;
         }
 
+        /// <inheritdoc/>
         public void RemoveNode(IRiakNode node)
         {
             lock (nodesLock)
@@ -59,6 +64,7 @@ namespace RiakClient.Comms.LoadBalancing
             }
         }
 
+        /// <inheritdoc/>
         public void AddNode(IRiakNode node)
         {
             lock (nodesLock)
