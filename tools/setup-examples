@@ -96,10 +96,19 @@ $riak_admin bucket-type create n_val_of_5 '{"props":{"n_val":5}}'
 $riak_admin bucket-type activate n_val_of_5
 
 $riak_admin bucket-type create maps '{"props":{"datatype":"map"}}'
-$riak_admin bucket-type create sets '{"props":{"datatype":"set"}}'
-$riak_admin bucket-type create counters '{"props":{"datatype":"counter"}}'
+$riak_admin bucket-type activate maps
 
-$riak_admin bucket-type create siblings '{"props":{"allow_mult":"true"}}'
+$riak_admin bucket-type create sets '{"props":{"datatype":"set"}}'
+$riak_admin bucket-type activate sets
+
+$riak_admin bucket-type create counters '{"props":{"datatype":"counter"}}'
+$riak_admin bucket-type activate counters
+
+$riak_admin bucket-type create siblings '{"props":{"allow_mult":true}}'
+$riak_admin bucket-type activate siblings
+
+$riak_admin bucket-type create siblings_allowed '{"props":{"allow_mult":true}}'
+$riak_admin bucket-type activate siblings_allowed
 
 set -o errexit
 
