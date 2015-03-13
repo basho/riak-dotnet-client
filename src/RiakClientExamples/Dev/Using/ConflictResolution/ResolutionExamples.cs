@@ -18,10 +18,12 @@
 
 namespace RiakClientExamples.Dev.Using.ConflictResolution
 {
+    using System.Linq;
     using System.Diagnostics;
     using NUnit.Framework;
     using RiakClient;
     using RiakClient.Models;
+    using System.Text;
 
     /*
      * http://docs.basho.com/riak/latest/dev/using/conflict-resolution/
@@ -33,6 +35,17 @@ namespace RiakClientExamples.Dev.Using.ConflictResolution
         public void StoringTwoValuesToSameKeyShowingSiblings()
         {
             id = PutNickolodeonCharacters();
+
+            var getResult = client.Get(id);
+            RiakObject obj = getResult.Value;
+            Assert.AreEqual(2, obj.Siblings.Count);
+            Debug.WriteLine(format: "Sibling count: {0}", args: obj.Siblings.Count);
+            foreach (var sibling in obj.Siblings)
+            {
+                Debug.WriteLine(
+                    format: "    VTag: {0}",
+                    args: sibling.VTag);
+            }
         }
 
         [Test]
@@ -57,6 +70,28 @@ namespace RiakClientExamples.Dev.Using.ConflictResolution
             Assert.AreEqual(0, obj.Siblings.Count);
         }
 
+        [Test]
+        public void ResolvingSiblingsWithUpdateUsingFirstSibling()
+        {
+            id = PutNickolodeonCharacters();
+
+            // First, fetch the object
+            var getResult = client.Get(id);
+
+            // Then, pick the first sibling
+            RiakObject chosenSibling = getResult.Value.Siblings.First();
+
+            // Then, store the chosen object
+            var putRslt = client.Put(chosenSibling);
+            CheckResult(putRslt);
+
+            RiakObject updatedObject = putRslt.Value;
+            // Voila, no more siblings!
+            Debug.Assert(updatedObject.Siblings.Count == 0);
+            Assert.AreEqual(0, updatedObject.Siblings.Count);
+            Assert.AreEqual("Ren", Encoding.UTF8.GetString(updatedObject.Value));
+        }
+
         private RiakObjectId PutNickolodeonCharacters()
         {
             var id = new RiakObjectId("siblings_allowed", "nickolodeon", "best_character");
@@ -69,17 +104,6 @@ namespace RiakClientExamples.Dev.Using.ConflictResolution
 
             var stimpyResult = client.Put(stimpyObj);
             CheckResult(stimpyResult);
-
-            var getResult = client.Get(id);
-            RiakObject obj = getResult.Value;
-            Assert.AreEqual(2, obj.Siblings.Count);
-            Debug.WriteLine(format: "Sibling count: {0}", args: obj.Siblings.Count);
-            foreach (var sibling in obj.Siblings)
-            {
-                Debug.WriteLine(
-                    format: "    VTag: {0}",
-                    args: sibling.VTag);
-            }
 
             return id;
         }
