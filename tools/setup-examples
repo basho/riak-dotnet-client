@@ -110,6 +110,9 @@ $riak_admin bucket-type activate siblings
 $riak_admin bucket-type create siblings_allowed '{"props":{"allow_mult":true}}'
 $riak_admin bucket-type activate siblings_allowed
 
+$riak_admin bucket-type create no_siblings '{"props":{"allow_mult":false}}'
+$riak_admin bucket-type activate no_siblings
+
 set -o errexit
 
 pinfo "Done!"
