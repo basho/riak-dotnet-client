@@ -31,7 +31,7 @@ namespace RiakClient.Models.RiakDt
         /// Initializes a new instance of the <see cref="CounterOperation"/> class.
         /// </summary>
         /// <param name="value">The value to initialize the counter to.</param>
-        internal CounterOperation(long value)
+        public CounterOperation(long value)
         {
             this.value = value;
         }

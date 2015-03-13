@@ -38,7 +38,7 @@ namespace RiakClient.Models.RiakDt
         /// <summary>
         /// Initializes a new instance of the <see cref="RiakDtCounter"/> class.
         /// </summary>
-        internal RiakDtCounter()
+        public RiakDtCounter()
         {
         }
 
@@ -52,7 +52,7 @@ namespace RiakClient.Models.RiakDt
         /// <param name="key">The key of this counter's object.</param>
         /// <param name="response">The response containing the counter's server-side value and context.</param>
         /// <remarks>Not used.</remarks>
-        internal RiakDtCounter(string bucket, string bucketType, string key, DtFetchResp response)
+        public RiakDtCounter(string bucket, string bucketType, string key, DtFetchResp response)
         {
             Bucket = bucket;
             BucketType = bucketType;

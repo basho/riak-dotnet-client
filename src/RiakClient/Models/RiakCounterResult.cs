@@ -26,12 +26,21 @@ namespace RiakClient.Models
     {
         private readonly RiakResult<RiakObject> result;
 
-        internal RiakCounterResult(RiakResult<RiakObject> result)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RiakCounterResult"/> class.
+        /// </summary>
+        /// <param name="result">The <see cref="RiakResult{T}"/> to populate the new <see cref="RiakCounterResult"/> from.</param>
+        public RiakCounterResult(RiakResult<RiakObject> result)
         {
             this.result = result;
         }
 
-        internal RiakCounterResult(RiakResult<RiakObject> result, long? value) : this(result)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RiakCounterResult"/> class.
+        /// </summary>
+        /// <param name="result">The <see cref="RiakResult{T}"/> to populate the new <see cref="RiakCounterResult"/> from.</param>
+        /// <param name="value">The current value of the counter.</param>
+        public RiakCounterResult(RiakResult<RiakObject> result, long? value) : this(result)
         {
             this.Value = value;
         }

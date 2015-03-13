@@ -26,7 +26,13 @@ namespace RiakClient.Models.RiakDt
     /// </summary>
     public class RiakDtMapResult
     {
-        internal RiakDtMapResult(
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RiakDtMapResult"/> class.
+        /// </summary>
+        /// <param name="result">The operation result.</param>
+        /// <param name="context">The current context, if one was returned with the operation result.</param>
+        /// <param name="values">The current collection of <see cref="RiakDtMapEntry"/>s, if they were returned with the operation result.</param>
+        public RiakDtMapResult(
             RiakResult<RiakObject> result,
             byte[] context = null,
             List<RiakDtMapEntry> values = null)
