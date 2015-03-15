@@ -6,6 +6,7 @@ set -o nounset
 # Defaults
 declare -r riak_admin=dev1/bin/riak-admin
 declare -r default_dev_cluster_path="$HOME/Projects/basho/riak/dev"
+opt_setup_document_store='false'
 
 script_dir=''
 script_path=''
@@ -55,17 +56,22 @@ function usage
       echo "
 setup-examples: Set up your dev cluster to run RiakClientExamples project
 
-Usage: setup-dev-cluster [-p <riak dev path>]
+Usage: setup-dev-cluster [-d] [-p <riak dev path>]
 
+-d      Set up bucket types for Document Store examples. Run this
+        *after* creating the blog_post_schema and blog_posts items
+        in Riak Search.
 -p      Riak dev path (Default: \"$default_dev_cluster_path\")
 "
       exit 0
 }
 
-while getopts "p:" opt; do
+while getopts "dp:" opt; do
     case $opt in
         p)
             opt_dev_cluster_path="$OPTARG";;
+        d)
+            opt_setup_document_store='true';;
         *)
             usage;;
     esac
@@ -112,6 +118,15 @@ $riak_admin bucket-type activate siblings_allowed
 
 $riak_admin bucket-type create no_siblings '{"props":{"allow_mult":false}}'
 $riak_admin bucket-type activate no_siblings
+
+# Note:
+# run the following commands for the "Document Store" examples
+# You must create the blog_posts index first
+if [[ $opt_setup_document_store == 'true' ]]
+then
+    $riak_admin bucket-type create cms '{"props":{"datatype":"map","search_index":"blog_posts"}}'
+    $riak_admin bucket-type activate cms
+fi
 
 set -o errexit
 
