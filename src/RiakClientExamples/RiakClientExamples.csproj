@@ -64,7 +64,12 @@
     </Compile>
     <Compile Include="Dev\Advanced\SearchSchemaExamples.cs" />
     <Compile Include="Dev\Advanced\BucketTypes.cs" />
+    <Compile Include="Dev\Search\Models\BlogPost.cs" />
     <Compile Include="Dev\Search\DocumentStore.cs" />
+    <Compile Include="Dev\Search\Models\IModel.cs" />
+    <Compile Include="Dev\Search\Repositories\BlogPostRepository.cs" />
+    <Compile Include="Dev\Search\Repositories\IRepository.cs" />
+    <Compile Include="Dev\Search\Repositories\Repository.cs" />
     <Compile Include="Dev\Using\ConflictResolution\ResolutionExamples.cs" />
     <Compile Include="Dev\Using\Updates.cs" />
     <Compile Include="Dev\Using\Search.cs" />
