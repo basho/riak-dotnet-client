@@ -16,7 +16,7 @@
 // under the License.
 // </copyright>
 
-namespace RiakClientExamples.Dev.Using
+namespace RiakClientExamples.Dev.Advanced
 {
     using NUnit.Framework;
     using RiakClient;
