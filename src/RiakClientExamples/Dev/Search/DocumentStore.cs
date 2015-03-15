@@ -73,7 +73,7 @@ namespace RiakClientExamples.Dev.Search
         }
 
         [Test]
-        public void CreateSearchIndex()
+        public void StoreBlogPost()
         {
             Assert.True(1 == 1);
         }
