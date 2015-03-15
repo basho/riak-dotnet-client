@@ -24,6 +24,9 @@ namespace RiakClient.Models.Index
     using Extensions;
     using Messages;
 
+    /// <summary>
+    /// Represents a result to an index query.
+    /// </summary>
     public class RiakIndexResult : IRiakIndexResult
     {
         private readonly IEnumerable<RiakIndexKeyTerm> indexKeyTerms;
@@ -41,6 +44,7 @@ namespace RiakClient.Models.Index
             }
         }
 
+        /// <inheritdoc/>
         public IEnumerable<RiakIndexKeyTerm> IndexKeyTerms
         {
             get { return indexKeyTerms; }

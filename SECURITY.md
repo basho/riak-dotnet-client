@@ -83,13 +83,13 @@ Riak Security:
     <nodes>
       <node name="node1"
             hostAddress="riak-node1.mydomain.internal"
-            pbcPort="8097" restScheme="http" restPort="8098" poolSize="16" />
+            pbcPort="8097" poolSize="16" />
       <node name="node2"
             hostAddress="riak-node2.mydomain.internal"
-            pbcPort="8097" restScheme="http" restPort="8098" poolSize="16" />
+            pbcPort="8097" poolSize="16" />
       <node name="node3"
             hostAddress="riak-node3.mydomain.internal"
-            pbcPort="8097" restScheme="http" restPort="8098" poolSize="16" />
+            pbcPort="8097" poolSize="16" />
     </nodes>
   </riakConfiguration>
 </configuration>

@@ -25,12 +25,18 @@ namespace RiakClient.Config
     using System.Linq;
     using System.Runtime.InteropServices;
 
+    /// <summary>
+    /// Represents the configuration file section for a Riak Cluster.
+    /// </summary>
     [ComVisible(false)]
     public sealed class RiakClusterConfiguration : ConfigurationSection, IRiakClusterConfiguration
     {
         private static readonly Timeout DefaultNodePollTime = new Timeout(TimeSpan.FromSeconds(5));
         private static readonly Timeout DefaultDefaultRetryWaitTime = new Timeout(200);
 
+        /// <summary>
+        /// A collection of <see cref="IRiakNodeConfiguration"/> configurations detailing the Riak nodes that can be connected to.
+        /// </summary>
         [ConfigurationProperty("nodes", IsDefaultCollection = true, IsRequired = true)]
         [ConfigurationCollection(typeof(RiakNodeConfigurationCollection), AddItemName = "node")]
         public RiakNodeConfigurationCollection Nodes
@@ -39,11 +45,14 @@ namespace RiakClient.Config
             set { this["nodes"] = value; }
         }
 
+        /// <inheritdoc/>
         IList<IRiakNodeConfiguration> IRiakClusterConfiguration.RiakNodes
         {
             get { return this.Nodes.Cast<IRiakNodeConfiguration>().ToList(); }
         }
 
+        /// <inheritdoc/>
+        /// <remarks>Defaults to 5000ms if omitted from the configuration file.</remarks>
         public Timeout NodePollTime
         {
             get
@@ -60,6 +69,8 @@ namespace RiakClient.Config
             }
         }
 
+        /// <inheritdoc/>
+        /// <remarks>Defaults to 200ms if omitted from the configuration file.</remarks>
         public Timeout DefaultRetryWaitTime
         {
             get
@@ -76,6 +87,8 @@ namespace RiakClient.Config
             }
         }
 
+        /// <inheritdoc/>
+        /// <remarks>Defaults to 3 if omitted from the configuration file.</remarks>
         [ConfigurationProperty("defaultRetryCount", DefaultValue = 3, IsRequired = false)]
         public int DefaultRetryCount
         {
@@ -83,12 +96,16 @@ namespace RiakClient.Config
             set { this["defaultRetryCount"] = value; }
         }
 
+        /// <summary>
+        /// A <see cref="IRiakAuthenticationConfiguration"/> configuration that details any authentication information.
+        /// </summary>
         [ConfigurationProperty("authentication", IsRequired = false)]
         public RiakAuthenticationConfiguration Authentication
         {
             get { return (RiakAuthenticationConfiguration)this["authentication"]; }
         }
 
+        /// <inheritdoc/>
         IRiakAuthenticationConfiguration IRiakClusterConfiguration.Authentication
         {
             get { return this.Authentication; }
@@ -108,11 +125,24 @@ namespace RiakClient.Config
             set { this["nodePollTime"] = value; }
         }
 
+        /// <summary>
+        /// Load a <see cref="RiakClusterConfiguration"/> from the local configuration file,
+        /// and return a new <see cref="IRiakClusterConfiguration"/>. 
+        /// </summary>
+        /// <param name="sectionName">The section to load the configuration from.</param>
+        /// <returns>An initialized and configured <see cref="IRiakClusterConfiguration"/>.</returns>
         public static IRiakClusterConfiguration LoadFromConfig(string sectionName)
         {
             return (IRiakClusterConfiguration)ConfigurationManager.GetSection(sectionName);
         }
 
+        /// <summary>
+        /// Load a <see cref="RiakClusterConfiguration"/> from a specified configuration file,
+        /// and return a new <see cref="IRiakClusterConfiguration"/>.
+        /// </summary>
+        /// <param name="sectionName">The section to load the configuration from.</param>
+        /// <param name="fileName">The file containing the configuration section.</param>
+        /// <returns>An initialized and configured <see cref="IRiakClusterConfiguration"/>.</returns>
         public static IRiakClusterConfiguration LoadFromConfig(string sectionName, string fileName)
         {
             var map = new ConfigurationFileMap(fileName);

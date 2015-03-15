@@ -23,40 +23,68 @@ namespace RiakClient.Models.Search
     using Extensions;
     using Messages;
 
+    /// <summary>
+    /// Represents a Lucene search index.
+    /// </summary>
     public class SearchIndex
     {
         private readonly string name;
         private readonly string schemaName;
         private readonly NVal nval;
 
-        public SearchIndex(string name)
-            : this(name, RiakConstants.Defaults.YokozunaIndex.IndexName, new NVal(RiakConstants.Defaults.YokozunaIndex.NVal))
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SearchIndex"/> class.
+        /// </summary>
+        /// <param name="indexName">The name of the index.</param>
+        /// <remarks>
+        /// Uses the default schema name (<see cref="RiakConstants.Defaults.YokozunaIndex.DefaultSchemaName"/>), 
+        /// and NVal value (<see cref="RiakConstants.Defaults.YokozunaIndex.NVal"/>).
+        /// </remarks>
+        public SearchIndex(string indexName)
+            : this(indexName, RiakConstants.Defaults.YokozunaIndex.DefaultSchemaName, new NVal(RiakConstants.Defaults.YokozunaIndex.NVal))
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SearchIndex"/> class.
+        /// </summary>
+        /// <param name="indexName">The name of the index.</param>
+        /// <param name="schemaName">The name of the schema for the index.</param>
+        /// <remarks>
+        /// Uses the provided schema name and default NVal value (<see cref="RiakConstants.Defaults.YokozunaIndex.NVal"/>).
+        /// </remarks>
         public SearchIndex(string name, string schemaName)
             : this(name, schemaName, new NVal(RiakConstants.Defaults.YokozunaIndex.NVal))
         {
         }
 
-        public SearchIndex(string name, string schemaName, NVal nval)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SearchIndex"/> class.
+        /// </summary>
+        /// <param name="indexName">The name of the index.</param>
+        /// <param name="schemaName">The name of the schema for the index.</param>
+        /// <param name="nval">The <see cref="NVal"/> value for storing index entries.</param>
+        /// <exception cref="ArgumentException"><paramref name="indexName"/> cannot be null, zero length, or whitespace</exception>
+        /// <exception cref="ArgumentException"><paramref name="schemaName"/> cannot be null, zero length, or whitespace</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The value of <paramref name="nval"/> must not be null.</exception>
+        public SearchIndex(string indexName, string schemaName, NVal nval)
         {
-            if (string.IsNullOrWhiteSpace(name))
+            if (string.IsNullOrWhiteSpace(indexName))
             {
-                throw new ArgumentException("Index Name cannot be null, zero length, or whitespace");
+                throw new ArgumentException("Index Name cannot be null, zero length, or whitespace.");
             }
 
             if (string.IsNullOrWhiteSpace(schemaName))
             {
-                throw new ArgumentException("Schema Name cannot be null, zero length, or whitespace");
+                throw new ArgumentException("Schema Name cannot be null, zero length, or whitespace.");
             }
 
             if (nval == null)
             {
-                throw new ArgumentNullException("nval must be greater than 0");
+                throw new ArgumentOutOfRangeException("nval", "nval must not be null.");
             }
 
-            this.name = name;
+            this.name = indexName;
             this.nval = nval;
             this.schemaName = schemaName;
         }
@@ -68,16 +96,26 @@ namespace RiakClient.Models.Search
             this.nval = new NVal(index.n_val);
         }
 
+        /// <summary>
+        /// The name of the index.
+        /// </summary>
         public string Name
         {
             get { return name; }
         }
 
+        /// <summary>
+        /// The name of the index's schema.
+        /// </summary>
         public string SchemaName
         {
             get { return schemaName; }
         }
 
+        /// <summary>
+        /// The <see cref="NVal"/> value for storing index entries.
+        /// I.e. - the number of copies to store the index to.
+        /// </summary>
         public NVal NVal
         {
             get { return nval; }

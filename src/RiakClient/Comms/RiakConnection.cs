@@ -21,26 +21,16 @@ namespace RiakClient.Comms
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Net;
-    using System.Text;
     using Config;
     using Exceptions;
-    using Extensions;
     using Messages;
-    using Models.Rest;
-    using Util;
 
     internal class RiakConnection : IRiakConnection
     {
-        private readonly string restRootUrl;
         private readonly RiakPbcSocket socket;
 
         public RiakConnection(IRiakNodeConfiguration nodeConfiguration, IRiakAuthenticationConfiguration authConfiguration)
         {
-            restRootUrl = string.Format(@"{0}://{1}:{2}", nodeConfiguration.RestScheme, nodeConfiguration.HostAddress, nodeConfiguration.RestPort);
-
             socket = new RiakPbcSocket(nodeConfiguration, authConfiguration);
         }
 
@@ -287,104 +277,6 @@ namespace RiakClient.Comms
         {
             var streamer = PbcWriteStreamReadIterator(messageCode, repeatRead, onFinish);
             return RiakResult<IEnumerable<RiakResult<TResult>>>.Success(streamer);
-        }
-
-        public RiakResult<RiakRestResponse> RestRequest(RiakRestRequest restRequest)
-        {
-            var baseUri = new StringBuilder(restRootUrl).Append(restRequest.Uri);
-
-            if (restRequest.QueryParams.Count > 0)
-            {
-                baseUri.Append("?");
-                var first = restRequest.QueryParams.First();
-                baseUri.Append(first.Key.UrlEncoded()).Append("=").Append(first.Value.UrlEncoded());
-                foreach (var queryParam in restRequest.QueryParams.Skip(1))
-                {
-                    baseUri.Append("&").Append(queryParam.Key.UrlEncoded()).Append("=").Append(queryParam.Value.UrlEncoded());
-                }
-            }
-
-            var targetUri = new Uri(baseUri.ToString());
-
-            var httpWebRequest = (HttpWebRequest)WebRequest.Create(targetUri);
-            httpWebRequest.KeepAlive = true;
-            httpWebRequest.Method = restRequest.Method;
-            httpWebRequest.Credentials = CredentialCache.DefaultCredentials;
-
-            if (!string.IsNullOrWhiteSpace(restRequest.ContentType))
-            {
-                httpWebRequest.ContentType = restRequest.ContentType;
-            }
-
-            if (!restRequest.Cache)
-            {
-                httpWebRequest.Headers.Set(RiakConstants.Rest.HttpHeaders.DisableCacheKey, RiakConstants.Rest.HttpHeaders.DisableCacheValue);
-            }
-
-            foreach (KeyValuePair<string, string> restRequestHeader in restRequest.Headers)
-            {
-                httpWebRequest.Headers.Set(restRequestHeader.Key, restRequestHeader.Value);
-            }
-
-            if (EnumerableUtil.NotNullOrEmpty(restRequest.Body))
-            {
-                httpWebRequest.ContentLength = restRequest.Body.Length;
-                using (var writer = httpWebRequest.GetRequestStream())
-                {
-                    writer.Write(restRequest.Body, 0, restRequest.Body.Length);
-                }
-            }
-            else
-            {
-                httpWebRequest.ContentLength = 0;
-            }
-
-            try
-            {
-                var response = (HttpWebResponse)httpWebRequest.GetResponse();
-
-                var result = new RiakRestResponse
-                {
-                    ContentLength = response.ContentLength,
-                    ContentType = response.ContentType,
-                    StatusCode = response.StatusCode,
-                    Headers = response.Headers.AllKeys.ToDictionary(k => k, k => response.Headers[k]),
-                    ContentEncoding = !string.IsNullOrWhiteSpace(response.ContentEncoding)
-                        ? Encoding.GetEncoding(response.ContentEncoding)
-                        : Encoding.Default
-                };
-
-                if (response.ContentLength > 0)
-                {
-                    Stream responseStream = response.GetResponseStream();
-                    if (responseStream != null)
-                    {
-                        using (var reader = new StreamReader(responseStream, result.ContentEncoding))
-                        {
-                            result.Body = reader.ReadToEnd();
-                        }
-                    }
-                }
-
-                return RiakResult<RiakRestResponse>.Success(result);
-            }
-            catch (RiakException ex)
-            {
-                return RiakResult<RiakRestResponse>.Error(ResultCode.CommunicationError, ex.Message, ex.NodeOffline);
-            }
-            catch (WebException ex)
-            {
-                if (ex.Status == WebExceptionStatus.ProtocolError)
-                {
-                    return RiakResult<RiakRestResponse>.Error(ResultCode.HttpError, ex.Message, false);
-                }
-
-                return RiakResult<RiakRestResponse>.Error(ResultCode.HttpError, ex.Message, true);
-            }
-            catch (Exception ex)
-            {
-                return RiakResult<RiakRestResponse>.Error(ResultCode.CommunicationError, ex.Message, true);
-            }
         }
 
         public void Dispose()
