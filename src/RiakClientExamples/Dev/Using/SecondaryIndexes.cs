@@ -20,7 +20,6 @@ namespace RiakClientExamples.Dev.Using
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Linq;
     using System.Numerics;
     using NUnit.Framework;
@@ -51,7 +50,7 @@ namespace RiakClientExamples.Dev.Using
             var idxRslt = rslt.Value;
             foreach (var keyTerm in idxRslt.IndexKeyTerms)
             {
-                Debug.WriteLine(keyTerm.Key);
+                Console.WriteLine(keyTerm.Key);
             }
         }
 
@@ -258,12 +257,11 @@ namespace RiakClientExamples.Dev.Using
         {
             if (printTerm)
             {
-                var args = new[] { kt.Key, kt.Term };
-                Debug.WriteLine(format: "Key: {0} Term: {1}", args: args);
+                Console.WriteLine("Key: {0} Term: {1}", kt.Key, kt.Term);
             }
             else
             {
-                Debug.WriteLine(kt.Key);
+                Console.WriteLine(kt.Key);
             }
         }
     }

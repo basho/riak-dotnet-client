@@ -18,8 +18,8 @@
 
 namespace RiakClientExamples.Dev.Using
 {
+    using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Linq;
     using System.Text;
     using System.Threading;
@@ -80,9 +80,9 @@ namespace RiakClientExamples.Dev.Using
                     doc.Key,
                     string.Join(", ", doc.Fields.Select(f => f.Value).ToArray())
                 };
-                Debug.WriteLine(
-                    format: "BucketType: {0} Bucket: {1} Key: {2} Values: {3}",
-                    args: args);
+                Console.WriteLine(
+                    "BucketType: {0} Bucket: {1} Key: {2} Values: {3}",
+                    args);
             }
         }
 
@@ -109,7 +109,7 @@ namespace RiakClientExamples.Dev.Using
             CheckResult(rslt);
 
             RiakObject obj = rslt.Value;
-            Debug.WriteLine(Encoding.UTF8.GetString(obj.Value));
+            Console.WriteLine(Encoding.UTF8.GetString(obj.Value));
         }
 
         [Test]
@@ -143,9 +143,7 @@ namespace RiakClientExamples.Dev.Using
                     doc.Key,
                     string.Join(", ", doc.Fields.Select(f => f.Value).ToArray())
                 };
-                Debug.WriteLine(
-                    format: "BucketType: {0} Bucket: {1} Key: {2} Values: {3}",
-                    args: args);
+                Console.WriteLine("BucketType: {0} Bucket: {1} Key: {2} Values: {3}", args);
             }
         }
 

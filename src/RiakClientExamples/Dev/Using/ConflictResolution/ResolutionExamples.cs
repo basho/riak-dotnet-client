@@ -18,12 +18,13 @@
 
 namespace RiakClientExamples.Dev.Using.ConflictResolution
 {
-    using System.Linq;
+    using System;
     using System.Diagnostics;
+    using System.Linq;
+    using System.Text;
     using NUnit.Framework;
     using RiakClient;
     using RiakClient.Models;
-    using System.Text;
 
     /*
      * http://docs.basho.com/riak/latest/dev/using/conflict-resolution/
@@ -39,12 +40,10 @@ namespace RiakClientExamples.Dev.Using.ConflictResolution
             var getResult = client.Get(id);
             RiakObject obj = getResult.Value;
             Assert.AreEqual(2, obj.Siblings.Count);
-            Debug.WriteLine(format: "Sibling count: {0}", args: obj.Siblings.Count);
+            Console.WriteLine("Sibling count: {0}", obj.Siblings.Count);
             foreach (var sibling in obj.Siblings)
             {
-                Debug.WriteLine(
-                    format: "    VTag: {0}",
-                    args: sibling.VTag);
+                Console.WriteLine("    VTag: {0}", sibling.VTag);
             }
         }
 
