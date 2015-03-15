@@ -22,6 +22,7 @@ namespace RiakClientExamples.Dev.Search
     using System.Collections.Generic;
     using System.IO;
     using System.Net;
+    using System.Text;
     using System.Threading;
     using Models;
     using NUnit.Framework;
@@ -71,7 +72,7 @@ namespace RiakClientExamples.Dev.Search
                 var rslt = client.PutSearchSchema(schema);
                 CheckResult(rslt);
 
-                Thread.Sleep(1250);
+                WaitForSearch();
 
                 var idx = new SearchIndex("blog_posts", "blog_post_schema");
                 rslt = client.PutSearchIndex(idx);
@@ -82,7 +83,7 @@ namespace RiakClientExamples.Dev.Search
         [Test]
         public void StoreBlogPost()
         {
-            var keywords = new HashSet<string> { "adorbs", "cheshire" };
+            var keywords = new HashSet<string> { "adorbs", "cheshire", "funny" };
 
             var post = new BlogPost(
                 "This one is so lulz!",
@@ -96,6 +97,40 @@ namespace RiakClientExamples.Dev.Search
             string id = repo.Save(post);
             Assert.IsNotNullOrEmpty(id);
             Console.WriteLine("Blog post ID: {0}", id);
+        }
+
+        [Test]
+        public void QueryBlogPostsKeywords()
+        {
+            StoreBlogPost();
+
+            WaitForSearch();
+
+            var searchRequest = new RiakSearchRequest("blog_posts", "keywords_set:funny");
+            var rslt = client.Search(searchRequest);
+            CheckResult(rslt);
+            foreach (var doc in rslt.Value.Documents)
+            {
+                Console.WriteLine("Key: {0}, Content:\n{1}",
+                    doc.Key, GetFields(doc));
+            }
+        }
+
+        private static void WaitForSearch()
+        {
+            Thread.Sleep(1250);
+        }
+
+        private static string GetFields(RiakSearchResultDocument doc)
+        {
+            var sb = new StringBuilder();
+
+            foreach (var f in doc.Fields)
+            {
+                sb.AppendFormat("\t{0}: {1}\n", f.Key, f.Value);
+            }
+
+            return sb.ToString();
         }
     }
 }
