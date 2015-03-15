@@ -21,8 +21,12 @@ namespace RiakClient.Comms
 {
     using Config;
 
+    /// <summary>
+    /// A factory that creates <see cref="IRiakConnection"/>s from <see cref="IRiakNodeConfiguration"/>s.
+    /// </summary>
     public class RiakConnectionFactory : IRiakConnectionFactory
     {
+        /// <inheritdoc/>
         public IRiakConnection CreateConnection(IRiakNodeConfiguration nodeConfig, IRiakAuthenticationConfiguration authConfig)
         {
             // As pointless as this seems, it serves the purpose of decoupling the

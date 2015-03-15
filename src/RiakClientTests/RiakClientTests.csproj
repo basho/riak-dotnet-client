@@ -83,6 +83,7 @@
     <Compile Include="Models\MapReduce\Inputs\SearchInputSerializationTests.cs" />
     <Compile Include="Messages\MessageCodeTests.cs" />
     <Compile Include="Models\NValTests.cs" />
+    <Compile Include="Models\Search\RiakSearchResultTests.cs" />
     <Compile Include="Models\TimeoutTests.cs" />
     <Compile Include="Models\RiakBucketPropertyTests.cs" />
     <Compile Include="Models\QuorumTests.cs" />

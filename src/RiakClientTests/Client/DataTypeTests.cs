@@ -22,13 +22,10 @@ namespace RiakClientTests.Client
     using System;
     using System.Collections.Generic;
     using System.Text;
-    using Moq;
     using NUnit.Framework;
-    using RiakClient;
     using RiakClient.Extensions;
     using RiakClient.Messages;
     using RiakClient.Models;
-    using RiakClient.Models.Rest;
 
     [TestFixture]
     public class DataTypeTests : ClientTestBase

@@ -26,7 +26,7 @@ namespace RiakClient.Models.Search
     using Messages;
 
     /// <summary>
-    /// Specifies the sort order of Riak Search Results
+    /// An enumeration of Riak Search result sort orders
     /// </summary>
     public enum PreSort
     {
@@ -42,24 +42,49 @@ namespace RiakClient.Models.Search
     }
 
     /// <summary>
-    /// Specifies the default_op override.
+    /// An enumeration of different default search query operators.
     /// </summary>
     public enum DefaultOperation
     {
+        /// <summary>
+        /// The and operator.
+        /// </summary>
         And,
+
+        /// <summary>
+        /// The or operator.
+        /// </summary>
         Or
     }
 
+    /// <summary>
+    /// Represents a Riak Search request.
+    /// </summary>
     public class RiakSearchRequest
     {
         private readonly string solrIndex;
         private readonly string solrQuery;
         private readonly string solrFilter;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RiakSearchRequest"/> class.
+        /// </summary>
+        /// <remarks>
+        /// Use the <see cref="Query"/> and <see cref="Filter"/> members for specifying
+        /// Solr query and filter.
+        /// </remarks>
         public RiakSearchRequest()
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RiakSearchRequest"/> class.
+        /// </summary>
+        /// <param name="solrIndex">The name of the Solr index to query.</param>
+        /// <param name="solrQuery">The Solr query.</param>
+        /// <param name="solrFilter">The Solr filter to use. Defaults to <c>null</c>.</param>
+        /// <exception cref="ArgumentException"><paramref name="solrIndex"/> cannot be null, zero length, or whitespace</exception>
+        /// <exception cref="ArgumentException"><paramref name="solrQuery"/> cannot be null, zero length, or whitespace</exception>
         public RiakSearchRequest(string solrIndex, string solrQuery, string solrFilter = null)
         {
             if (string.IsNullOrWhiteSpace(solrIndex))
@@ -78,6 +103,13 @@ namespace RiakClient.Models.Search
             this.solrFilter = solrFilter;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RiakSearchRequest"/> class.
+        /// </summary>
+        /// <param name="solrQuery">The Solr query as expressed by an instance of <see cref="RiakFluentSearch"/>.</param>
+        /// <param name="solrFilter">The Solr filter as expressed by an instance of <see cref="RiakFluentSearch"/>. Defaults to <c>null</c>.</param>
+        /// <exception cref="ArgumentException"><paramref name="solrIndex"/> cannot be null, zero length, or whitespace</exception>
+        /// <exception cref="ArgumentException"><paramref name="solrQuery"/> cannot be null, zero length, or whitespace</exception>
         public RiakSearchRequest(
             RiakFluentSearch solrQuery,
             RiakFluentSearch solrFilter = null)
@@ -91,23 +123,61 @@ namespace RiakClient.Models.Search
             this.Filter = solrFilter;
         }
 
+        /// <summary>
+        /// The query to run for the search.
+        /// </summary>
         public RiakFluentSearch Query { get; set; }
 
+        /// <summary>
+        /// The filter to use for the search.
+        /// </summary>
         public RiakFluentSearch Filter { get; set; }
 
+        /// <summary>
+        /// The maximum number of rows to return.
+        /// </summary>
+        /// <remarks>
+        /// Combine with <see cref="Start"/> to implement paging.
+        /// Distributed pagination in Riak Search cannot be used reliably when sorting on fields 
+        /// that can have different values per replica of the same object, namely score and _yz_id. 
+        /// In the case of sorting by these fields, you may receive redundant objects. 
+        /// In the case of score, the top-N can return different results over multiple runs.
+        /// </remarks>
         public long Rows { get; set; }
 
+        /// <summary>
+        /// The starting row to return.
+        /// </summary>
+        /// <remarks>
+        /// Combine with <see cref="Rows"/> to implement paging.
+        /// Distributed pagination in Riak Search cannot be used reliably when sorting on fields 
+        /// that can have different values per replica of the same object, namely score and _yz_id. 
+        /// In the case of sorting by these fields, you may receive redundant objects. 
+        /// In the case of score, the top-N can return different results over multiple runs.
+        /// </remarks>
         public long Start { get; set; }
 
+        /// <summary>
+        /// A <see cref="RiakFluentSearch"/> "filter" to run on the query.
+        /// </summary>
+        /// <summary>
+        /// The field to sort on.
+        /// </summary>
         public string Sort { get; set; }
 
+        /// <summary>
+        /// Presort the results by Key or Score.
+        /// </summary>
         public PreSort? PreSort { get; set; }
 
+        /// <summary>
+        /// The default operator for parsing queries.
+        /// </summary>
+        /// <remarks>Defaults to <see cref="DefaultOperation"/>.And if not specified.</remarks>
         public DefaultOperation? DefaultOperation { get; set; }
 
         /// <summary>
-        /// Gets or sets the list of fields that should be returned for each
-        /// record in the result list.
+        /// The list of fields that should be returned for each record in the result list.
         /// </summary>
         /// <remarks>
         /// The 'id' field is always returned, even if not specified in this list.

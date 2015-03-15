@@ -19,7 +19,7 @@
 
 namespace RiakClient.Containers
 {
-    public interface IConcurrentEnumerator<T>
+    internal interface IConcurrentEnumerator<T>
     {
         bool TryMoveNext(out T next);
     }

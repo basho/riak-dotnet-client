@@ -19,24 +19,48 @@
 
 namespace RiakClient.Config
 {
+    using System;
+
+    /// <summary>
+    /// Represents a configuration element interface for a Riak Node.
+    /// </summary>
     public interface IRiakNodeConfiguration
     {
+        /// <summary>
+        /// The name of the node.
+        /// </summary>
         string Name { get; }
 
+        /// <summary>
+        /// The address of the node.  
+        /// Can be an IP address or a resolvable domain name.
+        /// </summary>
         string HostAddress { get; }
 
+        /// <summary>
+        /// The port to use when connecting to the Protocol Buffers API.
+        /// </summary>
         int PbcPort { get; }
 
-        string RestScheme { get; }
-
-        int RestPort { get; }
-
+        /// <summary>
+        /// The worker pool size to use for this node.
+        /// This many workers (and connections) will be available for concurrent use.
+        /// </summary>
         int PoolSize { get; }
 
+        /// <summary>
+        /// The network timeout to use when attempting to read data from Riak.
+        /// </summary>
         Timeout NetworkReadTimeout { get; }
 
+        /// <summary>
+        /// The network timeout to use when attempting to write data to Riak.
+        /// </summary>
         Timeout NetworkWriteTimeout { get; }
 
+        /// <summary>
+        /// The network timeout to use when attempting to connect to Riak.
+        /// </summary>
         Timeout NetworkConnectTimeout { get; }
     }
 }

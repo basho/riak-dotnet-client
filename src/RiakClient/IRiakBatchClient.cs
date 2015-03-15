@@ -408,25 +408,7 @@ namespace RiakClient
         /// <see cref="RiakBucketProperties"/> will be set on the bucket. 
         /// Those not set in the object will retain their values on Riak's side.
         /// </param>
-        /// <remarks>There is, as of RiakClient 2.0, no reason to use the HTTP interface. This is kept for legacy reasons.</remarks>
         RiakResult SetBucketProperties(string bucket, RiakBucketProperties properties);
-
-        /// <summary>
-        /// Sets the <see cref="RiakBucketProperties"/> properties of a <paramref name="bucket"/>.
-        /// </summary>
-        /// <returns>
-        /// A <see cref="RiakResult"/> detailing the success or failure of the operation.
-        /// </returns>
-        /// <param name="bucket">The name of the bucket to set the properties on.</param>
-        /// <param name="properties">
-        /// The properties to set. Note that only those properties explicitly set in the 
-        /// <see cref="RiakBucketProperties"/> will be set on the bucket. 
-        /// Those not set in the object will retain their values on Riak's side.
-        /// </param>
-        /// <param name="useHttp">When true, RiakClient will use the HTTP interface</param>
-        /// <remarks>There is, as of RiakClient 2.0, no reason to use the HTTP interface. This is kept for legacy reasons.</remarks>
-        [Obsolete("This overload will be removed in the next version. Please remove any usages of the \"useHttp\" parameter.")]
-        RiakResult SetBucketProperties(string bucket, RiakBucketProperties properties, bool useHttp = false);
 
         /// <summary>
         /// Sets the <see cref="RiakBucketProperties"/> properties of a <paramref name="bucket"/>.
@@ -448,18 +430,7 @@ namespace RiakClient
         /// </summary>
         /// <param name="bucket">The name of the bucket to reset the properties on.</param>
         /// <returns>A <see cref="RiakResult"/> detailing the success or failure of the operation.</returns>
-        /// <remarks>There is, as of RiakClient 2.0, no reason to use the HTTP interface. This is kept for legacy reasons.</remarks>
         RiakResult ResetBucketProperties(string bucket);
-
-        /// <summary>
-        /// Reset the properties on a bucket back to their defaults.
-        /// </summary>
-        /// <param name="bucket">The name of the bucket to reset the properties on.</param>
-        /// <param name="useHttp">Whether or not to use the HTTP interface to Riak. Set to true for Riak 1.3 and earlier</param> 
-        /// <returns>A <see cref="RiakResult"/> detailing the success or failure of the operation.</returns>
-        /// <remarks>There is, as of RiakClient 2.0, no reason to use the HTTP interface. This is kept for legacy reasons.</remarks>
-        [Obsolete("This overload will be removed in the next version. Please remove any usages of the \"useHttp\" parameter.")]
-        RiakResult ResetBucketProperties(string bucket, bool useHttp = false);
 
         /// <summary>
         /// Reset the properties on a bucket back to their defaults.
@@ -762,11 +733,5 @@ namespace RiakClient
         /// <param name="schema">The schema to store.</param>
         /// <returns>A <see cref="RiakResult"/> detailing the success or failure of the operation.</returns>
         RiakResult PutSearchSchema(SearchSchema schema);
-
-        /// <summary>
-        /// Retrieves the current system information from the HTTP '/stats' API. 
-        /// </summary>
-        /// <returns>A <see cref="RiakResult{T}"/> containing a <see cref="string"/> result of the API call.</returns>
-        RiakResult<string> GetServerStatus();
     }
 }

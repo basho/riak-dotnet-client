@@ -21,7 +21,7 @@ namespace RiakClient.Containers
 {
     using System.Collections.Generic;
 
-    public sealed class ConcurrentEnumerator<T> : IConcurrentEnumerator<T>
+    internal sealed class ConcurrentEnumerator<T> : IConcurrentEnumerator<T>
     {
         private readonly object lockObj = new object();
         private readonly IEnumerator<T> wrapped;

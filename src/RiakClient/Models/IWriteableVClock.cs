@@ -33,6 +33,10 @@ namespace RiakClient.Models
     /// </summary>
     public interface IWriteableVClock
     {
+        /// <summary>
+        /// Sets the VClock.
+        /// </summary>
+        /// <param name="vclock">The value to set the VClock to.</param>
         void SetVClock(byte[] vclock);
     }
 }
