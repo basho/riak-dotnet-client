@@ -19,10 +19,13 @@
 namespace RiakClientExamples.Dev.Search
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Net;
     using System.Threading;
+    using Models;
     using NUnit.Framework;
+    using Repositories;
     using RiakClient;
     using RiakClient.Models.Search;
 
@@ -60,22 +63,39 @@ namespace RiakClientExamples.Dev.Search
 
             base.CreateClient();
 
-            var schemaXml = File.ReadAllText(blogPostSchemaFileName);
-            var schema = new SearchSchema(blogPostSchemaName, schemaXml);
-            var rslt = client.PutSearchSchema(schema);
-            CheckResult(rslt);
+            var getSchemaResult = client.GetSearchSchema("blog_post_schema");
+            if (!getSchemaResult.IsSuccess)
+            {
+                var schemaXml = File.ReadAllText(blogPostSchemaFileName);
+                var schema = new SearchSchema(blogPostSchemaName, schemaXml);
+                var rslt = client.PutSearchSchema(schema);
+                CheckResult(rslt);
 
-            Thread.Sleep(1250);
+                Thread.Sleep(1250);
 
-            var idx = new SearchIndex("blog_posts", "blog_post_schema");
-            rslt = client.PutSearchIndex(idx);
-            CheckResult(rslt);
+                var idx = new SearchIndex("blog_posts", "blog_post_schema");
+                rslt = client.PutSearchIndex(idx);
+                CheckResult(rslt);
+            }
         }
 
         [Test]
         public void StoreBlogPost()
         {
-            Assert.True(1 == 1);
+            var keywords = new HashSet<string> { "adorbs", "cheshire" };
+
+            var post = new BlogPost(
+                "This one is so lulz!",
+                "Cat Stevens",
+                "Please check out these cat pics!",
+                keywords,
+                DateTime.Now,
+                true);
+
+            var repo = new BlogPostRepository(client, "cat_pics_quarterly");
+            string id = repo.Save(post);
+            Assert.IsNotNullOrEmpty(id);
+            Console.WriteLine("Blog post ID: {0}", id);
         }
     }
 }
