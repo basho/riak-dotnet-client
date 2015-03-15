@@ -18,7 +18,7 @@
 
 namespace RiakClientExamples.Dev.Using
 {
-    using System.Diagnostics;
+    using System;
     using System.Text;
     using NUnit.Framework;
     using RiakClient;
@@ -75,7 +75,7 @@ namespace RiakClientExamples.Dev.Using
             opts.SetR(3);
             var rslt = client.Get(id, opts);
             CheckResult(rslt);
-            Debug.WriteLine(Encoding.UTF8.GetString(rslt.Value.Value));
+            Console.WriteLine(Encoding.UTF8.GetString(rslt.Value.Value));
         }
 
         [Test]
@@ -117,7 +117,7 @@ namespace RiakClientExamples.Dev.Using
                 RiakConstants.ContentTypes.ApplicationJson);
             var rslt = client.Put(obj);
             CheckResult(rslt);
-            Debug.WriteLine(format: "Generated key: {0}", args: rslt.Value.Key);
+            Console.WriteLine("Generated key: {0}", rslt.Value.Key);
         }
 
         [Test]
@@ -130,7 +130,7 @@ namespace RiakClientExamples.Dev.Using
             CheckResult(rslt);
 
             string key = rslt.Value.Key;
-            Debug.WriteLine(format: "Generated key: {0}", args: key);
+            Console.WriteLine("Generated key: {0}", key);
 
             id = new RiakObjectId("users", "random_user_keys", key);
             var del_rslt = client.Delete(id);

@@ -53,8 +53,8 @@ namespace RiakClient.Models.Search
         /// <remarks>
         /// Uses the provided schema name and default NVal value (<see cref="RiakConstants.Defaults.YokozunaIndex.NVal"/>).
         /// </remarks>
-        public SearchIndex(string name, string schemaName)
-            : this(name, schemaName, new NVal(RiakConstants.Defaults.YokozunaIndex.NVal))
+        public SearchIndex(string indexName, string schemaName)
+            : this(indexName, schemaName, new NVal(RiakConstants.Defaults.YokozunaIndex.NVal))
         {
         }
 

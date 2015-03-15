@@ -116,10 +116,10 @@ namespace RiakClientExamples.Dev.Using
             {
                 string city = Encoding.UTF8.GetString(value);
                 var args = new[] { city };
-                Debug.WriteLine(format: "Cities Set Value: {0}", args: args);
+                Console.WriteLine("Cities Set Value: {0}", args);
             }
 
-            Debug.WriteLine(format: "Cities Set Size: {0}", args: citiesSet.Values.Count);
+            Console.WriteLine("Cities Set Size: {0}", citiesSet.Values.Count);
         }
 
         [Test]
@@ -137,8 +137,8 @@ namespace RiakClientExamples.Dev.Using
             var rslt = client.DtFetchMap(id);
             CheckResult(rslt);
 
-            Debug.WriteLine("------------------------------------------------------------------------\n");
-            Debug.WriteLine("Initial import of Ahmed's data and contact");
+            Console.WriteLine("------------------------------------------------------------------------\n");
+            Console.WriteLine("Initial import of Ahmed's data and contact");
 
             // Ahmed's first name
             var firstNameRegisterMapUpdate = new MapUpdate
@@ -253,8 +253,8 @@ namespace RiakClientExamples.Dev.Using
             PrintMapValues(rslt.Values);
 
             // Update Ahmed's set of interests to remove "opera" and add "indie pop"
-            Debug.WriteLine("------------------------------------------------------------------------\n");
-            Debug.WriteLine("Updating Ahmed's interests");
+            Console.WriteLine("------------------------------------------------------------------------\n");
+            Console.WriteLine("Updating Ahmed's interests");
             var interestsRemoves = new[] { "opera" };
             interestsAdds = new[] { "indie pop" };
             setOperation = new SetOp();
@@ -278,8 +278,8 @@ namespace RiakClientExamples.Dev.Using
             PrintMapValues(rslt.Values);
 
             // Registers (and other map members) can also be removed
-            Debug.WriteLine("------------------------------------------------------------------------\n");
-            Debug.WriteLine("Removing Annika's first name");
+            Console.WriteLine("------------------------------------------------------------------------\n");
+            Console.WriteLine("Removing Annika's first name");
             var annikaMapRemoves = new List<MapField>
             {
                 new MapField
@@ -309,8 +309,8 @@ namespace RiakClientExamples.Dev.Using
 
 
             // Store whether Annika is subscribed to a variety of plans
-            Debug.WriteLine("------------------------------------------------------------------------\n");
-            Debug.WriteLine("Storing Annika's plan flags");
+            Console.WriteLine("------------------------------------------------------------------------\n");
+            Console.WriteLine("Storing Annika's plan flags");
             const string enterprisePlanFlag = "enterprise_plan";
             const string familyPlanFlag = "family_plan";
             const string freePlanFlag = "free_plan";
@@ -364,8 +364,8 @@ namespace RiakClientExamples.Dev.Using
             PrintMapValues(rslt.Values);
 
             // Store Annika's purchases in a counter
-            Debug.WriteLine("------------------------------------------------------------------------\n");
-            Debug.WriteLine("Adding Annika's widget_purchases counter");
+            Console.WriteLine("------------------------------------------------------------------------\n");
+            Console.WriteLine("Adding Annika's widget_purchases counter");
             const string widgetPurchasesCounter = "widget_purchases";
             annikaMapUpdates = new List<MapUpdate>
             {
@@ -399,8 +399,8 @@ namespace RiakClientExamples.Dev.Using
             PrintMapValues(rslt.Values);
 
             // Store Annika's interests in a set
-            Debug.WriteLine("------------------------------------------------------------------------\n");
-            Debug.WriteLine("Adding Annika's interests in a set");
+            Console.WriteLine("------------------------------------------------------------------------\n");
+            Console.WriteLine("Adding Annika's interests in a set");
             const string annikaInterestsSet = "interests";
             var annikaInterestsSetOp = new SetOp();
             annikaInterestsSetOp.adds.Add(Serializer("tango dancing"));
@@ -436,8 +436,8 @@ namespace RiakClientExamples.Dev.Using
             PrintMapValues(rslt.Values);
 
             // Remove "tango dancing" from Annika's interests
-            Debug.WriteLine("------------------------------------------------------------------------\n");
-            Debug.WriteLine("Remove \"tango dancing\" from Annika's interests");
+            Console.WriteLine("------------------------------------------------------------------------\n");
+            Console.WriteLine("Remove \"tango dancing\" from Annika's interests");
             annikaInterestsSetOp = new SetOp();
             annikaInterestsSetOp.removes.Add(Serializer("tango dancing"));
             annikaMapUpdates = new List<MapUpdate>
@@ -472,8 +472,8 @@ namespace RiakClientExamples.Dev.Using
             PrintMapValues(rslt.Values);
 
             // Add purchase information to Annika's data
-            Debug.WriteLine("------------------------------------------------------------------------\n");
-            Debug.WriteLine("Add specific purchase info to Annika's data");
+            Console.WriteLine("------------------------------------------------------------------------\n");
+            Console.WriteLine("Add specific purchase info to Annika's data");
 
             const string annikaPurchaseMap = "purchase";
             const string annikaFirstPurchaseFlag = "first_purchase";
@@ -524,7 +524,7 @@ namespace RiakClientExamples.Dev.Using
                     type = MapField.MapFieldType.MAP
                 }
             };
-            
+
             annikaInfoUpdateMapOp = new MapOp();
             annikaInfoUpdateMapOp.updates.Add(annikaPurchaseMapUpdate);
             annikaInfoUpdate = new MapUpdate
@@ -546,7 +546,7 @@ namespace RiakClientExamples.Dev.Using
 
             rslt = client.DtFetchMap(id);
             CheckResult(rslt);
-            Debug.WriteLine(format: "Context: {0}", args: Convert.ToBase64String(rslt.Context));
+            Console.WriteLine("Context: {0}", Convert.ToBase64String(rslt.Context));
         }
 
         private void CheckResult(RiakDtMapResult rslt)
@@ -575,20 +575,20 @@ namespace RiakClientExamples.Dev.Using
                 switch (field.Type)
                 {
                     case RiakDtMapField.RiakDtMapFieldType.Map:
-                        Debug.WriteLine(format: "{0}Map: {1}", args: args.ToArray());
+                        Console.WriteLine("{0}Map: {1}", args.ToArray());
                         PrintMapValues(mapEntry.MapValue, depth + 1);
                         break;
                     case RiakDtMapField.RiakDtMapFieldType.Register:
                         args.Add(Deserializer(mapEntry.RegisterValue));
-                        Debug.WriteLine(format: "{0}{1}: {2}", args: args.ToArray());
+                        Console.WriteLine("{0}{1}: {2}", args.ToArray());
                         break;
                     case RiakDtMapField.RiakDtMapFieldType.Flag:
                         args.Add(mapEntry.FlagValue.Value.ToString());
-                        Debug.WriteLine(format: "{0}{1}: {2}", args: args.ToArray());
+                        Console.WriteLine("{0}{1}: {2}", args.ToArray());
                         break;
                     case RiakDtMapField.RiakDtMapFieldType.Counter:
                         args.Add(mapEntry.Counter.Value.ToString());
-                        Debug.WriteLine(format: "{0}{1}: {2}", args: args.ToArray());
+                        Console.WriteLine("{0}{1}: {2}", args.ToArray());
                         break;
                     case RiakDtMapField.RiakDtMapFieldType.Set:
                         foreach (var setValue in mapEntry.SetValue)
@@ -596,7 +596,7 @@ namespace RiakClientExamples.Dev.Using
                             var setArgs = new List<string>();
                             setArgs.AddRange(args);
                             setArgs.Add(Deserializer(setValue));
-                            Debug.WriteLine(format: "{0}{1}: {2}", args: setArgs.ToArray());
+                            Console.WriteLine("{0}{1}: {2}", setArgs.ToArray());
                         }
                         break;
                     default:
