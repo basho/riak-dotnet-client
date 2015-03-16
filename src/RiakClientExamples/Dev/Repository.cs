@@ -16,10 +16,9 @@
 // under the License.
 // </copyright>
 
-namespace RiakClientExamples.Dev.Search.Repositories
+namespace RiakClientExamples.Dev
 {
     using System;
-    using Models;
     using RiakClient;
     using RiakClient.Models;
 

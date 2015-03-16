@@ -16,12 +16,12 @@
 // under the License.
 // </copyright>
 
-namespace RiakClientExamples.Dev.Search.Models
+namespace RiakClientExamples.Dev.DataModeling
 {
     using System;
     using System.Collections.Generic;
 
-    public class BlogPost : IModel
+    public class User : IModel
     {
         private readonly string title;
         private string author;
@@ -30,7 +30,7 @@ namespace RiakClientExamples.Dev.Search.Models
         private DateTime datePosted;
         private Boolean published;
 
-        public BlogPost(
+        public User(
             string title,
             string author,
             string content,

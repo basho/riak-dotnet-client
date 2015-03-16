@@ -20,15 +20,24 @@ namespace RiakClientExamples
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Linq;
+    using System.Text;
     using System.Threading;
     using NUnit.Framework;
     using RiakClient;
     using RiakClient.Models;
+    using RiakClient.Models.RiakDt;
     using RiakClient.Util;
 
     public abstract class ExampleBase : IDisposable
     {
         private readonly IRiakEndPoint endpoint;
+
+        protected static readonly SerializeObjectToByteArray<string> Serializer =
+            s => Encoding.UTF8.GetBytes(s);
+        protected static readonly DeserializeObject<string> Deserializer =
+            (b, type) => Encoding.UTF8.GetString(b);
 
         protected IRiakClient client;
         protected RiakObjectId id;
@@ -101,6 +110,50 @@ namespace RiakClientExamples
         protected void WaitForSearch()
         {
             Thread.Sleep(1250);
+        }
+
+        protected void PrintMapValues(IEnumerable<RiakDtMapEntry> mapEntries, int depth = 0)
+        {
+            string spaces = string.Concat(Enumerable.Repeat(" ", depth * 4));
+            foreach (RiakDtMapEntry mapEntry in mapEntries)
+            {
+                var args = new List<string> { spaces };
+                RiakDtMapField field = mapEntry.Field;
+                args.Add(field.Name);
+                switch (field.Type)
+                {
+                    case RiakDtMapField.RiakDtMapFieldType.Map:
+                        Console.WriteLine("{0}Map: {1}", args.ToArray());
+                        PrintMapValues(mapEntry.MapValue, depth + 1);
+                        break;
+                    case RiakDtMapField.RiakDtMapFieldType.Register:
+                        args.Add(Deserializer(mapEntry.RegisterValue));
+                        Console.WriteLine("{0}{1}: {2}", args.ToArray());
+                        break;
+                    case RiakDtMapField.RiakDtMapFieldType.Flag:
+                        args.Add(mapEntry.FlagValue.Value.ToString());
+                        Console.WriteLine("{0}{1}: {2}", args.ToArray());
+                        break;
+                    case RiakDtMapField.RiakDtMapFieldType.Counter:
+                        args.Add(mapEntry.Counter.Value.ToString());
+                        Console.WriteLine("{0}{1}: {2}", args.ToArray());
+                        break;
+                    case RiakDtMapField.RiakDtMapFieldType.Set:
+                        foreach (var setValue in mapEntry.SetValue)
+                        {
+                            var setArgs = new List<string>();
+                            setArgs.AddRange(args);
+                            setArgs.Add(Deserializer(setValue));
+                            Console.WriteLine("{0}{1}: {2}", setArgs.ToArray());
+                        }
+                        break;
+                    default:
+                        Assert.Fail("Unexpected field type: {0}", field.Type);
+                        Debug.Fail("Map Error",
+                            string.Format("Unexpected field type: {0}", field.Type));
+                        break;
+                }
+            }
         }
     }
 }

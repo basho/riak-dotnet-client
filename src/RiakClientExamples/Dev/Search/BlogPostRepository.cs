@@ -16,14 +16,13 @@
 // under the License.
 // </copyright>
 
-namespace RiakClientExamples.Dev.Search.Repositories
+namespace RiakClientExamples.Dev.Search
 {
     using System;
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
     using System.Text;
-    using Models;
     using RiakClient;
     using RiakClient.Messages;
     using RiakClient.Models;

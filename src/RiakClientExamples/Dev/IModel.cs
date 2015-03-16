@@ -1,4 +1,4 @@
-﻿// <copyright file="IRepository.cs" company="Basho Technologies, Inc.">
+﻿// <copyright file="IModel.cs" company="Basho Technologies, Inc.">
 // Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
@@ -16,13 +16,10 @@
 // under the License.
 // </copyright>
 
-namespace RiakClientExamples.Dev.Search.Repositories
+namespace RiakClientExamples.Dev
 {
-    using Models;
-
-    public interface IRepository<T> where T : IModel
+    public interface IModel
     {
-        T Get(string key, bool notFoundOK = false);
-        string Save(T model);
+        string ID { get; }
     }
 }
