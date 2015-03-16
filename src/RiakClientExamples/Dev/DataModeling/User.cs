@@ -19,25 +19,36 @@
 namespace RiakClientExamples.Dev.DataModeling
 {
     using System;
+    using System.Collections.Generic;
 
     public class User : IModel
     {
         private readonly string firstName;
         private readonly string lastName;
+        private readonly IEnumerable<string> interests;
+        private uint pageVisits = 0;
 
-        public User(string firstName, string lastName)
+        public User(
+            string firstName,
+            string lastName,
+            IEnumerable<string> interests,
+            uint pageVisits = 0)
         {
             if (string.IsNullOrWhiteSpace(firstName))
             {
                 throw new ArgumentNullException("firstName", "firstName is required");
             }
+
             this.firstName = firstName;
 
             if (string.IsNullOrWhiteSpace(lastName))
             {
                 throw new ArgumentNullException("lastName", "lastName is required");
             }
+
             this.lastName = lastName;
+            this.interests = interests;
+            this.pageVisits = pageVisits;
         }
 
         public string ID
@@ -57,6 +68,16 @@ namespace RiakClientExamples.Dev.DataModeling
         public string LastName
         {
             get { return lastName; }
+        }
+
+        public IEnumerable<string> Interests
+        {
+            get { return interests; }
+        }
+
+        public uint PageVisits
+        {
+            get { return pageVisits; }
         }
     }
 }

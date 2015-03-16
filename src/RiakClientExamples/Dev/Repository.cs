@@ -19,25 +19,42 @@
 namespace RiakClientExamples.Dev
 {
     using System;
+    using System.Text;
     using RiakClient;
     using RiakClient.Models;
 
     public abstract class Repository<TModel> : IRepository<TModel> where TModel : IModel
     {
-        protected IRiakClient client;
+        const string DefaultBucketTypeName = "default";
 
-        public Repository(IRiakClient client)
+        protected static readonly SerializeObjectToByteArray<string> TextSerializer =
+            s => Encoding.UTF8.GetBytes(s);
+        protected static readonly DeserializeObject<string> TextDeserializer =
+            (b, type) => Encoding.UTF8.GetString(b);
+
+        protected IRiakClient client;
+        protected IModel model;
+
+        public Repository(IRiakClient client, IModel model)
         {
             if (client == null)
             {
                 throw new ArgumentNullException("client");
             }
+
             this.client = client;
+
+            if (model == null)
+            {
+                throw new ArgumentNullException("model");
+            }
+
+            this.model = model;
         }
 
         public virtual TModel Get(string key, bool notFoundOK = false)
         {
-            var riakObjectId = new RiakObjectId(BucketName, key);
+            var riakObjectId = new RiakObjectId(BucketType, BucketName, key);
             RiakResult<RiakObject> result = client.Get(riakObjectId);
             CheckResult(result, notFoundOK);
             RiakObject value = result.Value;
@@ -51,14 +68,19 @@ namespace RiakClientExamples.Dev
             }
         }
 
-        public virtual string Save(TModel model)
+        public virtual string Save()
         {
-            var riakObjectId = new RiakObjectId(BucketName, model.ID);
+            var riakObjectId = new RiakObjectId(BucketType, BucketName, model.ID);
             var riakObject = new RiakObject(riakObjectId, model);
             RiakResult<RiakObject> result = client.Put(riakObject);
             CheckResult(result);
             RiakObject value = result.Value;
             return value.Key;
+        }
+
+        protected virtual string BucketType
+        {
+            get { return DefaultBucketTypeName; }
         }
 
         protected virtual string BucketName
@@ -79,6 +101,11 @@ namespace RiakClientExamples.Dev
                     throw new ApplicationException(string.Format("Riak failure: {0}", result.ErrorMessage));
                 }
             }
+        }
+
+        protected RiakObjectId GetRiakObjectId()
+        {
+            return new RiakObjectId(BucketType, BucketName, model.ID);
         }
     }
 }
