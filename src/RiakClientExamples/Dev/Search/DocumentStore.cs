@@ -23,7 +23,6 @@ namespace RiakClientExamples.Dev.Search
     using System.IO;
     using System.Net;
     using System.Text;
-    using System.Threading;
     using Models;
     using NUnit.Framework;
     using Repositories;
@@ -114,11 +113,6 @@ namespace RiakClientExamples.Dev.Search
                 Console.WriteLine("Key: {0}, Content:\n{1}",
                     doc.Key, GetFields(doc));
             }
-        }
-
-        private static void WaitForSearch()
-        {
-            Thread.Sleep(1250);
         }
 
         private static string GetFields(RiakSearchResultDocument doc)

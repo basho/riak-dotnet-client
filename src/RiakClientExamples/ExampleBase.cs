@@ -20,6 +20,7 @@ namespace RiakClientExamples
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading;
     using NUnit.Framework;
     using RiakClient;
     using RiakClient.Models;
@@ -95,6 +96,11 @@ namespace RiakClientExamples
             {
                 DeleteObject(id);
             }
+        }
+
+        protected void WaitForSearch()
+        {
+            Thread.Sleep(1250);
         }
     }
 }
