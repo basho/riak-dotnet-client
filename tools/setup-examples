@@ -58,9 +58,13 @@ setup-examples: Set up your dev cluster to run RiakClientExamples project
 
 Usage: setup-dev-cluster [-d] [-p <riak dev path>]
 
--d      Set up bucket types for Document Store examples. Run this
-        *after* creating the blog_post_schema and blog_posts items
-        in Riak Search.
+-d      Set up bucket types for Document Store and Search Data Types
+        examples. Run this *after* creating the blog_post_schema schema
+        and these indexes:
+            blog_posts
+            scores
+            hobbies
+            customers
 -p      Riak dev path (Default: \"$default_dev_cluster_path\")
 "
       exit 0
@@ -120,12 +124,22 @@ $riak_admin bucket-type create no_siblings '{"props":{"allow_mult":false}}'
 $riak_admin bucket-type activate no_siblings
 
 # Note:
-# run the following commands for the "Document Store" examples
-# You must create the blog_posts index first
+# run the following commands for the "Document Store"
+# and "Search Data Types" examples.
+# You must create these indexes first:
+#     blog_posts
+#     scores
+#     hobbies
+#     customers
+#
 if [[ $opt_setup_document_store == 'true' ]]
 then
     $riak_admin bucket-type create cms '{"props":{"datatype":"map","search_index":"blog_posts"}}'
     $riak_admin bucket-type activate cms
+
+    $riak_admin bucket-type update counters '{"props":{"search_index":"scores"}}'
+    $riak_admin bucket-type update sets '{"props":{"search_index":"hobbies"}}'
+    $riak_admin bucket-type update maps '{"props":{"search_index":"customers"}}'
 fi
 
 set -o errexit
