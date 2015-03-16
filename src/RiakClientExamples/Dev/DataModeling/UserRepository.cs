@@ -18,126 +18,111 @@
 
 namespace RiakClientExamples.Dev.DataModeling
 {
-#if FOO
-    using System;
-    using System.Collections.Generic;
-    using System.Globalization;
     using System.Linq;
-    using System.Text;
+    using System.Collections.Generic;
     using RiakClient;
     using RiakClient.Messages;
     using RiakClient.Models;
+    using RiakClient.Util;
+    using System;
 
     public class UserRepository : Repository<User>
     {
-        const string BucketType = "cms";
+        const string firstNameRegister = "first_name";
+        const string lastNameRegister = "last_name";
+        const string interestsSet = "interests";
+        const string visitsCounter = "visits";
 
-        const string titleRegister = "title";
-        const string authorRegister = "author";
-        const string contentRegister = "content";
-        const string keywordsSet = "keywords";
-        const string datePostedRegister = "date";
-        const string publishedFlag = "published";
+        private readonly User userModel;
 
-        private static readonly SerializeObjectToByteArray<string> Serializer =
-            s => Encoding.UTF8.GetBytes(s);
-        private static readonly DeserializeObject<string> Deserializer =
-            (b, type) => Encoding.UTF8.GetString(b);
-
-        private readonly string bucketName;
-
-        public UserRepository(IRiakClient client, string bucketName)
-            : base(client)
+        public UserRepository(IRiakClient client, User model)
+            : base(client, model)
         {
-            if (string.IsNullOrWhiteSpace(bucketName))
+            if (model == null)
             {
-                throw new ArgumentNullException("bucketName");
+                throw new ArgumentNullException("model");
             }
-            this.bucketName = bucketName;
+
+            this.userModel = model;
         }
 
-        public override string Save(User model)
+        public override string Save()
         {
-            var updates = new List<MapUpdate>();
+            var mapUpdates = new List<MapUpdate>();
 
-            updates.Add(new MapUpdate
+            mapUpdates.Add(new MapUpdate
             {
-                register_op = Serializer(model.Title),
+                register_op = TextSerializer(userModel.FirstName),
                 field = new MapField
                 {
-                    name = Serializer(titleRegister),
+                    name = TextSerializer(firstNameRegister),
                     type = MapField.MapFieldType.REGISTER
                 }
             });
 
-            updates.Add(new MapUpdate
+            mapUpdates.Add(new MapUpdate
             {
-                register_op = Serializer(model.Author),
+                register_op = TextSerializer(userModel.LastName),
                 field = new MapField
                 {
-                    name = Serializer(authorRegister),
+                    name = TextSerializer(lastNameRegister),
                     type = MapField.MapFieldType.REGISTER
                 }
             });
 
-            updates.Add(new MapUpdate
+            if (EnumerableUtil.NotNullOrEmpty(userModel.Interests))
             {
-                register_op = Serializer(model.Content),
-                field = new MapField
+                var interestsSetOp = new SetOp();
+                interestsSetOp.adds.AddRange(
+                    userModel.Interests.Select(i => TextSerializer(i))
+                );
+                mapUpdates.Add(new MapUpdate
                 {
-                    name = Serializer(contentRegister),
-                    type = MapField.MapFieldType.REGISTER
-                }
-            });
+                    set_op = interestsSetOp,
+                    field = new MapField
+                    {
+                        name = TextSerializer(interestsSet),
+                        type = MapField.MapFieldType.SET
+                    }
+                });
+            }
 
-            var keywordsSetOp = new SetOp();
-            keywordsSetOp.adds.AddRange(model.Keywords.Select(kw => Serializer(kw)));
-
-            updates.Add(new MapUpdate
-            {
-                set_op = keywordsSetOp,
-                field = new MapField
-                {
-                    name = Serializer(keywordsSet),
-                    type = MapField.MapFieldType.SET
-                }
-            });
-
-            string datePostedSolrFormatted =
-                model.DatePosted
-                    .ToUniversalTime()
-                    .ToString("yyyy-MM-dd'T'HH:mm:ss'Z'", CultureInfo.InvariantCulture);
-            updates.Add(new MapUpdate
-            {
-                register_op = Serializer(datePostedSolrFormatted),
-                field = new MapField
-                {
-                    name = Serializer(datePostedRegister),
-                    type = MapField.MapFieldType.REGISTER
-                }
-            });
-
-            updates.Add(new MapUpdate
-            {
-                flag_op = model.Published ? MapUpdate.FlagOp.ENABLE : MapUpdate.FlagOp.DISABLE,
-                field = new MapField
-                {
-                    name = Serializer(publishedFlag),
-                    type = MapField.MapFieldType.FLAG
-                }
-            });
-
-            var id = new RiakObjectId(BucketType, bucketName, null);
-
-            var rslt = client.DtFetchMap(id);
+            // Insert without context
+            var rslt = client.DtUpdateMap(
+                GetRiakObjectId(), TextSerializer, null, null, mapUpdates, null);
             CheckResult(rslt.Result);
 
-            rslt = client.DtUpdateMap(id, Serializer, rslt.Context, null, updates, null);
-            CheckResult(rslt.Result);
+            return model.ID;
+        }
 
-            RiakObject obj = rslt.Result.Value;
-            return obj.Key;
+        public void IncrementPageVisits()
+        {
+            var mapUpdates = new List<MapUpdate>();
+
+            mapUpdates.Add(new MapUpdate
+            {
+                counter_op = new CounterOp { increment = 1 },
+                field = new MapField
+                {
+                    name = TextSerializer(visitsCounter),
+                    type = MapField.MapFieldType.COUNTER
+                }
+            });
+
+            // Update without context
+            var rslt = client.DtUpdateMap(
+                GetRiakObjectId(), TextSerializer, null, null, mapUpdates, null);
+            CheckResult(rslt.Result);
+        }
+
+        protected override string BucketType
+        {
+            get { return "maps"; }
+        }
+
+        protected override string BucketName
+        {
+            get { return "users"; }
         }
     }
-#endif
 }

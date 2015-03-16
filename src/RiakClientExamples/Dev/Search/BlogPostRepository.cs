@@ -29,8 +29,6 @@ namespace RiakClientExamples.Dev.Search
 
     public class BlogPostRepository : Repository<BlogPost>
     {
-        const string BucketType = "cms";
-
         const string titleRegister = "title";
         const string authorRegister = "author";
         const string contentRegister = "content";
@@ -43,25 +41,29 @@ namespace RiakClientExamples.Dev.Search
         private static readonly DeserializeObject<string> Deserializer =
             (b, type) => Encoding.UTF8.GetString(b);
 
+        private readonly BlogPost blogPostModel;
         private readonly string bucketName;
 
-        public BlogPostRepository(IRiakClient client, string bucketName)
-            : base(client)
+        public BlogPostRepository(IRiakClient client, BlogPost model, string bucketName)
+            : base(client, model)
         {
+            this.blogPostModel = model;
+
             if (string.IsNullOrWhiteSpace(bucketName))
             {
                 throw new ArgumentNullException("bucketName");
             }
+
             this.bucketName = bucketName;
         }
 
-        public override string Save(BlogPost model)
+        public override string Save()
         {
             var updates = new List<MapUpdate>();
 
             updates.Add(new MapUpdate
             {
-                register_op = Serializer(model.Title),
+                register_op = Serializer(blogPostModel.Title),
                 field = new MapField
                 {
                     name = Serializer(titleRegister),
@@ -71,7 +73,7 @@ namespace RiakClientExamples.Dev.Search
 
             updates.Add(new MapUpdate
             {
-                register_op = Serializer(model.Author),
+                register_op = Serializer(blogPostModel.Author),
                 field = new MapField
                 {
                     name = Serializer(authorRegister),
@@ -81,7 +83,7 @@ namespace RiakClientExamples.Dev.Search
 
             updates.Add(new MapUpdate
             {
-                register_op = Serializer(model.Content),
+                register_op = Serializer(blogPostModel.Content),
                 field = new MapField
                 {
                     name = Serializer(contentRegister),
@@ -90,7 +92,7 @@ namespace RiakClientExamples.Dev.Search
             });
 
             var keywordsSetOp = new SetOp();
-            keywordsSetOp.adds.AddRange(model.Keywords.Select(kw => Serializer(kw)));
+            keywordsSetOp.adds.AddRange(blogPostModel.Keywords.Select(kw => Serializer(kw)));
 
             updates.Add(new MapUpdate
             {
@@ -103,7 +105,7 @@ namespace RiakClientExamples.Dev.Search
             });
 
             string datePostedSolrFormatted =
-                model.DatePosted
+                blogPostModel.DatePosted
                     .ToUniversalTime()
                     .ToString("yyyy-MM-dd'T'HH:mm:ss'Z'", CultureInfo.InvariantCulture);
             updates.Add(new MapUpdate
@@ -118,7 +120,8 @@ namespace RiakClientExamples.Dev.Search
 
             updates.Add(new MapUpdate
             {
-                flag_op = model.Published ? MapUpdate.FlagOp.ENABLE : MapUpdate.FlagOp.DISABLE,
+                flag_op = blogPostModel.Published ?
+                    MapUpdate.FlagOp.ENABLE : MapUpdate.FlagOp.DISABLE,
                 field = new MapField
                 {
                     name = Serializer(publishedFlag),
@@ -136,6 +139,11 @@ namespace RiakClientExamples.Dev.Search
 
             RiakObject obj = rslt.Result.Value;
             return obj.Key;
+        }
+
+        protected override string BucketType
+        {
+            get { return "cms"; }
         }
     }
 }
