@@ -1,4 +1,4 @@
-﻿// <copyright file="BlogPost.cs" company="Basho Technologies, Inc.">
+﻿// <copyright file="User.cs" company="Basho Technologies, Inc.">
 // Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
@@ -19,86 +19,44 @@
 namespace RiakClientExamples.Dev.DataModeling
 {
     using System;
-    using System.Collections.Generic;
 
     public class User : IModel
     {
-        private readonly string title;
-        private string author;
-        private string content;
-        private ISet<string> keywords;
-        private DateTime datePosted;
-        private Boolean published;
+        private readonly string firstName;
+        private readonly string lastName;
 
-        public User(
-            string title,
-            string author,
-            string content,
-            ISet<string> keywords,
-            DateTime datePosted,
-            bool published)
+        public User(string firstName, string lastName)
         {
-            if (string.IsNullOrWhiteSpace(title))
+            if (string.IsNullOrWhiteSpace(firstName))
             {
-                throw new ArgumentNullException("title", "title is required");
+                throw new ArgumentNullException("firstName", "firstName is required");
             }
-            this.title = title;
+            this.firstName = firstName;
 
-            if (string.IsNullOrWhiteSpace(author))
+            if (string.IsNullOrWhiteSpace(lastName))
             {
-                throw new ArgumentNullException("author", "author is required");
+                throw new ArgumentNullException("lastName", "lastName is required");
             }
-            this.author = author;
-
-            if (string.IsNullOrWhiteSpace(content))
-            {
-                throw new ArgumentNullException("content", "content is required");
-            }
-            this.content = content;
-
-            this.keywords = keywords;
-            this.datePosted = datePosted;
-            this.published = published;
+            this.lastName = lastName;
         }
 
         public string ID
         {
-            get { return CreateSlug(); }
+            get
+            {
+                return string.Format("{0}_{1}",
+                    firstName.ToLowerInvariant(), lastName.ToLowerInvariant());
+            }
         }
 
-        public string Title
+        public string FirstName
         {
-            get { return title; }
+            get { return firstName; }
         }
 
-        public string Author
+        public string LastName
         {
-            get { return author; }
-        }
-
-        public string Content
-        {
-            get { return content; }
-        }
-
-        public IEnumerable<string> Keywords
-        {
-            get { return keywords; }
-        }
-
-        public DateTime DatePosted
-        {
-            get { return datePosted; }
-        }
-
-        public bool Published
-        {
-            get { return published; }
-        }
-
-        private string CreateSlug()
-        {
-            return "TODO";
+            get { return lastName; }
         }
     }
 }

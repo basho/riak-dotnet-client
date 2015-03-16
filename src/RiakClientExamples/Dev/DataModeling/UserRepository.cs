@@ -18,6 +18,7 @@
 
 namespace RiakClientExamples.Dev.DataModeling
 {
+#if FOO
     using System;
     using System.Collections.Generic;
     using System.Globalization;
@@ -138,4 +139,5 @@ namespace RiakClientExamples.Dev.DataModeling
             return obj.Key;
         }
     }
+#endif
 }

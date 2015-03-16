@@ -43,7 +43,7 @@ namespace RiakClientExamples.Dev.Search
             if (!File.Exists(blogPostSchemaFileName))
             {
                 Console.WriteLine("Writing {0} in {1}", blogPostSchemaFileName, Environment.CurrentDirectory);
-                var req = WebRequest.CreateHttp(blogPostSchema);
+                var req = WebRequest.Create(blogPostSchema);
                 var rsp = req.GetResponse();
                 var stream = rsp.GetResponseStream();
                 string line = string.Empty;
