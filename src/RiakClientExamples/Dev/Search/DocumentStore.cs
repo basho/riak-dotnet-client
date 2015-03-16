@@ -23,9 +23,7 @@ namespace RiakClientExamples.Dev.Search
     using System.IO;
     using System.Net;
     using System.Text;
-    using Models;
     using NUnit.Framework;
-    using Repositories;
     using RiakClient;
     using RiakClient.Models.Search;
 
