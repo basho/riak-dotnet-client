@@ -477,6 +477,38 @@ namespace RiakClientTests.Live.GeneralIntegrationTests
         }
 
         [Test]
+        public void MultiWritesWithoutKeys_ReturnsRiakGeneratedKeys()
+        {
+            ushort insertCount = 10;
+            var docs = new List<RiakObject>();
+
+            for (ushort i = 0; i < insertCount; ++i)
+            {
+                var doc = new RiakObject(TestBucket, null, TestJson, RiakConstants.ContentTypes.ApplicationJson);
+                docs.Add(doc);
+            }
+
+            var keySet = new HashSet<string>();
+            var results = Client.Put(docs);
+            foreach (var result in results)
+            {
+                result.IsSuccess.ShouldBeTrue();
+                result.Value.ShouldNotBeNull();
+                result.Value.Key.ShouldNotBeNullOrEmpty();
+                keySet.Add(result.Value.Key);
+            }
+
+            Assert.AreEqual(insertCount, keySet.Count);
+
+            var del_results = Client.Delete(keySet.Select(k => new RiakObjectId(TestBucket, k)));
+            foreach (var del_result in del_results)
+            {
+                del_result.IsSuccess.ShouldBeTrue();
+                Assert.True(del_result.ResultCode == ResultCode.Success);
+            }
+        }
+
+        [Test]
         public void UpdatingWithGeneratedKey_ReturnsCorrectKey()
         {
             var doc = new RiakObject(TestBucket, null, TestJson, RiakConstants.ContentTypes.ApplicationJson);
