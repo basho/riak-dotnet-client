@@ -187,6 +187,7 @@ namespace RiakClientExamples.Dev.Using
         public void DeleteIndex()
         {
             var rslt = client.DeleteSearchIndex("famous");
+            CheckResult(rslt);
         }
 
         private ICollection<RiakObjectId> PutAnimals()
