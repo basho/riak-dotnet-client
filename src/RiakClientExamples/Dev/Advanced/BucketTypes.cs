@@ -32,6 +32,7 @@ namespace RiakClientExamples.Dev.Advanced
         {
             var id = new RiakObjectId("my_bucket", "my_key");
             var rslt = client.Get(id);
+            CheckResult(rslt);
         }
 
         [Test]
@@ -40,7 +41,9 @@ namespace RiakClientExamples.Dev.Advanced
             var id1 = new RiakObjectId("type1", "my_bucket", "my_key");
             var id2 = new RiakObjectId("type2", "my_bucket", "my_key");
             var rslt1 = client.Get(id1);
+            CheckResult(rslt1);
             var rslt2 = client.Get(id2);
+            CheckResult(rslt2);
         }
 
         [Test]

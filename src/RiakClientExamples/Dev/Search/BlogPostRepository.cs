@@ -38,8 +38,6 @@ namespace RiakClientExamples.Dev.Search
 
         private static readonly SerializeObjectToByteArray<string> Serializer =
             s => Encoding.UTF8.GetBytes(s);
-        private static readonly DeserializeObject<string> Deserializer =
-            (b, type) => Encoding.UTF8.GetString(b);
 
         private readonly BlogPost blogPostModel;
         private readonly string bucketName;

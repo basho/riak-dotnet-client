@@ -42,6 +42,7 @@ namespace RiakClientExamples.Dev.DataModeling
             Assert.AreEqual("<insert_key_here>", id.Key);
 
             var rslt = client.DtFetchCounter(id);
+            CheckResult(rslt.Result);
         }
     }
 }
