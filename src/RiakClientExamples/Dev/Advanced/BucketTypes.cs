@@ -32,18 +32,18 @@ namespace RiakClientExamples.Dev.Advanced
         {
             var id = new RiakObjectId("my_bucket", "my_key");
             var rslt = client.Get(id);
-            CheckResult(rslt);
+            CheckResult(rslt, true);
         }
 
         [Test]
         public void UsingBucketType()
         {
-            var id1 = new RiakObjectId("type1", "my_bucket", "my_key");
-            var id2 = new RiakObjectId("type2", "my_bucket", "my_key");
+            var id1 = new RiakObjectId("users", "my_bucket", "my_key");
+            var id2 = new RiakObjectId("users", "my_bucket", "my_key");
             var rslt1 = client.Get(id1);
-            CheckResult(rslt1);
+            CheckResult(rslt1, true);
             var rslt2 = client.Get(id2);
-            CheckResult(rslt2);
+            CheckResult(rslt2, true);
         }
 
         [Test]
@@ -67,7 +67,8 @@ namespace RiakClientExamples.Dev.Advanced
         {
             id = new RiakObjectId("no_siblings", "sensitive_user_data", "user19735");
             var obj = new RiakObject(id, "{\"name\":\"Bob\"}");
-            rslt = client.Put(obj);
+            var rslt = client.Put(obj);
+            CheckResult(rslt);
         }
 
         [Test]
@@ -76,7 +77,8 @@ namespace RiakClientExamples.Dev.Advanced
             id = new RiakObjectId("no_siblings", "old_memes", "all_your_base");
             var obj = new RiakObject(id, "all your base are belong to us",
                 RiakConstants.ContentTypes.TextPlain);
-            rslt = client.Put(obj);
+            var rslt = client.Put(obj);
+            CheckResult(rslt);
         }
     }
 }

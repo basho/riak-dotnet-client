@@ -37,14 +37,16 @@ namespace RiakClientExamples.Dev.Using
         public void CreateSearchIndex()
         {
             var idx = new SearchIndex("famous");
-            rslt = client.PutSearchIndex(idx);
+            var rslt = client.PutSearchIndex(idx);
+            CheckResult(rslt);
         }
 
         [Test]
         public void CreateSearchIndexWithDefaultSchema()
         {
             var idx = new SearchIndex("famous", "_yz_default");
-            rslt = client.PutSearchIndex(idx);
+            var rslt = client.PutSearchIndex(idx);
+            CheckResult(rslt);
         }
 
         [Test]
@@ -52,7 +54,8 @@ namespace RiakClientExamples.Dev.Using
         {
             var properties = new RiakBucketProperties();
             properties.SetSearchIndex("famous");
-            rslt = client.SetBucketProperties("cats", properties);
+            var rslt = client.SetBucketProperties("cats", properties);
+            CheckResult(rslt);
         }
 
         [Test]
@@ -157,7 +160,8 @@ namespace RiakClientExamples.Dev.Using
                     .Build()
             };
 
-            rslt = client.Search(search);
+            var rslt = client.Search(search);
+            CheckResult(rslt);
         }
 
         [Test]
@@ -187,7 +191,7 @@ namespace RiakClientExamples.Dev.Using
         public void DeleteIndex()
         {
             var rslt = client.DeleteSearchIndex("famous");
-            CheckResult(rslt);
+            CheckResult(rslt, true);
         }
 
         private ICollection<RiakObjectId> PutAnimals()

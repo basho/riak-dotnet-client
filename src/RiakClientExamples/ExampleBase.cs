@@ -42,7 +42,6 @@ namespace RiakClientExamples
         protected IRiakClient client;
         protected RiakObjectId id;
         protected ICollection<RiakObjectId> ids;
-        protected RiakResult rslt;
 
         public ExampleBase()
         {
@@ -58,11 +57,6 @@ namespace RiakClientExamples
         [TearDown]
         public void TearDown()
         {
-            if (rslt != null)
-            {
-                CheckResult(rslt);
-            }
-
 #if CLEANUP
             if (id != null)
             {
@@ -89,9 +83,16 @@ namespace RiakClientExamples
             }
         }
 
-        protected void CheckResult(RiakResult riakResult)
+        protected void CheckResult(RiakResult riakResult, bool errorIsOK = false)
         {
-            Assert.IsTrue(riakResult.IsSuccess, "Error: {0}", riakResult.ErrorMessage);
+            if (errorIsOK && !riakResult.IsSuccess)
+            {
+                Console.WriteLine("Error: {0}", riakResult.ErrorMessage);
+            }
+            else
+            {
+                Assert.IsTrue(riakResult.IsSuccess, "Error: {0}", riakResult.ErrorMessage);
+            }
         }
 
         protected void DeleteObject(RiakObjectId id)
