@@ -1,0 +1,148 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o nounset
+
+# Defaults
+declare -r riak_admin=dev1/bin/riak-admin
+declare -r default_dev_cluster_path="$HOME/Projects/basho/riak/dev"
+opt_setup_document_store='false'
+
+script_dir=''
+script_path=''
+if hash realpath 2>/dev/null
+then
+    script_dir="$(dirname $0)"
+    script_path="$(realpath $script_dir)"
+else
+    script_path="$(perl -e 'use File::Basename;use Cwd q(abs_path);print dirname(abs_path(shift))' $0)"
+fi
+PATH="$PATH:$script_path"
+
+function now
+{
+    date '+%Y-%m-%d %H:%M:%S'
+}
+
+function pwarn
+{
+    echo "$(now) [warning]: $@" 1>&2
+}
+
+function perr
+{
+    echo "$(now) [error]: $@" 1>&2
+}
+
+function pinfo
+{
+    echo "$(now) [info]: $@"
+}
+
+function errexit
+{
+    perr "$@"
+    exit 1
+}
+
+function onexit
+{
+    echo Exiting!
+    (( ${#DIRSTACK[*]} > 1 )) && popd
+}
+
+function usage
+{
+      echo "
+setup-examples: Set up your dev cluster to run RiakClientExamples project
+
+Usage: setup-dev-cluster [-d] [-p <riak dev path>]
+
+-d      Set up bucket types for Document Store and Search Data Types
+        examples. Run this *after* creating the blog_post_schema schema
+        and these indexes:
+            blog_posts
+            scores
+            hobbies
+            customers
+-p      Riak dev path (Default: \"$default_dev_cluster_path\")
+"
+      exit 0
+}
+
+while getopts "dp:" opt; do
+    case $opt in
+        p)
+            opt_dev_cluster_path="$OPTARG";;
+        d)
+            opt_setup_document_store='true';;
+        *)
+            usage;;
+    esac
+done
+
+trap onexit EXIT
+
+declare -r dev_cluster_path="${opt_dev_cluster_path:-$default_dev_cluster_path}"
+
+if [[ -d $dev_cluster_path ]]
+then
+    pinfo "Setting up dev cluster in $dev_cluster_path for RiakClientExamples"
+else
+    errexit "Dev cluster path $dev_cluster_path does not exist!"
+fi
+
+pushd $dev_cluster_path > /dev/null
+
+set +o errexit
+
+# Note:
+# run the following commands for the "Document Store"
+# and "Search Data Types" examples.
+# You must create these indexes first:
+#     blog_posts
+#     scores
+#     hobbies
+#     customers
+#
+if [[ $opt_setup_document_store == 'true' ]]
+then
+    $riak_admin bucket-type create cms '{"props":{"datatype":"map","search_index":"blog_posts"}}'
+    $riak_admin bucket-type activate cms
+
+    $riak_admin bucket-type update counters '{"props":{"search_index":"scores"}}'
+    $riak_admin bucket-type update sets '{"props":{"search_index":"hobbies"}}'
+    $riak_admin bucket-type update maps '{"props":{"search_index":"customers"}}'
+else
+    for bucket_type in animals quotes sports cars users indexes
+    do
+        $riak_admin bucket-type create "$bucket_type"
+        $riak_admin bucket-type activate "$bucket_type"
+    done
+
+    $riak_admin bucket-type create n_val_of_5 '{"props":{"n_val":5}}'
+    $riak_admin bucket-type activate n_val_of_5
+
+    $riak_admin bucket-type create maps '{"props":{"datatype":"map"}}'
+    $riak_admin bucket-type activate maps
+
+    $riak_admin bucket-type create sets '{"props":{"datatype":"set"}}'
+    $riak_admin bucket-type activate sets
+
+    $riak_admin bucket-type create counters '{"props":{"datatype":"counter"}}'
+    $riak_admin bucket-type activate counters
+
+    $riak_admin bucket-type create siblings '{"props":{"allow_mult":true}}'
+    $riak_admin bucket-type activate siblings
+
+    $riak_admin bucket-type create siblings_allowed '{"props":{"allow_mult":true}}'
+    $riak_admin bucket-type activate siblings_allowed
+
+    $riak_admin bucket-type create no_siblings '{"props":{"allow_mult":false}}'
+    $riak_admin bucket-type activate no_siblings
+fi
+
+set -o errexit
+
+pinfo "Done!"
+

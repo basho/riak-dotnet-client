@@ -50,6 +50,19 @@ namespace RiakClient.Models.Search
         /// </summary>
         /// <param name="indexName">The name of the index.</param>
         /// <param name="schemaName">The name of the schema for the index.</param>
+        /// <remarks>
+        /// Uses the provided schema name and default NVal value (<see cref="RiakConstants.Defaults.YokozunaIndex.NVal"/>).
+        /// </remarks>
+        public SearchIndex(string indexName, string schemaName)
+            : this(indexName, schemaName, new NVal(RiakConstants.Defaults.YokozunaIndex.NVal))
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SearchIndex"/> class.
+        /// </summary>
+        /// <param name="indexName">The name of the index.</param>
+        /// <param name="schemaName">The name of the schema for the index.</param>
         /// <param name="nval">The <see cref="NVal"/> value for storing index entries.</param>
         /// <exception cref="ArgumentException"><paramref name="indexName"/> cannot be null, zero length, or whitespace</exception>
         /// <exception cref="ArgumentException"><paramref name="schemaName"/> cannot be null, zero length, or whitespace</exception>
