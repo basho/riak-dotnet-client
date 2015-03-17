@@ -90,8 +90,8 @@ namespace RiakClientExamples.Dev.Search
                 DateTime.Now,
                 true);
 
-            var repo = new BlogPostRepository(client, post, "cat_pics_quarterly");
-            string id = repo.Save();
+            var repo = new BlogPostRepository(client, "cat_pics_quarterly");
+            string id = repo.Save(post);
             Assert.IsNotNullOrEmpty(id);
             Console.WriteLine("Blog post ID: {0}", id);
         }

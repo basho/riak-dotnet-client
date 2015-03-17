@@ -64,6 +64,7 @@
     </Compile>
     <Compile Include="Dev\Advanced\SearchSchemaExamples.cs" />
     <Compile Include="Dev\Advanced\BucketTypes.cs" />
+    <Compile Include="Dev\DataModeling\EntityManager.cs" />
     <Compile Include="Dev\DataModeling\User.cs" />
     <Compile Include="Dev\DataModeling\UserRepository.cs" />
     <Compile Include="Dev\DataModeling\DataTypes.cs" />

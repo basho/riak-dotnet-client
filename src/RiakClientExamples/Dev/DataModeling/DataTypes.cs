@@ -18,31 +18,35 @@
 
 namespace RiakClientExamples.Dev.DataModeling
 {
-    using System;
-    using System.Collections.Generic;
     using System.Linq;
-    using System.Text;
+    using System.Collections.Generic;
     using NUnit.Framework;
     using RiakClient;
-    using RiakClient.Messages;
-    using RiakClient.Models;
-    using RiakClient.Models.RiakDt;
 
     /*
-     * http://docs.basho.com/riak/latest/dev/using/data-types/
+     * http://docs.basho.com/riak/latest/dev/data-modeling/data-types/
      */
     public sealed class DataTypes : ExampleBase
     {
         [Test]
-        public void CountersIdAndFetch()
+        public void UserExample()
         {
-            id = new RiakObjectId("counters", "counters", "<insert_key_here>");
-            Assert.AreEqual("counters", id.BucketType);
-            Assert.AreEqual("counters", id.Bucket);
-            Assert.AreEqual("<insert_key_here>", id.Key);
+            var interests = new HashSet<string> { "distributed systems", "Erlang" };
+            var joe = new User("Joe", "Armstrong", interests);
 
-            var rslt = client.DtFetchCounter(id);
-            CheckResult(rslt.Result);
+            var entityManager = new EntityManager(client);
+            entityManager.Add(joe);
+            var repo = new UserRepository(client);
+            repo.Save(joe);
+
+            joe.VisitPage();
+
+            joe.AddInterest("riak");
+
+            var joeFetched = repo.Get("joe_armstrong");
+
+            Assert.GreaterOrEqual(joe.PageVisits, 0);
+            Assert.Contains("riak", joeFetched.Interests.ToArray());
         }
     }
 }

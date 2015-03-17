@@ -18,41 +18,86 @@
 
 namespace RiakClientExamples.Dev.DataModeling
 {
-    using System.Linq;
+    using System;
     using System.Collections.Generic;
+    using System.Linq;
     using RiakClient;
     using RiakClient.Messages;
-    using RiakClient.Models;
+    using RiakClient.Models.RiakDt;
     using RiakClient.Util;
-    using System;
 
     public class UserRepository : Repository<User>
     {
         const string firstNameRegister = "first_name";
         const string lastNameRegister = "last_name";
         const string interestsSet = "interests";
-        const string visitsCounter = "visits";
+        const string pageVisitsCounter = "visits";
+        const string paidAccountFlag = "paid_account";
 
-        private readonly User userModel;
-
-        public UserRepository(IRiakClient client, User model)
-            : base(client, model)
+        public UserRepository(IRiakClient client)
+            : base(client)
         {
-            if (model == null)
-            {
-                throw new ArgumentNullException("model");
-            }
-
-            this.userModel = model;
         }
 
-        public override string Save()
+        public override User Get(string key, bool notFoundOK = false)
+        {
+            var fetchRslt = client.DtFetchMap(GetRiakObjectId(key));
+            CheckResult(fetchRslt.Result);
+
+            string firstName = null;
+            string lastName = null;
+            var interests = new List<string>();
+            uint pageVisits = 0;
+
+            foreach (var value in fetchRslt.Values)
+            {
+                RiakDtMapField mapField = value.Field;
+                switch (mapField.Name)
+                {
+                    case firstNameRegister:
+                        if (mapField.Type != RiakDtMapField.RiakDtMapFieldType.Register)
+                        {
+                            throw new InvalidCastException("expected Register type");
+                        }
+                        firstName = TextDeserializer(value.RegisterValue);
+                        break;
+                    case lastNameRegister:
+                        if (mapField.Type != RiakDtMapField.RiakDtMapFieldType.Register)
+                        {
+                            throw new InvalidCastException("expected Register type");
+                        }
+                        lastName = TextDeserializer(value.RegisterValue);
+                        break;
+                    case interestsSet:
+                        if (mapField.Type != RiakDtMapField.RiakDtMapFieldType.Set)
+                        {
+                            throw new InvalidCastException("expected Set type");
+                        }
+                        interests.AddRange(value.SetValue.Select(v => TextDeserializer(v)));
+                        break;
+                    case pageVisitsCounter:
+                        if (mapField.Type != RiakDtMapField.RiakDtMapFieldType.Counter)
+                        {
+                            throw new InvalidCastException("expected Counter type");
+                        }
+                        pageVisits = (uint)value.Counter.Value;
+                        break;
+                    /*
+                     * Note: can do additional checks here in default case
+                     */
+                }
+            }
+
+            return new User(firstName, lastName, interests, pageVisits);
+        }
+
+        public override string Save(User model)
         {
             var mapUpdates = new List<MapUpdate>();
 
             mapUpdates.Add(new MapUpdate
             {
-                register_op = TextSerializer(userModel.FirstName),
+                register_op = TextSerializer(model.FirstName),
                 field = new MapField
                 {
                     name = TextSerializer(firstNameRegister),
@@ -62,7 +107,7 @@ namespace RiakClientExamples.Dev.DataModeling
 
             mapUpdates.Add(new MapUpdate
             {
-                register_op = TextSerializer(userModel.LastName),
+                register_op = TextSerializer(model.LastName),
                 field = new MapField
                 {
                     name = TextSerializer(lastNameRegister),
@@ -70,11 +115,11 @@ namespace RiakClientExamples.Dev.DataModeling
                 }
             });
 
-            if (EnumerableUtil.NotNullOrEmpty(userModel.Interests))
+            if (EnumerableUtil.NotNullOrEmpty(model.Interests))
             {
                 var interestsSetOp = new SetOp();
                 interestsSetOp.adds.AddRange(
-                    userModel.Interests.Select(i => TextSerializer(i))
+                    model.Interests.Select(i => TextSerializer(i))
                 );
                 mapUpdates.Add(new MapUpdate
                 {
@@ -87,15 +132,55 @@ namespace RiakClientExamples.Dev.DataModeling
                 });
             }
 
-            // Insert without context
-            var rslt = client.DtUpdateMap(
-                GetRiakObjectId(), TextSerializer, null, null, mapUpdates, null);
-            CheckResult(rslt.Result);
+            // Update without context
+            UpdateMap(model, mapUpdates);
 
             return model.ID;
         }
 
-        public void IncrementPageVisits()
+        public void AddInterest(User model, string interest)
+        {
+            var interestsSetOp = new SetOp();
+            interestsSetOp.adds.Add(TextSerializer(interest));
+
+            var mapUpdates = new List<MapUpdate>
+            {
+                new MapUpdate
+                {
+                    set_op = interestsSetOp,
+                    field = new MapField
+                    {
+                        name = TextSerializer(interestsSet),
+                        type = MapField.MapFieldType.SET
+                    }
+                }
+            };
+
+            UpdateMap(model, mapUpdates, fetchFirst: true);
+        }
+
+        public void RemoveInterest(User model, string interest)
+        {
+            var interestsSetOp = new SetOp();
+            interestsSetOp.removes.Add(TextSerializer(interest));
+
+            var mapUpdates = new List<MapUpdate>
+            {
+                new MapUpdate
+                {
+                    set_op = interestsSetOp,
+                    field = new MapField
+                    {
+                        name = TextSerializer(interestsSet),
+                        type = MapField.MapFieldType.SET
+                    }
+                }
+            };
+
+            UpdateMap(model, mapUpdates, fetchFirst: true);
+        }
+
+        public void IncrementPageVisits(User model)
         {
             var mapUpdates = new List<MapUpdate>();
 
@@ -104,15 +189,47 @@ namespace RiakClientExamples.Dev.DataModeling
                 counter_op = new CounterOp { increment = 1 },
                 field = new MapField
                 {
-                    name = TextSerializer(visitsCounter),
+                    name = TextSerializer(pageVisitsCounter),
                     type = MapField.MapFieldType.COUNTER
                 }
             });
 
             // Update without context
-            var rslt = client.DtUpdateMap(
-                GetRiakObjectId(), TextSerializer, null, null, mapUpdates, null);
-            CheckResult(rslt.Result);
+            UpdateMap(model, mapUpdates);
+        }
+
+        public void UpgradeAccount(User model)
+        {
+            var mapUpdates = new List<MapUpdate>();
+
+            mapUpdates.Add(new MapUpdate
+            {
+                flag_op = MapUpdate.FlagOp.ENABLE,
+                field = new MapField
+                {
+                    name = TextSerializer(paidAccountFlag),
+                    type = MapField.MapFieldType.FLAG
+                }
+            });
+
+            UpdateMap(model, mapUpdates, fetchFirst: true);
+        }
+
+        public void DowngradeAccount(User model)
+        {
+            var mapUpdates = new List<MapUpdate>();
+
+            mapUpdates.Add(new MapUpdate
+            {
+                flag_op = MapUpdate.FlagOp.DISABLE,
+                field = new MapField
+                {
+                    name = TextSerializer(paidAccountFlag),
+                    type = MapField.MapFieldType.FLAG
+                }
+            });
+
+            UpdateMap(model, mapUpdates, fetchFirst: true);
         }
 
         protected override string BucketType

@@ -19,8 +19,10 @@
 namespace RiakClientExamples.Dev
 {
     using System;
+    using System.Collections.Generic;
     using System.Text;
     using RiakClient;
+    using RiakClient.Messages;
     using RiakClient.Models;
 
     public abstract class Repository<TModel> : IRepository<TModel> where TModel : IModel
@@ -33,9 +35,8 @@ namespace RiakClientExamples.Dev
             (b, type) => Encoding.UTF8.GetString(b);
 
         protected IRiakClient client;
-        protected IModel model;
 
-        public Repository(IRiakClient client, IModel model)
+        public Repository(IRiakClient client)
         {
             if (client == null)
             {
@@ -43,13 +44,6 @@ namespace RiakClientExamples.Dev
             }
 
             this.client = client;
-
-            if (model == null)
-            {
-                throw new ArgumentNullException("model");
-            }
-
-            this.model = model;
         }
 
         public virtual TModel Get(string key, bool notFoundOK = false)
@@ -68,7 +62,7 @@ namespace RiakClientExamples.Dev
             }
         }
 
-        public virtual string Save()
+        public virtual string Save(TModel model)
         {
             var riakObjectId = new RiakObjectId(BucketType, BucketName, model.ID);
             var riakObject = new RiakObject(riakObjectId, model);
@@ -88,6 +82,24 @@ namespace RiakClientExamples.Dev
             get { return string.Empty; }
         }
 
+        protected void UpdateMap(TModel model, List<MapUpdate> mapUpdates, bool fetchFirst = false)
+        {
+            byte[] context = null;
+            RiakObjectId id = GetRiakObjectId(model);
+
+            if (fetchFirst)
+            {
+                var getRslt = client.DtFetchMap(id);
+                CheckResult(getRslt.Result);
+
+                context = getRslt.Context;
+            }
+
+            var rslt = client.DtUpdateMap(
+                id, TextSerializer, context, null, mapUpdates, null);
+            CheckResult(rslt.Result);
+        }
+
         protected void CheckResult(RiakResult result, bool notFoundOK = false)
         {
             if (!result.IsSuccess)
@@ -103,9 +115,14 @@ namespace RiakClientExamples.Dev
             }
         }
 
-        protected RiakObjectId GetRiakObjectId()
+        protected RiakObjectId GetRiakObjectId(TModel model)
         {
-            return new RiakObjectId(BucketType, BucketName, model.ID);
+            return GetRiakObjectId(model.ID);
+        }
+
+        protected RiakObjectId GetRiakObjectId(string key)
+        {
+            return new RiakObjectId(BucketType, BucketName, key);
         }
     }
 }
