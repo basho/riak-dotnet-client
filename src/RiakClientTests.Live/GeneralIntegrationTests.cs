@@ -26,7 +26,6 @@ namespace RiakClientTests.Live.GeneralIntegrationTests
     using RiakClient;
     using RiakClient.Models;
     using RiakClient.Models.MapReduce;
-    using RiakClient.Util;
 
     [TestFixture]
     public class WhenTalkingToRiak : LiveRiakConnectionTestBase
@@ -461,6 +460,74 @@ namespace RiakClientTests.Live.GeneralIntegrationTests
             var result = Client.StreamListBuckets();
             result.IsSuccess.ShouldBeTrue();
             result.Value.ShouldContain(TestBucket);
+        }
+
+        [Test]
+        public void WritingWithoutAKey_ReturnsRiakGeneratedKey()
+        {
+            var doc = new RiakObject(TestBucket, null, TestJson, RiakConstants.ContentTypes.ApplicationJson);
+            var result = Client.Put(doc);
+            result.IsSuccess.ShouldBeTrue();
+            result.Value.ShouldNotBeNull();
+            result.Value.Key.ShouldNotBeNullOrEmpty();
+
+            var del_result = Client.Delete(TestBucket, result.Value.Key);
+            del_result.IsSuccess.ShouldBeTrue();
+            Assert.True(del_result.ResultCode == ResultCode.Success);
+        }
+
+        [Test]
+        public void MultiWritesWithoutKeys_ReturnsRiakGeneratedKeys()
+        {
+            ushort insertCount = 10;
+            var docs = new List<RiakObject>();
+
+            for (ushort i = 0; i < insertCount; ++i)
+            {
+                var doc = new RiakObject(TestBucket, null, TestJson, RiakConstants.ContentTypes.ApplicationJson);
+                docs.Add(doc);
+            }
+
+            var keySet = new HashSet<string>();
+            var results = Client.Put(docs);
+            foreach (var result in results)
+            {
+                result.IsSuccess.ShouldBeTrue();
+                result.Value.ShouldNotBeNull();
+                result.Value.Key.ShouldNotBeNullOrEmpty();
+                keySet.Add(result.Value.Key);
+            }
+
+            Assert.AreEqual(insertCount, keySet.Count);
+
+            var del_results = Client.Delete(keySet.Select(k => new RiakObjectId(TestBucket, k)));
+            foreach (var del_result in del_results)
+            {
+                del_result.IsSuccess.ShouldBeTrue();
+                Assert.True(del_result.ResultCode == ResultCode.Success);
+            }
+        }
+
+        [Test]
+        public void UpdatingWithGeneratedKey_ReturnsCorrectKey()
+        {
+            var doc = new RiakObject(TestBucket, null, TestJson, RiakConstants.ContentTypes.ApplicationJson);
+            var result = Client.Put(doc);
+            result.IsSuccess.ShouldBeTrue();
+            result.Value.ShouldNotBeNull();
+            result.Value.Key.ShouldNotBeNullOrEmpty();
+
+            string key = result.Value.Key;
+            string updatedValue = @"{'foo':'bar'}";
+            var update = new RiakObject(TestBucket, key, updatedValue, RiakConstants.ContentTypes.ApplicationJson);
+            result = Client.Put(update);
+            result.IsSuccess.ShouldBeTrue();
+            result.Value.ShouldNotBeNull();
+            result.Value.Key.ShouldEqual(key);
+
+            var del_result = Client.Delete(TestBucket, key);
+            del_result.IsSuccess.ShouldBeTrue();
+            Assert.True(del_result.ResultCode == ResultCode.Success);
         }
 
         [Test]

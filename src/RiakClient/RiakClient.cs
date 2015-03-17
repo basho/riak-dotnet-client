@@ -234,14 +234,20 @@ namespace RiakClient
                 return RiakResult<RiakObject>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline);
             }
 
+            string key = value.Key;
+            if (key == null)
+            {
+                key = result.Value.key.FromRiakString();
+            }
+
             var finalResult = options.ReturnBody
-                ? new RiakObject(value.BucketType, value.Bucket, value.Key, result.Value.content.First(), result.Value.vclock)
-                : value;
+                ? new RiakObject(value.BucketType, value.Bucket, key, result.Value.content.First(), result.Value.vclock)
+                : new RiakObject(value.BucketType, value.Bucket, key, (RpbContent)null, result.Value.vclock);
 
             if (options.ReturnBody && result.Value.content.Count > 1)
             {
                 finalResult.Siblings = result.Value.content.Select(c =>
-                    new RiakObject(value.BucketType, value.Bucket, value.Key, c, result.Value.vclock)).ToList();
+                    new RiakObject(value.BucketType, value.Bucket, key, c, result.Value.vclock)).ToList();
             }
 
             return RiakResult<RiakObject>.Success(finalResult);
@@ -269,9 +275,15 @@ namespace RiakClient
             {
                 if (t.Item1.IsSuccess)
                 {
+                    string key = t.Item2.Key;
+                    if (key == null)
+                    {
+                        key = t.Item1.Value.key.FromRiakString();
+                    }
+
                     var finalResult = options.ReturnBody
-                        ? new RiakObject(t.Item2.BucketType, t.Item2.Bucket, t.Item2.Key, t.Item1.Value.content.First(), t.Item1.Value.vclock)
-                        : t.Item2;
+                        ? new RiakObject(t.Item2.BucketType, t.Item2.Bucket, key, t.Item1.Value.content.First(), t.Item1.Value.vclock)
+                        : new RiakObject(t.Item2.BucketType, t.Item2.Bucket, key, (RpbContent)null, t.Item1.Value.vclock);
 
                     if (options.ReturnBody && t.Item1.Value.content.Count > 1)
                     {
@@ -741,7 +753,14 @@ namespace RiakClient
                 return new RiakCounterResult(RiakResult<RiakObject>.Error(result.ResultCode, result.ErrorMessage, result.NodeOffline), null);
             }
 
-            var o = new RiakObject(objectId, result.Value.counter_value);
+            string key = objectId.Key;
+            if (key == null)
+            {
+                key = result.Value.key.FromRiakString();
+            }
+
+            var id = new RiakObjectId(objectId.BucketType, objectId.Bucket, key);
+            var o = new RiakObject(id, result.Value.counter_value);
 
             var rcr = new RiakCounterResult(RiakResult<RiakObject>.Success(o));
 
@@ -851,8 +870,16 @@ namespace RiakClient
 
             var response = UseConnection(conn => conn.PbcWriteRead<DtUpdateReq, DtUpdateResp>(request));
 
+            string key = objectId.Key;
+            if (key == null)
+            {
+                key = response.Value.key.FromRiakString();
+            }
+
+            var id = new RiakObjectId(objectId.BucketType, objectId.Bucket, key);
+
             var resultSet =
-                new RiakDtSetResult(RiakResult<RiakObject>.Success(new RiakObject(objectId, response.Value)));
+                new RiakDtSetResult(RiakResult<RiakObject>.Success(new RiakObject(id, response.Value)));
 
             if (options.IncludeContext && response.Value != null)
             {
@@ -995,8 +1022,16 @@ namespace RiakClient
                                .Error(result.ResultCode, result.ErrorMessage, result.NodeOffline));
             }
 
+            string key = objectId.Key;
+            if (key == null)
+            {
+                key = result.Value.key.FromRiakString();
+            }
+
+            var id = new RiakObjectId(objectId.BucketType, objectId.Bucket, key);
+
             var riakMapResult =
-                new RiakDtMapResult(RiakResult<RiakObject>.Success(new RiakObject(objectId, result.Value.map_value)));
+                new RiakDtMapResult(RiakResult<RiakObject>.Success(new RiakObject(id, result.Value.map_value)));
 
             if (options.IncludeContext)
             {
