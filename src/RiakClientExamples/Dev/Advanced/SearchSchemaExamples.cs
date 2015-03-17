@@ -33,7 +33,8 @@ namespace RiakClientExamples.Dev.Using.Advanced
         {
             var xml = File.ReadAllText("cartoons.xml");
             var schema = new SearchSchema("cartoons", xml);
-            rslt = client.PutSearchSchema(schema);
+            var rslt = client.PutSearchSchema(schema);
+            CheckResult(rslt);
         }
     }
 }

@@ -43,12 +43,9 @@ namespace RiakClientExamples.Dev.Using
             id = new RiakObjectId("siblings", "coaches", "packers");
             var getResult = client.Get(id);
 
-
             RiakObject packers = getResult.Value;
             Assert.AreEqual("Vince Lombardi", Encoding.UTF8.GetString(packers.Value));
             Assert.AreEqual(0, packers.Siblings.Count);
-
-            rslt = getResult;
         }
 
         private RiakObjectId PutCoach(string team, string coach)
