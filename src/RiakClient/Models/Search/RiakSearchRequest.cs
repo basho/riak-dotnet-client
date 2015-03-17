@@ -60,7 +60,7 @@ namespace RiakClient.Models.Search
     /// <summary>
     /// Represents a Riak Search request.
     /// </summary>
-    public class RiakSearchRequest
+    public class RiakSearchRequest : IEquatable<RiakSearchRequest>
     {
         private readonly string solrIndex;
         private readonly string solrQuery;
@@ -184,16 +184,56 @@ namespace RiakClient.Models.Search
         /// </remarks>
         public List<string> ReturnFields { get; set; }
 
+        /// <summary>
+        /// Compares two <see cref="RiakSearchRequest"/> objects for equality.
+        /// </summary>
+        /// <param name="other">The instance of <see cref="RiakSearchRequest"/> with which to compare equality</param>
+        /// <returns><b>true</b> if the specified object is equal to the current object, otherwise, <b>false</b>.</returns>
+        public bool Equals(RiakSearchRequest other)
+        {
+            if (object.ReferenceEquals(other, null))
+            {
+                return false;
+            }
+
+            if (object.ReferenceEquals(this, other))
+            {
+                return true;
+            }
+
+            return this.GetHashCode() == other.GetHashCode();
+        }
+
+        /// <inheritdoc/>
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as RiakSearchRequest);
+        }
+
+        /// <inheritdoc/>
+        public override int GetHashCode()
+        {
+            string filterString = GetFilterString();
+
+            unchecked
+            {
+                int idxHashCode = GetIndexString().GetHashCode();
+                int queryHashCode = GetQueryString().GetHashCode();
+                int filterHashCode = filterString == null ? 0 : filterString.GetHashCode();
+                return (idxHashCode * 397) ^ (queryHashCode * 397) ^ (filterHashCode * 397);
+            }
+        }
+
         internal RpbSearchQueryReq ToMessage()
         {
             var msg = new RpbSearchQueryReq
             {
-                index = GetIndexRiakString(),
-                q = GetQueryRiakString(),
+                index = GetIndexString().ToRiakString(),
+                q = GetQueryString().ToRiakString(),
                 rows = (uint)Rows,
                 start = (uint)Start,
                 sort = Sort.ToRiakString(),
-                filter = GetFilterRiakString(),
+                filter = GetFilterString().ToRiakString(),
                 presort = PreSort.HasValue ? PreSort.Value.ToString().ToLower().ToRiakString() : null,
                 op = DefaultOperation.HasValue ? DefaultOperation.Value.ToString().ToLower().ToRiakString() : null
             };
@@ -206,52 +246,52 @@ namespace RiakClient.Models.Search
             return msg;
         }
 
-        private byte[] GetIndexRiakString()
+        private string GetIndexString()
         {
-            byte[] indexRiakString = null;
+            string indexString = null;
 
             if (solrIndex != null)
             {
-                indexRiakString = solrIndex.ToRiakString();
+                indexString = solrIndex;
             }
             else
             {
-                indexRiakString = Query.Index.ToRiakString();
+                indexString = Query.Index;
             }
 
-            return indexRiakString;
+            return indexString;
         }
 
-        private byte[] GetQueryRiakString()
+        private string GetQueryString()
         {
-            byte[] queryRiakString = null;
+            string queryString = null;
 
             if (solrQuery != null)
             {
-                queryRiakString = solrQuery.ToRiakString();
+                queryString = solrQuery;
             }
             else
             {
-                queryRiakString = Query.ToString().ToRiakString();
+                queryString = Query.ToString();
             }
 
-            return queryRiakString;
+            return queryString;
         }
 
-        private byte[] GetFilterRiakString()
+        private string GetFilterString()
         {
-            byte[] filterRiakString = null;
+            string filterString = null;
 
             if (solrFilter != null)
             {
-                filterRiakString = solrFilter.ToRiakString();
+                filterString = solrFilter;
             }
             else if (Filter != null)
             {
-                filterRiakString = Filter.ToString().ToRiakString();
+                filterString = Filter.ToString();
             }
 
-            return filterRiakString;
+            return filterString;
         }
     }
 }
