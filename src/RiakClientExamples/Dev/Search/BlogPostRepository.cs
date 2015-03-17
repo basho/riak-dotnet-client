@@ -39,14 +39,11 @@ namespace RiakClientExamples.Dev.Search
         private static readonly SerializeObjectToByteArray<string> Serializer =
             s => Encoding.UTF8.GetBytes(s);
 
-        private readonly BlogPost blogPostModel;
         private readonly string bucketName;
 
-        public BlogPostRepository(IRiakClient client, BlogPost model, string bucketName)
-            : base(client, model)
+        public BlogPostRepository(IRiakClient client, string bucketName)
+            : base(client)
         {
-            this.blogPostModel = model;
-
             if (string.IsNullOrWhiteSpace(bucketName))
             {
                 throw new ArgumentNullException("bucketName");
@@ -55,13 +52,13 @@ namespace RiakClientExamples.Dev.Search
             this.bucketName = bucketName;
         }
 
-        public override string Save()
+        public override string Save(BlogPost model)
         {
             var updates = new List<MapUpdate>();
 
             updates.Add(new MapUpdate
             {
-                register_op = Serializer(blogPostModel.Title),
+                register_op = Serializer(model.Title),
                 field = new MapField
                 {
                     name = Serializer(titleRegister),
@@ -71,7 +68,7 @@ namespace RiakClientExamples.Dev.Search
 
             updates.Add(new MapUpdate
             {
-                register_op = Serializer(blogPostModel.Author),
+                register_op = Serializer(model.Author),
                 field = new MapField
                 {
                     name = Serializer(authorRegister),
@@ -81,7 +78,7 @@ namespace RiakClientExamples.Dev.Search
 
             updates.Add(new MapUpdate
             {
-                register_op = Serializer(blogPostModel.Content),
+                register_op = Serializer(model.Content),
                 field = new MapField
                 {
                     name = Serializer(contentRegister),
@@ -90,7 +87,7 @@ namespace RiakClientExamples.Dev.Search
             });
 
             var keywordsSetOp = new SetOp();
-            keywordsSetOp.adds.AddRange(blogPostModel.Keywords.Select(kw => Serializer(kw)));
+            keywordsSetOp.adds.AddRange(model.Keywords.Select(kw => Serializer(kw)));
 
             updates.Add(new MapUpdate
             {
@@ -103,7 +100,7 @@ namespace RiakClientExamples.Dev.Search
             });
 
             string datePostedSolrFormatted =
-                blogPostModel.DatePosted
+                model.DatePosted
                     .ToUniversalTime()
                     .ToString("yyyy-MM-dd'T'HH:mm:ss'Z'", CultureInfo.InvariantCulture);
             updates.Add(new MapUpdate
@@ -118,7 +115,7 @@ namespace RiakClientExamples.Dev.Search
 
             updates.Add(new MapUpdate
             {
-                flag_op = blogPostModel.Published ?
+                flag_op = model.Published ?
                     MapUpdate.FlagOp.ENABLE : MapUpdate.FlagOp.DISABLE,
                 field = new MapField
                 {
