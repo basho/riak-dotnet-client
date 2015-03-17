@@ -26,14 +26,21 @@ namespace RiakClient
     /// <typeparam name="TResult">The type of the Riak operation's return value.</typeparam>
     public class RiakResult<TResult> : RiakResult
     {
-        private RiakResult()
+        private readonly TResult value;
+
+        public RiakResult(TResult value, bool isSuccess, string errorMessage = null, ResultCode resultCode = ResultCode.Success)
+            : base(isSuccess, errorMessage, resultCode)
         {
+            this.value = value;
         }
 
         /// <summary>
         /// The return value from the Riak operation.
         /// </summary>
-        public TResult Value { get; private set; }
+        public TResult Value
+        {
+            get { return value; }
+        }
 
         /// <summary>Is the current paginated query / streaming query done?</summary>
         /// <remarks>Valid for Riak 1.4+ only.</remarks>
@@ -115,23 +122,14 @@ namespace RiakClient
 
         internal static RiakResult<TResult> Success(TResult value)
         {
-            return new RiakResult<TResult>
-            {
-                IsSuccess = true,
-                ResultCode = ResultCode.Success,
-                Value = value
-            };
+            return new RiakResult<TResult>(value, true);
         }
 
         internal static new RiakResult<TResult> Error(ResultCode code, string message, bool nodeOffline)
         {
-            return new RiakResult<TResult>
-            {
-                IsSuccess = false,
-                ResultCode = code,
-                ErrorMessage = message,
-                NodeOffline = nodeOffline
-            };
+            var riakResult = new RiakResult<TResult>(default(TResult), false, message, code);
+            riakResult.NodeOffline = nodeOffline;
+            return riakResult;
         }
 
         internal RiakResult SetDone(bool? value)
