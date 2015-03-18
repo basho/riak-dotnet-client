@@ -44,7 +44,7 @@ Authors
 Documentation
 -------------
 
-Documentation for the project can be found on the [project website](http://corrugatediron.org/).
+Documentation for the project can be found on the [project wiki](https://github.com/basho-labs/riak-dotnet-client/wiki)
 
 Release Notes
 -------------
