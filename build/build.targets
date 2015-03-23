@@ -48,7 +48,7 @@
       <NuGetVersion>$(VMajor).$(VMinor).$(VPatch)</NuGetVersion>
     </PropertyGroup>
     <PropertyGroup Condition="'$(VPreRelease)' != ''">
-      <NuGetVersion>$(VMajor).$(VMinor).$(VPatch)-$(VPreRelease)</NuGetVersion>
+      <NuGetVersion>$(VMajor).$(VMinor).$(VPatch)$(VPreRelease)</NuGetVersion> <!-- NB: VPreRelease starts with the dash -->
     </PropertyGroup>
     <PropertyGroup>
       <GitTagVersion>v$(NuGetVersion)</GitTagVersion>
@@ -104,31 +104,6 @@
   <Target Name="PublishRelease" DependsOnTargets="GenerateCommonAssemblyInfo">
     <Message Text="MSBuild properties: Configuration=Release;SolutionDir=$(SolutionDir)" />
     <MSBuild Projects="$(SolutionFile)" Properties="Configuration=Release;SolutionDir=$(SolutionDir)" />
-  </Target>
-
-  <Target Name="GenerateCommonAssemblyInfo" DependsOnTargets="PopulateVersionInformation">
-
-    <Message Text="VersionString: $(VersionString) Version: $(VMajor).$(VMinor).$(VPatch) PreRelease: $(VPreRelease) Commit hash: $(GitCommitHash)"/>
-
-    <Time>
-      <Output TaskParameter="Year" PropertyName="Year" />
-    </Time>
-
-    <Attrib Files="$(CommonAssemblyInfoFile)" ReadOnly="False" />
-
-    <!-- http://stackoverflow.com/questions/64602/what-are-differences-between-assemblyversion-assemblyfileversion-and-assemblyin -->
-    <AssemblyInfo CodeLanguage="CS"
-                  OutputFile="$(SolutionDir)src\CommonAssemblyInfo.cs"
-                  GenerateClass="true"
-                  AssemblyCompany="Basho Technologies"
-                  AssemblyCopyright="Copyright Basho Technologies © $(Year). All rights reserved."
-                  AssemblyProduct="riak-dotnet-client"
-                  AssemblyTrademark="riak-dotnet-client"
-                  AssemblyCulture=""
-                  AssemblyConfiguration="$(Configuration)"
-                  AssemblyVersion="$(VMajor).0.0"
-                  AssemblyFileVersion="$(VMajor).$(VMinor).$(VPatch)"
-                  AssemblyInformationalVersion="$(GitCommitHash)" />
   </Target>
 
   <Target Name="ProtoGen">
