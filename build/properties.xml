@@ -35,7 +35,7 @@
          Increment this manually for non-Release builds -->
     <VersionString Condition="'$(Configuration)' != 'Release'">v2.0.0</VersionString>
     <GitRemoteName Condition="'$(GitRemoteName)' == ''">origin</GitRemoteName>
-    <GitRemoteUrl Condition="'$(GitRemoteUrl)' == ''">git@github.com:basho-labs/riak-dotnet-client.git</GitRemoteUrl>
+    <GitRemoteUrl Condition="'$(GitRemoteUrl)' == ''">git@github.com:basho/riak-dotnet-client.git</GitRemoteUrl>
     <GitCommitHash>unknown</GitCommitHash>
     <MasterBranchName>master</MasterBranchName>
     <DevelopBranchName>develop</DevelopBranchName>

@@ -54,7 +54,7 @@ Write-Debug "GitHub API Key '$github_api_key'"
 $release_info = New-Object PSObject -Property @{
         tag_name = $VersionString
         name = $VersionString
-        body ="riak-dotnet-client $VersionString`nhttps://github.com/basho-labs/riak-dotnet-client/blob/master/RELNOTES.md"
+        body ="riak-dotnet-client $VersionString`nhttps://github.com/basho/riak-dotnet-client/blob/master/RELNOTES.md"
         draft = $false
         prerelease = $true
     }
@@ -64,7 +64,7 @@ $headers = @{ Authorization = "token $github_api_key" }
 $release_json = ConvertTo-Json -InputObject $release_info -Compress
 
 try {
-    $response = Invoke-WebRequest -Headers $headers -ContentType 'application/json' -Method Post -Body $release_json -Uri 'https://api.github.com/repos/basho-labs/riak-dotnet-client/releases'
+    $response = Invoke-WebRequest -Headers $headers -ContentType 'application/json' -Method Post -Body $release_json -Uri 'https://api.github.com/repos/basho/riak-dotnet-client/releases'
     if ([int]$response.StatusCode -ne 201) {
         throw "Creating release failed: $response.StatusCode"
     }
@@ -80,7 +80,7 @@ catch {
 }
 
 $response_json = ConvertFrom-Json -InputObject $response.Content
-# https://uploads.github.com/repos/basho-labs/riak-dotnet-client/releases/890350/assets{?name}
+# https://uploads.github.com/repos/basho/riak-dotnet-client/releases/890350/assets{?name}
 $upload_url_with_name = $response_json.upload_url -Replace '{\?name}', ('?name=' + $release_zip_name)
 
 $response = Get-Content $release_zip_path | Invoke-WebRequest -Headers $headers -ContentType 'application/zip' -Method Post -Uri $upload_url_with_name

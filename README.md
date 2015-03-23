@@ -30,8 +30,8 @@ Open `RiakClient.sln` and build. This will generate the required `src/CommonAsse
 Travis-CI Build Status
 ----------------------
 
-* Master: [![Build Status](https://travis-ci.org/basho-labs/riak-dotnet-client.svg?branch=master)](https://travis-ci.org/basho-labs/riak-dotnet-client)
-* Develop: [![Build Status](https://travis-ci.org/basho-labs/riak-dotnet-client.svg?branch=develop)](https://travis-ci.org/basho-labs/riak-dotnet-client)
+* Master: [![Build Status](https://travis-ci.org/basho/riak-dotnet-client.svg?branch=master)](https://travis-ci.org/basho/riak-dotnet-client)
+* Develop: [![Build Status](https://travis-ci.org/basho/riak-dotnet-client.svg?branch=develop)](https://travis-ci.org/basho/riak-dotnet-client)
 
 Authors
 -------
@@ -44,7 +44,7 @@ Authors
 Documentation
 -------------
 
-Documentation for the project can be found on the [project wiki](https://github.com/basho-labs/riak-dotnet-client/wiki)
+Documentation for the project can be found on the [project wiki](https://github.com/basho/riak-dotnet-client/wiki)
 
 Release Notes
 -------------
@@ -60,15 +60,15 @@ Riak .NET Client Roadmap
 ======================
 
 ### Cluster and node info
-[Github Issue 10](https://github.com/basho-labs/riak-dotnet-client/issues/10)
+[Github Issue 10](https://github.com/basho/riak-dotnet-client/issues/10)
 This would be looking for ways to get the results of `riak_admin status` and other commands through the Riak Client API
 
 ### SOLR Interface
-[Github Issue 20](https://github.com/basho-labs/riak-dotnet-client/issues/20)
+[Github Issue 20](https://github.com/basho/riak-dotnet-client/issues/20)
 Create an HTTP interface for [Faceted queries vi the Solr Interface](http://wiki.basho.com/Riak-Search---Querying.html#Faceted-Queries-via-the-Solr-Interface)
 
 ### Improved Riak Search API
-[Github Issue 23](url:https://github.com/basho-labs/riak-dotnet-client/issues/23) Additional development should be undertaken to make it easier for developers to use this.
+[Github Issue 23](url:https://github.com/basho/riak-dotnet-client/issues/23) Additional development should be undertaken to make it easier for developers to use this.
 
 Thanks
 ======
