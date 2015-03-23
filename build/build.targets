@@ -142,8 +142,11 @@
   </Target>
 
   <Target Name="PublishGitHubRelease" DependsOnTargets="PublishValidation">
+    <PropertyGroup Condition="'$(VPreRelease)' != ''">
+      <IsPreReleaseArg>-IsPreRelease</IsPreReleaseArg>
+    </PropertyGroup>
     <Exec WorkingDirectory="$(SolutionDir)"
-          Command="$(PowerShellExe) -NonInteractive -NoProfile -ExecutionPolicy Bypass -File $(SolutionDir)build\create-github-release.ps1 $(GitTagVersion)" />
+          Command="$(PowerShellExe) -NonInteractive -NoProfile -ExecutionPolicy Bypass -File $(SolutionDir)build\create-github-release.ps1 -VersionString $(GitTagVersion) $(IsPreReleaseArg)" />
   </Target>
 
   <Target Name="Publish"

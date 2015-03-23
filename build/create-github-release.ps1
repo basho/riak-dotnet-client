@@ -5,6 +5,8 @@
     Powershell script to create release in GitHub for RiakClient.
 .PARAMETER VersionString
     Version of the release. Must be in vX.Y.Z-PreRelease format.
+.PARAMETER IsPreRelease
+    Indicates that this should be published as a pre-release Release.
 .EXAMPLE
     C:\PS>cd path\to\riak-dotnet-client
     >.\build\create-github-release.ps1 v2.0.0-beta1
@@ -14,16 +16,18 @@
 #>
 [CmdletBinding()]
 Param(
-    [Parameter(Mandatory=$True, Position=1)]
+    [Parameter(Mandatory=$True, Position=0)]
     [ValidatePattern("^v[1-9]\.[0-9]\.[0-9](-[a-z0-9]+)?$")]
-    [string]$VersionString
+    [string]$VersionString,
+    [Parameter(Mandatory=$False)]
+    [switch]$IsPreRelease
 )
 
 Set-StrictMode -Version Latest
 
 # Note:
 # Set to Continue to see DEBUG messages
-# $DebugPreference = 'SilentlyContinue'
+# $DebugPreference = 'Continue'
 
 function Get-ScriptPath {
   $scriptDir = Get-Variable PSScriptRoot -ErrorAction SilentlyContinue | ForEach-Object { $_.Value }
@@ -56,12 +60,14 @@ $release_info = New-Object PSObject -Property @{
         name = $VersionString
         body ="riak-dotnet-client $VersionString`nhttps://github.com/basho/riak-dotnet-client/blob/master/RELNOTES.md"
         draft = $false
-        prerelease = $true
+        prerelease = $IsPreRelease.IsPresent
     }
 
 $headers = @{ Authorization = "token $github_api_key" }
 
 $release_json = ConvertTo-Json -InputObject $release_info -Compress
+
+Write-Debug "Release JSON: $release_json"
 
 try {
     $response = Invoke-WebRequest -Headers $headers -ContentType 'application/json' -Method Post -Body $release_json -Uri 'https://api.github.com/repos/basho/riak-dotnet-client/releases'
