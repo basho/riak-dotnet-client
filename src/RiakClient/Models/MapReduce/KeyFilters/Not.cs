@@ -23,6 +23,7 @@ namespace RiakClient.Models.MapReduce.KeyFilters
     using System.Collections.Generic;
     using System.IO;
     using System.Text;
+    using Extensions;
     using Newtonsoft.Json;
 
     /// <summary>
@@ -55,21 +56,17 @@ namespace RiakClient.Models.MapReduce.KeyFilters
         public string ToJsonString()
         {
             var sb = new StringBuilder();
-
-            using (var sw = new StringWriter(sb))
+            var sw = new StringWriter(sb);
+            
+            using (JsonWriter jw = new JsonTextWriter(sw))
             {
-                using (JsonWriter jw = new JsonTextWriter(sw))
-                {
-                    jw.WriteStartArray();
+                jw.WriteStartArray();
 
-                    jw.WriteValue(FunctionName);
-                    jw.WriteStartArray();
+                jw.WriteValue(FunctionName);
 
-                    Argument.ForEach(a => jw.WriteRawValue(a.ToString()));
+                jw.WriteRawFilterTokenArray(Argument);
 
-                    jw.WriteEndArray();
-                    jw.WriteEndArray();
-                }
+                jw.WriteEndArray();
             }
 
             return sb.ToString();

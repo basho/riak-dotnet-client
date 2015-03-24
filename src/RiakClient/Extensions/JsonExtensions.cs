@@ -19,6 +19,8 @@
 
 namespace RiakClient.Extensions
 {
+    using System.Collections.Generic;
+    using Models.MapReduce.KeyFilters;
     using Newtonsoft.Json;
 
     /// <summary>
@@ -120,6 +122,15 @@ namespace RiakClient.Extensions
             }
 
             return writer;
+        }
+
+        internal static void WriteRawFilterTokenArray(this JsonWriter writer, List<IRiakKeyFilterToken> tokens)
+        {
+            writer.WriteStartArray();
+
+            tokens.ForEach(t => writer.WriteRawValue(t.ToString()));
+
+            writer.WriteEndArray();
         }
     }
 }
