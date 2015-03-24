@@ -60,9 +60,12 @@ namespace RiakClient.Models.MapReduce.KeyFilters
 
         public string ToJsonString()
         {
+            /*
+             * NB: JsonTextWriter is guaranteed to close the StringWriter
+             * https://github.com/JamesNK/Newtonsoft.Json/blob/master/Src/Newtonsoft.Json/JsonTextWriter.cs#L150-L160
+             */
             var sb = new StringBuilder();
             var sw = new StringWriter(sb);
-            
             using (JsonWriter jw = new JsonTextWriter(sw))
             {
                 jw.WriteStartArray();
