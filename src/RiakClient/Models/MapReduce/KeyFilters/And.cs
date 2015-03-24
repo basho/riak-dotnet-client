@@ -23,6 +23,7 @@ namespace RiakClient.Models.MapReduce.KeyFilters
     using System.Collections.Generic;
     using System.IO;
     using System.Text;
+    using Extensions;
     using Newtonsoft.Json;
 
     /// <summary>
@@ -84,28 +85,25 @@ namespace RiakClient.Models.MapReduce.KeyFilters
         /// <returns>JSON representation of the <see cref="And"/> class</returns>
         public string ToJsonString()
         {
+            /*
+             * NB: JsonTextWriter is guaranteed to close the StringWriter
+             * https://github.com/JamesNK/Newtonsoft.Json/blob/master/Src/Newtonsoft.Json/JsonTextWriter.cs#L150-L160
+             */
             var sb = new StringBuilder();
-
-            using (var sw = new StringWriter(sb))
+            var sw = new StringWriter(sb);
+            using (JsonWriter jw = new JsonTextWriter(sw))
             {
-                using (JsonWriter jw = new JsonTextWriter(sw))
-                {
-                    jw.WriteStartArray();
+                jw.WriteStartArray();
 
-                    jw.WriteValue(FunctionName);
+                jw.WriteValue(FunctionName);
 
-                    jw.WriteStartArray();
-                    Left.ForEach(l => jw.WriteRawValue(l.ToString()));
-                    jw.WriteEndArray();
+                jw.WriteRawFilterTokenArray(Left);
 
-                    jw.WriteStartArray();
-                    Right.ForEach(r => jw.WriteRawValue(r.ToString()));
-                    jw.WriteEndArray();
+                jw.WriteRawFilterTokenArray(Right);
 
-                    jw.WriteEndArray();
-                }
+                jw.WriteEndArray();
             }
-
+            
             return sb.ToString();
         }
     }
