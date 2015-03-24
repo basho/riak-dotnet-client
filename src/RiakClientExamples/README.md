@@ -3,6 +3,6 @@
 These commands will set up your devrel:
 
 ```
-tools/setup-dev-cluster -b leveldb
-tools/setup-examples
+tools/devrel/setup-dev-cluster -b leveldb
+tools/devrel/setup-examples
 ```
