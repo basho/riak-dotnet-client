@@ -4,9 +4,9 @@ tools_path=''
 if hash realpath 2>/dev/null
 then
     script_dir="$(dirname $0)"
-    tools_path="$(realpath $script_dir/../tools)"
+    tools_path="$(realpath $script_dir/../tools/devrel)"
 else
-    tools_path="$(perl -e 'use File::Basename;use Cwd q(abs_path);$d = dirname(shift);print abs_path("$d/../tools")' $0)"
+    tools_path="$(perl -e 'use File::Basename;use Cwd q(abs_path);$d = dirname(shift);print abs_path("$d/../tools/devrel")' $0)"
 fi
 
 exec "$tools_path/setup-dev-cluster" -s -c
