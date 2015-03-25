@@ -5,6 +5,11 @@ Riak .NET Client - a .NET client for Riak
 
 The easiest way to get hold of it is to install the [Nuget package](http://www.nuget.org/Packages/RiakClient/).
 
+Cloning
+-------
+
+*Note:* Please use the `--recursive` git option or run `git submodule update --init` after cloning as a couple submodules are used. Thanks!
+
 Building From Source
 ----------------------
 
