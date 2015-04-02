@@ -14,7 +14,7 @@ Thank you for being part of the community! We love you for it.
 
 ## Helping through sample code
 
-The most immediately helpful way you can benefit this project is by cloning the [samples repository][https://github.com/basho-labs/riak-dotnet-client-samples/], make some changes and submit a pull request.
+The most immediately helpful way you can benefit this project is by cloning the [samples repository](https://github.com/basho-labs/riak-dotnet-client-samples/), make some changes and submit a pull request.
 
 ## How-to contribute to the .NET client
 
