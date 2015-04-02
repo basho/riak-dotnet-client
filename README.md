@@ -5,13 +5,13 @@ Riak .NET Client - a .NET client for Riak
 latency. Both Riak and this code is maintained by [Basho](http://www.basho.com/).
 
 1. [Installation](#installation)
-	* [Cloning](cloning)
-	* [Build from Source](build-from-source)
+	* [Cloning](#cloning)
+	* [Build from Source](#build-from-source)
 2. [Documentation](#documentation)
 3. [Contributing](#contributing)
 	* [An honest disclaimer](#an-honest-disclaimer)
 4. [Roadmap](#riak-.net-client-roadmap)
-	* [Cluster and node info](cluster-and-node-info)
+	* [Cluster and node info](#cluster-and-node-info)
 	* [SOLR Interface](#SOLR-interface)
 	* [Improved Riak Search API](#Improved-Riak-Search-API)
 5. [License and Authors](#license-and-authors)
