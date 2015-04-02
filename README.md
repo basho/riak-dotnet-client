@@ -10,10 +10,10 @@ latency. Both Riak and this code is maintained by [Basho](http://www.basho.com/)
 2. [Documentation](#documentation)
 3. [Contributing](#contributing)
 	* [An honest disclaimer](#an-honest-disclaimer)
-4. [Roadmap](#riak-.net-client-roadmap)
+4. [Roadmap](#riak-net-client-roadmap)
 	* [Cluster and node info](#cluster-and-node-info)
-	* [SOLR Interface](#SOLR-interface)
-	* [Improved Riak Search API](#Improved-Riak-Search-API)
+	* [SOLR Interface](#solr-interface)
+	* [Improved Riak Search API](#improved-riak-search-api)
 5. [License and Authors](#license-and-authors)
 
 
