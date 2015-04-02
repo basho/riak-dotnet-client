@@ -83,13 +83,12 @@ Create an HTTP interface for [Faceted queries vi the Solr Interface](http://wiki
 [Github Issue 23](url:https://github.com/basho/riak-dotnet-client/issues/23) Additional development should be undertaken to make it easier for developers to use this.
 
 ## License and Authors
+**Riak .NET Client** is Open Source software released under the Apache 2.0 License. Please see the [LICENSE](LICENSE) file for full license details.
 
 * Author: [OJ Reeves](http://buffered.io)
 * Author: [Jeremiah Peschka](http://facility9.com/)
 * Author: [Alex Moore](http://alexmoore.io/)
 * Author: [Luke Bakken](http://bakken.io/)
-
-**Riak .NET Client** is Open Source software released under the Apache 2.0 License. Please see the [LICENSE](LICENSE) file for full license details.
 
 ### Special Thanks
 
