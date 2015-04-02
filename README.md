@@ -5,8 +5,6 @@ Riak .NET Client - a .NET client for Riak
 latency. Both Riak and this code is maintained by [Basho](http://www.basho.com/).
 
 1. [Installation](#installation)
-	* [Cloning](#cloning)
-	* [Build from Source](#build-from-source)
 2. [Documentation](#documentation)
 3. [Contributing](#contributing)
 	* [An honest disclaimer](#an-honest-disclaimer)
@@ -20,31 +18,8 @@ latency. Both Riak and this code is maintained by [Basho](http://www.basho.com/)
 ## Installation
 The easiest way to get hold of it is to install the [Nuget package](http://www.nuget.org/Packages/RiakClient/).
 
+For more details on installation, including building from source, see the [installation section of the wiki](https://github.com/basho/riak-dotnet-client/wiki/Installation).
 
-### Cloning
-*Note:* Please use the `--recursive` git option or run `git submodule update --init` after cloning as a couple submodules are used. Thanks!
-
-
-### Build from Source
-
-#### GUI
-
-*Note*: `git` must be in your `PATH` when doing a `Release`-configuration build.
-
-Open `RiakClient.sln` and build. This will generate the required `src/CommonAssemblyInfo.cs` file.
-
-#### Command Line
-
-*Note*: `git` must be in your `PATH` when doing a `Release`-configuration build.
-
-* Windows
- * Execute `make.cmd` either via double-click in the file explorer, or
-   by opening a shell in your cloned repository and running `.\make.cmd`.
-   This will use `powershell.exe` to run `make.ps1` and create a Debug
-   build. Running `make.ps1` has much more flexibility. Use the `Get-Help
-   .\make.ps1 -Full` command in Powershell for more information.
-* Mono
- * Execute `make` (GNU Make required)
 
 ## Documentation
 
