@@ -14,18 +14,17 @@ latency. Both Riak and this code is maintained by [Basho](http://www.basho.com/)
 	* [Improved Riak Search API](#improved-riak-search-api)
 5. [License and Authors](#license-and-authors)
 
+## Build Status
+
+* Master: [![Build Status](https://travis-ci.org/basho/riak-dotnet-client.svg?branch=master)](https://travis-ci.org/basho/riak-dotnet-client)
+* Develop: [![Build Status](https://travis-ci.org/basho/riak-dotnet-client.svg?branch=develop)](https://travis-ci.org/basho/riak-dotnet-client)
 
 ## Installation
 The easiest way to get hold of it is to install the [Nuget package](http://www.nuget.org/Packages/RiakClient/).
 
 For more details on installation, including building from source, see the [installation section of the wiki](https://github.com/basho/riak-dotnet-client/wiki/Installation).
 
-
 ## Documentation
-
-* Master: [![Build Status](https://travis-ci.org/basho/riak-dotnet-client.svg?branch=master)](https://travis-ci.org/basho/riak-dotnet-client)
-* Develop: [![Build Status](https://travis-ci.org/basho/riak-dotnet-client.svg?branch=develop)](https://travis-ci.org/basho/riak-dotnet-client)
-
 
 Documentation for the project can be found on the [project wiki](https://github.com/basho/riak-dotnet-client/wiki). Please also see the [Release Notes](RELNOTES.md) for the latest updates.
 
