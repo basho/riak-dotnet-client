@@ -1,8 +1,10 @@
-Riak .NET Client - a .NET client for Riak
-=========================================
+Riak .NET Client
+================
 
-**Riak .NET Client** is a .NET library which makes it easy to communicate with [Riak](http://basho.com/riak/), an open source, distributed database that focuses on high availability, horizontal scalability, and *predictable*
-latency. Both Riak and this code is maintained by [Basho](http://www.basho.com/).
+**Riak .NET Client** is a .NET library which facilitates communication with
+[Riak](http://basho.com/riak/), an open source, distributed database that
+focuses on high availability, horizontal scalability, and *predictable* latency.
+Both Riak and this code is maintained by [Basho](http://www.basho.com/).
 
 1. [Installation](#installation)
 2. [Documentation](#documentation)
