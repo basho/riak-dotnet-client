@@ -36,11 +36,9 @@ This repo's maintainers are engineers at Basho and we welcome your contribution 
 
 ### An honest disclaimer
 
-Due to our obsession with stability and our rich ecosystem of users, community updates on this repo take longer to review. 
+Due to our obsession with stability and our rich ecosystem of users, community updates on this repo may take a little longer to review. 
 
 The most helpful way to contribute is by reporting your experience through issues. Issues may not be updated while we review internally, but they're still incredibly appreciated.
-
-Pull requests take multiple engineers for verification and testing. If you're passionate enough to want to learn more on how you can get hands on in this process, reach out to [Matt](mailto:mbrender@basho.com), your developer advocate. 
 
 Thank you for being part of the community! We love you for it. 
 
