@@ -77,4 +77,5 @@ The following people have contributed to Riak .NET Client, it's predecessor Corr
 * James Newton-King (Json.NET)
 * Alex Moore
 * Luke Bakken
+* Myles McDonnell
 
