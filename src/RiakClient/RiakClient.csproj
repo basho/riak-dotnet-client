@@ -69,6 +69,8 @@
     <Compile Include="Auth\RiakSecurityManager.cs">
       <ExcludeFromStyleCop>False</ExcludeFromStyleCop>
     </Compile>
+    <Compile Include="Commands\CRDT\UpdateMap.cs" />
+    <Compile Include="Commands\CRDT\UpdateMapOptions.cs" />
     <Compile Include="Comms\IRiakConnectionManager.cs" />
     <Compile Include="Comms\LoadBalancing\ILoadBalancingStrategy.cs" />
     <Compile Include="Comms\LoadBalancing\RoundRobinStrategy.cs" />

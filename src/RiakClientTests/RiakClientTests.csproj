@@ -72,6 +72,7 @@
     <Compile Include="Client\MockCluster.cs" />
     <Compile Include="Client\DataTypeTests.cs" />
     <Compile Include="Comms\RoundRobinStrategyTests.cs" />
+    <Compile Include="CRDT\UpdateMapTests.cs" />
     <Compile Include="Json\RiakObjectConversionTests.cs" />
     <Compile Include="Json\TestObjects.cs" />
     <Compile Include="Models\MapReduce\Inputs\BucketKeyKeyDataInputSerializationTests.cs" />

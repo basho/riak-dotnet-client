@@ -286,6 +286,7 @@ namespace RiakClient.Models.MapReduce
             return this;
         }
 
+#pragma warning disable 618
         /// <summary>
         /// Add a link phase to the list of phases.
         /// </summary>
@@ -309,7 +310,6 @@ namespace RiakClient.Models.MapReduce
             return this;
         }
 
-#pragma warning disable 618
         /// <summary>
         /// Add a key filter input to the inputs.
         /// </summary>
