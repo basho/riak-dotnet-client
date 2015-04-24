@@ -111,6 +111,18 @@ namespace RiakClient.Commands.CRDT
 
                     mapOp.removes.Add(field);
                 }
+
+                foreach (var removeFlag in mapOperation.RemoveFlags)
+                {
+                    RiakString flagName = removeFlag.Key;
+                    var field = new MapField
+                    {
+                        name = flagName,
+                        type = MapField.MapFieldType.FLAG
+                    };
+
+                    mapOp.removes.Add(field);
+                }
             }
 
             foreach (var incrementCounter in mapOperation.IncrementCounters)
@@ -203,6 +215,26 @@ namespace RiakClient.Commands.CRDT
 
                 mapOp.updates.Add(update);
             }
+
+            foreach (var flagToSet in mapOperation.FlagsToSet)
+            {
+                RiakString flagName = flagToSet.Key;
+                bool flagValue = flagToSet.Value;
+
+                var field = new MapField
+                {
+                    name = flagName,
+                    type = MapField.MapFieldType.FLAG
+                };
+
+                var update = new MapUpdate
+                {
+                    field = field,
+                    flag_op = flagValue ? MapUpdate.FlagOp.ENABLE : MapUpdate.FlagOp.DISABLE
+                };
+
+                mapOp.updates.Add(update);
+            }
         }
 
         public class MapOperation
@@ -216,6 +248,9 @@ namespace RiakClient.Commands.CRDT
 
             private readonly RegisterOperations registersToSet = new RegisterOperations();
             private readonly RegisterOperations removeRegisters = new RegisterOperations();
+
+            private readonly FlagOperations flagsToSet = new FlagOperations();
+            private readonly FlagOperations removeFlags = new FlagOperations();
 
             public bool HasRemoves
             {
@@ -231,7 +266,8 @@ namespace RiakClient.Commands.CRDT
                         removeCounters.Count > 0 ||
                         removeFromSets.Count > 0 ||
                         removeSets.Count > 0 ||
-                        removeRegisters.Count > 0;
+                        removeRegisters.Count > 0 ||
+                        removeFlags.Count > 0;
                 }
             }
 
@@ -268,6 +304,16 @@ namespace RiakClient.Commands.CRDT
             internal RegisterOperations RemoveRegisters
             {
                 get { return removeRegisters; }
+            }
+
+            internal FlagOperations FlagsToSet
+            {
+                get { return flagsToSet; }
+            }
+
+            internal FlagOperations RemoveFlags
+            {
+                get { return removeFlags; }
             }
 
             public MapOperation IncrementCounter(RiakString key, int increment)
@@ -320,6 +366,20 @@ namespace RiakClient.Commands.CRDT
                 return this;
             }
 
+            public MapOperation SetFlag(RiakString key, bool value)
+            {
+                removeFlags.Remove(key);
+                flagsToSet.Add(key, value);
+                return this;
+            }
+
+            public MapOperation RemoveFlag(RiakString key)
+            {
+                flagsToSet.Remove(key);
+                removeFlags.Add(key);
+                return this;
+            }
+
             internal abstract class MapOperations<TValue> : Dictionary<RiakString, TValue>
             {
                 public void Add(RiakString key)
@@ -367,6 +427,14 @@ namespace RiakClient.Commands.CRDT
             internal class RegisterOperations : MapOperations<RiakString>
             {
                 public void SetRegister(RiakString key, RiakString value)
+                {
+                    this[key] = value;
+                }
+            }
+
+            internal class FlagOperations : MapOperations<bool>
+            {
+                public void SetFlag(RiakString key, bool value)
                 {
                     this[key] = value;
                 }
