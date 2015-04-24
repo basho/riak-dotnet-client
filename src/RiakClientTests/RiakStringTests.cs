@@ -29,9 +29,23 @@ namespace RiakClientTests
         private static readonly byte[] testBytes = Encoding.UTF8.GetBytes(testString);
 
         [Test]
-        public void Can_Convert_To_Byte_Array()
+        public void Can_Cast_To_Byte_Array()
         {
             var rs = new RiakString(testString);
+            Assert.AreEqual(testBytes, (byte[])rs);
+        }
+
+        [Test]
+        public void Can_Cast_From_Byte_Array()
+        {
+            RiakString rs = testBytes;
+            Assert.AreEqual(testString, (string)rs);
+        }
+
+        [Test]
+        public void Can_Construct_From_Byte_Array()
+        {
+            var rs = new RiakString(testBytes);
             Assert.AreEqual(testBytes, (byte[])rs);
         }
 

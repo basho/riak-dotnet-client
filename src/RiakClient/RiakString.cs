@@ -121,6 +121,16 @@ namespace RiakClient
         }
 
         /// <summary>
+        /// Cast the value of a <see cref="Byte"/>[] to a <see cref="RiakString"/>.
+        /// </summary>
+        /// <param name="value">The <see cref="Byte"/>[] value to cast to an <see cref="RiakString"/>.</param>
+        /// <returns>A new <see cref="RiakString"/>.</returns>
+        public static implicit operator RiakString(byte[] value)
+        {
+            return new RiakString(value);
+        }
+
+        /// <summary>
         /// Returns a string that represents the RiakString value.
         /// </summary>
         /// <returns>

@@ -19,8 +19,8 @@
 namespace RiakClient.Commands.CRDT
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
+    using System.Linq;
     using Messages;
     using Models;
     using Util;
@@ -37,6 +37,12 @@ namespace RiakClient.Commands.CRDT
             }
 
             this.options = options;
+
+            if (this.options.Op.HasRemoves &&
+                EnumerableUtil.IsNullOrEmpty(this.options.Context))
+            {
+                throw new InvalidOperationException("When doing any removes a context must be provided.");
+            }
         }
 
         internal DtUpdateReq ConstructPbRequest()
@@ -68,6 +74,33 @@ namespace RiakClient.Commands.CRDT
 
         private static void Populate(MapOperation mapOperation, MapOp mapOp)
         {
+            if (mapOperation.HasRemoves)
+            {
+                foreach (var removeCounter in mapOperation.RemoveCounters)
+                {
+                    RiakString counterName = removeCounter.Key;
+                    var field = new MapField
+                    {
+                        name = counterName,
+                        type = MapField.MapFieldType.COUNTER
+                    };
+
+                    mapOp.removes.Add(field);
+                }
+
+                foreach (var removeSet in mapOperation.RemoveSets)
+                {
+                    RiakString setName = removeSet.Key;
+                    var field = new MapField
+                    {
+                        name = setName,
+                        type = MapField.MapFieldType.SET
+                    };
+
+                    mapOp.removes.Add(field);
+                }
+            }
+
             foreach (var incrementCounter in mapOperation.IncrementCounters)
             {
                 RiakString counterName = incrementCounter.Key;
@@ -92,6 +125,52 @@ namespace RiakClient.Commands.CRDT
 
                 mapOp.updates.Add(update);
             }
+
+            foreach (var addToSet in mapOperation.AddToSets)
+            {
+                RiakString setName = addToSet.Key;
+                IList<RiakString> setAdds = addToSet.Value;
+
+                var field = new MapField
+                {
+                    name = setName,
+                    type = MapField.MapFieldType.SET
+                };
+
+                var setOp = new SetOp();
+                setOp.adds.AddRange(setAdds.Select(v => (byte[])v));
+
+                var update = new MapUpdate
+                {
+                    field = field,
+                    set_op = setOp
+                };
+
+                mapOp.updates.Add(update);
+            }
+
+            foreach (var removeFromSet in mapOperation.RemoveFromSets)
+            {
+                RiakString setName = removeFromSet.Key;
+                IList<RiakString> setRemoves = removeFromSet.Value;
+
+                var field = new MapField
+                {
+                    name = setName,
+                    type = MapField.MapFieldType.SET
+                };
+
+                var setOp = new SetOp();
+                setOp.removes.AddRange(setRemoves.Select(v => (byte[])v));
+
+                var update = new MapUpdate
+                {
+                    field = field,
+                    set_op = setOp
+                };
+
+                mapOp.updates.Add(update);
+            }
         }
 
         public class MapOperation
@@ -99,31 +178,102 @@ namespace RiakClient.Commands.CRDT
             private readonly CounterOperations incrementCounters = new CounterOperations();
             private readonly CounterOperations removeCounters = new CounterOperations();
 
-            public CounterOperations IncrementCounters
+            private readonly SetOperations addToSets = new SetOperations();
+            private readonly SetOperations removeFromSets = new SetOperations();
+            private readonly SetOperations removeSets = new SetOperations();
+
+            public bool HasRemoves
+            {
+                get
+                {
+                    // TODO
+                    // Nested Map Removes
+                    // for (var i = 0; i < this.maps.modify.length; i++) {
+                    //     nestedHaveRemoves |= this.maps.modify[i].map._hasRemoves();
+                    // }
+                    bool hasNestedRemoves = false;
+                    return hasNestedRemoves ||
+                        removeCounters.Count > 0 ||
+                        removeFromSets.Count > 0 ||
+                        removeSets.Count > 0;
+                }
+            }
+
+            internal CounterOperations IncrementCounters
             {
                 get { return incrementCounters; }
             }
 
-            public CounterOperations RemoveCounters
+            internal CounterOperations RemoveCounters
             {
                 get { return removeCounters; }
             }
 
-            public void IncrementCounter(RiakString key, int increment)
+            internal SetOperations AddToSets
             {
-                RemoveRemovesFor(key, removeCounters);
-                incrementCounters.Increment(key, increment);
+                get { return addToSets; }
             }
 
-            private static void RemoveRemovesFor(RiakString key, IDictionary ops)
+            internal SetOperations RemoveFromSets
             {
-                if (ops.Contains(key))
+                get { return removeFromSets; }
+            }
+
+            internal SetOperations RemoveSets
+            {
+                get { return removeSets; }
+            }
+
+            public MapOperation IncrementCounter(RiakString key, int increment)
+            {
+                removeCounters.Remove(key);
+                incrementCounters.Increment(key, increment);
+                return this;
+            }
+
+            public MapOperation RemoveCounter(RiakString key)
+            {
+                incrementCounters.Remove(key);
+                removeCounters.Add(key);
+                return this;
+            }
+
+            public MapOperation AddToSet(RiakString key, RiakString value)
+            {
+                removeSets.Remove(key);
+                addToSets.Add(key, value);
+                return this;
+            }
+
+            public MapOperation RemoveFromSet(RiakString key, RiakString value)
+            {
+                removeSets.Remove(key);
+                removeFromSets.Add(key, value);
+                return this;
+            }
+
+            public MapOperation RemoveSet(RiakString key)
+            {
+                addToSets.Remove(key);
+                removeFromSets.Remove(key);
+                removeSets.Add(key);
+                return this;
+            }
+
+            internal abstract class MapOperations<TValue> : Dictionary<RiakString, TValue>
+            {
+                public void Add(RiakString key)
                 {
-                    ops.Remove(key);
+                    if (key == null)
+                    {
+                        throw new ArgumentNullException("key");
+                    }
+
+                    this[key] = default(TValue);
                 }
             }
 
-            public class CounterOperations : Dictionary<RiakString, int>
+            internal class CounterOperations : MapOperations<int>
             {
                 public void Increment(RiakString key, int increment)
                 {
@@ -135,6 +285,22 @@ namespace RiakClient.Commands.CRDT
                     {
                         this[key] = increment;
                     }
+                }
+            }
+
+            internal class SetOperations : MapOperations<IList<RiakString>>
+            {
+                public void Add(RiakString key, RiakString value)
+                {
+                    IList<RiakString> adds = null;
+
+                    if (!this.TryGetValue(key, out adds))
+                    {
+                        adds = new List<RiakString>();
+                        this[key] = adds;
+                    }
+
+                    adds.Add(value);
                 }
             }
         }
