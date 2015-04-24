@@ -93,6 +93,7 @@
     <Compile Include="IRiakClient.cs" />
     <Compile Include="Messages\RpbClasses.cs" />
     <Compile Include="Models\CommitHook\IRiakCommitHook.cs" />
+    <Compile Include="RiakString.cs" />
     <Compile Include="Timeout.cs" />
     <Compile Include="Models\NVal.cs" />
     <Compile Include="Models\Quorum.cs" />

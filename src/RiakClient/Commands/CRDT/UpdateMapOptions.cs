@@ -18,18 +18,50 @@
 
 namespace RiakClient.Commands.CRDT
 {
+    using System;
+
     public class UpdateMapOptions
     {
-        private readonly string bucketType;
+        private readonly RiakString bucketType;
+        private readonly RiakString bucket;
+        private readonly RiakString key;
 
-        public UpdateMapOptions(string bucketType)
+        public UpdateMapOptions(string bucketType, string bucket, string key)
         {
             this.bucketType = bucketType;
+
+            if (string.IsNullOrEmpty(bucket))
+            {
+                throw new ArgumentNullException("bucket");
+            }
+            else
+            {
+                this.bucket = bucket;
+            }
+
+            if (string.IsNullOrEmpty(key))
+            {
+                throw new ArgumentNullException("key");
+            }
+            else
+            {
+                this.key = key;
+            }
         }
 
-        public string BucketType
+        public RiakString BucketType
         {
             get { return bucketType; }
+        }
+
+        public RiakString Bucket
+        {
+            get { return bucket; }
+        }
+
+        public RiakString Key
+        {
+            get { return key; }
         }
     }
 }

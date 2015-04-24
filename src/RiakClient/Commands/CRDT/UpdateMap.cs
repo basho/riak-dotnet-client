@@ -27,13 +27,27 @@ namespace RiakClient.Commands.CRDT
 
     public class UpdateMap
     {
+        private readonly UpdateMapOptions options;
+
         public UpdateMap(UpdateMapOptions options)
         {
+            if (options == null)
+            {
+                throw new ArgumentNullException("options");
+            }
+
+            this.options = options;
         }
 
         internal DtUpdateReq ConstructPbRequest()
         {
-            return new DtUpdateReq();
+            var req = new DtUpdateReq();
+
+            req.type = options.BucketType;
+            req.bucket = options.Bucket;
+            req.key = options.Key;
+
+            return req;
         }
 
         public class MapOperation
@@ -91,7 +105,7 @@ namespace RiakClient.Commands.CRDT
 
             public UpdateMap Build()
             {
-                var options = new UpdateMapOptions(bucketType);
+                var options = new UpdateMapOptions(bucketType, bucket, key);
                 return new UpdateMap(options);
             }
 
