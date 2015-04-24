@@ -20,5 +20,16 @@ namespace RiakClient.Commands.CRDT
 {
     public class UpdateMapOptions
     {
+        private readonly string bucketType;
+
+        public UpdateMapOptions(string bucketType)
+        {
+            this.bucketType = bucketType;
+        }
+
+        public string BucketType
+        {
+            get { return bucketType; }
+        }
     }
 }

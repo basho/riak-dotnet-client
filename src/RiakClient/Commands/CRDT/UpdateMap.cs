@@ -19,6 +19,8 @@
 namespace RiakClient.Commands.CRDT
 {
     using System;
+    using System.Collections;
+    using System.Collections.Generic;
     using Messages;
     using Models;
     using Util;
@@ -36,9 +38,36 @@ namespace RiakClient.Commands.CRDT
 
         public class MapOperation
         {
-            public void IncrementCounter(string counterName, int incrementValue)
+            private readonly CounterOperations incrementCounters = new CounterOperations();
+            private readonly CounterOperations removeCounters = new CounterOperations();
+
+            public void IncrementCounter(string key, int increment)
             {
-                throw new System.NotImplementedException();
+                RemoveRemovesFor(key, removeCounters);
+                incrementCounters.Increment(key, increment);
+            }
+
+            private static void RemoveRemovesFor(string key, IDictionary ops)
+            {
+                if (ops.Contains(key))
+                {
+                    ops.Remove(key);
+                }
+            }
+
+            private class CounterOperations : Dictionary<string, int>
+            {
+                public void Increment(string key, int increment)
+                {
+                    if (this.ContainsKey(key))
+                    {
+                        this[key] += increment;
+                    }
+                    else
+                    {
+                        this[key] = increment;
+                    }
+                }
             }
         }
 
@@ -62,7 +91,7 @@ namespace RiakClient.Commands.CRDT
 
             public UpdateMap Build()
             {
-                var options = new UpdateMapOptions();
+                var options = new UpdateMapOptions(bucketType);
                 return new UpdateMap(options);
             }
 
