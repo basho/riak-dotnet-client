@@ -81,7 +81,7 @@ namespace RiakClientTests.CRDT
                 .WithPW(q1)
                 .WithDW(q2)
                 .WithReturnBody(true)
-                .WithIncludeContext(true)
+                .WithIncludeContext(false)
                 .WithTimeout(TimeSpan.FromSeconds(20));
 
             UpdateMap updateMapCommand = updateMapCommandBuilder.Build();
@@ -94,7 +94,7 @@ namespace RiakClientTests.CRDT
             Assert.AreEqual(q1, pbReq.pw);
             Assert.AreEqual(q2, pbReq.dw);
             Assert.True(pbReq.return_body);
-            Assert.True(pbReq.include_context);
+            Assert.False(pbReq.include_context);
             Assert.AreEqual(20000, pbReq.timeout);
             Assert.AreEqual(context, pbReq.context);
         }

@@ -47,6 +47,17 @@ namespace RiakClient.Commands.CRDT
             req.bucket = options.Bucket;
             req.key = options.Key;
 
+            req.w = options.W;
+            req.pw = options.PW;
+            req.dw = options.DW;
+
+            req.return_body = options.ReturnBody;
+
+            req.timeout = (uint)options.Timeout.TotalMilliseconds;
+
+            req.context = options.Context;
+            req.include_context = options.IncludeContext;
+
             return req;
         }
 
@@ -106,6 +117,17 @@ namespace RiakClient.Commands.CRDT
             public UpdateMap Build()
             {
                 var options = new UpdateMapOptions(bucketType, bucket, key);
+
+                options.W = w;
+                options.PW = pw;
+                options.DW = dw;
+
+                options.ReturnBody = returnBody;
+
+                options.Timeout = timeout;
+
+                options.Context = context;
+
                 return new UpdateMap(options);
             }
 

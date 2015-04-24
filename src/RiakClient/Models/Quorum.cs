@@ -19,6 +19,10 @@
 
 namespace RiakClient.Models
 {
+    /*
+     * TODO - FUTURE:
+     * Move out of "Models". Universal types should be in RiakClient namespace
+     */
     using System;
     using System.Collections.Generic;
 
@@ -161,7 +165,19 @@ namespace RiakClient.Models
         [CLSCompliant(false)]
         public static implicit operator uint(Quorum quorum)
         {
-            return (uint)quorum.quorumValue;
+            /*
+             * NB: this is the default since the defaultValue attribute for quorum values
+             * is default(uint) as well.
+             * See DtUpdateReq, for instance.
+             */
+            uint rv = default(uint);
+
+            if (quorum != null)
+            {
+                rv = (uint)quorum.quorumValue;
+            }
+
+            return rv;
         }
 
         /// <summary>

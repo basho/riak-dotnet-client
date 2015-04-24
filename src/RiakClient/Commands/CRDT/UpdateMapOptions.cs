@@ -19,6 +19,7 @@
 namespace RiakClient.Commands.CRDT
 {
     using System;
+    using Models;
 
     public class UpdateMapOptions
     {
@@ -63,5 +64,19 @@ namespace RiakClient.Commands.CRDT
         {
             get { return key; }
         }
+
+        public Quorum W { get; set; }
+
+        public Quorum PW { get; set; }
+
+        public Quorum DW { get; set; }
+
+        public bool ReturnBody { get; set; }
+
+        public TimeSpan Timeout { get; set; }
+
+        public byte[] Context { get; set; }
+
+        public bool IncludeContext { get; set; }
     }
 }
