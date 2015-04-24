@@ -58,7 +58,40 @@ namespace RiakClient.Commands.CRDT
             req.context = options.Context;
             req.include_context = options.IncludeContext;
 
+            req.op = new DtOp();
+            req.op.map_op = new MapOp();
+
+            Populate(options.Op, req.op.map_op);
+
             return req;
+        }
+
+        private static void Populate(MapOperation mapOperation, MapOp mapOp)
+        {
+            foreach (var incrementCounter in mapOperation.IncrementCounters)
+            {
+                RiakString counterName = incrementCounter.Key;
+                int increment = incrementCounter.Value;
+
+                var field = new MapField
+                {
+                    name = counterName,
+                    type = MapField.MapFieldType.COUNTER
+                };
+
+                var counterOp = new CounterOp
+                {
+                    increment = increment
+                };
+
+                var update = new MapUpdate
+                {
+                    field = field,
+                    counter_op = counterOp
+                };
+
+                mapOp.updates.Add(update);
+            }
         }
 
         public class MapOperation
@@ -66,13 +99,23 @@ namespace RiakClient.Commands.CRDT
             private readonly CounterOperations incrementCounters = new CounterOperations();
             private readonly CounterOperations removeCounters = new CounterOperations();
 
-            public void IncrementCounter(string key, int increment)
+            public CounterOperations IncrementCounters
+            {
+                get { return incrementCounters; }
+            }
+
+            public CounterOperations RemoveCounters
+            {
+                get { return removeCounters; }
+            }
+
+            public void IncrementCounter(RiakString key, int increment)
             {
                 RemoveRemovesFor(key, removeCounters);
                 incrementCounters.Increment(key, increment);
             }
 
-            private static void RemoveRemovesFor(string key, IDictionary ops)
+            private static void RemoveRemovesFor(RiakString key, IDictionary ops)
             {
                 if (ops.Contains(key))
                 {
@@ -80,9 +123,9 @@ namespace RiakClient.Commands.CRDT
                 }
             }
 
-            private class CounterOperations : Dictionary<string, int>
+            public class CounterOperations : Dictionary<RiakString, int>
             {
-                public void Increment(string key, int increment)
+                public void Increment(RiakString key, int increment)
                 {
                     if (this.ContainsKey(key))
                     {
@@ -103,20 +146,23 @@ namespace RiakClient.Commands.CRDT
             private string key;
 
             private MapOperation mapOp;
-            private byte[] context;
 
             private Quorum w;
             private Quorum pw;
             private Quorum dw;
 
             private bool returnBody;
-            private bool includeContext;
 
             private TimeSpan timeout;
 
+            private bool includeContext;
+            private byte[] context;
+
             public UpdateMap Build()
             {
-                var options = new UpdateMapOptions(bucketType, bucket, key);
+                var options = new UpdateMapOptions(bucketType, bucket, mapOp);
+
+                options.Key = key;
 
                 options.W = w;
                 options.PW = pw;
@@ -126,6 +172,7 @@ namespace RiakClient.Commands.CRDT
 
                 options.Timeout = timeout;
 
+                options.IncludeContext = includeContext;
                 options.Context = context;
 
                 return new UpdateMap(options);

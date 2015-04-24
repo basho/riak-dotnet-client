@@ -42,7 +42,7 @@ namespace RiakClientTests
             Assert.True(rs);
             Assert.True(rs.HasValue);
 
-            rs = new RiakString(null);
+            rs = new RiakString((string)null);
             Assert.False(rs);
             Assert.False(rs.HasValue);
         }

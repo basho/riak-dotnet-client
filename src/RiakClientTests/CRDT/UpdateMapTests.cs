@@ -19,11 +19,14 @@
 namespace RiakClientTests.CRDT
 {
     using System;
+    using System.Collections.Generic;
     using System.Text;
     using NUnit.Framework;
+    using RiakClient;
     using RiakClient.Commands.CRDT;
     using RiakClient.Messages;
     using RiakClient.Models;
+    using RiakClient.Util;
 
     [TestFixture]
     public class UpdateMapTests
@@ -86,17 +89,91 @@ namespace RiakClientTests.CRDT
 
             UpdateMap updateMapCommand = updateMapCommandBuilder.Build();
 
-            DtUpdateReq pbReq = updateMapCommand.ConstructPbRequest();
-            Assert.AreEqual(Encoding.UTF8.GetBytes(bucketType), pbReq.type);
-            Assert.AreEqual(Encoding.UTF8.GetBytes(bucket), pbReq.bucket);
-            Assert.AreEqual(Encoding.UTF8.GetBytes(key), pbReq.key);
-            Assert.AreEqual(q3, pbReq.w);
-            Assert.AreEqual(q1, pbReq.pw);
-            Assert.AreEqual(q2, pbReq.dw);
-            Assert.True(pbReq.return_body);
-            Assert.False(pbReq.include_context);
-            Assert.AreEqual(20000, pbReq.timeout);
-            Assert.AreEqual(context, pbReq.context);
+            DtUpdateReq protobuf = updateMapCommand.ConstructPbRequest();
+            Assert.AreEqual(Encoding.UTF8.GetBytes(bucketType), protobuf.type);
+            Assert.AreEqual(Encoding.UTF8.GetBytes(bucket), protobuf.bucket);
+            Assert.AreEqual(Encoding.UTF8.GetBytes(key), protobuf.key);
+            Assert.AreEqual(q3, protobuf.w);
+            Assert.AreEqual(q1, protobuf.pw);
+            Assert.AreEqual(q2, protobuf.dw);
+            Assert.True(protobuf.return_body);
+            Assert.False(protobuf.include_context);
+            Assert.AreEqual(20000, protobuf.timeout);
+            Assert.AreEqual(context, protobuf.context);
+
+            MapOp mapOpMsg = protobuf.op.map_op;
+
+            VerifyRemoves(mapOpMsg.removes);
+            VerifyUpdates(mapOpMsg.updates);
+        }
+
+        private static void VerifyRemoves(IEnumerable<MapField> mapFields)
+        {
+            // TODO
+        }
+
+        private static MapUpdate VerifyUpdates(IEnumerable<MapUpdate> updates)
+        {
+            bool counterIncremented = false;
+            bool setAddedTo = false;
+            bool setRemovedFrom = false;
+            bool registerSet = false;
+            bool flagSet = false;
+            bool mapAdded = false;
+            MapUpdate mapUpdate = null;
+
+            foreach (MapUpdate update in updates)
+            {
+                switch(update.field.type)
+                {
+                    case MapField.MapFieldType.COUNTER:
+                        Assert.AreEqual(RiakString.FromBytes(update.field.name), (RiakString)"counter_1");
+                        Assert.AreEqual(update.counter_op.increment, 50);
+                        counterIncremented = true;
+                        break;
+                    case MapField.MapFieldType.SET:
+                        if (!EnumerableUtil.IsNullOrEmpty(update.set_op.adds))
+                        {
+                            Assert.AreEqual(RiakString.FromBytes(update.field.name), (RiakString)"set_1");
+                            Assert.AreEqual(RiakString.FromBytes(update.set_op.adds[0]), (RiakString)"set_value_1");
+                            setAddedTo = true;
+
+                        }
+                        else
+                        {
+                            Assert.AreEqual(RiakString.FromBytes(update.field.name), (RiakString)"set_2");
+                            Assert.AreEqual(RiakString.FromBytes(update.set_op.removes[0]), (RiakString)"set_value_2");
+                            setRemovedFrom = true;
+                        }
+                        break;
+                    case MapField.MapFieldType.MAP:
+                        Assert.AreEqual(RiakString.FromBytes(update.field.name), (RiakString)"map_2");
+                        mapAdded = true;
+                        mapUpdate = update;
+                        break;
+                    case MapField.MapFieldType.REGISTER:
+                        Assert.AreEqual(RiakString.FromBytes(update.field.name), (RiakString)"register_1");
+                        Assert.AreEqual(RiakString.FromBytes(update.register_op), (RiakString)"register_value_1");
+                        registerSet = true;
+                        break;
+                    case MapField.MapFieldType.FLAG:
+                        Assert.AreEqual(RiakString.FromBytes(update.field.name), (RiakString)"flag_1");
+                        Assert.AreEqual(update.flag_op, MapUpdate.FlagOp.ENABLE);
+                        flagSet = true;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            Assert.True(counterIncremented);
+            Assert.True(setAddedTo);
+            Assert.True(setRemovedFrom);
+            Assert.True(registerSet);
+            Assert.True(flagSet);
+            Assert.True(mapAdded);
+
+            return mapUpdate;
         }
     }
 }

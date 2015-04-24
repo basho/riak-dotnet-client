@@ -39,6 +39,18 @@ namespace RiakClient
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="RiakString"/> class.
+        /// </summary>
+        /// <param name="value">The UTF8 byte array from which to construct this instance.</param>
+        public RiakString(byte[] value)
+        {
+            if (value != null)
+            {
+                this.value = Encoding.UTF8.GetString(value);
+            }
+        }
+
+        /// <summary>
         /// Returns a <see cref="Boolean"/> that indicates a non-null value.
         /// </summary>
         /// <returns>
@@ -47,6 +59,18 @@ namespace RiakClient
         public bool HasValue
         {
             get { return value != null; }
+        }
+
+        /// <summary>
+        /// Returns a <see cref="RiakString"/> from the byte array of UTF8-encoded characters.
+        /// </summary>
+        /// <param name="value">The <see cref="Byte"/>[] value from which to construct a <see cref="RiakString"/>.</param>
+        /// <returns>
+        /// A <see cref="RiakString"/>.
+        /// </returns>
+        public static RiakString FromBytes(byte[] value)
+        {
+            return new RiakString(value);
         }
 
         /// <summary>

@@ -25,11 +25,18 @@ namespace RiakClient.Commands.CRDT
     {
         private readonly RiakString bucketType;
         private readonly RiakString bucket;
-        private readonly RiakString key;
+        private readonly UpdateMap.MapOperation op;
 
-        public UpdateMapOptions(string bucketType, string bucket, string key)
+        public UpdateMapOptions(string bucketType, string bucket, UpdateMap.MapOperation op)
         {
-            this.bucketType = bucketType;
+            if (string.IsNullOrEmpty(bucketType))
+            {
+                throw new ArgumentNullException("bucketType");
+            }
+            else
+            {
+                this.bucketType = bucketType;
+            }
 
             if (string.IsNullOrEmpty(bucket))
             {
@@ -40,13 +47,13 @@ namespace RiakClient.Commands.CRDT
                 this.bucket = bucket;
             }
 
-            if (string.IsNullOrEmpty(key))
+            if (op == null)
             {
-                throw new ArgumentNullException("key");
+                throw new ArgumentNullException("op");
             }
             else
             {
-                this.key = key;
+                this.op = op;
             }
         }
 
@@ -60,10 +67,12 @@ namespace RiakClient.Commands.CRDT
             get { return bucket; }
         }
 
-        public RiakString Key
+        public UpdateMap.MapOperation Op
         {
-            get { return key; }
+            get { return op; }
         }
+
+        public RiakString Key { get; set; }
 
         public Quorum W { get; set; }
 
