@@ -123,6 +123,18 @@ namespace RiakClient.Commands.CRDT
 
                     mapOp.removes.Add(field);
                 }
+
+                foreach (var removeMap in mapOperation.RemoveMaps)
+                {
+                    RiakString mapName = removeMap.Key;
+                    var field = new MapField
+                    {
+                        name = mapName,
+                        type = MapField.MapFieldType.MAP
+                    };
+
+                    mapOp.removes.Add(field);
+                }
             }
 
             foreach (var incrementCounter in mapOperation.IncrementCounters)
@@ -235,6 +247,29 @@ namespace RiakClient.Commands.CRDT
 
                 mapOp.updates.Add(update);
             }
+
+            foreach (var map in mapOperation.Maps)
+            {
+                RiakString mapName = map.Key;
+                MapOperation innerMapOperation = map.Value;
+
+                var field = new MapField
+                {
+                    name = mapName,
+                    type = MapField.MapFieldType.MAP
+                };
+
+                var innerMapOp = new MapOp();
+                Populate(innerMapOperation, innerMapOp);
+
+                var update = new MapUpdate
+                {
+                    field = field,
+                    map_op = mapOp
+                };
+
+                mapOp.updates.Add(update);
+            }
         }
 
         public class MapOperation
@@ -252,22 +287,22 @@ namespace RiakClient.Commands.CRDT
             private readonly FlagOperations flagsToSet = new FlagOperations();
             private readonly FlagOperations removeFlags = new FlagOperations();
 
+            private readonly MapOperations maps = new MapOperations();
+            private readonly MapOperations removeMaps = new MapOperations();
+
             public bool HasRemoves
             {
                 get
                 {
-                    // TODO
-                    // Nested Map Removes
-                    // for (var i = 0; i < this.maps.modify.length; i++) {
-                    //     nestedHaveRemoves |= this.maps.modify[i].map._hasRemoves();
-                    // }
-                    bool hasNestedRemoves = false;
+                    bool hasNestedRemoves = GetNestedRemoves(maps);
+
                     return hasNestedRemoves ||
                         removeCounters.Count > 0 ||
                         removeFromSets.Count > 0 ||
                         removeSets.Count > 0 ||
                         removeRegisters.Count > 0 ||
-                        removeFlags.Count > 0;
+                        removeFlags.Count > 0 ||
+                        removeMaps.Count > 0;
                 }
             }
 
@@ -314,6 +349,16 @@ namespace RiakClient.Commands.CRDT
             internal FlagOperations RemoveFlags
             {
                 get { return removeFlags; }
+            }
+
+            internal MapOperations Maps
+            {
+                get { return maps; }
+            }
+
+            internal MapOperations RemoveMaps
+            {
+                get { return removeMaps; }
             }
 
             public MapOperation IncrementCounter(RiakString key, int increment)
@@ -380,6 +425,57 @@ namespace RiakClient.Commands.CRDT
                 return this;
             }
 
+            public MapOperation Map(RiakString key)
+            {
+                removeMaps.Remove(key);
+
+                MapOperation mapOp;
+                if (!maps.TryGetValue(key, out mapOp))
+                {
+                    mapOp = new MapOperation();
+                    maps.Add(key, mapOp);
+                }
+
+                return mapOp;
+            }
+
+            public MapOperation RemoveMap(RiakString key)
+            {
+                maps.Remove(key);
+                removeMaps.Add(key);
+                return this;
+            }
+
+            private static bool GetNestedRemoves(MapOperations maps)
+            {
+                if (EnumerableUtil.IsNullOrEmpty(maps))
+                {
+                    return false;
+                }
+
+                bool hasNestedRemoves = false;
+
+                foreach (var mapOperation in maps)
+                {
+                    if (hasNestedRemoves)
+                    {
+                        break;
+                    }
+
+                    hasNestedRemoves = mapOperation.Value.HasRemoves;
+                    if (hasNestedRemoves)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        hasNestedRemoves = GetNestedRemoves(mapOperation.Value.Maps);
+                    }
+                }
+
+                return hasNestedRemoves;
+            }
+
             internal abstract class MapOperations<TValue> : Dictionary<RiakString, TValue>
             {
                 public void Add(RiakString key)
@@ -438,6 +534,10 @@ namespace RiakClient.Commands.CRDT
                 {
                     this[key] = value;
                 }
+            }
+
+            internal class MapOperations : MapOperations<MapOperation>
+            {
             }
         }
 
