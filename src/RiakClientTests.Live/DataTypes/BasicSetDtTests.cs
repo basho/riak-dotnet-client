@@ -1,4 +1,5 @@
-﻿// Copyright (c) 2011 - OJ Reeves & Jeremiah Peschka
+﻿// <copyright file="BasicSetDtTests.cs" company="Basho Technologies, Inc.">
+// Copyright (c) 2015 - Basho Technologies
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file

@@ -448,28 +448,18 @@ namespace RiakClient.Commands.CRDT
 
             private static bool GetNestedRemoves(MapOperations maps)
             {
-                if (EnumerableUtil.IsNullOrEmpty(maps))
-                {
-                    return false;
-                }
-
                 bool hasNestedRemoves = false;
 
-                foreach (var mapOperation in maps)
+                if (maps != null)
                 {
-                    if (hasNestedRemoves)
+                    foreach (var mapOperation in maps)
                     {
-                        break;
-                    }
-
-                    hasNestedRemoves = mapOperation.Value.HasRemoves;
-                    if (hasNestedRemoves)
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        hasNestedRemoves = GetNestedRemoves(mapOperation.Value.Maps);
+                        hasNestedRemoves =
+                            mapOperation.Value.HasRemoves || GetNestedRemoves(mapOperation.Value.Maps);
+                        if (hasNestedRemoves)
+                        {
+                            break;
+                        }
                     }
                 }
 
