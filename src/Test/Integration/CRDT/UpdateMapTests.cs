@@ -1,5 +1,5 @@
 // <copyright file="UpdateMapTests.cs" company="Basho Technologies, Inc.">
-// Copyright (c) 2015 - Basho Technologies
+// Copyright © 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -14,6 +14,22 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
+
+namespace Test.Integration.CRDT
+{
+    using System.Text;
+    using Common.Logging;
+    using RiakClient.Models;
+
+    public class UpdateMapTests : TestBase
+    {
+        private static readonly ILog log = Logging.GetLogger(typeof(UpdateMapTests));
+
+        protected const string Bucket = "riak_dt_bucket";
+        protected readonly DeserializeObject<string> Deserializer = (b, type) => Encoding.UTF8.GetString(b);
+        protected readonly SerializeObjectToByteArray<string> Serializer = s => Encoding.UTF8.GetBytes(s);
+    }
+}
 
 #if COMMENTEDOUT
 var Test = require('../testparams');

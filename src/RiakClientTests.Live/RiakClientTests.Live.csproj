@@ -61,7 +61,6 @@
     </Compile>
     <Compile Include="BucketPropertyTests.cs" />
     <Compile Include="BucketTypeTests.cs" />
-    <Compile Include="CRDT\UpdateMapTests.cs" />
     <Compile Include="DataTypes\BasicCounterDtTests.cs" />
     <Compile Include="DataTypes\BasicMapDtTests.cs" />
     <Compile Include="DataTypes\BasicMapFlagDtTests.cs" />
