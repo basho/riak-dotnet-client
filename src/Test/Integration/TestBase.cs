@@ -24,6 +24,7 @@ namespace Test.Integration
     using NUnit.Framework;
     using RiakClient;
     using RiakClient.Config;
+    using RiakClient.Util;
 
     [TestFixture]
     public abstract class TestBase
@@ -66,13 +67,6 @@ namespace Test.Integration
         [TestFixtureTearDown]
         protected virtual void TestFixtureTearDown()
         {
-        }
-
-        protected string GetRandomKey([CallerMemberName] string memberName = "")
-        {
-            var key = string.Format("{0}_{1}", memberName, R.Next());
-            Log.DebugFormat("Using {0} for {1}() key", key, memberName);
-            return key;
         }
     }
 }
