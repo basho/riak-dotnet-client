@@ -1,19 +1,6 @@
 <StyleCopSettings Version="105">
   <!-- NOTE: LinkedSettingsFile does NOT work on Mono -->
   <SourceFileList>
-    <SourceFile>riak.cs</SourceFile>
-    <SourceFile>riak_dt.cs</SourceFile>
-    <SourceFile>riak_kv.cs</SourceFile>
-    <SourceFile>riak_search.cs</SourceFile>
-    <SourceFile>riak_yokozuna.cs</SourceFile>
-    <SourceFile>RpbClasses.cs</SourceFile>
-    <Settings>
-      <GlobalSettings>
-        <BooleanProperty Name="RulesEnabledByDefault">False</BooleanProperty>
-      </GlobalSettings>
-    </Settings>
-  </SourceFileList>
-  <SourceFileList>
     <SourceFile>AssemblyInfo.cs</SourceFile>
     <SourceFile>CommonAssemblyInfo.cs</SourceFile>
     <Settings>
@@ -62,6 +49,16 @@
         </Rule>
         <!-- NB: this rule does not seem to work well/consistently -->
         <Rule Name="PrefixCallsCorrectly">
+          <RuleSettings>
+            <BooleanProperty Name="Enabled">False</BooleanProperty>
+          </RuleSettings>
+        </Rule>
+      </Rules>
+      <AnalyzerSettings />
+    </Analyzer>
+    <Analyzer AnalyzerId="StyleCop.CSharp.MaintainabilityRules">
+      <Rules>
+        <Rule Name="FieldsMustBePrivate">
           <RuleSettings>
             <BooleanProperty Name="Enabled">False</BooleanProperty>
           </RuleSettings>

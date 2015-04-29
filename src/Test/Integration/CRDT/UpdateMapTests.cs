@@ -14,20 +14,52 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
+// </copyright>
 
 namespace Test.Integration.CRDT
 {
-    using System.Text;
+    using System;
     using Common.Logging;
-    using RiakClient.Models;
+    using NUnit.Framework;
+    using RiakClient;
+    using RiakClient.Commands.CRDT;
 
     public class UpdateMapTests : TestBase
     {
-        private static readonly ILog log = Logging.GetLogger(typeof(UpdateMapTests));
+        private const string MapBucketType = "maps";
+        private const string BucketName = "map_tests";
 
-        protected const string Bucket = "riak_dt_bucket";
-        protected readonly DeserializeObject<string> Deserializer = (b, type) => Encoding.UTF8.GetString(b);
-        protected readonly SerializeObjectToByteArray<string> Serializer = s => Encoding.UTF8.GetBytes(s);
+        private static readonly ILog Log = Logging.GetLogger(typeof(UpdateMapTests));
+
+        // protected override void TestFixtureSetUp()
+        [Test]
+        public void CanSaveMap()
+        {
+            var mapOp = new UpdateMap.MapOperation();
+
+            mapOp.IncrementCounter("counter_1", 50)
+                .AddToSet("set_1", "value_1")
+                .SetRegister("register_1", "register_value_1")
+                .SetFlag("flag_1", true);
+
+            mapOp.Map("map_2")
+                .IncrementCounter("counter_1", 50)
+                .AddToSet("set_1", "value_1")
+                .SetRegister("register_1", "register_value_1")
+                .SetFlag("flag_1", true)
+                .Map("map_3");
+
+            var update = new UpdateMap.Builder()
+                .WithBucketType(MapBucketType)
+                .WithBucket(BucketName)
+                .WithKey("map_1")
+                .WithMapOperation(mapOp)
+                .WithReturnBody(true)
+                .WithTimeout(TimeSpan.FromMilliseconds(20000))
+                .Build();
+
+            RiakResult rslt = client.Execute(update);
+        }
     }
 }
 

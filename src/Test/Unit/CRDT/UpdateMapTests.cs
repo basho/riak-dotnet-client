@@ -34,9 +34,9 @@ namespace Test.Unit.CRDT
         [Test]
         public void ShouldBuildDtUpdateReqCorrectly()
         {
-            const string bucketType = "maps";
-            const string bucket = "myBucket";
-            const string key = "map_1";
+            const string BucketType = "maps";
+            const string Bucket = "myBucket";
+            const string Key = "map_1";
 
             byte[] context = Encoding.UTF8.GetBytes("test-context");
 
@@ -70,9 +70,9 @@ namespace Test.Unit.CRDT
             var q3 = new Quorum(3);
 
             updateMapCommandBuilder
-                .WithBucketType(bucketType)
-                .WithBucket(bucket)
-                .WithKey(key)
+                .WithBucketType(BucketType)
+                .WithBucket(Bucket)
+                .WithKey(Key)
                 .WithMapOperation(mapOp)
                 .WithContext(context)
                 .WithW(q3)
@@ -86,9 +86,9 @@ namespace Test.Unit.CRDT
 
             DtUpdateReq protobuf = updateMapCommand.ConstructPbRequest();
 
-            Assert.AreEqual(Encoding.UTF8.GetBytes(bucketType), protobuf.type);
-            Assert.AreEqual(Encoding.UTF8.GetBytes(bucket), protobuf.bucket);
-            Assert.AreEqual(Encoding.UTF8.GetBytes(key), protobuf.key);
+            Assert.AreEqual(Encoding.UTF8.GetBytes(BucketType), protobuf.type);
+            Assert.AreEqual(Encoding.UTF8.GetBytes(Bucket), protobuf.bucket);
+            Assert.AreEqual(Encoding.UTF8.GetBytes(Key), protobuf.key);
             Assert.AreEqual(q3, protobuf.w);
             Assert.AreEqual(q1, protobuf.pw);
             Assert.AreEqual(q2, protobuf.dw);
@@ -176,7 +176,6 @@ namespace Test.Unit.CRDT
                             Assert.AreEqual(Encoding.UTF8.GetBytes("set_1"), update.field.name);
                             Assert.AreEqual(Encoding.UTF8.GetBytes("set_value_1"), update.set_op.adds[0]);
                             setAddedTo = true;
-
                         }
                         else
                         {
@@ -184,6 +183,7 @@ namespace Test.Unit.CRDT
                             Assert.AreEqual(Encoding.UTF8.GetBytes("set_value_2"), update.set_op.removes[0]);
                             setRemovedFrom = true;
                         }
+
                         break;
                     case MapField.MapFieldType.MAP:
                         Assert.AreEqual(Encoding.UTF8.GetBytes("map_2"), update.field.name);

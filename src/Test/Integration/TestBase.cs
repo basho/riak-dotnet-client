@@ -21,18 +21,20 @@ namespace Test.Integration
     using System;
     using System.Runtime.CompilerServices;
     using Common.Logging;
+    using NUnit.Framework;
     using RiakClient;
     using RiakClient.Config;
     using RiakClient.Util;
 
+    [TestFixture]
     public abstract class TestBase
     {
-        private static readonly ILog log = Logging.GetLogger(typeof(TestBase));
-        protected static readonly Random random = new Random();
+        protected static readonly Random R = new Random();
+        protected IRiakEndPoint cluster;
+        protected IRiakClient client;
+        protected IRiakClusterConfiguration clusterConfig;
 
-        protected IRiakEndPoint Cluster;
-        protected IRiakClient Client;
-        protected IRiakClusterConfiguration ClusterConfig;
+        private static readonly ILog Log = Logging.GetLogger(typeof(TestBase));
 
         static TestBase()
         {
@@ -47,20 +49,30 @@ namespace Test.Integration
 #else
             if (MonoUtil.IsRunningOnMono)
             {
-                Cluster = RiakCluster.FromConfig("riak1NodeNoAuthConfiguration");
+                cluster = RiakCluster.FromConfig("riak1NodeNoAuthConfiguration");
             }
             else
             {
-                Cluster = RiakCluster.FromConfig("riak1NodeConfiguration");
+                cluster = RiakCluster.FromConfig("riak1NodeConfiguration");
             }
 #endif
-            Client = Cluster.CreateClient();
+            client = cluster.CreateClient();
+        }
+
+        [TestFixtureSetUp]
+        protected virtual void TestFixtureSetUp()
+        {
+        }
+
+        [TestFixtureTearDown]
+        protected virtual void TestFixtureTearDown()
+        {
         }
 
         protected string GetRandomKey([CallerMemberName] string memberName = "")
         {
-            var key = string.Format("{0}_{1}", memberName, random.Next());
-            log.DebugFormat("Using {0} for {1}() key", key, memberName);
+            var key = string.Format("{0}_{1}", memberName, R.Next());
+            Log.DebugFormat("Using {0} for {1}() key", key, memberName);
             return key;
         }
     }

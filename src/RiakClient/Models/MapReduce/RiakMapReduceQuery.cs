@@ -52,7 +52,8 @@ namespace RiakClient.Models.MapReduce
         /// This overload defaults the content-type to "application/json", with the default timeout.
         /// </remarks>
 #pragma warning disable 618
-        public RiakMapReduceQuery() : this(RiakConstants.ContentTypes.ApplicationJson, null)
+        public RiakMapReduceQuery()
+            : this(RiakConstants.ContentTypes.ApplicationJson, null)
 #pragma warning restore 618
         {
         }

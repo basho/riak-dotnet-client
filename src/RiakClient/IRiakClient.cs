@@ -20,6 +20,7 @@
 namespace RiakClient
 {
     using System;
+    using Commands.CRDT;
 
     /// <summary>
     /// Subinterface of <see cref="IRiakBatchClient"/>. 
@@ -46,5 +47,7 @@ namespace RiakClient
         /// <param name="batchFunction">A func that wraps all the operations to batch together.</param>
         /// <returns>The return value of <paramref name="batchFun"/>.</returns>
         T Batch<T>(Func<IRiakBatchClient, T> batchFunction);
+
+        RiakResult Execute(UpdateMap command);
     }
 }

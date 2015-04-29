@@ -24,6 +24,7 @@ namespace RiakClient
     using System.Diagnostics;
     using System.Linq;
     using System.Numerics;
+    using Commands.CRDT;
     using Comms;
     using Extensions;
     using Messages;
@@ -548,7 +549,9 @@ namespace RiakClient
                 var link = riakLink;
                 var keep = ReferenceEquals(link, lastLink);
 
+#pragma warning disable 618
                 query.Link(l => l.FromRiakLink(link).Keep(keep));
+#pragma warning restore 618
             }
 
             var result = MapReduce(query);
@@ -1095,6 +1098,11 @@ namespace RiakClient
         {
             var request = new RpbYokozunaSchemaPutReq { schema = searchSchema.ToMessage() };
             return UseConnection(conn => conn.PbcWriteRead(request, MessageCode.RpbPutResp));
+        }
+
+        public RiakResult Execute(UpdateMap command)
+        {
+            throw new NotImplementedException();
         }
 
         internal RiakResult ResetPbcBucketProperties(string bucketType, string bucket)
