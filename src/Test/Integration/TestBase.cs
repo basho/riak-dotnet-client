@@ -20,7 +20,6 @@ namespace Test.Integration
 {
     using System;
     using System.Runtime.CompilerServices;
-    using Common.Logging;
     using NUnit.Framework;
     using RiakClient;
     using RiakClient.Config;
@@ -33,8 +32,6 @@ namespace Test.Integration
         protected IRiakEndPoint cluster;
         protected IRiakClient client;
         protected IRiakClusterConfiguration clusterConfig;
-
-        private static readonly ILog Log = Logging.GetLogger(typeof(TestBase));
 
         static TestBase()
         {

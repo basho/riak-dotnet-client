@@ -19,7 +19,6 @@
 namespace Test.Integration.CRDT
 {
     using System;
-    using Common.Logging;
     using NUnit.Framework;
     using RiakClient;
     using RiakClient.Commands.CRDT;
@@ -28,8 +27,6 @@ namespace Test.Integration.CRDT
     {
         private const string MapBucketType = "maps";
         private const string BucketName = "map_tests";
-
-        private static readonly ILog Log = Logging.GetLogger(typeof(UpdateMapTests));
 
         // protected override void TestFixtureSetUp()
         [Test]
