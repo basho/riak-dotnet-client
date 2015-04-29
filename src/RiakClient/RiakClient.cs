@@ -1102,7 +1102,9 @@ namespace RiakClient
 
         public RiakResult Execute(UpdateMap command)
         {
-            throw new NotImplementedException();
+            DtUpdateReq request = command.ConstructPbRequest();
+            MessageCode expected = command.ExpectedCode;
+            return UseConnection(conn => conn.PbcWriteRead(request, expected));
         }
 
         internal RiakResult ResetPbcBucketProperties(string bucketType, string bucket)
@@ -1112,8 +1114,8 @@ namespace RiakClient
                 type = bucketType.ToRiakString(),
                 bucket = bucket.ToRiakString()
             };
-            var result = UseConnection(conn => conn.PbcWriteRead(request, MessageCode.RpbResetBucketResp));
-            return result;
+
+            return UseConnection(conn => conn.PbcWriteRead(request, MessageCode.RpbResetBucketResp));
         }
 
         internal RiakResult SetPbcBucketProperties(string bucketType, string bucket, RiakBucketProperties properties)
@@ -1124,9 +1126,8 @@ namespace RiakClient
                 bucket = bucket.ToRiakString(),
                 props = properties.ToMessage()
             };
-            var result = UseConnection(conn => conn.PbcWriteRead(request, MessageCode.RpbSetBucketResp));
 
-            return result;
+            return UseConnection(conn => conn.PbcWriteRead(request, MessageCode.RpbSetBucketResp));
         }
 
         private static RiakResult<IEnumerable<RiakResult>> Delete(

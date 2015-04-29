@@ -36,18 +36,19 @@ namespace Test.Integration.CRDT
         public void CanSaveMap()
         {
             var mapOp = new UpdateMap.MapOperation();
-
-            mapOp.IncrementCounter("counter_1", 50)
+            mapOp.IncrementCounter("counter_1", 1)
                 .AddToSet("set_1", "value_1")
                 .SetRegister("register_1", "register_value_1")
                 .SetFlag("flag_1", true);
 
-            mapOp.Map("map_2")
-                .IncrementCounter("counter_1", 50)
+            var map_2 = mapOp.Map("map_2");
+            map_2.IncrementCounter("counter_1", 2)
                 .AddToSet("set_1", "value_1")
                 .SetRegister("register_1", "register_value_1")
-                .SetFlag("flag_1", true)
-                .Map("map_3");
+                .SetFlag("flag_1", true);
+
+            var map_3 = map_2.Map("map_3");
+            map_3.IncrementCounter("counter_1", 3);
 
             var update = new UpdateMap.Builder()
                 .WithBucketType(MapBucketType)
@@ -59,6 +60,7 @@ namespace Test.Integration.CRDT
                 .Build();
 
             RiakResult rslt = client.Execute(update);
+            Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
         }
     }
 }

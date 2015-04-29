@@ -24,7 +24,6 @@ namespace Test.Integration
     using NUnit.Framework;
     using RiakClient;
     using RiakClient.Config;
-    using RiakClient.Util;
 
     [TestFixture]
     public abstract class TestBase
@@ -45,7 +44,7 @@ namespace Test.Integration
         public TestBase()
         {
 #if NOAUTH
-            Cluster = RiakCluster.FromConfig("riak1NodeNoAuthConfiguration");
+            cluster = RiakCluster.FromConfig("riak1NodeNoAuthConfiguration");
 #else
             if (MonoUtil.IsRunningOnMono)
             {

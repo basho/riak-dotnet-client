@@ -45,6 +45,11 @@ namespace RiakClient.Commands.CRDT
             }
         }
 
+        public MessageCode ExpectedCode
+        {
+            get { return MessageCode.DtUpdateResp; }
+        }
+
         internal DtUpdateReq ConstructPbRequest()
         {
             var req = new DtUpdateReq();
@@ -65,15 +70,15 @@ namespace RiakClient.Commands.CRDT
             req.include_context = options.IncludeContext;
 
             req.op = new DtOp();
-            req.op.map_op = new MapOp();
-
-            Populate(options.Op, req.op.map_op);
+            req.op.map_op = Populate(options.Op);
 
             return req;
         }
 
-        private static void Populate(MapOperation mapOperation, MapOp mapOp)
+        private static MapOp Populate(MapOperation mapOperation)
         {
+            var mapOp = new MapOp();
+
             if (mapOperation.HasRemoves)
             {
                 foreach (var removeCounter in mapOperation.RemoveCounters)
@@ -259,17 +264,18 @@ namespace RiakClient.Commands.CRDT
                     type = MapField.MapFieldType.MAP
                 };
 
-                var innerMapOp = new MapOp();
-                Populate(innerMapOperation, innerMapOp);
+                MapOp innerMapOp = Populate(innerMapOperation);
 
                 var update = new MapUpdate
                 {
                     field = field,
-                    map_op = mapOp
+                    map_op = innerMapOp
                 };
 
                 mapOp.updates.Add(update);
             }
+
+            return mapOp;
         }
 
         public class MapOperation

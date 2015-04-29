@@ -1,0 +1,9 @@
+﻿<NUnitProject>
+  <Settings activeconfig="Debug" processModel="Default" domainUsage="Default" />
+  <Config name="Debug" binpathtype="Auto" runtimeFramework="v4.0.21006" configfile="bin\Debug\Test.dll.config">
+    <assembly path="bin\Debug\Test.dll" />
+  </Config>
+  <Config name="Debug-Mono" binpathtype="Auto" runtimeFramework="v4.0.21006" configfile="bin/Debug/Test.dll.config">
+    <assembly path="bin/Debug/Test.dll" />
+  </Config>
+</NUnitProject>

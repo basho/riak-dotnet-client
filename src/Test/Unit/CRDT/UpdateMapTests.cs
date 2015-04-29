@@ -100,9 +100,9 @@ namespace Test.Unit.CRDT
             MapOp mapOpMsg = protobuf.op.map_op;
 
             VerifyRemoves(mapOpMsg.removes);
-            MapUpdate innerMapUpdate = VerifyUpdates(mapOpMsg.updates);
+            MapUpdate innerMapUpdate = VerifyUpdates(mapOpMsg.updates, true);
             VerifyRemoves(innerMapUpdate.map_op.removes);
-            VerifyUpdates(innerMapUpdate.map_op.updates);
+            VerifyUpdates(innerMapUpdate.map_op.updates, false);
         }
 
         private static void VerifyRemoves(ICollection<MapField> mapFields)
@@ -151,7 +151,7 @@ namespace Test.Unit.CRDT
             Assert.IsTrue(mapRemoved);
         }
 
-        private static MapUpdate VerifyUpdates(IEnumerable<MapUpdate> updates)
+        private static MapUpdate VerifyUpdates(IEnumerable<MapUpdate> updates, bool expectMapUpdate)
         {
             bool counterIncremented = false;
             bool setAddedTo = false;
@@ -186,9 +186,13 @@ namespace Test.Unit.CRDT
 
                         break;
                     case MapField.MapFieldType.MAP:
-                        Assert.AreEqual(Encoding.UTF8.GetBytes("map_2"), update.field.name);
-                        mapAdded = true;
-                        mapUpdate = update;
+                        if (expectMapUpdate)
+                        {
+                            Assert.AreEqual(Encoding.UTF8.GetBytes("map_2"), update.field.name);
+                            mapAdded = true;
+                            mapUpdate = update;
+                        }
+
                         break;
                     case MapField.MapFieldType.REGISTER:
                         Assert.AreEqual(Encoding.UTF8.GetBytes("register_1"), update.field.name);
@@ -210,7 +214,15 @@ namespace Test.Unit.CRDT
             Assert.IsTrue(setRemovedFrom);
             Assert.IsTrue(registerSet);
             Assert.IsTrue(flagSet);
-            Assert.IsTrue(mapAdded);
+
+            if (expectMapUpdate)
+            {
+                Assert.IsTrue(mapAdded);
+            }
+            else
+            {
+                Assert.IsFalse(mapAdded);
+            }
 
             return mapUpdate;
         }
