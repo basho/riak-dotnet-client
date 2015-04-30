@@ -18,16 +18,48 @@
 
 namespace RiakClient.Commands.CRDT
 {
+    using Exceptions;
+    using Messages;
+
     /// <summary>
     /// Response to a <see cref="FetchMap"/> or <see cref="UpdateMap"/> command.
     /// </summary>
     public class MapResponse
     {
+        private static readonly MapResponse NotFoundResponseField;
+        private readonly bool notFound;
+
+        static MapResponse()
+        {
+            NotFoundResponseField = new MapResponse(true);
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="MapResponse"/> class.
         /// </summary>
-        public MapResponse()
+        /// <param name="fetchResp">The PB message from which to construct this <see cref="MapResponse"/></param>
+        public MapResponse(DtFetchResp fetchResp)
         {
+            if (fetchResp.type != DtFetchResp.DataType.MAP)
+            {
+                throw new RiakException(
+                    string.Format("Requested map, received {0}", fetchResp.type));
+            }
+        }
+
+        private MapResponse(bool notFound)
+        {
+            this.notFound = notFound;
+        }
+
+        public static MapResponse NotFoundResponse
+        {
+            get { return NotFoundResponseField; }
+        }
+
+        public bool NotFound
+        {
+            get { return notFound; }
         }
     }
 }

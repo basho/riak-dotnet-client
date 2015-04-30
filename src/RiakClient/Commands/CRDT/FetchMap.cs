@@ -68,7 +68,15 @@ namespace RiakClient.Commands.CRDT
 
         public void OnSuccess(RpbResp response)
         {
-            throw new NotImplementedException();
+            if (response == null)
+            {
+                Response = MapResponse.NotFoundResponse;
+            }
+            else
+            {
+                DtFetchResp fetchResp = (DtFetchResp)response;
+                Response = new MapResponse(fetchResp);
+            }
         }
 
         public class Builder

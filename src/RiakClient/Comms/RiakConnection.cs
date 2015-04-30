@@ -282,12 +282,10 @@ namespace RiakClient.Comms
 
         public RiakResult Execute(IRiakCommand command)
         {
-            RpbReq request = command.ConstructPbRequest();
-
-            RiakResult writeResult = PbcWrite(request);
+            RiakResult writeResult = DoExecute(() => socket.Write(command));
             if (writeResult.IsSuccess)
             {
-                return PbcRead(command);
+                return DoExecute(() => socket.Read(command));
             }
 
             return RiakResult.Error(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline);
@@ -304,11 +302,11 @@ namespace RiakClient.Comms
             socket.Disconnect();
         }
 
-        private RiakResult PbcRead(IRiakCommand command)
+        private RiakResult DoExecute(Func<RiakResult> socketFunc)
         {
             try
             {
-                return socket.Read(command);
+                return socketFunc();
             }
             catch (RiakException ex)
             {
@@ -317,6 +315,7 @@ namespace RiakClient.Comms
                     Disconnect();
                 }
 
+                // TODO: we really should preserve the Exception object
                 return RiakResult.Error(ResultCode.CommunicationError, ex.Message, ex.NodeOffline);
             }
             catch (Exception ex)

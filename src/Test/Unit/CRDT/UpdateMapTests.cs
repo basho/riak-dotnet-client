@@ -25,14 +25,13 @@ namespace Test.Unit.CRDT
     using RiakClient;
     using RiakClient.Commands.CRDT;
     using RiakClient.Messages;
-    using RiakClient.Models;
     using RiakClient.Util;
 
     [TestFixture]
     public class UpdateMapTests
     {
         [Test]
-        public void ShouldBuildDtUpdateReqCorrectly()
+        public void Should_Build_DtUpdateReq_Correctly()
         {
             const string BucketType = "maps";
             const string Bucket = "myBucket";

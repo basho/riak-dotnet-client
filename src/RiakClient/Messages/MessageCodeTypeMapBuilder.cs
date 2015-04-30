@@ -87,10 +87,9 @@ namespace RiakClient.Messages
             }
         }
 
-        public static byte GetMessageCodeFor(Type type)
+        public static MessageCode GetMessageCodeFor(Type type)
         {
-            MessageCode messageCode = TypeToMessageCodeMap[type];
-            return (byte)messageCode;
+            return TypeToMessageCodeMap[type];
         }
 
         public static Type GetTypeFor(MessageCode messageCode)

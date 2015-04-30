@@ -108,7 +108,18 @@ namespace RiakClient.Commands.CRDT
 
         public void OnSuccess(RpbResp response)
         {
-            throw new NotImplementedException();
+            if (response == null)
+            {
+                // TODO is this really always not found?
+                Response = MapResponse.NotFoundResponse;
+            }
+            else
+            {
+                DtUpdateResp fetchResp = (DtUpdateResp)response;
+
+                // TODO
+                Response = null;
+            }
         }
 
         private static MapOp Populate(MapOperation mapOperation)
