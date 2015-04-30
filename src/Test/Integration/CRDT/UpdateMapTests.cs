@@ -37,7 +37,7 @@ namespace Test.Integration.CRDT
                     .WithBucketType(BucketType)
                     .WithBucket(Bucket)
                     .WithKey(Key)
-                    .build();
+                    .Build();
 
             RiakResult<MapResponse> rslt = client.Execute(fetch);
             Assert.IsTrue(rslt.IsSuccess);
