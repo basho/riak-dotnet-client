@@ -51,11 +51,10 @@ namespace RiakClient
         /// <summary>
         /// Used to execute a command against a Riak cluster.
         /// </summary>
-        /// <typeparam name="TResult">The command's result type.</typeparam>
         /// <param name="command">The command to execute.</param>
         /// <returns>
-        /// A <see cref="RiakResult{TResult}"/>, which will contain the requested data.
+        /// A <see cref="RiakResult"/>, which will indicate success. The passed in command will contain the response.
         /// </returns>
-        RiakResult<TResult> Execute<TResult>(IRiakCommand command);
+        RiakResult Execute(IRiakCommand command);
     }
 }

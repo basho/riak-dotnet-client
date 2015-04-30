@@ -70,10 +70,11 @@
       <ExcludeFromStyleCop>False</ExcludeFromStyleCop>
     </Compile>
     <Compile Include="Commands\CRDT\FetchMap.cs" />
+    <Compile Include="Commands\CRDT\MapResponse.cs" />
     <Compile Include="Commands\CRDT\UpdateMap.cs" />
     <Compile Include="Commands\CRDT\FetchMapOptions.cs" />
     <Compile Include="Commands\CRDT\UpdateMapOptions.cs" />
-    <Compile Include="Commands\Command.cs" />
+    <Compile Include="Commands\IRiakCommand.cs" />
     <Compile Include="Comms\IRiakConnectionManager.cs" />
     <Compile Include="Comms\LoadBalancing\ILoadBalancingStrategy.cs" />
     <Compile Include="Comms\LoadBalancing\RoundRobinStrategy.cs" />

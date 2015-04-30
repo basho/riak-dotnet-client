@@ -21,6 +21,7 @@ namespace RiakClient.Comms
 {
     using System;
     using System.Collections.Generic;
+    using Commands;
     using Messages;
 
     /// <summary>
@@ -77,5 +78,7 @@ namespace RiakClient.Comms
             Func<RiakResult<TResult>, bool> repeatRead,
             Action onFinish)
             where TResult : class, new();
+
+        RiakResult Execute(IRiakCommand command);
     }
 }

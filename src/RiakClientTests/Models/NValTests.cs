@@ -20,7 +20,7 @@ namespace RiakClientTests.Models
 {
     using System;
     using NUnit.Framework;
-    using RiakClient.Models;
+    using RiakClient;
 
     [TestFixture]
     public class NValTests

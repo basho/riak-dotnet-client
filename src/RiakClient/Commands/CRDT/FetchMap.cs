@@ -20,10 +20,9 @@ namespace RiakClient.Commands.CRDT
 {
     using System;
     using Messages;
-    using Models;
-    using Util;
 
     /// <summary>
+    /// Fetches a Map from Riak
     /// </summary>
     public class FetchMap : IRiakCommand
     {
@@ -48,7 +47,9 @@ namespace RiakClient.Commands.CRDT
             get { return MessageCode.DtFetchResp; }
         }
 
-        internal DtFetchReq ConstructPbRequest()
+        public MapResponse Response { get; private set; }
+
+        public RpbReq ConstructPbRequest()
         {
             var req = new DtFetchReq();
 
@@ -56,15 +57,18 @@ namespace RiakClient.Commands.CRDT
             req.bucket = options.Bucket;
             req.key = options.Key;
 
-            req.w = options.W;
-            req.pw = options.PW;
-            req.dw = options.DW;
+            req.r = options.R;
+            req.pr = options.PR;
 
             req.timeout = (uint)options.Timeout.TotalMilliseconds;
-
             req.include_context = options.IncludeContext;
 
             return req;
+        }
+
+        public void OnSuccess(RpbResp response)
+        {
+            throw new NotImplementedException();
         }
 
         public class Builder
@@ -73,33 +77,21 @@ namespace RiakClient.Commands.CRDT
             private string bucket;
             private string key;
 
-            private Quorum w;
-            private Quorum pw;
-            private Quorum dw;
-
-            private bool returnBody;
+            private Quorum r;
+            private Quorum pr;
 
             private TimeSpan timeout;
-
             private bool includeContext;
-            private byte[] context;
 
             public FetchMap Build()
             {
-                var options = new FetchMapOptions(bucketType, bucket, mapOp);
+                var options = new FetchMapOptions(bucketType, bucket, key);
 
-                options.Key = key;
-
-                options.W = w;
-                options.PW = pw;
-                options.DW = dw;
-
-                options.ReturnBody = returnBody;
+                options.R = r;
+                options.PR = pr;
 
                 options.Timeout = timeout;
-
                 options.IncludeContext = includeContext;
-                options.Context = context;
 
                 return new FetchMap(options);
             }
@@ -137,64 +129,25 @@ namespace RiakClient.Commands.CRDT
                 return this;
             }
 
-            public Builder WithMapOperation(MapOperation mapOp)
+            public Builder WithR(Quorum r)
             {
-                if (mapOp == null)
+                if (r == null)
                 {
-                    throw new ArgumentNullException("mapOp", "mapOp may not be null");
+                    throw new ArgumentNullException("r", "r may not be null");
                 }
 
-                this.mapOp = mapOp;
+                this.r = r;
                 return this;
             }
 
-            public Builder WithContext(byte[] context)
+            public Builder WithPR(Quorum pr)
             {
-                if (EnumerableUtil.IsNullOrEmpty(context))
+                if (pr == null)
                 {
-                    throw new ArgumentNullException("context", "context may not be null or empty");
+                    throw new ArgumentNullException("pr", "pr may not be null");
                 }
 
-                this.context = context;
-                return this;
-            }
-
-            public Builder WithW(Quorum w)
-            {
-                if (w == null)
-                {
-                    throw new ArgumentNullException("w", "w may not be null");
-                }
-
-                this.w = w;
-                return this;
-            }
-
-            public Builder WithPW(Quorum pw)
-            {
-                if (pw == null)
-                {
-                    throw new ArgumentNullException("pw", "pw may not be null");
-                }
-
-                this.pw = pw;
-                return this;
-            }
-
-            public Builder WithDW(Quorum dw)
-            {
-                if (dw == null)
-                {
-                    throw new ArgumentNullException("dw", "dw may not be null");
-                }
-
-                this.dw = dw;
-                return this;
-            }
-
-            public Builder WithReturnBody(bool returnBody)
-            {
-                this.returnBody = returnBody;
+                this.pr = pr;
                 return this;
             }
 

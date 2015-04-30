@@ -1,4 +1,4 @@
-﻿// <copyright file="Command.cs" company="Basho Technologies, Inc.">
+﻿// <copyright file="IRiakCommand.cs" company="Basho Technologies, Inc.">
 // Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
@@ -23,9 +23,12 @@ namespace RiakClient.Commands
     /// <summary>
     /// Represents a command to execute against Riak
     /// </summary>
-    public abstract class IRiakCommand
+    public interface IRiakCommand
     {
-        public MessageCode ExpectedCode { get; }
-        internal RpbReq ConstructPbRequest();
+        MessageCode ExpectedCode { get; }
+        
+        RpbReq ConstructPbRequest();
+
+        void OnSuccess(RpbResp rpbResp);
     }
 }

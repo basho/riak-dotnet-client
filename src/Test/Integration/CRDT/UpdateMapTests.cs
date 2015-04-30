@@ -39,8 +39,11 @@ namespace Test.Integration.CRDT
                     .WithKey(Key)
                     .Build();
 
-            RiakResult<MapResponse> rslt = client.Execute(fetch);
+            RiakResult rslt = client.Execute(fetch);
             Assert.IsTrue(rslt.IsSuccess);
+
+            MapResponse response = fetch.Response;
+            Assert.IsNotNull(response);
         }
 
         protected override void TestFixtureSetUp()

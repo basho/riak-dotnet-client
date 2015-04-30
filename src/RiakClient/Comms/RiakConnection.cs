@@ -21,6 +21,7 @@ namespace RiakClient.Comms
 {
     using System;
     using System.Collections.Generic;
+    using Commands;
     using Config;
     using Exceptions;
     using Messages;
@@ -279,6 +280,19 @@ namespace RiakClient.Comms
             return RiakResult<IEnumerable<RiakResult<TResult>>>.Success(streamer);
         }
 
+        public RiakResult Execute(IRiakCommand command)
+        {
+            RpbReq request = command.ConstructPbRequest();
+
+            RiakResult writeResult = PbcWrite(request);
+            if (writeResult.IsSuccess)
+            {
+                return PbcRead(command);
+            }
+
+            return RiakResult.Error(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline);
+        }
+
         public void Dispose()
         {
             socket.Dispose();
@@ -288,6 +302,28 @@ namespace RiakClient.Comms
         public void Disconnect()
         {
             socket.Disconnect();
+        }
+
+        private RiakResult PbcRead(IRiakCommand command)
+        {
+            try
+            {
+                return socket.Read(command);
+            }
+            catch (RiakException ex)
+            {
+                if (ex.NodeOffline)
+                {
+                    Disconnect();
+                }
+
+                return RiakResult.Error(ResultCode.CommunicationError, ex.Message, ex.NodeOffline);
+            }
+            catch (Exception ex)
+            {
+                Disconnect();
+                return RiakResult.Error(ResultCode.CommunicationError, ex.Message, true);
+            }
         }
 
         private IEnumerable<RiakResult<TResult>> PbcWriteStreamReadIterator<TResult>(

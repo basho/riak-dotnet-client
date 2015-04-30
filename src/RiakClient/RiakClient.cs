@@ -24,6 +24,7 @@ namespace RiakClient
     using System.Diagnostics;
     using System.Linq;
     using System.Numerics;
+    using Commands;
     using Commands.CRDT;
     using Comms;
     using Extensions;
@@ -1100,11 +1101,9 @@ namespace RiakClient
             return UseConnection(conn => conn.PbcWriteRead(request, MessageCode.RpbPutResp));
         }
 
-        public RiakResult Execute(UpdateMap command)
+        public RiakResult Execute(IRiakCommand command)
         {
-            DtUpdateReq request = command.ConstructPbRequest();
-            MessageCode expected = command.ExpectedCode;
-            return UseConnection(conn => conn.PbcWriteRead(request, expected));
+            return UseConnection(conn => conn.Execute(command));
         }
 
         internal RiakResult ResetPbcBucketProperties(string bucketType, string bucket)

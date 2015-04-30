@@ -79,7 +79,9 @@ namespace RiakClient.Commands.CRDT
             get { return MessageCode.DtUpdateResp; }
         }
 
-        internal DtUpdateReq ConstructPbRequest()
+        public MapResponse Response { get; private set; }
+
+        public RpbReq ConstructPbRequest()
         {
             var req = new DtUpdateReq();
 
@@ -102,6 +104,11 @@ namespace RiakClient.Commands.CRDT
             req.op.map_op = Populate(options.Op);
 
             return req;
+        }
+
+        public void OnSuccess(RpbResp response)
+        {
+            throw new NotImplementedException();
         }
 
         private static MapOp Populate(MapOperation mapOperation)

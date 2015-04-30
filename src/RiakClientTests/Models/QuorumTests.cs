@@ -21,7 +21,7 @@ namespace RiakClientTests.Models
     using System;
     using System.Collections.Generic;
     using NUnit.Framework;
-    using RiakClient.Models;
+    using RiakClient;
 
     [TestFixture]
     public class QuorumTests

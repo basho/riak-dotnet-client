@@ -252,10 +252,10 @@ namespace RiakClient
         /// </summary>
         public static class WellKnown
         {
-            private static readonly Quorum OneStatic = new Quorum(Models.Quorum.OneAsInt);
-            private static readonly Quorum QuorumStatic = new Quorum(Models.Quorum.QuorumAsInt);
-            private static readonly Quorum AllStatic = new Quorum(Models.Quorum.AllAsInt);
-            private static readonly Quorum DefaultStatic = new Quorum(Models.Quorum.DefaultAsInt);
+            private static readonly Quorum OneStatic = new Quorum(Quorum.OneAsInt);
+            private static readonly Quorum QuorumStatic = new Quorum(Quorum.QuorumAsInt);
+            private static readonly Quorum AllStatic = new Quorum(Quorum.AllAsInt);
+            private static readonly Quorum DefaultStatic = new Quorum(Quorum.DefaultAsInt);
 
             /// <summary>
             /// The "one" Quorum instance.
