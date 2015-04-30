@@ -1,5 +1,5 @@
 ﻿// <copyright file="BasicMapSetDtTests.cs" company="Basho Technologies, Inc.">
-// Copyright (c) 2015 - Basho Technologies
+// Copyright 2015 - Basho Technologies
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -14,6 +14,7 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
+// </copyright>
 
 using System.Collections.Generic;
 using System.Linq;
