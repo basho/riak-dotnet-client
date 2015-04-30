@@ -17,7 +17,7 @@
 // under the License.
 // </copyright>
 
-namespace RiakClient.Models
+namespace RiakClient
 {
     using System;
 

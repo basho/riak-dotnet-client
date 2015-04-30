@@ -22,15 +22,28 @@ namespace Test.Integration.CRDT
     using NUnit.Framework;
     using RiakClient;
     using RiakClient.Commands.CRDT;
+    using RiakClient.Models;
 
     public class UpdateMapTests : TestBase
     {
-        private const string MapBucketType = "maps";
-        private const string BucketName = "map_tests";
+        private const string BucketType = "maps";
+        private const string Bucket = "map_tests";
+        private const string Key = "map_1";
 
-        // protected override void TestFixtureSetUp()
         [Test]
-        public void CanSaveMap()
+        public void Fetching_A_Map_Produces_Expected_Values()
+        {
+            var fetch = new FetchMap.Builder()
+                    .WithBucketType(BucketType)
+                    .WithBucket(Bucket)
+                    .WithKey(Key)
+                    .build();
+
+            RiakResult<MapResponse> rslt = client.Execute(fetch);
+            Assert.IsTrue(rslt.IsSuccess);
+        }
+
+        protected override void TestFixtureSetUp()
         {
             var mapOp = new UpdateMap.MapOperation();
             mapOp.IncrementCounter("counter_1", 1)
@@ -48,9 +61,9 @@ namespace Test.Integration.CRDT
             map_3.IncrementCounter("counter_1", 3);
 
             var update = new UpdateMap.Builder()
-                .WithBucketType(MapBucketType)
-                .WithBucket(BucketName)
-                .WithKey("map_1")
+                .WithBucketType(BucketType)
+                .WithBucket(Bucket)
+                .WithKey(Key)
                 .WithMapOperation(mapOp)
                 .WithReturnBody(true)
                 .WithTimeout(TimeSpan.FromMilliseconds(20000))
@@ -59,70 +72,22 @@ namespace Test.Integration.CRDT
             RiakResult rslt = client.Execute(update);
             Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
         }
+
+        protected override void TestFixtureTearDown()
+        {
+            var id = new RiakObjectId(BucketType, Bucket, Key);
+            client.Delete(id);
+            /*
+            Test.cleanBucket(cluster, Test.mapBucketType, Test.bucketName, function() {
+                cluster.on('stateChange', function(state) { if (state === RiakCluster.State.SHUTDOWN) { done();} });
+                cluster.stop();
+            });
+             */
+        }
     }
 }
 
 #if COMMENTEDOUT
-var Test = require('../testparams');
-var UpdateMap = require('../../../lib/commands/crdt/updatemap');
-var FetchMap = require('../../../lib/commands/crdt/fetchmap');
-var RiakNode = require('../../../lib/core/riaknode');
-var RiakCluster = require('../../../lib/core/riakcluster');
-var assert = require('assert');
-
-describe('Update and Fetch Map - Integration', function() {
-    
-    var cluster;
-    this.timeout(10000);
-    var context;
-    
-    before(function(done) {
-        var nodes = RiakNode.buildNodes(Test.nodeAddresses);
-        cluster = new RiakCluster({ nodes: nodes});
-        cluster.start();
-
-        var callback = function(err, resp) {
-            assert(!err, err);
-            assert(resp.context);
-            context = resp.context;
-            done();
-        };
-
-        var mapOp = new UpdateMap.MapOperation();
-           
-        mapOp.incrementCounter('counter_1', 50)
-            .addToSet('set_1', 'value_1')
-            .setRegister('register_1', new Buffer('register_value_1'))
-            .setFlag('flag_1', true);
-
-        mapOp.map('map_2').incrementCounter('counter_1', 50)
-            .addToSet('set_1', 'value_1')
-            .setRegister('register_1', new Buffer('register_value_1'))
-            .setFlag('flag_1', true)
-            .map('map_3');
-
-
-        var update = new UpdateMap.Builder()
-            .withBucketType(Test.mapBucketType)
-            .withBucket(Test.bucketName)
-            .withKey('map_1')
-            .withMapOperation(mapOp)
-            .withCallback(callback)
-            .withReturnBody(true)
-            .withTimeout(20000)
-            .build();
-
-        cluster.execute(update);
-
-    });
-    
-    after(function(done) {
-        Test.cleanBucket(cluster, Test.mapBucketType, Test.bucketName, function() {
-            cluster.on('stateChange', function(state) { if (state === RiakCluster.State.SHUTDOWN) { done();} });
-            cluster.stop();
-        });
-    });
-    
     it('Should fetch a map', function(done) {
        
         var callback = function(err, resp) {

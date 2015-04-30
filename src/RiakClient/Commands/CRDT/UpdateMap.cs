@@ -25,10 +25,39 @@ namespace RiakClient.Commands.CRDT
     using Models;
     using Util;
 
-    public class UpdateMap
+    /// <summary>
+    /// Command used to update a Map in Riak. As a convenience, a builder method
+    /// is provided as well as an object with a fluent API for constructing the
+    /// update. See <see cref="UpdateMap.MapOperation"/>
+    /// <code>
+    /// var mapOp = new UpdateMap.MapOperation();
+    /// mapOp.IncrementCounter("counter_1", 50)
+    ///     .AddToSet("set_1", "set_value_1")
+    ///     .SetRegister("register_1", "register_value_1")
+    ///     .SetFlag("flag_1", true)
+    ///     .Map("inner_map")
+    ///         .IncrementCounter("counter_1", 50)
+    ///         .AddToSet("set_2", "set_value_2");
+    /// </code>
+    /// See <see cref="UpdateMap.Builder"/>
+    /// <code>
+    /// var update = new UpdateMap.Builder()
+    ///           .WithBucketType("maps")
+    ///           .WithBucket("myBucket")
+    ///           .WithKey("map_1")
+    ///           .WithMapOperation(mapOp)
+    ///           .WithReturnBody(true)
+    ///           .Build();
+    /// </code>
+    /// </summary>
+    public class UpdateMap : IRiakCommand
     {
         private readonly UpdateMapOptions options;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UpdateMap"/> class.
+        /// </summary>
+        /// <param name="options">Options for this operation. See <see cref="UpdateMapOptions"/></param>
         public UpdateMap(UpdateMapOptions options)
         {
             if (options == null)

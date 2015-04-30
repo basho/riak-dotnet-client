@@ -1,4 +1,4 @@
-﻿// <copyright file="UpdateMapOptions.cs" company="Basho Technologies, Inc.">
+﻿// <copyright file="FetchMapOptions.cs" company="Basho Technologies, Inc.">
 // Copyright (c) 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
@@ -19,24 +19,23 @@
 namespace RiakClient.Commands.CRDT
 {
     using System;
-    using Models;
 
     /// <summary>
-    /// Represents options for a <see cref="UpdateMap"/> operation.
+    /// Represents options for a <see cref="FetchMap"/> operation.
     /// </summary>
-    public class UpdateMapOptions
+    public class FetchMapOptions
     {
         private readonly RiakString bucketType;
         private readonly RiakString bucket;
-        private readonly UpdateMap.MapOperation op;
+        private readonly RiakString key;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="UpdateMapOptions"/> class.
+        /// Initializes a new instance of the <see cref="FetchMapOptions"/> class.
         /// </summary>
         /// <param name="bucketType">The bucket type in Riak. Required.</param>
         /// <param name="bucket">The bucket in Riak. Required.</param>
-        /// <param name="op">The set of modifications to make to this map. Required.</param>
-        public UpdateMapOptions(string bucketType, string bucket, UpdateMap.MapOperation op)
+        /// <param name="key">The key in Riak. Required.</param>
+        public FetchMapOptions(string bucketType, string bucket, string key)
         {
             if (string.IsNullOrEmpty(bucketType))
             {
@@ -56,14 +55,19 @@ namespace RiakClient.Commands.CRDT
                 this.bucket = bucket;
             }
 
-            if (op == null)
+            if (string.IsNullOrEmpty(key))
             {
-                throw new ArgumentNullException("op");
+                throw new ArgumentNullException("key");
             }
             else
             {
-                this.op = op;
+                this.key = key;
             }
+
+            // ensure default values
+            this.NotFoundOk = false;
+            this.UseBasicQuorum = false;
+            this.IncludeContext = true;
         }
 
         /// <summary>
@@ -85,38 +89,13 @@ namespace RiakClient.Commands.CRDT
         }
 
         /// <summary>
-        /// The <see cref="UpdateMap.MapOperation"/>
+        /// The key
         /// </summary>
-        /// <value>The <see cref="UpdateMap.MapOperation"/> to be executed by the <see cref="UpdateMap"/> command.</value>
-        public UpdateMap.MapOperation Op
+        /// <value>The <see cref="RiakString"/> representing the key.</value>
+        public RiakString Key
         {
-            get { return op; }
+            get { return key; }
         }
-
-        /// <summary>
-        /// The key for the map you want to store. If not supplied Riak will generate one.
-        /// </summary>
-        public RiakString Key { get; set; }
-
-        /// <summary>
-        /// The W (write) value to use.
-        /// </summary>
-        public Quorum W { get; set; }
-
-        /// <summary>
-        /// The PW (primary vnode write) value to use.
-        /// </summary>
-        public Quorum PW { get; set; }
-
-        /// <summary>
-        /// The DW (durable write) value to use.
-        /// </summary>
-        public Quorum DW { get; set; }
-
-        /// <summary>
-        /// If true, returns the updated map.
-        /// </summary>
-        public bool ReturnBody { get; set; }
 
         /// <summary>
         /// The timeout for this command.
@@ -124,9 +103,24 @@ namespace RiakClient.Commands.CRDT
         public TimeSpan Timeout { get; set; }
 
         /// <summary>
-        /// The context from a previous fetch. Required for remove operations. 
+        /// The R (read) value to use.
         /// </summary>
-        public byte[] Context { get; set; }
+        public Quorum R { get; set; }
+
+        /// <summary>
+        /// The PR (primary vnode read) value to use.
+        /// </summary>
+        public Quorum PR { get; set; }
+
+        /// <summary>
+        /// If true, a <c>not_found</c> response from Riak is not an error.
+        /// </summary>
+        public bool NotFoundOk { get; set; }
+
+        /// <summary>
+        /// Controls whether a read request should return early in some failure cases.
+        /// </summary>
+        public bool UseBasicQuorum { get; set; }
 
         /// <summary>
         /// Set to <b>false</b> to not return context. Default (and recommended value) is <b>true</b>.

@@ -69,8 +69,11 @@
     <Compile Include="Auth\RiakSecurityManager.cs">
       <ExcludeFromStyleCop>False</ExcludeFromStyleCop>
     </Compile>
+    <Compile Include="Commands\CRDT\FetchMap.cs" />
     <Compile Include="Commands\CRDT\UpdateMap.cs" />
+    <Compile Include="Commands\CRDT\FetchMapOptions.cs" />
     <Compile Include="Commands\CRDT\UpdateMapOptions.cs" />
+    <Compile Include="Commands\Command.cs" />
     <Compile Include="Comms\IRiakConnectionManager.cs" />
     <Compile Include="Comms\LoadBalancing\ILoadBalancingStrategy.cs" />
     <Compile Include="Comms\LoadBalancing\RoundRobinStrategy.cs" />
@@ -95,8 +98,8 @@
     <Compile Include="Models\CommitHook\IRiakCommitHook.cs" />
     <Compile Include="RiakString.cs" />
     <Compile Include="Timeout.cs" />
-    <Compile Include="Models\NVal.cs" />
-    <Compile Include="Models\Quorum.cs" />
+    <Compile Include="NVal.cs" />
+    <Compile Include="Quorum.cs" />
     <Compile Include="Models\RiakBinIndexId.cs" />
     <Compile Include="Models\RiakDt\CounterOperation.cs" />
     <Compile Include="Models\RiakDt\MapOperation.cs" />

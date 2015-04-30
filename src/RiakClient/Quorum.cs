@@ -17,12 +17,8 @@
 // under the License.
 // </copyright>
 
-namespace RiakClient.Models
+namespace RiakClient
 {
-    /*
-     * TODO - FUTURE:
-     * Move out of "Models". Universal types should be in RiakClient namespace
-     */
     using System;
     using System.Collections.Generic;
 

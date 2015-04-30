@@ -323,7 +323,7 @@ namespace RiakClient
         /// <b>Callers should fully enumerate the collection or else close the connection when finished.</b>
         /// </remarks>
         RiakResult<IEnumerable<string>> StreamListBuckets();
-        
+
         /// <summary>
         /// Lists all keys in the specified <paramref name="bucket"/>.
         /// </summary>
@@ -338,7 +338,7 @@ namespace RiakClient
         /// a list of keys. This operation, while cheaper in Riak 1.0 than in earlier versions of Riak, should be avoided.
         /// </remarks>
         RiakResult<IEnumerable<string>> ListKeys(string bucket);
-        
+
         /// <summary>
         /// Lists all keys in the specified <paramref name="bucket"/>.
         /// </summary>
