@@ -57,7 +57,7 @@ namespace RiakClient.Commands.CRDT
         {
         }
 
-        public class Counter : MapOf<int>
+        public class Counter : MapOf<long>
         {
         }
 

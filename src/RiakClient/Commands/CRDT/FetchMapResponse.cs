@@ -18,6 +18,7 @@
 
 namespace RiakClient.Commands.CRDT
 {
+    using System;
     using System.Collections.Generic;
     using Exceptions;
     using Messages;
@@ -51,7 +52,7 @@ namespace RiakClient.Commands.CRDT
 
             this.context = fetchResp.context;
 
-            ParsePbResponse(fetchResp.value.map_value);
+            ParsePbResponse(this.map, fetchResp.value.map_value);
         }
 
         private FetchMapResponse(bool notFound)
@@ -79,8 +80,36 @@ namespace RiakClient.Commands.CRDT
             get { return map; }
         }
 
-        private void ParsePbResponse(IEnumerable<MapEntry> mapEntries)
+        private static void ParsePbResponse(Map map, IEnumerable<MapEntry> mapEntries)
         {
+            foreach (MapEntry mapEntry in mapEntries)
+            {
+                MapField field = mapEntry.field;
+                RiakString fieldName = new RiakString(field.name);
+                switch (field.type)
+                {
+                    case MapField.MapFieldType.COUNTER:
+                        map.Counters.Add(fieldName, mapEntry.counter_value);
+                        break;
+                    case MapField.MapFieldType.FLAG:
+                        map.Flags.Add(fieldName, mapEntry.flag_value);
+                        break;
+                    case MapField.MapFieldType.REGISTER:
+                        map.Registers.Add(fieldName, mapEntry.register_value);
+                        break;
+                    case MapField.MapFieldType.SET:
+                        map.Sets.Add(fieldName, mapEntry.set_value);
+                        break;
+                    case MapField.MapFieldType.MAP:
+                        var innerMap = new Map();
+                        ParsePbResponse(innerMap, mapEntry.map_value);
+                        map.Maps.Add(fieldName, innerMap);
+                        break;
+                    default:
+                        throw new InvalidOperationException(
+                            string.Format("Unknown map entry type: {0}", field.type));
+                }
+            }
         }
     }
 }

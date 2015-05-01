@@ -74,6 +74,30 @@ namespace RiakClient
         }
 
         /// <summary>
+        /// Returns a <see cref="Byte"/>[] from the string, encoded in UTF8.
+        /// </summary>
+        /// <param name="value">The <see cref="String"/> value from which to construct a <see cref="Byte"/>[].</param>
+        /// <returns>
+        /// A <see cref="Byte"/>[].
+        /// </returns>
+        public static byte[] ToBytes(string value)
+        {
+            return Encoding.UTF8.GetBytes(value);
+        }
+
+        /// <summary>
+        /// Returns a <see cref="Byte"/>[] from the string, encoded in UTF8.
+        /// </summary>
+        /// <param name="value">The <see cref="RiakString"/> value from which to construct a <see cref="Byte"/>[].</param>
+        /// <returns>
+        /// A <see cref="Byte"/>[].
+        /// </returns>
+        public static byte[] ToBytes(RiakString value)
+        {
+            return Encoding.UTF8.GetBytes(value);
+        }
+
+        /// <summary>
         /// Cast the value of this <see cref="RiakString"/> to an <see cref="String"/>.
         /// </summary>
         /// <param name="value">The <see cref="RiakString"/> value to cast to an <see cref="String"/>.</param>

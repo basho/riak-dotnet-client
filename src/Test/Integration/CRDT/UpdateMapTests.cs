@@ -47,12 +47,19 @@ namespace Test.Integration.CRDT
 
             Assert.IsNotEmpty(response.Context);
             Assert.IsNotNull(response.Map);
-            Assert.AreEqual(response.Map.Counters["counter_1"], 50);
-            /*
-            assert.equal(resp.map.sets.set_1[0], 'value_1');
-            assert.equal(resp.map.registers.register_1.toString('utf8'), 'register_value_1');
-            assert.equal(resp.map.flags.flag_1, true);
-             */
+            Assert.AreEqual(1, response.Map.Counters["counter_1"]);
+            Assert.AreEqual((RiakString)"value_1", (RiakString)response.Map.Sets["set_1"][0]);
+            Assert.AreEqual((RiakString)"register_value_1", (RiakString)response.Map.Registers["register_1"]);
+            Assert.AreEqual(true, response.Map.Flags["flag_1"]);
+
+            Map map2 = response.Map.Maps["map_2"];
+            Assert.AreEqual(2, map2.Counters["counter_1"]);
+            Assert.AreEqual(RiakString.ToBytes("value_1"), map2.Sets["set_1"][0]);
+            Assert.AreEqual(RiakString.ToBytes("register_value_1"), map2.Registers["register_1"]);
+            Assert.AreEqual(true, map2.Flags["flag_1"]);
+
+            Map map3 = map2.Maps["map_3"];
+            Assert.AreEqual(3, map3.Counters["counter_1"]);
         }
 
         protected override void TestFixtureSetUp()
