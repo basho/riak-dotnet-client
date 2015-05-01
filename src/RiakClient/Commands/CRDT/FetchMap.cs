@@ -82,7 +82,14 @@ namespace RiakClient.Commands.CRDT
                         string.Format("Requested map, received {0}", fetchResp.type));
                 }
 
-                Response = new MapResponse(fetchResp.context, fetchResp.value.map_value);
+                if (fetchResp.value == null)
+                {
+                    Response = MapResponse.NotFoundResponse;
+                }
+                else
+                {
+                    Response = new MapResponse(fetchResp.context, fetchResp.value.map_value);
+                }
             }
         }
 

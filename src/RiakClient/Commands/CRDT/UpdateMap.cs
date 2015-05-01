@@ -596,7 +596,7 @@ namespace RiakClient.Commands.CRDT
 
             private TimeSpan timeout;
 
-            private bool includeContext;
+            private bool includeContext = true; // NB: default to true
             private byte[] context;
 
             public UpdateMap Build()

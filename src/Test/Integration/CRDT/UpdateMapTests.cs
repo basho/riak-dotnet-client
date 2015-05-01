@@ -19,6 +19,7 @@
 namespace Test.Integration.CRDT
 {
     using System;
+    using System.Collections.Generic;
     using NUnit.Framework;
     using RiakClient;
     using RiakClient.Commands.CRDT;
@@ -28,15 +29,18 @@ namespace Test.Integration.CRDT
     {
         private const string BucketType = "maps";
         private const string Bucket = "map_tests";
-        private const string Key = "map_1";
+        private readonly IList<string> keys = new List<string>();
 
         [Test]
         public void Fetching_A_Map_Produces_Expected_Values()
         {
+            string key = Guid.NewGuid().ToString();
+            SaveMap(key);
+
             var fetch = new FetchMap.Builder()
                     .WithBucketType(BucketType)
                     .WithBucket(Bucket)
-                    .WithKey(Key)
+                    .WithKey(key)
                     .Build();
 
             RiakResult rslt = client.Execute(fetch);
@@ -62,8 +66,60 @@ namespace Test.Integration.CRDT
             Assert.AreEqual(3, map3.Counters["counter_1"]);
         }
 
-        protected override void TestFixtureSetUp()
+        [Test]
+        public void Can_Remove_Data_From_A_Map()
         {
+            string key = Guid.NewGuid().ToString();
+            byte[] context = SaveMap(key);
+
+            var mapOp = new UpdateMap.MapOperation();
+            mapOp.RemoveCounter("counter_1");
+
+            var update = new UpdateMap.Builder()
+                .WithBucketType(BucketType)
+                .WithBucket(Bucket)
+                .WithKey(key)
+                .WithMapOperation(mapOp)
+                .WithContext(context)
+                .WithReturnBody(true)
+                .WithTimeout(TimeSpan.FromMilliseconds(20000))
+                .Build();
+
+            RiakResult rslt = client.Execute(update);
+            Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
+
+            MapResponse response = update.Response;
+            Assert.False(response.Map.Counters.ContainsKey("counter_1"));
+        }
+
+        [Test]
+        public void Fetching_An_Unknown_Map_Results_In_Not_Found()
+        {
+            var fetch = new FetchMap.Builder()
+                    .WithBucketType(BucketType)
+                    .WithBucket(Bucket)
+                    .WithKey(Guid.NewGuid().ToString())
+                    .Build();
+
+            RiakResult rslt = client.Execute(fetch);
+            Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
+            MapResponse response = fetch.Response;
+            Assert.AreEqual(MapResponse.NotFoundResponse, response);
+        }
+
+        protected override void TestFixtureTearDown()
+        {
+            foreach (string key in keys)
+            {
+                var id = new RiakObjectId(BucketType, Bucket, key);
+                client.Delete(id);
+            }
+        }
+
+        private byte[] SaveMap(string key)
+        {
+            keys.Add(key);
+
             var mapOp = new UpdateMap.MapOperation();
             mapOp.IncrementCounter("counter_1", 1)
                 .AddToSet("set_1", "value_1")
@@ -82,7 +138,7 @@ namespace Test.Integration.CRDT
             var update = new UpdateMap.Builder()
                 .WithBucketType(BucketType)
                 .WithBucket(Bucket)
-                .WithKey(Key)
+                .WithKey(key)
                 .WithMapOperation(mapOp)
                 .WithReturnBody(true)
                 .WithTimeout(TimeSpan.FromMilliseconds(20000))
@@ -90,77 +146,7 @@ namespace Test.Integration.CRDT
 
             RiakResult rslt = client.Execute(update);
             Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
-        }
-
-        protected override void TestFixtureTearDown()
-        {
-            var id = new RiakObjectId(BucketType, Bucket, Key);
-            client.Delete(id);
-            /*
-            Test.cleanBucket(cluster, Test.mapBucketType, Test.bucketName, function() {
-                cluster.on('stateChange', function(state) { if (state === RiakCluster.State.SHUTDOWN) { done();} });
-                cluster.stop();
-            });
-             */
+            return update.Response.Context;
         }
     }
 }
-
-#if COMMENTEDOUT
-    it('Should fetch a map', function(done) {
-       
-        var callback = function(err, resp) {
-            assert(!err, err);
-            assert(resp.context);
-            assert(resp.map);
-            assert.equal(resp.map.counters.counter_1, 50);
-            assert.equal(resp.map.sets.set_1[0], 'value_1');
-            assert.equal(resp.map.registers.register_1.toString('utf8'), 'register_value_1');
-            assert.equal(resp.map.flags.flag_1, true);
-            done();
-        };
-        
-        var fetch = new FetchMap.Builder()
-                .withBucketType(Test.mapBucketType)
-                .withBucket(Test.bucketName)
-                .withKey('map_1')
-                .withCallback(callback)
-                .build();
-
-        cluster.execute(fetch);
-
-        
-    });
-    
-    it('Should remove stuff from a map', function(done) {
-        
-        var callback = function(err, resp) {
-            assert(!err, err);
-            assert(resp.context);
-            assert(resp.map);
-            assert(!resp.map.counters.counter_1);
-            assert.equal(resp.map.sets.set_1[0], 'value_1');
-            assert.equal(resp.map.registers.register_1.toString('utf8'), 'register_value_1');
-            assert.equal(resp.map.flags.flag_1, true);
-            done();
-        };
-        
-        var mapOp = new UpdateMap.MapOperation().removeCounter('counter_1');
-        
-        var update = new UpdateMap.Builder()
-            .withBucketType(Test.mapBucketType)
-            .withBucket(Test.bucketName)
-            .withKey('map_1')
-            .withContext(context)
-            .withMapOperation(mapOp)
-            .withCallback(callback)
-            .withTimeout(20000)
-            .build();
-    
-        cluster.execute(update);
-        
-        
-    });
-    
-});
-#endif
