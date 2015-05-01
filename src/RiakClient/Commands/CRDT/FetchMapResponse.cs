@@ -76,7 +76,7 @@ namespace RiakClient.Commands.CRDT
 
         public Map Map
         {
-            get { throw new System.NotImplementedException("Map"); }
+            get { return map; }
         }
 
         private void ParsePbResponse(IEnumerable<MapEntry> mapEntries)

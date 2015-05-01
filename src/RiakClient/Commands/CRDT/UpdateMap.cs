@@ -114,7 +114,7 @@ namespace RiakClient.Commands.CRDT
             }
             else
             {
-                DtUpdateResp fetchResp = (DtUpdateResp)response;
+                // DtUpdateResp fetchResp = (DtUpdateResp)response;
 
                 // TODO
                 Response = null;
