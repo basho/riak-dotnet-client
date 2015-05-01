@@ -42,7 +42,7 @@ namespace Test.Integration.CRDT
             RiakResult rslt = client.Execute(fetch);
             Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
 
-            FetchMapResponse response = fetch.Response;
+            MapResponse response = fetch.Response;
             Assert.IsNotNull(response);
 
             Assert.IsNotEmpty(response.Context);

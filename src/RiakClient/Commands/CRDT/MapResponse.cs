@@ -1,4 +1,4 @@
-﻿// <copyright file="FetchMapResponse.cs" company="Basho Technologies, Inc.">
+﻿// <copyright file="MapResponse.cs" company="Basho Technologies, Inc.">
 // Copyright 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
@@ -20,47 +20,40 @@ namespace RiakClient.Commands.CRDT
 {
     using System;
     using System.Collections.Generic;
-    using Exceptions;
     using Messages;
 
     /// <summary>
     /// Response to a <see cref="FetchMap"/> or <see cref="FetchMap"/> command.
     /// </summary>
-    public class FetchMapResponse
+    public class MapResponse
     {
-        private static readonly FetchMapResponse NotFoundResponseField;
+        private static readonly MapResponse NotFoundResponseField;
         private readonly bool notFound;
         private readonly byte[] context;
         private readonly Map map = new Map();
 
-        static FetchMapResponse()
+        static MapResponse()
         {
-            NotFoundResponseField = new FetchMapResponse(true);
+            NotFoundResponseField = new MapResponse(true);
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FetchMapResponse"/> class.
+        /// Initializes a new instance of the <see cref="MapResponse"/> class.
         /// </summary>
-        /// <param name="fetchResp">The PB message from which to construct this <see cref="FetchMapResponse"/></param>
-        public FetchMapResponse(DtFetchResp fetchResp)
+        /// <param name="context">The data type context. Necessary to use this if updating a data type with removals.</param>
+        /// <param name="mapEntries">The map data that will be parsed into usable data structures.</param>
+        public MapResponse(byte[] context, IEnumerable<MapEntry> mapEntries)
         {
-            if (fetchResp.type != DtFetchResp.DataType.MAP)
-            {
-                throw new RiakException(
-                    string.Format("Requested map, received {0}", fetchResp.type));
-            }
-
-            this.context = fetchResp.context;
-
-            ParsePbResponse(this.map, fetchResp.value.map_value);
+            this.context = context;
+            ParseMapEntries(this.map, mapEntries);
         }
 
-        private FetchMapResponse(bool notFound)
+        private MapResponse(bool notFound)
         {
             this.notFound = notFound;
         }
 
-        public static FetchMapResponse NotFoundResponse
+        public static MapResponse NotFoundResponse
         {
             get { return NotFoundResponseField; }
         }
@@ -80,7 +73,7 @@ namespace RiakClient.Commands.CRDT
             get { return map; }
         }
 
-        private static void ParsePbResponse(Map map, IEnumerable<MapEntry> mapEntries)
+        private static void ParseMapEntries(Map map, IEnumerable<MapEntry> mapEntries)
         {
             foreach (MapEntry mapEntry in mapEntries)
             {
@@ -102,7 +95,7 @@ namespace RiakClient.Commands.CRDT
                         break;
                     case MapField.MapFieldType.MAP:
                         var innerMap = new Map();
-                        ParsePbResponse(innerMap, mapEntry.map_value);
+                        ParseMapEntries(innerMap, mapEntry.map_value);
                         map.Maps.Add(fieldName, innerMap);
                         break;
                     default:

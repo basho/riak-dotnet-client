@@ -70,9 +70,8 @@
       <ExcludeFromStyleCop>False</ExcludeFromStyleCop>
     </Compile>
     <Compile Include="Commands\CRDT\FetchMap.cs" />
-    <Compile Include="Commands\CRDT\FetchMapResponse.cs" />
+    <Compile Include="Commands\CRDT\MapResponse.cs" />
     <Compile Include="Commands\CRDT\Map.cs" />
-    <Compile Include="Commands\CRDT\UpdateMapResponse.cs" />
     <Compile Include="Commands\CRDT\UpdateMap.cs" />
     <Compile Include="Commands\CRDT\FetchMapOptions.cs" />
     <Compile Include="Commands\CRDT\UpdateMapOptions.cs" />

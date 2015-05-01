@@ -19,6 +19,7 @@
 namespace RiakClient.Commands.CRDT
 {
     using System;
+    using Exceptions;
     using Messages;
 
     /// <summary>
@@ -47,7 +48,7 @@ namespace RiakClient.Commands.CRDT
             get { return MessageCode.DtFetchResp; }
         }
 
-        public FetchMapResponse Response { get; private set; }
+        public MapResponse Response { get; private set; }
 
         public RpbReq ConstructPbRequest()
         {
@@ -70,12 +71,18 @@ namespace RiakClient.Commands.CRDT
         {
             if (response == null)
             {
-                Response = FetchMapResponse.NotFoundResponse;
+                Response = MapResponse.NotFoundResponse;
             }
             else
             {
                 DtFetchResp fetchResp = (DtFetchResp)response;
-                Response = new FetchMapResponse(fetchResp);
+                if (fetchResp.type != DtFetchResp.DataType.MAP)
+                {
+                    throw new RiakException(
+                        string.Format("Requested map, received {0}", fetchResp.type));
+                }
+
+                Response = new MapResponse(fetchResp.context, fetchResp.value.map_value);
             }
         }
 

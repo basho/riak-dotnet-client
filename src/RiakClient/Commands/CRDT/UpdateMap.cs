@@ -78,7 +78,7 @@ namespace RiakClient.Commands.CRDT
             get { return MessageCode.DtUpdateResp; }
         }
 
-        public UpdateMapResponse Response { get; private set; }
+        public MapResponse Response { get; private set; }
 
         public RpbReq ConstructPbRequest()
         {
@@ -109,15 +109,12 @@ namespace RiakClient.Commands.CRDT
         {
             if (response == null)
             {
-                // TODO is this really always not found?
-                Response = UpdateMapResponse.NotFoundResponse;
+                Response = MapResponse.NotFoundResponse;
             }
             else
             {
-                // DtUpdateResp fetchResp = (DtUpdateResp)response;
-
-                // TODO
-                Response = null;
+                DtUpdateResp resp = (DtUpdateResp)response;
+                Response = new MapResponse(resp.context, resp.map_value);
             }
         }
 
@@ -191,7 +188,7 @@ namespace RiakClient.Commands.CRDT
             foreach (var incrementCounter in mapOperation.IncrementCounters)
             {
                 RiakString counterName = incrementCounter.Key;
-                int increment = incrementCounter.Value;
+                long increment = incrementCounter.Value;
 
                 var field = new MapField
                 {
@@ -413,7 +410,7 @@ namespace RiakClient.Commands.CRDT
                 get { return removeMaps; }
             }
 
-            public MapOperation IncrementCounter(RiakString key, int increment)
+            public MapOperation IncrementCounter(RiakString key, long increment)
             {
                 removeCounters.Remove(key);
                 incrementCounters.Increment(key, increment);
@@ -531,9 +528,9 @@ namespace RiakClient.Commands.CRDT
                 }
             }
 
-            internal class CounterOperations : MapOperations<int>
+            internal class CounterOperations : MapOperations<long>
             {
-                public void Increment(RiakString key, int increment)
+                public void Increment(RiakString key, long increment)
                 {
                     if (this.ContainsKey(key))
                     {
