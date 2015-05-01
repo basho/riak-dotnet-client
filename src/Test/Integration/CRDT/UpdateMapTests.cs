@@ -1,5 +1,5 @@
 // <copyright file="UpdateMapTests.cs" company="Basho Technologies, Inc.">
-// Copyright © 2015 - Basho Technologies, Inc.
+// Copyright 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -40,10 +40,19 @@ namespace Test.Integration.CRDT
                     .Build();
 
             RiakResult rslt = client.Execute(fetch);
-            Assert.IsTrue(rslt.IsSuccess);
+            Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
 
-            MapResponse response = fetch.Response;
+            FetchMapResponse response = fetch.Response;
             Assert.IsNotNull(response);
+
+            Assert.IsNotEmpty(response.Context);
+            Assert.IsNotNull(response.Map);
+            Assert.AreEqual(response.Map.Counters["counter_1"], 50);
+            /*
+            assert.equal(resp.map.sets.set_1[0], 'value_1');
+            assert.equal(resp.map.registers.register_1.toString('utf8'), 'register_value_1');
+            assert.equal(resp.map.flags.flag_1, true);
+             */
         }
 
         protected override void TestFixtureSetUp()

@@ -1,5 +1,5 @@
 ﻿// <copyright file="UpdateMap.cs" company="Basho Technologies, Inc.">
-// Copyright (c) 2015 - Basho Technologies, Inc.
+// Copyright 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -22,7 +22,6 @@ namespace RiakClient.Commands.CRDT
     using System.Collections.Generic;
     using System.Linq;
     using Messages;
-    using Models;
     using Util;
 
     /// <summary>
@@ -79,7 +78,7 @@ namespace RiakClient.Commands.CRDT
             get { return MessageCode.DtUpdateResp; }
         }
 
-        public MapResponse Response { get; private set; }
+        public UpdateMapResponse Response { get; private set; }
 
         public RpbReq ConstructPbRequest()
         {
@@ -111,7 +110,7 @@ namespace RiakClient.Commands.CRDT
             if (response == null)
             {
                 // TODO is this really always not found?
-                Response = MapResponse.NotFoundResponse;
+                Response = UpdateMapResponse.NotFoundResponse;
             }
             else
             {

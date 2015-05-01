@@ -60,7 +60,7 @@
                   OutputFile="$(SolutionDir)src\CommonAssemblyInfo.cs"
                   GenerateClass="true"
                   AssemblyCompany="Basho Technologies"
-                  AssemblyCopyright="Copyright Basho Technologies © $(Year). All rights reserved."
+                  AssemblyCopyright="Copyright $(Year) Basho Technologies, Inc. All rights reserved."
                   AssemblyProduct="riak-dotnet-client"
                   AssemblyTrademark="riak-dotnet-client"
                   AssemblyCulture=""

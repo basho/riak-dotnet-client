@@ -1,5 +1,5 @@
-﻿// <copyright file="MapResponse.cs" company="Basho Technologies, Inc.">
-// Copyright © 2015 - Basho Technologies, Inc.
+﻿// <copyright file="UpdateMapResponse.cs" company="Basho Technologies, Inc.">
+// Copyright 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -24,35 +24,30 @@ namespace RiakClient.Commands.CRDT
     /// <summary>
     /// Response to a <see cref="FetchMap"/> or <see cref="UpdateMap"/> command.
     /// </summary>
-    public class MapResponse
+    public class UpdateMapResponse
     {
-        private static readonly MapResponse NotFoundResponseField;
+        private static readonly UpdateMapResponse NotFoundResponseField;
         private readonly bool notFound;
 
-        static MapResponse()
+        static UpdateMapResponse()
         {
-            NotFoundResponseField = new MapResponse(true);
+            NotFoundResponseField = new UpdateMapResponse(true);
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MapResponse"/> class.
+        /// Initializes a new instance of the <see cref="UpdateMapResponse"/> class.
         /// </summary>
-        /// <param name="fetchResp">The PB message from which to construct this <see cref="MapResponse"/></param>
-        public MapResponse(DtFetchResp fetchResp)
+        /// <param name="fetchResp">The PB message from which to construct this <see cref="UpdateMapResponse"/></param>
+        public UpdateMapResponse(DtUpdateResp fetchResp)
         {
-            if (fetchResp.type != DtFetchResp.DataType.MAP)
-            {
-                throw new RiakException(
-                    string.Format("Requested map, received {0}", fetchResp.type));
-            }
         }
 
-        private MapResponse(bool notFound)
+        private UpdateMapResponse(bool notFound)
         {
             this.notFound = notFound;
         }
 
-        public static MapResponse NotFoundResponse
+        public static UpdateMapResponse NotFoundResponse
         {
             get { return NotFoundResponseField; }
         }

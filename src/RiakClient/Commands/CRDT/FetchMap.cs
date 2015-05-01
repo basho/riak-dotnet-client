@@ -1,5 +1,5 @@
 ﻿// <copyright file="FetchMap.cs" company="Basho Technologies, Inc.">
-// Copyright © 2015 - Basho Technologies, Inc.
+// Copyright 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -47,7 +47,7 @@ namespace RiakClient.Commands.CRDT
             get { return MessageCode.DtFetchResp; }
         }
 
-        public MapResponse Response { get; private set; }
+        public FetchMapResponse Response { get; private set; }
 
         public RpbReq ConstructPbRequest()
         {
@@ -70,12 +70,12 @@ namespace RiakClient.Commands.CRDT
         {
             if (response == null)
             {
-                Response = MapResponse.NotFoundResponse;
+                Response = FetchMapResponse.NotFoundResponse;
             }
             else
             {
                 DtFetchResp fetchResp = (DtFetchResp)response;
-                Response = new MapResponse(fetchResp);
+                Response = new FetchMapResponse(fetchResp);
             }
         }
 
@@ -89,7 +89,7 @@ namespace RiakClient.Commands.CRDT
             private Quorum pr;
 
             private TimeSpan timeout;
-            private bool includeContext;
+            private bool includeContext = true;
 
             public FetchMap Build()
             {
