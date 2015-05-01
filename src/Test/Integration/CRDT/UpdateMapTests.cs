@@ -20,6 +20,7 @@ namespace Test.Integration.CRDT
 {
     using System;
     using System.Collections.Generic;
+    using Common.Logging;
     using NUnit.Framework;
     using RiakClient;
     using RiakClient.Commands.CRDT;
@@ -29,6 +30,8 @@ namespace Test.Integration.CRDT
     {
         private const string BucketType = "maps";
         private const string Bucket = "map_tests";
+        private static readonly ILog Log = Logging.GetLogger(typeof(UpdateMapTests));
+
         private readonly IList<string> keys = new List<string>();
 
         [Test]
@@ -70,7 +73,7 @@ namespace Test.Integration.CRDT
         public void Can_Remove_Data_From_A_Map()
         {
             string key = Guid.NewGuid().ToString();
-            byte[] context = SaveMap(key);
+            MapResponse r = SaveMap(key);
 
             var mapOp = new UpdateMap.MapOperation();
             mapOp.RemoveCounter("counter_1");
@@ -80,7 +83,7 @@ namespace Test.Integration.CRDT
                 .WithBucket(Bucket)
                 .WithKey(key)
                 .WithMapOperation(mapOp)
-                .WithContext(context)
+                .WithContext(r.Context)
                 .WithReturnBody(true)
                 .WithTimeout(TimeSpan.FromMilliseconds(20000))
                 .Build();
@@ -90,6 +93,14 @@ namespace Test.Integration.CRDT
 
             MapResponse response = update.Response;
             Assert.False(response.Map.Counters.ContainsKey("counter_1"));
+        }
+
+        [Test]
+        public void Riak_Can_Generate_Key()
+        {
+            MapResponse r = SaveMap();
+            Assert.IsNotNullOrEmpty(r.Key);
+            Log.DebugFormat("[integration/crdt/updatemaptests] Riak Generated Key: {0}", r.Key);
         }
 
         [Test]
@@ -116,10 +127,8 @@ namespace Test.Integration.CRDT
             }
         }
 
-        private byte[] SaveMap(string key)
+        private MapResponse SaveMap(string key = null)
         {
-            keys.Add(key);
-
             var mapOp = new UpdateMap.MapOperation();
             mapOp.IncrementCounter("counter_1", 1)
                 .AddToSet("set_1", "value_1")
@@ -135,18 +144,25 @@ namespace Test.Integration.CRDT
             var map_3 = map_2.Map("map_3");
             map_3.IncrementCounter("counter_1", 3);
 
-            var update = new UpdateMap.Builder()
+            var updateBuilder = new UpdateMap.Builder()
                 .WithBucketType(BucketType)
                 .WithBucket(Bucket)
-                .WithKey(key)
                 .WithMapOperation(mapOp)
                 .WithReturnBody(true)
-                .WithTimeout(TimeSpan.FromMilliseconds(20000))
-                .Build();
+                .WithTimeout(TimeSpan.FromMilliseconds(20000));
 
-            RiakResult rslt = client.Execute(update);
+            if (!string.IsNullOrEmpty(key))
+            {
+                updateBuilder.WithKey(key);
+            }
+
+            UpdateMap cmd = updateBuilder.Build();
+            RiakResult rslt = client.Execute(cmd);
             Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
-            return update.Response.Context;
+
+            MapResponse response = cmd.Response;
+            keys.Add(response.Key);
+            return response;
         }
     }
 }

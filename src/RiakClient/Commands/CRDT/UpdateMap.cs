@@ -114,7 +114,9 @@ namespace RiakClient.Commands.CRDT
             else
             {
                 DtUpdateResp resp = (DtUpdateResp)response;
-                Response = new MapResponse(resp.context, resp.map_value);
+                RiakString key = EnumerableUtil.NotNullOrEmpty(resp.key) ?
+                    new RiakString(resp.key) : options.Key;
+                Response = new MapResponse(key, resp.context, resp.map_value);
             }
         }
 

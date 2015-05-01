@@ -88,7 +88,7 @@ namespace RiakClient.Commands.CRDT
                 }
                 else
                 {
-                    Response = new MapResponse(fetchResp.context, fetchResp.value.map_value);
+                    Response = new MapResponse(options.Key, fetchResp.context, fetchResp.value.map_value);
                 }
             }
         }

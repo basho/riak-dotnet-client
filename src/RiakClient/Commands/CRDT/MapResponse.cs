@@ -29,6 +29,7 @@ namespace RiakClient.Commands.CRDT
     {
         private static readonly MapResponse NotFoundResponseField;
         private readonly bool notFound;
+        private readonly RiakString key;
         private readonly byte[] context;
         private readonly Map map = new Map();
 
@@ -40,10 +41,20 @@ namespace RiakClient.Commands.CRDT
         /// <summary>
         /// Initializes a new instance of the <see cref="MapResponse"/> class.
         /// </summary>
+        /// <param name="key">A <see cref="RiakString"/> representing the key.</param>
         /// <param name="context">The data type context. Necessary to use this if updating a data type with removals.</param>
         /// <param name="mapEntries">The map data that will be parsed into usable data structures.</param>
-        public MapResponse(byte[] context, IEnumerable<MapEntry> mapEntries)
+        public MapResponse(RiakString key, byte[] context, IEnumerable<MapEntry> mapEntries)
         {
+            if (key == null)
+            {
+                throw new ArgumentNullException("key", "key is required!");
+            }
+            else
+            {
+                this.key = key;
+            }
+
             this.context = context;
             ParseMapEntries(this.map, mapEntries);
         }
@@ -61,6 +72,11 @@ namespace RiakClient.Commands.CRDT
         public bool NotFound
         {
             get { return notFound; }
+        }
+
+        public RiakString Key
+        {
+            get { return key; }
         }
 
         public byte[] Context
