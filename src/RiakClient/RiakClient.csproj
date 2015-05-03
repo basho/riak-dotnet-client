@@ -69,7 +69,15 @@
     <Compile Include="Auth\RiakSecurityManager.cs">
       <ExcludeFromStyleCop>False</ExcludeFromStyleCop>
     </Compile>
+    <Compile Include="Commands\CRDT\Response.cs" />
+    <Compile Include="Commands\CRDT\Response{TValue}.cs" />
+    <Compile Include="Commands\CRDT\FetchCommandBuilder.cs" />
+    <Compile Include="Commands\CRDT\FetchCommand.cs" />
+    <Compile Include="Commands\CRDT\FetchCounter.cs" />
+    <Compile Include="Commands\CRDT\FetchCommandOptions.cs" />
     <Compile Include="Commands\CRDT\FetchMap.cs" />
+    <Compile Include="Commands\CRDT\FetchCounterOptions.cs" />
+    <Compile Include="Commands\CRDT\CounterResponse.cs" />
     <Compile Include="Commands\CRDT\MapResponse.cs" />
     <Compile Include="Commands\CRDT\Map.cs" />
     <Compile Include="Commands\CRDT\UpdateMap.cs" />

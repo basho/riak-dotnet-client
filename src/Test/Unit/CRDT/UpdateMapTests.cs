@@ -30,15 +30,14 @@ namespace Test.Unit.CRDT
     [TestFixture]
     public class UpdateMapTests
     {
+        private const string BucketType = "maps";
+        private const string Bucket = "myBucket";
+        private const string Key = "map_1";
+        private static readonly byte[] Context = Encoding.UTF8.GetBytes("test-context");
+
         [Test]
         public void Should_Build_DtUpdateReq_Correctly()
         {
-            const string BucketType = "maps";
-            const string Bucket = "myBucket";
-            const string Key = "map_1";
-
-            byte[] context = Encoding.UTF8.GetBytes("test-context");
-
             var mapOp = new UpdateMap.MapOperation()
                 .IncrementCounter("counter_1", 50)
                 .RemoveCounter("counter_2")
@@ -73,7 +72,7 @@ namespace Test.Unit.CRDT
                 .WithBucket(Bucket)
                 .WithKey(Key)
                 .WithMapOperation(mapOp)
-                .WithContext(context)
+                .WithContext(Context)
                 .WithW(q3)
                 .WithPW(q1)
                 .WithDW(q2)
@@ -94,7 +93,7 @@ namespace Test.Unit.CRDT
             Assert.IsTrue(protobuf.return_body);
             Assert.IsFalse(protobuf.include_context);
             Assert.AreEqual(20000, protobuf.timeout);
-            Assert.AreEqual(context, protobuf.context);
+            Assert.AreEqual(Context, protobuf.context);
 
             MapOp mapOpMsg = protobuf.op.map_op;
 
@@ -191,8 +190,8 @@ namespace Test.Unit.CRDT
             Assert.AreEqual(key, response.Key);
             Assert.AreEqual(RiakString.ToBytes(context), response.Context);
 
-            verifyMap(response.Map);
-            verifyMap(response.Map.Maps["map_1"]);
+            verifyMap(response.Value);
+            verifyMap(response.Value.Maps["map_1"]);
         }
 
         private static void VerifyRemoves(ICollection<MapField> mapFields)

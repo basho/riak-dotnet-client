@@ -109,7 +109,7 @@ namespace RiakClient.Commands.CRDT
         {
             if (response == null)
             {
-                Response = MapResponse.NotFoundResponse;
+                Response = new MapResponse();
             }
             else
             {

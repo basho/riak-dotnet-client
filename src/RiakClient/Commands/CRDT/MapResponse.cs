@@ -23,19 +23,13 @@ namespace RiakClient.Commands.CRDT
     using Messages;
 
     /// <summary>
-    /// Response to a <see cref="FetchMap"/> or <see cref="FetchMap"/> command.
+    /// Response to a <see cref="FetchMap"/> command.
     /// </summary>
-    public class MapResponse
+    public class MapResponse : Response<Map>
     {
-        private static readonly MapResponse NotFoundResponseField;
-        private readonly bool notFound;
-        private readonly RiakString key;
-        private readonly byte[] context;
-        private readonly Map map = new Map();
-
-        static MapResponse()
+        /// <inheritdoc />
+        public MapResponse() : base()
         {
-            NotFoundResponseField = new MapResponse(true);
         }
 
         /// <summary>
@@ -43,50 +37,22 @@ namespace RiakClient.Commands.CRDT
         /// </summary>
         /// <param name="key">A <see cref="RiakString"/> representing the key.</param>
         /// <param name="context">The data type context. Necessary to use this if updating a data type with removals.</param>
-        /// <param name="mapEntries">The map data that will be parsed into usable data structures.</param>
+        /// <param name="value">A map that has been parsed from the Riak CRDT data.</param>
+        public MapResponse(RiakString key, byte[] context, Map value)
+            : base(key, context, value)
+        {
+        }
+
         public MapResponse(RiakString key, byte[] context, IEnumerable<MapEntry> mapEntries)
+            : base(key, context, ParseMapEntries(mapEntries))
         {
-            if (key == null)
-            {
-                throw new ArgumentNullException("key", "key is required!");
-            }
-            else
-            {
-                this.key = key;
-            }
-
-            this.context = context;
-            ParseMapEntries(this.map, mapEntries);
         }
 
-        private MapResponse(bool notFound)
+        private static Map ParseMapEntries(IEnumerable<MapEntry> mapEntries)
         {
-            this.notFound = notFound;
-        }
-
-        public static MapResponse NotFoundResponse
-        {
-            get { return NotFoundResponseField; }
-        }
-
-        public bool NotFound
-        {
-            get { return notFound; }
-        }
-
-        public RiakString Key
-        {
-            get { return key; }
-        }
-
-        public byte[] Context
-        {
-            get { return context; }
-        }
-
-        public Map Map
-        {
-            get { return map; }
+            var map = new Map();
+            ParseMapEntries(map, mapEntries);
+            return map;
         }
 
         private static void ParseMapEntries(Map map, IEnumerable<MapEntry> mapEntries)

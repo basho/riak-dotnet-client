@@ -1,4 +1,4 @@
-﻿// <copyright file="FetchMapOptions.cs" company="Basho Technologies, Inc.">
+﻿// <copyright file="FetchCounterOptions.cs" company="Basho Technologies, Inc.">
 // Copyright 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
@@ -19,13 +19,13 @@
 namespace RiakClient.Commands.CRDT
 {
     /// <summary>
-    /// Represents options for a <see cref="FetchMap"/> operation.
+    /// Represents options for a <see cref="FetchCounter"/> operation.
     /// </summary>
     /// <inheritdoc/>
-    public class FetchMapOptions : FetchCommandOptions
+    public class FetchCounterOptions : FetchCommandOptions
     {
         /// <inheritdoc/>
-        public FetchMapOptions(string bucketType, string bucket, string key)
+        public FetchCounterOptions(string bucketType, string bucket, string key)
             : base(bucketType, bucket, key)
         {
         }

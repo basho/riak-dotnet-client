@@ -1,4 +1,4 @@
-﻿// <copyright file="FetchMap.cs" company="Basho Technologies, Inc.">
+﻿// <copyright file="FetchCounter.cs" company="Basho Technologies, Inc.">
 // Copyright 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
@@ -24,13 +24,13 @@ namespace RiakClient.Commands.CRDT
     /// <summary>
     /// Fetches a Map from Riak
     /// </summary>
-    public class FetchMap : FetchCommand<MapResponse>, IRiakCommand
+    public class FetchCounter : FetchCommand<CounterResponse>, IRiakCommand
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="FetchMap"/> class.
+        /// Initializes a new instance of the <see cref="FetchCounter"/> class.
         /// </summary>
-        /// <param name="options">Options for this operation. See <see cref="FetchMapOptions"/></param>
-        public FetchMap(FetchMapOptions options)
+        /// <param name="options">Options for this operation. See <see cref="FetchCounterOptions"/></param>
+        public FetchCounter(FetchCounterOptions options)
             : base(options)
         {
         }
@@ -39,30 +39,30 @@ namespace RiakClient.Commands.CRDT
         {
             if (response == null)
             {
-                Response = new MapResponse();
+                Response = new CounterResponse();
             }
             else
             {
                 DtFetchResp fetchResp = (DtFetchResp)response;
-                if (fetchResp.type != DtFetchResp.DataType.MAP)
+                if (fetchResp.type != DtFetchResp.DataType.COUNTER)
                 {
                     throw new RiakException(
-                        string.Format("Requested map, received {0}", fetchResp.type));
+                        string.Format("Requested counter, received {0}", fetchResp.type));
                 }
 
                 if (fetchResp.value == null)
                 {
-                    Response = new MapResponse();
+                    Response = new CounterResponse();
                 }
                 else
                 {
-                    Response = new MapResponse(Options.Key, fetchResp.context, fetchResp.value.map_value);
+                    Response = new CounterResponse(Options.Key, fetchResp.context, fetchResp.value.counter_value);
                 }
             }
         }
 
         /// <inheritdoc />
-        public class Builder : FetchCommandBuilder<FetchMap, FetchMapOptions, MapResponse>
+        public class Builder : FetchCommandBuilder<FetchCounter, FetchCounterOptions, CounterResponse>
         {
         }
     }

@@ -53,13 +53,13 @@ namespace Test.Integration.CRDT
             Assert.IsNotNull(response);
 
             Assert.IsNotEmpty(response.Context);
-            Assert.IsNotNull(response.Map);
-            Assert.AreEqual(1, response.Map.Counters["counter_1"]);
-            Assert.AreEqual((RiakString)"value_1", (RiakString)response.Map.Sets["set_1"][0]);
-            Assert.AreEqual((RiakString)"register_value_1", (RiakString)response.Map.Registers["register_1"]);
-            Assert.AreEqual(true, response.Map.Flags["flag_1"]);
+            Assert.IsNotNull(response.Value);
+            Assert.AreEqual(1, response.Value.Counters["counter_1"]);
+            Assert.AreEqual((RiakString)"value_1", (RiakString)response.Value.Sets["set_1"][0]);
+            Assert.AreEqual((RiakString)"register_value_1", (RiakString)response.Value.Registers["register_1"]);
+            Assert.AreEqual(true, response.Value.Flags["flag_1"]);
 
-            Map map2 = response.Map.Maps["map_2"];
+            Map map2 = response.Value.Maps["map_2"];
             Assert.AreEqual(2, map2.Counters["counter_1"]);
             Assert.AreEqual(RiakString.ToBytes("value_1"), map2.Sets["set_1"][0]);
             Assert.AreEqual(RiakString.ToBytes("register_value_1"), map2.Registers["register_1"]);
@@ -92,7 +92,7 @@ namespace Test.Integration.CRDT
             Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
 
             MapResponse response = update.Response;
-            Assert.False(response.Map.Counters.ContainsKey("counter_1"));
+            Assert.False(response.Value.Counters.ContainsKey("counter_1"));
         }
 
         [Test]
@@ -115,7 +115,7 @@ namespace Test.Integration.CRDT
             RiakResult rslt = client.Execute(fetch);
             Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
             MapResponse response = fetch.Response;
-            Assert.AreEqual(MapResponse.NotFoundResponse, response);
+            Assert.IsTrue(response.NotFound);
         }
 
         protected override void TestFixtureTearDown()
