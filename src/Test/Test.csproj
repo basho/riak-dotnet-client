@@ -51,6 +51,7 @@
     <Compile Include="Integration\TestBase.cs" />
     <Compile Include="Logging.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Unit\CRDT\FetchSetTests.cs" />
     <Compile Include="Unit\CRDT\FetchMapTests.cs" />
     <Compile Include="Unit\CRDT\FetchCounterTests.cs" />
     <Compile Include="Unit\CRDT\UpdateMapTests.cs" />

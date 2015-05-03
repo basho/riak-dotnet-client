@@ -69,6 +69,9 @@
     <Compile Include="Auth\RiakSecurityManager.cs">
       <ExcludeFromStyleCop>False</ExcludeFromStyleCop>
     </Compile>
+    <Compile Include="Commands\CRDT\FetchSetOptions.cs" />
+    <Compile Include="Commands\CRDT\SetResponse.cs" />
+    <Compile Include="Commands\CRDT\FetchSet.cs" />
     <Compile Include="Commands\CRDT\Response.cs" />
     <Compile Include="Commands\CRDT\Response{TValue}.cs" />
     <Compile Include="Commands\CRDT\FetchCommandBuilder.cs" />
