@@ -58,5 +58,26 @@ namespace Test.Unit.CRDT
             Assert.AreEqual(true, protobuf.basic_quorum);
             Assert.AreEqual(20000, protobuf.timeout);
         }
+
+        [Test]
+        public void Should_Construct_CounterResponse_From_DtFetchResp()
+        {
+            var value = new DtValue();
+            value.counter_value = 42;
+
+            var fetchResp = new DtFetchResp();
+            fetchResp.value = value;
+            fetchResp.type = DtFetchResp.DataType.COUNTER;
+            
+            var fetch = new FetchCounter.Builder()
+                .WithBucketType(BucketType)
+                .WithBucket(Bucket)
+                .WithKey(Key)
+                .Build();
+        
+            fetch.OnSuccess(fetchResp);
+
+            Assert.AreEqual(42, fetch.Response.Value);
+        }
     }
 }
