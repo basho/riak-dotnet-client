@@ -32,7 +32,6 @@ namespace Test.Unit.CRDT
         private static readonly RiakString BucketType = "maps";
         private static readonly RiakString Bucket = "myBucket";
         private static readonly RiakString Key = "map_1";
-        private static readonly byte[] Context = Encoding.UTF8.GetBytes("test-context");
 
         [Test]
         public void Should_Build_DtFetchReq_Correctly()

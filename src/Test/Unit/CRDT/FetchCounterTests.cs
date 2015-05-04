@@ -31,7 +31,6 @@ namespace Test.Unit.CRDT
         private static readonly RiakString BucketType = "counters";
         private static readonly RiakString Bucket = "myBucket";
         private static readonly RiakString Key = "counter_1";
-        private static readonly byte[] Context = Encoding.UTF8.GetBytes("test-context");
 
         [Test]
         public void Should_Build_DtFetchReq_Correctly()
