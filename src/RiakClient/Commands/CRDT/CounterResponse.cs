@@ -19,7 +19,7 @@
 namespace RiakClient.Commands.CRDT
 {
     /// <summary>
-    /// Response to a <see cref="FetchCounter"/> command.
+    /// Response to a <see cref="FetchCounter"/> or <see cref="UpdateCounter"/> command.
     /// </summary>
     public class CounterResponse : Response<long>
     {

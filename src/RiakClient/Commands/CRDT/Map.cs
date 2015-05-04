@@ -18,7 +18,9 @@
 
 namespace RiakClient.Commands.CRDT
 {
-    using System.Collections.Generic;
+    using System;
+using System.Collections.Generic;
+using System.Runtime.Serialization;
 
     public class Map
     {
@@ -53,16 +55,44 @@ namespace RiakClient.Commands.CRDT
             get { return maps; }
         }
 
+        [Serializable]
         public class MapOf<TValue> : Dictionary<RiakString, TValue>
         {
+            public MapOf()
+            {
+            }
+
+            protected MapOf(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            {
+            }
         }
 
+        [Serializable]
         public class Counter : MapOf<long>
         {
+            public Counter()
+            {
+            }
+
+            protected Counter(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            {
+            }
         }
 
+        [Serializable]
         public class Set : MapOf<IList<byte[]>>
         {
+            public Set()
+            {
+            }
+
+            protected Set(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            {
+            }
+
             public void Add(RiakString key, byte[] value)
             {
                 IList<byte[]> values = null;
@@ -77,12 +107,30 @@ namespace RiakClient.Commands.CRDT
             }
         }
 
+        [Serializable]
         public class Register : MapOf<byte[]>
         {
+            public Register()
+            {
+            }
+
+            protected Register(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            {
+            }
         }
 
+        [Serializable]
         public class Flag : MapOf<bool>
         {
+            public Flag()
+            {
+            }
+
+            protected Flag(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            {
+            }
         }
     }
 }

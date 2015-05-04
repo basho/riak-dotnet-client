@@ -209,6 +209,7 @@ if ($Verbosity -eq 'detailed' -or $Verbosity -eq 'd' -or
     $verbose_property = '/property:Verbose=true'
 }
 
+$protogen_property = ''
 if ($Target -eq 'ProtoGen') {
     if ([String]::IsNullOrEmpty($ProtoGenExe)) {
         throw 'The -ProtoGenExe parameter pointing to protogen.exe is required by the "ProtoGen" target'

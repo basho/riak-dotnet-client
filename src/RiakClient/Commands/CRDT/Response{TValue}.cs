@@ -27,7 +27,8 @@ namespace RiakClient.Commands.CRDT
         private readonly TValue value;
 
         /// <inheritdoc />
-        public Response() : base()
+        public Response()
+            : base()
         {
         }
 
@@ -43,6 +44,10 @@ namespace RiakClient.Commands.CRDT
             this.value = value;
         }
 
+        /// <summary>
+        /// The value returned from Riak
+        /// </summary>
+        /// <value>The value returned from Riak, deserialized.</value>
         public TValue Value
         {
             get { return value; }

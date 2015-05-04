@@ -24,7 +24,6 @@ namespace RiakClient.Models
     /// A collection of common options for most Riak operations.
     /// </summary>
     /// <typeparam name="T">The concrete subclass type.</typeparam>
-    [ComVisible(false)]
     public abstract class RiakOptions<T> where T : RiakOptions<T>
     {
         /// <summary>

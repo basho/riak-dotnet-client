@@ -43,11 +43,17 @@ namespace RiakClient.Commands.CRDT
             this.Options = options;
         }
 
+        /// <summary>
+        /// The expected protobuf message code from Riak.
+        /// </summary>
         public MessageCode ExpectedCode
         {
             get { return MessageCode.DtFetchResp; }
         }
 
+        /// <summary>
+        /// A sub-class instance of <see cref="Response"/> representing the response from Riak.
+        /// </summary>
         public TResponse Response { get; protected set; }
 
         public RpbReq ConstructPbRequest()

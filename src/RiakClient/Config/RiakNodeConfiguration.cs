@@ -26,7 +26,6 @@ namespace RiakClient.Config
     /// <summary>
     /// Represents a configuration element for a Riak Node.
     /// </summary>
-    [ComVisible(false)]
     public sealed class RiakNodeConfiguration : ConfigurationElement, IRiakNodeConfiguration
     {
         private static readonly Timeout DefaultTimeout = new Timeout(4000);

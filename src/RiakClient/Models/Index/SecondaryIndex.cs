@@ -30,7 +30,6 @@ namespace RiakClient.Models.Index
     /// </summary>
     /// <typeparam name="TClass">The concrete type of the implementing class.</typeparam>
     /// <typeparam name="TIndex">The type of the index (<see cref="BigInteger"/> or <see cref="string"/>).</typeparam>
-    [ComVisible(false)]
     public abstract class SecondaryIndex<TClass, TIndex>
     {
         protected readonly RiakObject Container;

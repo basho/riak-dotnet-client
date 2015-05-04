@@ -57,16 +57,28 @@ namespace RiakClient.Commands.CRDT
             this.context = context;
         }
 
+        /// <summary>
+        /// Will be set to <b>true</b> when the object does not exist in Riak.
+        /// </summary>
+        /// <value><b>false</b> when the object exists in Riak, <b>true</b> if the object does NOT exist.</value>
         public bool NotFound
         {
             get { return notFound; }
         }
 
+        /// <summary>
+        /// Returns the object's key in Riak. If Riak generates a key for you, it will be here.
+        /// </summary>
+        /// <value>A <see cref="RiakString"/> representing the key of the object in Riak.</value>
         public RiakString Key
         {
             get { return key; }
         }
 
+        /// <summary>
+        /// If non-null, a context that can be used for subsequent operations that contain removals.
+        /// </summary>
+        /// <value>A <see cref="Byte"/>[] representing an opaque context.</value>
         public byte[] Context
         {
             get { return context; }

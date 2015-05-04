@@ -28,7 +28,6 @@ namespace RiakClient.Config
     /// <summary>
     /// Represents the configuration file section for a Riak Cluster.
     /// </summary>
-    [ComVisible(false)]
     public sealed class RiakClusterConfiguration : ConfigurationSection, IRiakClusterConfiguration
     {
         private static readonly Timeout DefaultNodePollTime = new Timeout(TimeSpan.FromSeconds(5));

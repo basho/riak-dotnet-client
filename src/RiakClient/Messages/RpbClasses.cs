@@ -173,4 +173,10 @@ namespace RiakClient.Messages
     public sealed partial class RpbYokozunaSchemaGetReq { }
 
     public sealed partial class RpbYokozunaSchemaGetResp { }
+
+    public sealed partial class RpbGetBucketKeyPreflistReq { }
+
+    public sealed partial class RpbGetBucketKeyPreflistResp { }
+
+    public sealed partial class RpbBucketKeyPreflistItem { }
 }

@@ -25,7 +25,6 @@ namespace RiakClient.Config
     /// <summary>
     /// Represents a configuration file element for configuring Riak Authentication.
     /// </summary>
-    [ComVisible(false)]
     public class RiakAuthenticationConfiguration : ConfigurationElement, IRiakAuthenticationConfiguration
     {
         /// <inheritdoc/>

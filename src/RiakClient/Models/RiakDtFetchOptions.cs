@@ -26,7 +26,6 @@ namespace RiakClient.Models
     /// Represents a collection of optional properties when fetching Riak Data Types. 
     /// Each property changes the semantics of the operation slightly. 
     /// </summary>
-    [ComVisible(false)]
     public class RiakDtFetchOptions : RiakOptions<RiakDtFetchOptions>
     {
         public RiakDtFetchOptions()
