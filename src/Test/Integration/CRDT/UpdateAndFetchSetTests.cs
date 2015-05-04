@@ -38,12 +38,6 @@ namespace Test.Integration.CRDT
                 Encoding.UTF8.GetBytes("add_2")
             };
 
-        private static readonly IEnumerable<byte[]> DefaultRemoves = new[]
-            {
-                Encoding.UTF8.GetBytes("remove_1"),
-                Encoding.UTF8.GetBytes("remove_2")
-            };
-
         protected override RiakString BucketType
         {
             get { return new RiakString("sets"); }
