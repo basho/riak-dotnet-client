@@ -1,4 +1,4 @@
-﻿// <copyright file="UpdateMapOptions.cs" company="Basho Technologies, Inc.">
+﻿// <copyright file="UpdateSetOptions.cs" company="Basho Technologies, Inc.">
 // Copyright 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
@@ -18,26 +18,39 @@
 
 namespace RiakClient.Commands.CRDT
 {
+    using System.Collections.Generic;
+    using Util;
+
     /// <summary>
-    /// Represents options for a <see cref="UpdateMap"/> operation.
+    /// Represents options for a <see cref="UpdateSet"/> operation.
     /// </summary>
     /// <inheritdoc />
-    public class UpdateMapOptions : UpdateCommandOptions
+    public class UpdateSetOptions : UpdateCommandOptions
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="UpdateMapOptions"/> class.
+        /// Initializes a new instance of the <see cref="UpdateSetOptions"/> class.
         /// </summary>
         /// <inheritdoc />
-        public UpdateMapOptions(string bucketType, string bucket, string key)
+        public UpdateSetOptions(string bucketType, string bucket, string key)
             : base(bucketType, bucket, key)
         {
         }
 
         /// <summary>
-        /// The <see cref="UpdateMap.MapOperation"/>
+        /// The <see cref="UpdateSet"/> additions.
         /// </summary>
-        /// <value>The <see cref="UpdateMap.MapOperation"/> to be executed by the <see cref="UpdateMap"/> command.</value>
-        public UpdateMap.MapOperation Op
+        /// <value>The values to add via the <see cref="UpdateSet"/> command.</value>
+        public IEnumerable<byte[]> Additions
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// The <see cref="UpdateSet"/> removals.
+        /// </summary>
+        /// <value>The values to remove via the <see cref="UpdateSet"/> command.</value>
+        public IEnumerable<byte[]> Removals
         {
             get;
             set;
@@ -45,7 +58,7 @@ namespace RiakClient.Commands.CRDT
 
         protected override bool GetHasRemoves()
         {
-            return Op.HasRemoves;
+            return EnumerableUtil.NotNullOrEmpty(Removals);
         }
     }
 }

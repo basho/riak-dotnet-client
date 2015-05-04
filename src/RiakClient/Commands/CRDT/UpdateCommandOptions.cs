@@ -119,6 +119,14 @@ namespace RiakClient.Commands.CRDT
         /// </summary>
         public bool IncludeContext { get; set; }
 
-        public bool HasRemoves { get; set; }
+        /// <summary>
+        /// Returns to <b>true</b> if this command has removals.
+        /// </summary>
+        public bool HasRemoves
+        {
+            get { return GetHasRemoves(); }
+        }
+
+        protected abstract bool GetHasRemoves();
     }
 }

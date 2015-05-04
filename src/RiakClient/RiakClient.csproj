@@ -84,6 +84,8 @@
     <Compile Include="Commands\CRDT\MapResponse.cs" />
     <Compile Include="Commands\CRDT\Map.cs" />
     <Compile Include="Commands\CRDT\UpdateCommandBuilder.cs" />
+    <Compile Include="Commands\CRDT\UpdateSetOptions.cs" />
+    <Compile Include="Commands\CRDT\UpdateSet.cs" />
     <Compile Include="Commands\CRDT\UpdateCounter.cs" />
     <Compile Include="Commands\CRDT\UpdateCommandOptions.cs" />
     <Compile Include="Commands\CRDT\UpdateCommand{TResponse}.cs" />

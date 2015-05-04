@@ -42,5 +42,10 @@ namespace RiakClient.Commands.CRDT
             get;
             set;
         }
+
+        protected override bool GetHasRemoves()
+        {
+            return false;
+        }
     }
 }
