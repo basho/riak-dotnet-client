@@ -29,7 +29,7 @@ Param(
     [Parameter(Mandatory=$False, Position=0)]
     [ValidateSet('Debug','Release', 'All', 'Publish', 'Clean', 'CleanAll',
         'Test','TestAll','UnitTest','IntegrationTest','DeprecatedTest',
-        'CodeAnalysis','Documentation',
+        'CodeAnalysis','Documentation','ProtoGen',
         IgnoreCase = $True)]
     [string]$Target = 'Debug',
     [Parameter(Mandatory=$False)]
@@ -43,7 +43,9 @@ Param(
     [switch]$UpdateDependencies,
     [Parameter(Mandatory=$False)]
     [ValidatePattern("^[a-zA-Z0-9-]+$")]
-    [string]$GitRemoteName
+    [string]$GitRemoteName,
+    [Parameter(Mandatory=$False)]
+    [string]$ProtoGenExe
 )
 
 Set-StrictMode -Version Latest
@@ -207,6 +209,16 @@ if ($Verbosity -eq 'detailed' -or $Verbosity -eq 'd' -or
     $verbose_property = '/property:Verbose=true'
 }
 
+if ($Target -eq 'ProtoGen') {
+    if ([String]::IsNullOrEmpty($ProtoGenExe)) {
+        throw 'The -ProtoGenExe parameter pointing to protogen.exe is required by the "ProtoGen" target'
+    }
+    else {
+        $protogen_exe_path = $(Resolve-Path $ProtoGenExe).Path
+        $protogen_property = "/property:ProtoGenExe=$protogen_exe_path"
+    }
+}
+
 $git_remote_property = ''
 if (! ([String]::IsNullOrEmpty($GitRemoteName))) {
     $git_remote_property = "/property:GitRemoteName=$GitRemoteName"
@@ -229,8 +241,8 @@ else
     $maxcpu_property = '/maxcpucount'
 }
 
-Write-Debug "MSBuild command: $msbuild_exe ""/verbosity:$Verbosity"" /nologo /m ""/property:SolutionDir=$script_path\"" ""$maxcpu_property"" ""$version_property"" ""$verbose_property"" ""$git_remote_property"" ""/target:$Target"" ""$build_targets_file"""
-& $msbuild_exe "/verbosity:$Verbosity" /nologo /m "/property:SolutionDir=$script_path\" "$maxcpu_property" "$version_property" "$verbose_property" "$git_remote_property" "/target:$Target" "$build_targets_file"
+Write-Debug "MSBuild command: $msbuild_exe ""/verbosity:$Verbosity"" /nologo /m ""/property:SolutionDir=$script_path\"" ""$maxcpu_property"" ""$version_property"" ""$verbose_property"" ""$git_remote_property"" ""$protogen_property"" ""/target:$Target"" ""$build_targets_file"""
+& $msbuild_exe "/verbosity:$Verbosity" /nologo /m "/property:SolutionDir=$script_path\" "$maxcpu_property" "$version_property" "$verbose_property" "$git_remote_property" "$protogen_property" "/target:$Target" "$build_targets_file"
 if ($? -ne $True) {
     throw "$msbuild_exe failed: $LastExitCode"
 }

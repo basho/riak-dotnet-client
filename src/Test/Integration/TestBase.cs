@@ -19,16 +19,21 @@
 namespace Test.Integration
 {
     using System;
+    using System.Collections.Generic;
     using System.Runtime.CompilerServices;
     using NUnit.Framework;
     using RiakClient;
     using RiakClient.Config;
+    using RiakClient.Models;
     using RiakClient.Util;
 
     [TestFixture]
     public abstract class TestBase
     {
         protected static readonly Random R = new Random();
+
+        protected readonly IList<string> Keys = new List<string>();
+
         protected IRiakEndPoint cluster;
         protected IRiakClient client;
         protected IRiakClusterConfiguration clusterConfig;
@@ -56,6 +61,16 @@ namespace Test.Integration
             client = cluster.CreateClient();
         }
 
+        protected abstract RiakString BucketType
+        {
+            get;
+        }
+
+        protected abstract RiakString Bucket
+        {
+            get;
+        }
+
         [TestFixtureSetUp]
         protected virtual void TestFixtureSetUp()
         {
@@ -64,6 +79,11 @@ namespace Test.Integration
         [TestFixtureTearDown]
         protected virtual void TestFixtureTearDown()
         {
+            foreach (string key in Keys)
+            {
+                var id = new RiakObjectId(BucketType, Bucket, key);
+                client.Delete(id);
+            }
         }
     }
 }

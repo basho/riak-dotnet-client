@@ -29,21 +29,21 @@ namespace Test.Unit.CRDT
     [TestFixture]
     public class UpdateSetTests
     {
-        public static readonly IEnumerable<byte[]> DefaultAdds = new byte[][]
+        private const string BucketType = "sets";
+        private const string Bucket = "myBucket";
+        private const string Key = "set_1";
+
+        private static readonly IEnumerable<byte[]> DefaultAdds = new byte[][]
             {
                 Encoding.UTF8.GetBytes("add_1"),
                 Encoding.UTF8.GetBytes("add_2")
             };
 
-        public static readonly IEnumerable<byte[]> DefaultRemoves = new byte[][]
+        private static readonly IEnumerable<byte[]> DefaultRemoves = new byte[][]
             {
                 Encoding.UTF8.GetBytes("remove_1"),
                 Encoding.UTF8.GetBytes("remove_2")
             };
-
-        private const string BucketType = "sets";
-        private const string Bucket = "myBucket";
-        private const string Key = "set_1";
 
         private static readonly byte[] Context = Encoding.UTF8.GetBytes("1234");
 

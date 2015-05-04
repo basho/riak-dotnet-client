@@ -1,4 +1,4 @@
-// <copyright file="UpdateAndFetchCounterTests.cs" company="Basho Technologies, Inc.">
+// <copyright file="UpdateAndFetchSetTests.cs" company="Basho Technologies, Inc.">
 // Copyright 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
@@ -20,35 +20,47 @@ namespace Test.Integration.CRDT
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
     using Common.Logging;
     using NUnit.Framework;
     using RiakClient;
     using RiakClient.Commands.CRDT;
-    using RiakClient.Models;
     using RiakClient.Util;
 
-    public class UpdateAndFetchCounterTests : TestBase
+    public class UpdateAndFetchSetTests : TestBase
     {
-        private static readonly ILog Log = Logging.GetLogger(typeof(UpdateAndFetchCounterTests));
-        private static readonly long DefaultIncrement = 10;
+        private static readonly ILog Log = Logging.GetLogger(typeof(UpdateAndFetchSetTests));
+
+        private static readonly IEnumerable<byte[]> DefaultAdds = new[]
+            {
+                Encoding.UTF8.GetBytes("add_1"),
+                Encoding.UTF8.GetBytes("add_2")
+            };
+
+        private static readonly IEnumerable<byte[]> DefaultRemoves = new[]
+            {
+                Encoding.UTF8.GetBytes("remove_1"),
+                Encoding.UTF8.GetBytes("remove_2")
+            };
 
         protected override RiakString BucketType
         {
-            get { return new RiakString("counters"); }
+            get { return new RiakString("sets"); }
         }
 
         protected override RiakString Bucket
         {
-            get { return new RiakString("counter_tests"); }
+            get { return new RiakString("set_tests"); }
         }
 
         [Test]
-        public void Fetching_A_Counter_Produces_Expected_Values()
+        public void Fetching_A_Set_Produces_Expected_Values()
         {
             string key = Guid.NewGuid().ToString();
-            SaveCounter(key);
+            SaveSet(key);
 
-            var fetch = new FetchCounter.Builder()
+            var fetch = new FetchSet.Builder()
                     .WithBucketType(BucketType)
                     .WithBucket(Bucket)
                     .WithKey(key)
@@ -57,22 +69,31 @@ namespace Test.Integration.CRDT
             RiakResult rslt = client.Execute(fetch);
             Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
 
-            CounterResponse response = fetch.Response;
+            SetResponse response = fetch.Response;
             Assert.IsNotNull(response);
 
-            Assert.AreEqual(DefaultIncrement, response.Value);
+            Assert.IsNotNull(response.Context);
+            Assert.IsNotEmpty(response.Context);
+            Assert.AreEqual(DefaultAdds, response.Value);
         }
 
         [Test]
-        public void Can_Update_A_Counter()
+        public void Can_Update_A_Set()
         {
             string key = Guid.NewGuid().ToString();
-            SaveCounter(key);
+            SetResponse resp = SaveSet(key);
 
-            var update = new UpdateCounter.Builder(DefaultIncrement)
+            var add_3 = new RiakString("add_3");
+            var adds = new[] { add_3 };
+
+            var add_1 = new RiakString("add_1");
+            var removes = new[] { add_1 };
+
+            var update = new UpdateSet.Builder(adds.Select(a => (byte[])a), removes.Select(r => (byte[])r))
                 .WithBucketType(BucketType)
                 .WithBucket(Bucket)
                 .WithKey(key)
+                .WithContext(resp.Context)
                 .WithReturnBody(true)
                 .WithTimeout(TimeSpan.FromMilliseconds(20000))
                 .Build();
@@ -80,22 +101,38 @@ namespace Test.Integration.CRDT
             RiakResult rslt = client.Execute(update);
             Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
 
-            CounterResponse response = update.Response;
-            Assert.AreEqual(20, response.Value);
+            SetResponse response = update.Response;
+            bool found_add_1 = false;
+            bool found_add_3 = false;
+            foreach (RiakString value in response.Value)
+            {
+                if (value.Equals(add_1))
+                {
+                    found_add_1 = true;
+                }
+
+                if (value.Equals(add_3))
+                {
+                    found_add_3 = true;
+                }
+            }
+
+            Assert.True(found_add_3);
+            Assert.False(found_add_1);
         }
 
         [Test]
         public void Riak_Can_Generate_Key()
         {
-            CounterResponse r = SaveCounter();
+            SetResponse r = SaveSet();
             Assert.IsNotNullOrEmpty(r.Key);
             Log.DebugFormat("Riak Generated Key: {0}", r.Key);
         }
 
         [Test]
-        public void Fetching_An_Unknown_Counter_Results_In_Not_Found()
+        public void Fetching_An_Unknown_Set_Results_In_Not_Found()
         {
-            var fetch = new FetchCounter.Builder()
+            var fetch = new FetchSet.Builder()
                     .WithBucketType(BucketType)
                     .WithBucket(Bucket)
                     .WithKey(Guid.NewGuid().ToString())
@@ -103,13 +140,13 @@ namespace Test.Integration.CRDT
 
             RiakResult rslt = client.Execute(fetch);
             Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
-            CounterResponse response = fetch.Response;
+            SetResponse response = fetch.Response;
             Assert.IsTrue(response.NotFound);
         }
 
-        private CounterResponse SaveCounter(string key = null)
+        private SetResponse SaveSet(string key = null)
         {
-            var updateBuilder = new UpdateCounter.Builder(DefaultIncrement)
+            var updateBuilder = new UpdateSet.Builder(DefaultAdds, null)
                 .WithBucketType(BucketType)
                 .WithBucket(Bucket)
                 .WithTimeout(TimeSpan.FromMilliseconds(20000));
@@ -119,12 +156,14 @@ namespace Test.Integration.CRDT
                 updateBuilder.WithKey(key);
             }
 
-            UpdateCounter cmd = updateBuilder.Build();
+            UpdateSet cmd = updateBuilder.Build();
             RiakResult rslt = client.Execute(cmd);
             Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
 
-            CounterResponse response = cmd.Response;
+            SetResponse response = cmd.Response;
             Keys.Add(response.Key);
+
+            Assert.True(EnumerableUtil.NotNullOrEmpty(response.Context));
 
             return response;
         }

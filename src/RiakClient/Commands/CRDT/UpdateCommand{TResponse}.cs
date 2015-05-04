@@ -72,6 +72,11 @@ namespace RiakClient.Commands.CRDT
             req.context = options.Context;
             req.include_context = options.IncludeContext;
 
+            if (req.include_context)
+            {
+                req.return_body = true;
+            }
+
             req.op = GetRequestOp();
 
             return req;

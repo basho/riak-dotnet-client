@@ -19,20 +19,25 @@
 namespace Test.Integration.CRDT
 {
     using System;
-    using System.Collections.Generic;
     using Common.Logging;
     using NUnit.Framework;
     using RiakClient;
     using RiakClient.Commands.CRDT;
-    using RiakClient.Models;
+    using RiakClient.Util;
 
     public class UpdateAndFetchMapTests : TestBase
     {
-        private const string BucketType = "maps";
-        private const string Bucket = "map_tests";
         private static readonly ILog Log = Logging.GetLogger(typeof(UpdateAndFetchMapTests));
 
-        private readonly IList<string> keys = new List<string>();
+        protected override RiakString BucketType
+        {
+            get { return new RiakString("maps"); }
+        }
+
+        protected override RiakString Bucket
+        {
+            get { return new RiakString("map_tests"); }
+        }
 
         [Test]
         public void Fetching_A_Map_Produces_Expected_Values()
@@ -117,15 +122,6 @@ namespace Test.Integration.CRDT
             Assert.IsTrue(response.NotFound);
         }
 
-        protected override void TestFixtureTearDown()
-        {
-            foreach (string key in keys)
-            {
-                var id = new RiakObjectId(BucketType, Bucket, key);
-                client.Delete(id);
-            }
-        }
-
         private MapResponse SaveMap(string key = null)
         {
             var mapOp = new UpdateMap.MapOperation();
@@ -159,7 +155,10 @@ namespace Test.Integration.CRDT
             Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
 
             MapResponse response = cmd.Response;
-            keys.Add(response.Key);
+            Keys.Add(response.Key);
+
+            Assert.True(EnumerableUtil.NotNullOrEmpty(response.Context));
+
             return response;
         }
     }

@@ -102,11 +102,6 @@ namespace RiakClient.Commands.CRDT
 
         public UpdateCommandBuilder<TCommand, TOptions, TResponse> WithContext(byte[] context)
         {
-            if (EnumerableUtil.IsNullOrEmpty(context))
-            {
-                throw new ArgumentNullException("context", "context may not be null or empty");
-            }
-
             this.context = context;
             return this;
         }

@@ -23,7 +23,6 @@
 
     <MonoExe Condition="'$(OS)' != 'Windows_NT'">mono --runtime=v4.0.30319</MonoExe>
 
-    <ProtoGenExe>$(SolutionDir)tools\protobuf-net\protogen\protogen.exe</ProtoGenExe>
     <ProtoDir>$(SolutionDir)src\riak_pb\src</ProtoDir>
     <ProtoMsgDir>$(RiakClientProjDir)\Messages</ProtoMsgDir>
     <ProtoMsgCsvFile>$(ProtoDir)\riak_pb_messages.csv</ProtoMsgCsvFile>
