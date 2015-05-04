@@ -136,7 +136,7 @@ namespace RiakClient
         {
             byte[] rv = null;
 
-            if (value.HasValue)
+            if (value != null && value.HasValue)
             {
                 rv = Encoding.UTF8.GetBytes(value.value);
             }

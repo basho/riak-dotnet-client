@@ -75,7 +75,7 @@
     <Compile Include="Commands\CRDT\Response.cs" />
     <Compile Include="Commands\CRDT\Response{TValue}.cs" />
     <Compile Include="Commands\CRDT\FetchCommandBuilder.cs" />
-    <Compile Include="Commands\CRDT\FetchCommand.cs" />
+    <Compile Include="Commands\CRDT\FetchCommand{TResponse}.cs" />
     <Compile Include="Commands\CRDT\FetchCounter.cs" />
     <Compile Include="Commands\CRDT\FetchCommandOptions.cs" />
     <Compile Include="Commands\CRDT\FetchMap.cs" />
@@ -83,8 +83,13 @@
     <Compile Include="Commands\CRDT\CounterResponse.cs" />
     <Compile Include="Commands\CRDT\MapResponse.cs" />
     <Compile Include="Commands\CRDT\Map.cs" />
+    <Compile Include="Commands\CRDT\UpdateCommandBuilder.cs" />
+    <Compile Include="Commands\CRDT\UpdateCounter.cs" />
+    <Compile Include="Commands\CRDT\UpdateCommandOptions.cs" />
+    <Compile Include="Commands\CRDT\UpdateCommand{TResponse}.cs" />
     <Compile Include="Commands\CRDT\UpdateMap.cs" />
     <Compile Include="Commands\CRDT\FetchMapOptions.cs" />
+    <Compile Include="Commands\CRDT\UpdateCounterOptions.cs" />
     <Compile Include="Commands\CRDT\UpdateMapOptions.cs" />
     <Compile Include="Commands\IRiakCommand.cs" />
     <Compile Include="Comms\IRiakConnectionManager.cs" />

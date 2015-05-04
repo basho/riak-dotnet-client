@@ -22,7 +22,6 @@ namespace RiakClient.Commands.CRDT
     using System.Collections.Generic;
     using System.Linq;
     using Messages;
-    using Util;
 
     /// <summary>
     /// Command used to update a Map in Riak. As a convenience, a builder method
@@ -40,16 +39,15 @@ namespace RiakClient.Commands.CRDT
     /// </code>
     /// See <see cref="UpdateMap.Builder"/>
     /// <code>
-    /// var update = new UpdateMap.Builder()
+    /// var update = new UpdateMap.Builder(mapOp)
     ///           .WithBucketType("maps")
     ///           .WithBucket("myBucket")
     ///           .WithKey("map_1")
-    ///           .WithMapOperation(mapOp)
     ///           .WithReturnBody(true)
     ///           .Build();
     /// </code>
     /// </summary>
-    public class UpdateMap : IRiakCommand
+    public class UpdateMap : UpdateCommand<MapResponse>, IRiakCommand
     {
         private readonly UpdateMapOptions options;
 
@@ -58,66 +56,21 @@ namespace RiakClient.Commands.CRDT
         /// </summary>
         /// <param name="options">Options for this operation. See <see cref="UpdateMapOptions"/></param>
         public UpdateMap(UpdateMapOptions options)
+            : base(options)
         {
-            if (options == null)
-            {
-                throw new ArgumentNullException("options");
-            }
-
             this.options = options;
-
-            if (this.options.Op.HasRemoves &&
-                EnumerableUtil.IsNullOrEmpty(this.options.Context))
-            {
-                throw new InvalidOperationException("When doing any removes a context must be provided.");
-            }
         }
 
-        public MessageCode ExpectedCode
+        protected override DtOp GetRequestOp()
         {
-            get { return MessageCode.DtUpdateResp; }
+            var op = new DtOp();
+            op.map_op = Populate(options.Op);
+            return op;
         }
 
-        public MapResponse Response { get; private set; }
-
-        public RpbReq ConstructPbRequest()
+        protected override MapResponse CreateResponse(RiakString key, DtUpdateResp resp)
         {
-            var req = new DtUpdateReq();
-
-            req.type = options.BucketType;
-            req.bucket = options.Bucket;
-            req.key = options.Key;
-
-            req.w = options.W;
-            req.pw = options.PW;
-            req.dw = options.DW;
-
-            req.return_body = options.ReturnBody;
-
-            req.timeout = (uint)options.Timeout.TotalMilliseconds;
-
-            req.context = options.Context;
-            req.include_context = options.IncludeContext;
-
-            req.op = new DtOp();
-            req.op.map_op = Populate(options.Op);
-
-            return req;
-        }
-
-        public void OnSuccess(RpbResp response)
-        {
-            if (response == null)
-            {
-                Response = new MapResponse();
-            }
-            else
-            {
-                DtUpdateResp resp = (DtUpdateResp)response;
-                RiakString key = EnumerableUtil.NotNullOrEmpty(resp.key) ?
-                    new RiakString(resp.key) : options.Key;
-                Response = new MapResponse(key, resp.context, resp.map_value);
-            }
+            return new MapResponse(key, resp.context, resp.map_value);
         }
 
         private static MapOp Populate(MapOperation mapOperation)
@@ -582,149 +535,26 @@ namespace RiakClient.Commands.CRDT
             }
         }
 
-        public class Builder
+        public class Builder : UpdateCommandBuilder<UpdateMap, UpdateMapOptions, MapResponse>
         {
-            private string bucketType;
-            private string bucket;
-            private string key;
-
             private MapOperation mapOp;
 
-            private Quorum w;
-            private Quorum pw;
-            private Quorum dw;
-
-            private bool returnBody;
-
-            private TimeSpan timeout;
-
-            private bool includeContext = true; // NB: default to true
-            private byte[] context;
-
-            public UpdateMap Build()
-            {
-                var options = new UpdateMapOptions(bucketType, bucket, mapOp);
-
-                options.Key = key;
-
-                options.W = w;
-                options.PW = pw;
-                options.DW = dw;
-
-                options.ReturnBody = returnBody;
-
-                options.Timeout = timeout;
-
-                options.IncludeContext = includeContext;
-                options.Context = context;
-
-                return new UpdateMap(options);
-            }
-
-            public Builder WithBucketType(string bucketType)
-            {
-                if (string.IsNullOrWhiteSpace(bucketType))
-                {
-                    throw new ArgumentNullException("bucketType", "bucketType may not be null, empty or whitespace");
-                }
-
-                this.bucketType = bucketType;
-                return this;
-            }
-
-            public Builder WithBucket(string bucket)
-            {
-                if (string.IsNullOrWhiteSpace(bucket))
-                {
-                    throw new ArgumentNullException("bucket", "bucket may not be null, empty or whitespace");
-                }
-
-                this.bucket = bucket;
-                return this;
-            }
-
-            public Builder WithKey(string key)
-            {
-                if (string.IsNullOrWhiteSpace(key))
-                {
-                    throw new ArgumentNullException("key", "key may not be null, empty or whitespace");
-                }
-
-                this.key = key;
-                return this;
-            }
-
-            public Builder WithMapOperation(MapOperation mapOp)
+            public Builder(MapOperation mapOp)
+                : base()
             {
                 if (mapOp == null)
                 {
-                    throw new ArgumentNullException("mapOp", "mapOp may not be null");
+                    throw new ArgumentNullException("mapOp", "mapOp is required.");
                 }
-
-                this.mapOp = mapOp;
-                return this;
-            }
-
-            public Builder WithContext(byte[] context)
-            {
-                if (EnumerableUtil.IsNullOrEmpty(context))
+                else
                 {
-                    throw new ArgumentNullException("context", "context may not be null or empty");
+                    this.mapOp = mapOp;
                 }
-
-                this.context = context;
-                return this;
             }
 
-            public Builder WithW(Quorum w)
+            protected override void PopulateOptions(UpdateMapOptions options)
             {
-                if (w == null)
-                {
-                    throw new ArgumentNullException("w", "w may not be null");
-                }
-
-                this.w = w;
-                return this;
-            }
-
-            public Builder WithPW(Quorum pw)
-            {
-                if (pw == null)
-                {
-                    throw new ArgumentNullException("pw", "pw may not be null");
-                }
-
-                this.pw = pw;
-                return this;
-            }
-
-            public Builder WithDW(Quorum dw)
-            {
-                if (dw == null)
-                {
-                    throw new ArgumentNullException("dw", "dw may not be null");
-                }
-
-                this.dw = dw;
-                return this;
-            }
-
-            public Builder WithReturnBody(bool returnBody)
-            {
-                this.returnBody = returnBody;
-                return this;
-            }
-
-            public Builder WithIncludeContext(bool includeContext)
-            {
-                this.includeContext = includeContext;
-                return this;
-            }
-
-            public Builder WithTimeout(TimeSpan timeout)
-            {
-                this.timeout = timeout;
-                return this;
+                options.Op = mapOp;
             }
         }
     }

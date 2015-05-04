@@ -19,9 +19,6 @@
 namespace RiakClient.Commands.CRDT
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
 
     /// <summary>
     /// Builds a fetch command.
@@ -32,6 +29,7 @@ namespace RiakClient.Commands.CRDT
     public abstract class FetchCommandBuilder<TCommand, TOptions, TResponse>
         where TCommand : FetchCommand<TResponse>
         where TOptions : FetchCommandOptions
+        where TResponse : Response
     {
         private string bucketType;
         private string bucket;

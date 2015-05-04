@@ -1,4 +1,4 @@
-﻿// <copyright file="FetchCommand.cs" company="Basho Technologies, Inc.">
+﻿// <copyright file="FetchCommand{TResponse}.cs" company="Basho Technologies, Inc.">
 // Copyright 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
@@ -25,7 +25,7 @@ namespace RiakClient.Commands.CRDT
     /// Fetches a Map from Riak
     /// </summary>
     /// <typeparam name="TResponse">The type of the response data from Riak.</typeparam>
-    public abstract class FetchCommand<TResponse>
+    public abstract class FetchCommand<TResponse> where TResponse : Response
     {
         protected readonly FetchCommandOptions Options;
 

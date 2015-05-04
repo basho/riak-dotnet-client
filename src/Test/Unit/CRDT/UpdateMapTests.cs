@@ -61,7 +61,7 @@ namespace Test.Unit.CRDT
                 .RemoveFlag("flag_2")
                 .RemoveMap("map_3");
 
-            var updateMapCommandBuilder = new UpdateMap.Builder();
+            var updateMapCommandBuilder = new UpdateMap.Builder(mapOp);
 
             var q1 = new Quorum(1);
             var q2 = new Quorum(2);
@@ -71,7 +71,6 @@ namespace Test.Unit.CRDT
                 .WithBucketType(BucketType)
                 .WithBucket(Bucket)
                 .WithKey(Key)
-                .WithMapOperation(mapOp)
                 .WithContext(Context)
                 .WithW(q3)
                 .WithPW(q1)
@@ -175,11 +174,10 @@ namespace Test.Unit.CRDT
 
             var mapOp = new UpdateMap.MapOperation();
 
-            var update = new UpdateMap.Builder()
+            var update = new UpdateMap.Builder(mapOp)
                 .WithBucketType("maps")
                 .WithBucket("myBucket")
                 .WithKey("map_1")
-                .WithMapOperation(mapOp)
                 .Build();
 
             update.OnSuccess(updateResp);

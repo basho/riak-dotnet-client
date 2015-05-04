@@ -1,4 +1,4 @@
-// <copyright file="UpdateMapTests.cs" company="Basho Technologies, Inc.">
+// <copyright file="UpdateAndFetchCounterTests.cs" company="Basho Technologies, Inc.">
 // Copyright 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
@@ -26,21 +26,22 @@ namespace Test.Integration.CRDT
     using RiakClient.Commands.CRDT;
     using RiakClient.Models;
 
-    public class UpdateMapTests : TestBase
+    public class UpdateAndFetchCounterTests : TestBase
     {
-        private const string BucketType = "maps";
-        private const string Bucket = "map_tests";
-        private static readonly ILog Log = Logging.GetLogger(typeof(UpdateMapTests));
+        private const string BucketType = "counters";
+        private const string Bucket = "counter_tests";
+        private static readonly ILog Log = Logging.GetLogger(typeof(UpdateAndFetchCounterTests));
 
+        private static readonly long DefaultIncrement = 10;
         private readonly IList<string> keys = new List<string>();
 
         [Test]
-        public void Fetching_A_Map_Produces_Expected_Values()
+        public void Fetching_A_Counter_Produces_Expected_Values()
         {
             string key = Guid.NewGuid().ToString();
-            SaveMap(key);
+            SaveCounter(key);
 
-            var fetch = new FetchMap.Builder()
+            var fetch = new FetchCounter.Builder()
                     .WithBucketType(BucketType)
                     .WithBucket(Bucket)
                     .WithKey(key)
@@ -49,40 +50,23 @@ namespace Test.Integration.CRDT
             RiakResult rslt = client.Execute(fetch);
             Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
 
-            MapResponse response = fetch.Response;
+            CounterResponse response = fetch.Response;
             Assert.IsNotNull(response);
 
             Assert.IsNotEmpty(response.Context);
-            Assert.IsNotNull(response.Value);
-            Assert.AreEqual(1, response.Value.Counters["counter_1"]);
-            Assert.AreEqual((RiakString)"value_1", (RiakString)response.Value.Sets["set_1"][0]);
-            Assert.AreEqual((RiakString)"register_value_1", (RiakString)response.Value.Registers["register_1"]);
-            Assert.AreEqual(true, response.Value.Flags["flag_1"]);
-
-            Map map2 = response.Value.Maps["map_2"];
-            Assert.AreEqual(2, map2.Counters["counter_1"]);
-            Assert.AreEqual(RiakString.ToBytes("value_1"), map2.Sets["set_1"][0]);
-            Assert.AreEqual(RiakString.ToBytes("register_value_1"), map2.Registers["register_1"]);
-            Assert.AreEqual(true, map2.Flags["flag_1"]);
-
-            Map map3 = map2.Maps["map_3"];
-            Assert.AreEqual(3, map3.Counters["counter_1"]);
+            Assert.AreEqual(DefaultIncrement, response.Value);
         }
 
         [Test]
-        public void Can_Remove_Data_From_A_Map()
+        public void Can_Update_A_Counter()
         {
             string key = Guid.NewGuid().ToString();
-            MapResponse r = SaveMap(key);
+            CounterResponse r = SaveCounter(key);
 
-            var mapOp = new UpdateMap.MapOperation();
-            mapOp.RemoveCounter("counter_1");
-
-            var update = new UpdateMap.Builder()
+            var update = new UpdateCounter.Builder(DefaultIncrement)
                 .WithBucketType(BucketType)
                 .WithBucket(Bucket)
                 .WithKey(key)
-                .WithMapOperation(mapOp)
                 .WithContext(r.Context)
                 .WithReturnBody(true)
                 .WithTimeout(TimeSpan.FromMilliseconds(20000))
@@ -91,22 +75,22 @@ namespace Test.Integration.CRDT
             RiakResult rslt = client.Execute(update);
             Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
 
-            MapResponse response = update.Response;
-            Assert.False(response.Value.Counters.ContainsKey("counter_1"));
+            CounterResponse response = update.Response;
+            Assert.AreEqual(20, response.Value);
         }
 
         [Test]
         public void Riak_Can_Generate_Key()
         {
-            MapResponse r = SaveMap();
+            CounterResponse r = SaveCounter();
             Assert.IsNotNullOrEmpty(r.Key);
-            Log.DebugFormat("[integration/crdt/updatemaptests] Riak Generated Key: {0}", r.Key);
+            Log.DebugFormat("Riak Generated Key: {0}", r.Key);
         }
 
         [Test]
-        public void Fetching_An_Unknown_Map_Results_In_Not_Found()
+        public void Fetching_An_Unknown_Counter_Results_In_Not_Found()
         {
-            var fetch = new FetchMap.Builder()
+            var fetch = new FetchCounter.Builder()
                     .WithBucketType(BucketType)
                     .WithBucket(Bucket)
                     .WithKey(Guid.NewGuid().ToString())
@@ -114,7 +98,7 @@ namespace Test.Integration.CRDT
 
             RiakResult rslt = client.Execute(fetch);
             Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
-            MapResponse response = fetch.Response;
+            CounterResponse response = fetch.Response;
             Assert.IsTrue(response.NotFound);
         }
 
@@ -127,28 +111,11 @@ namespace Test.Integration.CRDT
             }
         }
 
-        private MapResponse SaveMap(string key = null)
+        private CounterResponse SaveCounter(string key = null)
         {
-            var mapOp = new UpdateMap.MapOperation();
-            mapOp.IncrementCounter("counter_1", 1)
-                .AddToSet("set_1", "value_1")
-                .SetRegister("register_1", "register_value_1")
-                .SetFlag("flag_1", true);
-
-            var map_2 = mapOp.Map("map_2");
-            map_2.IncrementCounter("counter_1", 2)
-                .AddToSet("set_1", "value_1")
-                .SetRegister("register_1", "register_value_1")
-                .SetFlag("flag_1", true);
-
-            var map_3 = map_2.Map("map_3");
-            map_3.IncrementCounter("counter_1", 3);
-
-            var updateBuilder = new UpdateMap.Builder()
+            var updateBuilder = new UpdateCounter.Builder(DefaultIncrement)
                 .WithBucketType(BucketType)
                 .WithBucket(Bucket)
-                .WithMapOperation(mapOp)
-                .WithReturnBody(true)
                 .WithTimeout(TimeSpan.FromMilliseconds(20000));
 
             if (!string.IsNullOrEmpty(key))
@@ -156,11 +123,11 @@ namespace Test.Integration.CRDT
                 updateBuilder.WithKey(key);
             }
 
-            UpdateMap cmd = updateBuilder.Build();
+            UpdateCounter cmd = updateBuilder.Build();
             RiakResult rslt = client.Execute(cmd);
             Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
 
-            MapResponse response = cmd.Response;
+            CounterResponse response = cmd.Response;
             keys.Add(response.Key);
             return response;
         }

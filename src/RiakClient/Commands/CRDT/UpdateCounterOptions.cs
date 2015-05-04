@@ -1,4 +1,4 @@
-﻿// <copyright file="UpdateMapOptions.cs" company="Basho Technologies, Inc.">
+﻿// <copyright file="UpdateCounterOptions.cs" company="Basho Technologies, Inc.">
 // Copyright 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
@@ -19,25 +19,25 @@
 namespace RiakClient.Commands.CRDT
 {
     /// <summary>
-    /// Represents options for a <see cref="UpdateMap"/> operation.
+    /// Represents options for a <see cref="UpdateCounter"/> operation.
     /// </summary>
     /// <inheritdoc />
-    public class UpdateMapOptions : UpdateCommandOptions
+    public class UpdateCounterOptions : UpdateCommandOptions
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="UpdateMapOptions"/> class.
+        /// Initializes a new instance of the <see cref="UpdateCounterOptions"/> class.
         /// </summary>
         /// <inheritdoc />
-        public UpdateMapOptions(string bucketType, string bucket, string key)
+        public UpdateCounterOptions(string bucketType, string bucket, string key)
             : base(bucketType, bucket, key)
         {
         }
 
         /// <summary>
-        /// The <see cref="UpdateMap.MapOperation"/>
+        /// The <see cref="UpdateCounter"/> increment value.
         /// </summary>
-        /// <value>The <see cref="UpdateMap.MapOperation"/> to be executed by the <see cref="UpdateMap"/> command.</value>
-        public UpdateMap.MapOperation Op
+        /// <value>The increment value for the <see cref="UpdateCounter"/> command.</value>
+        public long Increment
         {
             get;
             set;
