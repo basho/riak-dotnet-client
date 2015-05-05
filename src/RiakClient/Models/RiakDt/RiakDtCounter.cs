@@ -29,7 +29,8 @@ namespace RiakClient.Models.RiakDt
     /// <summary>
     /// Represents a Riak Counter data type.
     /// </summary>
-    public class RiakDtCounter : IRiakDtType<CounterOperation>, IDtOp, IChangeTracking 
+    [System.Obsolete("RiakDt is deprecated. Please use Commands/CRDT namespace.")]
+    public class RiakDtCounter : IRiakDtType<CounterOperation>, IDtOp, IChangeTracking
     {
         private readonly List<CounterOperation> operations = new List<CounterOperation>();
         private readonly byte[] context;
@@ -69,8 +70,8 @@ namespace RiakClient.Models.RiakDt
         /// <summary>
         /// The current local value of this <see cref="RiakDtCounter"/>.
         /// </summary>
-        public long Value 
-        { 
+        public long Value
+        {
             get
             {
                 if (IsChanged)
@@ -111,7 +112,7 @@ namespace RiakClient.Models.RiakDt
         {
             return counter.Increment();
         }
-        
+
         /// <summary>
         /// Increment the counter.
         /// </summary>

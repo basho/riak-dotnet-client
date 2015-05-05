@@ -24,6 +24,7 @@ namespace RiakClient.Models.RiakDt
     /// <summary>
     /// Represents an operation on a Riak Set data type.
     /// </summary>
+    [System.Obsolete("RiakDt is deprecated. Please use Commands/CRDT namespace.")]
     public class SetOperation : IDtOp
     {
         /// <inheritdoc/>

@@ -19,13 +19,13 @@
 
 namespace RiakClient.Models
 {
-    using System.Runtime.InteropServices;
     using Messages;
 
     /// <summary>
     /// Represents a collection of optional properties when fetching Riak Data Types. 
     /// Each property changes the semantics of the operation slightly. 
     /// </summary>
+    [System.Obsolete("RiakDt is deprecated. Please use Commands/CRDT namespace.")]
     public class RiakDtFetchOptions : RiakOptions<RiakDtFetchOptions>
     {
         public RiakDtFetchOptions()

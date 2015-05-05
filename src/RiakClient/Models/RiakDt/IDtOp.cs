@@ -24,6 +24,7 @@ namespace RiakClient.Models.RiakDt
     /// <summary>
     /// An interface representing a Riak datatype operation.
     /// </summary>
+    [System.Obsolete("RiakDt is deprecated. Please use Commands/CRDT namespace.")]
     public interface IDtOp
     {
         /// <summary>

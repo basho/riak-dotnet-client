@@ -689,6 +689,7 @@ namespace RiakClient
         }
 
         /// <inheritdoc/>
+        [System.Obsolete("RiakDt is deprecated. Please use Commands/CRDT namespace.")]
         public RiakCounterResult DtFetchCounter(
             string bucketType, string bucket, string key, RiakDtFetchOptions options = null)
         {
@@ -696,6 +697,7 @@ namespace RiakClient
         }
 
         /// <inheritdoc/>
+        [System.Obsolete("RiakDt is deprecated. Please use Commands/CRDT namespace.")]
         public RiakCounterResult DtFetchCounter(RiakObjectId objectId, RiakDtFetchOptions options = null)
         {
             var message = new DtFetchReq
@@ -729,6 +731,7 @@ namespace RiakClient
         }
 
         /// <inheritdoc/>
+        [System.Obsolete("RiakDt is deprecated. Please use Commands/CRDT namespace.")]
         public RiakCounterResult DtUpdateCounter(
             string bucketType, string bucket, string key, long amount, RiakDtUpdateOptions options = null)
         {
@@ -736,6 +739,7 @@ namespace RiakClient
         }
 
         /// <inheritdoc/>
+        [System.Obsolete("RiakDt is deprecated. Please use Commands/CRDT namespace.")]
         public RiakCounterResult DtUpdateCounter(
             RiakObjectId objectId, long amount, RiakDtUpdateOptions options = null)
         {
@@ -777,12 +781,14 @@ namespace RiakClient
         }
 
         /// <inheritdoc/>
+        [System.Obsolete("RiakDt is deprecated. Please use Commands/CRDT namespace.")]
         public RiakDtSetResult DtFetchSet(string bucketType, string bucket, string key, RiakDtFetchOptions options = null)
         {
             return DtFetchSet(new RiakObjectId(bucketType, bucket, key), options);
         }
 
         /// <inheritdoc/>
+        [System.Obsolete("RiakDt is deprecated. Please use Commands/CRDT namespace.")]
         public RiakDtSetResult DtFetchSet(RiakObjectId objectId, RiakDtFetchOptions options = null)
         {
             var message = new DtFetchReq
@@ -823,6 +829,7 @@ namespace RiakClient
         }
 
         /// <inheritdoc/>
+        [System.Obsolete("RiakDt is deprecated. Please use Commands/CRDT namespace.")]
         public RiakDtSetResult DtUpdateSet<T>(
             string bucketType,
             string bucket,
@@ -837,6 +844,7 @@ namespace RiakClient
         }
 
         /// <inheritdoc/>
+        [System.Obsolete("RiakDt is deprecated. Please use Commands/CRDT namespace.")]
         public RiakDtSetResult DtUpdateSet<T>(
             RiakObjectId objectId,
             SerializeObjectToByteArray<T> serialize,
@@ -899,6 +907,7 @@ namespace RiakClient
         }
 
         /// <inheritdoc/>
+        [System.Obsolete("RiakDt is deprecated. Please use Commands/CRDT namespace.")]
         public RiakDtMapResult DtFetchMap(
             string bucket,
             string key,
@@ -909,6 +918,7 @@ namespace RiakClient
         }
 
         /// <inheritdoc/>
+        [System.Obsolete("RiakDt is deprecated. Please use Commands/CRDT namespace.")]
         public RiakDtMapResult DtFetchMap(RiakObjectId objectId, RiakDtFetchOptions options = null)
         {
             var message = new DtFetchReq
@@ -947,6 +957,7 @@ namespace RiakClient
         }
 
         /// <inheritdoc/>
+        [System.Obsolete("RiakDt is deprecated. Please use Commands/CRDT namespace.")]
         public RiakDtMapResult DtUpdateMap<T>(
             string bucketType,
             string bucket,
@@ -971,9 +982,8 @@ namespace RiakClient
                 options);
         }
 
-        // TODO: We don't use the serialize parameter, remove it.
-
         /// <inheritdoc/>
+        [System.Obsolete("RiakDt is deprecated. Please use Commands/CRDT namespace.")]
         public RiakDtMapResult DtUpdateMap<T>(
             RiakObjectId objectId,
             SerializeObjectToByteArray<T> serialize,

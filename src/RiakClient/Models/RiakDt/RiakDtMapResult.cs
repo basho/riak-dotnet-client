@@ -20,10 +20,11 @@
 namespace RiakClient.Models.RiakDt
 {
     using System.Collections.Generic;
-    
+
     /// <summary>
     /// Represents an operation result for a Riak Map data type.
     /// </summary>
+    [System.Obsolete("RiakDt is deprecated. Please use Commands/CRDT namespace.")]
     public class RiakDtMapResult
     {
         /// <summary>

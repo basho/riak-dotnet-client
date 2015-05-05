@@ -26,6 +26,7 @@ namespace RiakClient.Models.RiakDt
     /// <summary>
     /// Represents a Riak Map DataType Entry
     /// </summary>
+    [System.Obsolete("RiakDt is deprecated. Please use Commands/CRDT namespace.")]
     public class RiakDtMapEntry
     {
         internal RiakDtMapEntry(MapEntry entry)

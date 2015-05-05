@@ -16,6 +16,8 @@
 // under the License.
 // </copyright>
 
+#pragma warning disable 618
+
 namespace RiakClientExamples
 {
     using System;
@@ -158,3 +160,5 @@ namespace RiakClientExamples
         }
     }
 }
+
+#pragma warning restore 618

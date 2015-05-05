@@ -26,6 +26,7 @@ namespace RiakClient.Models
     /// Represents a collection of optional properties when updating Riak Data Types. 
     /// Each property changes the semantics of the operation slightly. 
     /// </summary>
+    [System.Obsolete("RiakDt is deprecated. Please use Commands/CRDT namespace.")]
     public class RiakDtUpdateOptions : RiakOptions<RiakDtUpdateOptions>
     {
         /// <summary>

@@ -16,6 +16,8 @@
 // under the License.
 // </copyright>
 
+#pragma warning disable 618
+
 namespace RiakClientExamples.Dev.DataModeling
 {
     using System;
@@ -243,3 +245,5 @@ namespace RiakClientExamples.Dev.DataModeling
         }
     }
 }
+
+#pragma warning restore 618

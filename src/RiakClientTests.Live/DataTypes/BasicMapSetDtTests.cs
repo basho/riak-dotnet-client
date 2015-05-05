@@ -22,6 +22,8 @@ using NUnit.Framework;
 using RiakClient.Messages;
 using RiakClient.Models;
 
+#pragma warning disable 618
+
 namespace RiakClientTests.Live.DataTypes
 {
     [TestFixture]
@@ -70,3 +72,5 @@ namespace RiakClientTests.Live.DataTypes
         }
     }
 }
+
+#pragma warning restore 618
