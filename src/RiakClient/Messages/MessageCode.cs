@@ -68,7 +68,7 @@ namespace RiakClient.Messages
         /// Get Server Info Request.
         /// </summary>
         RpbGetServerInfoReq = 7,
-        
+
         /// <summary>
         /// Get Server Info Response.
         /// </summary>
@@ -108,7 +108,7 @@ namespace RiakClient.Messages
         /// List Buckets Request.
         /// </summary>
         RpbListBucketsReq = 15,
-        
+
         /// <summary>
         /// List Buckets Response.
         /// </summary>
@@ -118,7 +118,7 @@ namespace RiakClient.Messages
         /// List Keys Request.
         /// </summary>
         RpbListKeysReq = 17,
-        
+
         /// <summary>
         /// List Keys Response.
         /// </summary>
@@ -196,6 +196,16 @@ namespace RiakClient.Messages
         RpbSetBucketTypeReq = 32,
 
         /// <summary>
+        /// Get bucket key preflist request.
+        /// </summary>
+        RpbGetBucketKeyPreflistReq = 33,
+
+        /// <summary>
+        /// Get bucket key preflist response.
+        /// </summary>
+        RpbGetBucketKeyPreflistResp = 34,
+
+        /// <summary>
         /// Riak CS Bucket Request.
         /// </summary>
         RpbCSBucketReq = 40,
@@ -259,7 +269,7 @@ namespace RiakClient.Messages
         /// Yokozuna Schema Put Request.
         /// </summary>
         RpbYokozunaSchemaPutReq = 60,
-        
+
         /// <summary>
         /// DataType Fetch Request.
         /// </summary>

@@ -76,7 +76,10 @@ namespace RiakClient.Messages
 
                 { MessageCode.RpbGetBucketTypeReq, typeof(RpbGetBucketTypeReq) },
                 { MessageCode.RpbSetBucketTypeReq, typeof(RpbSetBucketTypeReq) },
-                { MessageCode.RpbAuthReq, typeof(RpbAuthReq) }
+                { MessageCode.RpbAuthReq, typeof(RpbAuthReq) },
+
+                { MessageCode.RpbGetBucketKeyPreflistReq, typeof(RpbGetBucketKeyPreflistReq) },
+                { MessageCode.RpbGetBucketKeyPreflistResp, typeof(RpbGetBucketKeyPreflistResp) }
             };
 
             TypeToMessageCodeMap = new Dictionary<Type, MessageCode>();
