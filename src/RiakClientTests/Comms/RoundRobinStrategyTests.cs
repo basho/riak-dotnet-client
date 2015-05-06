@@ -28,7 +28,7 @@ using RiakClient.Comms.LoadBalancing;
 
 namespace RiakClientTests.Comms.RoundRobinStrategyTests
 {
-    [TestFixture]
+    [TestFixture, UnitTest]
     public class WhenAddingAndRemovingNodesConstantlyOnDifferentThreads
     {
         [Test]

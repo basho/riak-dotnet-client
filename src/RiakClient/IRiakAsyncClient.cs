@@ -23,6 +23,7 @@ namespace RiakClient
     using System.Collections.Generic;
     using System.Numerics;
     using System.Threading.Tasks;
+    using Commands;
     using Models;
     using Models.Index;
     using Models.MapReduce;
@@ -386,7 +387,7 @@ namespace RiakClient
         /// <remarks>Refer to http://wiki.basho.com/Links-and-Link-Walking.html for more information.</remarks>
         [Obsolete("Linkwalking has been deprecated as of Riak 2.0. This method will be removed in the next major version.")]
         Task<RiakResult<IList<RiakObject>>> WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks);
-        
+
         /// <summary>
         /// Get the server information from the connected cluster.
         /// </summary>
@@ -532,177 +533,13 @@ namespace RiakClient
         /// <returns>A <see cref="Task{TResult}"/> that will contain the return value of <paramref name="batchFun"/>.</returns>
         Task<T> Batch<T>(Func<IRiakBatchClient, T> batchFunction);
 
-        // TODO: We're missing everything below:
-        /*
         /// <summary>
-        /// Fetch a Counter Data Type object from the provided address. 
+        /// Used to execute a command against a Riak cluster.
         /// </summary>
-        /// <param name="bucketType">The name of the bucket type containing the <paramref name="bucket"/>.</param>
-        /// <param name="bucket">The name of the bucket containing the <paramref name="key"/>.</param>
-        /// <param name="key">The key of the data type object.</param>
-        /// <param name="options">The <see cref="RiakDtFetchOptions"/> responsible for configuring the semantics of this data type fetch request.</param>
-        /// <returns>A <see cref="RiakCounterResult"/> detailing the operation result and current counter value.</returns>
-        RiakCounterResult DtFetchCounter(string bucketType, string bucket, string key, RiakDtFetchOptions options = null);
-
-        /// <summary>
-        /// Fetch a Counter Data Type object from the provided address.
-        /// </summary>
-        /// <param name="objectId">The <see cref="RiakObjectId"/> of the counter to fetch.</param>
-        /// <param name="options">The <see cref="RiakDtFetchOptions"/> responsible for configuring the semantics of this data type fetch request.</param>
-        /// <returns>A <see cref="RiakCounterResult"/> detailing the operation result and current counter value.</returns>
-        RiakCounterResult DtFetchCounter(RiakObjectId objectId, RiakDtFetchOptions options = null);
-
-        /// <summary>
-        /// Update a Counter Data Type object at the provided address.
-        /// </summary>
-        /// <param name="bucketType">The name of the bucket type containing the <paramref name="bucket"/>.</param>
-        /// <param name="bucket">The name of the bucket containing the <paramref name="key"/>.</param>
-        /// <param name="key">The key of the data type object.</param>
-        /// <param name="amount">The delta to apply to the counter. To add 1 to the counter, use "1". To subtract 5, use "-5".</param>
-        /// <param name="options">The <see cref="RiakDtUpdateOptions"/> responsible for configuring the semantics of this data type update request.</param>
-        /// <returns>A <see cref="RiakCounterResult"/> detailing the operation result and current counter value.</returns>
-        RiakCounterResult DtUpdateCounter(string bucketType, string bucket, string key, long amount, RiakDtUpdateOptions options = null);
-
-        /// <summary>
-        /// Update a Counter Data Type object at the provided address.
-        /// </summary>
-        /// <param name="objectId">The <see cref="RiakObjectId"/> of the counter to update.</param>
-        /// <param name="amount">The delta to apply to the counter. To add 1 to the counter, use "1". To subtract 5, use "-5".</param>
-        /// <param name="options">The <see cref="RiakDtUpdateOptions"/> responsible for configuring the semantics of this data type update request.</param>
-        /// <returns>A <see cref="RiakCounterResult"/> detailing the operation result and current counter value.</returns>
-        RiakCounterResult DtUpdateCounter(RiakObjectId objectId, long amount, RiakDtUpdateOptions options = null);
-
-        /// <summary>
-        /// Fetch a Set Data Type object at the provided address.
-        /// </summary>
-        /// <param name="bucketType">The name of the bucket type containing the <paramref name="bucket"/>.</param>
-        /// <param name="bucket">The name of the bucket containing the <paramref name="key"/>.</param>
-        /// <param name="key">The key of the data type object.</param>
-        /// <param name="options">The <see cref="RiakDtFetchOptions"/> responsible for configuring the semantics of this data type fetch request.</param>
-        /// <returns>A <see cref="RiakDtSetResult"/> detailing the operation result, current context, and set values.</returns>
-        RiakDtSetResult DtFetchSet(string bucketType, string bucket, string key, RiakDtFetchOptions options = null);
-
-        /// <summary>
-        /// Fetch a Set Data Type object at the provided address.
-        /// </summary>
-        /// <param name="objectId">The <see cref="RiakObjectId"/> of the set to fetch.</param>
-        /// <param name="options">The <see cref="RiakDtFetchOptions"/> responsible for configuring the semantics of this data type fetch request.</param>
-        /// <returns>A <see cref="RiakDtSetResult"/> detailing the operation result, current context, and set values.</returns>
-        RiakDtSetResult DtFetchSet(RiakObjectId objectId, RiakDtFetchOptions options = null);
-
-        /// <summary>
-        /// Update a Set Data Type object at the provided address.
-        /// </summary>
-        /// <typeparam name="T">The type of the objects being stored in the set.</typeparam>
-        /// <param name="bucketType">The name of the bucket type containing the <paramref name="bucket"/>.</param>
-        /// <param name="bucket">The name of the bucket containing the <paramref name="key"/>.</param>
-        /// <param name="key">The key of the data type object.</param>
-        /// <param name="serialize">A delegate to serialize the <paramref name="adds"/> and <paramref name="removes"/> lists from objects of type <typeparamref name="T"/> to a byte[].</param>
-        /// <param name="context">The most recent known byte[] data type context for this object, to base this operation off of for causality merging.</param>
-        /// <param name="adds">A <see cref="List{T}"/> of items to add to the set.</param>
-        /// <param name="removes">A <see cref="List{T}"/> of items to remove from the set.</param>
-        /// <param name="options">The <see cref="RiakDtUpdateOptions"/> responsible for configuring the semantics of this data type update request.</param>
-        /// <returns>A <see cref="RiakDtSetResult"/> detailing the operation result, current context, and set values.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="context"/> cannot be null if removing any item from the set.</exception>
-        RiakDtSetResult DtUpdateSet<T>(string bucketType, string bucket, string key, SerializeObjectToByteArray<T> serialize, byte[] context, List<T> adds = null, List<T> removes = null, RiakDtUpdateOptions options = null);
-
-        /// <summary>
-        /// Update a Set Data Type object at the provided address.
-        /// </summary>
-        /// <typeparam name="T">The type of the objects being stored in the set.</typeparam>
-        /// <param name="objectId">The <see cref="RiakObjectId"/> of the set to update.</param>
-        /// <param name="serialize">A delegate to serialize the <paramref name="adds"/> and <paramref name="removes"/> lists from objects of type <typeparamref name="T"/> to a byte[].</param>
-        /// <param name="context">The most recent known byte[] data type context for this object, to base this operation off of for causality merging.</param>
-        /// <param name="adds">A <see cref="List{T}"/> of items to add to the set.</param>
-        /// <param name="removes">A <see cref="List{T}"/> of items to remove from the set.</param>
-        /// <param name="options">The <see cref="RiakDtUpdateOptions"/> responsible for configuring the semantics of this data type update request.</param>
-        /// <returns>A <see cref="RiakDtSetResult"/> detailing the operation result, current context, and set values.</returns>
-        /// <remarks>Removal of any item from the set requires that the <paramref name="context"/> be non-null, or else an <see cref="ArgumentNullException"/> will be thrown.</remarks>
-        /// <exception cref="ArgumentNullException"><paramref name="context"/> cannot be null if removing any item from the set.</exception>
-        RiakDtSetResult DtUpdateSet<T>(RiakObjectId objectId, SerializeObjectToByteArray<T> serialize, byte[] context, List<T> adds = null, List<T> removes = null, RiakDtUpdateOptions options = null);
-
-        /// <summary>
-        /// Fetch a Map Data Type object at the provided address.
-        /// </summary>
-        /// <param name="bucketType">The name of the bucket type containing the <paramref name="bucket"/>.</param>
-        /// <param name="bucket">The name of the bucket containing the <paramref name="key"/>.</param>
-        /// <param name="key">The key of the data type object.</param>
-        /// <param name="options">The <see cref="RiakDtFetchOptions"/> responsible for configuring the semantics of this data type fetch request.</param>
-        /// <returns>A <see cref="RiakDtMapResult"/> detailing the operation result, current context, and map values.</returns>
-        RiakDtMapResult DtFetchMap(string bucketType, string bucket, string key, RiakDtFetchOptions options = null);
-
-        /// <summary>
-        /// Fetch a Map Data Type object at the provided address.
-        /// </summary>
-        /// <param name="objectId">The <see cref="RiakObjectId"/> of the map to fetch.</param>
-        /// <param name="options">The <see cref="RiakDtFetchOptions"/> responsible for configuring the semantics of this data type fetch request.</param>
-        /// <returns>A <see cref="RiakDtMapResult"/> detailing the operation result, current context, and map values.</returns>
-        RiakDtMapResult DtFetchMap(RiakObjectId objectId, RiakDtFetchOptions options = null);
-
-        /// <summary>
-        /// Update a Map Data Type object at the provided address.
-        /// </summary>
-        /// <typeparam name="T">The type of the objects being stored in the map.</typeparam>
-        /// <param name="bucketType">The name of the bucket type containing the <paramref name="bucket"/>.</param>
-        /// <param name="bucket">The name of the bucket containing the <paramref name="key"/>.</param>
-        /// <param name="key">The key of the data type object.</param>
-        /// <param name="serialize">A delegate to serialize the <paramref name="updates"/> and <paramref name="removes"/> operation lists from objects of type <typeparamref name="T"/> to a byte[].</param>
-        /// <param name="context">The most recent known byte[] data type context for this object, to base this operation off of for causality merging.</param>
-        /// <param name="removes">A <see cref="List{T}"/> of <see cref="RiakDtMapField"/> to specify which fields to remove.</param>
-        /// <param name="updates">A <see cref="List{T}"/> of <see cref="MapUpdate"/> to specify what updates to perform on the map.</param>
-        /// <param name="options">The <see cref="RiakDtUpdateOptions"/> responsible for configuring the semantics of this data type update request.</param>
-        /// <returns>A <see cref="RiakDtMapResult"/> detailing the operation result, current context, and map values.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="context"/> cannot be null if removing any field from the map, nested maps, or removing any item from nested sets.</exception>
-        RiakDtMapResult DtUpdateMap<T>(string bucketType, string bucket, string key, SerializeObjectToByteArray<T> serialize, byte[] context, List<RiakDtMapField> removes = null, List<MapUpdate> updates = null, RiakDtUpdateOptions options = null);
-
-        /// <summary>
-        /// Update a Map Data Type object at the provided address.
-        /// </summary>
-        /// <typeparam name="T">The type of the objects being stored in the map.</typeparam>
-        /// <param name="objectId">The <see cref="RiakObjectId"/> of the map to update.</param>
-        /// <param name="serialize">A delegate to serialize the <paramref name="updates"/> and <paramref name="removes"/> operation lists from objects of type <typeparamref name="T"/> to a byte[].</param>
-        /// <param name="context">The most recent known byte[] data type context for this object, to base this operation off of for causality merging.</param>
-        /// <param name="removes">A <see cref="List{T}"/> of <see cref="RiakDtMapField"/> to specify which fields to remove.</param>
-        /// <param name="updates">A <see cref="List{T}"/> of <see cref="MapUpdate"/> to specify what updates to perform on the map.</param>
-        /// <param name="options">The <see cref="RiakDtUpdateOptions"/> responsible for configuring the semantics of this data type update request.</param>
-        /// <returns>A <see cref="RiakDtMapResult"/> detailing the operation result, current context, and map values.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="context"/> cannot be null if removing any field from the map, nested maps, or removing any item from nested sets.</exception>
-        RiakDtMapResult DtUpdateMap<T>(RiakObjectId objectId, SerializeObjectToByteArray<T> serialize, byte[] context, List<RiakDtMapField> removes = null, List<MapUpdate> updates = null, RiakDtUpdateOptions options = null);
-
-        /// <summary>
-        /// Fetches the specified search index from Riak. 
-        /// </summary>
-        /// <param name="indexName">The name of the index to retrieve.</param>
-        /// <returns>A <see cref="RiakResult{T}"/> containing a <see cref="SearchIndexResult"/>.</returns>
-        RiakResult<SearchIndexResult> GetSearchIndex(string indexName);
-
-        /// <summary>
-        /// Saves the specified <see cref="SearchIndex"/> to Riak.
-        /// </summary>
-        /// <param name="index">The <see cref="SearchIndex"/> to save.</param>
-        /// <returns>A <see cref="RiakResult"/> detailing the success or failure of the operation.</returns>
-        RiakResult PutSearchIndex(SearchIndex index);
-
-        /// <summary>
-        /// Deletes the specified <see cref="SearchIndex"/> from Riak.
-        /// </summary>
-        /// <param name="indexName">THe name of the search index to delete.</param>
-        /// <returns>A <see cref="RiakResult"/> detailing the success or failure of the operation.</returns>
-        RiakResult DeleteSearchIndex(string indexName);
-
-        /// <summary>
-        /// Fetches the specified <see cref="SearchSchema"/> from Riak.
-        /// </summary>
-        /// <param name="schemaName">The name of the schema to fetch.</param>
-        /// <returns>A <see cref="RiakResult{T}"/> containing a <see cref="SearchSchema"/>.</returns>
-        RiakResult<SearchSchema> GetSearchSchema(string schemaName);
-
-        /// <summary>
-        /// Stores the provided <see cref="SearchSchema"/> in Riak. 
-        /// </summary>
-        /// <param name="schema">The schema to store.</param>
-        /// <returns>A <see cref="RiakResult"/> detailing the success or failure of the operation.</returns>
-        RiakResult PutSearchSchema(SearchSchema schema);
-        */
+        /// <param name="command">The command to execute.</param>
+        /// <returns>
+        /// A <see cref="Task{RiakResult}"/>, which will indicate success. The passed in command will contain the response.
+        /// </returns>
+        Task<RiakResult> Execute(IRiakCommand command);
     }
 }

@@ -51,7 +51,7 @@ namespace RiakClient
         /// <param name="retryAttempts">The number of times to retry an operation.</param>
         /// <returns>The result of the <paramref name="useFun"/> delegate.</returns>
         RiakResult<TResult> UseConnection<TResult>(Func<IRiakConnection, RiakResult<TResult>> useFun, int retryAttempts);
-        
+
         /// <summary>
         /// Executes a delegate function using a <see cref="IRiakConnection"/>, and returns the results.
         /// Retries if possible for certain error states.

@@ -25,7 +25,7 @@ namespace RiakClientTests.Models
     using RiakClient.Models;
     using RiakClient.Models.CommitHook;
 
-    [TestFixture]
+    [TestFixture, UnitTest]
     public class RiakBucketPropertyTests
     {
         [Test]

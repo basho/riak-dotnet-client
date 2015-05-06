@@ -23,7 +23,7 @@ namespace RiakClientTests.Live.IdleTests
     using RiakClient;
     using RiakClient.Comms;
 
-    [TestFixture]
+    [TestFixture, IntegrationTest]
     [Ignore("Idling is undergoing rework, so these tests are currently invalid")]
     public class WhenConnectionGoesIdle : LiveRiakConnectionTestBase
     {

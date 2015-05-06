@@ -31,7 +31,7 @@ namespace RiakClientTests.Live.LoadTests
     using RiakClient.Models.MapReduce;
     using RiakClient.Models.MapReduce.Inputs;
 
-    [TestFixture]
+    [TestFixture, IntegrationTest]
     public class WhenUnderLoad : LiveRiakConnectionTestBase
     {
         // thread count is currently set to the same

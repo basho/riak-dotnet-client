@@ -323,7 +323,7 @@ namespace RiakClient
         /// <b>Callers should fully enumerate the collection or else close the connection when finished.</b>
         /// </remarks>
         RiakResult<IEnumerable<string>> StreamListBuckets();
-        
+
         /// <summary>
         /// Lists all keys in the specified <paramref name="bucket"/>.
         /// </summary>
@@ -338,7 +338,7 @@ namespace RiakClient
         /// a list of keys. This operation, while cheaper in Riak 1.0 than in earlier versions of Riak, should be avoided.
         /// </remarks>
         RiakResult<IEnumerable<string>> ListKeys(string bucket);
-        
+
         /// <summary>
         /// Lists all keys in the specified <paramref name="bucket"/>.
         /// </summary>
@@ -572,6 +572,7 @@ namespace RiakClient
         /// <param name="key">The key of the data type object.</param>
         /// <param name="options">The <see cref="RiakDtFetchOptions"/> responsible for configuring the semantics of this data type fetch request.</param>
         /// <returns>A <see cref="RiakCounterResult"/> detailing the operation result and current counter value.</returns>
+        [System.Obsolete("RiakDt is deprecated. Please use Commands/CRDT namespace.")]
         RiakCounterResult DtFetchCounter(string bucketType, string bucket, string key, RiakDtFetchOptions options = null);
 
         /// <summary>
@@ -580,6 +581,7 @@ namespace RiakClient
         /// <param name="objectId">The <see cref="RiakObjectId"/> of the counter to fetch.</param>
         /// <param name="options">The <see cref="RiakDtFetchOptions"/> responsible for configuring the semantics of this data type fetch request.</param>
         /// <returns>A <see cref="RiakCounterResult"/> detailing the operation result and current counter value.</returns>
+        [System.Obsolete("RiakDt is deprecated. Please use Commands/CRDT namespace.")]
         RiakCounterResult DtFetchCounter(RiakObjectId objectId, RiakDtFetchOptions options = null);
 
         /// <summary>
@@ -591,6 +593,7 @@ namespace RiakClient
         /// <param name="amount">The delta to apply to the counter. To add 1 to the counter, use "1". To subtract 5, use "-5".</param>
         /// <param name="options">The <see cref="RiakDtUpdateOptions"/> responsible for configuring the semantics of this data type update request.</param>
         /// <returns>A <see cref="RiakCounterResult"/> detailing the operation result and current counter value.</returns>
+        [System.Obsolete("RiakDt is deprecated. Please use Commands/CRDT namespace.")]
         RiakCounterResult DtUpdateCounter(string bucketType, string bucket, string key, long amount, RiakDtUpdateOptions options = null);
 
         /// <summary>
@@ -600,6 +603,7 @@ namespace RiakClient
         /// <param name="amount">The delta to apply to the counter. To add 1 to the counter, use "1". To subtract 5, use "-5".</param>
         /// <param name="options">The <see cref="RiakDtUpdateOptions"/> responsible for configuring the semantics of this data type update request.</param>
         /// <returns>A <see cref="RiakCounterResult"/> detailing the operation result and current counter value.</returns>
+        [System.Obsolete("RiakDt is deprecated. Please use Commands/CRDT namespace.")]
         RiakCounterResult DtUpdateCounter(RiakObjectId objectId, long amount, RiakDtUpdateOptions options = null);
 
         /// <summary>
@@ -610,6 +614,7 @@ namespace RiakClient
         /// <param name="key">The key of the data type object.</param>
         /// <param name="options">The <see cref="RiakDtFetchOptions"/> responsible for configuring the semantics of this data type fetch request.</param>
         /// <returns>A <see cref="RiakDtSetResult"/> detailing the operation result, current context, and set values.</returns>
+        [System.Obsolete("RiakDt is deprecated. Please use Commands/CRDT namespace.")]
         RiakDtSetResult DtFetchSet(string bucketType, string bucket, string key, RiakDtFetchOptions options = null);
 
         /// <summary>
@@ -618,6 +623,7 @@ namespace RiakClient
         /// <param name="objectId">The <see cref="RiakObjectId"/> of the set to fetch.</param>
         /// <param name="options">The <see cref="RiakDtFetchOptions"/> responsible for configuring the semantics of this data type fetch request.</param>
         /// <returns>A <see cref="RiakDtSetResult"/> detailing the operation result, current context, and set values.</returns>
+        [System.Obsolete("RiakDt is deprecated. Please use Commands/CRDT namespace.")]
         RiakDtSetResult DtFetchSet(RiakObjectId objectId, RiakDtFetchOptions options = null);
 
         /// <summary>
@@ -634,6 +640,7 @@ namespace RiakClient
         /// <param name="options">The <see cref="RiakDtUpdateOptions"/> responsible for configuring the semantics of this data type update request.</param>
         /// <returns>A <see cref="RiakDtSetResult"/> detailing the operation result, current context, and set values.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="context"/> cannot be null if removing any item from the set.</exception>
+        [System.Obsolete("RiakDt is deprecated. Please use Commands/CRDT namespace.")]
         RiakDtSetResult DtUpdateSet<T>(string bucketType, string bucket, string key, SerializeObjectToByteArray<T> serialize, byte[] context, List<T> adds = null, List<T> removes = null, RiakDtUpdateOptions options = null);
 
         /// <summary>
@@ -649,6 +656,7 @@ namespace RiakClient
         /// <returns>A <see cref="RiakDtSetResult"/> detailing the operation result, current context, and set values.</returns>
         /// <remarks>Removal of any item from the set requires that the <paramref name="context"/> be non-null, or else an <see cref="ArgumentNullException"/> will be thrown.</remarks>
         /// <exception cref="ArgumentNullException"><paramref name="context"/> cannot be null if removing any item from the set.</exception>
+        [System.Obsolete("RiakDt is deprecated. Please use Commands/CRDT namespace.")]
         RiakDtSetResult DtUpdateSet<T>(RiakObjectId objectId, SerializeObjectToByteArray<T> serialize, byte[] context, List<T> adds = null, List<T> removes = null, RiakDtUpdateOptions options = null);
 
         /// <summary>
@@ -659,6 +667,7 @@ namespace RiakClient
         /// <param name="key">The key of the data type object.</param>
         /// <param name="options">The <see cref="RiakDtFetchOptions"/> responsible for configuring the semantics of this data type fetch request.</param>
         /// <returns>A <see cref="RiakDtMapResult"/> detailing the operation result, current context, and map values.</returns>
+        [System.Obsolete("RiakDt is deprecated. Please use Commands/CRDT namespace.")]
         RiakDtMapResult DtFetchMap(string bucketType, string bucket, string key, RiakDtFetchOptions options = null);
 
         /// <summary>
@@ -667,6 +676,7 @@ namespace RiakClient
         /// <param name="objectId">The <see cref="RiakObjectId"/> of the map to fetch.</param>
         /// <param name="options">The <see cref="RiakDtFetchOptions"/> responsible for configuring the semantics of this data type fetch request.</param>
         /// <returns>A <see cref="RiakDtMapResult"/> detailing the operation result, current context, and map values.</returns>
+        [System.Obsolete("RiakDt is deprecated. Please use Commands/CRDT namespace.")]
         RiakDtMapResult DtFetchMap(RiakObjectId objectId, RiakDtFetchOptions options = null);
 
         /// <summary>
@@ -683,6 +693,7 @@ namespace RiakClient
         /// <param name="options">The <see cref="RiakDtUpdateOptions"/> responsible for configuring the semantics of this data type update request.</param>
         /// <returns>A <see cref="RiakDtMapResult"/> detailing the operation result, current context, and map values.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="context"/> cannot be null if removing any field from the map, nested maps, or removing any item from nested sets.</exception>
+        [System.Obsolete("RiakDt is deprecated. Please use Commands/CRDT namespace.")]
         RiakDtMapResult DtUpdateMap<T>(string bucketType, string bucket, string key, SerializeObjectToByteArray<T> serialize, byte[] context, List<RiakDtMapField> removes = null, List<MapUpdate> updates = null, RiakDtUpdateOptions options = null);
 
         /// <summary>
@@ -697,6 +708,7 @@ namespace RiakClient
         /// <param name="options">The <see cref="RiakDtUpdateOptions"/> responsible for configuring the semantics of this data type update request.</param>
         /// <returns>A <see cref="RiakDtMapResult"/> detailing the operation result, current context, and map values.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="context"/> cannot be null if removing any field from the map, nested maps, or removing any item from nested sets.</exception>
+        [System.Obsolete("RiakDt is deprecated. Please use Commands/CRDT namespace.")]
         RiakDtMapResult DtUpdateMap<T>(RiakObjectId objectId, SerializeObjectToByteArray<T> serialize, byte[] context, List<RiakDtMapField> removes = null, List<MapUpdate> updates = null, RiakDtUpdateOptions options = null);
 
         /// <summary>

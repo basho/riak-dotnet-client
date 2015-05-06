@@ -28,7 +28,6 @@ namespace RiakClient.Models
     /// Represents a collection of optional properties when executing secondary index queries.
     /// Each property changes the semantics of the operation slightly. 
     /// </summary>
-    [ComVisible(false)]
     public class RiakIndexGetOptions : RiakOptions<RiakIndexGetOptions>
     {
         /// <summary>

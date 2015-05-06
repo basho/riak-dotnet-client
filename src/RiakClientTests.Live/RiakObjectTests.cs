@@ -99,7 +99,7 @@ namespace RiakClientTests.Live
         }
     }
 
-    [TestFixture]
+    [TestFixture, IntegrationTest]
     public class WhenSavingObjects : RiakObjectTestBase
     {
         private string Bucket;
@@ -149,7 +149,7 @@ namespace RiakClientTests.Live
         }
     }
 
-    [TestFixture]
+    [TestFixture, IntegrationTest]
     public class WhenCreatingLinks : RiakObjectTestBase
     {
         [SetUp]
@@ -294,7 +294,7 @@ namespace RiakClientTests.Live
         }
     }
     
-    [TestFixture]
+    [TestFixture, IntegrationTest]
     public class WhenSerializingObjects : RiakObjectTestBase
     {
         [ProtoContract]

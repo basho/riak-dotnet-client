@@ -17,7 +17,7 @@
 // under the License.
 // </copyright>
 
-namespace RiakClient.Models
+namespace RiakClient
 {
     using System;
     using System.Collections.Generic;
@@ -161,7 +161,19 @@ namespace RiakClient.Models
         [CLSCompliant(false)]
         public static implicit operator uint(Quorum quorum)
         {
-            return (uint)quorum.quorumValue;
+            /*
+             * NB: this is the default since the defaultValue attribute for quorum values
+             * is default(uint) as well.
+             * See DtUpdateReq, for instance.
+             */
+            uint rv = default(uint);
+
+            if (quorum != null)
+            {
+                rv = (uint)quorum.quorumValue;
+            }
+
+            return rv;
         }
 
         /// <summary>
@@ -240,10 +252,10 @@ namespace RiakClient.Models
         /// </summary>
         public static class WellKnown
         {
-            private static readonly Quorum OneStatic = new Quorum(Models.Quorum.OneAsInt);
-            private static readonly Quorum QuorumStatic = new Quorum(Models.Quorum.QuorumAsInt);
-            private static readonly Quorum AllStatic = new Quorum(Models.Quorum.AllAsInt);
-            private static readonly Quorum DefaultStatic = new Quorum(Models.Quorum.DefaultAsInt);
+            private static readonly Quorum OneStatic = new Quorum(Quorum.OneAsInt);
+            private static readonly Quorum QuorumStatic = new Quorum(Quorum.QuorumAsInt);
+            private static readonly Quorum AllStatic = new Quorum(Quorum.AllAsInt);
+            private static readonly Quorum DefaultStatic = new Quorum(Quorum.DefaultAsInt);
 
             /// <summary>
             /// The "one" Quorum instance.

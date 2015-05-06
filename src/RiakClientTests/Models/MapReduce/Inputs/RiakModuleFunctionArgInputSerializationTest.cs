@@ -23,7 +23,7 @@ namespace RiakClientTests.Models.MapReduce.Inputs
 {
     using NUnit.Framework;
 
-    [TestFixture]
+    [TestFixture, UnitTest]
     public class RiakModuleFunctionArgInputSerializationTest : MapReduceSerializationTestsBase
     {
         [Test]

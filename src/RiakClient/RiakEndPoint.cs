@@ -52,13 +52,13 @@ namespace RiakClient
         /// <inheritdoc />
         public RiakResult UseConnection(Func<IRiakConnection, RiakResult> useFun, int retryAttempts)
         {
-            return UseConnection(useFun, RiakResult.Error, retryAttempts);
+            return UseConnection(useFun, RiakResult.FromError, retryAttempts);
         }
 
         /// <inheritdoc />
         public RiakResult<TResult> UseConnection<TResult>(Func<IRiakConnection, RiakResult<TResult>> useFun, int retryAttempts)
         {
-            return UseConnection(useFun, RiakResult<TResult>.Error, retryAttempts);
+            return UseConnection(useFun, RiakResult<TResult>.FromError, retryAttempts);
         }
 
         /// <summary>

@@ -22,7 +22,7 @@ using RiakClient.Config;
 
 namespace RiakClientTests.Auth
 {
-    [TestFixture]
+    [TestFixture, UnitTest]
     public class CertificateTests : AuthTestBase
     {
         [Test]

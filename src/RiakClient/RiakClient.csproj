@@ -69,6 +69,31 @@
     <Compile Include="Auth\RiakSecurityManager.cs">
       <ExcludeFromStyleCop>False</ExcludeFromStyleCop>
     </Compile>
+    <Compile Include="Commands\CRDT\FetchSetOptions.cs" />
+    <Compile Include="Commands\CRDT\SetResponse.cs" />
+    <Compile Include="Commands\CRDT\FetchSet.cs" />
+    <Compile Include="Commands\CRDT\Response.cs" />
+    <Compile Include="Commands\CRDT\Response{TValue}.cs" />
+    <Compile Include="Commands\CRDT\FetchCommandBuilder.cs" />
+    <Compile Include="Commands\CRDT\FetchCommand{TResponse}.cs" />
+    <Compile Include="Commands\CRDT\FetchCounter.cs" />
+    <Compile Include="Commands\CRDT\FetchCommandOptions.cs" />
+    <Compile Include="Commands\CRDT\FetchMap.cs" />
+    <Compile Include="Commands\CRDT\FetchCounterOptions.cs" />
+    <Compile Include="Commands\CRDT\CounterResponse.cs" />
+    <Compile Include="Commands\CRDT\MapResponse.cs" />
+    <Compile Include="Commands\CRDT\Map.cs" />
+    <Compile Include="Commands\CRDT\UpdateCommandBuilder.cs" />
+    <Compile Include="Commands\CRDT\UpdateSetOptions.cs" />
+    <Compile Include="Commands\CRDT\UpdateSet.cs" />
+    <Compile Include="Commands\CRDT\UpdateCounter.cs" />
+    <Compile Include="Commands\CRDT\UpdateCommandOptions.cs" />
+    <Compile Include="Commands\CRDT\UpdateCommand{TResponse}.cs" />
+    <Compile Include="Commands\CRDT\UpdateMap.cs" />
+    <Compile Include="Commands\CRDT\FetchMapOptions.cs" />
+    <Compile Include="Commands\CRDT\UpdateCounterOptions.cs" />
+    <Compile Include="Commands\CRDT\UpdateMapOptions.cs" />
+    <Compile Include="Commands\IRiakCommand.cs" />
     <Compile Include="Comms\IRiakConnectionManager.cs" />
     <Compile Include="Comms\LoadBalancing\ILoadBalancingStrategy.cs" />
     <Compile Include="Comms\LoadBalancing\RoundRobinStrategy.cs" />
@@ -91,9 +116,10 @@
     <Compile Include="IRiakClient.cs" />
     <Compile Include="Messages\RpbClasses.cs" />
     <Compile Include="Models\CommitHook\IRiakCommitHook.cs" />
+    <Compile Include="RiakString.cs" />
     <Compile Include="Timeout.cs" />
-    <Compile Include="Models\NVal.cs" />
-    <Compile Include="Models\Quorum.cs" />
+    <Compile Include="NVal.cs" />
+    <Compile Include="Quorum.cs" />
     <Compile Include="Models\RiakBinIndexId.cs" />
     <Compile Include="Models\RiakDt\CounterOperation.cs" />
     <Compile Include="Models\RiakDt\MapOperation.cs" />

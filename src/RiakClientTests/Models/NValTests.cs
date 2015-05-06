@@ -20,9 +20,9 @@ namespace RiakClientTests.Models
 {
     using System;
     using NUnit.Framework;
-    using RiakClient.Models;
+    using RiakClient;
 
-    [TestFixture]
+    [TestFixture, UnitTest]
     public class NValTests
     {
         private static readonly Random r = new Random();

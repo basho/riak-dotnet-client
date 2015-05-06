@@ -25,7 +25,7 @@ using RiakClient.Models.MapReduce.Inputs;
 
 namespace RiakClientTests.Models.MapReduce.Inputs
 {
-    [TestFixture]
+    [TestFixture, UnitTest]
     public class BucketKeyInputSerializationTests : MapReduceSerializationTestsBase
     {
         private const string SerializedRiakBucketKeyInput =

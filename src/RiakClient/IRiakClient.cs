@@ -20,6 +20,7 @@
 namespace RiakClient
 {
     using System;
+    using Commands;
 
     /// <summary>
     /// Subinterface of <see cref="IRiakBatchClient"/>. 
@@ -46,5 +47,14 @@ namespace RiakClient
         /// <param name="batchFunction">A func that wraps all the operations to batch together.</param>
         /// <returns>The return value of <paramref name="batchFun"/>.</returns>
         T Batch<T>(Func<IRiakBatchClient, T> batchFunction);
+
+        /// <summary>
+        /// Used to execute a command against a Riak cluster.
+        /// </summary>
+        /// <param name="command">The command to execute.</param>
+        /// <returns>
+        /// A <see cref="RiakResult"/>, which will indicate success. The passed in command will contain the response.
+        /// </returns>
+        RiakResult Execute(IRiakCommand command);
     }
 }

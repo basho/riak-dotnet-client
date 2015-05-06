@@ -110,12 +110,12 @@ namespace RiakClient
         {
             if (retryAttempts < 0)
             {
-                return RiakResult<IEnumerable<TResult>>.Error(ResultCode.NoRetries, "Unable to access a connection on the cluster.", false);
+                return RiakResult<IEnumerable<TResult>>.FromError(ResultCode.NoRetries, "Unable to access a connection on the cluster.", false);
             }
 
             if (disposing)
             {
-                return RiakResult<IEnumerable<TResult>>.Error(ResultCode.ShuttingDown, "System currently shutting down", true);
+                return RiakResult<IEnumerable<TResult>>.FromError(ResultCode.ShuttingDown, "System currently shutting down", true);
             }
 
             var node = loadBalancer.SelectNode();
@@ -146,7 +146,7 @@ namespace RiakClient
                 return result;
             }
 
-            return RiakResult<IEnumerable<TResult>>.Error(ResultCode.ClusterOffline, "Unable to access functioning Riak node", true);
+            return RiakResult<IEnumerable<TResult>>.FromError(ResultCode.ClusterOffline, "Unable to access functioning Riak node", true);
         }
 
         protected override void Dispose(bool disposing)

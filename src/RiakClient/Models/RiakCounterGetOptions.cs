@@ -25,7 +25,6 @@ namespace RiakClient.Models
     /// <summary>
     /// A collection of optional settings for fetching a 1.4-style counter from Riak.
     /// </summary>
-    [ComVisible(false)]
     public class RiakCounterGetOptions : RiakOptions<RiakCounterGetOptions>
     {
         /// <summary>

@@ -62,6 +62,7 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Examples.cs" />
     <Compile Include="Dev\Advanced\SearchSchemaExamples.cs" />
     <Compile Include="Dev\Advanced\BucketTypes.cs" />
     <Compile Include="Dev\DataModeling\EntityManager.cs" />

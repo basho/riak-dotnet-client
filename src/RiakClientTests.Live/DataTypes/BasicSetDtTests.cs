@@ -1,4 +1,5 @@
-﻿// Copyright 2011 - OJ Reeves & Jeremiah Peschka
+﻿// <copyright file="BasicSetDtTests.cs" company="Basho Technologies, Inc.">
+// Copyright 2015 - Basho Technologies
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -13,15 +14,18 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
+// </copyright>
 
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using RiakClient.Models;
 
+#pragma warning disable 618
+
 namespace RiakClientTests.Live.DataTypes
 {
-    [TestFixture]
+    [TestFixture, IntegrationTest]
     public class BasicSetDtTests : DataTypeTestsBase
     {
         [Test]
@@ -72,3 +76,5 @@ namespace RiakClientTests.Live.DataTypes
         }
     }
 }
+
+#pragma warning restore 618

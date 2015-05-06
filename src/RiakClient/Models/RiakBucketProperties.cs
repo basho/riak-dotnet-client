@@ -34,7 +34,6 @@ namespace RiakClient.Models
     /// <remarks>
     /// When creating new objects, any properties not set will default to the server default values upon saving.
     /// </remarks>
-    [ComVisible(false)]
     public class RiakBucketProperties : RiakOptions<RiakBucketProperties>
     {
         private bool? addHooks;

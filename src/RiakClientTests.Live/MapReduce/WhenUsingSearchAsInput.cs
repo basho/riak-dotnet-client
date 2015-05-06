@@ -33,7 +33,7 @@ namespace RiakClientTests.Live.MapReduce
     using RiakClient.Util;
     using Extensions;
 
-    [TestFixture]
+    [TestFixture, IntegrationTest]
     public class WhenUsingSearchAsInput : RiakMapReduceTestBase
     {
         private const string BucketType = "search_type";

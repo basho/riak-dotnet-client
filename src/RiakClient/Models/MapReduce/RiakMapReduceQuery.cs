@@ -52,7 +52,8 @@ namespace RiakClient.Models.MapReduce
         /// This overload defaults the content-type to "application/json", with the default timeout.
         /// </remarks>
 #pragma warning disable 618
-        public RiakMapReduceQuery() : this(RiakConstants.ContentTypes.ApplicationJson, null)
+        public RiakMapReduceQuery()
+            : this(RiakConstants.ContentTypes.ApplicationJson, null)
 #pragma warning restore 618
         {
         }
@@ -286,6 +287,7 @@ namespace RiakClient.Models.MapReduce
             return this;
         }
 
+#pragma warning disable 618
         /// <summary>
         /// Add a link phase to the list of phases.
         /// </summary>
@@ -309,7 +311,6 @@ namespace RiakClient.Models.MapReduce
             return this;
         }
 
-#pragma warning disable 618
         /// <summary>
         /// Add a key filter input to the inputs.
         /// </summary>

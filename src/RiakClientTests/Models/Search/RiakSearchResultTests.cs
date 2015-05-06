@@ -23,7 +23,7 @@ namespace RiakClientTests.Models.Search
     using NUnit.Framework;
     using RiakClient.Models.Search;
 
-    [TestFixture]
+    [TestFixture, UnitTest]
     public class RiakSearchResultTests
     {
 

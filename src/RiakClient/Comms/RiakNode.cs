@@ -47,12 +47,12 @@ namespace RiakClient.Comms
 
         public RiakResult UseConnection(Func<IRiakConnection, RiakResult> useFun)
         {
-            return UseConnection(useFun, RiakResult.Error);
+            return UseConnection(useFun, RiakResult.FromError);
         }
 
         public RiakResult<TResult> UseConnection<TResult>(Func<IRiakConnection, RiakResult<TResult>> useFun)
         {
-            return UseConnection(useFun, RiakResult<TResult>.Error);
+            return UseConnection(useFun, RiakResult<TResult>.FromError);
         }
 
         public RiakResult<IEnumerable<TResult>> UseDelayedConnection<TResult>(Func<IRiakConnection, Action, RiakResult<IEnumerable<TResult>>> useFun)
@@ -60,7 +60,7 @@ namespace RiakClient.Comms
         {
             if (disposing)
             {
-                return RiakResult<IEnumerable<TResult>>.Error(ResultCode.ShuttingDown, "Connection is shutting down", true);
+                return RiakResult<IEnumerable<TResult>>.FromError(ResultCode.ShuttingDown, "Connection is shutting down", true);
             }
 
             var response = connections.DelayedConsume(useFun);
@@ -69,7 +69,7 @@ namespace RiakClient.Comms
                 return response.Item2;
             }
 
-            return RiakResult<IEnumerable<TResult>>.Error(ResultCode.NoConnections, "Unable to acquire connection", true);
+            return RiakResult<IEnumerable<TResult>>.FromError(ResultCode.NoConnections, "Unable to acquire connection", true);
         }
 
         public void Dispose()

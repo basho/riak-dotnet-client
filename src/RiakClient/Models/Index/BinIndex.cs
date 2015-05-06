@@ -26,7 +26,6 @@ namespace RiakClient.Models.Index
     /// <summary>
     /// A binary secondary index for a <see cref="RiakObject"/>.
     /// </summary>
-    [ComVisible(false)]
     public class BinIndex : SecondaryIndex<BinIndex, string>
     {
         internal BinIndex(RiakObject container, string name)

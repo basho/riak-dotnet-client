@@ -16,10 +16,13 @@
 // under the License.
 // </copyright>
 
-#pragma warning disable 1591
 namespace RiakClient.Messages
 {
     using System;
+
+    public abstract class RpbReq { }
+
+    public abstract class RpbResp { }
 
     [CLSCompliant(false)]
     public sealed partial class RpbErrorResp { }
@@ -57,11 +60,11 @@ namespace RiakClient.Messages
     public sealed partial class MapEntry { }
 
     [CLSCompliant(false)]
-    public sealed partial class DtFetchReq { }
+    public sealed partial class DtFetchReq : RpbReq { }
 
     public sealed partial class DtValue { }
 
-    public sealed partial class DtFetchResp { }
+    public sealed partial class DtFetchResp : RpbResp { }
 
     public sealed partial class CounterOp { }
 
@@ -74,9 +77,9 @@ namespace RiakClient.Messages
     public sealed partial class DtOp { }
 
     [CLSCompliant(false)]
-    public sealed partial class DtUpdateReq { }
+    public sealed partial class DtUpdateReq : RpbReq { }
 
-    public sealed partial class DtUpdateResp { }
+    public sealed partial class DtUpdateResp : RpbResp { }
 
     public sealed partial class RpbGetClientIdResp { }
 
@@ -169,4 +172,10 @@ namespace RiakClient.Messages
     public sealed partial class RpbYokozunaSchemaGetReq { }
 
     public sealed partial class RpbYokozunaSchemaGetResp { }
+
+    public sealed partial class RpbGetBucketKeyPreflistReq { }
+
+    public sealed partial class RpbGetBucketKeyPreflistResp { }
+
+    public sealed partial class RpbBucketKeyPreflistItem { }
 }

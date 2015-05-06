@@ -25,7 +25,6 @@ namespace RiakClient.Models
     /// <summary>
     /// A collection of optional settings for fetching objects from Riak.
     /// </summary>
-    [ComVisible(false)]
     public class RiakGetOptions : RiakOptions<RiakGetOptions>
     {
         private static readonly RiakGetOptions DefaultGetOptions = new RiakGetOptions();

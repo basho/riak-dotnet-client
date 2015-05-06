@@ -16,6 +16,8 @@
 // under the License.
 // </copyright>
 
+#pragma warning disable 618
+
 namespace RiakClientExamples
 {
     using System;
@@ -30,6 +32,7 @@ namespace RiakClientExamples
     using RiakClient.Models.RiakDt;
     using RiakClient.Util;
 
+    [Examples]
     public abstract class ExampleBase : IDisposable
     {
         private readonly IRiakEndPoint endpoint;
@@ -158,3 +161,5 @@ namespace RiakClientExamples
         }
     }
 }
+
+#pragma warning restore 618

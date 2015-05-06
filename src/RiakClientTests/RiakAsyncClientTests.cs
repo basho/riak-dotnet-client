@@ -40,7 +40,7 @@ namespace RiakClientTests.RiakAsyncClientTests
         }
     }
 
-    [TestFixture]
+    [TestFixture, UnitTest]
     internal class WhenPingingServerAsync : RiakAsyncClientTestBase<RiakResult>
     {
         [SetUp]
@@ -64,7 +64,7 @@ namespace RiakClientTests.RiakAsyncClientTests
         }
     }
 
-    [TestFixture]
+    [TestFixture, UnitTest]
     internal class WhenCallingGetWithObjectIdAsync : RiakAsyncClientTestBase<RiakResult<RiakObject>>
     {
         [SetUp]
@@ -92,7 +92,7 @@ namespace RiakClientTests.RiakAsyncClientTests
         }
     }
 
-    [TestFixture]
+    [TestFixture, UnitTest]
     internal class WhenCallingGetWithBucketKeyAsync : RiakAsyncClientTestBase<RiakResult<RiakObject>>
     {
         [SetUp]
@@ -120,7 +120,7 @@ namespace RiakClientTests.RiakAsyncClientTests
         }
     }
 
-    [TestFixture]
+    [TestFixture, UnitTest]
     internal class WhenCallingGetManyAsync : RiakAsyncClientTestBase<IEnumerable<RiakResult<RiakObject>>>
     {
         [SetUp]

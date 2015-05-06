@@ -23,7 +23,7 @@ namespace RiakClientTests.KeyFilters
     using NUnit.Framework;
     using RiakClient.Models.MapReduce.KeyFilters;
 
-    [TestFixture]
+    [TestFixture, UnitTest]
     public abstract class KeyFilterTests
     {
         internal const string IntToStringJson = @"[""int_to_string""]";

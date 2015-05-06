@@ -38,7 +38,7 @@
       <DocumentationSource sourceFile="RiakClient\bin\Release\RiakClient.dll" />
       <DocumentationSource sourceFile="RiakClient\bin\Release\RiakClient.xml" />
     </DocumentationSources>
-    <CopyrightText>Copyright %28c%29 2014 - Basho Technologies, Inc.</CopyrightText>
+    <CopyrightText>Copyright 2015 Basho Technologies, Inc.</CopyrightText>
     <NamespaceSummaries>
       <NamespaceSummaryItem name="RiakClient" isDocumented="True">The &lt;b&gt;RiakClient&lt;/b&gt; namespace provides some of the commonly used classes of the framework.</NamespaceSummaryItem>
 <NamespaceSummaryItem name="RiakClient.Comms" isDocumented="True">The &lt;b&gt;RiakClient.Comms&lt;/b&gt; namespace provides network communication related classes.</NamespaceSummaryItem>

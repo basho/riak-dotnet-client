@@ -25,7 +25,7 @@ namespace RiakClientTests.Models
     using RiakClient.Exceptions;
     using RiakClient.Models;
 
-    [TestFixture]
+    [TestFixture, UnitTest]
     public class RiakObjectTests
     {
         private const string Bucket = "bucket";

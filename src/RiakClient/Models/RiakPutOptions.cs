@@ -25,7 +25,6 @@ namespace RiakClient.Models
     /// <summary>
     /// A collection of optional settings for updating objects from Riak.
     /// </summary>
-    [ComVisible(false)]
     public class RiakPutOptions : RiakOptions<RiakPutOptions>
     {
         /// <summary>

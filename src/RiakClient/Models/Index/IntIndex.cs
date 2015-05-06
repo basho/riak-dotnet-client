@@ -27,7 +27,6 @@ namespace RiakClient.Models.Index
     /// <summary>
     /// An integer secondary index for a <see cref="RiakObject"/>.
     /// </summary>
-    [ComVisible(false)]
     public class IntIndex : SecondaryIndex<IntIndex, BigInteger>
     {
         internal IntIndex(RiakObject container, string name)

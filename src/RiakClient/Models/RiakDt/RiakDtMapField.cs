@@ -25,6 +25,7 @@ namespace RiakClient.Models.RiakDt
     /// <summary>
     /// Represents a Map field in a Riak Map data type.
     /// </summary>
+    [System.Obsolete("RiakDt is deprecated. Please use Commands/CRDT namespace.")]
     public class RiakDtMapField
     {
         internal RiakDtMapField(MapField mapField)

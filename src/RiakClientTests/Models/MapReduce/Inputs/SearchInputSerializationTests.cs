@@ -22,7 +22,7 @@ using RiakClient.Models.MapReduce.Inputs;
 
 namespace RiakClientTests.Models.MapReduce.Inputs
 {
-    [TestFixture]
+    [TestFixture, UnitTest]
     public class SearchInputSerializationTests : MapReduceSerializationTestsBase
     {
         [Test]

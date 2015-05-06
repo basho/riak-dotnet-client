@@ -23,6 +23,7 @@ namespace RiakClient
     using System.Collections.Generic;
     using System.Numerics;
     using System.Threading.Tasks;
+    using Commands;
     using Models;
     using Models.Index;
     using Models.MapReduce;
@@ -365,6 +366,12 @@ namespace RiakClient
         public void GetServerInfo(Action<RiakResult<RiakServerInfo>> callback)
         {
             ExecAsync(() => callback(client.GetServerInfo()));
+        }
+
+        /// <inheritdoc/>
+        public Task<RiakResult> Execute(IRiakCommand command)
+        {
+            return Task.Factory.StartNew(() => client.Execute(command));
         }
 
         private static void ExecAsync(Action action)

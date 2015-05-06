@@ -26,6 +26,7 @@ namespace RiakClient.Models.RiakDt
     /// <summary>
     /// Represents an operation result for a Riak Set data type.
     /// </summary>
+    [System.Obsolete("RiakDt is deprecated. Please use Commands/CRDT namespace.")]
     public class RiakDtSetResult
     {
         /// <summary>

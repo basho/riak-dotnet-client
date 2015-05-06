@@ -19,13 +19,11 @@
 
 namespace RiakClient.Models
 {
-    using System.Runtime.InteropServices;
     using Messages;
 
     /// <summary>
     /// A collection of options that can be modified when updating a 1.4-style counter in Riak.
     /// </summary>
-    [ComVisible(false)]
     public class RiakCounterUpdateOptions : RiakOptions<RiakCounterUpdateOptions>
     {
         /// <summary>

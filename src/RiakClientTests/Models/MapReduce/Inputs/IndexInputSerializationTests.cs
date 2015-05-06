@@ -25,7 +25,7 @@ namespace RiakClientTests.Models.MapReduce.Inputs
     using RiakClient.Models.MapReduce.Inputs;
     using RiakClient.Util;
 
-    [TestFixture]
+    [TestFixture, UnitTest]
     public class BinEqualityIndexSerializationTests : MapReduceSerializationTestsBase
     {
         [Test]
@@ -75,7 +75,7 @@ namespace RiakClientTests.Models.MapReduce.Inputs
         }
     }
 
-    [TestFixture]
+    [TestFixture, UnitTest]
     public class BinRangeIndexSerializationTests : MapReduceSerializationTestsBase
     {
         [Test]
@@ -118,7 +118,7 @@ namespace RiakClientTests.Models.MapReduce.Inputs
         }
     }
 
-    [TestFixture]
+    [TestFixture, UnitTest]
     public class IntIndexEqualitySerializationTests : MapReduceSerializationTestsBase
     {
         [Test]
@@ -158,7 +158,7 @@ namespace RiakClientTests.Models.MapReduce.Inputs
         }
     }
 
-    [TestFixture]
+    [TestFixture, UnitTest]
     public class IntIndexRangeSerializationTests : MapReduceSerializationTestsBase
     {
         [Test]

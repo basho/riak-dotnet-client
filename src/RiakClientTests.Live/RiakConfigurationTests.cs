@@ -24,7 +24,7 @@ namespace RiakClientTests.Live.RiakConfigurationTests
     using RiakClient;
     using RiakClient.Config;
 
-    [TestFixture]
+    [TestFixture, IntegrationTest]
     public class WhenLoadingFromExternalConfiguration
     {
         private const string SampleConfig = @"<?xml version=""1.0"" encoding=""utf-8"" ?>

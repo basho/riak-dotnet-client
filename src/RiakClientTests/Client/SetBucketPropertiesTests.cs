@@ -25,7 +25,7 @@ namespace RiakClientTests.Client
     using RiakClient.Messages;
     using RiakClient.Models;
 
-    [TestFixture]
+    [TestFixture, UnitTest]
     public class WhenSettingBucketPropertiesWithoutExtendedProperties : ClientTestBase
     {
         protected RiakResult Response;

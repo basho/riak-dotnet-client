@@ -15,6 +15,9 @@ Help
 Doc
 src/RiakClient/docs/
 
+*.dll
+*.res
+*.il
 *.orig
 *.ncb
 *.obj

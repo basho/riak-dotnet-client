@@ -29,6 +29,7 @@ namespace RiakClient.Models.RiakDt
     /// </summary>
     /// <typeparam name="T">The type of the data type.</typeparam>
     /// <remarks>Not used.</remarks>
+    [System.Obsolete("RiakDt is deprecated. Please use Commands/CRDT namespace.")]
     public interface IRiakDtType<T>
     {
         /// <summary>

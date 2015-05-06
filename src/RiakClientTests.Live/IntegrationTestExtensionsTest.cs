@@ -24,14 +24,14 @@ namespace RiakClientTests.Live
     using NUnit.Framework;
     using RiakClient;
 
-    [TestFixture]
+    [TestFixture, IntegrationTest]
     public class IntegrationTestExtensionsTest
     {
         [Ignore("Run this to test the WaitUntil test helper's output")]
         [Test]
         public void ThisTestShouldFail()
         {
-            Func<RiakResult> alwaysFail = () => RiakResult.Error(ResultCode.InvalidRequest, "Nope.", true);
+            Func<RiakResult> alwaysFail = () => RiakResult.FromError(ResultCode.InvalidRequest, "Nope.", true);
             Func<RiakResult> alwaysThrow = () => { throw new ApplicationException("Whoopsie"); };
             var failResult = alwaysFail.WaitUntil(2);
             alwaysThrow.WaitUntil(2);

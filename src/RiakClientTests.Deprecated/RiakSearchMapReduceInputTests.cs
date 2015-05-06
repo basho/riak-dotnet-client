@@ -32,7 +32,7 @@ namespace RiakClientTests.Deprecated
     using RiakClient.Models.Search;
     using RiakClient.Util;
 
-    [TestFixture]
+    [TestFixture, DeprecatedTest]
     public class RiakSearchMapReduceInputTests : RiakMapReduceTestBase
     {
         private new const string Bucket = "riak_search_bucket";

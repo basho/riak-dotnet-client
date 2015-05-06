@@ -21,6 +21,7 @@ namespace RiakClient.Comms
 {
     using System;
     using System.Collections.Generic;
+    using Commands;
     using Config;
     using Exceptions;
     using Messages;
@@ -52,15 +53,15 @@ namespace RiakClient.Comms
                 if (ex.Message.Contains("Bucket cannot be zero-length")
                     || ex.Message.Contains("Key cannot be zero-length"))
                 {
-                    return RiakResult<TResult>.Error(ResultCode.InvalidRequest, ex.Message, ex.NodeOffline);
+                    return RiakResult<TResult>.FromException(ResultCode.InvalidRequest, ex, ex.NodeOffline);
                 }
 
-                return RiakResult<TResult>.Error(ResultCode.CommunicationError, ex.Message, ex.NodeOffline);
+                return RiakResult<TResult>.FromException(ResultCode.CommunicationError, ex, ex.NodeOffline);
             }
             catch (Exception ex)
             {
                 Disconnect();
-                return RiakResult<TResult>.Error(ResultCode.CommunicationError, ex.Message, true);
+                return RiakResult<TResult>.FromException(ResultCode.CommunicationError, ex, true);
             }
         }
 
@@ -78,12 +79,12 @@ namespace RiakClient.Comms
                     Disconnect();
                 }
 
-                return RiakResult.Error(ResultCode.CommunicationError, ex.Message, ex.NodeOffline);
+                return RiakResult.FromException(ResultCode.CommunicationError, ex, ex.NodeOffline);
             }
             catch (Exception ex)
             {
                 Disconnect();
-                return RiakResult.Error(ResultCode.CommunicationError, ex.Message, true);
+                return RiakResult.FromException(ResultCode.CommunicationError, ex, true);
             }
         }
 
@@ -111,12 +112,12 @@ namespace RiakClient.Comms
                     Disconnect();
                 }
 
-                return RiakResult<IEnumerable<RiakResult<TResult>>>.Error(ResultCode.CommunicationError, ex.Message, ex.NodeOffline);
+                return RiakResult<IEnumerable<RiakResult<TResult>>>.FromException(ResultCode.CommunicationError, ex, ex.NodeOffline);
             }
             catch (Exception ex)
             {
                 Disconnect();
-                return RiakResult<IEnumerable<RiakResult<TResult>>>.Error(ResultCode.CommunicationError, ex.Message, true);
+                return RiakResult<IEnumerable<RiakResult<TResult>>>.FromException(ResultCode.CommunicationError, ex, true);
             }
         }
 
@@ -135,12 +136,12 @@ namespace RiakClient.Comms
                     Disconnect();
                 }
 
-                return RiakResult.Error(ResultCode.CommunicationError, ex.Message, ex.NodeOffline);
+                return RiakResult.FromException(ResultCode.CommunicationError, ex, ex.NodeOffline);
             }
             catch (Exception ex)
             {
                 Disconnect();
-                return RiakResult.Error(ResultCode.CommunicationError, ex.Message, true);
+                return RiakResult.FromException(ResultCode.CommunicationError, ex, true);
             }
         }
 
@@ -158,13 +159,12 @@ namespace RiakClient.Comms
                     Disconnect();
                 }
 
-                // TODO: we really should preserve the Exception object
-                return RiakResult.Error(ResultCode.CommunicationError, ex.Message, ex.NodeOffline);
+                return RiakResult.FromException(ResultCode.CommunicationError, ex, ex.NodeOffline);
             }
             catch (Exception ex)
             {
                 Disconnect();
-                return RiakResult.Error(ResultCode.CommunicationError, ex.Message, true);
+                return RiakResult.FromException(ResultCode.CommunicationError, ex, true);
             }
         }
 
@@ -173,51 +173,47 @@ namespace RiakClient.Comms
             where TResult : class, new()
         {
             var writeResult = PbcWrite(request);
-
             if (writeResult.IsSuccess)
             {
                 return PbcRead<TResult>();
             }
 
-            return RiakResult<TResult>.Error(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline);
+            return new RiakResult<TResult>(writeResult);
         }
 
         public RiakResult PbcWriteRead<TRequest>(TRequest request, MessageCode expectedMessageCode)
             where TRequest : class
         {
             var writeResult = PbcWrite(request);
-
             if (writeResult.IsSuccess)
             {
                 return PbcRead(expectedMessageCode);
             }
 
-            return RiakResult.Error(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline);
+            return writeResult;
         }
 
         public RiakResult<TResult> PbcWriteRead<TResult>(MessageCode messageCode)
             where TResult : class, new()
         {
             var writeResult = PbcWrite(messageCode);
-
             if (writeResult.IsSuccess)
             {
                 return PbcRead<TResult>();
             }
 
-            return RiakResult<TResult>.Error(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline);
+            return new RiakResult<TResult>(writeResult);
         }
 
         public RiakResult PbcWriteRead(MessageCode messageCode, MessageCode expectedMessageCode)
         {
             var writeResult = PbcWrite(messageCode);
-
             if (writeResult.IsSuccess)
             {
                 return PbcRead(expectedMessageCode);
             }
 
-            return RiakResult.Error(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline);
+            return writeResult;
         }
 
         public RiakResult<IEnumerable<RiakResult<TResult>>> PbcWriteRead<TRequest, TResult>(
@@ -233,7 +229,7 @@ namespace RiakClient.Comms
                 return PbcRepeatRead(repeatRead);
             }
 
-            return RiakResult<IEnumerable<RiakResult<TResult>>>.Error(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline);
+            return new RiakResult<IEnumerable<RiakResult<TResult>>>(writeResult);
         }
 
         public RiakResult<IEnumerable<RiakResult<TResult>>> PbcWriteRead<TResult>(
@@ -248,7 +244,7 @@ namespace RiakClient.Comms
                 return PbcRepeatRead(repeatRead);
             }
 
-            return RiakResult<IEnumerable<RiakResult<TResult>>>.Error(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline);
+            return new RiakResult<IEnumerable<RiakResult<TResult>>>(writeResult);
         }
 
         public RiakResult<IEnumerable<RiakResult<TResult>>> PbcStreamRead<TResult>(Func<RiakResult<TResult>, bool> repeatRead, Action onFinish)
@@ -279,6 +275,18 @@ namespace RiakClient.Comms
             return RiakResult<IEnumerable<RiakResult<TResult>>>.Success(streamer);
         }
 
+        public RiakResult Execute(IRiakCommand command)
+        {
+            RiakResult executeResult = DoExecute(() => socket.Write(command));
+
+            if (executeResult.IsSuccess)
+            {
+                executeResult = DoExecute(() => socket.Read(command));
+            }
+
+            return executeResult;
+        }
+
         public void Dispose()
         {
             socket.Dispose();
@@ -288,6 +296,28 @@ namespace RiakClient.Comms
         public void Disconnect()
         {
             socket.Disconnect();
+        }
+
+        private RiakResult DoExecute(Func<RiakResult> socketFunc)
+        {
+            try
+            {
+                return socketFunc();
+            }
+            catch (RiakException ex)
+            {
+                if (ex.NodeOffline)
+                {
+                    Disconnect();
+                }
+
+                return RiakResult.FromException(ResultCode.CommunicationError, ex, ex.NodeOffline);
+            }
+            catch (Exception ex)
+            {
+                Disconnect();
+                return RiakResult.FromException(ResultCode.CommunicationError, ex, true);
+            }
         }
 
         private IEnumerable<RiakResult<TResult>> PbcWriteStreamReadIterator<TResult>(
@@ -305,7 +335,7 @@ namespace RiakClient.Comms
 
             onFinish();
 
-            return new[] { RiakResult<TResult>.Error(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline) };
+            return new[] { new RiakResult<TResult>(writeResult) };
         }
 
         private IEnumerable<RiakResult<TResult>> PbcStreamReadIterator<TResult>(Func<RiakResult<TResult>, bool> repeatRead, Action onFinish)
@@ -341,7 +371,6 @@ namespace RiakClient.Comms
             where TResult : class, new()
         {
             var writeResult = PbcWrite(request);
-
             if (writeResult.IsSuccess)
             {
                 return PbcStreamReadIterator(repeatRead, onFinish);
@@ -349,7 +378,7 @@ namespace RiakClient.Comms
 
             onFinish();
 
-            return new[] { RiakResult<TResult>.Error(writeResult.ResultCode, writeResult.ErrorMessage, writeResult.NodeOffline) };
+            return new[] { new RiakResult<TResult>(writeResult) };
         }
     }
 }

@@ -26,7 +26,7 @@ using RiakClient.Messages;
 
 namespace RiakClientTests.Messages
 {
-    [TestFixture]
+    [TestFixture, UnitTest]
     public class MessageCodeTests
     {
         private static readonly char[] csv_split = new char[] { ',' };
