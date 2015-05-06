@@ -16,7 +16,6 @@
 // under the License.
 // </copyright>
 
-#pragma warning disable 1591
 namespace RiakClient.Messages
 {
     using System;

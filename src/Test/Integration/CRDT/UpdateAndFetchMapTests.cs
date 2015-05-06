@@ -104,7 +104,7 @@ namespace Test.Integration.CRDT
         {
             MapResponse r = SaveMap();
             Assert.IsNotNullOrEmpty(r.Key);
-            Log.DebugFormat("[integration/crdt/updatemaptests] Riak Generated Key: {0}", r.Key);
+            Log.DebugFormat("Riak Generated Key: {0}", r.Key);
         }
 
         [Test]
