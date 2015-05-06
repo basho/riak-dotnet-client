@@ -19,6 +19,8 @@
 
 namespace RiakClient
 {
+    using System;
+
     /// <summary>
     /// Represents the collection of result information for a Riak operation that 
     /// returns a <typeparamref name="TResult"/>-typed value.     
@@ -29,9 +31,21 @@ namespace RiakClient
         private readonly TResult value;
 
         public RiakResult(TResult value, bool isSuccess, string errorMessage = null, ResultCode resultCode = ResultCode.Success)
-            : base(isSuccess, errorMessage, resultCode)
+            : base(isSuccess, resultCode, null, errorMessage)
         {
             this.value = value;
+        }
+
+        public RiakResult(Exception exception, ResultCode resultCode)
+            : base(false, resultCode, exception, null)
+        {
+            this.value = default(TResult);
+        }
+
+        public RiakResult(RiakResult result)
+            : base(result.IsSuccess, result.ResultCode, result.Exception, result.ErrorMessage)
+        {
+            this.value = default(TResult);
         }
 
         /// <summary>
@@ -125,9 +139,16 @@ namespace RiakClient
             return new RiakResult<TResult>(value, true);
         }
 
-        internal static new RiakResult<TResult> Error(ResultCode code, string message, bool nodeOffline)
+        internal static new RiakResult<TResult> FromError(ResultCode code, string message, bool nodeOffline)
         {
             var riakResult = new RiakResult<TResult>(default(TResult), false, message, code);
+            riakResult.NodeOffline = nodeOffline;
+            return riakResult;
+        }
+
+        internal static new RiakResult<TResult> FromException(ResultCode code, Exception exception, bool nodeOffline)
+        {
+            var riakResult = new RiakResult<TResult>(exception, code);
             riakResult.NodeOffline = nodeOffline;
             return riakResult;
         }
