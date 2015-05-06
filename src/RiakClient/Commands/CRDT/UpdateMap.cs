@@ -540,7 +540,19 @@ namespace RiakClient.Commands.CRDT
             private MapOperation mapOp;
 
             public Builder(MapOperation mapOp)
-                : base()
+            {
+                if (mapOp == null)
+                {
+                    throw new ArgumentNullException("mapOp", "mapOp is required.");
+                }
+                else
+                {
+                    this.mapOp = mapOp;
+                }
+            }
+
+            public Builder(MapOperation mapOp, Builder source)
+                : base(source)
             {
                 if (mapOp == null)
                 {

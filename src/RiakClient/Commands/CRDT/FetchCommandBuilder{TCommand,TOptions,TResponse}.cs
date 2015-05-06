@@ -1,4 +1,4 @@
-﻿// <copyright file="FetchCommandBuilder.cs" company="Basho Technologies, Inc.">
+﻿// <copyright file="FetchCommandBuilder{TCommand,TOptions,TResponse}.cs" company="Basho Technologies, Inc.">
 // Copyright 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
@@ -31,25 +31,22 @@ namespace RiakClient.Commands.CRDT
         where TOptions : FetchCommandOptions
         where TResponse : Response
     {
-        private string bucketType;
-        private string bucket;
-        private string key;
+        private readonly CommandBuilderHelper helper = new CommandBuilderHelper();
 
         private Quorum r;
         private Quorum pr;
 
-        private TimeSpan timeout;
         private bool notFoundOK = false;
         private bool includeContext = true;
         private bool useBasicQuorum = false;
 
         public TCommand Build()
         {
-            TOptions options = (TOptions)Activator.CreateInstance(typeof(TOptions), bucketType, bucket, key);
+            TOptions options = (TOptions)Activator.CreateInstance(typeof(TOptions), helper.BucketType, helper.Bucket, helper.Key);
             options.R = r;
             options.PR = pr;
 
-            options.Timeout = timeout;
+            options.Timeout = helper.Timeout;
             options.NotFoundOK = notFoundOK;
             options.IncludeContext = includeContext;
             options.UseBasicQuorum = useBasicQuorum;
@@ -59,34 +56,25 @@ namespace RiakClient.Commands.CRDT
 
         public FetchCommandBuilder<TCommand, TOptions, TResponse> WithBucketType(string bucketType)
         {
-            if (string.IsNullOrWhiteSpace(bucketType))
-            {
-                throw new ArgumentNullException("bucketType", "bucketType may not be null, empty or whitespace");
-            }
-
-            this.bucketType = bucketType;
+            helper.WithBucketType(bucketType);
             return this;
         }
 
         public FetchCommandBuilder<TCommand, TOptions, TResponse> WithBucket(string bucket)
         {
-            if (string.IsNullOrWhiteSpace(bucket))
-            {
-                throw new ArgumentNullException("bucket", "bucket may not be null, empty or whitespace");
-            }
-
-            this.bucket = bucket;
+            helper.WithBucket(bucket);
             return this;
         }
 
         public FetchCommandBuilder<TCommand, TOptions, TResponse> WithKey(string key)
         {
-            if (string.IsNullOrWhiteSpace(key))
-            {
-                throw new ArgumentNullException("key", "key may not be null, empty or whitespace");
-            }
+            helper.WithKey(key);
+            return this;
+        }
 
-            this.key = key;
+        public FetchCommandBuilder<TCommand, TOptions, TResponse> WithTimeout(TimeSpan timeout)
+        {
+            helper.WithTimeout(timeout);
             return this;
         }
 
@@ -109,12 +97,6 @@ namespace RiakClient.Commands.CRDT
             }
 
             this.pr = pr;
-            return this;
-        }
-
-        public FetchCommandBuilder<TCommand, TOptions, TResponse> WithTimeout(TimeSpan timeout)
-        {
-            this.timeout = timeout;
             return this;
         }
 

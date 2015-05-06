@@ -74,7 +74,7 @@
     <Compile Include="Commands\CRDT\FetchSet.cs" />
     <Compile Include="Commands\CRDT\Response.cs" />
     <Compile Include="Commands\CRDT\Response{TValue}.cs" />
-    <Compile Include="Commands\CRDT\FetchCommandBuilder.cs" />
+    <Compile Include="Commands\CRDT\FetchCommandBuilder{TCommand,TOptions,TResponse}.cs" />
     <Compile Include="Commands\CRDT\FetchCommand{TResponse}.cs" />
     <Compile Include="Commands\CRDT\FetchCounter.cs" />
     <Compile Include="Commands\CRDT\FetchCommandOptions.cs" />
@@ -83,7 +83,8 @@
     <Compile Include="Commands\CRDT\CounterResponse.cs" />
     <Compile Include="Commands\CRDT\MapResponse.cs" />
     <Compile Include="Commands\CRDT\Map.cs" />
-    <Compile Include="Commands\CRDT\UpdateCommandBuilder.cs" />
+    <Compile Include="Commands\CRDT\UpdateCommandBuilder{TCommand,TOptions,TResponse}.cs" />
+    <Compile Include="Commands\CRDT\CommandBuilderHelper.cs" />
     <Compile Include="Commands\CRDT\UpdateSetOptions.cs" />
     <Compile Include="Commands\CRDT\UpdateSet.cs" />
     <Compile Include="Commands\CRDT\UpdateCounter.cs" />

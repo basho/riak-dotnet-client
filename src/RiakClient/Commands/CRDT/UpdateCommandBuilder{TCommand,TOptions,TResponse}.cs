@@ -1,4 +1,4 @@
-﻿// <copyright file="UpdateCommandBuilder.cs" company="Basho Technologies, Inc.">
+﻿// <copyright file="UpdateCommandBuilder{TCommand,TOptions,TResponse}.cs" company="Basho Technologies, Inc.">
 // Copyright 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
@@ -32,71 +32,82 @@ namespace RiakClient.Commands.CRDT
         where TOptions : UpdateCommandOptions
         where TResponse : Response, new()
     {
-        private string bucketType;
-        private string bucket;
-        private string key;
+        private readonly CommandBuilderHelper helper = new CommandBuilderHelper();
 
         private Quorum w;
         private Quorum pw;
         private Quorum dw;
 
-        private bool returnBody;
-
-        private TimeSpan timeout;
+        private bool returnBody = true; // NB: default to true
 
         private bool includeContext = true; // NB: default to true
         private byte[] context;
 
+        public UpdateCommandBuilder()
+        {
+        }
+
+        public UpdateCommandBuilder(UpdateCommandBuilder<TCommand, TOptions, TResponse> source)
+        {
+            this.helper = source.helper;
+
+            this.w = source.w;
+            this.pw = source.pw;
+            this.dw = source.dw;
+
+            this.returnBody = source.returnBody;
+
+            this.includeContext = source.includeContext;
+            this.context = source.context;
+        }
+
+        public TOptions Options
+        {
+            get;
+            private set;
+        }
+
         public TCommand Build()
         {
-            var options = (TOptions)Activator.CreateInstance(typeof(TOptions), bucketType, bucket, key);
+            this.Options = (TOptions)Activator.CreateInstance(typeof(TOptions), helper.BucketType, helper.Bucket, helper.Key);
 
-            options.W = w;
-            options.PW = pw;
-            options.DW = dw;
+            Options.W = w;
+            Options.PW = pw;
+            Options.DW = dw;
 
-            options.ReturnBody = returnBody;
+            Options.ReturnBody = returnBody;
 
-            options.Timeout = timeout;
+            Options.Timeout = helper.Timeout;
 
-            options.IncludeContext = includeContext;
-            options.Context = context;
+            Options.IncludeContext = includeContext;
+            Options.Context = context;
 
-            PopulateOptions(options);
+            PopulateOptions(Options);
 
-            return (TCommand)Activator.CreateInstance(typeof(TCommand), options);
+            return (TCommand)Activator.CreateInstance(typeof(TCommand), Options);
         }
 
         public UpdateCommandBuilder<TCommand, TOptions, TResponse> WithBucketType(string bucketType)
         {
-            if (string.IsNullOrWhiteSpace(bucketType))
-            {
-                throw new ArgumentNullException("bucketType", "bucketType may not be null, empty or whitespace");
-            }
-
-            this.bucketType = bucketType;
+            helper.WithBucketType(bucketType);
             return this;
         }
 
         public UpdateCommandBuilder<TCommand, TOptions, TResponse> WithBucket(string bucket)
         {
-            if (string.IsNullOrWhiteSpace(bucket))
-            {
-                throw new ArgumentNullException("bucket", "bucket may not be null, empty or whitespace");
-            }
-
-            this.bucket = bucket;
+            helper.WithBucket(bucket);
             return this;
         }
 
         public UpdateCommandBuilder<TCommand, TOptions, TResponse> WithKey(string key)
         {
-            if (string.IsNullOrWhiteSpace(key))
-            {
-                throw new ArgumentNullException("key", "key may not be null, empty or whitespace");
-            }
+            helper.WithKey(key);
+            return this;
+        }
 
-            this.key = key;
+        public UpdateCommandBuilder<TCommand, TOptions, TResponse> WithTimeout(TimeSpan timeout)
+        {
+            helper.WithTimeout(timeout);
             return this;
         }
 
@@ -148,12 +159,6 @@ namespace RiakClient.Commands.CRDT
         public UpdateCommandBuilder<TCommand, TOptions, TResponse> WithIncludeContext(bool includeContext)
         {
             this.includeContext = includeContext;
-            return this;
-        }
-
-        public UpdateCommandBuilder<TCommand, TOptions, TResponse> WithTimeout(TimeSpan timeout)
-        {
-            this.timeout = timeout;
             return this;
         }
 

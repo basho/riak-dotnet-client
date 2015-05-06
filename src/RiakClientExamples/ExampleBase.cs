@@ -28,6 +28,7 @@ namespace RiakClientExamples
     using System.Threading;
     using NUnit.Framework;
     using RiakClient;
+    using RiakClient.Commands.CRDT;
     using RiakClient.Models;
     using RiakClient.Models.RiakDt;
     using RiakClient.Util;
@@ -45,6 +46,8 @@ namespace RiakClientExamples
         protected IRiakClient client;
         protected RiakObjectId id;
         protected ICollection<RiakObjectId> ids;
+
+        protected FetchCommandOptions options;
 
         public ExampleBase()
         {
@@ -69,6 +72,12 @@ namespace RiakClientExamples
             if (EnumerableUtil.NotNullOrEmpty(ids))
             {
                 DeleteObjects(ids);
+            }
+
+            if (options != null)
+            {
+                id = new RiakObjectId(options.BucketType, options.Bucket, options.Key);
+                DeleteObject(id);
             }
 #endif
         }

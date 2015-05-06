@@ -71,6 +71,12 @@ namespace RiakClient.Commands.CRDT
                 this.increment = increment;
             }
 
+            public Builder(long increment, Builder source)
+                : base(source)
+            {
+                this.increment = increment;
+            }
+
             protected override void PopulateOptions(UpdateCounterOptions options)
             {
                 options.Increment = increment;

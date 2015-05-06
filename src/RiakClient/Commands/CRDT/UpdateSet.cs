@@ -85,6 +85,13 @@ namespace RiakClient.Commands.CRDT
                 this.removals = removals;
             }
 
+            public Builder(IEnumerable<byte[]> additions, IEnumerable<byte[]> removals, Builder source)
+                : base(source)
+            {
+                this.additions = additions;
+                this.removals = removals;
+            }
+
             protected override void PopulateOptions(UpdateSetOptions options)
             {
                 options.Additions = additions;

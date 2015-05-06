@@ -29,6 +29,9 @@ namespace RiakClient.Commands.CRDT
         private readonly RiakString bucket;
         private readonly RiakString key;
 
+        private bool returnBody = true;
+        private bool includeContext = true;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="UpdateCommandOptions"/> class.
         /// </summary>
@@ -102,7 +105,11 @@ namespace RiakClient.Commands.CRDT
         /// <summary>
         /// If true, returns the updated CRDT.
         /// </summary>
-        public bool ReturnBody { get; set; }
+        public bool ReturnBody
+        {
+            get { return returnBody; }
+            set { returnBody = value; }
+        }
 
         /// <summary>
         /// The timeout for this command.
@@ -117,7 +124,11 @@ namespace RiakClient.Commands.CRDT
         /// <summary>
         /// Set to <b>false</b> to not return context. Default (and recommended value) is <b>true</b>.
         /// </summary>
-        public bool IncludeContext { get; set; }
+        public bool IncludeContext
+        {
+            get { return includeContext; }
+            set { includeContext = value; }
+        }
 
         /// <summary>
         /// Returns to <b>true</b> if this command has removals.

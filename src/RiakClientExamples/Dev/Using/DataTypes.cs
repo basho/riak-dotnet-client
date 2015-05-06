@@ -16,19 +16,12 @@
 // under the License.
 // </copyright>
 
-#pragma warning disable 618
-
 namespace RiakClientExamples.Dev.Using
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
     using NUnit.Framework;
     using RiakClient;
-    using RiakClient.Messages;
+    using RiakClient.Commands.CRDT;
     using RiakClient.Models;
-    using RiakClient.Models.RiakDt;
 
     /*
      * http://docs.basho.com/riak/latest/dev/using/data-types/
@@ -38,49 +31,106 @@ namespace RiakClientExamples.Dev.Using
         [Test]
         public void CountersIdAndFetch()
         {
-            id = new RiakObjectId("counters", "counters", "<insert_key_here>");
-            Assert.AreEqual("counters", id.BucketType);
-            Assert.AreEqual("counters", id.Bucket);
-            Assert.AreEqual("<insert_key_here>", id.Key);
+            FetchCounter cmd = new FetchCounter.Builder()
+                .WithBucketType("counters")
+                .WithBucket("counters")
+                .WithKey("<insert_key_here>")
+                .Build();
 
-            var rslt = client.DtFetchCounter(id);
+            RiakResult rslt = client.Execute(cmd);
             CheckResult(rslt);
+
+            CounterResponse response = cmd.Response;
+            Assert.AreEqual(0, response.Value);
+
+            // NB: for cleanup
+            id = new RiakObjectId("counters", "counters", "<insert_key_here>");
         }
 
         // Note: decrement example as well
         [Test]
         public void TrafficTicketsCounterFetchAndUpdate()
         {
-            id = new RiakObjectId("counters", "counters", "traffic_tickets");
-            var rslt = client.DtFetchCounter(id);
+            var fetchCounterOptions = new FetchCounterOptions("counters", "counters", "traffic_tickts");
+            FetchCounter cmd = new FetchCounter(fetchCounterOptions);
+
+            // NB: for cleanup
+            options = fetchCounterOptions;
+
+            RiakResult rslt = client.Execute(cmd);
             CheckResult(rslt);
 
-            rslt = client.DtUpdateCounter(id, 1);
-            CheckResult(rslt);
-            Assert.AreEqual(1, rslt.Value);
+            CounterResponse response = cmd.Response;
+            Assert.AreEqual(0, response.Value);
 
-            rslt = client.DtUpdateCounter(id, -1);
+            UpdateCounter updateCmd = new UpdateCounter.Builder(1)
+                .WithBucketType("counters")
+                .WithBucket("counters")
+                .WithKey("traffic_tickets")
+                .WithReturnBody(true)
+                .Build();
+
+            rslt = client.Execute(updateCmd);
             CheckResult(rslt);
-            Assert.AreEqual(0, rslt.Value);
+
+            response = updateCmd.Response;
+            Assert.AreEqual(1, response.Value);
+
+            updateCmd = new UpdateCounter.Builder(increment: -1)
+                .WithBucketType("counters")
+                .WithBucket("counters")
+                .WithKey("traffic_tickets")
+                .WithReturnBody(true)
+                .Build();
+
+            rslt = client.Execute(updateCmd);
+            CheckResult(rslt);
+
+            response = updateCmd.Response;
+            Assert.AreEqual(0, response.Value);
         }
 
         // Note: decrement example as well
         [Test]
         public void WhoopsIGotFiveTrafficTickets()
         {
-            id = new RiakObjectId("counters", "counters", "traffic_tickets");
-            var rslt = client.DtFetchCounter(id);
+            var fetchCounterOptions = new FetchCounterOptions("counters", "counters", "traffic_tickts");
+            FetchCounter cmd = new FetchCounter(fetchCounterOptions);
+
+            // NB: for cleanup
+            options = fetchCounterOptions;
+
+            RiakResult rslt = client.Execute(cmd);
             CheckResult(rslt);
 
-            rslt = client.DtUpdateCounter(id, 5);
-            CheckResult(rslt);
-            Assert.AreEqual(5, rslt.Value);
+            CounterResponse response = cmd.Response;
+            Assert.AreEqual(0, response.Value);
 
-            rslt = client.DtUpdateCounter(id, -5);
+            var builder = new UpdateCounter.Builder(5);
+
+            builder.WithBucketType("counters")
+                .WithBucket("counters")
+                .WithKey("traffic_tickets")
+                .WithReturnBody(true);
+
+            UpdateCounter updateCmd = builder.Build();
+
+            rslt = client.Execute(updateCmd);
             CheckResult(rslt);
-            Assert.AreEqual(0, rslt.Value);
+
+            response = updateCmd.Response;
+            Assert.AreEqual(5, response.Value);
+
+            updateCmd = new UpdateCounter.Builder(increment: -5, source: builder).Build();
+
+            rslt = client.Execute(updateCmd);
+            CheckResult(rslt);
+
+            response = updateCmd.Response;
+            Assert.AreEqual(0, response.Value);
         }
 
+        /*
         [Test]
         public void InitialSetIsEmpty()
         {
@@ -559,7 +609,6 @@ namespace RiakClientExamples.Dev.Using
         {
             CheckResult(rslt.Result);
         }
+         */
     }
 }
-
-#pragma warning restore 618
