@@ -24,7 +24,7 @@ using RiakClient.Config;
 
 namespace RiakClientTests.Auth
 {
-    [TestFixture]
+    [TestFixture, UnitTest]
     public class RiakSecurityManagerTests : AuthTestBase
     {
         private readonly IRiakClusterConfiguration clusterConfig;

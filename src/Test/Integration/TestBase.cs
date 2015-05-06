@@ -27,7 +27,7 @@ namespace Test.Integration
     using RiakClient.Models;
     using RiakClient.Util;
 
-    [TestFixture]
+    [TestFixture, IntegrationTest]
     public abstract class TestBase
     {
         protected static readonly Random R = new Random();

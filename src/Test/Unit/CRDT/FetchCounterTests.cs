@@ -19,13 +19,12 @@
 namespace Test.Unit.CRDT
 {
     using System;
-    using System.Text;
     using NUnit.Framework;
     using RiakClient;
     using RiakClient.Commands.CRDT;
     using RiakClient.Messages;
-    
-    [TestFixture]
+
+    [TestFixture, UnitTest]
     public class FetchCounterTests
     {
         private static readonly RiakString BucketType = "counters";
@@ -67,13 +66,13 @@ namespace Test.Unit.CRDT
             var fetchResp = new DtFetchResp();
             fetchResp.value = value;
             fetchResp.type = DtFetchResp.DataType.COUNTER;
-            
+
             var fetch = new FetchCounter.Builder()
                 .WithBucketType(BucketType)
                 .WithBucket(Bucket)
                 .WithKey(Key)
                 .Build();
-        
+
             fetch.OnSuccess(fetchResp);
 
             Assert.AreEqual(42, fetch.Response.Value);

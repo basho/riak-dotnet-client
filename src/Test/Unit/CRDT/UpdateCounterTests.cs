@@ -25,7 +25,7 @@ namespace Test.Unit.CRDT
     using RiakClient.Commands.CRDT;
     using RiakClient.Messages;
 
-    [TestFixture]
+    [TestFixture, UnitTest]
     public class UpdateCounterTests
     {
         private const string BucketType = "counters";

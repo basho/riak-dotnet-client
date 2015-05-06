@@ -26,7 +26,7 @@ namespace RiakClientTests.Models.MapReduce
     using RiakClient.Models.MapReduce;
     using RiakClient.Models.MapReduce.Inputs;
 
-    [TestFixture]
+    [TestFixture, UnitTest]
     public class RiakMapReduceTests
     {
         private const string MrJobText =

@@ -29,7 +29,7 @@ namespace RiakClientTests.Client
     using RiakClient.Messages;
     using RiakClient.Models;
 
-    [TestFixture]
+    [TestFixture, UnitTest]
     public class DataTypeTests : ClientTestBase
     {
         private readonly SerializeObjectToByteArray<string> Serializer = s => Encoding.UTF8.GetBytes(s);

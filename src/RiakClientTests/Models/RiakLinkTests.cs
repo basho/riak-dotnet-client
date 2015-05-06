@@ -22,7 +22,7 @@ using RiakClient.Models;
 
 namespace RiakClientTests.Models
 {
-    [TestFixture]
+    [TestFixture, UnitTest]
     public class RiakLinkTests
     {
         private static readonly RiakLink Link = new RiakLink("bucket", "key", "tag");

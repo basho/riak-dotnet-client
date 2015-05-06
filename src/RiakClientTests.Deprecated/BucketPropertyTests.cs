@@ -21,12 +21,12 @@ namespace RiakClientTests.Deprecated
 {
     using System;
     using System.Linq;
+    using Live;
     using NUnit.Framework;
     using RiakClient.Models;
     using RiakClient.Models.Search;
-    using Live;
 
-    [TestFixture]
+    [TestFixture, DeprecatedTest]
     public class WhenDealingWithBucketProperties : LiveRiakConnectionTestBase
     {
         // use the one node configuration here because we might run the risk

@@ -27,7 +27,7 @@ namespace RiakClientTests.Live.GeneralIntegrationTests
     using RiakClient.Models;
     using RiakClient.Models.MapReduce;
 
-    [TestFixture]
+    [TestFixture, IntegrationTest]
     public class WhenTalkingToRiak : LiveRiakConnectionTestBase
     {
         [Test]

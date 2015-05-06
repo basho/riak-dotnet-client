@@ -24,7 +24,7 @@ namespace RiakClientTests.Live
     using NUnit.Framework;
     using RiakClient;
 
-    [TestFixture]
+    [TestFixture, IntegrationTest]
     public class IntegrationTestExtensionsTest
     {
         [Ignore("Run this to test the WaitUntil test helper's output")]

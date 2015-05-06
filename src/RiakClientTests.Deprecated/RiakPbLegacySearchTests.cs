@@ -17,19 +17,20 @@
 // under the License.
 // </copyright>
 
-namespace RiakClientTests.Live.Deprecated
+namespace RiakClientTests.Deprecated
 {
     using System;
     using System.Collections.Generic;
-    using Extensions;
     using NUnit.Framework;
+    using Live;
+    using Live.Extensions;
     using RiakClient;
     using RiakClient.Extensions;
     using RiakClient.Models;
     using RiakClient.Models.Search;
     using RiakClient.Util;
 
-    [TestFixture]
+    [TestFixture, DeprecatedTest]
     public class WhenQueryingRiakLegacySearchViaPbc : LiveRiakConnectionTestBase
     {
         private const string Bucket = "riak_search_bucket";

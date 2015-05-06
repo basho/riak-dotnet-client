@@ -23,7 +23,7 @@ namespace RiakClientTests.Models
     using NUnit.Framework;
     using RiakClient;
 
-    [TestFixture]
+    [TestFixture, UnitTest]
     public class QuorumTests
     {
         [Test]

@@ -29,7 +29,7 @@ using RiakClient.Models.RiakDt;
 
 namespace RiakClientTests.Live.DataTypes
 {
-    [TestFixture]
+    [TestFixture, IntegrationTest]
     public class MapDtEdgeCaseTests : DataTypeTestsBase
     {
         public static readonly byte[] NoContext = null;

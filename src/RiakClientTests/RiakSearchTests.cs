@@ -25,7 +25,7 @@ using RiakClient.Models.Search;
 
 namespace RiakClientTests
 {
-    [TestFixture]
+    [TestFixture, UnitTest]
     public class SimpleRiakSearchSerializationTests
     {
         [Test]

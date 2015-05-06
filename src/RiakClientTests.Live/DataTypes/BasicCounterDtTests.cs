@@ -22,7 +22,7 @@ using RiakClient.Models;
 
 namespace RiakClientTests.Live.DataTypes
 {
-    [TestFixture]
+    [TestFixture, IntegrationTest]
     public class BasicCounterDtTests : DataTypeTestsBase
     {
         [Test]

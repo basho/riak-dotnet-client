@@ -28,7 +28,7 @@ namespace RiakClientTests.Live.Search
     using RiakClient.Models;
     using RiakClient.Models.Search;
 
-    [TestFixture]
+    [TestFixture, IntegrationTest]
     public class TestSearchOperation : LiveRiakConnectionTestBase
     {
         private const string BucketType = "search_type";

@@ -32,7 +32,7 @@ namespace RiakClientTests.Live
     using RiakClient.Models.MapReduce.Inputs;
     using RiakClient.Util;
 
-    [TestFixture]
+    [TestFixture, IntegrationTest]
     public class WhenUsingIndexes : RiakMapReduceTestBase
     {
         private const string BucketType = "leveldb_type";

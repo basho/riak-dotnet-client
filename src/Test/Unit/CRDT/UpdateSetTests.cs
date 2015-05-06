@@ -26,7 +26,7 @@ namespace Test.Unit.CRDT
     using RiakClient.Commands.CRDT;
     using RiakClient.Messages;
 
-    [TestFixture]
+    [TestFixture, UnitTest]
     public class UpdateSetTests
     {
         private const string BucketType = "sets";

@@ -27,7 +27,7 @@ namespace Test.Unit.CRDT
     using RiakClient.Messages;
     using RiakClient.Util;
 
-    [TestFixture]
+    [TestFixture, UnitTest]
     public class UpdateMapTests
     {
         private const string BucketType = "maps";

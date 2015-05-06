@@ -26,7 +26,7 @@ using RiakClient.Models.RiakDt;
 
 namespace RiakClientTests.Live.DataTypes
 {
-    [TestFixture]
+    [TestFixture, IntegrationTest]
     public class BasicMapDtTests : DataTypeTestsBase
     {
         [Test]

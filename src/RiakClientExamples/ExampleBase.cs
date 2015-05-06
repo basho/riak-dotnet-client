@@ -32,6 +32,7 @@ namespace RiakClientExamples
     using RiakClient.Models.RiakDt;
     using RiakClient.Util;
 
+    [Examples]
     public abstract class ExampleBase : IDisposable
     {
         private readonly IRiakEndPoint endpoint;

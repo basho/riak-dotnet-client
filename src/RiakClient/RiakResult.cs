@@ -66,6 +66,7 @@ namespace RiakClient
             this.errorMessage = errorMessage;
 
             if (string.IsNullOrWhiteSpace(this.errorMessage) &&
+                exception != null &&
                 !string.IsNullOrWhiteSpace(exception.Message))
             {
                 this.errorMessage = exception.Message;

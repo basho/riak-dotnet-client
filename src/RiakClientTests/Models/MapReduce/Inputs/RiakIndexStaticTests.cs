@@ -26,7 +26,7 @@ namespace RiakClientTests.Models.MapReduce.Inputs
     using RiakClient.Models.MapReduce.Inputs;
     using RiakClient.Util;
 
-    [TestFixture]
+    [TestFixture, UnitTest]
     public class RiakIndexStaticTests : MapReduceSerializationTestsBase
     {
         private const string BucketType = "my_bucket_type";

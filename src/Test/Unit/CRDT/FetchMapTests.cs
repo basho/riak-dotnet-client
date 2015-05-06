@@ -20,13 +20,12 @@ namespace Test.Unit.CRDT
 {
     using System;
     using System.Collections.Generic;
-    using System.Text;
     using NUnit.Framework;
     using RiakClient;
     using RiakClient.Commands.CRDT;
     using RiakClient.Messages;
 
-    [TestFixture]
+    [TestFixture, UnitTest]
     public class FetchMapTests
     {
         private static readonly RiakString BucketType = "maps";

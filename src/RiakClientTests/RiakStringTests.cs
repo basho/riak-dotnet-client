@@ -22,7 +22,7 @@ namespace RiakClientTests
     using NUnit.Framework;
     using RiakClient;
 
-    [TestFixture]
+    [TestFixture, UnitTest]
     public class RiakStringTests
     {
         const string testString = "test1234";

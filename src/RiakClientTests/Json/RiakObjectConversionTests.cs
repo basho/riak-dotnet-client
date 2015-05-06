@@ -29,7 +29,7 @@ namespace RiakClientTests.Json.RiakObjectConversionTests
     using RiakClient.Models;
     using RiakClient.Util;
 
-    [TestFixture]
+    [TestFixture, UnitTest]
     public class WhenStoringDataIntoRiakObjectsAsJson
     {
         [Test]

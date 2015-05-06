@@ -27,7 +27,7 @@ using RiakClient.Models.RiakDt;
 
 namespace RiakClientTests.Live.DataTypes
 {
-    [TestFixture]
+    [TestFixture, IntegrationTest]
     public class SetDtEdgeCaseTests : DataTypeTestsBase
     {
         private static readonly byte[] NoContext = null;

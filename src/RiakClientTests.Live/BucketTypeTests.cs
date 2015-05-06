@@ -24,7 +24,7 @@ namespace RiakClientTests.Live
     using NUnit.Framework;
     using RiakClient.Models;
 
-    [TestFixture]
+    [TestFixture, IntegrationTest]
     public class BucketTypeTests : LiveRiakConnectionTestBase
     {
         private const string Value = "value";
