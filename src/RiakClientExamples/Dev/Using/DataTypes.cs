@@ -43,8 +43,8 @@ namespace RiakClientExamples.Dev.Using
             CounterResponse response = cmd.Response;
             Assert.AreEqual(0, response.Value);
 
-            // NB: for cleanup
-            id = new RiakObjectId("counters", "counters", "<insert_key_here>");
+            // NB: for cleanup on test teardown
+            options = cmd.Options;
         }
 
         // Note: decrement example as well
@@ -54,8 +54,8 @@ namespace RiakClientExamples.Dev.Using
             var fetchCounterOptions = new FetchCounterOptions("counters", "counters", "traffic_tickts");
             FetchCounter cmd = new FetchCounter(fetchCounterOptions);
 
-            // NB: for cleanup
-            options = fetchCounterOptions;
+            // NB: for cleanup on test teardown
+            options = cmd.Options;
 
             RiakResult rslt = client.Execute(cmd);
             CheckResult(rslt);
