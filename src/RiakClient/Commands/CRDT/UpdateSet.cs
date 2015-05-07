@@ -36,7 +36,7 @@ namespace RiakClient.Commands.CRDT
     ///           .Build();
     /// </code>
     /// </summary>
-    public class UpdateSet : UpdateCommand<SetResponse>, IRiakCommand
+    public class UpdateSet : UpdateCommand<SetResponse>
     {
         private readonly UpdateSetOptions options;
 
@@ -74,10 +74,15 @@ namespace RiakClient.Commands.CRDT
             return new SetResponse(key, resp.context, resp.set_value);
         }
 
-        public class Builder : UpdateCommandBuilder<UpdateSet, UpdateSetOptions, SetResponse>
+        public class Builder
+            : UpdateCommandBuilder<UpdateSet.Builder, UpdateSet, UpdateSetOptions, SetResponse>
         {
             private IEnumerable<byte[]> additions;
             private IEnumerable<byte[]> removals;
+
+            public Builder()
+            {
+            }
 
             public Builder(IEnumerable<byte[]> additions, IEnumerable<byte[]> removals)
             {
@@ -90,6 +95,18 @@ namespace RiakClient.Commands.CRDT
             {
                 this.additions = additions;
                 this.removals = removals;
+            }
+
+            public Builder WithAdditions(IEnumerable<byte[]> additions)
+            {
+                this.additions = additions;
+                return this;
+            }
+
+            public Builder WithRemovals(IEnumerable<byte[]> removals)
+            {
+                this.removals = removals;
+                return this;
             }
 
             protected override void PopulateOptions(UpdateSetOptions options)

@@ -63,11 +63,11 @@ namespace RiakClientExamples.Dev.Using
             CounterResponse response = cmd.Response;
             Assert.AreEqual(0, response.Value);
 
-            UpdateCounter updateCmd = new UpdateCounter.Builder(1)
+            UpdateCounter updateCmd = new UpdateCounter.Builder()
                 .WithBucketType("counters")
                 .WithBucket("counters")
                 .WithKey("traffic_tickets")
-                .WithReturnBody(true)
+                .WithIncrement(1)
                 .Build();
 
             rslt = client.Execute(updateCmd);
@@ -76,11 +76,11 @@ namespace RiakClientExamples.Dev.Using
             response = updateCmd.Response;
             Assert.AreEqual(1, response.Value);
 
-            updateCmd = new UpdateCounter.Builder(increment: -1)
+            updateCmd = new UpdateCounter.Builder()
                 .WithBucketType("counters")
                 .WithBucket("counters")
                 .WithKey("traffic_tickets")
-                .WithReturnBody(true)
+                .WithIncrement(-1)
                 .Build();
 
             rslt = client.Execute(updateCmd);
@@ -106,12 +106,12 @@ namespace RiakClientExamples.Dev.Using
             CounterResponse response = cmd.Response;
             Assert.AreEqual(0, response.Value);
 
-            var builder = new UpdateCounter.Builder(5);
+            var builder = new UpdateCounter.Builder();
 
             builder.WithBucketType("counters")
                 .WithBucket("counters")
                 .WithKey("traffic_tickets")
-                .WithReturnBody(true);
+                .WithIncrement(5);
 
             UpdateCounter updateCmd = builder.Build();
 

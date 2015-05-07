@@ -16,12 +16,12 @@
 // under the License.
 // </copyright>
 
-namespace RiakClient.Commands.CRDT
+namespace RiakClient.Commands
 {
     using System;
 
     /// <summary>
-    /// Response to a CRDT command.
+    /// Response to a Riak command.
     /// </summary>
     public class Response
     {

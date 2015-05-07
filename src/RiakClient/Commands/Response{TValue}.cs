@@ -16,10 +16,10 @@
 // under the License.
 // </copyright>
 
-namespace RiakClient.Commands.CRDT
+namespace RiakClient.Commands
 {
     /// <summary>
-    /// Response to a CRDT command.
+    /// Response to a Riak command with a return value.
     /// </summary>
     /// <typeparam name="TValue">The type of the Riak response.</typeparam>
     public abstract class Response<TValue> : Response

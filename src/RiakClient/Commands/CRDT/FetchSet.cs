@@ -24,7 +24,7 @@ namespace RiakClient.Commands.CRDT
     /// <summary>
     /// Fetches a Map from Riak
     /// </summary>
-    public class FetchSet : FetchCommand<SetResponse>, IRiakCommand
+    public class FetchSet : FetchCommand<SetResponse>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="FetchSet"/> class.
@@ -62,7 +62,8 @@ namespace RiakClient.Commands.CRDT
         }
 
         /// <inheritdoc />
-        public class Builder : FetchCommandBuilder<FetchSet, FetchSetOptions, SetResponse>
+        public class Builder
+            : FetchCommandBuilder<FetchSet.Builder, FetchSet, FetchSetOptions, SetResponse>
         {
         }
     }

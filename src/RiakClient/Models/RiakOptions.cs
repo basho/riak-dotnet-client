@@ -18,8 +18,6 @@
 
 namespace RiakClient.Models
 {
-    using System.Runtime.InteropServices;
-
     /// <summary>
     /// A collection of common options for most Riak operations.
     /// </summary>

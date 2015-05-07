@@ -25,7 +25,7 @@ namespace RiakClient.Commands.CRDT
     /// Fetches a Map from Riak
     /// </summary>
     /// <typeparam name="TResponse">The type of the response data from Riak.</typeparam>
-    public abstract class FetchCommand<TResponse> where TResponse : Response
+    public abstract class FetchCommand<TResponse> : IRiakCommand where TResponse : Response
     {
         protected readonly FetchCommandOptions Options;
 
@@ -67,7 +67,7 @@ namespace RiakClient.Commands.CRDT
             req.r = Options.R;
             req.pr = Options.PR;
 
-            req.timeout = (uint)Options.Timeout.TotalMilliseconds;
+            req.timeout = (uint)Options.Timeout;
             req.notfound_ok = Options.NotFoundOK;
             req.include_context = Options.IncludeContext;
             req.basic_quorum = Options.UseBasicQuorum;

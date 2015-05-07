@@ -1,4 +1,4 @@
-﻿// <copyright file="UpdateCommandBuilder{TCommand,TOptions,TResponse}.cs" company="Basho Technologies, Inc.">
+﻿// <copyright file="UpdateCommandBuilder{TBuilder,TCommand,TOptions,TResponse}.cs" company="Basho Technologies, Inc.">
 // Copyright 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
@@ -19,21 +19,21 @@
 namespace RiakClient.Commands.CRDT
 {
     using System;
-    using Util;
 
     /// <summary>
     /// Builds a fetch command.
     /// </summary>
+    /// <typeparam name="TBuilder">The type of the builder. Allows chaining.</typeparam>
     /// <typeparam name="TCommand">The type of the update command.</typeparam>
     /// <typeparam name="TOptions">The type of the options for the update command.</typeparam>
     /// <typeparam name="TResponse">The type of the update command's response.</typeparam>
-    public abstract class UpdateCommandBuilder<TCommand, TOptions, TResponse>
+    public abstract class UpdateCommandBuilder<TBuilder, TCommand, TOptions, TResponse>
+        : CommandBuilder<TBuilder, TCommand, TOptions>
+        where TBuilder : UpdateCommandBuilder<TBuilder, TCommand, TOptions, TResponse>
         where TCommand : UpdateCommand<TResponse>
         where TOptions : UpdateCommandOptions
         where TResponse : Response, new()
     {
-        private readonly CommandBuilderHelper helper = new CommandBuilderHelper();
-
         private Quorum w;
         private Quorum pw;
         private Quorum dw;
@@ -47,10 +47,9 @@ namespace RiakClient.Commands.CRDT
         {
         }
 
-        public UpdateCommandBuilder(UpdateCommandBuilder<TCommand, TOptions, TResponse> source)
+        public UpdateCommandBuilder(UpdateCommandBuilder<TBuilder, TCommand, TOptions, TResponse> source)
+            : base(source)
         {
-            this.helper = source.helper;
-
             this.w = source.w;
             this.pw = source.pw;
             this.dw = source.dw;
@@ -61,15 +60,9 @@ namespace RiakClient.Commands.CRDT
             this.context = source.context;
         }
 
-        public TOptions Options
+        public override TCommand Build()
         {
-            get;
-            private set;
-        }
-
-        public TCommand Build()
-        {
-            this.Options = (TOptions)Activator.CreateInstance(typeof(TOptions), helper.BucketType, helper.Bucket, helper.Key);
+            this.Options = (TOptions)Activator.CreateInstance(typeof(TOptions), bucketType, bucket, key);
 
             Options.W = w;
             Options.PW = pw;
@@ -77,7 +70,7 @@ namespace RiakClient.Commands.CRDT
 
             Options.ReturnBody = returnBody;
 
-            Options.Timeout = helper.Timeout;
+            Options.Timeout = timeout;
 
             Options.IncludeContext = includeContext;
             Options.Context = context;
@@ -87,37 +80,13 @@ namespace RiakClient.Commands.CRDT
             return (TCommand)Activator.CreateInstance(typeof(TCommand), Options);
         }
 
-        public UpdateCommandBuilder<TCommand, TOptions, TResponse> WithBucketType(string bucketType)
-        {
-            helper.WithBucketType(bucketType);
-            return this;
-        }
-
-        public UpdateCommandBuilder<TCommand, TOptions, TResponse> WithBucket(string bucket)
-        {
-            helper.WithBucket(bucket);
-            return this;
-        }
-
-        public UpdateCommandBuilder<TCommand, TOptions, TResponse> WithKey(string key)
-        {
-            helper.WithKey(key);
-            return this;
-        }
-
-        public UpdateCommandBuilder<TCommand, TOptions, TResponse> WithTimeout(TimeSpan timeout)
-        {
-            helper.WithTimeout(timeout);
-            return this;
-        }
-
-        public UpdateCommandBuilder<TCommand, TOptions, TResponse> WithContext(byte[] context)
+        public TBuilder WithContext(byte[] context)
         {
             this.context = context;
-            return this;
+            return (TBuilder)this;
         }
 
-        public UpdateCommandBuilder<TCommand, TOptions, TResponse> WithW(Quorum w)
+        public TBuilder WithW(Quorum w)
         {
             if (w == null)
             {
@@ -125,10 +94,10 @@ namespace RiakClient.Commands.CRDT
             }
 
             this.w = w;
-            return this;
+            return (TBuilder)this;
         }
 
-        public UpdateCommandBuilder<TCommand, TOptions, TResponse> WithPW(Quorum pw)
+        public TBuilder WithPW(Quorum pw)
         {
             if (pw == null)
             {
@@ -136,10 +105,10 @@ namespace RiakClient.Commands.CRDT
             }
 
             this.pw = pw;
-            return this;
+            return (TBuilder)this;
         }
 
-        public UpdateCommandBuilder<TCommand, TOptions, TResponse> WithDW(Quorum dw)
+        public TBuilder WithDW(Quorum dw)
         {
             if (dw == null)
             {
@@ -147,19 +116,19 @@ namespace RiakClient.Commands.CRDT
             }
 
             this.dw = dw;
-            return this;
+            return (TBuilder)this;
         }
 
-        public UpdateCommandBuilder<TCommand, TOptions, TResponse> WithReturnBody(bool returnBody)
+        public TBuilder WithReturnBody(bool returnBody)
         {
             this.returnBody = returnBody;
-            return this;
+            return (TBuilder)this;
         }
 
-        public UpdateCommandBuilder<TCommand, TOptions, TResponse> WithIncludeContext(bool includeContext)
+        public TBuilder WithIncludeContext(bool includeContext)
         {
             this.includeContext = includeContext;
-            return this;
+            return (TBuilder)this;
         }
 
         protected abstract void PopulateOptions(TOptions options);

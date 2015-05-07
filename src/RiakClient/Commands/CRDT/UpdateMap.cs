@@ -47,7 +47,7 @@ namespace RiakClient.Commands.CRDT
     ///           .Build();
     /// </code>
     /// </summary>
-    public class UpdateMap : UpdateCommand<MapResponse>, IRiakCommand
+    public class UpdateMap : UpdateCommand<MapResponse>
     {
         private readonly UpdateMapOptions options;
 
@@ -535,25 +535,38 @@ namespace RiakClient.Commands.CRDT
             }
         }
 
-        public class Builder : UpdateCommandBuilder<UpdateMap, UpdateMapOptions, MapResponse>
+        public class Builder : UpdateCommandBuilder<UpdateMap.Builder, UpdateMap, UpdateMapOptions, MapResponse>
         {
             private MapOperation mapOp;
 
+            public Builder()
+            {
+            }
+
             public Builder(MapOperation mapOp)
             {
-                if (mapOp == null)
-                {
-                    throw new ArgumentNullException("mapOp", "mapOp is required.");
-                }
-                else
-                {
-                    this.mapOp = mapOp;
-                }
+                InitMapOp(mapOp);
             }
 
             public Builder(MapOperation mapOp, Builder source)
                 : base(source)
             {
+                InitMapOp(mapOp);
+            }
+
+            public Builder WithMapOperation(MapOperation mapOp)
+            {
+                this.mapOp = mapOp;
+                return this;
+            }
+
+            protected override void PopulateOptions(UpdateMapOptions options)
+            {
+                options.Op = mapOp;
+            }
+
+            private void InitMapOp(MapOperation mapOp)
+            {
                 if (mapOp == null)
                 {
                     throw new ArgumentNullException("mapOp", "mapOp is required.");
@@ -562,11 +575,6 @@ namespace RiakClient.Commands.CRDT
                 {
                     this.mapOp = mapOp;
                 }
-            }
-
-            protected override void PopulateOptions(UpdateMapOptions options)
-            {
-                options.Op = mapOp;
             }
         }
     }

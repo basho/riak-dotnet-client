@@ -19,8 +19,8 @@
 namespace RiakClient.Commands.CRDT
 {
     using System;
-using System.Collections.Generic;
-using System.Runtime.Serialization;
+    using System.Collections.Generic;
+    using System.Runtime.Serialization;
 
     public class Map
     {

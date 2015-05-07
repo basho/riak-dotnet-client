@@ -24,7 +24,7 @@ namespace RiakClient.Commands.CRDT
     /// <summary>
     /// Fetches a Map from Riak
     /// </summary>
-    public class FetchCounter : FetchCommand<CounterResponse>, IRiakCommand
+    public class FetchCounter : FetchCommand<CounterResponse>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="FetchCounter"/> class.
@@ -62,7 +62,8 @@ namespace RiakClient.Commands.CRDT
         }
 
         /// <inheritdoc />
-        public class Builder : FetchCommandBuilder<FetchCounter, FetchCounterOptions, CounterResponse>
+        public class Builder
+            : FetchCommandBuilder<FetchCounter.Builder, FetchCounter, FetchCounterOptions, CounterResponse>
         {
         }
     }

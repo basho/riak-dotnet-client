@@ -24,7 +24,7 @@ namespace RiakClient.Commands.CRDT
     /// <summary>
     /// Fetches a Map from Riak
     /// </summary>
-    public class FetchMap : FetchCommand<MapResponse>, IRiakCommand
+    public class FetchMap : FetchCommand<MapResponse>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="FetchMap"/> class.
@@ -62,7 +62,8 @@ namespace RiakClient.Commands.CRDT
         }
 
         /// <inheritdoc />
-        public class Builder : FetchCommandBuilder<FetchMap, FetchMapOptions, MapResponse>
+        public class Builder
+            : FetchCommandBuilder<FetchMap.Builder, FetchMap, FetchMapOptions, MapResponse>
         {
         }
     }

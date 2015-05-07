@@ -18,17 +18,11 @@
 
 namespace RiakClient.Commands.CRDT
 {
-    using System;
-
     /// <summary>
     /// Represents options for a <see cref="UpdateCommand{TResponse}"/> operation.
     /// </summary>
-    public abstract class UpdateCommandOptions
+    public abstract class UpdateCommandOptions : CommandOptions
     {
-        private readonly RiakString bucketType;
-        private readonly RiakString bucket;
-        private readonly RiakString key;
-
         private bool returnBody = true;
         private bool includeContext = true;
 
@@ -39,52 +33,8 @@ namespace RiakClient.Commands.CRDT
         /// <param name="bucket">The bucket in Riak. Required.</param>
         /// <param name="key">The key in Riak. If <b>null</b>, Riak will generate a key.</param>
         public UpdateCommandOptions(string bucketType, string bucket, string key)
+            : base(bucketType, bucket, key, false)
         {
-            if (string.IsNullOrEmpty(bucketType))
-            {
-                throw new ArgumentNullException("bucketType");
-            }
-            else
-            {
-                this.bucketType = bucketType;
-            }
-
-            if (string.IsNullOrEmpty(bucket))
-            {
-                throw new ArgumentNullException("bucket");
-            }
-            else
-            {
-                this.bucket = bucket;
-            }
-
-            this.key = key;
-        }
-
-        /// <summary>
-        /// The bucket type
-        /// </summary>
-        /// <value>A <see cref="RiakString"/> representing the bucket type.</value>
-        public RiakString BucketType
-        {
-            get { return bucketType; }
-        }
-
-        /// <summary>
-        /// The bucket
-        /// </summary>
-        /// <value>A <see cref="RiakString"/> representing the bucket.</value>
-        public RiakString Bucket
-        {
-            get { return bucket; }
-        }
-
-        /// <summary>
-        /// The key for the map you want to store. If not supplied Riak will generate one.
-        /// </summary>
-        public RiakString Key
-        {
-            get { return key; }
         }
 
         /// <summary>
@@ -110,11 +60,6 @@ namespace RiakClient.Commands.CRDT
             get { return returnBody; }
             set { returnBody = value; }
         }
-
-        /// <summary>
-        /// The timeout for this command.
-        /// </summary>
-        public TimeSpan Timeout { get; set; }
 
         /// <summary>
         /// The context from a previous fetch. Required for remove operations. 
