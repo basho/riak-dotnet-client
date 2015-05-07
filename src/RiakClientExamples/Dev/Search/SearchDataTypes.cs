@@ -16,6 +16,8 @@
 // under the License.
 // </copyright>
 
+#if TODO_CLIENTS_394
+
 #pragma warning disable 618
 
 namespace RiakClientExamples.Dev.Search
@@ -282,3 +284,5 @@ namespace RiakClientExamples.Dev.Search
 }
 
 #pragma warning restore 618
+
+#endif
