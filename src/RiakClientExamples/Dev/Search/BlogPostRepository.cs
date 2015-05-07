@@ -64,8 +64,6 @@ namespace RiakClientExamples.Dev.Search
 
             mapOp.SetFlag(publishedFlag, model.Published);
 
-            var id = new RiakObjectId(BucketType, bucket, null);
-
             // NB: no key so Riak will generate it
             var cmd = new UpdateMap.Builder()
                 .WithBucketType(BucketType)
