@@ -18,10 +18,14 @@
 
 namespace RiakClientExamples.Dev.Using
 {
+    using System;
+    using System.Diagnostics;
+    using System.Linq;
+    using Newtonsoft.Json;
     using NUnit.Framework;
     using RiakClient;
     using RiakClient.Commands.CRDT;
-    using RiakClient.Models;
+    using RiakClient.Util;
 
     /*
      * http://docs.basho.com/riak/latest/dev/using/data-types/
@@ -121,7 +125,9 @@ namespace RiakClientExamples.Dev.Using
             response = updateCmd.Response;
             Assert.AreEqual(5, response.Value);
 
-            updateCmd = new UpdateCounter.Builder(increment: -5, source: builder).Build();
+            // Modify the builder's increment, then construct a new command
+            builder.WithIncrement(-5);
+            updateCmd = builder.Build();
 
             rslt = client.Execute(updateCmd);
             CheckResult(rslt);
@@ -130,119 +136,160 @@ namespace RiakClientExamples.Dev.Using
             Assert.AreEqual(0, response.Value);
         }
 
-        /*
         [Test]
         public void InitialSetIsEmpty()
         {
-            id = new RiakObjectId("sets", "travel", "cities");
-            var rslt = client.DtFetchSet(id);
+            var builder = new FetchSet.Builder()
+                .WithBucketType("sets")
+                .WithBucket("travel")
+                .WithKey("cities");
+
+            // NB: builder.Options will only be set after Build() is called.
+            FetchSet fetchSetCommand = builder.Build();
+
+            FetchSetOptions options = new FetchSetOptions("sets", "travel", "cities");
+            Assert.AreEqual(options, builder.Options);
+
+            RiakResult rslt = client.Execute(fetchSetCommand);
             CheckResult(rslt);
 
-            int setSize = rslt.Values.Count;
-            Assert.AreEqual(0, setSize);
+            SetResponse response = fetchSetCommand.Response;
+            Assert.IsTrue(EnumerableUtil.IsNullOrEmpty(response.Value));
         }
 
         [Test]
         public void CitiesSetAddRemoveAndView()
         {
-            id = new RiakObjectId("sets", "travel", "cities");
-            var citiesSet = client.DtFetchSet(id);
-            CheckResult(citiesSet);
+            var adds = new[] { "Toronto", "Montreal" };
 
-            var adds = new List<string> { "Toronto", "Montreal" };
-            citiesSet = client.DtUpdateSet(id, Serializer, citiesSet.Context, adds);
-            CheckResult(citiesSet);
+            var builder = new UpdateSet.Builder()
+                .WithBucketType("sets")
+                .WithBucket("travel")
+                .WithKey("cities")
+                .WithAdditions(adds);
 
-            var removes = new List<string> { "Montreal" };
-            adds = new List<string> { "Hamilton", "Ottawa" };
-            citiesSet = client.DtUpdateSet(id, Serializer, citiesSet.Context, adds, removes);
-            CheckResult(citiesSet);
+            UpdateSet cmd = builder.Build();
+            RiakResult rslt = client.Execute(cmd);
+            CheckResult(rslt);
+            SetResponse response = cmd.Response;
 
-            foreach (var value in citiesSet.Values)
+            Assert.Contains("Toronto", response.AsStrings.ToArray());
+            Assert.Contains("Montreal", response.AsStrings.ToArray());
+
+            var removes = new[] { "Montreal" };
+            adds = new[] { "Hamilton", "Ottawa" };
+
+            Assert.True(EnumerableUtil.NotNullOrEmpty(response.Context));
+
+            builder
+                .WithAdditions(adds)
+                .WithRemovals(removes)
+                .WithContext(response.Context);
+
+            cmd = builder.Build();
+
+            rslt = client.Execute(cmd);
+            CheckResult(rslt);
+            response = cmd.Response;
+
+            var responseStrings = response.AsStrings.ToArray();
+
+            Assert.Contains("Toronto", responseStrings);
+            Assert.Contains("Hamilton", responseStrings);
+            Assert.Contains("Ottawa", responseStrings);
+
+            foreach (var value in response.AsStrings)
             {
-                string city = Encoding.UTF8.GetString(value);
-                var args = new[] { city };
-                Console.WriteLine("Cities Set Value: {0}", args);
+                Console.WriteLine("Cities Set Value: {0}", value);
             }
 
-            Console.WriteLine("Cities Set Size: {0}", citiesSet.Values.Count);
+            Console.WriteLine("Cities Set Size: {0}", responseStrings.Length);
+
+            bool includesVancouver = response.AsStrings.Any(v => v == "Vancouver");
+            bool includesOttawa = response.AsStrings.Any(v => v == "Ottawa");
+
+            Assert.False(includesVancouver);
+            Assert.True(includesOttawa);
         }
 
         [Test]
         public void Maps()
         {
-            const string firstNameRegister = "first_name";
-            const string lastNameRegister = "last_name";
-            const string phoneNumberRegister = "phone_number";
-            const string enterpriseCustomerFlag = "enterprise_customer";
-            const string pageVisitsCounter = "page_visits";
-            const string interestsSet = "interests";
-            const string annikaInfoMap = "annika_info";
-
-            id = new RiakObjectId("maps", "customers", "ahmed_info");
-            var rslt = client.DtFetchMap(id);
-            CheckResult(rslt);
+            var builder = new UpdateMap.Builder()
+                .WithBucketType("maps")
+                .WithBucket("customers")
+                .WithKey("ahmed_info");
 
             Console.WriteLine("------------------------------------------------------------------------\n");
             Console.WriteLine("Initial import of Ahmed's data and contact");
 
+            var mapOperation = new UpdateMap.MapOperation();
+
             // Ahmed's first name
-            var firstNameRegisterMapUpdate = new MapUpdate
-            {
-                register_op = Serializer("Ahmed"),
-                field = new MapField
-                {
-                    name = Serializer(firstNameRegister),
-                    type = MapField.MapFieldType.REGISTER
-                }
-            };
+            mapOperation.SetRegister("first_name", "Ahmed");
 
             // Ahmed's phone number
-            var phoneNumberRegisterMapUpdate = new MapUpdate
-            {
-                register_op = Serializer("5551234567"),
-                field = new MapField
-                {
-                    name = Serializer(phoneNumberRegister),
-                    type = MapField.MapFieldType.REGISTER
-                }
-            };
+            mapOperation.SetRegister("phone_number", "5551234567");
 
-            // Set Ahmed to NOT be an enterprise customer right now
-            var enterpriseCustomerFlagUpdate = new MapUpdate
-            {
-                flag_op = MapUpdate.FlagOp.DISABLE,
-                field = new MapField
-                {
-                    name = Serializer(enterpriseCustomerFlag),
-                    type = MapField.MapFieldType.FLAG
-                }
-            };
+            builder.WithMapOperation(mapOperation);
+            UpdateMap cmd = builder.Build();
+            RiakResult rslt = client.Execute(cmd);
+            CheckResult(rslt);
 
-            var pageVisitsCounterUpdate = new MapUpdate
-            {
-                counter_op = new CounterOp { increment = 1 },
-                field = new MapField
-                {
-                    name = Serializer(pageVisitsCounter),
-                    type = MapField.MapFieldType.COUNTER
-                }
-            };
+            MapResponse response = cmd.Response;
+            PrintMap(response.Value);
 
-            // Interests Set
+            Console.WriteLine("------------------------------------------------------------------------\n");
+            Console.WriteLine("Set Ahmed to NOT be an enterprise customer right now");
+
+            mapOperation = new UpdateMap.MapOperation();
+            mapOperation.SetFlag("enterprise_customer", false);
+
+            builder.WithMapOperation(mapOperation);
+            cmd = builder.Build();
+            rslt = client.Execute(cmd);
+            CheckResult(rslt);
+
+            response = cmd.Response;
+            PrintMap(response.Value);
+
+            Console.WriteLine("------------------------------------------------------------------------\n");
+            Console.WriteLine("enterprise_customer flag value");
+
+            Map ahmedMap = response.Value;
+            Console.WriteLine("Ahmed enterprise_customer: {0}", ahmedMap.Flags["enterprise_customer"]);
+
+            Console.WriteLine("------------------------------------------------------------------------\n");
+            Console.WriteLine("Add page visits counter for Ahmed");
+
+            mapOperation = new UpdateMap.MapOperation();
+            mapOperation.IncrementCounter("page_visits", 1);
+
+            builder.WithMapOperation(mapOperation);
+            cmd = builder.Build();
+            rslt = client.Execute(cmd);
+            CheckResult(rslt);
+
+            response = cmd.Response;
+            PrintMap(response.Value);
+
+            Console.WriteLine("------------------------------------------------------------------------\n");
+            Console.WriteLine("Add Ahmed's interests set");
+
             var interestsAdds = new[] { "robots", "opera", "motorcycles" };
-            var setOperation = new SetOp();
-            setOperation.adds.AddRange(interestsAdds.Select(i => Serializer(i)));
-            var interestsSetUpdate = new MapUpdate
-            {
-                set_op = setOperation,
-                field = new MapField
-                {
-                    name = Serializer(interestsSet),
-                    type = MapField.MapFieldType.SET
-                }
-            };
 
+            mapOperation = new UpdateMap.MapOperation();
+            mapOperation.AddToSet("interests", interestsAdds);
+
+            builder.WithMapOperation(mapOperation);
+            cmd = builder.Build();
+            rslt = client.Execute(cmd);
+            CheckResult(rslt);
+
+            response = cmd.Response;
+            PrintMap(response.Value);
+
+            /*
             // Maps within Maps (Nested Maps)
             var annikaMapUpdates = new List<MapUpdate>
             {
@@ -593,22 +640,15 @@ namespace RiakClientExamples.Dev.Using
             rslt = client.DtFetchMap(id);
             CheckResult(rslt);
             Console.WriteLine("Context: {0}", Convert.ToBase64String(rslt.Context));
+             */
         }
 
-        private void CheckResult(RiakDtMapResult rslt)
+        private static void PrintMap(Map map)
         {
-            CheckResult(rslt.Result);
+            var converter = new ByteArrayAsStringConverter();
+            string msg = string.Format("Map: {0}", JsonConvert.SerializeObject(map, converter));
+            Console.WriteLine(msg);
+            Debug.WriteLine(msg);
         }
-
-        private void CheckResult(RiakDtSetResult rslt)
-        {
-            CheckResult(rslt.Result);
-        }
-
-        private void CheckResult(RiakCounterResult rslt)
-        {
-            CheckResult(rslt.Result);
-        }
-         */
     }
 }

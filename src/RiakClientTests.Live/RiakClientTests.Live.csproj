@@ -70,6 +70,7 @@
     <Compile Include="DataTypes\DataTypeTestsBase.cs" />
     <Compile Include="DataTypes\MapDtEdgeCaseTests.cs" />
     <Compile Include="DataTypes\SetDtEdgeCaseTests.cs" />
+    <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="IntegrationTest.cs" />
     <Compile Include="IntegrationTestExtensions.cs" />
     <Compile Include="IntegrationTestExtensionsTest.cs" />

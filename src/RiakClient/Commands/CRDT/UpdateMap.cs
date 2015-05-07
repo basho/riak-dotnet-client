@@ -386,10 +386,44 @@ namespace RiakClient.Commands.CRDT
                 return this;
             }
 
+            public MapOperation AddToSet(RiakString key, IEnumerable<string> values)
+            {
+                return AddToSet(key, values.Select(v => new RiakString(v)));
+            }
+
+            public MapOperation AddToSet(RiakString key, IEnumerable<RiakString> values)
+            {
+                removeSets.Remove(key);
+
+                foreach (var value in values)
+                {
+                    addToSets.Add(key, value);
+                }
+
+                return this;
+            }
+
             public MapOperation RemoveFromSet(RiakString key, RiakString value)
             {
                 removeSets.Remove(key);
                 removeFromSets.Add(key, value);
+                return this;
+            }
+
+            public MapOperation RemoveFromSet(RiakString key, IEnumerable<string> values)
+            {
+                return RemoveFromSet(key, values.Select(v => new RiakString(v)));
+            }
+
+            public MapOperation RemoveFromSet(RiakString key, IEnumerable<RiakString> values)
+            {
+                removeSets.Remove(key);
+
+                foreach (var value in values)
+                {
+                    removeFromSets.Add(key, value);
+                }
+
                 return this;
             }
 

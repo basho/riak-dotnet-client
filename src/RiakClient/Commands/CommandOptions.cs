@@ -23,7 +23,7 @@ namespace RiakClient.Commands
     /// <summary>
     /// Base class for all Riak command options.
     /// </summary>
-    public abstract class CommandOptions
+    public abstract class CommandOptions : IEquatable<CommandOptions>
     {
         private readonly RiakString bucketType;
         private readonly RiakString bucket;
@@ -126,6 +126,43 @@ namespace RiakClient.Commands
                 {
                     timeout = value;
                 }
+            }
+        }
+
+        public bool Equals(CommandOptions other)
+        {
+            if (object.ReferenceEquals(other, null))
+            {
+                return false;
+            }
+
+            if (object.ReferenceEquals(this, other))
+            {
+                return true;
+            }
+
+            return this.GetHashCode() == other.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as CommandOptions);
+        }
+
+        /// <summary>
+        /// Returns a hash code for the current object.
+        /// Uses a combination of the public properties to generate a unique hash code.
+        /// </summary>
+        /// <returns>A hash code for the current object.</returns>
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int result = bucketType.GetHashCode();
+                result = (result * 397) ^ bucket.GetHashCode();
+                result = (result * 397) ^ (key != null ? key.GetHashCode() : 0);
+                result = (result * 397) ^ (timeout != null ? timeout.GetHashCode() : 0);
+                return result;
             }
         }
     }

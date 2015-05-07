@@ -19,17 +19,46 @@
 
 namespace RiakClient.Extensions
 {
-    using System;
     using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
 
     internal static class EnumerableExtensions
     {
-        internal static IEnumerable<T> Times<T>(this int count, Func<T> generator)
+        private static readonly UTF8Encoding UTF8 = new UTF8Encoding();
+
+        public static IEnumerable<byte[]> GetUTF8Bytes(this IEnumerable<string> strings)
         {
-            while (count-- > 0)
+            return GetBytes(strings, UTF8);
+        }
+
+        public static IEnumerable<byte[]> GetBytes(this IEnumerable<string> strings, Encoding encoding)
+        {
+            IEnumerable<byte[]> rv = null;
+
+            if (strings != null)
             {
-                yield return generator();
+                rv = strings.Select(encoding.GetBytes);
             }
+
+            return rv;
+        }
+
+        public static IEnumerable<string> GetUTF8Strings(this IEnumerable<byte[]> bytes)
+        {
+            return GetStrings(bytes, UTF8);
+        }
+
+        public static IEnumerable<string> GetStrings(this IEnumerable<byte[]> bytes, Encoding encoding)
+        {
+            IEnumerable<string> rv = null;
+
+            if (bytes != null)
+            {
+                rv = bytes.Select(encoding.GetString);
+            }
+
+            return rv;
         }
     }
 }

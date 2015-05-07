@@ -62,5 +62,19 @@ namespace RiakClient.Commands.CRDT
         /// Set to <b>false</b> to not return context. Default (and recommended value) is <b>true</b>.
         /// </summary>
         public bool IncludeContext { get; set; }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int result = base.GetHashCode();
+                result = (result * 397) ^ NotFoundOK.GetHashCode();
+                result = (result * 397) ^ UseBasicQuorum.GetHashCode();
+                result = (result * 397) ^ IncludeContext.GetHashCode();
+                result = (result * 397) ^ (R != null ? R.GetHashCode() : 0);
+                result = (result * 397) ^ (PR != null ? PR.GetHashCode() : 0);
+                return result;
+            }
+        }
     }
 }

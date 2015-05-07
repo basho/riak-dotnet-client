@@ -83,6 +83,21 @@ namespace RiakClient.Commands.CRDT
             get { return GetHasRemoves(); }
         }
 
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int result = base.GetHashCode();
+                result = (result * 397) ^ (W != null ? W.GetHashCode() : 0);
+                result = (result * 397) ^ (PW != null ? PW.GetHashCode() : 0);
+                result = (result * 397) ^ (DW != null ? DW.GetHashCode() : 0);
+                result = (result * 397) ^ ReturnBody.GetHashCode();
+                result = (result * 397) ^ Context.GetHashCode();
+                result = (result * 397) ^ IncludeContext.GetHashCode();
+                return result;
+            }
+        }
+
         protected abstract bool GetHasRemoves();
     }
 }

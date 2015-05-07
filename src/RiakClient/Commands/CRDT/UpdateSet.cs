@@ -19,6 +19,7 @@
 namespace RiakClient.Commands.CRDT
 {
     using System.Collections.Generic;
+    using Extensions;
     using Messages;
     using Util;
 
@@ -90,11 +91,24 @@ namespace RiakClient.Commands.CRDT
                 this.removals = removals;
             }
 
+            public Builder(IEnumerable<string> additions, IEnumerable<string> removals)
+            {
+                this.additions = additions.GetUTF8Bytes();
+                this.removals = removals.GetUTF8Bytes();
+            }
+
             public Builder(IEnumerable<byte[]> additions, IEnumerable<byte[]> removals, Builder source)
                 : base(source)
             {
                 this.additions = additions;
                 this.removals = removals;
+            }
+
+            public Builder(IEnumerable<string> additions, IEnumerable<string> removals, Builder source)
+                : base(source)
+            {
+                this.additions = additions.GetUTF8Bytes();
+                this.removals = removals.GetUTF8Bytes();
             }
 
             public Builder WithAdditions(IEnumerable<byte[]> additions)
@@ -103,9 +117,21 @@ namespace RiakClient.Commands.CRDT
                 return this;
             }
 
+            public Builder WithAdditions(IEnumerable<string> additions)
+            {
+                this.additions = additions.GetUTF8Bytes();
+                return this;
+            }
+
             public Builder WithRemovals(IEnumerable<byte[]> removals)
             {
                 this.removals = removals;
+                return this;
+            }
+
+            public Builder WithRemovals(IEnumerable<string> removals)
+            {
+                this.removals = removals.GetUTF8Bytes();
                 return this;
             }
 

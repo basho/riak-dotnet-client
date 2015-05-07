@@ -19,6 +19,7 @@
 namespace RiakClient.Commands.CRDT
 {
     using System.Collections.Generic;
+    using Extensions;
 
     /// <summary>
     /// Response to a <see cref="FetchSet"/> command.
@@ -40,6 +41,11 @@ namespace RiakClient.Commands.CRDT
         public SetResponse(RiakString key, byte[] context, IEnumerable<byte[]> value)
             : base(key, context, value)
         {
+        }
+
+        public IEnumerable<string> AsStrings
+        {
+            get { return Value.GetUTF8Strings(); }
         }
     }
 }
