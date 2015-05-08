@@ -19,6 +19,7 @@
 namespace RiakClientExamples.Dev.Using
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using NUnit.Framework;
     using RiakClient;
@@ -158,7 +159,7 @@ namespace RiakClientExamples.Dev.Using
         [Test]
         public void CitiesSetAddRemoveAndView()
         {
-            var adds = new[] { "Toronto", "Montreal" };
+            var adds = new HashSet<string> { "Toronto", "Montreal" };
 
             var builder = new UpdateSet.Builder()
                 .WithBucketType("sets")
@@ -174,8 +175,8 @@ namespace RiakClientExamples.Dev.Using
             Assert.Contains("Toronto", response.AsStrings.ToArray());
             Assert.Contains("Montreal", response.AsStrings.ToArray());
 
-            var removes = new[] { "Montreal" };
-            adds = new[] { "Hamilton", "Ottawa" };
+            var removes = new HashSet<string> { "Montreal" };
+            adds = new HashSet<string> { "Hamilton", "Ottawa" };
 
             Assert.True(EnumerableUtil.NotNullOrEmpty(response.Context));
 

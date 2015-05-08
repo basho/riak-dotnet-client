@@ -1,4 +1,4 @@
-// <copyright file="EnumerableExtensions.cs" company="Basho Technologies, Inc.">
+// <copyright file="SetExtensions.cs" company="Basho Technologies, Inc.">
 // Copyright 2011 - OJ Reeves & Jeremiah Peschka
 // Copyright 2014 - Basho Technologies, Inc.
 //
@@ -23,39 +23,39 @@ namespace RiakClient.Extensions
     using System.Linq;
     using System.Text;
 
-    internal static class EnumerableExtensions
+    internal static class SetExtensions
     {
         private static readonly UTF8Encoding UTF8 = new UTF8Encoding();
 
-        public static IEnumerable<byte[]> GetUTF8Bytes(this IEnumerable<string> strings)
+        public static ISet<byte[]> GetUTF8Bytes(this ISet<string> strings)
         {
             return GetBytes(strings, UTF8);
         }
 
-        public static IEnumerable<byte[]> GetBytes(this IEnumerable<string> strings, Encoding encoding)
+        public static ISet<byte[]> GetBytes(this ISet<string> strings, Encoding encoding)
         {
-            IEnumerable<byte[]> rv = null;
+            ISet<byte[]> rv = null;
 
             if (strings != null)
             {
-                rv = strings.Select(encoding.GetBytes);
+                rv = new HashSet<byte[]>(strings.Select(encoding.GetBytes));
             }
 
             return rv;
         }
 
-        public static IEnumerable<string> GetUTF8Strings(this IEnumerable<byte[]> bytes)
+        public static ISet<string> GetUTF8Strings(this ISet<byte[]> bytes)
         {
             return GetStrings(bytes, UTF8);
         }
 
-        public static IEnumerable<string> GetStrings(this IEnumerable<byte[]> bytes, Encoding encoding)
+        public static ISet<string> GetStrings(this ISet<byte[]> bytes, Encoding encoding)
         {
-            IEnumerable<string> rv = null;
+            ISet<string> rv = null;
 
             if (bytes != null)
             {
-                rv = bytes.Select(encoding.GetString);
+                rv = new HashSet<string>(bytes.Select(encoding.GetString));
             }
 
             return rv;

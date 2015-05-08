@@ -73,64 +73,64 @@ namespace RiakClient.Commands.CRDT
 
         protected override SetResponse CreateResponse(RiakString key, DtUpdateResp resp)
         {
-            return new SetResponse(key, resp.context, resp.set_value);
+            return new SetResponse(key, resp.context, new HashSet<byte[]>(resp.set_value));
         }
 
         public class Builder
             : UpdateCommandBuilder<UpdateSet.Builder, UpdateSet, UpdateSetOptions, SetResponse>
         {
-            private IEnumerable<byte[]> additions = Enumerable.Empty<byte[]>();
-            private IEnumerable<byte[]> removals = Enumerable.Empty<byte[]>();
+            private ISet<byte[]> additions;
+            private ISet<byte[]> removals;
 
             public Builder()
             {
             }
 
-            public Builder(IEnumerable<byte[]> additions, IEnumerable<byte[]> removals)
+            public Builder(ISet<byte[]> additions, ISet<byte[]> removals)
             {
                 this.additions = additions;
                 this.removals = removals;
             }
 
-            public Builder(IEnumerable<string> additions, IEnumerable<string> removals)
+            public Builder(ISet<string> additions, ISet<string> removals)
             {
                 this.additions = additions.GetUTF8Bytes();
                 this.removals = removals.GetUTF8Bytes();
             }
 
-            public Builder(IEnumerable<byte[]> additions, IEnumerable<byte[]> removals, Builder source)
+            public Builder(ISet<byte[]> additions, ISet<byte[]> removals, Builder source)
                 : base(source)
             {
                 this.additions = additions;
                 this.removals = removals;
             }
 
-            public Builder(IEnumerable<string> additions, IEnumerable<string> removals, Builder source)
+            public Builder(ISet<string> additions, ISet<string> removals, Builder source)
                 : base(source)
             {
                 this.additions = additions.GetUTF8Bytes();
                 this.removals = removals.GetUTF8Bytes();
             }
 
-            public Builder WithAdditions(IEnumerable<byte[]> additions)
+            public Builder WithAdditions(ISet<byte[]> additions)
             {
                 this.additions = additions;
                 return this;
             }
 
-            public Builder WithAdditions(IEnumerable<string> additions)
+            public Builder WithAdditions(ISet<string> additions)
             {
                 this.additions = additions.GetUTF8Bytes();
                 return this;
             }
 
-            public Builder WithRemovals(IEnumerable<byte[]> removals)
+            public Builder WithRemovals(ISet<byte[]> removals)
             {
                 this.removals = removals;
                 return this;
             }
 
-            public Builder WithRemovals(IEnumerable<string> removals)
+            public Builder WithRemovals(ISet<string> removals)
             {
                 this.removals = removals.GetUTF8Bytes();
                 return this;

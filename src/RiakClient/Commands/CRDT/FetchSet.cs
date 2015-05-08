@@ -18,6 +18,7 @@
 
 namespace RiakClient.Commands.CRDT
 {
+    using System.Collections.Generic;
     using Exceptions;
     using Messages;
 
@@ -56,7 +57,10 @@ namespace RiakClient.Commands.CRDT
                 }
                 else
                 {
-                    Response = new SetResponse(Options.Key, fetchResp.context, fetchResp.value.set_value);
+                    Response = new SetResponse(
+                        Options.Key,
+                        fetchResp.context,
+                        new HashSet<byte[]>(fetchResp.value.set_value));
                 }
             }
         }

@@ -32,7 +32,7 @@ namespace Test.Integration.CRDT
     {
         private static readonly ILog Log = Logging.GetLogger(typeof(UpdateAndFetchSetTests));
 
-        private static readonly IEnumerable<byte[]> DefaultAdds = new[]
+        private static readonly ISet<byte[]> DefaultAdds = new HashSet<byte[]>
             {
                 Encoding.UTF8.GetBytes("add_1"),
                 Encoding.UTF8.GetBytes("add_2")
@@ -78,12 +78,12 @@ namespace Test.Integration.CRDT
             SetResponse resp = SaveSet(key);
 
             var add_3 = new RiakString("add_3");
-            var adds = new[] { add_3 };
+            var adds = new HashSet<string> { add_3 };
 
             var add_1 = new RiakString("add_1");
-            var removes = new[] { add_1 };
+            var removes = new HashSet<string> { add_1 };
 
-            var update = new UpdateSet.Builder(adds.Select(a => (byte[])a), removes.Select(r => (byte[])r))
+            var update = new UpdateSet.Builder(adds, removes)
                 .WithBucketType(BucketType)
                 .WithBucket(Bucket)
                 .WithKey(key)

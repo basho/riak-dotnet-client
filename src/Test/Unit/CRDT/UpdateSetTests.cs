@@ -33,13 +33,13 @@ namespace Test.Unit.CRDT
         private const string Bucket = "myBucket";
         private const string Key = "set_1";
 
-        private static readonly IEnumerable<byte[]> DefaultAdds = new byte[][]
+        private static readonly ISet<byte[]> DefaultAdds = new HashSet<byte[]>
             {
                 Encoding.UTF8.GetBytes("add_1"),
                 Encoding.UTF8.GetBytes("add_2")
             };
 
-        private static readonly IEnumerable<byte[]> DefaultRemoves = new byte[][]
+        private static readonly ISet<byte[]> DefaultRemoves = new HashSet<byte[]>
             {
                 Encoding.UTF8.GetBytes("remove_1"),
                 Encoding.UTF8.GetBytes("remove_2")

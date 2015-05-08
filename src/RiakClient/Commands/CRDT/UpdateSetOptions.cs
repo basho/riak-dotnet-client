@@ -41,7 +41,7 @@ namespace RiakClient.Commands.CRDT
         /// The <see cref="UpdateSet"/> additions.
         /// </summary>
         /// <value>The values to add via the <see cref="UpdateSet"/> command.</value>
-        public IEnumerable<byte[]> Additions
+        public ISet<byte[]> Additions
         {
             get;
             set;
@@ -51,7 +51,7 @@ namespace RiakClient.Commands.CRDT
         /// The <see cref="UpdateSet"/> removals.
         /// </summary>
         /// <value>The values to remove via the <see cref="UpdateSet"/> command.</value>
-        public IEnumerable<byte[]> Removals
+        public ISet<byte[]> Removals
         {
             get;
             set;
@@ -61,7 +61,7 @@ namespace RiakClient.Commands.CRDT
         /// The <see cref="UpdateSet"/> additions, as UTF8-encoded strings.
         /// </summary>
         /// <value>The values to add via the <see cref="UpdateSet"/> command.</value>
-        public IEnumerable<string> AdditionsAsStrings
+        public ISet<string> AdditionsAsStrings
         {
             get { return Additions.GetUTF8Strings(); }
             set { Additions = value.GetUTF8Bytes(); }
@@ -71,7 +71,7 @@ namespace RiakClient.Commands.CRDT
         /// The <see cref="UpdateSet"/> removals, as UTF8-encoded strings.
         /// </summary>
         /// <value>The values to remove via the <see cref="UpdateSet"/> command.</value>
-        public IEnumerable<string> RemovalsAsStrings
+        public ISet<string> RemovalsAsStrings
         {
             get { return Removals.GetUTF8Strings(); }
             set { Removals = value.GetUTF8Bytes(); }

@@ -24,7 +24,7 @@ namespace RiakClient.Commands.CRDT
     /// <summary>
     /// Response to a <see cref="FetchSet"/> command.
     /// </summary>
-    public class SetResponse : Response<IEnumerable<byte[]>>
+    public class SetResponse : Response<ISet<byte[]>>
     {
         /// <inheritdoc />
         public SetResponse()
@@ -38,12 +38,12 @@ namespace RiakClient.Commands.CRDT
         /// <param name="key">A <see cref="RiakString"/> representing the key.</param>
         /// <param name="context">The data type context. Necessary to use this if updating a data type with removals.</param>
         /// <param name="value">The value of the fetched CRDT counter.</param>
-        public SetResponse(RiakString key, byte[] context, IEnumerable<byte[]> value)
+        public SetResponse(RiakString key, byte[] context, ISet<byte[]> value)
             : base(key, context, value)
         {
         }
 
-        public IEnumerable<string> AsStrings
+        public ISet<string> AsStrings
         {
             get { return Value.GetUTF8Strings(); }
         }

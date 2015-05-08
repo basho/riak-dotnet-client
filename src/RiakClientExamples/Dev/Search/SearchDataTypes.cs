@@ -92,7 +92,7 @@ namespace RiakClientExamples.Dev.Search
                 .WithBucketType("sets")
                 .WithBucket("people")
                 .WithKey("ditka")
-                .WithAdditions(new[] { "football", "winning" })
+                .WithAdditions(new HashSet<string> { "football", "winning" })
                 .Build();
             RiakResult rslt = client.Execute(cmd);
             CheckResult(rslt);
@@ -101,7 +101,7 @@ namespace RiakClientExamples.Dev.Search
                 .WithBucketType("sets")
                 .WithBucket("people")
                 .WithKey("dio")
-                .WithAdditions(new[] { "wailing", "rocking", "winning" })
+                .WithAdditions(new HashSet<string> { "wailing", "rocking", "winning" })
                 .Build();
             rslt = client.Execute(cmd);
             CheckResult(rslt);

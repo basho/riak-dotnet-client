@@ -294,7 +294,7 @@
     <Compile Include="Config\RiakClusterConfiguration.cs" />
     <Compile Include="Config\RiakNodeConfiguration.cs" />
     <Compile Include="Config\RiakNodeConfigurationCollection.cs" />
-    <Compile Include="Extensions\EnumerableExtensions.cs" />
+    <Compile Include="Extensions\SetExtensions.cs" />
     <Compile Include="Extensions\JsonExtensions.cs" />
     <Compile Include="Util\MonoUtil.cs" />
     <Compile Include="RiakConstants.cs" />
