@@ -19,9 +19,7 @@
 namespace RiakClientExamples.Dev.Using
 {
     using System;
-    using System.Diagnostics;
     using System.Linq;
-    using Newtonsoft.Json;
     using NUnit.Framework;
     using RiakClient;
     using RiakClient.Commands.CRDT;
@@ -394,14 +392,8 @@ namespace RiakClientExamples.Dev.Using
             CheckResult(rslt);
 
             MapResponse response = cmd.Response;
-            PrintMap(response.Value);
+            PrintObject(response.Value);
             return response;
-        }
-
-        private static void PrintMap(Map map)
-        {
-            var converter = new ByteArrayAsStringConverter();
-            Console.WriteLine("Map: {0}", JsonConvert.SerializeObject(map, converter));
         }
     }
 }

@@ -19,6 +19,7 @@
 namespace RiakClient.Commands.CRDT
 {
     using System.Collections.Generic;
+    using System.Linq;
     using Extensions;
     using Messages;
     using Util;
@@ -78,8 +79,8 @@ namespace RiakClient.Commands.CRDT
         public class Builder
             : UpdateCommandBuilder<UpdateSet.Builder, UpdateSet, UpdateSetOptions, SetResponse>
         {
-            private IEnumerable<byte[]> additions;
-            private IEnumerable<byte[]> removals;
+            private IEnumerable<byte[]> additions = Enumerable.Empty<byte[]>();
+            private IEnumerable<byte[]> removals = Enumerable.Empty<byte[]>();
 
             public Builder()
             {

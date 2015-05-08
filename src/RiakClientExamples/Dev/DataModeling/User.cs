@@ -120,6 +120,14 @@ namespace RiakClientExamples.Dev.DataModeling
             PropertyChanged(this, e);
         }
 
+        public void SetAccountStatus(bool accountStatus)
+        {
+            this.accountStatus = accountStatus;
+            var data = string.Format("AccountStatus:{0}", this.accountStatus.ToString());
+            var e = new PropertyChangedEventArgs(data);
+            PropertyChanged(this, e);
+        }
+
         public bool AccountStatus
         {
             get { return accountStatus; }

@@ -596,6 +596,11 @@ namespace RiakClient.Commands.CRDT
 
             protected override void PopulateOptions(UpdateMapOptions options)
             {
+                if (mapOp == null)
+                {
+                    throw new InvalidOperationException("Missing required MapOperation!");
+                }
+
                 options.Op = mapOp;
             }
 

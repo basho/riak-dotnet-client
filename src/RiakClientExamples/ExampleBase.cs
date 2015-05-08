@@ -21,6 +21,7 @@ namespace RiakClientExamples
     using System;
     using System.Collections.Generic;
     using System.Threading;
+    using Newtonsoft.Json;
     using NUnit.Framework;
     using RiakClient;
     using RiakClient.Commands.CRDT;
@@ -112,6 +113,12 @@ namespace RiakClientExamples
         protected void WaitForSearch()
         {
             Thread.Sleep(1250);
+        }
+
+        protected static void PrintObject(object obj)
+        {
+            var converter = new ByteArrayAsStringConverter();
+            Console.WriteLine("Object: {0}", JsonConvert.SerializeObject(obj, converter));
         }
     }
 }

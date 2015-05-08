@@ -16,15 +16,12 @@
 // under the License.
 // </copyright>
 
-#pragma warning disable 618
-
 namespace RiakClientExamples.Dev
 {
     using System;
-    using System.Collections.Generic;
     using System.Text;
     using RiakClient;
-    using RiakClient.Messages;
+    using RiakClient.Commands.CRDT;
     using RiakClient.Models;
 
     public abstract class Repository<TModel> : IRepository<TModel> where TModel : IModel
@@ -50,7 +47,7 @@ namespace RiakClientExamples.Dev
 
         public virtual TModel Get(string key, bool notFoundOK = false)
         {
-            var riakObjectId = new RiakObjectId(BucketType, BucketName, key);
+            var riakObjectId = new RiakObjectId(BucketType, Bucket, key);
             RiakResult<RiakObject> result = client.Get(riakObjectId);
             CheckResult(result, notFoundOK);
             RiakObject value = result.Value;
@@ -66,7 +63,7 @@ namespace RiakClientExamples.Dev
 
         public virtual string Save(TModel model)
         {
-            var riakObjectId = new RiakObjectId(BucketType, BucketName, model.ID);
+            var riakObjectId = new RiakObjectId(BucketType, Bucket, model.ID);
             var riakObject = new RiakObject(riakObjectId, model);
             RiakResult<RiakObject> result = client.Put(riakObject);
             CheckResult(result);
@@ -79,27 +76,48 @@ namespace RiakClientExamples.Dev
             get { return DefaultBucketTypeName; }
         }
 
-        protected virtual string BucketName
+        protected virtual string Bucket
         {
             get { return string.Empty; }
         }
 
-        protected void UpdateMap(TModel model, List<MapUpdate> mapUpdates, bool fetchFirst = false)
+        protected RiakString UpdateMap(TModel model, UpdateMap.MapOperation mapOperation, bool fetchFirst = false)
         {
             byte[] context = null;
-            RiakObjectId id = GetRiakObjectId(model);
 
             if (fetchFirst)
             {
-                var getRslt = client.DtFetchMap(id);
-                CheckResult(getRslt.Result);
-
-                context = getRslt.Context;
+                MapResponse response = FetchMap(model);
+                context = response.Context;
             }
 
-            var rslt = client.DtUpdateMap(
-                id, TextSerializer, context, null, mapUpdates, null);
-            CheckResult(rslt.Result);
+            var builder = new UpdateMap.Builder(mapOperation)
+                .WithBucketType(BucketType)
+                .WithBucket(Bucket);
+
+            if (!string.IsNullOrEmpty(model.ID))
+            {
+                builder.WithKey(model.ID);
+            }
+
+            UpdateMap cmd = builder.Build();
+            RiakResult rslt = client.Execute(cmd);
+            CheckResult(rslt);
+            return cmd.Response.Key;
+        }
+
+        protected MapResponse FetchMap(TModel model)
+        {
+            var cmd = new FetchMap.Builder()
+                .WithBucketType(BucketType)
+                .WithBucket(Bucket)
+                .WithKey(model.ID)
+                .WithIncludeContext(true)
+                .Build();
+
+            RiakResult rslt = client.Execute(cmd);
+            CheckResult(rslt);
+            return cmd.Response;
         }
 
         protected void CheckResult(RiakResult result, bool notFoundOK = false)
@@ -124,9 +142,7 @@ namespace RiakClientExamples.Dev
 
         protected RiakObjectId GetRiakObjectId(string key)
         {
-            return new RiakObjectId(BucketType, BucketName, key);
+            return new RiakObjectId(BucketType, Bucket, key);
         }
     }
 }
-
-#pragma warning restore 618

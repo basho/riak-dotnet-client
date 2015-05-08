@@ -80,6 +80,19 @@ namespace RiakClient.Commands.CRDT
                 : base(info, context)
             {
             }
+
+            public long GetValue(RiakString key)
+            {
+                long value;
+                if (TryGetValue(key, out value))
+                {
+                    return value;
+                }
+                else
+                {
+                    return default(long);
+                }
+            }
         }
 
         [Serializable]
