@@ -1063,7 +1063,11 @@ namespace RiakClient
         /// <inheritdoc/>
         public RiakResult PutSearchIndex(SearchIndex searchIndex)
         {
-            var request = new RpbYokozunaIndexPutReq { index = searchIndex.ToMessage() };
+            var request = new RpbYokozunaIndexPutReq
+            {
+                index = searchIndex.ToMessage(),
+                timeout = (uint)searchIndex.Timeout
+            };
             return UseConnection(conn => conn.PbcWriteRead(request, MessageCode.RpbPutResp));
         }
 

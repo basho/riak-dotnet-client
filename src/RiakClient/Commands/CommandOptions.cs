@@ -38,13 +38,29 @@ namespace RiakClient.Commands
         /// <param name="bucket">The bucket in Riak. Required.</param>
         /// <param name="key">The key in Riak.</param>
         /// <param name="keyIsRequired">If <b>true</b> and no key given, an exception is thrown.</param>
+        public CommandOptions(
+            string bucketType,
+            string bucket,
+            string key,
+            bool keyIsRequired)
+            : this(bucketType, bucket, key, keyIsRequired, CommandDefaults.Timeout)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CommandOptions"/> class.
+        /// </summary>
+        /// <param name="bucketType">The bucket type in Riak. Required.</param>
+        /// <param name="bucket">The bucket in Riak. Required.</param>
+        /// <param name="key">The key in Riak.</param>
+        /// <param name="keyIsRequired">If <b>true</b> and no key given, an exception is thrown.</param>
         /// <param name="timeout">The command timeout in Riak. Default is <b>60 seconds</b></param>
         public CommandOptions(
             string bucketType,
             string bucket,
             string key,
             bool keyIsRequired,
-            Timeout timeout = null)
+            Timeout timeout)
         {
             if (string.IsNullOrEmpty(bucketType))
             {

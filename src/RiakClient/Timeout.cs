@@ -24,12 +24,12 @@ namespace RiakClient
     /// <summary>
     /// Represents a wall-clock timeout for Riak operations. 
     /// </summary>
-    public class Timeout : IEquatable<Timeout>
+    public struct Timeout : IEquatable<Timeout>
     {
-        private readonly TimeSpan timeout = default(TimeSpan);
+        private readonly TimeSpan timeout;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Timeout"/> class.
+        /// Initializes a new instance of the <see cref="Timeout"/> struct.
         /// </summary>
         /// <param name="timeout">The <see cref="TimeSpan"/> to base this <see cref="Timeout"/> off of.</param>
         public Timeout(TimeSpan timeout)
@@ -38,7 +38,7 @@ namespace RiakClient
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Timeout"/> class.
+        /// Initializes a new instance of the <see cref="Timeout"/> struct.
         /// </summary>
         /// <param name="milliseconds">The number of milliseconds to base this <see cref="Timeout"/> off of.</param>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="milliseconds"/> must be greater than or equal to zero.</exception>
@@ -119,7 +119,14 @@ namespace RiakClient
         /// <returns><b>true</b> if the specified object is equal to the current object, otherwise, <b>false</b>.</returns>
         public override bool Equals(object obj)
         {
-            return Equals(obj as Timeout);
+            if (obj is Timeout)
+            {
+                return Equals((Timeout)obj);
+            }
+            else
+            {
+                return false;
+            }
         }
 
         /// <summary>
