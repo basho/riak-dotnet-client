@@ -16,17 +16,12 @@
 // under the License.
 // </copyright>
 
-#pragma warning disable 618
-
 namespace RiakClientExamples.Dev.Search
 {
     using System;
-    using System.Collections.Generic;
     using System.Globalization;
-    using System.Linq;
-    using System.Text;
     using RiakClient;
-    using RiakClient.Messages;
+    using RiakClient.Commands.CRDT;
     using RiakClient.Models;
 
     public class BlogPostRepository : Repository<BlogPost>
@@ -38,104 +33,48 @@ namespace RiakClientExamples.Dev.Search
         const string datePostedRegister = "date";
         const string publishedFlag = "published";
 
-        private static readonly SerializeObjectToByteArray<string> Serializer =
-            s => Encoding.UTF8.GetBytes(s);
+        private readonly string bucket;
 
-        private readonly string bucketName;
-
-        public BlogPostRepository(IRiakClient client, string bucketName)
+        public BlogPostRepository(IRiakClient client, string bucket)
             : base(client)
         {
-            if (string.IsNullOrWhiteSpace(bucketName))
+            if (string.IsNullOrWhiteSpace(bucket))
             {
-                throw new ArgumentNullException("bucketName");
+                throw new ArgumentNullException("bucket");
             }
 
-            this.bucketName = bucketName;
+            this.bucket = bucket;
         }
 
         public override string Save(BlogPost model)
         {
-            var updates = new List<MapUpdate>();
+            var mapOp = new UpdateMap.MapOperation();
 
-            updates.Add(new MapUpdate
-            {
-                register_op = Serializer(model.Title),
-                field = new MapField
-                {
-                    name = Serializer(titleRegister),
-                    type = MapField.MapFieldType.REGISTER
-                }
-            });
-
-            updates.Add(new MapUpdate
-            {
-                register_op = Serializer(model.Author),
-                field = new MapField
-                {
-                    name = Serializer(authorRegister),
-                    type = MapField.MapFieldType.REGISTER
-                }
-            });
-
-            updates.Add(new MapUpdate
-            {
-                register_op = Serializer(model.Content),
-                field = new MapField
-                {
-                    name = Serializer(contentRegister),
-                    type = MapField.MapFieldType.REGISTER
-                }
-            });
-
-            var keywordsSetOp = new SetOp();
-            keywordsSetOp.adds.AddRange(model.Keywords.Select(kw => Serializer(kw)));
-
-            updates.Add(new MapUpdate
-            {
-                set_op = keywordsSetOp,
-                field = new MapField
-                {
-                    name = Serializer(keywordsSet),
-                    type = MapField.MapFieldType.SET
-                }
-            });
+            mapOp.SetRegister(titleRegister, model.Title);
+            mapOp.SetRegister(authorRegister, model.Author);
+            mapOp.SetRegister(contentRegister, model.Content);
+            mapOp.AddToSet(keywordsSet, model.Keywords);
 
             string datePostedSolrFormatted =
                 model.DatePosted
                     .ToUniversalTime()
                     .ToString("yyyy-MM-dd'T'HH:mm:ss'Z'", CultureInfo.InvariantCulture);
-            updates.Add(new MapUpdate
-            {
-                register_op = Serializer(datePostedSolrFormatted),
-                field = new MapField
-                {
-                    name = Serializer(datePostedRegister),
-                    type = MapField.MapFieldType.REGISTER
-                }
-            });
 
-            updates.Add(new MapUpdate
-            {
-                flag_op = model.Published ?
-                    MapUpdate.FlagOp.ENABLE : MapUpdate.FlagOp.DISABLE,
-                field = new MapField
-                {
-                    name = Serializer(publishedFlag),
-                    type = MapField.MapFieldType.FLAG
-                }
-            });
+            mapOp.SetRegister(datePostedRegister, datePostedSolrFormatted);
 
-            var id = new RiakObjectId(BucketType, bucketName, null);
+            mapOp.SetFlag(publishedFlag, model.Published);
 
-            var rslt = client.DtFetchMap(id);
-            CheckResult(rslt.Result);
+            // NB: no key so Riak will generate it
+            var cmd = new UpdateMap.Builder()
+                .WithBucketType(BucketType)
+                .WithBucket(this.bucket)
+                .WithMapOperation(mapOp)
+                .Build();
 
-            rslt = client.DtUpdateMap(id, Serializer, rslt.Context, null, updates, null);
-            CheckResult(rslt.Result);
-
-            RiakObject obj = rslt.Result.Value;
-            return obj.Key;
+            RiakResult rslt = client.Execute(cmd);
+            CheckResult(rslt);
+            MapResponse response = cmd.Response;
+            return response.Key;
         }
 
         protected override string BucketType
@@ -144,5 +83,3 @@ namespace RiakClientExamples.Dev.Search
         }
     }
 }
-
-#pragma warning restore 618

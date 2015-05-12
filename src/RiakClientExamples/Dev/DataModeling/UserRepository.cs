@@ -16,17 +16,11 @@
 // under the License.
 // </copyright>
 
-#pragma warning disable 618
-
 namespace RiakClientExamples.Dev.DataModeling
 {
-    using System;
-    using System.Collections.Generic;
     using System.Linq;
     using RiakClient;
-    using RiakClient.Messages;
-    using RiakClient.Models.RiakDt;
-    using RiakClient.Util;
+    using RiakClient.Commands.CRDT;
 
     public class UserRepository : Repository<User>
     {
@@ -43,195 +37,77 @@ namespace RiakClientExamples.Dev.DataModeling
 
         public override User Get(string key, bool notFoundOK = false)
         {
-            var fetchRslt = client.DtFetchMap(GetRiakObjectId(key));
-            CheckResult(fetchRslt.Result);
+            FetchMap cmd = new FetchMap.Builder()
+                .WithBucketType(BucketType)
+                .WithBucket(Bucket)
+                .WithKey(key)
+                .Build();
 
-            string firstName = null;
-            string lastName = null;
-            var interests = new List<string>();
-            uint pageVisits = 0;
+            RiakResult rslt = client.Execute(cmd);
+            CheckResult(rslt);
+            MapResponse response = cmd.Response;
+            Map map = response.Value;
 
-            foreach (var value in fetchRslt.Values)
-            {
-                RiakDtMapField mapField = value.Field;
-                switch (mapField.Name)
-                {
-                    case firstNameRegister:
-                        if (mapField.Type != RiakDtMapField.RiakDtMapFieldType.Register)
-                        {
-                            throw new InvalidCastException("expected Register type");
-                        }
-                        firstName = TextDeserializer(value.RegisterValue);
-                        break;
-                    case lastNameRegister:
-                        if (mapField.Type != RiakDtMapField.RiakDtMapFieldType.Register)
-                        {
-                            throw new InvalidCastException("expected Register type");
-                        }
-                        lastName = TextDeserializer(value.RegisterValue);
-                        break;
-                    case interestsSet:
-                        if (mapField.Type != RiakDtMapField.RiakDtMapFieldType.Set)
-                        {
-                            throw new InvalidCastException("expected Set type");
-                        }
-                        interests.AddRange(value.SetValue.Select(v => TextDeserializer(v)));
-                        break;
-                    case pageVisitsCounter:
-                        if (mapField.Type != RiakDtMapField.RiakDtMapFieldType.Counter)
-                        {
-                            throw new InvalidCastException("expected Counter type");
-                        }
-                        pageVisits = (uint)value.Counter.Value;
-                        break;
-                    /*
-                     * Note: can do additional checks here in default case
-                     */
-                }
-            }
+            string firstName = map.Registers.GetValue(firstNameRegister);
+            string lastName = map.Registers.GetValue(lastNameRegister);
+            var interests = map.Sets.GetValue(interestsSet).ToArray();
+            uint pageVisits = (uint)map.Counters.GetValue(pageVisitsCounter);
 
-            return new User(firstName, lastName, interests, pageVisits);
+            bool accountStatus;
+            map.Flags.TryGetValue(paidAccountFlag, out accountStatus);
+
+            return new User(firstName, lastName, interests, pageVisits, accountStatus);
         }
 
         public override string Save(User model)
         {
-            var mapUpdates = new List<MapUpdate>();
+            var mapOperation = new UpdateMap.MapOperation();
 
-            mapUpdates.Add(new MapUpdate
-            {
-                register_op = TextSerializer(model.FirstName),
-                field = new MapField
-                {
-                    name = TextSerializer(firstNameRegister),
-                    type = MapField.MapFieldType.REGISTER
-                }
-            });
+            mapOperation.SetRegister(firstNameRegister, model.FirstName);
+            mapOperation.SetRegister(lastNameRegister, model.LastName);
+            mapOperation.IncrementCounter(pageVisitsCounter, model.PageVisits);
+            mapOperation.AddToSet(interestsSet, model.Interests);
 
-            mapUpdates.Add(new MapUpdate
-            {
-                register_op = TextSerializer(model.LastName),
-                field = new MapField
-                {
-                    name = TextSerializer(lastNameRegister),
-                    type = MapField.MapFieldType.REGISTER
-                }
-            });
-
-            if (EnumerableUtil.NotNullOrEmpty(model.Interests))
-            {
-                var interestsSetOp = new SetOp();
-                interestsSetOp.adds.AddRange(
-                    model.Interests.Select(i => TextSerializer(i))
-                );
-                mapUpdates.Add(new MapUpdate
-                {
-                    set_op = interestsSetOp,
-                    field = new MapField
-                    {
-                        name = TextSerializer(interestsSet),
-                        type = MapField.MapFieldType.SET
-                    }
-                });
-            }
-
-            // Update without context
-            UpdateMap(model, mapUpdates);
-
-            return model.ID;
+            // Insert does not require context
+            RiakString key = UpdateMap(model, mapOperation, fetchFirst: false);
+            return (string)key;
         }
 
         public void AddInterest(User model, string interest)
         {
-            var interestsSetOp = new SetOp();
-            interestsSetOp.adds.Add(TextSerializer(interest));
+            var mapOperation = new UpdateMap.MapOperation();
+            mapOperation.AddToSet(interestsSet, interest);
 
-            var mapUpdates = new List<MapUpdate>
-            {
-                new MapUpdate
-                {
-                    set_op = interestsSetOp,
-                    field = new MapField
-                    {
-                        name = TextSerializer(interestsSet),
-                        type = MapField.MapFieldType.SET
-                    }
-                }
-            };
-
-            UpdateMap(model, mapUpdates, fetchFirst: true);
+            // Adding to a set does not require context
+            UpdateMap(model, mapOperation, fetchFirst: false);
         }
 
         public void RemoveInterest(User model, string interest)
         {
-            var interestsSetOp = new SetOp();
-            interestsSetOp.removes.Add(TextSerializer(interest));
+            var mapOperation = new UpdateMap.MapOperation();
+            mapOperation.RemoveFromSet(interestsSet, interest);
 
-            var mapUpdates = new List<MapUpdate>
-            {
-                new MapUpdate
-                {
-                    set_op = interestsSetOp,
-                    field = new MapField
-                    {
-                        name = TextSerializer(interestsSet),
-                        type = MapField.MapFieldType.SET
-                    }
-                }
-            };
-
-            UpdateMap(model, mapUpdates, fetchFirst: true);
+            // Removing from a set requires context
+            UpdateMap(model, mapOperation, fetchFirst: true);
         }
 
         public void IncrementPageVisits(User model)
         {
-            var mapUpdates = new List<MapUpdate>();
-
-            mapUpdates.Add(new MapUpdate
-            {
-                counter_op = new CounterOp { increment = 1 },
-                field = new MapField
-                {
-                    name = TextSerializer(pageVisitsCounter),
-                    type = MapField.MapFieldType.COUNTER
-                }
-            });
+            var mapOperation = new UpdateMap.MapOperation();
+            mapOperation.IncrementCounter(pageVisitsCounter, 1);
 
             // Update without context
-            UpdateMap(model, mapUpdates);
+            UpdateMap(model, mapOperation, fetchFirst: false);
         }
 
         public void UpgradeAccount(User model)
         {
-            var mapUpdates = new List<MapUpdate>();
-
-            mapUpdates.Add(new MapUpdate
-            {
-                flag_op = MapUpdate.FlagOp.ENABLE,
-                field = new MapField
-                {
-                    name = TextSerializer(paidAccountFlag),
-                    type = MapField.MapFieldType.FLAG
-                }
-            });
-
-            UpdateMap(model, mapUpdates, fetchFirst: true);
+            SetPaidAccount(model, true);
         }
 
         public void DowngradeAccount(User model)
         {
-            var mapUpdates = new List<MapUpdate>();
-
-            mapUpdates.Add(new MapUpdate
-            {
-                flag_op = MapUpdate.FlagOp.DISABLE,
-                field = new MapField
-                {
-                    name = TextSerializer(paidAccountFlag),
-                    type = MapField.MapFieldType.FLAG
-                }
-            });
-
-            UpdateMap(model, mapUpdates, fetchFirst: true);
+            SetPaidAccount(model, false);
         }
 
         protected override string BucketType
@@ -239,11 +115,18 @@ namespace RiakClientExamples.Dev.DataModeling
             get { return "maps"; }
         }
 
-        protected override string BucketName
+        protected override string Bucket
         {
             get { return "users"; }
         }
+
+        private void SetPaidAccount(User model, bool value)
+        {
+            var mapOperation = new UpdateMap.MapOperation();
+            mapOperation.SetFlag(paidAccountFlag, value);
+
+            // Flag update does not require context
+            UpdateMap(model, mapOperation, fetchFirst: false);
+        }
     }
 }
-
-#pragma warning restore 618

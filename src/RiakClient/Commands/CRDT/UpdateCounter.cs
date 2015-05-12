@@ -34,7 +34,7 @@ namespace RiakClient.Commands.CRDT
     ///           .Build();
     /// </code>
     /// </summary>
-    public class UpdateCounter : UpdateCommand<CounterResponse>, IRiakCommand
+    public class UpdateCounter : UpdateCommand<CounterResponse>
     {
         private readonly UpdateCounterOptions options;
 
@@ -62,13 +62,30 @@ namespace RiakClient.Commands.CRDT
             return new CounterResponse(key, resp.context, resp.counter_value);
         }
 
-        public class Builder : UpdateCommandBuilder<UpdateCounter, UpdateCounterOptions, CounterResponse>
+        public class Builder :
+            UpdateCommandBuilder<UpdateCounter.Builder, UpdateCounter, UpdateCounterOptions, CounterResponse>
         {
             private long increment;
+
+            public Builder()
+            {
+            }
 
             public Builder(long increment)
             {
                 this.increment = increment;
+            }
+
+            public Builder(long increment, Builder source)
+                : base(source)
+            {
+                this.increment = increment;
+            }
+
+            public Builder WithIncrement(long increment)
+            {
+                this.increment = increment;
+                return this;
             }
 
             protected override void PopulateOptions(UpdateCounterOptions options)

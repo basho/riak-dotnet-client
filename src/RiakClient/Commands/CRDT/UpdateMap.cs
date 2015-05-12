@@ -47,7 +47,7 @@ namespace RiakClient.Commands.CRDT
     ///           .Build();
     /// </code>
     /// </summary>
-    public class UpdateMap : UpdateCommand<MapResponse>, IRiakCommand
+    public class UpdateMap : UpdateCommand<MapResponse>
     {
         private readonly UpdateMapOptions options;
 
@@ -386,10 +386,44 @@ namespace RiakClient.Commands.CRDT
                 return this;
             }
 
+            public MapOperation AddToSet(RiakString key, IEnumerable<string> values)
+            {
+                return AddToSet(key, values.Select(v => new RiakString(v)));
+            }
+
+            public MapOperation AddToSet(RiakString key, IEnumerable<RiakString> values)
+            {
+                removeSets.Remove(key);
+
+                foreach (var value in values)
+                {
+                    addToSets.Add(key, value);
+                }
+
+                return this;
+            }
+
             public MapOperation RemoveFromSet(RiakString key, RiakString value)
             {
                 removeSets.Remove(key);
                 removeFromSets.Add(key, value);
+                return this;
+            }
+
+            public MapOperation RemoveFromSet(RiakString key, IEnumerable<string> values)
+            {
+                return RemoveFromSet(key, values.Select(v => new RiakString(v)));
+            }
+
+            public MapOperation RemoveFromSet(RiakString key, IEnumerable<RiakString> values)
+            {
+                removeSets.Remove(key);
+
+                foreach (var value in values)
+                {
+                    removeFromSets.Add(key, value);
+                }
+
                 return this;
             }
 
@@ -535,12 +569,42 @@ namespace RiakClient.Commands.CRDT
             }
         }
 
-        public class Builder : UpdateCommandBuilder<UpdateMap, UpdateMapOptions, MapResponse>
+        public class Builder : UpdateCommandBuilder<UpdateMap.Builder, UpdateMap, UpdateMapOptions, MapResponse>
         {
             private MapOperation mapOp;
 
+            public Builder()
+            {
+            }
+
             public Builder(MapOperation mapOp)
-                : base()
+            {
+                InitMapOp(mapOp);
+            }
+
+            public Builder(MapOperation mapOp, Builder source)
+                : base(source)
+            {
+                InitMapOp(mapOp);
+            }
+
+            public Builder WithMapOperation(MapOperation mapOp)
+            {
+                this.mapOp = mapOp;
+                return this;
+            }
+
+            protected override void PopulateOptions(UpdateMapOptions options)
+            {
+                if (mapOp == null)
+                {
+                    throw new InvalidOperationException("Missing required MapOperation!");
+                }
+
+                options.Op = mapOp;
+            }
+
+            private void InitMapOp(MapOperation mapOp)
             {
                 if (mapOp == null)
                 {
@@ -550,11 +614,6 @@ namespace RiakClient.Commands.CRDT
                 {
                     this.mapOp = mapOp;
                 }
-            }
-
-            protected override void PopulateOptions(UpdateMapOptions options)
-            {
-                options.Op = mapOp;
             }
         }
     }

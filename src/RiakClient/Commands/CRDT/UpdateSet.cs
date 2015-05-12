@@ -19,6 +19,8 @@
 namespace RiakClient.Commands.CRDT
 {
     using System.Collections.Generic;
+    using System.Linq;
+    using Extensions;
     using Messages;
     using Util;
 
@@ -36,7 +38,7 @@ namespace RiakClient.Commands.CRDT
     ///           .Build();
     /// </code>
     /// </summary>
-    public class UpdateSet : UpdateCommand<SetResponse>, IRiakCommand
+    public class UpdateSet : UpdateCommand<SetResponse>
     {
         private readonly UpdateSetOptions options;
 
@@ -71,18 +73,67 @@ namespace RiakClient.Commands.CRDT
 
         protected override SetResponse CreateResponse(RiakString key, DtUpdateResp resp)
         {
-            return new SetResponse(key, resp.context, resp.set_value);
+            return new SetResponse(key, resp.context, new HashSet<byte[]>(resp.set_value));
         }
 
-        public class Builder : UpdateCommandBuilder<UpdateSet, UpdateSetOptions, SetResponse>
+        public class Builder
+            : UpdateCommandBuilder<UpdateSet.Builder, UpdateSet, UpdateSetOptions, SetResponse>
         {
-            private IEnumerable<byte[]> additions;
-            private IEnumerable<byte[]> removals;
+            private ISet<byte[]> additions;
+            private ISet<byte[]> removals;
 
-            public Builder(IEnumerable<byte[]> additions, IEnumerable<byte[]> removals)
+            public Builder()
+            {
+            }
+
+            public Builder(ISet<byte[]> additions, ISet<byte[]> removals)
             {
                 this.additions = additions;
                 this.removals = removals;
+            }
+
+            public Builder(ISet<string> additions, ISet<string> removals)
+            {
+                this.additions = additions.GetUTF8Bytes();
+                this.removals = removals.GetUTF8Bytes();
+            }
+
+            public Builder(ISet<byte[]> additions, ISet<byte[]> removals, Builder source)
+                : base(source)
+            {
+                this.additions = additions;
+                this.removals = removals;
+            }
+
+            public Builder(ISet<string> additions, ISet<string> removals, Builder source)
+                : base(source)
+            {
+                this.additions = additions.GetUTF8Bytes();
+                this.removals = removals.GetUTF8Bytes();
+            }
+
+            public Builder WithAdditions(ISet<byte[]> additions)
+            {
+                this.additions = additions;
+                return this;
+            }
+
+            public Builder WithAdditions(ISet<string> additions)
+            {
+                this.additions = additions.GetUTF8Bytes();
+                return this;
+            }
+
+            public Builder WithRemovals(ISet<byte[]> removals)
+            {
+                this.removals = removals;
+                return this;
+            }
+
+            public Builder WithRemovals(ISet<string> removals)
+            {
+                this.removals = removals.GetUTF8Bytes();
+                return this;
             }
 
             protected override void PopulateOptions(UpdateSetOptions options)

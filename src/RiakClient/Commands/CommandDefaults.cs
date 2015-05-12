@@ -1,4 +1,4 @@
-﻿// <copyright file="IRepository.cs" company="Basho Technologies, Inc.">
+﻿// <copyright file="CommandDefaults.cs" company="Basho Technologies, Inc.">
 // Copyright 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
@@ -16,12 +16,12 @@
 // under the License.
 // </copyright>
 
-namespace RiakClientExamples.Dev
+namespace RiakClient.Commands
 {
+    using System;
 
-    public interface IRepository<T> where T : IModel
+    internal static class CommandDefaults
     {
-        T Get(string key, bool notFoundOK = false);
-        string Save(T model);
+        public static readonly Timeout Timeout = new Timeout(TimeSpan.FromSeconds(60));
     }
 }

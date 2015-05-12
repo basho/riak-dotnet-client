@@ -24,7 +24,7 @@ namespace RiakClient.Commands.CRDT
 
     public abstract class UpdateCommand<TResponse> : IRiakCommand where TResponse : Response, new()
     {
-        private readonly UpdateCommandOptions options;
+        private readonly UpdateCommandOptions updateOptions;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UpdateCommand{TResponse}"/> class.
@@ -37,13 +37,18 @@ namespace RiakClient.Commands.CRDT
                 throw new ArgumentNullException("options");
             }
 
-            this.options = options;
+            this.updateOptions = options;
 
-            if (this.options.HasRemoves &&
-                EnumerableUtil.IsNullOrEmpty(this.options.Context))
+            if (this.updateOptions.HasRemoves &&
+                EnumerableUtil.IsNullOrEmpty(this.updateOptions.Context))
             {
                 throw new InvalidOperationException("When doing any removes a context must be provided.");
             }
+        }
+
+        public UpdateCommandOptions Options
+        {
+            get { return updateOptions; }
         }
 
         public MessageCode ExpectedCode
@@ -57,20 +62,20 @@ namespace RiakClient.Commands.CRDT
         {
             var req = new DtUpdateReq();
 
-            req.type = options.BucketType;
-            req.bucket = options.Bucket;
-            req.key = options.Key;
+            req.type = updateOptions.BucketType;
+            req.bucket = updateOptions.Bucket;
+            req.key = updateOptions.Key;
 
-            req.w = options.W;
-            req.pw = options.PW;
-            req.dw = options.DW;
+            req.w = updateOptions.W;
+            req.pw = updateOptions.PW;
+            req.dw = updateOptions.DW;
 
-            req.return_body = options.ReturnBody;
+            req.return_body = updateOptions.ReturnBody;
 
-            req.timeout = (uint)options.Timeout.TotalMilliseconds;
+            req.timeout = (uint)updateOptions.Timeout;
 
-            req.context = options.Context;
-            req.include_context = options.IncludeContext;
+            req.context = updateOptions.Context;
+            req.include_context = updateOptions.IncludeContext;
 
             if (req.include_context)
             {
@@ -92,7 +97,7 @@ namespace RiakClient.Commands.CRDT
             {
                 DtUpdateResp resp = (DtUpdateResp)response;
                 RiakString key = EnumerableUtil.NotNullOrEmpty(resp.key) ?
-                    new RiakString(resp.key) : options.Key;
+                    new RiakString(resp.key) : updateOptions.Key;
                 Response = CreateResponse(key, resp);
             }
         }

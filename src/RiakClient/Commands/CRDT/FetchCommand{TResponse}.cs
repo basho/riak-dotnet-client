@@ -22,12 +22,12 @@ namespace RiakClient.Commands.CRDT
     using Messages;
 
     /// <summary>
-    /// Fetches a Map from Riak
+    /// Fetches a CRDT from Riak
     /// </summary>
     /// <typeparam name="TResponse">The type of the response data from Riak.</typeparam>
-    public abstract class FetchCommand<TResponse> where TResponse : Response
+    public abstract class FetchCommand<TResponse> : IRiakCommand where TResponse : Response
     {
-        protected readonly FetchCommandOptions Options;
+        private readonly FetchCommandOptions fetchOptions;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FetchCommand{TResponse}"/> class.
@@ -40,7 +40,12 @@ namespace RiakClient.Commands.CRDT
                 throw new ArgumentNullException("options");
             }
 
-            this.Options = options;
+            this.fetchOptions = options;
+        }
+
+        public FetchCommandOptions Options
+        {
+            get { return fetchOptions; }
         }
 
         /// <summary>
@@ -60,17 +65,17 @@ namespace RiakClient.Commands.CRDT
         {
             var req = new DtFetchReq();
 
-            req.type = Options.BucketType;
-            req.bucket = Options.Bucket;
-            req.key = Options.Key;
+            req.type = fetchOptions.BucketType;
+            req.bucket = fetchOptions.Bucket;
+            req.key = fetchOptions.Key;
 
-            req.r = Options.R;
-            req.pr = Options.PR;
+            req.r = fetchOptions.R;
+            req.pr = fetchOptions.PR;
 
-            req.timeout = (uint)Options.Timeout.TotalMilliseconds;
-            req.notfound_ok = Options.NotFoundOK;
-            req.include_context = Options.IncludeContext;
-            req.basic_quorum = Options.UseBasicQuorum;
+            req.timeout = (uint)fetchOptions.Timeout;
+            req.notfound_ok = fetchOptions.NotFoundOK;
+            req.include_context = fetchOptions.IncludeContext;
+            req.basic_quorum = fetchOptions.UseBasicQuorum;
 
             return req;
         }

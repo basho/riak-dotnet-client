@@ -17,14 +17,14 @@
 // under the License.
 // </copyright>
 
-namespace RiakClient.Extensions
+namespace RiakClientTests.Live
 {
     using System;
     using System.Collections.Generic;
 
     internal static class EnumerableExtensions
     {
-        internal static IEnumerable<T> Times<T>(this int count, Func<T> generator)
+        public static IEnumerable<T> Times<T>(this int count, Func<T> generator)
         {
             while (count-- > 0)
             {

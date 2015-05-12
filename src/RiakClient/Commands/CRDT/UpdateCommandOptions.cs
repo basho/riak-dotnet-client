@@ -18,16 +18,13 @@
 
 namespace RiakClient.Commands.CRDT
 {
-    using System;
-
     /// <summary>
     /// Represents options for a <see cref="UpdateCommand{TResponse}"/> operation.
     /// </summary>
-    public abstract class UpdateCommandOptions
+    public abstract class UpdateCommandOptions : CommandOptions
     {
-        private readonly RiakString bucketType;
-        private readonly RiakString bucket;
-        private readonly RiakString key;
+        private bool returnBody = true;
+        private bool includeContext = true;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UpdateCommandOptions"/> class.
@@ -36,52 +33,8 @@ namespace RiakClient.Commands.CRDT
         /// <param name="bucket">The bucket in Riak. Required.</param>
         /// <param name="key">The key in Riak. If <b>null</b>, Riak will generate a key.</param>
         public UpdateCommandOptions(string bucketType, string bucket, string key)
+            : base(bucketType, bucket, key, false)
         {
-            if (string.IsNullOrEmpty(bucketType))
-            {
-                throw new ArgumentNullException("bucketType");
-            }
-            else
-            {
-                this.bucketType = bucketType;
-            }
-
-            if (string.IsNullOrEmpty(bucket))
-            {
-                throw new ArgumentNullException("bucket");
-            }
-            else
-            {
-                this.bucket = bucket;
-            }
-
-            this.key = key;
-        }
-
-        /// <summary>
-        /// The bucket type
-        /// </summary>
-        /// <value>A <see cref="RiakString"/> representing the bucket type.</value>
-        public RiakString BucketType
-        {
-            get { return bucketType; }
-        }
-
-        /// <summary>
-        /// The bucket
-        /// </summary>
-        /// <value>A <see cref="RiakString"/> representing the bucket.</value>
-        public RiakString Bucket
-        {
-            get { return bucket; }
-        }
-
-        /// <summary>
-        /// The key for the map you want to store. If not supplied Riak will generate one.
-        /// </summary>
-        public RiakString Key
-        {
-            get { return key; }
         }
 
         /// <summary>
@@ -102,12 +55,11 @@ namespace RiakClient.Commands.CRDT
         /// <summary>
         /// If true, returns the updated CRDT.
         /// </summary>
-        public bool ReturnBody { get; set; }
-
-        /// <summary>
-        /// The timeout for this command.
-        /// </summary>
-        public TimeSpan Timeout { get; set; }
+        public bool ReturnBody
+        {
+            get { return returnBody; }
+            set { returnBody = value; }
+        }
 
         /// <summary>
         /// The context from a previous fetch. Required for remove operations. 
@@ -117,7 +69,11 @@ namespace RiakClient.Commands.CRDT
         /// <summary>
         /// Set to <b>false</b> to not return context. Default (and recommended value) is <b>true</b>.
         /// </summary>
-        public bool IncludeContext { get; set; }
+        public bool IncludeContext
+        {
+            get { return includeContext; }
+            set { includeContext = value; }
+        }
 
         /// <summary>
         /// Returns to <b>true</b> if this command has removals.
@@ -125,6 +81,21 @@ namespace RiakClient.Commands.CRDT
         public bool HasRemoves
         {
             get { return GetHasRemoves(); }
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int result = base.GetHashCode();
+                result = (result * 397) ^ (W != null ? W.GetHashCode() : 0);
+                result = (result * 397) ^ (PW != null ? PW.GetHashCode() : 0);
+                result = (result * 397) ^ (DW != null ? DW.GetHashCode() : 0);
+                result = (result * 397) ^ ReturnBody.GetHashCode();
+                result = (result * 397) ^ Context.GetHashCode();
+                result = (result * 397) ^ IncludeContext.GetHashCode();
+                return result;
+            }
         }
 
         protected abstract bool GetHasRemoves();

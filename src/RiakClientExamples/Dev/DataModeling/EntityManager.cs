@@ -26,7 +26,9 @@ namespace RiakClientExamples.Dev.DataModeling
 
     public class EntityManager
     {
-        private static readonly char[] interestsEventChars = new char[] { ':' };
+        private static readonly char[] EventDataChars = new char[] { ':' };
+        private static readonly string TrueStr = true.ToString();
+        private static readonly string FalseStr = false.ToString();
 
         private readonly IRiakClient client;
         private readonly IList<INotifyPropertyChanged> models = new List<INotifyPropertyChanged>();
@@ -58,7 +60,7 @@ namespace RiakClientExamples.Dev.DataModeling
                 }
                 else if (e.PropertyName.StartsWith("Interests:"))
                 {
-                    var op = e.PropertyName.Split(interestsEventChars);
+                    var op = e.PropertyName.Split(EventDataChars);
                     Debug.Assert(op[0] == "Interests");
                     switch (op[1])
                     {
@@ -71,6 +73,24 @@ namespace RiakClientExamples.Dev.DataModeling
                         default:
                             throw new InvalidOperationException(
                                 string.Format("Unexpected Interests event action: {0}", op[1]));
+                    }
+                }
+                else if (e.PropertyName.StartsWith("AccountStatus:"))
+                {
+                    var op = e.PropertyName.Split(EventDataChars);
+                    Debug.Assert(op[0] == "AccountStatus");
+                    if (op[1] == TrueStr)
+                    {
+                        repository.UpgradeAccount(user);
+                    }
+                    else if (op[1] == FalseStr)
+                    {
+                        repository.DowngradeAccount(user);
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException(
+                            string.Format("Unexpected AccountStatus event action: {0}", op[1]));
                     }
                 }
             }

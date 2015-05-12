@@ -18,8 +18,8 @@
 
 namespace RiakClientExamples.Dev.DataModeling
 {
-    using System.Linq;
     using System.Collections.Generic;
+    using System.Linq;
     using NUnit.Framework;
     using RiakClient;
 
@@ -43,10 +43,19 @@ namespace RiakClientExamples.Dev.DataModeling
 
             joe.AddInterest("riak");
 
-            var joeFetched = repo.Get("joe_armstrong");
+            repo.UpgradeAccount(joe);
+
+            var joeFetched = repo.Get(joe.ID);
 
             Assert.GreaterOrEqual(joe.PageVisits, 0);
             Assert.Contains("riak", joeFetched.Interests.ToArray());
+
+            PrintObject(joeFetched);
+
+            repo.DowngradeAccount(joe);
+
+            joeFetched = repo.Get(joe.ID);
+            PrintObject(joeFetched);
         }
     }
 }

@@ -16,19 +16,15 @@
 // under the License.
 // </copyright>
 
-#pragma warning disable 618
-
 namespace RiakClientExamples.Dev.Using
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Text;
     using NUnit.Framework;
     using RiakClient;
-    using RiakClient.Messages;
-    using RiakClient.Models;
-    using RiakClient.Models.RiakDt;
+    using RiakClient.Commands.CRDT;
+    using RiakClient.Util;
 
     /*
      * http://docs.basho.com/riak/latest/dev/using/data-types/
@@ -38,528 +34,367 @@ namespace RiakClientExamples.Dev.Using
         [Test]
         public void CountersIdAndFetch()
         {
-            id = new RiakObjectId("counters", "counters", "<insert_key_here>");
-            Assert.AreEqual("counters", id.BucketType);
-            Assert.AreEqual("counters", id.Bucket);
-            Assert.AreEqual("<insert_key_here>", id.Key);
+            FetchCounter cmd = new FetchCounter.Builder()
+                .WithBucketType("counters")
+                .WithBucket("counters")
+                .WithKey("<insert_key_here>")
+                .Build();
 
-            var rslt = client.DtFetchCounter(id);
+            RiakResult rslt = client.Execute(cmd);
             CheckResult(rslt);
+
+            CounterResponse response = cmd.Response;
+            Assert.AreEqual(0, response.Value);
+
+            // NB: for cleanup on test teardown
+            options = cmd.Options;
         }
 
         // Note: decrement example as well
         [Test]
         public void TrafficTicketsCounterFetchAndUpdate()
         {
-            id = new RiakObjectId("counters", "counters", "traffic_tickets");
-            var rslt = client.DtFetchCounter(id);
+            var fetchCounterOptions = new FetchCounterOptions("counters", "counters", "traffic_tickts");
+            FetchCounter cmd = new FetchCounter(fetchCounterOptions);
+
+            // NB: for cleanup on test teardown
+            options = cmd.Options;
+
+            RiakResult rslt = client.Execute(cmd);
             CheckResult(rslt);
 
-            rslt = client.DtUpdateCounter(id, 1);
-            CheckResult(rslt);
-            Assert.AreEqual(1, rslt.Value);
+            CounterResponse response = cmd.Response;
+            Assert.AreEqual(0, response.Value);
 
-            rslt = client.DtUpdateCounter(id, -1);
+            UpdateCounter updateCmd = new UpdateCounter.Builder()
+                .WithBucketType("counters")
+                .WithBucket("counters")
+                .WithKey("traffic_tickets")
+                .WithIncrement(1)
+                .Build();
+
+            rslt = client.Execute(updateCmd);
             CheckResult(rslt);
-            Assert.AreEqual(0, rslt.Value);
+
+            response = updateCmd.Response;
+            Assert.AreEqual(1, response.Value);
+
+            updateCmd = new UpdateCounter.Builder()
+                .WithBucketType("counters")
+                .WithBucket("counters")
+                .WithKey("traffic_tickets")
+                .WithIncrement(-1)
+                .Build();
+
+            rslt = client.Execute(updateCmd);
+            CheckResult(rslt);
+
+            response = updateCmd.Response;
+            Assert.AreEqual(0, response.Value);
         }
 
         // Note: decrement example as well
         [Test]
         public void WhoopsIGotFiveTrafficTickets()
         {
-            id = new RiakObjectId("counters", "counters", "traffic_tickets");
-            var rslt = client.DtFetchCounter(id);
+            var fetchCounterOptions = new FetchCounterOptions("counters", "counters", "traffic_tickts");
+            FetchCounter cmd = new FetchCounter(fetchCounterOptions);
+
+            // NB: for cleanup
+            options = fetchCounterOptions;
+
+            RiakResult rslt = client.Execute(cmd);
             CheckResult(rslt);
 
-            rslt = client.DtUpdateCounter(id, 5);
-            CheckResult(rslt);
-            Assert.AreEqual(5, rslt.Value);
+            CounterResponse response = cmd.Response;
+            Assert.AreEqual(0, response.Value);
 
-            rslt = client.DtUpdateCounter(id, -5);
+            var builder = new UpdateCounter.Builder();
+
+            builder.WithBucketType("counters")
+                .WithBucket("counters")
+                .WithKey("traffic_tickets")
+                .WithIncrement(5);
+
+            UpdateCounter updateCmd = builder.Build();
+
+            rslt = client.Execute(updateCmd);
             CheckResult(rslt);
-            Assert.AreEqual(0, rslt.Value);
+
+            response = updateCmd.Response;
+            Assert.AreEqual(5, response.Value);
+
+            // Modify the builder's increment, then construct a new command
+            builder.WithIncrement(-5);
+            updateCmd = builder.Build();
+
+            rslt = client.Execute(updateCmd);
+            CheckResult(rslt);
+
+            response = updateCmd.Response;
+            Assert.AreEqual(0, response.Value);
         }
 
         [Test]
         public void InitialSetIsEmpty()
         {
-            id = new RiakObjectId("sets", "travel", "cities");
-            var rslt = client.DtFetchSet(id);
+            var builder = new FetchSet.Builder()
+                .WithBucketType("sets")
+                .WithBucket("travel")
+                .WithKey("cities");
+
+            // NB: builder.Options will only be set after Build() is called.
+            FetchSet fetchSetCommand = builder.Build();
+
+            FetchSetOptions options = new FetchSetOptions("sets", "travel", "cities");
+            Assert.AreEqual(options, builder.Options);
+
+            RiakResult rslt = client.Execute(fetchSetCommand);
             CheckResult(rslt);
 
-            int setSize = rslt.Values.Count;
-            Assert.AreEqual(0, setSize);
+            SetResponse response = fetchSetCommand.Response;
+            Assert.IsTrue(EnumerableUtil.IsNullOrEmpty(response.Value));
         }
 
         [Test]
         public void CitiesSetAddRemoveAndView()
         {
-            id = new RiakObjectId("sets", "travel", "cities");
-            var citiesSet = client.DtFetchSet(id);
-            CheckResult(citiesSet);
+            var adds = new HashSet<string> { "Toronto", "Montreal" };
 
-            var adds = new List<string> { "Toronto", "Montreal" };
-            citiesSet = client.DtUpdateSet(id, Serializer, citiesSet.Context, adds);
-            CheckResult(citiesSet);
+            var builder = new UpdateSet.Builder()
+                .WithBucketType("sets")
+                .WithBucket("travel")
+                .WithKey("cities")
+                .WithAdditions(adds);
 
-            var removes = new List<string> { "Montreal" };
-            adds = new List<string> { "Hamilton", "Ottawa" };
-            citiesSet = client.DtUpdateSet(id, Serializer, citiesSet.Context, adds, removes);
-            CheckResult(citiesSet);
+            UpdateSet cmd = builder.Build();
+            RiakResult rslt = client.Execute(cmd);
+            CheckResult(rslt);
+            SetResponse response = cmd.Response;
 
-            foreach (var value in citiesSet.Values)
+            Assert.Contains("Toronto", response.AsStrings.ToArray());
+            Assert.Contains("Montreal", response.AsStrings.ToArray());
+
+            var removes = new HashSet<string> { "Montreal" };
+            adds = new HashSet<string> { "Hamilton", "Ottawa" };
+
+            Assert.True(EnumerableUtil.NotNullOrEmpty(response.Context));
+
+            builder
+                .WithAdditions(adds)
+                .WithRemovals(removes)
+                .WithContext(response.Context);
+
+            cmd = builder.Build();
+
+            rslt = client.Execute(cmd);
+            CheckResult(rslt);
+            response = cmd.Response;
+
+            var responseStrings = response.AsStrings.ToArray();
+
+            Assert.Contains("Toronto", responseStrings);
+            Assert.Contains("Hamilton", responseStrings);
+            Assert.Contains("Ottawa", responseStrings);
+
+            foreach (var value in response.AsStrings)
             {
-                string city = Encoding.UTF8.GetString(value);
-                var args = new[] { city };
-                Console.WriteLine("Cities Set Value: {0}", args);
+                Console.WriteLine("Cities Set Value: {0}", value);
             }
 
-            Console.WriteLine("Cities Set Size: {0}", citiesSet.Values.Count);
+            Console.WriteLine("Cities Set Size: {0}", responseStrings.Length);
+
+            bool includesVancouver = response.AsStrings.Any(v => v == "Vancouver");
+            bool includesOttawa = response.AsStrings.Any(v => v == "Ottawa");
+
+            Assert.False(includesVancouver);
+            Assert.True(includesOttawa);
         }
 
         [Test]
         public void Maps()
         {
-            const string firstNameRegister = "first_name";
-            const string lastNameRegister = "last_name";
-            const string phoneNumberRegister = "phone_number";
-            const string enterpriseCustomerFlag = "enterprise_customer";
-            const string pageVisitsCounter = "page_visits";
-            const string interestsSet = "interests";
-            const string annikaInfoMap = "annika_info";
-
-            id = new RiakObjectId("maps", "customers", "ahmed_info");
-            var rslt = client.DtFetchMap(id);
-            CheckResult(rslt);
+            var builder = new UpdateMap.Builder()
+                .WithBucketType("maps")
+                .WithBucket("customers")
+                .WithKey("ahmed_info");
 
             Console.WriteLine("------------------------------------------------------------------------\n");
             Console.WriteLine("Initial import of Ahmed's data and contact");
 
+            var mapOperation = new UpdateMap.MapOperation();
+
             // Ahmed's first name
-            var firstNameRegisterMapUpdate = new MapUpdate
-            {
-                register_op = Serializer("Ahmed"),
-                field = new MapField
-                {
-                    name = Serializer(firstNameRegister),
-                    type = MapField.MapFieldType.REGISTER
-                }
-            };
+            mapOperation.SetRegister("first_name", "Ahmed");
 
             // Ahmed's phone number
-            var phoneNumberRegisterMapUpdate = new MapUpdate
-            {
-                register_op = Serializer("5551234567"),
-                field = new MapField
-                {
-                    name = Serializer(phoneNumberRegister),
-                    type = MapField.MapFieldType.REGISTER
-                }
-            };
+            mapOperation.SetRegister("phone_number", "5551234567");
 
-            // Set Ahmed to NOT be an enterprise customer right now
-            var enterpriseCustomerFlagUpdate = new MapUpdate
-            {
-                flag_op = MapUpdate.FlagOp.DISABLE,
-                field = new MapField
-                {
-                    name = Serializer(enterpriseCustomerFlag),
-                    type = MapField.MapFieldType.FLAG
-                }
-            };
+            builder.WithMapOperation(mapOperation);
+            MapResponse response = SaveMap(builder);
 
-            var pageVisitsCounterUpdate = new MapUpdate
-            {
-                counter_op = new CounterOp { increment = 1 },
-                field = new MapField
-                {
-                    name = Serializer(pageVisitsCounter),
-                    type = MapField.MapFieldType.COUNTER
-                }
-            };
+            Console.WriteLine("------------------------------------------------------------------------\n");
+            Console.WriteLine("Set Ahmed to NOT be an enterprise customer right now");
 
-            // Interests Set
+            mapOperation = new UpdateMap.MapOperation();
+            mapOperation.SetFlag("enterprise_customer", false);
+
+            builder.WithMapOperation(mapOperation);
+            response = SaveMap(builder);
+
+            Console.WriteLine("------------------------------------------------------------------------\n");
+            Console.WriteLine("enterprise_customer flag value");
+
+            Map ahmedMap = response.Value;
+            Console.WriteLine("Ahmed enterprise_customer: {0}", ahmedMap.Flags["enterprise_customer"]);
+
+            Console.WriteLine("------------------------------------------------------------------------\n");
+            Console.WriteLine("Add page visits counter for Ahmed");
+
+            mapOperation = new UpdateMap.MapOperation();
+            mapOperation.IncrementCounter("page_visits", 1);
+
+            builder.WithMapOperation(mapOperation);
+            response = SaveMap(builder);
+
+            Console.WriteLine("------------------------------------------------------------------------\n");
+            Console.WriteLine("Add Ahmed's interests set");
+
             var interestsAdds = new[] { "robots", "opera", "motorcycles" };
-            var setOperation = new SetOp();
-            setOperation.adds.AddRange(interestsAdds.Select(i => Serializer(i)));
-            var interestsSetUpdate = new MapUpdate
-            {
-                set_op = setOperation,
-                field = new MapField
-                {
-                    name = Serializer(interestsSet),
-                    type = MapField.MapFieldType.SET
-                }
-            };
 
-            // Maps within Maps (Nested Maps)
-            var annikaMapUpdates = new List<MapUpdate>
-            {
-                new MapUpdate
-                {
-                    register_op = Serializer("Annika"),
-                    field = new MapField
-                    {
-                        name = Serializer(firstNameRegister),
-                        type = MapField.MapFieldType.REGISTER
-                    },
-                },
-                new MapUpdate
-                {
-                    register_op = Serializer("Weiss"),
-                    field = new MapField
-                    {
-                        name = Serializer(lastNameRegister),
-                        type = MapField.MapFieldType.REGISTER
-                    },
-                },
-                new MapUpdate
-                {
-                    register_op = Serializer("5559876543"),
-                    field = new MapField
-                    {
-                        name = Serializer(phoneNumberRegister),
-                        type = MapField.MapFieldType.REGISTER
-                    },
-                }
-            };
-            var annikaInfoUpdateMapOp = new MapOp();
-            annikaInfoUpdateMapOp.updates.AddRange(annikaMapUpdates);
-            var annikaInfoUpdate = new MapUpdate
-            {
-                map_op = annikaInfoUpdateMapOp,
-                field = new MapField
-                {
-                    name = Serializer(annikaInfoMap),
-                    type = MapField.MapFieldType.MAP
-                }
-            };
+            mapOperation = new UpdateMap.MapOperation();
+            mapOperation.AddToSet("interests", interestsAdds);
 
-            var updates = new List<MapUpdate> {
-                firstNameRegisterMapUpdate,
-                phoneNumberRegisterMapUpdate,
-                enterpriseCustomerFlagUpdate,
-                pageVisitsCounterUpdate,
-                interestsSetUpdate,
-                annikaInfoUpdate
-            };
-            rslt = client.DtUpdateMap(id, Serializer, rslt.Context, null, updates);
-            CheckResult(rslt);
-            PrintMapValues(rslt.Values);
+            builder.WithMapOperation(mapOperation);
+            response = SaveMap(builder);
 
-            // Update Ahmed's set of interests to remove "opera" and add "indie pop"
+            ahmedMap = response.Value;
+
+            Assert.True(ahmedMap.Sets.GetValue("interests").Contains("robots"));
+            Assert.True(ahmedMap.Sets.GetValue("interests").Contains("opera"));
+            Assert.True(ahmedMap.Sets.GetValue("interests").Contains("motorcycles"));
+
             Console.WriteLine("------------------------------------------------------------------------\n");
             Console.WriteLine("Updating Ahmed's interests");
-            var interestsRemoves = new[] { "opera" };
-            interestsAdds = new[] { "indie pop" };
-            setOperation = new SetOp();
-            setOperation.adds.AddRange(interestsAdds.Select(i => Serializer(i)));
-            setOperation.removes.AddRange(interestsRemoves.Select(i => Serializer(i)));
-            interestsSetUpdate = new MapUpdate
-            {
-                set_op = setOperation,
-                field = new MapField
-                {
-                    name = Serializer(interestsSet),
-                    type = MapField.MapFieldType.SET
-                }
-            };
 
-            updates = new List<MapUpdate> {
-                interestsSetUpdate
-            };
-            rslt = client.DtUpdateMap(id, Serializer, rslt.Context, null, updates);
-            CheckResult(rslt);
-            PrintMapValues(rslt.Values);
+            mapOperation = new UpdateMap.MapOperation();
+            mapOperation.AddToSet("interests", "indie pop");
+            mapOperation.RemoveFromSet("interests", "opera");
 
-            // Registers (and other map members) can also be removed
+            builder
+                .WithMapOperation(mapOperation)
+                .WithContext(response.Context);
+            response = SaveMap(builder);
+
+            ahmedMap = response.Value;
+
+            Assert.False(ahmedMap.Sets.GetValue("interests").Contains("opera"));
+            Assert.True(ahmedMap.Sets.GetValue("interests").Contains("indie pop"));
+
+            Assert.True(ahmedMap.Sets.GetValue("interests").Contains("robots"));
+            Assert.True(ahmedMap.Sets.GetValue("interests").Contains("motorcycles"));
+
+            Console.WriteLine("------------------------------------------------------------------------\n");
+            Console.WriteLine("Adding Annika map");
+
+            mapOperation = new UpdateMap.MapOperation();
+
+            UpdateMap.MapOperation annikaInfoOperation = mapOperation.Map("annika_info");
+            annikaInfoOperation.SetRegister("first_name", "Annika");
+            annikaInfoOperation.SetRegister("last_name", "Weiss");
+            annikaInfoOperation.SetRegister("phone_number", "5559876543");
+
+            builder.WithMapOperation(mapOperation);
+            response = SaveMap(builder);
+
+            Console.WriteLine("------------------------------------------------------------------------\n");
+            Console.WriteLine("Annika's first name");
+
+            ahmedMap = response.Value;
+            Console.WriteLine(ahmedMap.Maps["annika_info"].Registers.GetValue("first_name"));
+
             Console.WriteLine("------------------------------------------------------------------------\n");
             Console.WriteLine("Removing Annika's first name");
-            var annikaMapRemoves = new List<MapField>
-            {
-                new MapField
-                {
-                    name = Serializer(firstNameRegister),
-                    type = MapField.MapFieldType.REGISTER
-                },
-            };
-            annikaInfoUpdateMapOp = new MapOp();
-            annikaInfoUpdateMapOp.removes.AddRange(annikaMapRemoves);
-            annikaInfoUpdate = new MapUpdate
-            {
-                map_op = annikaInfoUpdateMapOp,
-                field = new MapField
-                {
-                    name = Serializer(annikaInfoMap),
-                    type = MapField.MapFieldType.MAP
-                }
-            };
 
-            updates = new List<MapUpdate> {
-                annikaInfoUpdate
-            };
-            rslt = client.DtUpdateMap(id, Serializer, rslt.Context, null, updates);
-            CheckResult(rslt);
-            PrintMapValues(rslt.Values);
+            mapOperation = new UpdateMap.MapOperation();
+            mapOperation.Map("annika_info").RemoveRegister("first_name");
 
+            builder
+                .WithMapOperation(mapOperation)
+                .WithContext(response.Context);
+            response = SaveMap(builder);
 
-            // Store whether Annika is subscribed to a variety of plans
             Console.WriteLine("------------------------------------------------------------------------\n");
             Console.WriteLine("Storing Annika's plan flags");
-            const string enterprisePlanFlag = "enterprise_plan";
-            const string familyPlanFlag = "family_plan";
-            const string freePlanFlag = "free_plan";
-            annikaMapUpdates = new List<MapUpdate>
-            {
-                new MapUpdate
-                {
-                    flag_op = MapUpdate.FlagOp.DISABLE,
-                    field = new MapField
-                    {
-                        name = Serializer(enterprisePlanFlag),
-                        type = MapField.MapFieldType.FLAG
-                    },
-                },
-                new MapUpdate
-                {
-                    flag_op = MapUpdate.FlagOp.DISABLE,
-                    field = new MapField
-                    {
-                        name = Serializer(familyPlanFlag),
-                        type = MapField.MapFieldType.FLAG
-                    },
-                },
-                new MapUpdate
-                {
-                    flag_op = MapUpdate.FlagOp.DISABLE,
-                    field = new MapField
-                    {
-                        name = Serializer(freePlanFlag),
-                        type = MapField.MapFieldType.FLAG
-                    },
-                } 
-            };
-            annikaInfoUpdateMapOp = new MapOp();
-            annikaInfoUpdateMapOp.updates.AddRange(annikaMapUpdates);
-            annikaInfoUpdate = new MapUpdate
-            {
-                map_op = annikaInfoUpdateMapOp,
-                field = new MapField
-                {
-                    name = Serializer(annikaInfoMap),
-                    type = MapField.MapFieldType.MAP
-                }
-            };
 
-            updates = new List<MapUpdate> {
-                annikaInfoUpdate
-            };
-            rslt = client.DtUpdateMap(id, Serializer, rslt.Context, null, updates);
-            CheckResult(rslt);
-            PrintMapValues(rslt.Values);
+            mapOperation = new UpdateMap.MapOperation();
+            mapOperation.Map("annika_info")
+                .SetFlag("enterprise_plan", false)
+                .SetFlag("family_plan", false)
+                .SetFlag("free_plan", true);
 
-            // Store Annika's purchases in a counter
+            builder.WithMapOperation(mapOperation);
+            response = SaveMap(builder);
+
+            Console.WriteLine("------------------------------------------------------------------------\n");
+            Console.WriteLine("Is Annika on enterprise plan?");
+
+            ahmedMap = response.Value;
+            Console.WriteLine(ahmedMap.Maps["annika_info"].Flags["enterprise_plan"]);
+
             Console.WriteLine("------------------------------------------------------------------------\n");
             Console.WriteLine("Adding Annika's widget_purchases counter");
-            const string widgetPurchasesCounter = "widget_purchases";
-            annikaMapUpdates = new List<MapUpdate>
-            {
-                new MapUpdate
-                {
-                    counter_op = new CounterOp { increment = 1 },
-                    field = new MapField
-                    {
-                        name = Serializer(widgetPurchasesCounter),
-                        type = MapField.MapFieldType.COUNTER
-                    },
-                }
-            };
-            annikaInfoUpdateMapOp = new MapOp();
-            annikaInfoUpdateMapOp.updates.AddRange(annikaMapUpdates);
-            annikaInfoUpdate = new MapUpdate
-            {
-                map_op = annikaInfoUpdateMapOp,
-                field = new MapField
-                {
-                    name = Serializer(annikaInfoMap),
-                    type = MapField.MapFieldType.MAP
-                }
-            };
 
-            updates = new List<MapUpdate> {
-                annikaInfoUpdate
-            };
-            rslt = client.DtUpdateMap(id, Serializer, rslt.Context, null, updates);
-            CheckResult(rslt);
-            PrintMapValues(rslt.Values);
+            mapOperation = new UpdateMap.MapOperation();
+            mapOperation.Map("annika_info").IncrementCounter("widget_purchases", 1);
 
-            // Store Annika's interests in a set
+            builder.WithMapOperation(mapOperation);
+            response = SaveMap(builder);
+
             Console.WriteLine("------------------------------------------------------------------------\n");
             Console.WriteLine("Adding Annika's interests in a set");
-            const string annikaInterestsSet = "interests";
-            var annikaInterestsSetOp = new SetOp();
-            annikaInterestsSetOp.adds.Add(Serializer("tango dancing"));
-            annikaMapUpdates = new List<MapUpdate>
-            {
-                new MapUpdate
-                {
-                    set_op = annikaInterestsSetOp,
-                    field = new MapField
-                    {
-                        name = Serializer(annikaInterestsSet),
-                        type = MapField.MapFieldType.SET
-                    },
-                }
-            };
-            annikaInfoUpdateMapOp = new MapOp();
-            annikaInfoUpdateMapOp.updates.AddRange(annikaMapUpdates);
-            annikaInfoUpdate = new MapUpdate
-            {
-                map_op = annikaInfoUpdateMapOp,
-                field = new MapField
-                {
-                    name = Serializer(annikaInfoMap),
-                    type = MapField.MapFieldType.MAP
-                }
-            };
 
-            updates = new List<MapUpdate> {
-                annikaInfoUpdate
-            };
-            rslt = client.DtUpdateMap(id, Serializer, rslt.Context, null, updates);
-            CheckResult(rslt);
-            PrintMapValues(rslt.Values);
+            mapOperation = new UpdateMap.MapOperation();
+            mapOperation.Map("annika_info").AddToSet("interests", "tango dancing");
 
-            // Remove "tango dancing" from Annika's interests
+            builder.WithMapOperation(mapOperation);
+            response = SaveMap(builder);
+
             Console.WriteLine("------------------------------------------------------------------------\n");
             Console.WriteLine("Remove \"tango dancing\" from Annika's interests");
-            annikaInterestsSetOp = new SetOp();
-            annikaInterestsSetOp.removes.Add(Serializer("tango dancing"));
-            annikaMapUpdates = new List<MapUpdate>
-            {
-                new MapUpdate
-                {
-                    set_op = annikaInterestsSetOp,
-                    field = new MapField
-                    {
-                        name = Serializer(annikaInterestsSet),
-                        type = MapField.MapFieldType.SET
-                    },
-                }
-            };
-            annikaInfoUpdateMapOp = new MapOp();
-            annikaInfoUpdateMapOp.updates.AddRange(annikaMapUpdates);
-            annikaInfoUpdate = new MapUpdate
-            {
-                map_op = annikaInfoUpdateMapOp,
-                field = new MapField
-                {
-                    name = Serializer(annikaInfoMap),
-                    type = MapField.MapFieldType.MAP
-                }
-            };
 
-            updates = new List<MapUpdate> {
-                annikaInfoUpdate
-            };
-            rslt = client.DtUpdateMap(id, Serializer, rslt.Context, null, updates);
-            CheckResult(rslt);
-            PrintMapValues(rslt.Values);
+            mapOperation = new UpdateMap.MapOperation();
+            mapOperation.Map("annika_info").RemoveFromSet("interests", "tango dancing");
 
-            // Add purchase information to Annika's data
+            builder
+                .WithMapOperation(mapOperation)
+                .WithContext(response.Context);
+            response = SaveMap(builder);
+
             Console.WriteLine("------------------------------------------------------------------------\n");
             Console.WriteLine("Add specific purchase info to Annika's data");
 
-            const string annikaPurchaseMap = "purchase";
-            const string annikaFirstPurchaseFlag = "first_purchase";
-            const string annikaPurchaseAmountRegister = "amount";
-            const string annikaPurchaseItemsSet = "items";
+            mapOperation = new UpdateMap.MapOperation();
+            mapOperation.Map("annika_info").Map("purchase")
+                .SetFlag("first_purchase", true)
+                .SetRegister("amount", "1271")
+                .AddToSet("items", "large widget");
 
-            var annikaItemsSetOp = new SetOp();
-            annikaItemsSetOp.adds.Add(Serializer("large widget"));
-            annikaMapUpdates = new List<MapUpdate>
-            {
-                new MapUpdate
-                {
-                    flag_op = MapUpdate.FlagOp.ENABLE,
-                    field = new MapField
-                    {
-                        name = Serializer(annikaFirstPurchaseFlag),
-                        type = MapField.MapFieldType.FLAG
-                    }
-                },
-                new MapUpdate
-                {
-                    register_op = Serializer("1271"),
-                    field = new MapField
-                    {
-                        name = Serializer(annikaPurchaseAmountRegister),
-                        type = MapField.MapFieldType.REGISTER
-                    }
-                },
-                new MapUpdate
-                {
-                    set_op = annikaItemsSetOp,
-                    field = new MapField
-                    {
-                        name = Serializer(annikaPurchaseItemsSet),
-                        type = MapField.MapFieldType.SET
-                    },
-                }
-            };
+            builder.WithMapOperation(mapOperation);
+            response = SaveMap(builder);
 
-            var annikaPurchaseMapOp = new MapOp();
-            annikaPurchaseMapOp.updates.AddRange(annikaMapUpdates);
-            var annikaPurchaseMapUpdate = new MapUpdate
-            {
-                map_op = annikaPurchaseMapOp,
-                field = new MapField
-                {
-                    name = Serializer(annikaPurchaseMap),
-                    type = MapField.MapFieldType.MAP
-                }
-            };
+            Console.WriteLine("Context: {0}", Convert.ToBase64String(response.Context));
+        }
 
-            annikaInfoUpdateMapOp = new MapOp();
-            annikaInfoUpdateMapOp.updates.Add(annikaPurchaseMapUpdate);
-            annikaInfoUpdate = new MapUpdate
-            {
-                map_op = annikaInfoUpdateMapOp,
-                field = new MapField
-                {
-                    name = Serializer(annikaInfoMap),
-                    type = MapField.MapFieldType.MAP
-                }
-            };
-
-            updates = new List<MapUpdate> {
-                annikaInfoUpdate
-            };
-            rslt = client.DtUpdateMap(id, Serializer, rslt.Context, null, updates);
+        private MapResponse SaveMap(UpdateMap.Builder builder)
+        {
+            UpdateMap cmd = builder.Build();
+            RiakResult rslt = client.Execute(cmd);
             CheckResult(rslt);
-            PrintMapValues(rslt.Values);
 
-            rslt = client.DtFetchMap(id);
-            CheckResult(rslt);
-            Console.WriteLine("Context: {0}", Convert.ToBase64String(rslt.Context));
-        }
-
-        private void CheckResult(RiakDtMapResult rslt)
-        {
-            CheckResult(rslt.Result);
-        }
-
-        private void CheckResult(RiakDtSetResult rslt)
-        {
-            CheckResult(rslt.Result);
-        }
-
-        private void CheckResult(RiakCounterResult rslt)
-        {
-            CheckResult(rslt.Result);
+            MapResponse response = cmd.Response;
+            PrintObject(response.Value);
+            return response;
         }
     }
 }
-
-#pragma warning restore 618

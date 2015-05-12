@@ -18,13 +18,14 @@
 
 namespace RiakClient.Commands.CRDT
 {
+    using System.Collections.Generic;
     using Exceptions;
     using Messages;
 
     /// <summary>
     /// Fetches a Map from Riak
     /// </summary>
-    public class FetchSet : FetchCommand<SetResponse>, IRiakCommand
+    public class FetchSet : FetchCommand<SetResponse>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="FetchSet"/> class.
@@ -56,13 +57,17 @@ namespace RiakClient.Commands.CRDT
                 }
                 else
                 {
-                    Response = new SetResponse(Options.Key, fetchResp.context, fetchResp.value.set_value);
+                    Response = new SetResponse(
+                        Options.Key,
+                        fetchResp.context,
+                        new HashSet<byte[]>(fetchResp.value.set_value));
                 }
             }
         }
 
         /// <inheritdoc />
-        public class Builder : FetchCommandBuilder<FetchSet, FetchSetOptions, SetResponse>
+        public class Builder
+            : FetchCommandBuilder<FetchSet.Builder, FetchSet, FetchSetOptions, SetResponse>
         {
         }
     }

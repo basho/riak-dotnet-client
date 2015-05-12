@@ -19,8 +19,9 @@
 namespace RiakClient.Commands.CRDT
 {
     using System;
-using System.Collections.Generic;
-using System.Runtime.Serialization;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Runtime.Serialization;
 
     public class Map
     {
@@ -79,6 +80,19 @@ using System.Runtime.Serialization;
                 : base(info, context)
             {
             }
+
+            public long GetValue(RiakString key)
+            {
+                long value;
+                if (TryGetValue(key, out value))
+                {
+                    return value;
+                }
+                else
+                {
+                    return default(long);
+                }
+            }
         }
 
         [Serializable]
@@ -91,6 +105,24 @@ using System.Runtime.Serialization;
             protected Set(SerializationInfo info, StreamingContext context)
                 : base(info, context)
             {
+            }
+
+            public IEnumerable<string> GetValue(RiakString key)
+            {
+                return GetValueAsRiakStrings(key).Select(v => (string)v);
+            }
+
+            public IEnumerable<RiakString> GetValueAsRiakStrings(RiakString key)
+            {
+                IEnumerable<RiakString> valueAsRiakStrings = null;
+                IList<byte[]> value = null;
+
+                if (TryGetValue(key, out value))
+                {
+                    valueAsRiakStrings = value.Select(v => RiakString.FromBytes(v));
+                }
+
+                return valueAsRiakStrings;
             }
 
             public void Add(RiakString key, byte[] value)
@@ -117,6 +149,24 @@ using System.Runtime.Serialization;
             protected Register(SerializationInfo info, StreamingContext context)
                 : base(info, context)
             {
+            }
+
+            public string GetValue(RiakString key)
+            {
+                return (string)GetValueAsRiakString(key);
+            }
+
+            public RiakString GetValueAsRiakString(RiakString key)
+            {
+                RiakString valueAsRiakString = null;
+                byte[] value = null;
+
+                if (TryGetValue(key, out value))
+                {
+                    valueAsRiakString = new RiakString(value);
+                }
+
+                return valueAsRiakString;
             }
         }
 

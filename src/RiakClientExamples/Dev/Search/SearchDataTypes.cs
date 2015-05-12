@@ -16,8 +16,6 @@
 // under the License.
 // </copyright>
 
-#pragma warning disable 618
-
 namespace RiakClientExamples.Dev.Search
 {
     using System;
@@ -25,7 +23,7 @@ namespace RiakClientExamples.Dev.Search
     using System.Linq;
     using NUnit.Framework;
     using RiakClient;
-    using RiakClient.Messages;
+    using RiakClient.Commands.CRDT;
     using RiakClient.Models;
     using RiakClient.Models.Search;
 
@@ -64,13 +62,23 @@ namespace RiakClientExamples.Dev.Search
         [Test]
         public void SearchForCountersWithValueGreaterThan25()
         {
-            var christopherHitchensId = new RiakObjectId("counters", "people", "christ_hitchens");
-            var hitchensRslt = client.DtUpdateCounter(christopherHitchensId, 10);
-            CheckResult(hitchensRslt.Result);
+            var cmd = new UpdateCounter.Builder()
+                .WithBucketType("counters")
+                .WithBucket("people")
+                .WithKey("christ_hitchens")
+                .WithIncrement(10)
+                .Build();
+            RiakResult rslt = client.Execute(cmd);
+            CheckResult(rslt);
 
-            var joanRiversId = new RiakObjectId("counters", "people", "joan_rivers");
-            var joanRiversRslt = client.DtUpdateCounter(joanRiversId, 25);
-            CheckResult(joanRiversRslt.Result);
+            cmd = new UpdateCounter.Builder()
+                .WithBucketType("counters")
+                .WithBucket("people")
+                .WithKey("joan_rivers")
+                .WithIncrement(25)
+                .Build();
+            rslt = client.Execute(cmd);
+            CheckResult(rslt);
 
             WaitForSearch();
 
@@ -80,15 +88,23 @@ namespace RiakClientExamples.Dev.Search
         [Test]
         public void SearchForSetsContainingFootballString()
         {
-            var mikeDitkaId = new RiakObjectId("sets", "people", "ditka");
-            var ditkaAdds = new List<string> { "football", "winning" };
-            var ditkaRslt = client.DtUpdateSet(mikeDitkaId, Serializer, null, ditkaAdds);
-            CheckResult(ditkaRslt.Result);
+            var cmd = new UpdateSet.Builder()
+                .WithBucketType("sets")
+                .WithBucket("people")
+                .WithKey("ditka")
+                .WithAdditions(new HashSet<string> { "football", "winning" })
+                .Build();
+            RiakResult rslt = client.Execute(cmd);
+            CheckResult(rslt);
 
-            var dioId = new RiakObjectId("sets", "people", "dio");
-            var dioAdds = new List<string> { "wailing", "rocking", "winning" };
-            var dioRslt = client.DtUpdateSet(dioId, Serializer, null, dioAdds);
-            CheckResult(dioRslt.Result);
+            cmd = new UpdateSet.Builder()
+                .WithBucketType("sets")
+                .WithBucket("people")
+                .WithKey("dio")
+                .WithAdditions(new HashSet<string> { "wailing", "rocking", "winning" })
+                .Build();
+            rslt = client.Execute(cmd);
+            CheckResult(rslt);
 
             WaitForSearch();
 
@@ -104,121 +120,43 @@ namespace RiakClientExamples.Dev.Search
             const string pageVisitsCounter = "page_visits";
             const string interestsSet = "interests";
 
-            var idrisElbaId = new RiakObjectId("maps", "customers", "idris_elba");
-            var idrisMapUpdates = new List<MapUpdate>();
-            idrisMapUpdates.Add(new MapUpdate
-            {
-                register_op = Serializer("Idris"),
-                field = new MapField
-                {
-                    name = Serializer(firstNameRegister),
-                    type = MapField.MapFieldType.REGISTER
-                }
-            });
-
-            idrisMapUpdates.Add(new MapUpdate
-            {
-                register_op = Serializer("Elba"),
-                field = new MapField
-                {
-                    name = Serializer(lastNameRegister),
-                    type = MapField.MapFieldType.REGISTER
-                }
-            });
-
-            idrisMapUpdates.Add(new MapUpdate
-            {
-                flag_op = MapUpdate.FlagOp.DISABLE,
-                field = new MapField
-                {
-                    name = Serializer(enterpriseCustomerFlag),
-                    type = MapField.MapFieldType.FLAG
-                }
-            });
-
-            idrisMapUpdates.Add(new MapUpdate
-            {
-                counter_op = new CounterOp { increment = 10 },
-                field = new MapField
-                {
-                    name = Serializer(pageVisitsCounter),
-                    type = MapField.MapFieldType.COUNTER
-                }
-            });
-
             var idrisAdds = new[] { "acting", "being Stringer Bell" };
-            var idrisSetOp = new SetOp();
-            idrisSetOp.adds.AddRange(idrisAdds.Select(x => Serializer(x)));
-            idrisMapUpdates.Add(new MapUpdate
-            {
-                set_op = idrisSetOp,
-                field = new MapField
-                {
-                    name = Serializer(interestsSet),
-                    type = MapField.MapFieldType.SET
-                }
-            });
 
-            var idrisRslt = client.DtUpdateMap(idrisElbaId, Serializer, null, null, idrisMapUpdates);
-            CheckResult(idrisRslt.Result);
+            var mapOp = new UpdateMap.MapOperation()
+                .SetRegister(firstNameRegister, "Idris")
+                .SetRegister(lastNameRegister, "Elba")
+                .SetFlag(enterpriseCustomerFlag, false)
+                .IncrementCounter(pageVisitsCounter, 10)
+                .AddToSet(interestsSet, idrisAdds);
 
-            var joanJettId = new RiakObjectId("maps", "customers", "joan_jett");
-            var joanJettMapUpdates = new List<MapUpdate>();
-            joanJettMapUpdates.Add(new MapUpdate
-            {
-                register_op = Serializer("Joan"),
-                field = new MapField
-                {
-                    name = Serializer(firstNameRegister),
-                    type = MapField.MapFieldType.REGISTER
-                }
-            });
+            var cmd = new UpdateMap.Builder()
+                .WithBucketType("maps")
+                .WithBucket("customers")
+                .WithKey("idris_elba")
+                .WithMapOperation(mapOp)
+                .Build();
 
-            joanJettMapUpdates.Add(new MapUpdate
-            {
-                register_op = Serializer("Jett"),
-                field = new MapField
-                {
-                    name = Serializer(lastNameRegister),
-                    type = MapField.MapFieldType.REGISTER
-                }
-            });
-
-            joanJettMapUpdates.Add(new MapUpdate
-            {
-                flag_op = MapUpdate.FlagOp.DISABLE,
-                field = new MapField
-                {
-                    name = Serializer(enterpriseCustomerFlag),
-                    type = MapField.MapFieldType.FLAG
-                }
-            });
-
-            joanJettMapUpdates.Add(new MapUpdate
-            {
-                counter_op = new CounterOp { increment = 25 },
-                field = new MapField
-                {
-                    name = Serializer(pageVisitsCounter),
-                    type = MapField.MapFieldType.COUNTER
-                }
-            });
+            RiakResult rslt = client.Execute(cmd);
+            CheckResult(rslt);
 
             var joanJettAdds = new[] { "loving rock and roll", "being in the Blackhearts" };
-            var joanJettSetOp = new SetOp();
-            joanJettSetOp.adds.AddRange(joanJettAdds.Select(x => Serializer(x)));
-            joanJettMapUpdates.Add(new MapUpdate
-            {
-                set_op = joanJettSetOp,
-                field = new MapField
-                {
-                    name = Serializer(interestsSet),
-                    type = MapField.MapFieldType.SET
-                }
-            });
 
-            var joanJettRslt = client.DtUpdateMap(joanJettId, Serializer, null, null, joanJettMapUpdates);
-            CheckResult(joanJettRslt.Result);
+            mapOp = new UpdateMap.MapOperation()
+                .SetRegister(firstNameRegister, "Joan")
+                .SetRegister(lastNameRegister, "Jett")
+                .SetFlag(enterpriseCustomerFlag, false)
+                .IncrementCounter(pageVisitsCounter, 25)
+                .AddToSet(interestsSet, joanJettAdds);
+
+            cmd = new UpdateMap.Builder()
+                .WithBucketType("maps")
+                .WithBucket("customers")
+                .WithKey("joan_jett")
+                .WithMapOperation(mapOp)
+                .Build();
+
+            rslt = client.Execute(cmd);
+            CheckResult(rslt);
 
             WaitForSearch();
 
@@ -228,35 +166,22 @@ namespace RiakClientExamples.Dev.Search
             const string nameRegister = "name";
             const string alterEgoMap = "alter_ego";
 
-            idrisElbaId = new RiakObjectId("maps", "customers", "idris_elba");
-            var idrisGetRslt = client.DtFetchMap(idrisElbaId);
-            CheckResult(idrisGetRslt.Result);
+            mapOp = new UpdateMap.MapOperation();
+            mapOp.Map(alterEgoMap).SetRegister(nameRegister, "John Luther");
 
-            var alterEgoMapOp = new MapOp();
-            alterEgoMapOp.updates.Add(new MapUpdate
-            {
-                register_op = Serializer("John Luther"),
-                field = new MapField
-                {
-                    name = Serializer(nameRegister),
-                    type = MapField.MapFieldType.REGISTER
-                }
-            });
+            cmd = new UpdateMap.Builder()
+                .WithBucketType("maps")
+                .WithBucket("customers")
+                .WithKey("idris_elba")
+                .WithMapOperation(mapOp)
+                .Build();
 
-            var alterEgoMapUpdate = new MapUpdate
-            {
-                map_op = alterEgoMapOp,
-                field = new MapField
-                {
-                    name = Serializer(alterEgoMap),
-                    type = MapField.MapFieldType.MAP
-                }
-            };
+            rslt = client.Execute(cmd);
+            CheckResult(rslt);
 
-            var idrisUpdateRslt = client.DtUpdateMap(idrisElbaId, Serializer,
-                idrisGetRslt.Context, null, new List<MapUpdate> { alterEgoMapUpdate });
-            CheckResult(idrisUpdateRslt.Result);
-            PrintMapValues(idrisUpdateRslt.Values);
+            PrintObject(cmd.Response.Value);
+
+            WaitForSearch();
 
             DoSearch("customers", "alter_ego_map.name_register:*");
         }
@@ -280,5 +205,3 @@ namespace RiakClientExamples.Dev.Search
         }
     }
 }
-
-#pragma warning restore 618

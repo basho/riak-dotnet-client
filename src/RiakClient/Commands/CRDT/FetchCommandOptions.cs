@@ -18,17 +18,11 @@
 
 namespace RiakClient.Commands.CRDT
 {
-    using System;
-
     /// <summary>
     /// Represents options for a CRDT command that fetches data.
     /// </summary>
-    public abstract class FetchCommandOptions
+    public abstract class FetchCommandOptions : CommandOptions
     {
-        private readonly RiakString bucketType;
-        private readonly RiakString bucket;
-        private readonly RiakString key;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="FetchCommandOptions"/> class.
         /// </summary>
@@ -36,71 +30,13 @@ namespace RiakClient.Commands.CRDT
         /// <param name="bucket">The bucket in Riak. Required.</param>
         /// <param name="key">The key in Riak. Required.</param>
         public FetchCommandOptions(string bucketType, string bucket, string key)
+            : base(bucketType, bucket, key, true)
         {
-            if (string.IsNullOrEmpty(bucketType))
-            {
-                throw new ArgumentNullException("bucketType");
-            }
-            else
-            {
-                this.bucketType = bucketType;
-            }
-
-            if (string.IsNullOrEmpty(bucket))
-            {
-                throw new ArgumentNullException("bucket");
-            }
-            else
-            {
-                this.bucket = bucket;
-            }
-
-            if (string.IsNullOrEmpty(key))
-            {
-                throw new ArgumentNullException("key");
-            }
-            else
-            {
-                this.key = key;
-            }
-
             // ensure default values
             this.NotFoundOK = false;
             this.UseBasicQuorum = false;
             this.IncludeContext = true;
         }
-
-        /// <summary>
-        /// The bucket type
-        /// </summary>
-        /// <value>A <see cref="RiakString"/> representing the bucket type.</value>
-        public RiakString BucketType
-        {
-            get { return bucketType; }
-        }
-
-        /// <summary>
-        /// The bucket
-        /// </summary>
-        /// <value>A <see cref="RiakString"/> representing the bucket.</value>
-        public RiakString Bucket
-        {
-            get { return bucket; }
-        }
-
-        /// <summary>
-        /// The key
-        /// </summary>
-        /// <value>The <see cref="RiakString"/> representing the key.</value>
-        public RiakString Key
-        {
-            get { return key; }
-        }
-
-        /// <summary>
-        /// The timeout for this command.
-        /// </summary>
-        public TimeSpan Timeout { get; set; }
 
         /// <summary>
         /// The R (read) value to use.
@@ -126,5 +62,19 @@ namespace RiakClient.Commands.CRDT
         /// Set to <b>false</b> to not return context. Default (and recommended value) is <b>true</b>.
         /// </summary>
         public bool IncludeContext { get; set; }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int result = base.GetHashCode();
+                result = (result * 397) ^ NotFoundOK.GetHashCode();
+                result = (result * 397) ^ UseBasicQuorum.GetHashCode();
+                result = (result * 397) ^ IncludeContext.GetHashCode();
+                result = (result * 397) ^ (R != null ? R.GetHashCode() : 0);
+                result = (result * 397) ^ (PR != null ? PR.GetHashCode() : 0);
+                return result;
+            }
+        }
     }
 }
