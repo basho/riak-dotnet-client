@@ -131,11 +131,7 @@ namespace RiakClient.Models
             request.if_none_match = IfNoneMatch;
             request.return_head = ReturnHead;
             request.return_body = ReturnBody;
-
-            if (Timeout != null)
-            {
-                request.timeout = (uint)Timeout;
-            }
+            request.timeout = (uint)Timeout;
         }
     }
 }

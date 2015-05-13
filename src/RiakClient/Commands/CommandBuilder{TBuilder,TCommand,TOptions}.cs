@@ -89,11 +89,6 @@ namespace RiakClient.Commands
 
         public TBuilder WithTimeout(Timeout timeout)
         {
-            if (timeout == null)
-            {
-                throw new ArgumentNullException("timeout", "timeout may not be null");
-            }
-
             this.timeout = timeout;
             return (TBuilder)this;
         }

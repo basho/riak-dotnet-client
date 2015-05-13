@@ -89,10 +89,7 @@ namespace RiakClient.Commands
                 this.key = key;
             }
 
-            if (timeout != null)
-            {
-                this.timeout = timeout;
-            }
+            this.timeout = timeout;
         }
 
         /// <summary>
@@ -127,22 +124,8 @@ namespace RiakClient.Commands
         /// </summary>
         public Timeout Timeout
         {
-            get
-            {
-                return timeout;
-            }
-
-            set
-            {
-                if (value == null)
-                {
-                    timeout = CommandDefaults.Timeout;
-                }
-                else
-                {
-                    timeout = value;
-                }
-            }
+            get { return timeout; }
+            set { timeout = value; }
         }
 
         public bool Equals(CommandOptions other)
@@ -177,7 +160,7 @@ namespace RiakClient.Commands
                 int result = bucketType.GetHashCode();
                 result = (result * 397) ^ bucket.GetHashCode();
                 result = (result * 397) ^ (key != null ? key.GetHashCode() : 0);
-                result = (result * 397) ^ (timeout != null ? timeout.GetHashCode() : 0);
+                result = (result * 397) ^ timeout.GetHashCode();
                 return result;
             }
         }
