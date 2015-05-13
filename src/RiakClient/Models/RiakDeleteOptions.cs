@@ -62,11 +62,7 @@ namespace RiakClient.Models
             request.w = W;
             request.pw = Pw;
             request.dw = Dw;
-
-            if (Timeout != null)
-            {
-                request.timeout = (uint)Timeout;
-            }
+            request.timeout = (uint)Timeout;
 
             if (Vclock != null)
             {

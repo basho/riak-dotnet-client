@@ -125,10 +125,7 @@ namespace RiakClient.Models
                 request.if_modified = IfModified;
             }
 
-            if (Timeout != null)
-            {
-                request.timeout = (uint)Timeout;
-            }
+            request.timeout = (uint)Timeout;
         }
     }
 }

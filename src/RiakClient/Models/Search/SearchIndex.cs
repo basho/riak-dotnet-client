@@ -121,6 +121,15 @@ namespace RiakClient.Models.Search
             get { return nval; }
         }
 
+        /// <summary>
+        /// The <see cref="Timeout"/> value for storing index entries.
+        /// </summary>
+        public Timeout Timeout
+        {
+            get;
+            set;
+        }
+
         internal RpbYokozunaIndex ToMessage()
         {
             return new RpbYokozunaIndex

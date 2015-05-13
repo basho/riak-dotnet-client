@@ -24,12 +24,12 @@ namespace RiakClient
     /// <summary>
     /// Represents a wall-clock timeout for Riak operations. 
     /// </summary>
-    public class Timeout : IEquatable<Timeout>
+    public struct Timeout : IEquatable<Timeout>
     {
-        private readonly TimeSpan timeout = default(TimeSpan);
+        private readonly TimeSpan timeout;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Timeout"/> class.
+        /// Initializes a new instance of the <see cref="Timeout"/> struct.
         /// </summary>
         /// <param name="timeout">The <see cref="TimeSpan"/> to base this <see cref="Timeout"/> off of.</param>
         public Timeout(TimeSpan timeout)
@@ -38,7 +38,7 @@ namespace RiakClient
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Timeout"/> class.
+        /// Initializes a new instance of the <see cref="Timeout"/> struct.
         /// </summary>
         /// <param name="milliseconds">The number of milliseconds to base this <see cref="Timeout"/> off of.</param>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="milliseconds"/> must be greater than or equal to zero.</exception>
@@ -50,6 +50,33 @@ namespace RiakClient
             }
 
             this.timeout = TimeSpan.FromMilliseconds(milliseconds);
+        }
+
+        /// <summary>
+        /// Determines whether the specified object is equal to the current object.
+        /// </summary>
+        /// <param name="a">The first value.</param>
+        /// <param name="b">The second value.</param>
+        /// <returns><b>true</b> if the values are equal.</returns>
+        public static bool operator ==(Timeout a, Timeout b)
+        {
+            if (object.ReferenceEquals(a, b))
+            {
+                return true;
+            }
+
+            return a.Equals(b);
+        }
+
+        /// <summary>
+        /// Determines whether the specified object is not equal to the current object.
+        /// </summary>
+        /// <param name="a">The first value.</param>
+        /// <param name="b">The second value.</param>
+        /// <returns><b>true</b> if the values are not equal.</returns>
+        public static bool operator !=(Timeout a, Timeout b)
+        {
+            return !(a == b);
         }
 
         /// <summary>
@@ -119,7 +146,14 @@ namespace RiakClient
         /// <returns><b>true</b> if the specified object is equal to the current object, otherwise, <b>false</b>.</returns>
         public override bool Equals(object obj)
         {
-            return Equals(obj as Timeout);
+            if (obj is Timeout)
+            {
+                return Equals((Timeout)obj);
+            }
+            else
+            {
+                return false;
+            }
         }
 
         /// <summary>
