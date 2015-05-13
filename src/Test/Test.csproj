@@ -60,6 +60,7 @@
     <Compile Include="Unit\CRDT\UpdateSetTests.cs" />
     <Compile Include="Unit\CRDT\UpdateCounterTests.cs" />
     <Compile Include="Unit\CRDT\UpdateMapTests.cs" />
+    <Compile Include="Unit\KV\FetchPreflistTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RiakClient\RiakClient.csproj">
