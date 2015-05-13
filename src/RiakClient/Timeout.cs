@@ -53,6 +53,33 @@ namespace RiakClient
         }
 
         /// <summary>
+        /// Determines whether the specified object is equal to the current object.
+        /// </summary>
+        /// <param name="a">The first value.</param>
+        /// <param name="b">The second value.</param>
+        /// <returns><b>true</b> if the values are equal.</returns>
+        public static bool operator ==(Timeout a, Timeout b)
+        {
+            if (object.ReferenceEquals(a, b))
+            {
+                return true;
+            }
+
+            return a.Equals(b);
+        }
+
+        /// <summary>
+        /// Determines whether the specified object is not equal to the current object.
+        /// </summary>
+        /// <param name="a">The first value.</param>
+        /// <param name="b">The second value.</param>
+        /// <returns><b>true</b> if the values are not equal.</returns>
+        public static bool operator !=(Timeout a, Timeout b)
+        {
+            return !(a == b);
+        }
+
+        /// <summary>
         /// Cast the value of this <see cref="Int32"/> to a <see cref="Timeout"/>.
         /// </summary>
         /// <param name="timeout">The <see cref="Int32"/> value to cast to a <see cref="Timeout"/>.</param>
