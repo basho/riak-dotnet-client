@@ -25,10 +25,11 @@ namespace RiakClient.Commands.CRDT
     /// <summary>
     /// Response to a <see cref="FetchMap"/> command.
     /// </summary>
-    public class MapResponse : Response<Map>
+    public class MapResponse : DataTypeResponse<Map>
     {
         /// <inheritdoc />
-        public MapResponse() : base()
+        public MapResponse()
+            : base()
         {
         }
 

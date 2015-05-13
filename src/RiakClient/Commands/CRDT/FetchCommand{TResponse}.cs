@@ -18,68 +18,49 @@
 
 namespace RiakClient.Commands.CRDT
 {
-    using System;
     using Messages;
 
     /// <summary>
     /// Fetches a CRDT from Riak
     /// </summary>
     /// <typeparam name="TResponse">The type of the response data from Riak.</typeparam>
-    public abstract class FetchCommand<TResponse> : IRiakCommand where TResponse : Response
+    public abstract class FetchCommand<TResponse> : Command<FetchCommandOptions, TResponse>
+        where TResponse : Response
     {
-        private readonly FetchCommandOptions fetchOptions;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="FetchCommand{TResponse}"/> class.
         /// </summary>
         /// <param name="options">Options for this operation. See <see cref="FetchCommandOptions"/></param>
         public FetchCommand(FetchCommandOptions options)
+            : base(options)
         {
-            if (options == null)
-            {
-                throw new ArgumentNullException("options");
-            }
-
-            this.fetchOptions = options;
-        }
-
-        public FetchCommandOptions Options
-        {
-            get { return fetchOptions; }
         }
 
         /// <summary>
         /// The expected protobuf message code from Riak.
         /// </summary>
-        public MessageCode ExpectedCode
+        public override MessageCode ExpectedCode
         {
             get { return MessageCode.DtFetchResp; }
         }
 
-        /// <summary>
-        /// A sub-class instance of <see cref="Response"/> representing the response from Riak.
-        /// </summary>
-        public TResponse Response { get; protected set; }
-
-        public RpbReq ConstructPbRequest()
+        public override RpbReq ConstructPbRequest()
         {
             var req = new DtFetchReq();
 
-            req.type = fetchOptions.BucketType;
-            req.bucket = fetchOptions.Bucket;
-            req.key = fetchOptions.Key;
+            req.type = CommandOptions.BucketType;
+            req.bucket = CommandOptions.Bucket;
+            req.key = CommandOptions.Key;
 
-            req.r = fetchOptions.R;
-            req.pr = fetchOptions.PR;
+            req.r = CommandOptions.R;
+            req.pr = CommandOptions.PR;
 
-            req.timeout = (uint)fetchOptions.Timeout;
-            req.notfound_ok = fetchOptions.NotFoundOK;
-            req.include_context = fetchOptions.IncludeContext;
-            req.basic_quorum = fetchOptions.UseBasicQuorum;
+            req.timeout = (uint)CommandOptions.Timeout;
+            req.notfound_ok = CommandOptions.NotFoundOK;
+            req.include_context = CommandOptions.IncludeContext;
+            req.basic_quorum = CommandOptions.UseBasicQuorum;
 
             return req;
         }
-
-        public abstract void OnSuccess(RpbResp response);
     }
 }

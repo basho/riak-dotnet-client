@@ -1,4 +1,4 @@
-﻿// <copyright file="IRiakCommand.cs" company="Basho Technologies, Inc.">
+﻿// <copyright file="PreflistItem.cs" company="Basho Technologies, Inc.">
 // Copyright 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
@@ -16,19 +16,18 @@
 // under the License.
 // </copyright>
 
-namespace RiakClient.Commands
+namespace RiakClient.Commands.KV
 {
-    using Messages;
-
     /// <summary>
-    /// Represents a command to execute against Riak
+    /// Part of the <see cref="PreflistResponse"/> class.
     /// </summary>
-    public interface IRiakCommand
+    public class PreflistItem
     {
-        MessageCode ExpectedCode { get; }
-
-        RpbReq ConstructPbRequest();
-
-        void OnSuccess(RpbResp rpbResp);
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PreflistItem"/> class.
+        /// </summary>
+        public PreflistItem()
+        {
+        }
     }
 }

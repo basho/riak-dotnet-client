@@ -40,7 +40,7 @@ namespace RiakClient.Commands.CRDT
     /// </summary>
     public class UpdateSet : UpdateCommand<SetResponse>
     {
-        private readonly UpdateSetOptions options;
+        private readonly UpdateSetOptions setOptions;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UpdateSet"/> class.
@@ -50,7 +50,7 @@ namespace RiakClient.Commands.CRDT
         public UpdateSet(UpdateSetOptions options)
             : base(options)
         {
-            this.options = options;
+            this.setOptions = options;
         }
 
         protected override DtOp GetRequestOp()
@@ -58,14 +58,14 @@ namespace RiakClient.Commands.CRDT
             var op = new DtOp();
             op.set_op = new SetOp();
 
-            if (EnumerableUtil.NotNullOrEmpty(options.Additions))
+            if (EnumerableUtil.NotNullOrEmpty(setOptions.Additions))
             {
-                op.set_op.adds.AddRange(options.Additions);
+                op.set_op.adds.AddRange(setOptions.Additions);
             }
 
-            if (EnumerableUtil.NotNullOrEmpty(options.Removals))
+            if (EnumerableUtil.NotNullOrEmpty(setOptions.Removals))
             {
-                op.set_op.removes.AddRange(options.Removals);
+                op.set_op.removes.AddRange(setOptions.Removals);
             }
 
             return op;

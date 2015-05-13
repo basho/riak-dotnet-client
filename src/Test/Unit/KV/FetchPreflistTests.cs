@@ -18,6 +18,7 @@
 
 namespace Test.Unit.CRDT
 {
+    using System.Linq;
     using NUnit.Framework;
     using RiakClient;
     using RiakClient.Commands.KV;
@@ -68,7 +69,7 @@ namespace Test.Unit.CRDT
 
             fetch.OnSuccess(fetchResp);
 
-            Assert.AreEqual(1, fetch.Response.Preflist.Count());
+            Assert.AreEqual(1, fetch.Response.Value.Count());
         }
     }
 }

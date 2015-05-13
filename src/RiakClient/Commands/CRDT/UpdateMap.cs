@@ -49,7 +49,7 @@ namespace RiakClient.Commands.CRDT
     /// </summary>
     public class UpdateMap : UpdateCommand<MapResponse>
     {
-        private readonly UpdateMapOptions options;
+        private readonly UpdateMapOptions mapOptions;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UpdateMap"/> class.
@@ -58,13 +58,13 @@ namespace RiakClient.Commands.CRDT
         public UpdateMap(UpdateMapOptions options)
             : base(options)
         {
-            this.options = options;
+            this.mapOptions = options;
         }
 
         protected override DtOp GetRequestOp()
         {
             var op = new DtOp();
-            op.map_op = Populate(options.Op);
+            op.map_op = Populate(mapOptions.Op);
             return op;
         }
 

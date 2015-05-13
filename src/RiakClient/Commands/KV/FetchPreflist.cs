@@ -18,13 +18,16 @@
 
 namespace RiakClient.Commands.KV
 {
+    using System.Collections.Generic;
+    using System.Linq;
     using Exceptions;
     using Messages;
+    using Util;
 
     /// <summary>
     /// Fetches a Map from Riak
     /// </summary>
-    public class FetchPreflist : FetchCommand<PreflistResponse>
+    public class FetchPreflist : Command<FetchPreflistOptions, Response<IEnumerable<PreflistItem>>>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="FetchPreflist"/> class.
@@ -35,6 +38,16 @@ namespace RiakClient.Commands.KV
         {
         }
 
+        public override MessageCode ExpectedCode
+        {
+            get { throw new System.NotImplementedException(); }
+        }
+
+        public override RpbReq ConstructPbRequest()
+        {
+            throw new System.NotImplementedException();
+        }
+
         public override void OnSuccess(RpbResp response)
         {
             if (response == null)
@@ -43,28 +56,27 @@ namespace RiakClient.Commands.KV
             }
             else
             {
-                DtFetchResp fetchResp = (DtFetchResp)response;
-                if (fetchResp.type != DtFetchResp.DataType.COUNTER)
+                RpbGetBucketKeyPreflistResp resp = (RpbGetBucketKeyPreflistResp)response;
+
+                IEnumerable<PreflistItem> preflistItems = Enumerable.Empty<PreflistItem>();
+
+                if (EnumerableUtil.NotNullOrEmpty(resp.preflist))
                 {
-                    throw new RiakException(
-                        string.Format("Requested counter, received {0}", fetchResp.type));
+                    preflistItems = resp.preflist.Select(i => new PreflistItem());
                 }
 
-                if (fetchResp.value == null)
-                {
-                    Response = new PreflistResponse();
-                }
-                else
-                {
-                    Response = new PreflistResponse(Options.Key, fetchResp.context, fetchResp.value.counter_value);
-                }
+                Response = new PreflistResponse(Options.Key, preflistItems);
             }
         }
 
         /// <inheritdoc />
         public class Builder
-            : FetchCommandBuilder<FetchPreflist.Builder, FetchPreflist, FetchPreflistOptions, PreflistResponse>
+            : CommandBuilder<FetchPreflist.Builder, FetchPreflist, FetchPreflistOptions>
         {
+            public override FetchPreflist Build()
+            {
+                throw new System.NotImplementedException();
+            }
         }
     }
 }

@@ -22,11 +22,11 @@ namespace RiakClient.Commands.KV
     /// Represents options for a <see cref="FetchPreflist"/> operation.
     /// </summary>
     /// <inheritdoc/>
-    public class FetchPreflistOptions : FetchCommandOptions
+    public class FetchPreflistOptions : CommandOptions
     {
         /// <inheritdoc/>
         public FetchPreflistOptions(string bucketType, string bucket, string key)
-            : base(bucketType, bucket, key)
+            : base(bucketType, bucket, key, true)
         {
         }
     }

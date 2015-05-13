@@ -16,12 +16,12 @@
 // under the License.
 // </copyright>
 
-namespace RiakClient.Commands.CRDT
+namespace RiakClient.Commands.KV
 {
     using System.Collections.Generic;
 
     /// <summary>
-    /// Response to a <see cref="FetchPreflist"/> or <see cref="UpdatePreflist"/> command.
+    /// Response to a <see cref="FetchPreflist"/> command.
     /// </summary>
     public class PreflistResponse : Response<IEnumerable<PreflistItem>>
     {
@@ -35,10 +35,9 @@ namespace RiakClient.Commands.CRDT
         /// Initializes a new instance of the <see cref="PreflistResponse"/> class.
         /// </summary>
         /// <param name="key">A <see cref="RiakString"/> representing the key.</param>
-        /// <param name="context">The data type context. Necessary to use this if updating a data type with removals.</param>
         /// <param name="value">The value of the fetched preflist.</param>
-        public PreflistResponse(RiakString key, byte[] context, IEnumerable<PreflistItem> value)
-            : base(key, context, value)
+        public PreflistResponse(RiakString key, IEnumerable<PreflistItem> value)
+            : base(key, value)
         {
         }
     }

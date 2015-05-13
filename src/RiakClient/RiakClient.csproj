@@ -71,8 +71,11 @@
     </Compile>
     <Compile Include="Commands\CommandDefaults.cs" />
     <Compile Include="Commands\CRDT\FetchSetOptions.cs" />
+    <Compile Include="Commands\CRDT\DataTypeResponse{TValue}.cs" />
     <Compile Include="Commands\CRDT\SetResponse.cs" />
     <Compile Include="Commands\CRDT\FetchSet.cs" />
+    <Compile Include="Commands\Command{TOptions,TResponse}.cs" />
+    <Compile Include="Commands\KV\PreflistItem.cs" />
     <Compile Include="Commands\KV\PreflistResponse.cs" />
     <Compile Include="Commands\KV\FetchPreflist.cs" />
     <Compile Include="Commands\KV\FetchPreflistOptions.cs" />

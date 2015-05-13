@@ -36,10 +36,9 @@ namespace RiakClient.Commands
         /// Initializes a new instance of the <see cref="Response{TValue}"/> class.
         /// </summary>
         /// <param name="key">A <see cref="RiakString"/> representing the key.</param>
-        /// <param name="context">The data type context. Necessary to use this if updating a data type with removals.</param>
         /// <param name="value">The data that will be parsed into usable CRDT data structures.</param>
-        public Response(RiakString key, byte[] context, TValue value)
-            : base(key, context)
+        public Response(RiakString key, TValue value)
+            : base(key)
         {
             this.value = value;
         }

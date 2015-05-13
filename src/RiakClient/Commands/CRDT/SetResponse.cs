@@ -24,7 +24,7 @@ namespace RiakClient.Commands.CRDT
     /// <summary>
     /// Response to a <see cref="FetchSet"/> command.
     /// </summary>
-    public class SetResponse : Response<ISet<byte[]>>
+    public class SetResponse : DataTypeResponse<ISet<byte[]>>
     {
         /// <inheritdoc />
         public SetResponse()
