@@ -573,6 +573,7 @@ namespace RiakClient
         }
 
         /// <inheritdoc/>
+        [System.Obsolete("Please use RiakClient.Commands.ServerInfo instead.")]
         public RiakResult<RiakServerInfo> GetServerInfo()
         {
             var result = UseConnection(conn => conn.PbcWriteRead<RpbGetServerInfoResp>(MessageCode.RpbGetServerInfoReq));

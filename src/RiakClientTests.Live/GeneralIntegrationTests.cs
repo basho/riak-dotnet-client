@@ -66,6 +66,7 @@ namespace RiakClientTests.Live.GeneralIntegrationTests
             }
         }
 
+#pragma warning disable 618
         [Test]
         public void ServerInfoIsSuccessfullyExtracted()
         {
@@ -79,6 +80,7 @@ namespace RiakClientTests.Live.GeneralIntegrationTests
             var result = Client.Async.GetServerInfo().Result;
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
         }
+#pragma warning restore 618
 
         [Test]
         public void PingRequestResultsInPingResponse()

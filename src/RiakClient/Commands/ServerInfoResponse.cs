@@ -1,4 +1,4 @@
-﻿// <copyright file="PreflistResponse.cs" company="Basho Technologies, Inc.">
+﻿// <copyright file="ServerInfoResponse.cs" company="Basho Technologies, Inc.">
 // Copyright 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
@@ -16,28 +16,27 @@
 // under the License.
 // </copyright>
 
-namespace RiakClient.Commands.KV
+namespace RiakClient.Commands
 {
-    using System.Collections.Generic;
-
     /// <summary>
-    /// Response to a <see cref="FetchPreflist"/> command.
+    /// Response to a <see cref="FetchServerInfo"/> command.
     /// </summary>
-    public class PreflistResponse : Response<IEnumerable<PreflistItem>>
+    public class ServerInfoResponse : Response<ServerInfo>
     {
-        /// <inheritdoc />
-        public PreflistResponse()
-            : base(notFound: true)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ServerInfoResponse"/> class.
+        /// </summary>
+        public ServerInfoResponse()
+            : base(true)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PreflistResponse"/> class.
+        /// Initializes a new instance of the <see cref="ServerInfoResponse"/> class.
         /// </summary>
-        /// <param name="key">A <see cref="RiakString"/> representing the key.</param>
-        /// <param name="value">The value of the fetched preflist.</param>
-        public PreflistResponse(RiakString key, IEnumerable<PreflistItem> value)
-            : base(key, value)
+        /// <param name="value">The fetched server information.</param>
+        public ServerInfoResponse(ServerInfo value)
+            : base(false, value)
         {
         }
     }

@@ -31,9 +31,10 @@ namespace RiakClient.Commands
         /// <summary>
         /// Initializes a new instance of the <see cref="Response"/> class representing "Not Found".
         /// </summary>
-        public Response()
+        /// <param name="notFound">Set to <b>true</b> to indicate the item was not found.</param>
+        public Response(bool notFound)
         {
-            this.notFound = true;
+            this.notFound = notFound;
         }
 
         /// <summary>

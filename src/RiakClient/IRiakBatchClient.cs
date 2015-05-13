@@ -463,6 +463,7 @@ namespace RiakClient
         /// that is returned technically only relates to that node. All nodes in a cluster should
         /// run on the same version of Riak.
         /// </remarks>
+        [System.Obsolete("Please use RiakClient.Commands.ServerInfo instead.")]
         RiakResult<RiakServerInfo> GetServerInfo();
 
         /// <summary>

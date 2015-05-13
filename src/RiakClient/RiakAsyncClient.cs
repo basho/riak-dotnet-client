@@ -196,6 +196,7 @@ namespace RiakClient
         }
 
         /// <inheritdoc/>
+        [System.Obsolete("Please use RiakClient.Commands.ServerInfo instead.")]
         public Task<RiakResult<RiakServerInfo>> GetServerInfo()
         {
             return Task.Factory.StartNew(() => client.GetServerInfo());
@@ -363,6 +364,7 @@ namespace RiakClient
         }
 
         /// <inheritdoc/>
+        [System.Obsolete("Please use RiakClient.Commands.ServerInfo instead.")]
         public void GetServerInfo(Action<RiakResult<RiakServerInfo>> callback)
         {
             ExecAsync(() => callback(client.GetServerInfo()));

@@ -32,7 +32,7 @@ namespace RiakClient.Commands.CRDT
         /// Initializes a new instance of the <see cref="DataTypeResponse{TValue}"/> class representing "Not Found".
         /// </summary>
         public DataTypeResponse()
-            : base()
+            : base(notFound: true)
         {
         }
 

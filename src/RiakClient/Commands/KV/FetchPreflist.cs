@@ -26,7 +26,7 @@ namespace RiakClient.Commands.KV
     /// <summary>
     /// Fetches a Map from Riak
     /// </summary>
-    public class FetchPreflist : Command<FetchPreflistOptions, Response<IEnumerable<PreflistItem>>>
+    public class FetchPreflist : Command<FetchPreflistOptions, PreflistResponse>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="FetchPreflist"/> class.

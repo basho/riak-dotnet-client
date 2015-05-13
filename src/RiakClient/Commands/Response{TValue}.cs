@@ -26,17 +26,32 @@ namespace RiakClient.Commands
     {
         private readonly TValue value;
 
-        /// <inheritdoc />
-        public Response()
-            : base()
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Response{TValue}"/> class.
+        /// </summary>
+        /// <param name="notFound">Set to <b>true</b> to indicate the item was not found.</param>
+        public Response(bool notFound)
+            : base(notFound)
         {
+            this.value = default(TValue);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Response{TValue}"/> class.
+        /// </summary>
+        /// <param name="notFound">Set to <b>true</b> to indicate the item was not found.</param>
+        /// <param name="value">The response data.</param>
+        public Response(bool notFound, TValue value)
+            : base(notFound)
+        {
+            this.value = value;
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Response{TValue}"/> class.
         /// </summary>
         /// <param name="key">A <see cref="RiakString"/> representing the key.</param>
-        /// <param name="value">The data that will be parsed into usable CRDT data structures.</param>
+        /// <param name="value">The response data.</param>
         public Response(RiakString key, TValue value)
             : base(key)
         {
