@@ -106,5 +106,10 @@ namespace RiakClient.Commands
 
             return (TBuilder)this;
         }
+
+        protected TOptions BuildOptions()
+        {
+            return (TOptions)Activator.CreateInstance(typeof(TOptions), bucketType, bucket, key);
+        }
     }
 }

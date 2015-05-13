@@ -62,7 +62,7 @@ namespace RiakClient.Commands.CRDT
 
         public override TCommand Build()
         {
-            this.Options = (TOptions)Activator.CreateInstance(typeof(TOptions), bucketType, bucket, key);
+            Options = BuildOptions();
 
             Options.W = w;
             Options.PW = pw;

@@ -20,7 +20,6 @@ namespace RiakClient.Commands.KV
 {
     using System.Collections.Generic;
     using System.Linq;
-    using Exceptions;
     using Messages;
     using Util;
 
@@ -40,12 +39,18 @@ namespace RiakClient.Commands.KV
 
         public override MessageCode ExpectedCode
         {
-            get { throw new System.NotImplementedException(); }
+            get { return MessageCode.RpbGetBucketKeyPreflistResp; }
         }
 
         public override RpbReq ConstructPbRequest()
         {
-            throw new System.NotImplementedException();
+            var req = new RpbGetBucketKeyPreflistReq();
+
+            req.type = CommandOptions.BucketType;
+            req.bucket = CommandOptions.Bucket;
+            req.key = CommandOptions.Key;
+
+            return req;
         }
 
         public override void OnSuccess(RpbResp response)
@@ -62,7 +67,8 @@ namespace RiakClient.Commands.KV
 
                 if (EnumerableUtil.NotNullOrEmpty(resp.preflist))
                 {
-                    preflistItems = resp.preflist.Select(i => new PreflistItem());
+                    preflistItems = resp.preflist.Select(i =>
+                        new PreflistItem(RiakString.FromBytes(i.node), i.partition, i.primary));
                 }
 
                 Response = new PreflistResponse(Options.Key, preflistItems);
@@ -75,7 +81,8 @@ namespace RiakClient.Commands.KV
         {
             public override FetchPreflist Build()
             {
-                throw new System.NotImplementedException();
+                Options = BuildOptions();
+                return new FetchPreflist(Options);
             }
         }
     }
