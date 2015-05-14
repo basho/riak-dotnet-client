@@ -20,9 +20,9 @@ namespace Test.Integration
 {
     using System;
     using System.Collections.Generic;
-    using System.Runtime.CompilerServices;
     using NUnit.Framework;
     using RiakClient;
+    using RiakClient.Commands;
     using RiakClient.Config;
     using RiakClient.Models;
     using RiakClient.Util;
@@ -37,6 +37,8 @@ namespace Test.Integration
         protected IRiakEndPoint cluster;
         protected IRiakClient client;
         protected IRiakClusterConfiguration clusterConfig;
+
+        private static Version riakVersion = null;
 
         static TestBase()
         {
@@ -83,6 +85,32 @@ namespace Test.Integration
             {
                 var id = new RiakObjectId(BucketType, Bucket, key);
                 client.Delete(id);
+            }
+        }
+
+        protected void RiakMinVersion(ushort major, ushort minor, ushort build)
+        {
+            if (client == null)
+            {
+                throw new InvalidOperationException("Expected a client!");
+            }
+
+            if (riakVersion == null)
+            {
+                var serverInfo = new FetchServerInfo();
+                RiakResult rslt = client.Execute(serverInfo);
+                Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
+
+                var serverVersion = serverInfo.Response.Value.ServerVersion;
+                if (!Version.TryParse(serverVersion, out riakVersion))
+                {
+                    Assert.Fail("Could not parse server version: {0}", serverVersion);
+                }
+            }
+
+            if (!(riakVersion.Major >= major && riakVersion.Minor >= minor && riakVersion.Build >= build))
+            {
+                Assert.Pass("Test requires a newer version of Riak. Skipping!");
             }
         }
     }
