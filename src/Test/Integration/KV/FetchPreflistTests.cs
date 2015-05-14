@@ -28,8 +28,6 @@ namespace Test.Integration.CRDT
 
     public class FetchPreflistTests : TestBase
     {
-        private static readonly ILog Log = Logging.GetLogger(typeof(FetchPreflistTests));
-
         protected override RiakString BucketType
         {
             get { return new RiakString("plain"); }
