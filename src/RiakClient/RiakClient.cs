@@ -210,8 +210,8 @@ namespace RiakClient
 
                 if (result.Item1.Value.content.Count > 1)
                 {
-                    o.Siblings = result.Item1.Value.content.Select(c =>
-                        new RiakObject(result.Item2.BucketType, result.Item2.Bucket, result.Item2.Key, c, result.Item1.Value.vclock)).ToList();
+                    o.AddSiblings(result.Item1.Value.content.Select(c =>
+                        new RiakObject(result.Item2.BucketType, result.Item2.Bucket, result.Item2.Key, c, result.Item1.Value.vclock)));
                 }
 
                 return RiakResult<RiakObject>.Success(o);
@@ -238,14 +238,14 @@ namespace RiakClient
                 key = result.Value.key.FromRiakString();
             }
 
-            var finalResult = options.ReturnBody
+            var finalResult = options.ReturnBody && EnumerableUtil.NotNullOrEmpty(result.Value.content)
                 ? new RiakObject(value.BucketType, value.Bucket, key, result.Value.content.First(), result.Value.vclock)
                 : new RiakObject(value.BucketType, value.Bucket, key, (RpbContent)null, result.Value.vclock);
 
-            if (options.ReturnBody && result.Value.content.Count > 1)
+            if (options.ReturnBody && EnumerableUtil.NotNullOrEmpty(result.Value.content))
             {
-                finalResult.Siblings = result.Value.content.Select(c =>
-                    new RiakObject(value.BucketType, value.Bucket, key, c, result.Value.vclock)).ToList();
+                finalResult.AddSiblings(result.Value.content.Select(c =>
+                    new RiakObject(value.BucketType, value.Bucket, key, c, result.Value.vclock)));
             }
 
             return RiakResult<RiakObject>.Success(finalResult);
@@ -285,8 +285,8 @@ namespace RiakClient
 
                     if (options.ReturnBody && t.Item1.Value.content.Count > 1)
                     {
-                        finalResult.Siblings = t.Item1.Value.content.Select(c =>
-                            new RiakObject(t.Item2.BucketType, t.Item2.Bucket, t.Item2.Key, c, t.Item1.Value.vclock)).ToList();
+                        finalResult.AddSiblings(t.Item1.Value.content.Select(c =>
+                            new RiakObject(t.Item2.BucketType, t.Item2.Bucket, t.Item2.Key, c, t.Item1.Value.vclock)));
                     }
 
                     return RiakResult<RiakObject>.Success(finalResult);

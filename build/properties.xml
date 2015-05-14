@@ -21,7 +21,7 @@
 
     <CommonAssemblyInfoFile>$(SolutionDir)src\CommonAssemblyInfo.cs</CommonAssemblyInfoFile>
 
-    <MonoExe Condition="'$(OS)' != 'Windows_NT'">mono --runtime=v4.0.30319</MonoExe>
+    <MonoExe Condition="'$(OS)' != 'Windows_NT'">mono --debug --runtime=v4.0.30319</MonoExe>
 
     <ProtoDir>$(SolutionDir)src\riak_pb\src</ProtoDir>
     <ProtoMsgDir>$(RiakClientProjDir)\Messages</ProtoMsgDir>

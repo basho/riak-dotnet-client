@@ -23,6 +23,7 @@ namespace RiakClientTests.Live.MapReduce
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
+    using Extensions;
     using NUnit.Framework;
     using RiakClient;
     using RiakClient.Extensions;
@@ -30,10 +31,8 @@ namespace RiakClientTests.Live.MapReduce
     using RiakClient.Models.MapReduce;
     using RiakClient.Models.MapReduce.Inputs;
     using RiakClient.Models.Search;
-    using RiakClient.Util;
-    using Extensions;
 
-    [TestFixture, IntegrationTest]
+    [TestFixture, IntegrationTest, SkipMono]
     public class WhenUsingSearchAsInput : RiakMapReduceTestBase
     {
         private const string BucketType = "search_type";
@@ -70,23 +69,38 @@ namespace RiakClientTests.Live.MapReduce
         private void SetupSearchIndexes()
         {
             var index = new SearchIndex(Index);
-            Client.PutSearchIndex(index);
+            index.Timeout = TimeSpan.FromSeconds(60);
+            RiakResult rrslt = Client.PutSearchIndex(index);
+            Assert.True(rrslt.IsSuccess, rrslt.ErrorMessage);
+
+            RiakBucketProperties props = null;
+
+            Func<RiakResult<RiakBucketProperties>, bool> propsExist =
+                result => result != null && result.Value != null && props != null;
 
             Func<RiakResult<RiakBucketProperties>, bool> indexIsSet =
-                result => result.IsSuccess &&
+                result => result != null &&
+                          result.IsSuccess &&
                           result.Value != null &&
                           !string.IsNullOrEmpty(result.Value.SearchIndex);
 
-            Func<RiakResult<RiakBucketProperties>> setBucketProperties =
-                () =>
+            Func<RiakResult<RiakBucketProperties>> getBucketProperties = () =>
                 {
-                    RiakBucketProperties props = Client.GetBucketProperties(BucketType, Bucket).Value;
-                    props.SetSearchIndex(Index);
-                    Client.SetBucketProperties(BucketType, Bucket, props);
-                    return Client.GetBucketProperties(BucketType, Bucket);
+                    RiakResult<RiakBucketProperties> rslt = Client.GetBucketProperties(BucketType, Bucket);
+                    if (rslt.Value != null)
+                    {
+                        props = rslt.Value;
+                    }
+                    return rslt;
                 };
 
-            setBucketProperties.WaitUntil(indexIsSet);
+            getBucketProperties.WaitUntil(propsExist);
+
+            props.SetSearchIndex(Index);
+            rrslt = Client.SetBucketProperties(BucketType, Bucket, props);
+            Assert.True(rrslt.IsSuccess, rrslt.ErrorMessage);
+
+            getBucketProperties.WaitUntil(indexIsSet);
             Thread.Sleep(5000); // Wait for Yoko to start up
         }
 
@@ -207,4 +221,3 @@ namespace RiakClientTests.Live.MapReduce
         }
     }
 }
-

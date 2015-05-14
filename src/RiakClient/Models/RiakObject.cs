@@ -31,6 +31,7 @@ namespace RiakClient.Models
     using Models.Index;
     using Newtonsoft.Json;
     using ProtoBuf;
+    using Util;
 
     /// <summary>
     /// A delegate to handle serialization of an object to a string.
@@ -72,10 +73,16 @@ namespace RiakClient.Models
     public class RiakObject : IWriteableVClock
     {
         private readonly int hashCode;
-        private readonly Dictionary<string, IntIndex> intIndexes;
-        private readonly Dictionary<string, BinIndex> binIndexes;
+        private readonly Dictionary<string, string> userMetaData = new Dictionary<string, string>();
+        private readonly Dictionary<string, IntIndex> intIndexes = new Dictionary<string, IntIndex>();
+        private readonly Dictionary<string, BinIndex> binIndexes = new Dictionary<string, BinIndex>();
+        private readonly List<RiakLink> links = new List<RiakLink>();
+        private readonly List<RiakObject> siblings = new List<RiakObject>();
 
+        private readonly string vtag;
         private List<string> vtags;
+
+        private byte[] vectorClock = null;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RiakObject"/> class.
@@ -259,12 +266,6 @@ namespace RiakClient.Models
             Value = value;
             ContentType = contentType;
             CharSet = charSet;
-            UserMetaData = new Dictionary<string, string>();
-            Links = new List<RiakLink>();
-            Siblings = new List<RiakObject>();
-
-            intIndexes = new Dictionary<string, IntIndex>();
-            binIndexes = new Dictionary<string, BinIndex>();
         }
 
         internal RiakObject(string bucketType, string bucket, string key, RpbContent content, byte[] vectorClock)
@@ -272,36 +273,43 @@ namespace RiakClient.Models
             BucketType = bucketType;
             Bucket = bucket;
             Key = key;
-            VectorClock = vectorClock;
 
-            Value = content.value;
-            VTag = content.vtag.FromRiakString();
-            ContentEncoding = content.content_encoding.FromRiakString();
-            ContentType = content.content_type.FromRiakString();
-            UserMetaData = content.usermeta.ToDictionary(p => p.key.FromRiakString(), p => p.value.FromRiakString());
-            Links = content.links.Select(l => new RiakLink(l)).ToList();
-            Siblings = new List<RiakObject>();
+            this.vectorClock = vectorClock;
 
-            // TODO - FUTURE: look at how other clients use this data
-            LastModified = content.last_mod;
-            LastModifiedUsec = content.last_mod_usecs;
-
-            intIndexes = new Dictionary<string, IntIndex>();
-            binIndexes = new Dictionary<string, BinIndex>();
-
-            foreach (var index in content.indexes)
+            if (content != null)
             {
-                var name = index.key.FromRiakString();
+                Value = content.value;
 
-                if (name.EndsWith(RiakConstants.IndexSuffix.Integer))
+                vtag = content.vtag.FromRiakString();
+
+                ContentEncoding = content.content_encoding.FromRiakString();
+                ContentType = content.content_type.FromRiakString();
+
+                foreach (var userMeta in content.usermeta)
                 {
-                    IntIndex(name.Remove(name.Length - RiakConstants.IndexSuffix.Integer.Length))
-                        .Add(index.value.FromRiakString());
+                    userMetaData.Add(userMeta.key.FromRiakString(), userMeta.value.FromRiakString());
                 }
-                else
+
+                links.AddRange(content.links.Select(l => new RiakLink(l)));
+
+                // TODO - FUTURE: look at how other clients use this data
+                LastModified = content.last_mod;
+                LastModifiedUsec = content.last_mod_usecs;
+
+                foreach (var index in content.indexes)
                 {
-                    BinIndex(name.Remove(name.Length - RiakConstants.IndexSuffix.Binary.Length))
-                        .Add(index.value.FromRiakString());
+                    var name = index.key.FromRiakString();
+
+                    if (name.EndsWith(RiakConstants.IndexSuffix.Integer))
+                    {
+                        IntIndex(name.Remove(name.Length - RiakConstants.IndexSuffix.Integer.Length))
+                            .Add(index.value.FromRiakString());
+                    }
+                    else
+                    {
+                        BinIndex(name.Remove(name.Length - RiakConstants.IndexSuffix.Binary.Length))
+                            .Add(index.value.FromRiakString());
+                    }
                 }
             }
 
@@ -313,7 +321,7 @@ namespace RiakClient.Models
         {
             if (contents.Count > 1)
             {
-                Siblings = contents.Select(c => new RiakObject(bucketType, bucket, key, c, vectorClock)).ToList();
+                AddSiblings(contents.Select(c => new RiakObject(bucketType, bucket, key, c, vectorClock)));
                 hashCode = CalculateHashCode();
             }
         }
@@ -356,17 +364,26 @@ namespace RiakClient.Models
         /// <summary>
         /// Get the Vector Clock.
         /// </summary>
-        public byte[] VectorClock { get; private set; }
+        public byte[] VectorClock
+        {
+            get { return vectorClock; }
+        }
 
         /// <summary>
         /// Get the VTag.
         /// </summary>
-        public string VTag { get; private set; }
+        public string VTag
+        {
+            get { return vtag; }
+        }
 
         /// <summary>
         /// Get any user set MetaData.
         /// </summary>
-        public IDictionary<string, string> UserMetaData { get; set; }
+        public IDictionary<string, string> UserMetaData
+        {
+            get { return userMetaData; }
+        }
 
         /// <summary>
         /// Get the Last Modified unix timestamp. 
@@ -381,12 +398,18 @@ namespace RiakClient.Models
         /// <summary>
         /// Get the list of Links to other Riak objects. 
         /// </summary>
-        public IList<RiakLink> Links { get; private set; }
+        public IList<RiakLink> Links
+        {
+            get { return links; }
+        }
 
         /// <summary>
         /// Get a list of conflicting Sibling objects. 
         /// </summary>
-        public IList<RiakObject> Siblings { get; set; }
+        public IList<RiakObject> Siblings
+        {
+            get { return siblings; }
+        }
 
         /// <summary>
         /// Get the collection of Integer secondary indexes for this object.
@@ -417,8 +440,22 @@ namespace RiakClient.Models
         /// </summary>
         public List<string> VTags
         {
-            // TODO: this is too complex
-            get { return vtags ?? (vtags = Siblings.Count == 0 ? new List<string> { VTag } : Siblings.Select(s => s.VTag).ToList()); }
+            get
+            {
+                if (vtags == null)
+                {
+                    if (EnumerableUtil.IsNullOrEmpty(siblings))
+                    {
+                        vtags = new List<string> { vtag };
+                    }
+                    else
+                    {
+                        vtags = siblings.Select(s => s.VTag).ToList();
+                    }
+                }
+
+                return vtags;
+            }
         }
 
         /// <summary>
@@ -663,7 +700,7 @@ namespace RiakClient.Models
                 && other.LastModified == LastModified
                 && other.LastModifiedUsec == LastModifiedUsec
                 && Equals(other.Links, Links)
-                && Equals(other.vtags, vtags)
+                && Equals(other.VTags, VTags)
                 && other.Links.SequenceEqual(Links)
                 && other.UserMetaData.SequenceEqual(UserMetaData)
                 && other.BinIndexes.SequenceEqual(BinIndexes)
@@ -688,7 +725,7 @@ namespace RiakClient.Models
             Justification = "Mucking with a VClock should require casting to IWriteableVClock. TODO - FUTURE: evaluate this decision")]
         void IWriteableVClock.SetVClock(byte[] vclock)
         {
-            VectorClock = vclock;
+            this.vectorClock = vclock;
         }
 
         /// <summary>
@@ -954,6 +991,11 @@ namespace RiakClient.Models
                     })));
 
             return message;
+        }
+
+        internal void AddSiblings(IEnumerable<RiakObject> siblings)
+        {
+            this.siblings.AddRange(siblings);
         }
 
         /// <summary>

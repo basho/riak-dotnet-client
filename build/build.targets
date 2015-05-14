@@ -181,7 +181,7 @@
       <NUnitConsoleRunnerArgs Condition="'$(Verbose)' != 'true'">-nologo -nodots</NUnitConsoleRunnerArgs>
       <NUnitConsoleRunnerArgs Condition="'$(Verbose)' == 'true'">-labels</NUnitConsoleRunnerArgs>
       <NUnitConsoleRunnerCommand Condition="'$(OS)' == 'Windows_NT'">$(NUnitConsoleRunnerExe) $(NUnitConsoleRunnerArgs) -config Debug</NUnitConsoleRunnerCommand>
-      <NUnitConsoleRunnerCommand Condition="'$(OS)' != 'Windows_NT'">$(MonoExe) $(NUnitConsoleRunnerExe) $(NUnitConsoleRunnerArgs) -config Debug-Mono</NUnitConsoleRunnerCommand>
+      <NUnitConsoleRunnerCommand Condition="'$(OS)' != 'Windows_NT'">$(MonoExe) $(NUnitConsoleRunnerExe) $(NUnitConsoleRunnerArgs) -config Debug-Mono -exclude=SkipMono</NUnitConsoleRunnerCommand>
     </PropertyGroup>
   </Target>
 

@@ -25,38 +25,63 @@ namespace RiakClientTests.Live.BucketPropertyTests
     using RiakClient;
     using RiakClient.Models;
     using RiakClient.Models.CommitHook;
+    using RiakClient.Util;
 
-    [TestFixture, IntegrationTest]
+    [TestFixture, IntegrationTest, SkipMono]
     public class WhenDealingWithBucketProperties : LiveRiakConnectionTestBase
     {
         private readonly Random _random = new Random();
 
+        private string bucket;
+
+        [SetUp]
+        public void TestSetUp()
+        {
+            bucket = Guid.NewGuid().ToString();
+        }
+
         [Test]
         public void GettingExtendedPropertiesOnABucketWithoutExtendedPropertiesSetDoesntThrowAnException()
         {
-            var bucketName = Guid.NewGuid().ToString();
-
-            var getResult = Client.GetBucketProperties(bucketName);
+            var getResult = Client.GetBucketProperties(bucket);
             getResult.IsSuccess.ShouldBeTrue(getResult.ErrorMessage);
         }
 
         [Test]
         public void SettingPropertiesOnNewBucketWorksCorrectly()
         {
-            var bucketName = Guid.NewGuid().ToString();
             RiakBucketProperties props = new RiakBucketProperties()
                 .SetNVal((NVal)4)
                 .SetLegacySearch(true)
                 .SetW((Quorum)"all")
                 .SetR((Quorum)"quorum");
 
-            var setResult = Client.SetBucketProperties(bucketName, props);
+            var setResult = Client.SetBucketProperties(bucket, props);
             setResult.IsSuccess.ShouldBeTrue(setResult.ErrorMessage);
 
-            var getResult = Client.GetBucketProperties(bucketName);
-            getResult.IsSuccess.ShouldBeTrue(getResult.ErrorMessage);
+            Func<RiakResult<RiakBucketProperties>> getFunc = () =>
+                {
+                    var getResult = Client.GetBucketProperties(bucket);
+                    getResult.IsSuccess.ShouldBeTrue(getResult.ErrorMessage);
+                    return getResult;
+                };
 
-            props = getResult.Value;
+            Func<RiakResult<RiakBucketProperties>, bool> successFunc = (r) =>
+                {
+                    bool rv = false;
+
+                    RiakBucketProperties p = r.Value;
+                    if (p.NVal == 4)
+                    {
+                        rv = true;
+                        props = p;
+                    }
+
+                    return rv;
+                };
+
+            getFunc.WaitUntil(successFunc);
+
             props.NVal.ShouldNotBeNull();
             ((int)props.NVal).ShouldEqual(4);
             props.LegacySearch.ShouldNotEqual(null);
@@ -68,7 +93,7 @@ namespace RiakClientTests.Live.BucketPropertyTests
         [Test]
         public void GettingWithExtendedFlagReturnsExtraProperties()
         {
-            var result = Client.GetBucketProperties(PropertiesTestBucket);
+            var result = Client.GetBucketProperties(bucket);
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
             result.Value.AllowMultiple.HasValue.ShouldBeTrue();
             result.Value.NVal.ShouldNotBeNull();
@@ -82,18 +107,11 @@ namespace RiakClientTests.Live.BucketPropertyTests
         [Test]
         public void CommitHooksAreStoredAndLoadedProperly()
         {
-            // make sure we're all clear first
-            var result = Client.GetBucketProperties(PropertiesTestBucket);
-            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
-
-            var props = result.Value;
-            props.ClearPostCommitHooks().ClearPreCommitHooks();
-            Client.SetBucketProperties(PropertiesTestBucket, props).IsSuccess.ShouldBeTrue();
-
             // when we load, the commit hook lists should be null
-            result = Client.GetBucketProperties(PropertiesTestBucket);
+            RiakResult<RiakBucketProperties> result = Client.GetBucketProperties(bucket);
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
-            props = result.Value;
+
+            RiakBucketProperties props = result.Value;
             props.PreCommitHooks.ShouldBeNull();
             props.PostCommitHooks.ShouldBeNull();
 
@@ -102,20 +120,40 @@ namespace RiakClientTests.Live.BucketPropertyTests
                 .AddPreCommitHook(new RiakErlangCommitHook("my_mod", "do_fun"))
                 .AddPostCommitHook(new RiakErlangCommitHook("my_other_mod", "do_more"));
 
-            var propResult = Client.SetBucketProperties(PropertiesTestBucket, props);
+            var propResult = Client.SetBucketProperties(bucket, props);
             propResult.IsSuccess.ShouldBeTrue(propResult.ErrorMessage);
 
             // load them out again and make sure they got loaded up
-            result = Client.GetBucketProperties(PropertiesTestBucket);
-            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
-            props = result.Value;
+            Func<RiakResult<RiakBucketProperties>> getFunc = () =>
+                {
+                    result = Client.GetBucketProperties(bucket);
+                    result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
+                    return result;
+                };
+
+            Func<RiakResult<RiakBucketProperties>, bool> successFunc = (r) =>
+                {
+                    bool rv = false;
+
+                    RiakBucketProperties p = r.Value;
+                    if (EnumerableUtil.NotNullOrEmpty(p.PreCommitHooks) &&
+                        EnumerableUtil.NotNullOrEmpty(p.PostCommitHooks))
+                    {
+                        rv = true;
+                        props = p;
+                    }
+
+                    return rv;
+                };
+
+            getFunc.WaitUntil(successFunc);
 
             props.PreCommitHooks.ShouldNotBeNull();
             props.PreCommitHooks.Count.ShouldEqual(2);
             props.PostCommitHooks.ShouldNotBeNull();
             props.PostCommitHooks.Count.ShouldEqual(1);
 
-            Client.DeleteBucket(PropertiesTestBucket);
+            Client.DeleteBucket(bucket);
         }
 
         [Test]
@@ -124,15 +162,15 @@ namespace RiakClientTests.Live.BucketPropertyTests
             Client.Batch(batch =>
                 {
                     // make sure we're all clear first
-                    var result = batch.GetBucketProperties(PropertiesTestBucket);
+                    var result = batch.GetBucketProperties(bucket);
                     result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
                     var props = result.Value;
                     props.ClearPostCommitHooks().ClearPreCommitHooks();
-                    var propResult = batch.SetBucketProperties(PropertiesTestBucket, props);
+                    var propResult = batch.SetBucketProperties(bucket, props);
                     propResult.IsSuccess.ShouldBeTrue(propResult.ErrorMessage);
 
                     // when we load, the commit hook lists should be null
-                    result = batch.GetBucketProperties(PropertiesTestBucket);
+                    result = batch.GetBucketProperties(bucket);
                     result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
                     props = result.Value;
                     props.PreCommitHooks.ShouldBeNull();
@@ -142,11 +180,11 @@ namespace RiakClientTests.Live.BucketPropertyTests
                     props.AddPreCommitHook(new RiakJavascriptCommitHook("Foo.doBar"))
                         .AddPreCommitHook(new RiakErlangCommitHook("my_mod", "do_fun"))
                         .AddPostCommitHook(new RiakErlangCommitHook("my_other_mod", "do_more"));
-                    propResult = batch.SetBucketProperties(PropertiesTestBucket, props);
+                    propResult = batch.SetBucketProperties(bucket, props);
                     propResult.IsSuccess.ShouldBeTrue(propResult.ErrorMessage);
 
                     // load them out again and make sure they got loaded up
-                    result = batch.GetBucketProperties(PropertiesTestBucket);
+                    result = batch.GetBucketProperties(bucket);
                     result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
                     props = result.Value;
 
@@ -164,15 +202,15 @@ namespace RiakClientTests.Live.BucketPropertyTests
             var task = Client.Async.Batch(batch =>
                 {
                     // make sure we're all clear first
-                    var result = batch.GetBucketProperties(PropertiesTestBucket);
+                    var result = batch.GetBucketProperties(bucket);
                     result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
                     var props = result.Value;
                     props.ClearPostCommitHooks().ClearPreCommitHooks();
-                    var propResult = batch.SetBucketProperties(PropertiesTestBucket, props);
+                    var propResult = batch.SetBucketProperties(bucket, props);
                     propResult.IsSuccess.ShouldBeTrue(propResult.ErrorMessage);
 
                     // when we load, the commit hook lists should be null
-                    result = batch.GetBucketProperties(PropertiesTestBucket);
+                    result = batch.GetBucketProperties(bucket);
                     result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
                     props = result.Value;
                     props.PreCommitHooks.ShouldBeNull();
@@ -182,11 +220,11 @@ namespace RiakClientTests.Live.BucketPropertyTests
                     props.AddPreCommitHook(new RiakJavascriptCommitHook("Foo.doBar"))
                         .AddPreCommitHook(new RiakErlangCommitHook("my_mod", "do_fun"))
                         .AddPostCommitHook(new RiakErlangCommitHook("my_other_mod", "do_more"));
-                    propResult = batch.SetBucketProperties(PropertiesTestBucket, props);
+                    propResult = batch.SetBucketProperties(bucket, props);
                     propResult.IsSuccess.ShouldBeTrue(propResult.ErrorMessage);
 
                     // load them out again and make sure they got loaded up
-                    result = batch.GetBucketProperties(PropertiesTestBucket);
+                    result = batch.GetBucketProperties(bucket);
                     result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
                     props = result.Value;
 
@@ -206,8 +244,6 @@ namespace RiakClientTests.Live.BucketPropertyTests
         [Test]
         public void ResettingBucketPropertiesWorksCorrectly()
         {
-            const string bucket = "Schmoopy";
-
             var props = new RiakBucketProperties()
                 .SetAllowMultiple(true)
                 .SetDw(10)
@@ -217,15 +253,47 @@ namespace RiakClientTests.Live.BucketPropertyTests
             var setPropsResult = Client.SetBucketProperties(bucket, props);
             setPropsResult.IsSuccess.ShouldBeTrue(setPropsResult.ErrorMessage);
 
-#pragma warning disable 618
+            Func<RiakResult<RiakBucketProperties>> getFunc = () =>
+                {
+                    var getResult = Client.GetBucketProperties(bucket);
+                    getResult.IsSuccess.ShouldBeTrue(getResult.ErrorMessage);
+                    return getResult;
+                };
+
+            Func<RiakResult<RiakBucketProperties>, bool> successFunc = (r) =>
+                {
+                    bool rv = false;
+
+                    if (r.Value.AllowMultiple == props.AllowMultiple &&
+                        r.Value.LastWriteWins == props.LastWriteWins)
+                    {
+                        rv = true;
+                    }
+
+                    return rv;
+                };
+
+            getFunc.WaitUntil(successFunc);
+
             var resetResult = Client.ResetBucketProperties(bucket);
-#pragma warning restore 618
             resetResult.IsSuccess.ShouldBeTrue(resetResult.ErrorMessage);
 
-            var getPropsResult = Client.GetBucketProperties(bucket);
-            getPropsResult.IsSuccess.ShouldBeTrue(getPropsResult.ErrorMessage);
+            RiakBucketProperties resetProps = null;
+            successFunc = (r) =>
+                {
+                    bool rv = false;
 
-            var resetProps = getPropsResult.Value;
+                    if (r.Value.AllowMultiple != props.AllowMultiple &&
+                        r.Value.LastWriteWins != props.LastWriteWins)
+                    {
+                        rv = true;
+                        resetProps = r.Value;
+                    }
+
+                    return rv;
+                };
+
+            getFunc.WaitUntil(successFunc);
 
             resetProps.AllowMultiple.ShouldNotEqual(props.AllowMultiple);
             resetProps.Dw.ShouldNotEqual(props.Dw);

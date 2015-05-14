@@ -100,6 +100,16 @@ namespace RiakClient
         }
 
         /// <summary>
+        /// Cast the value of this <see cref="TimeSpan"/> to a <see cref="Timeout"/>.
+        /// </summary>
+        /// <param name="timespan">The <see cref="TimeSpan"/> value to cast to a <see cref="Timeout"/>.</param>
+        /// <returns>A <see cref="Timeout"/> based on the value of the this <see cref="TimeSpan"/>.</returns>
+        public static implicit operator Timeout(TimeSpan timespan)
+        {
+            return new Timeout(timespan);
+        }
+
+        /// <summary>
         /// Cast the value of this <see cref="Timeout"/> to a <see cref="TimeSpan"/>.
         /// </summary>
         /// <param name="timeout">The <see cref="Timeout"/> value to cast to a <see cref="TimeSpan"/>.</param>

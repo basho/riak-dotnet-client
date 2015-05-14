@@ -22,7 +22,9 @@ lint:
 	echo Nope > /dev/null
 
 setup-integration:
-	cp -f $(CURDIR)/App.config $(PROJDIR)/RiakClientTests.Live/bin/Debug/RiakClientTests.Live.dll.config
+	sed -e 's/riak-test/127.0.0.1/g' -e 's/\<10017\>/8087/g' $(PROJDIR)/RiakClientTests.Live/App.config > $(PROJDIR)/RiakClientTests.Live/bin/Debug/RiakClientTests.Live.dll.config
+	sed -e 's/riak-test/127.0.0.1/g' -e 's/\<10017\>/8087/g' $(PROJDIR)/Test/App.config > $(PROJDIR)/Test/bin/Debug/Test.dll.config
 
-test: setup-integration test-all
+# test: setup-integration test-all
+test: unit-test
 

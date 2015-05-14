@@ -38,7 +38,7 @@ namespace RiakClientTests.Live.GeneralIntegrationTests
             RiakResult result = client.Ping();
             if (!result.IsSuccess)
             {
-                Assert.IsTrue(result.ErrorMessage.Contains("Connection to remote server timed out"));
+                Assert.IsTrue(result.ErrorMessage.Contains("Connection to remote server timed out"), result.ErrorMessage);
             }
         }
 
@@ -50,7 +50,10 @@ namespace RiakClientTests.Live.GeneralIntegrationTests
             RiakResult result = client.Ping();
             if (!result.IsSuccess)
             {
-                Assert.IsTrue(result.ErrorMessage.Contains("the connected party did not properly respond after a period of time"));
+                bool foundExpected =
+                    result.ErrorMessage.Contains("the connected party did not properly respond after a period of time") ||
+                    result.ErrorMessage.Contains("Read error");
+                Assert.IsTrue(foundExpected, result.ErrorMessage);
             }
         }
 
@@ -62,7 +65,7 @@ namespace RiakClientTests.Live.GeneralIntegrationTests
             RiakResult result = client.Ping();
             if (!result.IsSuccess)
             {
-                Assert.IsTrue(result.ErrorMessage.Contains("the connected party did not properly respond after a period of time"));
+                Assert.IsTrue(result.ErrorMessage.Contains("the connected party did not properly respond after a period of time"), result.ErrorMessage);
             }
         }
 
