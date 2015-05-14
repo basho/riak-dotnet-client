@@ -19,14 +19,12 @@
 namespace Test.Integration.CRDT
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using Common.Logging;
     using NUnit.Framework;
     using RiakClient;
+    using RiakClient.Commands;
     using RiakClient.Commands.KV;
-    using RiakClient.Models;
-    using RiakClient.Util;
 
     public class FetchPreflistTests : TestBase
     {
@@ -45,6 +43,8 @@ namespace Test.Integration.CRDT
         [Test]
         public void Can_Fetch_Preflist()
         {
+            RiakMinVersion(2, 1, 0);
+
             var fetch = new FetchPreflist.Builder()
                     .WithBucketType(BucketType)
                     .WithBucket(Bucket)
