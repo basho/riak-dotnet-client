@@ -1,4 +1,4 @@
-﻿// <copyright file="IRiakCommand.cs" company="Basho Technologies, Inc.">
+﻿// <copyright file="ServerInfoResponse.cs" company="Basho Technologies, Inc.">
 // Copyright 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
@@ -18,17 +18,26 @@
 
 namespace RiakClient.Commands
 {
-    using Messages;
-
     /// <summary>
-    /// Represents a command to execute against Riak
+    /// Response to a <see cref="FetchServerInfo"/> command.
     /// </summary>
-    public interface IRiakCommand
+    public class ServerInfoResponse : Response<ServerInfo>
     {
-        MessageCode ExpectedCode { get; }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ServerInfoResponse"/> class.
+        /// </summary>
+        public ServerInfoResponse()
+            : base(true)
+        {
+        }
 
-        RpbReq ConstructPbRequest();
-
-        void OnSuccess(RpbResp rpbResp);
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ServerInfoResponse"/> class.
+        /// </summary>
+        /// <param name="value">The fetched server information.</param>
+        public ServerInfoResponse(ServerInfo value)
+            : base(false, value)
+        {
+        }
     }
 }

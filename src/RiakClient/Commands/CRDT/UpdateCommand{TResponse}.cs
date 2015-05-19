@@ -22,60 +22,46 @@ namespace RiakClient.Commands.CRDT
     using Messages;
     using Util;
 
-    public abstract class UpdateCommand<TResponse> : IRiakCommand where TResponse : Response, new()
+    public abstract class UpdateCommand<TResponse> : Command<UpdateCommandOptions, TResponse>
+        where TResponse : Response
     {
-        private readonly UpdateCommandOptions updateOptions;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="UpdateCommand{TResponse}"/> class.
         /// </summary>
         /// <param name="options">Options for this operation. See <see cref="UpdateMapOptions"/></param>
         public UpdateCommand(UpdateCommandOptions options)
+            : base(options)
         {
-            if (options == null)
-            {
-                throw new ArgumentNullException("options");
-            }
-
-            this.updateOptions = options;
-
-            if (this.updateOptions.HasRemoves &&
-                EnumerableUtil.IsNullOrEmpty(this.updateOptions.Context))
+            if (this.CommandOptions.HasRemoves &&
+                EnumerableUtil.IsNullOrEmpty(this.CommandOptions.Context))
             {
                 throw new InvalidOperationException("When doing any removes a context must be provided.");
             }
         }
 
-        public UpdateCommandOptions Options
-        {
-            get { return updateOptions; }
-        }
-
-        public MessageCode ExpectedCode
+        public override MessageCode ExpectedCode
         {
             get { return MessageCode.DtUpdateResp; }
         }
 
-        public TResponse Response { get; private set; }
-
-        public RpbReq ConstructPbRequest()
+        public override RpbReq ConstructPbRequest()
         {
             var req = new DtUpdateReq();
 
-            req.type = updateOptions.BucketType;
-            req.bucket = updateOptions.Bucket;
-            req.key = updateOptions.Key;
+            req.type = CommandOptions.BucketType;
+            req.bucket = CommandOptions.Bucket;
+            req.key = CommandOptions.Key;
 
-            req.w = updateOptions.W;
-            req.pw = updateOptions.PW;
-            req.dw = updateOptions.DW;
+            req.w = CommandOptions.W;
+            req.pw = CommandOptions.PW;
+            req.dw = CommandOptions.DW;
 
-            req.return_body = updateOptions.ReturnBody;
+            req.return_body = CommandOptions.ReturnBody;
 
-            req.timeout = (uint)updateOptions.Timeout;
+            req.timeout = (uint)CommandOptions.Timeout;
 
-            req.context = updateOptions.Context;
-            req.include_context = updateOptions.IncludeContext;
+            req.context = CommandOptions.Context;
+            req.include_context = CommandOptions.IncludeContext;
 
             if (req.include_context)
             {
@@ -87,17 +73,17 @@ namespace RiakClient.Commands.CRDT
             return req;
         }
 
-        public void OnSuccess(RpbResp response)
+        public override void OnSuccess(RpbResp response)
         {
             if (response == null)
             {
-                Response = new TResponse();
+                Response = default(TResponse);
             }
             else
             {
                 DtUpdateResp resp = (DtUpdateResp)response;
                 RiakString key = EnumerableUtil.NotNullOrEmpty(resp.key) ?
-                    new RiakString(resp.key) : updateOptions.Key;
+                    new RiakString(resp.key) : CommandOptions.Key;
                 Response = CreateResponse(key, resp);
             }
         }

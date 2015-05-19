@@ -36,7 +36,7 @@ namespace RiakClient.Commands.CRDT
     /// </summary>
     public class UpdateCounter : UpdateCommand<CounterResponse>
     {
-        private readonly UpdateCounterOptions options;
+        private readonly UpdateCounterOptions counterOptions;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UpdateCounter"/> class.
@@ -46,14 +46,14 @@ namespace RiakClient.Commands.CRDT
         public UpdateCounter(UpdateCounterOptions options)
             : base(options)
         {
-            this.options = options;
+            this.counterOptions = options;
         }
 
         protected override DtOp GetRequestOp()
         {
             var op = new DtOp();
             op.counter_op = new CounterOp();
-            op.counter_op.increment = options.Increment;
+            op.counter_op.increment = counterOptions.Increment;
             return op;
         }
 

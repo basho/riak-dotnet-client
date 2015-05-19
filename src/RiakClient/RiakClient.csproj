@@ -70,9 +70,19 @@
       <ExcludeFromStyleCop>False</ExcludeFromStyleCop>
     </Compile>
     <Compile Include="Commands\CommandDefaults.cs" />
+    <Compile Include="Commands\Command{TResponse}.cs" />
     <Compile Include="Commands\CRDT\FetchSetOptions.cs" />
+    <Compile Include="Commands\CRDT\DataTypeResponse{TValue}.cs" />
     <Compile Include="Commands\CRDT\SetResponse.cs" />
     <Compile Include="Commands\CRDT\FetchSet.cs" />
+    <Compile Include="Commands\Command{TOptions,TResponse}.cs" />
+    <Compile Include="Commands\ServerInfo.cs" />
+    <Compile Include="Commands\ServerInfoResponse.cs" />
+    <Compile Include="Commands\FetchServerInfo.cs" />
+    <Compile Include="Commands\KV\PreflistItem.cs" />
+    <Compile Include="Commands\KV\PreflistResponse.cs" />
+    <Compile Include="Commands\KV\FetchPreflist.cs" />
+    <Compile Include="Commands\KV\FetchPreflistOptions.cs" />
     <Compile Include="Commands\Response.cs" />
     <Compile Include="Commands\Response{TValue}.cs" />
     <Compile Include="Commands\CRDT\FetchCommandBuilder{TBuilder,TCommand,TOptions,TResponse}.cs" />
@@ -332,6 +342,7 @@
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\build\assemblyinfo.targets" Condition="Exists('$(SolutionDir)\build\assemblyinfo.targets')" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

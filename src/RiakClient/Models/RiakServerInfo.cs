@@ -25,6 +25,7 @@ namespace RiakClient.Models
     /// <summary>
     /// A collection of server info that can be queried from a single Riak node.
     /// </summary>
+    [System.Obsolete("Please use RiakClient.Commands.ServerInfo instead.")]
     public class RiakServerInfo
     {
         private readonly string node;

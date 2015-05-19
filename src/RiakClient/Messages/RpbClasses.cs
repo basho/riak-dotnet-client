@@ -20,14 +20,38 @@ namespace RiakClient.Messages
 {
     using System;
 
-    public abstract class RpbReq { }
+    public class RpbReq
+    {
+        private readonly MessageCode messageCode;
+        private readonly bool isMessageCodeOnly = false;
+
+        public RpbReq()
+        {
+        }
+
+        public RpbReq(MessageCode messageCode)
+        {
+            this.messageCode = messageCode;
+            this.isMessageCodeOnly = true;
+        }
+
+        public MessageCode MessageCode
+        {
+            get { return messageCode; }
+        }
+
+        public bool IsMessageCodeOnly
+        {
+            get { return isMessageCodeOnly; }
+        }
+    }
 
     public abstract class RpbResp { }
 
     [CLSCompliant(false)]
     public sealed partial class RpbErrorResp { }
 
-    public sealed partial class RpbGetServerInfoResp { }
+    public sealed partial class RpbGetServerInfoResp : RpbResp { }
 
     public sealed partial class RpbPair { }
 
@@ -173,9 +197,9 @@ namespace RiakClient.Messages
 
     public sealed partial class RpbYokozunaSchemaGetResp { }
 
-    public sealed partial class RpbGetBucketKeyPreflistReq { }
+    public sealed partial class RpbGetBucketKeyPreflistReq : RpbReq { }
 
-    public sealed partial class RpbGetBucketKeyPreflistResp { }
+    public sealed partial class RpbGetBucketKeyPreflistResp : RpbResp { }
 
     public sealed partial class RpbBucketKeyPreflistItem { }
 }

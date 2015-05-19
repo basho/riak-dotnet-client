@@ -27,22 +27,21 @@ namespace RiakClient.Commands
     {
         private readonly RiakString key;
         private readonly bool notFound;
-        private readonly byte[] context;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Response"/> class representing "Not Found".
         /// </summary>
-        public Response()
+        /// <param name="notFound">Set to <b>true</b> to indicate the item was not found.</param>
+        public Response(bool notFound)
         {
-            this.notFound = true;
+            this.notFound = notFound;
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Response"/> class.
         /// </summary>
         /// <param name="key">A <see cref="RiakString"/> representing the key.</param>
-        /// <param name="context">The data type context. Necessary to use this if updating a data type with removals.</param>
-        public Response(RiakString key, byte[] context)
+        public Response(RiakString key)
         {
             if (key == null)
             {
@@ -54,7 +53,6 @@ namespace RiakClient.Commands
             }
 
             this.notFound = false;
-            this.context = context;
         }
 
         /// <summary>
@@ -73,15 +71,6 @@ namespace RiakClient.Commands
         public RiakString Key
         {
             get { return key; }
-        }
-
-        /// <summary>
-        /// If non-null, a context that can be used for subsequent operations that contain removals.
-        /// </summary>
-        /// <value>A <see cref="Byte"/>[] representing an opaque context.</value>
-        public byte[] Context
-        {
-            get { return context; }
         }
     }
 }

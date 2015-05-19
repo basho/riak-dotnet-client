@@ -1,4 +1,4 @@
-﻿// <copyright file="IRiakCommand.cs" company="Basho Technologies, Inc.">
+﻿// <copyright file="FetchPreflistOptions.cs" company="Basho Technologies, Inc.">
 // Copyright 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
@@ -16,19 +16,18 @@
 // under the License.
 // </copyright>
 
-namespace RiakClient.Commands
+namespace RiakClient.Commands.KV
 {
-    using Messages;
-
     /// <summary>
-    /// Represents a command to execute against Riak
+    /// Represents options for a <see cref="FetchPreflist"/> operation.
     /// </summary>
-    public interface IRiakCommand
+    /// <inheritdoc/>
+    public class FetchPreflistOptions : CommandOptions
     {
-        MessageCode ExpectedCode { get; }
-
-        RpbReq ConstructPbRequest();
-
-        void OnSuccess(RpbResp rpbResp);
+        /// <inheritdoc/>
+        public FetchPreflistOptions(string bucketType, string bucket, string key)
+            : base(bucketType, bucket, key, true)
+        {
+        }
     }
 }

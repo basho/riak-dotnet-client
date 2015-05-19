@@ -86,7 +86,15 @@ namespace RiakClient.Comms
         public RiakResult Write(IRiakCommand command)
         {
             RpbReq request = command.ConstructPbRequest();
-            return DoWrite(s => Serializer.Serialize(s, request), request.GetType());
+            if (request.IsMessageCodeOnly)
+            {
+                Write(request.MessageCode);
+                return RiakResult.Success();
+            }
+            else
+            {
+                return DoWrite(s => Serializer.Serialize(s, request), request.GetType());
+            }
         }
 
         public void Write<T>(T message) where T : class

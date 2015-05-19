@@ -1,4 +1,4 @@
-﻿// <copyright file="SetResponse.cs" company="Basho Technologies, Inc.">
+﻿// <copyright file="PreflistResponse.cs" company="Basho Technologies, Inc.">
 // Copyright 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
@@ -16,36 +16,29 @@
 // under the License.
 // </copyright>
 
-namespace RiakClient.Commands.CRDT
+namespace RiakClient.Commands.KV
 {
     using System.Collections.Generic;
-    using Extensions;
 
     /// <summary>
-    /// Response to a <see cref="FetchSet"/> command.
+    /// Response to a <see cref="FetchPreflist"/> command.
     /// </summary>
-    public class SetResponse : DataTypeResponse<ISet<byte[]>>
+    public class PreflistResponse : Response<IEnumerable<PreflistItem>>
     {
         /// <inheritdoc />
-        public SetResponse()
-            : base()
+        public PreflistResponse()
+            : base(notFound: true)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SetResponse"/> class.
+        /// Initializes a new instance of the <see cref="PreflistResponse"/> class.
         /// </summary>
         /// <param name="key">A <see cref="RiakString"/> representing the key.</param>
-        /// <param name="context">The data type context. Necessary to use this if updating a data type with removals.</param>
-        /// <param name="value">The value of the fetched CRDT counter.</param>
-        public SetResponse(RiakString key, byte[] context, ISet<byte[]> value)
-            : base(key, context, value)
+        /// <param name="value">The value of the fetched preflist.</param>
+        public PreflistResponse(RiakString key, IEnumerable<PreflistItem> value)
+            : base(key, value)
         {
-        }
-
-        public ISet<string> AsStrings
-        {
-            get { return Value.GetUTF8Strings(); }
         }
     }
 }
