@@ -19,9 +19,7 @@
 
 namespace RiakClient.Config
 {
-    using System;
     using System.Configuration;
-    using System.Runtime.InteropServices;
 
     /// <summary>
     /// Represents a configuration element for a Riak Node.

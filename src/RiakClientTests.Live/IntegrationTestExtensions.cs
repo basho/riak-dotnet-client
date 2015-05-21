@@ -75,7 +75,9 @@ namespace RiakClientTests.Live
                 }
 
                 if (result != null && successCriteriaFunc.Invoke(result))
+                {
                     return result;
+                }
 
                 invalidResults[i] = result;
 
@@ -117,7 +119,9 @@ namespace RiakClientTests.Live
                 }
 
                 if (result != null && successCriteriaFunc.Invoke(result))
+                {
                     return result;
+                }
 
                 Thread.Sleep(i * timeout);
             }

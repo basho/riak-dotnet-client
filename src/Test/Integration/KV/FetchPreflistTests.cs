@@ -18,12 +18,9 @@
 
 namespace Test.Integration.CRDT
 {
-    using System;
     using System.Linq;
-    using Common.Logging;
     using NUnit.Framework;
     using RiakClient;
-    using RiakClient.Commands;
     using RiakClient.Commands.KV;
 
     public class FetchPreflistTests : TestBase
@@ -50,12 +47,23 @@ namespace Test.Integration.CRDT
                     .Build();
 
             RiakResult rslt = client.Execute(fetch);
-            Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
+            if (rslt.IsSuccess)
+            {
+                PreflistResponse response = fetch.Response;
+                Assert.IsNotNull(response);
 
-            PreflistResponse response = fetch.Response;
-            Assert.IsNotNull(response);
-
-            Assert.AreEqual(3, response.Value.Count());
+                Assert.AreEqual(3, response.Value.Count());
+            }
+            else
+            {
+                // TODO: remove this else case when this fix is in Riak:
+                // https://github.com/basho/riak_kv/pull/1116
+                // https://github.com/basho/riak_core/issues/706
+                bool foundMessage =
+                    (rslt.ErrorMessage.IndexOf("Permission denied") >= 0 && rslt.ErrorMessage.IndexOf("riak_kv.get_preflist") >= 0) ||
+                    (rslt.ErrorMessage.IndexOf("error:badarg") >= 0 && rslt.ErrorMessage.IndexOf("characters_to_binary") >= 0);
+                Assert.True(foundMessage, rslt.ErrorMessage);
+            }
         }
     }
 }

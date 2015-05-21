@@ -27,7 +27,7 @@ namespace RiakClientTests.Live.Search
     using RiakClient.Models.Search;
     using RiakClient.Util;
 
-    [TestFixture, IntegrationTest]
+    [TestFixture, IntegrationTest, SkipMono]
     public class TestSearchAdminOperations : LiveRiakConnectionTestBase
     {
         [SetUp]
@@ -41,6 +41,8 @@ namespace RiakClientTests.Live.Search
         {
             // Get Default schema
             var getSchemaResult = Client.GetSearchSchema("_yz_default");
+            Assert.True(getSchemaResult.IsSuccess, getSchemaResult.ErrorMessage);
+
             var defaultSchema = getSchemaResult.Value;
 
             defaultSchema.Name.ShouldNotBeNull();

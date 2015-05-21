@@ -24,6 +24,7 @@ namespace RiakClientTests.Live.DataTypes
     using System.Text;
     using RiakClient.Models;
 
+    [SkipMono]
     public class DataTypeTestsBase : LiveRiakConnectionTestBase
     {
         protected const string Bucket = "riak_dt_bucket";

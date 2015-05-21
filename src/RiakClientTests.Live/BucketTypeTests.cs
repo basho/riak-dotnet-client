@@ -19,9 +19,11 @@
 
 namespace RiakClientTests.Live
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using NUnit.Framework;
+    using RiakClient;
     using RiakClient.Models;
 
     [TestFixture, IntegrationTest]
@@ -108,7 +110,7 @@ namespace RiakClientTests.Live
 
             var obj1 = new RiakObject(new RiakObjectId(TestBucketType, TestBucket, key1), Value);
             obj1.IntIndex(indexName).Add(1);
-            
+
             var obj2 = new RiakObject(new RiakObjectId(TestBucketType, TestBucket, key2), Value);
             obj2.IntIndex(indexName).Add(2);
 
@@ -123,10 +125,10 @@ namespace RiakClientTests.Live
             var keyTerms = indexResult.Value.IndexKeyTerms.ToList();
             var keys = keyTerms.Select(t => t.Key).ToList();
             var terms = keyTerms.Select(t => t.Term).ToList();
-            
+
             keys.ShouldContain(key1);
             keys.ShouldContain(key2);
-            
+
             terms.ShouldContain("1");
             terms.ShouldContain("2");
         }
@@ -145,17 +147,26 @@ namespace RiakClientTests.Live
             // set
             var props = getPropsResult.Value;
             props.SetLastWriteWins(true);
-            
+
             var setPropsResult = Client.SetBucketProperties(bucketType, bucket, props);
             setPropsResult.IsSuccess.ShouldBeTrue();
-            getPropsResult = Client.GetBucketProperties(bucketType, bucket);
-            getPropsResult.Value.LastWriteWins.Value.ShouldBeTrue();
-            
+
+            Func<RiakResult<RiakBucketProperties>> getFunc = () =>
+                {
+                    var getResult = Client.GetBucketProperties(bucketType, bucket);
+                    getResult.IsSuccess.ShouldBeTrue(getResult.ErrorMessage);
+                    return getResult;
+                };
+
+            Func<RiakResult<RiakBucketProperties>, bool> successFunc = (r) => r.Value.LastWriteWins.Value;
+            getFunc.WaitUntil(successFunc);
+
             // reset
             var resetPropsResult = Client.ResetBucketProperties(bucketType, bucket);
             resetPropsResult.IsSuccess.ShouldBeTrue();
-            getPropsResult = Client.GetBucketProperties(bucketType, bucket);
-            getPropsResult.Value.LastWriteWins.Value.ShouldBeFalse();
+
+            successFunc = (r) => !r.Value.LastWriteWins.Value;
+            getFunc.WaitUntil(successFunc);
         }
     }
 }

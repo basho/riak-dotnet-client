@@ -17,7 +17,6 @@
 // under the License.
 // </copyright>
 
-using RiakClient.Exceptions;
 
 namespace RiakClientTests.Live
 {
@@ -30,7 +29,6 @@ namespace RiakClientTests.Live
     using RiakClient.Models;
     using RiakClient.Models.MapReduce;
     using RiakClient.Models.MapReduce.Inputs;
-    using RiakClient.Util;
 
     public class RiakObjectTestBase : LiveRiakConnectionTestBase
     {
@@ -188,7 +186,7 @@ namespace RiakClientTests.Live
             var query = new RiakMapReduceQuery()
                 .Inputs(input)
 #pragma warning disable 618
-                    .Link(l => l.AllLinks().Keep(true));
+.Link(l => l.AllLinks().Keep(true));
 #pragma warning restore 618
 
             var mrResult = Client.MapReduce(query);
@@ -214,12 +212,12 @@ namespace RiakClientTests.Live
         {
             var query = new RiakMapReduceQuery()
                     .Inputs(TestBucket)
-                    //.Filter(new Matches<string>(Jeremiah))
+                //.Filter(new Matches<string>(Jeremiah))
 #pragma warning disable 618
                     .Filter(f => f.Matches(Jeremiah))
                     .Link(l => l.Tag("friends").Bucket(TestBucket).Keep(false))
 #pragma warning restore 618
-                    .ReduceErlang(r => r.ModFun("riak_kv_mapreduce", "reduce_set_union").Keep(true));
+.ReduceErlang(r => r.ModFun("riak_kv_mapreduce", "reduce_set_union").Keep(true));
 
             var result = Client.MapReduce(query);
             result.IsSuccess.ShouldBeTrue();
@@ -293,7 +291,7 @@ namespace RiakClientTests.Live
             linkPeople.Value.Count.ShouldEqual(6);
         }
     }
-    
+
     [TestFixture, IntegrationTest]
     public class WhenSerializingObjects : RiakObjectTestBase
     {

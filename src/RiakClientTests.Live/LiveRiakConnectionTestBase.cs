@@ -48,7 +48,6 @@ namespace RiakClientTests.Live
         protected const string MultiKey = "test_multi_key";
         protected const string MultiBodyOne = @"{""dishes"": 9}";
         protected const string MultiBodyTwo = @"{""dishes"": 11}";
-        protected const string PropertiesTestBucket = @"propertiestestbucket";
         protected readonly Random Random = new Random();
 
         protected IRiakEndPoint Cluster;
@@ -74,18 +73,23 @@ namespace RiakClientTests.Live
 
         public LiveRiakConnectionTestBase()
         {
+            string userName = Environment.GetEnvironmentVariable("USERNAME");
+            string configName = "riak1NodeConfiguration";
 #if NOAUTH
-            Cluster = RiakCluster.FromConfig("riak1NodeNoAuthConfiguration");
+            configName = userName == "buildbot" ?
+                "riak1NodeNoAuthConfiguration" : "riakDevrelNoAuthConfiguration";
 #else
             if (MonoUtil.IsRunningOnMono)
             {
-                Cluster = RiakCluster.FromConfig("riak1NodeNoAuthConfiguration");
+                configName = "riak1NodeNoAuthConfiguration";
             }
             else
             {
-                Cluster = RiakCluster.FromConfig("riak1NodeConfiguration");
+                configName = userName == "buildbot" ?
+                    "riak1NodeConfiguration" : "riakDevrelConfiguration";
             }
 #endif
+            Cluster = RiakCluster.FromConfig(configName);
         }
 
         [SetUp]
