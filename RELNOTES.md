@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+v2.1.0
+------
+
+* [Fix bug handling `write_once` buckets](https://github.com/basho/riak-dotnet-client/pull/279)
+* [Add `FetchPreflist` command](https://github.com/basho/riak-dotnet-client/pull/276)
+* [Add `Timeout` to the Riak Search (Yokozuna) put request](https://github.com/basho/riak-dotnet-client/pull/275)
+* [Improve `IRiakCommand` and Builder classes](https://github.com/basho/riak-dotnet-client/pull/274)
+* [Major CRDT API overhaul](https://github.com/basho/riak-dotnet-client/pull/272)
+
 v2.0.0
 ------
 
