@@ -35,4 +35,4 @@ Once you're ready to contribute code back to this repo, start with these steps:
 
 You can [read the full guidelines for bug reporting and code contributions](http://docs.basho.com/riak/latest/community/bugs/) on the Riak Docs. 
 
-And **thank you!** Your contribution is incredible important to us.
+And **thank you!** Your contribution is incredibly important to us.
