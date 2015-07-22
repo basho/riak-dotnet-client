@@ -20,6 +20,8 @@ namespace RiakClient.Commands.CRDT
 {
     using System;
 
+    // TODO TODO GENERATED RIAK KEY
+
     /// <summary>
     /// Response to a Riak CRDT command.
     /// </summary>
