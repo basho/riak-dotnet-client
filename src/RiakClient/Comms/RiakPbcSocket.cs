@@ -150,6 +150,7 @@ namespace RiakClient.Comms
             {
                 networkStream.Close();
                 networkStream.Dispose();
+                networkStream = null;
             }
         }
 
