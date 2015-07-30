@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+v2.1.1
+------
+
+* [Fixed dropped connection bug](https://github.com/basho/riak-dotnet-client/pull/284)
+
 v2.1.0
 ------
 
