@@ -6,7 +6,7 @@
     <ProjectGuid>{A2CA0CDC-85BB-489D-99D0-3EE1D135BE17}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RiakClient</RootNamespace>
+    <RootNamespace>Riak</RootNamespace>
     <AssemblyName>RiakClient</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
@@ -18,7 +18,7 @@
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <StyleCopTreatErrorsAsWarnings>false</StyleCopTreatErrorsAsWarnings>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -58,15 +58,10 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Web" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Numerics" />
+    <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\CommonAssemblyInfo.cs">
@@ -75,13 +70,17 @@
     <Compile Include="Auth\RiakSecurityManager.cs">
       <ExcludeFromStyleCop>False</ExcludeFromStyleCop>
     </Compile>
-    <Compile Include="Commands\CommandDefaults.cs" />
     <Compile Include="Commands\Command{TResponse}.cs" />
     <Compile Include="Commands\CRDT\FetchSetOptions.cs" />
     <Compile Include="Commands\CRDT\DataTypeResponse{TValue}.cs" />
     <Compile Include="Commands\CRDT\SetResponse.cs" />
     <Compile Include="Commands\CRDT\FetchSet.cs" />
     <Compile Include="Commands\Command{TOptions,TResponse}.cs" />
+    <Compile Include="Commands\IStreamingCommand.cs" />
+    <Compile Include="Commands\KV\ListBucketsOptions.cs" />
+    <Compile Include="Commands\KV\ListBuckets.cs" />
+    <Compile Include="Commands\KV\ListBucketsResponse.cs" />
+    <Compile Include="Commands\Ping.cs" />
     <Compile Include="Commands\ServerInfo.cs" />
     <Compile Include="Commands\ServerInfoResponse.cs" />
     <Compile Include="Commands\FetchServerInfo.cs" />
@@ -125,16 +124,36 @@
     <Compile Include="Config\IRiakClusterConfiguration.cs" />
     <Compile Include="Config\IRiakNodeConfiguration.cs" />
     <Compile Include="Config\RiakAuthenticationConfiguration.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="Containers\ConcurrentEnumerable.cs" />
     <Compile Include="Containers\ConcurrentEnumerator.cs" />
     <Compile Include="Comms\RiakConnectionPool.cs" />
     <Compile Include="Containers\IConcurrentEnumerable.cs" />
     <Compile Include="Containers\IConcurrentEnumerator.cs" />
+    <Compile Include="Core\ConnectionException.cs" />
+    <Compile Include="Core\ConnectionWriteException.cs" />
+    <Compile Include="Core\ConnectionReadException.cs" />
+    <Compile Include="Core\MessageConstants.cs" />
+    <Compile Include="Core\MessageDecoder.cs" />
+    <Compile Include="Core\MessageReader.cs" />
+    <Compile Include="Core\MessageBase.cs" />
+    <Compile Include="Core\MessageWriter.cs" />
+    <Compile Include="Core\Connection.cs" />
+    <Compile Include="Core\ConnectionOptions.cs" />
+    <Compile Include="Core\ConnectionInFlightException.cs" />
     <Compile Include="Exceptions\RiakUnsupportedException.cs" />
     <Compile Include="IRiakAsyncClient.cs" />
     <Compile Include="IRiakClient.cs" />
     <Compile Include="Messages\RpbClasses.cs" />
     <Compile Include="Models\CommitHook\IRiakCommitHook.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="RError.cs" />
+    <Compile Include="RException.cs" />
+    <Compile Include="Result.cs" />
     <Compile Include="RiakString.cs" />
     <Compile Include="Timeout.cs" />
     <Compile Include="NVal.cs" />
@@ -346,7 +365,12 @@
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\build\assemblyinfo.targets" Condition="Exists('$(SolutionDir)\build\assemblyinfo.targets')" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

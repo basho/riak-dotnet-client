@@ -54,11 +54,6 @@ namespace RiakClient.Extensions
             return value == null ? null : RiakEncoding.GetString(value);
         }
 
-        internal static string UrlEncoded(this string value)
-        {
-            return HttpUtility.UrlEncode(value);
-        }
-
         internal static bool IsUserIntegerKey(this string value)
         {
             return RiakConstants.SystemIndexKeys.SystemIntKeys.Contains(value)

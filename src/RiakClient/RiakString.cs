@@ -82,7 +82,14 @@ namespace RiakClient
         /// </returns>
         public static byte[] ToBytes(string value)
         {
-            return Encoding.UTF8.GetBytes(value);
+            byte[] rv = null;
+
+            if (value != null)
+            {
+                rv = Encoding.UTF8.GetBytes(value);
+            }
+
+            return rv;
         }
 
         /// <summary>
@@ -94,7 +101,14 @@ namespace RiakClient
         /// </returns>
         public static byte[] ToBytes(RiakString value)
         {
-            return Encoding.UTF8.GetBytes(value);
+            byte[] rv = null;
+
+            if (value != null && value.HasValue)
+            {
+                rv = Encoding.UTF8.GetBytes(value);
+            }
+
+            return rv;
         }
 
         /// <summary>
@@ -208,7 +222,14 @@ namespace RiakClient
         /// <returns>A hash code for the current object.</returns>
         public override int GetHashCode()
         {
-            return value.GetHashCode();
+            if (value == null)
+            {
+                return base.GetHashCode();
+            }
+            else
+            {
+                return value.GetHashCode();
+            }
         }
     }
 }

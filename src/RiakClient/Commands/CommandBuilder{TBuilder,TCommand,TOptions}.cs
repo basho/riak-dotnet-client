@@ -32,7 +32,7 @@ namespace RiakClient.Commands
         protected string bucketType;
         protected string bucket;
         protected string key;
-        protected Timeout timeout = CommandDefaults.Timeout;
+        protected Timeout timeout = Timeout.DefaultCommandTimeout;
 
         public CommandBuilder()
         {
@@ -97,7 +97,7 @@ namespace RiakClient.Commands
         {
             if (timeout == default(TimeSpan))
             {
-                this.timeout = CommandDefaults.Timeout;
+                this.timeout = Timeout.DefaultCommandTimeout;
             }
             else
             {

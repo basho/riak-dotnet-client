@@ -22,7 +22,7 @@ namespace RiakClient.Messages
     using System;
     using System.Collections.Generic;
 
-    internal static class MessageCodeTypeMapBuilder
+    internal static class MessageCodeTypeMapBuilder // TODO 3.0 - encapsulate in Command classes
     {
         private static readonly Dictionary<MessageCode, Type> MessageCodeToTypeMap;
         private static readonly Dictionary<Type, MessageCode> TypeToMessageCodeMap;

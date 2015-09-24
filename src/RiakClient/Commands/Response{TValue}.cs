@@ -22,9 +22,18 @@ namespace RiakClient.Commands
     /// Response to a Riak command with a return value.
     /// </summary>
     /// <typeparam name="TValue">The type of the Riak response.</typeparam>
-    public abstract class Response<TValue> : Response
+    public class Response<TValue> : Response
     {
         private readonly TValue value;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Response{TValue}"/> class.
+        /// </summary>
+        /// <param name="value">The response data.</param>
+        public Response(TValue value)
+            : this(false, value)
+        {
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Response{TValue}"/> class.

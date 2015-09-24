@@ -86,20 +86,27 @@ namespace RiakClient.Comms
         public RiakResult Write(IRiakCommand command)
         {
             RpbReq request = command.ConstructPbRequest();
-            if (request.IsMessageCodeOnly)
+            if (request == null)
+            {
+                Write(command.RequestCode);
+                return RiakResult.Success();
+            }
+            else if (request.IsMessageCodeOnly)
             {
                 Write(request.MessageCode);
                 return RiakResult.Success();
             }
             else
             {
-                return DoWrite(s => Serializer.Serialize(s, request), request.GetType());
+                return DoWrite(s => Serializer.Serialize(s, request), command.RequestCode);
             }
         }
 
         public void Write<T>(T message) where T : class
         {
-            DoWrite(s => Serializer.Serialize(s, message), typeof(T));
+            var requestType = typeof(T);
+            var requestCode = MessageCodeTypeMapBuilder.GetMessageCodeFor(requestType);
+            DoWrite(s => Serializer.Serialize(s, message), requestCode);
         }
 
         public MessageCode Read(MessageCode expectedCode)
@@ -118,7 +125,7 @@ namespace RiakClient.Comms
 
         public RiakResult Read(IRiakCommand command)
         {
-            MessageCode expectedCode = command.ExpectedCode;
+            MessageCode expectedCode = command.ResponseCode;
             Type expectedType = MessageCodeTypeMapBuilder.GetTypeFor(expectedCode);
 
             int size = DoRead(expectedCode, expectedType);
@@ -208,11 +215,10 @@ namespace RiakClient.Comms
             return messageCode;
         }
 
-        private RiakResult DoWrite(Action<MemoryStream> serializer, Type messageType)
+        private RiakResult DoWrite(Action<MemoryStream> serializer, MessageCode requestCode)
         {
             byte[] messageBody;
             int messageLength = 0;
-
             using (var memStream = new MemoryStream())
             {
                 // add a buffer to the start of the array to put the size and message code
@@ -228,10 +234,9 @@ namespace RiakClient.Comms
                 messageBody = new byte[PbMsgHeaderSize];
             }
 
-            MessageCode messageCode = MessageCodeTypeMapBuilder.GetMessageCodeFor(messageType);
             var size = BitConverter.GetBytes(IPAddress.HostToNetworkOrder((int)messageLength - PbMsgHeaderSize + 1));
             Array.Copy(size, messageBody, SizeOfInt);
-            messageBody[SizeOfInt] = (byte)messageCode;
+            messageBody[SizeOfInt] = (byte)requestCode;
 
             if (NetworkStream.CanWrite)
             {
@@ -239,7 +244,7 @@ namespace RiakClient.Comms
             }
             else
             {
-                string errorMessage = string.Format("Failed to send data to server - Can't write: {0}:{1}", server, port);
+                string errorMessage = string.Format(Riak.Properties.Resources.Riak_Core_ConnectionCantWriteException_fmt, server, port);
                 throw new RiakException(errorMessage, true);
             }
 
