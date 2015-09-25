@@ -42,6 +42,9 @@ namespace RiakClientTests.Live.GeneralIntegrationTests
             const ushort endingPort = startingPort + ((numNodes - 1) * portInterval);
             const int totalObjects = 65536;
 
+            byte[] data = new byte[65536];
+            Random.NextBytes(data);
+
             int batchSize = totalConnectionCount;
             int totalBatches = totalObjects / batchSize;
             Assert.AreEqual(0, totalObjects % batchSize);
@@ -61,7 +64,8 @@ namespace RiakClientTests.Live.GeneralIntegrationTests
             for (int i = 0; i < totalObjects; i++)
             {
                 var key = String.Format("{0}_{1}", TestKey, i);
-                var obj = new RiakObject(TestBucket, key, TestJson, RiakConstants.ContentTypes.ApplicationJson);
+                var id = new RiakObjectId(TestBucket, key);
+                var obj = new RiakObject(id, data, RiakConstants.ContentTypes.ApplicationOctetStream, null);
                 objs.Add(obj);
             }
 
