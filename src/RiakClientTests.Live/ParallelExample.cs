@@ -35,12 +35,17 @@ namespace RiakClientTests.Live.GeneralIntegrationTests
         public void Parallel_ForEach_Can_Be_Used_To_Put_And_Get_Objects()
         {
             const int numNodes = 4;
-            const int poolSize = 32;
+            const int poolSize = 8;
             const int totalConnectionCount = poolSize * numNodes;
             const ushort portInterval = 10;
             const ushort startingPort = 10017;
             const ushort endingPort = startingPort + ((numNodes - 1) * portInterval);
-            const int totalObjects = 8192;
+            const int totalObjects = 65536;
+
+            int batchSize = totalConnectionCount;
+            int totalBatches = totalObjects / batchSize;
+            Assert.AreEqual(0, totalObjects % batchSize);
+            Debug.WriteLine("batchSize: {0}, totalBatches: {1}", batchSize, totalBatches);
 
             string riakHost = Environment.GetEnvironmentVariable("RIAK_HOST");
             if (String.IsNullOrWhiteSpace(riakHost))
@@ -72,69 +77,63 @@ namespace RiakClientTests.Live.GeneralIntegrationTests
                 clusterConfig.AddNode(nc);
             }
 
-            int batchSize = totalConnectionCount;
-            int totalBatches = totalObjects / batchSize;
-            Debug.WriteLine("batchSize: {0}, totalBatches: {1}", batchSize, totalBatches);
+            var batchObjs = new RiakObject[batchSize];
+            var p = new int[] { 1, batchSize };
 
-            var parallelOptions = new ParallelOptions();
-            parallelOptions.MaxDegreeOfParallelism = batchSize;
-
-            using (var cluster = new RiakCluster(clusterConfig))
+            foreach (int parallelism in p)
             {
-                var client = cluster.CreateClient();
+                var parallelOptions = new ParallelOptions();
+                parallelOptions.MaxDegreeOfParallelism = parallelism;
 
-                var sw = new Stopwatch();
-                sw.Start();
-
-                var results = new List<RiakResult>();
-                for (int i = 0; i < totalObjects; i += batchSize)
+                using (var cluster = new RiakCluster(clusterConfig))
                 {
-                    var batchObjs = new RiakObject[batchSize];
-                    objs.CopyTo(i, batchObjs, 0, batchSize);
+                    var client = cluster.CreateClient();
 
-                    Parallel.ForEach(batchObjs, parallelOptions, (obj) =>
+                    var sw = new Stopwatch();
+                    sw.Start();
+
+                    for (int i = 0; i < totalObjects; i += batchSize)
                     {
-                        try
+                        objs.CopyTo(i, batchObjs, 0, batchSize);
+                        Parallel.ForEach(batchObjs, parallelOptions, (obj) =>
                         {
-                            results.Add(client.Put(obj));
-                        }
-                        catch (Exception e)
-                        {
-                            Debug.WriteLine("[ERROR] put exception: {0}", e.ToString());
-                        }
-                    });
-                }
+                            try
+                            {
+                                client.Put(obj);
+                            }
+                            catch (Exception e)
+                            {
+                                Debug.WriteLine("[ERROR] put exception: {0}", e.ToString());
+                            }
+                        });
+                    }
 
-                sw.Stop();
-                Debug.WriteLine("put {0} objects in {1}", totalObjects, sw.Elapsed);
+                    sw.Stop();
+                    Debug.WriteLine("parallelism: {0} - put {1} objects in {2}", parallelism, totalObjects, sw.Elapsed);
 
-                sw.Reset();
+                    sw.Reset();
 
-                // Check results here
-                results.Clear();
-
-                sw.Start();
-                for (int i = 0; i < totalObjects; i += batchSize)
-                {
-                    var batchObjs = new RiakObject[batchSize];
-                    objs.CopyTo(i, batchObjs, 0, batchSize);
-
-                    Parallel.ForEach(batchObjs, parallelOptions, (obj) =>
+                    sw.Start();
+                    for (int i = 0; i < totalObjects; i += batchSize)
                     {
-                        try
+                        objs.CopyTo(i, batchObjs, 0, batchSize);
+                        Parallel.ForEach(batchObjs, parallelOptions, (obj) =>
                         {
-                            var id = new RiakObjectId(obj.Bucket, obj.Key);
-                            results.Add(client.Get(id));
-                        }
-                        catch (Exception e)
-                        {
-                            Debug.WriteLine("[ERROR] put exception: {0}", e.ToString());
-                        }
-                    });
-                }
+                            try
+                            {
+                                var id = new RiakObjectId(obj.Bucket, obj.Key);
+                                client.Get(id);
+                            }
+                            catch (Exception e)
+                            {
+                                Debug.WriteLine("[ERROR] put exception: {0}", e.ToString());
+                            }
+                        });
+                    }
 
-                sw.Stop();
-                Debug.WriteLine("fetched {0} objects in {1}", totalObjects, sw.Elapsed);
+                    sw.Stop();
+                    Debug.WriteLine("parallelism: {0} - fetched {1} objects in {2}", parallelism, totalObjects, sw.Elapsed);
+                }
             }
         }
     }
