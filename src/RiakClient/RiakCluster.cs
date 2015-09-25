@@ -65,6 +65,16 @@ namespace RiakClient
             Task.Factory.StartNew(NodeMonitor);
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RiakCluster"/> class using the default connection factory.
+        /// </summary>
+        /// <param name="clusterConfig">The <see cref="IRiakClusterConfiguration"/> to use for this RiakCluster.</param>
+        /// <exception cref="ArgumentNullException">If <paramref name="clusterConfig" /> contains no node information.</exception>
+        public RiakCluster(IRiakClusterConfiguration clusterConfig)
+            : this(clusterConfig, new RiakConnectionFactory())
+        {
+        }
+
         /// <inheritdoc/>
         protected override int DefaultRetryCount
         {

@@ -88,6 +88,11 @@ namespace RiakClient.Config
                     return DefaultTimeout;
                 }
             }
+
+            set
+            {
+                this.NetworkReadTimeoutProperty = value.ToString();
+            }
         }
 
         /// <inheritdoc/>
@@ -106,6 +111,11 @@ namespace RiakClient.Config
                     return DefaultTimeout;
                 }
             }
+
+            set
+            {
+                this.NetworkWriteTimeoutProperty = value.ToString();
+            }
         }
 
         /// <inheritdoc/>
@@ -123,6 +133,11 @@ namespace RiakClient.Config
                 {
                     return DefaultTimeout;
                 }
+            }
+
+            set
+            {
+                this.NetworkConnectTimeoutProperty = value.ToString();
             }
         }
 

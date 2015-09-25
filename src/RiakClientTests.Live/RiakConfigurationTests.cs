@@ -20,6 +20,7 @@
 namespace RiakClientTests.Live.RiakConfigurationTests
 {
     using System.IO;
+    using System.Linq;
     using NUnit.Framework;
     using RiakClient;
     using RiakClient.Config;
@@ -58,9 +59,10 @@ namespace RiakClientTests.Live.RiakConfigurationTests
                 config.DefaultRetryCount.ShouldEqual(3);
                 config.DefaultRetryWaitTime.ShouldEqual((Timeout)twoHundredMillis);
                 config.NodePollTime.ShouldEqual((Timeout)fiveSecsAsMillis);
-                config.RiakNodes.Count.ShouldEqual(2);
+                config.RiakNodes.Count().ShouldEqual(2);
 
-                IRiakNodeConfiguration node1 = config.RiakNodes[0];
+                var nodes = config.RiakNodes.ToArray();
+                IRiakNodeConfiguration node1 = nodes[0];
                 node1.Name.ShouldEqual("node1");
                 node1.HostAddress.ShouldEqual("host1");
                 node1.PbcPort.ShouldEqual(8081);
@@ -69,7 +71,7 @@ namespace RiakClientTests.Live.RiakConfigurationTests
                 node1.NetworkReadTimeout.ShouldEqual((Timeout)fourSecsAsMillis);
                 node1.NetworkWriteTimeout.ShouldEqual((Timeout)fourSecsAsMillis);
 
-                IRiakNodeConfiguration node2 = config.RiakNodes[1];
+                IRiakNodeConfiguration node2 = nodes[1];
                 node2.Name.ShouldEqual("node2");
                 node2.HostAddress.ShouldEqual("host2");
                 node2.PbcPort.ShouldEqual(8081);
