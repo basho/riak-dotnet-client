@@ -152,11 +152,9 @@ namespace RiakClientTests.Live.MapReduce
         public void SearchingViaOldInterfaceFluentSearchObjectWorks()
         {
             var search = new RiakFluentSearch(Index, "name_s").Search(Token.StartsWith(_randomId + "Al")).Build();
-            var mr = new RiakMapReduceQuery()
 #pragma warning disable 618
-.Inputs(new RiakBucketSearchInput(search));
+            var mr = new RiakMapReduceQuery().Inputs(new RiakBucketSearchInput(search));
 #pragma warning restore 618
-
 
             var result = Client.RunMapReduceQuery(mr).WaitUntil(MapReduceTestHelpers.OnePhaseWithTwoResultsFound);
 

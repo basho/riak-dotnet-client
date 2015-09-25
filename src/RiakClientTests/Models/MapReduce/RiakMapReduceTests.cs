@@ -94,14 +94,14 @@ namespace RiakClientTests.Models.MapReduce
         [Test]
         public void BuildingComplexMapReduceJobsWithFiltersProducesTheCorrectCommand()
         {
+#pragma warning disable 618
             var query = new RiakMapReduceQuery()
                 .Inputs("animals")
                 //.Filter(new Matches<string>("spider"))
-#pragma warning disable 618
                 .Filter(f => f.Matches("spider"))
-#pragma warning restore 618
                 .MapJs(m => m.Source("function(o) { return [1]; }"))
                 .ReduceJs(r => r.Name("Riak.reduceSum").Keep(true));
+#pragma warning restore 618
 
             var request = query.ToMessage();
             request.request.ShouldEqual(ComplexMrJobWithFilterText.ToRiakString());
@@ -110,14 +110,13 @@ namespace RiakClientTests.Models.MapReduce
         [Test]
         public void BuildingComplexMapReduceJobsWithFiltersAndTypesProducesTheCorrectCommand()
         {
+#pragma warning disable 618
             var query = new RiakMapReduceQuery()
                 .Inputs("zoo", "animals")
-                //.Filter(new Matches<string>("spider"))
-#pragma warning disable 618
                 .Filter(f => f.Matches("spider"))
-#pragma warning restore 618
                 .MapJs(m => m.Source("function(o) { return [1]; }"))
                 .ReduceJs(r => r.Name("Riak.reduceSum").Keep(true));
+#pragma warning restore 618
 
             var request = query.ToMessage();
             request.request.ShouldEqual(ComplexMrJobWithTypeAndFilterText.ToRiakString());
