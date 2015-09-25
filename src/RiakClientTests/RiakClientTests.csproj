@@ -91,7 +91,6 @@
     <Compile Include="RiakStringTests.cs" />
     <Compile Include="RiakAsyncClientTests.cs" />
     <Compile Include="Client\SetBucketPropertiesTests.cs" />
-    <Compile Include="RiakClientTestBase.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Models\MapReduce\RiakMapReduceTests.cs" />
     <Compile Include="Models\RiakLinkTests.cs" />
