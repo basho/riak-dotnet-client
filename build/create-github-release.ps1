@@ -25,9 +25,20 @@ Param(
 
 Set-StrictMode -Version Latest
 
+$IsDebug = $DebugPreference -ne 'SilentlyContinue'
+$IsVerbose = $VerbosePreference -ne 'SilentlyContinue'
+
 # Note:
 # Set to Continue to see DEBUG messages
-# $DebugPreference = 'Continue'
+if ($IsVerbose) {
+    $DebugPreference = 'Continue'
+}
+
+trap
+{
+    Write-Error -ErrorRecord $_
+    exit 1
+}
 
 function Get-ScriptPath {
   $scriptDir = Get-Variable PSScriptRoot -ErrorAction SilentlyContinue | ForEach-Object { $_.Value }
@@ -47,9 +58,14 @@ function Get-ScriptPath {
   return $scriptDir
 }
 
-$release_zip_name = 'RiakClient.zip'
+$release_zip_name = "RiakClient-$VersionString.zip"
 $release_zip_path = Resolve-Path ($(Get-ScriptPath) + '\..\src\RiakClient\bin\Release\' + $release_zip_name)
-Write-Debug -Message "RiakClient release zip file: $release_zip_path"
+if (!(Test-Path $release_zip_path)) {
+    throw "Could not find file $release_zip_path"
+}
+else {
+    Write-Debug -Message "RiakClient release zip file: $release_zip_path"
+}
 
 $github_api_key_file = Resolve-Path '~/.ghapi'
 $github_api_key = Get-Content $github_api_key_file

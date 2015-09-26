@@ -365,7 +365,7 @@
       <ZipFiles Include="$(OutputPath)*.xml" />
       <ZipFiles Include="$(OutputPath)*.pdb" />
     </ItemGroup>
-    <Zip Files="@(ZipFiles)" WorkingDirectory="$(OutputPath)" ZipFileName="$(OutputPath)$(AssemblyName).zip" ZipLevel="9" />
+    <Zip Files="@(ZipFiles)" WorkingDirectory="$(OutputPath)" ZipFileName="$(OutputPath)$(AssemblyName)-$(VersionString).zip" ZipLevel="9" />
   </Target>
   <Import Project="..\..\packages\StyleCop.MSBuild.4.7.49.1\build\StyleCop.MSBuild.Targets" Condition="Exists('..\..\packages\StyleCop.MSBuild.4.7.49.1\build\StyleCop.MSBuild.Targets')" />
 </Project>
