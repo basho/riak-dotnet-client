@@ -68,9 +68,9 @@ namespace RiakClient.Commands.CRDT
             return op;
         }
 
-        protected override MapResponse CreateResponse(RiakString key, DtUpdateResp resp)
+        protected override MapResponse CreateResponse(RiakString key, DtUpdateResp response)
         {
-            return new MapResponse(key, resp.context, resp.map_value);
+            return new MapResponse(key, response.context, response.map_value);
         }
 
         private static MapOp Populate(MapOperation mapOperation)

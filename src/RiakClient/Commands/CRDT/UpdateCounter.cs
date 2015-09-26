@@ -57,9 +57,9 @@ namespace RiakClient.Commands.CRDT
             return op;
         }
 
-        protected override CounterResponse CreateResponse(RiakString key, DtUpdateResp resp)
+        protected override CounterResponse CreateResponse(RiakString key, DtUpdateResp response)
         {
-            return new CounterResponse(key, resp.context, resp.counter_value);
+            return new CounterResponse(key, response.context, response.counter_value);
         }
 
         public class Builder :

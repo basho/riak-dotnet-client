@@ -102,8 +102,8 @@
   </Target>
 
   <Target Name="PublishRelease" DependsOnTargets="GenerateCommonAssemblyInfo">
-    <Message Text="MSBuild properties: Configuration=Release;SolutionDir=$(SolutionDir)" />
-    <MSBuild Projects="$(SolutionFile)" Properties="Configuration=Release;SolutionDir=$(SolutionDir)" />
+    <Message Text="MSBuild properties: Configuration=Release;SolutionDir=$(SolutionDir);VersionString=$(VersionString)" />
+    <MSBuild Projects="$(SolutionFile)" Properties="Configuration=Release;SolutionDir=$(SolutionDir);VersionString=$(VersionString)" />
   </Target>
 
   <Target Name="ProtoGen">
@@ -157,19 +157,19 @@
   </Target>
 
   <Target Name="All" DependsOnTargets="GenerateCommonAssemblyInfo">
-    <MSBuild Projects="@(ProjectToBuild)" BuildInParallel="True" />
+    <MSBuild Projects="@(ProjectToBuild)" Properties="VersionString=$(VersionString)" BuildInParallel="True" />
   </Target>
 
   <Target Name="CleanAll">
-    <MSBuild Projects="@(ProjectToBuild)" Targets="Clean" BuildInParallel="True" />
+    <MSBuild Projects="@(ProjectToBuild)" Properties="VersionString=$(VersionString)" Targets="Clean" BuildInParallel="True" />
   </Target>
 
   <Target Name="Release" DependsOnTargets="GenerateCommonAssemblyInfo">
-    <MSBuild Projects="$(SolutionFile)" Properties="Configuration=Release" />
+    <MSBuild Projects="$(SolutionFile)" Properties="Configuration=Release;VersionString=$(VersionString)" />
   </Target>
 
   <Target Name="Debug" DependsOnTargets="GenerateCommonAssemblyInfo">
-    <MSBuild Projects="$(SolutionFile)" Properties="Configuration=Debug" />
+    <MSBuild Projects="$(SolutionFile)" Properties="Configuration=Debug;VersionString=$(VersionString)" />
   </Target>
 
   <Target Name="SetupTests">

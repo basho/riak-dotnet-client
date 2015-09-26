@@ -25,9 +25,20 @@ Param(
 
 Set-StrictMode -Version Latest
 
+$IsDebug = $DebugPreference -ne 'SilentlyContinue'
+$IsVerbose = $VerbosePreference -ne 'SilentlyContinue'
+
 # Note:
 # Set to Continue to see DEBUG messages
-# $DebugPreference = 'Continue'
+if ($IsVerbose) {
+    $DebugPreference = 'Continue'
+}
+
+trap
+{
+    Write-Error -ErrorRecord $_
+    exit 1
+}
 
 function Get-ScriptPath {
   $scriptDir = Get-Variable PSScriptRoot -ErrorAction SilentlyContinue | ForEach-Object { $_.Value }
@@ -47,9 +58,14 @@ function Get-ScriptPath {
   return $scriptDir
 }
 
-$release_zip_name = 'RiakClient.zip'
+$release_zip_name = "RiakClient-$VersionString.zip"
 $release_zip_path = Resolve-Path ($(Get-ScriptPath) + '\..\src\RiakClient\bin\Release\' + $release_zip_name)
-Write-Debug -Message "RiakClient release zip file: $release_zip_path"
+if (!(Test-Path $release_zip_path)) {
+    throw "Could not find file $release_zip_path"
+}
+else {
+    Write-Debug -Message "RiakClient release zip file: $release_zip_path"
+}
 
 $github_api_key_file = Resolve-Path '~/.ghapi'
 $github_api_key = Get-Content $github_api_key_file
@@ -86,8 +102,8 @@ catch {
 }
 
 $response_json = ConvertFrom-Json -InputObject $response.Content
-# https://uploads.github.com/repos/basho/riak-dotnet-client/releases/890350/assets{?name}
-$upload_url_with_name = $response_json.upload_url -Replace '{\?name}', ('?name=' + $release_zip_name)
+# https://uploads.github.com/repos/basho/riak-dotnet-client/releases/890350/assets{?name,label}
+$upload_url_with_name = $response_json.upload_url -Replace '{\?name,label}', ('?name=' + $release_zip_name)
 
 $response = Get-Content $release_zip_path | Invoke-WebRequest -Headers $headers -ContentType 'application/zip' -Method Post -Uri $upload_url_with_name
 if ([int]$response.StatusCode -ne 201) {

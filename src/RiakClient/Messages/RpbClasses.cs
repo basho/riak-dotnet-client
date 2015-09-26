@@ -19,6 +19,7 @@
 namespace RiakClient.Messages
 {
     using System;
+    using Util;
 
     public class RpbReq
     {
@@ -44,6 +45,13 @@ namespace RiakClient.Messages
         {
             get { return isMessageCodeOnly; }
         }
+    }
+
+    public interface IRpbGeneratedKey
+    {
+        bool HasKey { get; }
+
+        byte[] key { get; }
     }
 
     public abstract class RpbResp { }
@@ -103,7 +111,13 @@ namespace RiakClient.Messages
     [CLSCompliant(false)]
     public sealed partial class DtUpdateReq : RpbReq { }
 
-    public sealed partial class DtUpdateResp : RpbResp { }
+    public sealed partial class DtUpdateResp : RpbResp, IRpbGeneratedKey
+    {
+        public bool HasKey
+        {
+            get { return EnumerableUtil.NotNullOrEmpty(key); }
+        }
+    }
 
     public sealed partial class RpbGetClientIdResp { }
 

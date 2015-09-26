@@ -32,7 +32,7 @@
     <VersionString Condition="'$(Configuration)' == 'Release'">unknown</VersionString>
     <!-- NB: Hard-coded for non-Release builds to skip querying git for information.
          Increment this manually for non-Release builds -->
-    <VersionString Condition="'$(Configuration)' != 'Release'">v2.0.0</VersionString>
+    <VersionString Condition="'$(Configuration)' != 'Release'">v2.2.0</VersionString>
     <GitRemoteName Condition="'$(GitRemoteName)' == ''">origin</GitRemoteName>
     <GitRemoteUrl Condition="'$(GitRemoteUrl)' == ''">git@github.com:basho/riak-dotnet-client.git</GitRemoteUrl>
     <GitCommitHash>unknown</GitCommitHash>

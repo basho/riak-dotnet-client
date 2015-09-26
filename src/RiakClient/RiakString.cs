@@ -25,7 +25,7 @@ namespace RiakClient
     /// Represents a string that encapsulates conversion to/from <see cref="String"/> and <see cref="Byte"/>[]
     /// values
     /// </summary>
-    public class RiakString : IEquatable<RiakString>
+    public class RiakString : IEquatable<RiakString> // TODO 3.0 rename to RString
     {
         private string value;
 

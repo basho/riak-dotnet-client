@@ -97,7 +97,6 @@ namespace RiakClientTests.Models.MapReduce
 #pragma warning disable 618
             var query = new RiakMapReduceQuery()
                 .Inputs("animals")
-                //.Filter(new Matches<string>("spider"))
                 .Filter(f => f.Matches("spider"))
                 .MapJs(m => m.Source("function(o) { return [1]; }"))
                 .ReduceJs(r => r.Name("Riak.reduceSum").Keep(true));

@@ -50,6 +50,15 @@ namespace RiakClientTests
         }
 
         [Test]
+        public void Can_Construct_From_Null()
+        {
+            var rs = new RiakString((byte[])null);
+            Assert.False(rs.HasValue);
+            Assert.IsNull((byte[])rs);
+            Assert.IsNull(rs.ToString());
+        }
+
+        [Test]
         public void Can_Convert_To_Boolean_To_Indicate_Non_Null_Value()
         {
             var rs = new RiakString(testString);
