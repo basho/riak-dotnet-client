@@ -61,5 +61,22 @@ namespace RiakClient.Commands
         public abstract RpbReq ConstructPbRequest();
 
         public abstract void OnSuccess(RpbResp rpbResp);
+
+        protected RiakString GetKey(RpbResp response)
+        {
+            RiakString key = null;
+
+            IRpbGeneratedKey krsp = response as IRpbGeneratedKey;
+            if (krsp != null && krsp.HasKey)
+            {
+                key = new RiakString(krsp.key);
+            }
+            else
+            {
+                key = CommandOptions.Key;
+            }
+
+            return key;
+        }
     }
 }

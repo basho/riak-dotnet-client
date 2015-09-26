@@ -71,9 +71,9 @@ namespace RiakClient.Commands.CRDT
             return op;
         }
 
-        protected override SetResponse CreateResponse(RiakString key, DtUpdateResp resp)
+        protected override SetResponse CreateResponse(RiakString key, DtUpdateResp response)
         {
-            return new SetResponse(key, resp.context, new HashSet<byte[]>(resp.set_value));
+            return new SetResponse(key, response.context, new HashSet<byte[]>(response.set_value));
         }
 
         public class Builder
