@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+v2.2.0
+------
+
+* [Added ability to configure `RiakCluster` in code](https://github.com/basho/riak-dotnet-client/pull/291)
+
 v2.1.1
 ------
 
