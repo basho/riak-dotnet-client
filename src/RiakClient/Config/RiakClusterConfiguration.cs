@@ -23,7 +23,6 @@ namespace RiakClient.Config
     using System.Collections.Generic;
     using System.Configuration;
     using System.Linq;
-    using System.Runtime.InteropServices;
 
     /// <summary>
     /// Represents the configuration file section for a Riak Cluster.
@@ -45,9 +44,9 @@ namespace RiakClient.Config
         }
 
         /// <inheritdoc/>
-        IList<IRiakNodeConfiguration> IRiakClusterConfiguration.RiakNodes
+        IEnumerable<IRiakNodeConfiguration> IRiakClusterConfiguration.RiakNodes
         {
-            get { return this.Nodes.Cast<IRiakNodeConfiguration>().ToList(); }
+            get { return this.Nodes.Cast<IRiakNodeConfiguration>().ToArray(); }
         }
 
         /// <inheritdoc/>
@@ -65,6 +64,11 @@ namespace RiakClient.Config
                 {
                     return DefaultNodePollTime;
                 }
+            }
+
+            set
+            {
+                this.NodePollTimeProperty = value.ToString();
             }
         }
 
@@ -84,6 +88,11 @@ namespace RiakClient.Config
                     return DefaultDefaultRetryWaitTime;
                 }
             }
+
+            set
+            {
+                this.DefaultRetryWaitTimeProperty = value.ToString();
+            }
         }
 
         /// <inheritdoc/>
@@ -102,12 +111,14 @@ namespace RiakClient.Config
         public RiakAuthenticationConfiguration Authentication
         {
             get { return (RiakAuthenticationConfiguration)this["authentication"]; }
+            set { this["authentication"] = value; }
         }
 
         /// <inheritdoc/>
         IRiakAuthenticationConfiguration IRiakClusterConfiguration.Authentication
         {
             get { return this.Authentication; }
+            set { this.Authentication = (RiakAuthenticationConfiguration)value; }
         }
 
         [ConfigurationProperty("defaultRetryWaitTime", DefaultValue = "200", IsRequired = false)]
@@ -147,6 +158,12 @@ namespace RiakClient.Config
             var map = new ConfigurationFileMap(fileName);
             var config = ConfigurationManager.OpenMappedMachineConfiguration(map);
             return (IRiakClusterConfiguration)config.GetSection(sectionName);
+        }
+
+        /// <inheritdoc/>
+        void IRiakClusterConfiguration.AddNode(IRiakNodeConfiguration nodeConfiguration)
+        {
+            this.Nodes.Add((RiakNodeConfiguration)nodeConfiguration);
         }
     }
 }

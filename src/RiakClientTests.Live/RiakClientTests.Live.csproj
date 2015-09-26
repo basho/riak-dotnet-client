@@ -71,6 +71,8 @@
     <Compile Include="DataTypes\MapDtEdgeCaseTests.cs" />
     <Compile Include="DataTypes\SetDtEdgeCaseTests.cs" />
     <Compile Include="EnumerableExtensions.cs" />
+    <Compile Include="Example.cs" />
+    <Compile Include="ParallelExample.cs" />
     <Compile Include="SkipMono.cs" />
     <Compile Include="IntegrationTest.cs" />
     <Compile Include="IntegrationTestExtensions.cs" />

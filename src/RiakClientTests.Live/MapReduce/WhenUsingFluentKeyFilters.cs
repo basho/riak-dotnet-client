@@ -47,12 +47,12 @@ namespace RiakClientTests.Live.MapReduce
 
             var mr = new RiakMapReduceQuery();
 
-            mr.Inputs(Bucket)
 #pragma warning disable 618
+            mr.Inputs(Bucket)
                 .Filter(f => f.Equal("time_8"))
-#pragma warning restore 618
                 .MapJs(m => m.Source("function (o) { return [1]; }"))
                 .ReduceJs(r => r.Name("Riak.reduceSum").Keep(true));
+#pragma warning restore 618
 
             var result = Client.MapReduce(mr);
             result.IsSuccess.ShouldBeTrue();
@@ -86,14 +86,13 @@ namespace RiakClientTests.Live.MapReduce
                     RiakConstants.ContentTypes.ApplicationJson));
             }
 
-            var mr = new RiakMapReduceQuery();
-
-            mr.Inputs(Bucket)
 #pragma warning disable 618
+            var mr = new RiakMapReduceQuery();
+            mr.Inputs(Bucket)
                 .Filter(f => f.StartsWith("time"))
-#pragma warning restore 618
                 .MapJs(m => m.Source("function (o) { return [1]; }"))
                 .ReduceJs(r => r.Name("Riak.reduceSum").Keep(true));
+#pragma warning restore 618
 
             var result = Client.MapReduce(mr);
             result.IsSuccess.ShouldBeTrue();
@@ -122,17 +121,16 @@ namespace RiakClientTests.Live.MapReduce
                     RiakConstants.ContentTypes.ApplicationJson));
             }
 
-            var mr = new RiakMapReduceQuery();
-
-            mr.Inputs(Bucket)
 #pragma warning disable 618
+            var mr = new RiakMapReduceQuery();
+            mr.Inputs(Bucket)
                 .Filter(f => f.And(l => l.StartsWith("time"),
                                    r => r.Tokenize("_", 2)
                                             .StringToInt()
                                             .Between(3, 7, true)))
-#pragma warning restore 618
                 .MapJs(m => m.Source("function (o) { return [1]; }").Keep(false))
                 .ReduceJs(r => r.Name("Riak.reduceSum").Keep(true));
+#pragma warning restore 618
 
             var result = Client.MapReduce(mr);
             result.IsSuccess.ShouldBeTrue();
