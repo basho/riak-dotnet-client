@@ -27,6 +27,7 @@
   </Target>
 
   <Target Name="PublishValidation" DependsOnTargets="PublishValidateVersionString;PublishValidateOnDevelopBranch;PopulateVersionInformation">
+    <Error Condition="'$(OS)' != 'Windows_NT'" Text="Publish target is Windows-only!" />
     <!-- Validate parsed VersionString -->
     <RegexMatch Input="$(VMajor)" Expression="^[1-9]$">
       <Output PropertyName="VMajorValidated" TaskParameter="Output" />
@@ -173,11 +174,12 @@
   </Target>
 
   <Target Name="SetupTests">
-    <XmlQuery XmlFileName="$(NuGetPackagesConfig)" XPath="/packages/package[@id='NUnit.Runners']/@version">
+    <XmlQuery Condition="'$(OS)' == 'Windows_NT'" XmlFileName="$(NuGetPackagesConfig)" XPath="/packages/package[@id='NUnit.Runners']/@version">
       <Output TaskParameter="Values" PropertyName="NUnitRunnersVersion" />
     </XmlQuery>
     <PropertyGroup>
-      <NUnitConsoleRunnerExe>$(SolutionDir)packages\NUnit.Runners.$(NunitRunnersVersion)\tools\nunit-console.exe </NUnitConsoleRunnerExe>
+      <NUnitRunnersVersion Condition="'$(OS)' != 'Windows_NT'">2.6.4</NUnitRunnersVersion>
+      <NUnitConsoleRunnerExe>$(SolutionDir)packages\NUnit.Runners.$(NUnitRunnersVersion)\tools\nunit-console.exe </NUnitConsoleRunnerExe>
       <NUnitConsoleRunnerArgs Condition="'$(Verbose)' != 'true'">-nologo -nodots</NUnitConsoleRunnerArgs>
       <NUnitConsoleRunnerArgs Condition="'$(Verbose)' == 'true'">-labels</NUnitConsoleRunnerArgs>
       <NUnitConsoleRunnerCommand Condition="'$(OS)' == 'Windows_NT'">$(NUnitConsoleRunnerExe) $(NUnitConsoleRunnerArgs) -config Debug</NUnitConsoleRunnerCommand>
