@@ -1,4 +1,4 @@
-﻿namespace RiakClient.Commands.KV
+namespace RiakClient.Commands.KV
 {
     using System;
     using System.Collections.Generic;
@@ -56,7 +56,7 @@
 
             req.type = CommandOptions.BucketType;
             req.stream = CommandOptions.Stream;
-            req.timeout = (uint)CommandOptions.Timeout;
+            req.timeout = (uint)CommandOptions.Timeout.TotalMilliseconds;
 
             return req;
         }

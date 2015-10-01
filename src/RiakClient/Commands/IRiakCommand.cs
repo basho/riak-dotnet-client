@@ -1,4 +1,4 @@
-﻿namespace RiakClient.Commands
+namespace RiakClient.Commands
 {
     using System;
     using Messages;
@@ -10,7 +10,7 @@
     public interface IRiakCommand // TODO 3.0 rename?
     {
         MessageCode RequestCode { get; }
-        
+
         MessageCode ResponseCode { get; }
 
         Type ResponseType { get; }

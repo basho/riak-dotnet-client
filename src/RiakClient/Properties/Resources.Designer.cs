@@ -97,7 +97,7 @@ namespace Riak.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Failed to send data to server - Can&apos;t write: {0}:{1}.
+        ///   Looks up a localized string similar to Failed to send data to server - Can&apos;t write: {0}.
         /// </summary>
         internal static string Riak_Core_ConnectionCantWriteException_fmt {
             get {
@@ -115,11 +115,119 @@ namespace Riak.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Attempt to execute command {0} on connection that is executing another command..
+        ///   Looks up a localized string similar to {0}|attempt to execute command {1} on connection that is executing another command..
         /// </summary>
         internal static string Riak_Core_ConnectionInFlightException_fmt {
             get {
                 return ResourceManager.GetString("Riak_Core_ConnectionInFlightException_fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}|all connections in use / max connections reached..
+        /// </summary>
+        internal static string Riak_Core_ConnectionManagerAllConnectionsInUseException_fmt {
+            get {
+                return ResourceManager.GetString("Riak_Core_ConnectionManagerAllConnectionsInUseException_fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}|connection expiration routine is starting..
+        /// </summary>
+        internal static string Riak_Core_ConnectionManagerExpirationRoutineStarting_fmt {
+            get {
+                return ResourceManager.GetString("Riak_Core_ConnectionManagerExpirationRoutineStarting_fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}|connection expiration routine is stopping..
+        /// </summary>
+        internal static string Riak_Core_ConnectionManagerExpirationRoutineStopping_fmt {
+            get {
+                return ResourceManager.GetString("Riak_Core_ConnectionManagerExpirationRoutineStopping_fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}|expired {1} connections..
+        /// </summary>
+        internal static string Riak_Core_ConnectionManagerExpiredConnections_fmt {
+            get {
+                return ResourceManager.GetString("Riak_Core_ConnectionManagerExpiredConnections_fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}|connection manager expiring connections at {1}.
+        /// </summary>
+        internal static string Riak_Core_ConnectionManagerExpiringAt_fmt {
+            get {
+                return ResourceManager.GetString("Riak_Core_ConnectionManagerExpiringAt_fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to maxConnections must be greater than or equal to minConnections..
+        /// </summary>
+        internal static string Riak_Core_ConnectionManagerMaxMustBeGreaterThanMinException {
+            get {
+                return ResourceManager.GetString("Riak_Core_ConnectionManagerMaxMustBeGreaterThanMinException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ConnectionManagerOptions requires a non-null address..
+        /// </summary>
+        internal static string Riak_Core_ConnectionManagerRequiresAddressException {
+            get {
+                return ResourceManager.GetString("Riak_Core_ConnectionManagerRequiresAddressException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ConnectionManager requires options..
+        /// </summary>
+        internal static string Riak_Core_ConnectionManagerRequiresOptionsException {
+            get {
+                return ResourceManager.GetString("Riak_Core_ConnectionManagerRequiresOptionsException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}|connection returned at shutdown..
+        /// </summary>
+        internal static string Riak_Core_ConnectionManagerReturnedShutdown_fmt {
+            get {
+                return ResourceManager.GetString("Riak_Core_ConnectionManagerReturnedShutdown_fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}|stop already called. Current state: {1}.
+        /// </summary>
+        internal static string Riak_Core_ConnectionManagerStopAlreadyCalled_fmt {
+            get {
+                return ResourceManager.GetString("Riak_Core_ConnectionManagerStopAlreadyCalled_fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}|connection count &apos;{1}&apos; does NOT equal queue count &apos;{2}&apos;..
+        /// </summary>
+        internal static string Riak_Core_ConnectionManagerStopConnectionCountNotEqualQueueCount_fmt {
+            get {
+                return ResourceManager.GetString("Riak_Core_ConnectionManagerStopConnectionCountNotEqualQueueCount_fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Connection port must be between 1 and 65535, inclusive..
+        /// </summary>
+        internal static string Riak_Core_ConnectionPortMustBeInRange {
+            get {
+                return ResourceManager.GetString("Riak_Core_ConnectionPortMustBeInRange", resourceCulture);
             }
         }
         
@@ -156,6 +264,60 @@ namespace Riak.Properties {
         internal static string Riak_Core_MessageUnexpectedResponseCodeException_fmt {
             get {
                 return ResourceManager.GetString("Riak_Core_MessageUnexpectedResponseCodeException_fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}|running..
+        /// </summary>
+        internal static string Riak_Core_Running_fmt {
+            get {
+                return ResourceManager.GetString("Riak_Core_Running_fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}|shutting down..
+        /// </summary>
+        internal static string Riak_Core_ShuttingDown_fmt {
+            get {
+                return ResourceManager.GetString("Riak_Core_ShuttingDown_fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to StateManager requires an enum using a byte as the underyling type..
+        /// </summary>
+        internal static string Riak_Core_StateManagerMustUseByteEnum {
+            get {
+                return ResourceManager.GetString("Riak_Core_StateManagerMustUseByteEnum", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to StateManager requires an enum type..
+        /// </summary>
+        internal static string Riak_Core_StateManagerMustUseEnum {
+            get {
+                return ResourceManager.GetString("Riak_Core_StateManagerMustUseEnum", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to StateManager requires at least one state value..
+        /// </summary>
+        internal static string Riak_Core_StateManagerRequiresAtLeastOneState {
+            get {
+                return ResourceManager.GetString("Riak_Core_StateManagerRequiresAtLeastOneState", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Illegal state! Expected state {0} but got {1}.
+        /// </summary>
+        internal static string Riak_Core_StateManagerStateCheckExpectedStateButGot_fmt {
+            get {
+                return ResourceManager.GetString("Riak_Core_StateManagerStateCheckExpectedStateButGot_fmt", resourceCulture);
             }
         }
     }

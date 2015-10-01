@@ -1,60 +1,57 @@
-﻿namespace Riak.Core
+namespace Riak.Core
 {
     using System;
     using System.Net;
-    using RiakClient;
 
     internal class ConnectionOptions
     {
-        private readonly IPAddress address;
-        private readonly ushort port;
-        private readonly Timeout connectTimeout = Constants.DefaultConnectTimeout;
-        private readonly Timeout requestTimeout = Constants.DefaultRequestTimeout;
+        private readonly IPEndPoint address;
+        private readonly TimeSpan connectTimeout = Constants.DefaultConnectTimeout;
+        private readonly TimeSpan requestTimeout = Constants.DefaultRequestTimeout;
 
-        public ConnectionOptions(IPAddress address, ushort port)
+        public ConnectionOptions(IPEndPoint address)
         {
             if (address == null)
             {
                 throw new ArgumentNullException("address");
             }
 
-            if (port == 0)
+            if (address.Port <= IPEndPoint.MinPort || address.Port > IPEndPoint.MaxPort)
             {
-                throw new ArgumentException("port");
+                throw new ArgumentException(Properties.Resources.Riak_Core_ConnectionPortMustBeInRange);
             }
 
             this.address = address;
-            this.port = port;
         }
 
         public ConnectionOptions(string address, ushort port)
-            : this(IPAddress.Parse(address), port)
+            : this(new IPEndPoint(IPAddress.Parse(address), port))
         {
         }
 
-        public ConnectionOptions(IPAddress address, ushort port, Timeout connectTimeout, Timeout requestTimeout)
-            : this(address, port)
+        public ConnectionOptions(IPAddress address, ushort port)
+            : this(new IPEndPoint(address, port))
+        {
+        }
+
+        public ConnectionOptions(IPEndPoint address, TimeSpan connectTimeout, TimeSpan requestTimeout)
+            : this(address)
         {
             this.connectTimeout = connectTimeout;
             this.requestTimeout = requestTimeout;
         }
 
-        public IPAddress Address
+        public IPEndPoint Address
         {
             get { return address; }
         }
 
-        public ushort Port
-        {
-            get { return port; }
-        }
-
-        public Timeout ConnectTimeout
+        public TimeSpan ConnectTimeout
         {
             get { return connectTimeout; }
         }
 
-        public Timeout RequestTimeout
+        public TimeSpan RequestTimeout
         {
             get { return requestTimeout; }
         }

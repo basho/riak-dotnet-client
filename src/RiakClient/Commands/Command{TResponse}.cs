@@ -1,4 +1,4 @@
-﻿namespace RiakClient.Commands
+namespace RiakClient.Commands
 {
     using System;
     using Messages;

@@ -1,11 +1,10 @@
-﻿namespace Test.Unit.Core
+namespace Test.Unit.Core
 {
     using System;
     using System.Net;
     using NUnit.Framework;
     using Riak;
     using Riak.Core;
-    using RiakClient;
 
     [TestFixture, UnitTest]
     public class ConnectionTests
@@ -17,10 +16,12 @@
             {
                 new ConnectionOptions((string)null, 8087);
             });
+
             Assert.Throws<FormatException>(() =>
             {
                 new ConnectionOptions(string.Empty, 8087);
             });
+
             Assert.Throws<FormatException>(() =>
             {
                 new ConnectionOptions("1,2.3.4", 8087);
@@ -32,7 +33,7 @@
         {
             Assert.Throws<ArgumentException>(() =>
             {
-                new ConnectionOptions("10.0.0.1", 0);
+                new ConnectionOptions(IPAddress.Parse("10.0.0.1"), 0);
             });
         }
 
@@ -47,11 +48,11 @@
         [Test]
         public void ConnectionOptions_With_Custom_Timeouts_Should_Use_Those_Timeouts()
         {
-            var ct = new Timeout(1234);
-            var rt = new Timeout(5678);
-            var opts = new ConnectionOptions(IPAddress.Parse("10.0.0.1"), 8087, ct, rt);
-            Assert.AreEqual(1234, (int)opts.ConnectTimeout);
-            Assert.AreEqual(5678, (int)opts.RequestTimeout);
+            var ct = TimeSpan.FromMilliseconds(1234);
+            var rt = TimeSpan.FromMilliseconds(5678);
+            var opts = new ConnectionOptions(new IPEndPoint(IPAddress.Parse("10.0.0.1"), 8087), ct, rt);
+            Assert.AreEqual(1234, (int)opts.ConnectTimeout.TotalMilliseconds);
+            Assert.AreEqual(5678, (int)opts.RequestTimeout.TotalMilliseconds);
         }
 
         [Test]
@@ -78,7 +79,7 @@
         {
             var o = new ConnectionOptions(IPAddress.Parse("10.0.0.1"), 8087);
             var c = new Connection(o);
-            Assert.AreEqual(ConnectionState.Created, c.State);
+            Assert.AreEqual(Connection.ConnectionState.Created, c.State);
         }
     }
 }

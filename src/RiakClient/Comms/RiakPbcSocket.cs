@@ -1,22 +1,3 @@
-// <copyright file="RiakPbcSocket.cs" company="Basho Technologies, Inc.">
-// Copyright 2011 - OJ Reeves & Jeremiah Peschka
-// Copyright 2014 - Basho Technologies, Inc.
-//
-// This file is provided to you under the Apache License,
-// Version 2.0 (the "License"); you may not use this file
-// except in compliance with the License.  You may obtain
-// a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-// </copyright>
-
 namespace RiakClient.Comms
 {
     using System;
@@ -40,9 +21,9 @@ namespace RiakClient.Comms
 
         private readonly string server;
         private readonly int port;
-        private readonly Timeout connectTimeout;
-        private readonly Timeout readTimeout;
-        private readonly Timeout writeTimeout;
+        private readonly TimeSpan connectTimeout;
+        private readonly TimeSpan readTimeout;
+        private readonly TimeSpan writeTimeout;
         private readonly RiakSecurityManager securityManager;
         private readonly bool checkCertificateRevocation = false;
 
@@ -275,8 +256,8 @@ namespace RiakClient.Comms
                 throw new RiakException(errorMessage, true);
             }
 
-            socket.ReceiveTimeout = (int)readTimeout;
-            socket.SendTimeout = (int)writeTimeout;
+            socket.ReceiveTimeout = (int)readTimeout.TotalMilliseconds;
+            socket.SendTimeout = (int)writeTimeout.TotalMilliseconds;
             this.networkStream = new NetworkStream(socket, true);
             SetUpSslStream(this.networkStream);
         }
@@ -301,8 +282,8 @@ namespace RiakClient.Comms
                 securityManager.ServerCertificateValidationCallback,
                 securityManager.ClientCertificateSelectionCallback);
 
-            sslStream.ReadTimeout = (int)readTimeout;
-            sslStream.WriteTimeout = (int)writeTimeout;
+            sslStream.ReadTimeout = (int)readTimeout.TotalMilliseconds;
+            sslStream.WriteTimeout = (int)writeTimeout.TotalMilliseconds;
 
             if (securityManager.ClientCertificatesConfigured)
             {

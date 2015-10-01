@@ -1,12 +1,10 @@
-﻿namespace Test.Integration.Core
+namespace Test.Integration.Core
 {
     using System;
     using System.IO;
-    using System.Net;
     using System.Net.Sockets;
     using System.Threading.Tasks;
     using NUnit.Framework;
-    using Riak;
     using Riak.Core;
     using RiakClient.Commands;
 
@@ -16,7 +14,6 @@
         [Test]
         public async Task Create_Connection_And_Start_Should_Connect()
         {
-            ushort port = 1337;
             bool sawConn = false;
 
             Func<TcpClient, bool> onConn = (client) =>
@@ -26,21 +23,23 @@
                 return true;
             };
 
-            var l = new TestListener(port, onConn);
+            var l = new TestListener(onConn);
             var w = l.Start();
 
-            var o = new ConnectionOptions(IPAddress.Loopback, port);
-            var c = new Connection(o);
-            Assert.AreEqual(ConnectionState.Created, c.State);
-            await c.Connect();
+            var o = new ConnectionOptions(l.EndPoint);
+            Connection c = null;
+            using (c = new Connection(o))
+            {
+                Assert.AreEqual(Connection.ConnectionState.Created, c.State);
+                await c.Connect();
 
-            l.Wait(w);
+                l.Wait(w);
 
-            Assert.True(sawConn);
-            Assert.AreEqual(ConnectionState.Active, c.State);
+                Assert.True(sawConn);
+                Assert.AreEqual(Connection.ConnectionState.Active, c.State);
+            }
 
-            c.Close();
-            Assert.AreEqual(ConnectionState.Inactive, c.State);
+            Assert.AreEqual(Connection.ConnectionState.Inactive, c.State);
 
             l.Stop();
         }
@@ -48,7 +47,6 @@
         [Test]
         public async Task Execute_Ping_On_Closed_Connection_Should_Throw_Exception()
         {
-            ushort port = 1337;
             bool sawConn = false;
 
             Func<TcpClient, bool> onConn = (client) =>
@@ -58,18 +56,18 @@
                 return true;
             };
 
-            var l = new TestListener(port, onConn);
+            var l = new TestListener(onConn);
             var w = l.Start();
 
-            var o = new ConnectionOptions(IPAddress.Loopback, port);
+            var o = new ConnectionOptions(l.EndPoint);
             var c = new Connection(o);
-            Assert.AreEqual(ConnectionState.Created, c.State);
+            Assert.AreEqual(Connection.ConnectionState.Created, c.State);
             await c.Connect();
 
             l.Wait(w);
 
             Assert.True(sawConn);
-            Assert.AreEqual(ConnectionState.Active, c.State);
+            Assert.AreEqual(Connection.ConnectionState.Active, c.State);
 
             var cmd = new Ping();
 

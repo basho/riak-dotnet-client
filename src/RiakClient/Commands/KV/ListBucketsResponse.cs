@@ -1,4 +1,4 @@
-﻿namespace RiakClient.Commands.KV
+namespace RiakClient.Commands.KV
 {
     using System;
     using System.Collections.Generic;

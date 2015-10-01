@@ -1,26 +1,21 @@
-﻿namespace Riak.Core
+namespace Riak.Core
 {
     using System;
     using System.Net.Sockets;
+    using System.Threading;
     using System.Threading.Tasks;
     using RiakClient.Commands;
-    using RiakClient.Exceptions;
-
-    internal enum ConnectionState
-    {
-        Created,
-        TlsStarting,
-        Active,
-        Inactive
-    }
 
     internal class Connection : IDisposable
     {
-        private readonly object sync = new object();
+        private readonly ReaderWriterLockSlim sync = new ReaderWriterLockSlim();
+        private readonly StateManager sm;
         private readonly ConnectionOptions opts;
-        private readonly TcpClient client;
 
-        private ConnectionState state;
+        private bool disposed = false;
+        private ConnectionState finalState;
+
+        private TcpClient client;
         private bool inFlight = false;
         private DateTime lastUsed = DateTime.Now;
 
@@ -31,14 +26,32 @@
                 throw new ArgumentNullException("opts");
             }
 
+            this.sm = StateManager.FromEnum<ConnectionState>(sync);
             this.opts = opts;
 
             client = new TcpClient(AddressFamily.InterNetwork);
             client.NoDelay = true;
-            client.ReceiveTimeout = (int)opts.RequestTimeout;
+            client.ReceiveTimeout = (int)opts.RequestTimeout.TotalMilliseconds;
             client.SendTimeout = client.ReceiveTimeout;
 
-            SetState(ConnectionState.Created);
+            sm.State = (byte)ConnectionState.Created;
+        }
+
+        public enum ConnectionState : byte
+        {
+            // NB: order matters!
+            Created,
+            TlsStarting,
+            Active,
+            Inactive
+        }
+
+        public ConnectionState State
+        {
+            get
+            {
+                return disposed ? finalState : (ConnectionState)sm.State;
+            }
         }
 
         public DateTime LastUsed
@@ -46,27 +59,38 @@
             get { return lastUsed; }
         }
 
-        public ConnectionState State
+        public bool Available
         {
             get
             {
-                lock (sync)
+                sync.EnterReadLock();
+                try
                 {
-                    return state;
+                    return client != null &&
+                        inFlight == false &&
+                        sm.IsStateLessThan((byte)ConnectionState.Inactive);
+                }
+                finally
+                {
+                    sync.ExitReadLock();
                 }
             }
         }
 
+        public override string ToString()
+        {
+            return this.opts.Address.ToString();
+        }
+
         public async Task Connect()
         {
-            await client.ConnectAsync(opts.Address, opts.Port);
-            SetState(ConnectionState.Active);
+            await client.ConnectAsync(opts.Address.Address, opts.Address.Port);
+            sm.State = (byte)ConnectionState.Active;
         }
 
         public void Close()
         {
-            client.Close();
-            SetState(ConnectionState.Inactive);
+            Dispose();
         }
 
         public async Task<Result> Execute(IRiakCommand command)
@@ -92,48 +116,61 @@
             else
             {
                 // TODO: exception vs inactivate connection / error code?
-                string errorMessage = string.Format(
-                    Properties.Resources.Riak_Core_ConnectionCantWriteException_fmt, opts.Address, opts.Port);
-                throw new ConnectionWriteException(errorMessage);
+                var message = string.Format(
+                    Properties.Resources.Riak_Core_ConnectionCantWriteException_fmt, opts.Address);
+                throw new ConnectionWriteException(message);
             }
         }
 
         public void Dispose()
         {
-            if (client != null)
+            if (!disposed)
             {
-                client.Close();
-            }
-        }
+                if (client != null)
+                {
+                    client.Close();
+                    client = null;
+                }
 
-        private void SetState(ConnectionState state)
-        {
-            lock (sync)
-            {
-                this.state = state;
+                finalState = ConnectionState.Inactive;
+                sm.State = (byte)finalState;
+                sm.Dispose();
+
+                sync.Dispose();
+                disposed = true;
             }
         }
 
         private void StartExecute(IRiakCommand command)
         {
-            lock (sync)
+            sync.EnterWriteLock();
+            try
             {
                 if (inFlight)
                 {
-                    var msg = string.Format(Properties.Resources.Riak_Core_ConnectionInFlightException_fmt, command.GetType().Name);
+                    var msg = string.Format(Properties.Resources.Riak_Core_ConnectionInFlightException_fmt, this, command.GetType().Name);
                     throw new ConnectionInFlightException(msg);
                 }
 
                 inFlight = true;
                 lastUsed = DateTime.Now;
             }
+            finally
+            {
+                sync.ExitWriteLock();
+            }
         }
 
         private void StopExecute()
         {
-            lock (sync)
+            sync.EnterWriteLock();
+            try
             {
                 inFlight = false;
+            }
+            finally
+            {
+                sync.ExitWriteLock();
             }
         }
     }

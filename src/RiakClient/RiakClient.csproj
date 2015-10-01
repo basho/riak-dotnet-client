@@ -48,8 +48,16 @@
     <AssemblyOriginatorKeyFile>..\RiakClient.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Common.Logging, Version=3.3.0.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Common.Logging.3.3.0\lib\net40\Common.Logging.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Common.Logging.Core, Version=3.3.0.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Common.Logging.Core.3.3.0\lib\net40\Common.Logging.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="protobuf-net, Version=2.0.0.668, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
@@ -131,6 +139,8 @@
     <Compile Include="Containers\IConcurrentEnumerable.cs" />
     <Compile Include="Containers\IConcurrentEnumerator.cs" />
     <Compile Include="Core\ConnectionException.cs" />
+    <Compile Include="Core\ConnectionManager.cs" />
+    <Compile Include="Core\ConnectionManagerOptions.cs" />
     <Compile Include="Core\ConnectionWriteException.cs" />
     <Compile Include="Core\ConnectionReadException.cs" />
     <Compile Include="Core\MessageConstants.cs" />
@@ -141,6 +151,7 @@
     <Compile Include="Core\Connection.cs" />
     <Compile Include="Core\ConnectionOptions.cs" />
     <Compile Include="Core\ConnectionInFlightException.cs" />
+    <Compile Include="Core\StateManager.cs" />
     <Compile Include="Exceptions\RiakUnsupportedException.cs" />
     <Compile Include="IRiakAsyncClient.cs" />
     <Compile Include="IRiakClient.cs" />
@@ -151,11 +162,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="RQIterRslt.cs" />
+    <Compile Include="RQueue.cs" />
     <Compile Include="RError.cs" />
     <Compile Include="RException.cs" />
     <Compile Include="Result.cs" />
     <Compile Include="RiakString.cs" />
-    <Compile Include="Timeout.cs" />
     <Compile Include="NVal.cs" />
     <Compile Include="Quorum.cs" />
     <Compile Include="Models\RiakBinIndexId.cs" />
