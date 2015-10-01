@@ -30,7 +30,7 @@ namespace RiakClient.Commands.CRDT
         /// <param name="bucket">The bucket in Riak. Required.</param>
         /// <param name="key">The key in Riak. Required.</param>
         public FetchCommandOptions(string bucketType, string bucket, string key)
-            : base(bucketType, bucket, key, true)
+            : base(new Args(bucketType, bucket, true, key, true))
         {
             // ensure default values
             this.NotFoundOK = false;

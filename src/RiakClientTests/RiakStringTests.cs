@@ -68,6 +68,13 @@ namespace RiakClientTests
             rs = new RiakString((string)null);
             Assert.False(rs);
             Assert.False(rs.HasValue);
+
+            Assert.Greater(rs.GetHashCode(), 0);
+
+            Assert.DoesNotThrow(() =>
+            {
+                RiakString.ToBytes(rs);
+            });
         }
     }
 }

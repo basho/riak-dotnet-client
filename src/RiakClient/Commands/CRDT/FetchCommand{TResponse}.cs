@@ -18,6 +18,7 @@
 
 namespace RiakClient.Commands.CRDT
 {
+    using System;
     using Messages;
 
     /// <summary>
@@ -37,11 +38,27 @@ namespace RiakClient.Commands.CRDT
         }
 
         /// <summary>
-        /// The expected protobuf message code from Riak.
+        /// The request message code.
         /// </summary>
-        public override MessageCode ExpectedCode
+        public override MessageCode RequestCode
+        {
+            get { return MessageCode.DtFetchReq; }
+        }
+
+        /// <summary>
+        /// The expected response message code from Riak.
+        /// </summary>
+        public override MessageCode ResponseCode
         {
             get { return MessageCode.DtFetchResp; }
+        }
+
+        /// <summary>
+        /// The expected response type.
+        /// </summary>
+        public override Type ResponseType
+        {
+            get { return typeof(DtFetchResp); }
         }
 
         public override RpbReq ConstructPbRequest()

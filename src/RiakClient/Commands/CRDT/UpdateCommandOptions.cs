@@ -33,7 +33,7 @@ namespace RiakClient.Commands.CRDT
         /// <param name="bucket">The bucket in Riak. Required.</param>
         /// <param name="key">The key in Riak. If <b>null</b>, Riak will generate a key.</param>
         public UpdateCommandOptions(string bucketType, string bucket, string key)
-            : base(bucketType, bucket, key, false)
+            : base(new Args(bucketType, bucket, true, key, false))
         {
         }
 

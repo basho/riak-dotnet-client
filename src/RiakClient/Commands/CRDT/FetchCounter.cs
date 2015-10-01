@@ -18,6 +18,7 @@
 
 namespace RiakClient.Commands.CRDT
 {
+    using System;
     using Exceptions;
     using Messages;
 

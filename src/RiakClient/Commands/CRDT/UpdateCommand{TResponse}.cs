@@ -39,9 +39,19 @@ namespace RiakClient.Commands.CRDT
             }
         }
 
-        public override MessageCode ExpectedCode
+        public override MessageCode RequestCode
+        {
+            get { return MessageCode.DtUpdateReq; }
+        }
+
+        public override MessageCode ResponseCode
         {
             get { return MessageCode.DtUpdateResp; }
+        }
+
+        public override Type ResponseType
+        {
+            get { return typeof(DtUpdateResp); }
         }
 
         public override RpbReq ConstructPbRequest()
