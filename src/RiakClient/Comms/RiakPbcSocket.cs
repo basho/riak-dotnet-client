@@ -1,22 +1,3 @@
-// <copyright file="RiakPbcSocket.cs" company="Basho Technologies, Inc.">
-// Copyright 2011 - OJ Reeves & Jeremiah Peschka
-// Copyright 2014 - Basho Technologies, Inc.
-//
-// This file is provided to you under the Apache License,
-// Version 2.0 (the "License"); you may not use this file
-// except in compliance with the License.  You may obtain
-// a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-// </copyright>
-
 namespace RiakClient.Comms
 {
     using System;
@@ -40,9 +21,9 @@ namespace RiakClient.Comms
 
         private readonly string server;
         private readonly int port;
-        private readonly Timeout connectTimeout;
-        private readonly Timeout readTimeout;
-        private readonly Timeout writeTimeout;
+        private readonly TimeSpan connectTimeout;
+        private readonly TimeSpan readTimeout;
+        private readonly TimeSpan writeTimeout;
         private readonly RiakSecurityManager securityManager;
         private readonly bool checkCertificateRevocation = false;
 
@@ -86,20 +67,27 @@ namespace RiakClient.Comms
         public RiakResult Write(IRiakCommand command)
         {
             RpbReq request = command.ConstructPbRequest();
-            if (request.IsMessageCodeOnly)
+            if (request == null)
+            {
+                Write(command.RequestCode);
+                return RiakResult.Success();
+            }
+            else if (request.IsMessageCodeOnly)
             {
                 Write(request.MessageCode);
                 return RiakResult.Success();
             }
             else
             {
-                return DoWrite(s => Serializer.Serialize(s, request), request.GetType());
+                return DoWrite(s => Serializer.Serialize(s, request), command.RequestCode);
             }
         }
 
         public void Write<T>(T message) where T : class
         {
-            DoWrite(s => Serializer.Serialize(s, message), typeof(T));
+            var requestType = typeof(T);
+            var requestCode = MessageCodeTypeMapBuilder.GetMessageCodeFor(requestType);
+            DoWrite(s => Serializer.Serialize(s, message), requestCode);
         }
 
         public MessageCode Read(MessageCode expectedCode)
@@ -118,7 +106,7 @@ namespace RiakClient.Comms
 
         public RiakResult Read(IRiakCommand command)
         {
-            MessageCode expectedCode = command.ExpectedCode;
+            MessageCode expectedCode = command.ResponseCode;
             Type expectedType = MessageCodeTypeMapBuilder.GetTypeFor(expectedCode);
 
             int size = DoRead(expectedCode, expectedType);
@@ -208,11 +196,10 @@ namespace RiakClient.Comms
             return messageCode;
         }
 
-        private RiakResult DoWrite(Action<MemoryStream> serializer, Type messageType)
+        private RiakResult DoWrite(Action<MemoryStream> serializer, MessageCode requestCode)
         {
             byte[] messageBody;
             int messageLength = 0;
-
             using (var memStream = new MemoryStream())
             {
                 // add a buffer to the start of the array to put the size and message code
@@ -228,10 +215,9 @@ namespace RiakClient.Comms
                 messageBody = new byte[PbMsgHeaderSize];
             }
 
-            MessageCode messageCode = MessageCodeTypeMapBuilder.GetMessageCodeFor(messageType);
             var size = BitConverter.GetBytes(IPAddress.HostToNetworkOrder((int)messageLength - PbMsgHeaderSize + 1));
             Array.Copy(size, messageBody, SizeOfInt);
-            messageBody[SizeOfInt] = (byte)messageCode;
+            messageBody[SizeOfInt] = (byte)requestCode;
 
             if (NetworkStream.CanWrite)
             {
@@ -239,7 +225,7 @@ namespace RiakClient.Comms
             }
             else
             {
-                string errorMessage = string.Format("Failed to send data to server - Can't write: {0}:{1}", server, port);
+                string errorMessage = string.Format(Riak.Properties.Resources.Riak_Core_ConnectionCantWriteException_fmt, server, port);
                 throw new RiakException(errorMessage, true);
             }
 
@@ -270,8 +256,8 @@ namespace RiakClient.Comms
                 throw new RiakException(errorMessage, true);
             }
 
-            socket.ReceiveTimeout = (int)readTimeout;
-            socket.SendTimeout = (int)writeTimeout;
+            socket.ReceiveTimeout = (int)readTimeout.TotalMilliseconds;
+            socket.SendTimeout = (int)writeTimeout.TotalMilliseconds;
             this.networkStream = new NetworkStream(socket, true);
             SetUpSslStream(this.networkStream);
         }
@@ -296,8 +282,8 @@ namespace RiakClient.Comms
                 securityManager.ServerCertificateValidationCallback,
                 securityManager.ClientCertificateSelectionCallback);
 
-            sslStream.ReadTimeout = (int)readTimeout;
-            sslStream.WriteTimeout = (int)writeTimeout;
+            sslStream.ReadTimeout = (int)readTimeout.TotalMilliseconds;
+            sslStream.WriteTimeout = (int)writeTimeout.TotalMilliseconds;
 
             if (securityManager.ClientCertificatesConfigured)
             {

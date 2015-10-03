@@ -1,22 +1,3 @@
-// <copyright file="RiakClusterConfiguration.cs" company="Basho Technologies, Inc.">
-// Copyright 2011 - OJ Reeves & Jeremiah Peschka
-// Copyright 2014 - Basho Technologies, Inc.
-//
-// This file is provided to you under the Apache License,
-// Version 2.0 (the "License"); you may not use this file
-// except in compliance with the License.  You may obtain
-// a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-// </copyright>
-
 namespace RiakClient.Config
 {
     using System;
@@ -29,8 +10,8 @@ namespace RiakClient.Config
     /// </summary>
     public sealed class RiakClusterConfiguration : ConfigurationSection, IRiakClusterConfiguration
     {
-        private static readonly Timeout DefaultNodePollTime = new Timeout(TimeSpan.FromSeconds(5));
-        private static readonly Timeout DefaultDefaultRetryWaitTime = new Timeout(200);
+        private static readonly TimeSpan DefaultNodePollTime = TimeSpan.FromSeconds(5);
+        private static readonly TimeSpan DefaultDefaultRetryWaitTime = TimeSpan.FromMilliseconds(200);
 
         /// <summary>
         /// A collection of <see cref="IRiakNodeConfiguration"/> configurations detailing the Riak nodes that can be connected to.
@@ -51,14 +32,14 @@ namespace RiakClient.Config
 
         /// <inheritdoc/>
         /// <remarks>Defaults to 5000ms if omitted from the configuration file.</remarks>
-        public Timeout NodePollTime
+        public TimeSpan NodePollTime
         {
             get
             {
                 int nodePollTimeMilliseconds;
                 if (int.TryParse(this.NodePollTimeProperty, out nodePollTimeMilliseconds))
                 {
-                    return new Timeout(nodePollTimeMilliseconds);
+                    return TimeSpan.FromMilliseconds(nodePollTimeMilliseconds);
                 }
                 else
                 {
@@ -74,14 +55,14 @@ namespace RiakClient.Config
 
         /// <inheritdoc/>
         /// <remarks>Defaults to 200ms if omitted from the configuration file.</remarks>
-        public Timeout DefaultRetryWaitTime
+        public TimeSpan DefaultRetryWaitTime
         {
             get
             {
                 int defaultRetryWaitTimeMilliseconds;
                 if (int.TryParse(this.DefaultRetryWaitTimeProperty, out defaultRetryWaitTimeMilliseconds))
                 {
-                    return new Timeout(defaultRetryWaitTimeMilliseconds);
+                    return TimeSpan.FromMilliseconds(defaultRetryWaitTimeMilliseconds);
                 }
                 else
                 {
