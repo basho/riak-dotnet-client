@@ -1,4 +1,4 @@
-﻿namespace RiakClient.Commands
+namespace RiakClient.Commands
 {
     /// <summary>
     /// Represents a command that streams from Riak.

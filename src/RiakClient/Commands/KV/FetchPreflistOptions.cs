@@ -1,4 +1,4 @@
-﻿namespace RiakClient.Commands.KV
+namespace RiakClient.Commands.KV
 {
     /// <summary>
     /// Represents options for a <see cref="FetchPreflist"/> operation.

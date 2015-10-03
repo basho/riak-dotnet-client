@@ -1,4 +1,4 @@
-﻿namespace RiakClient.Commands.KV
+namespace RiakClient.Commands.KV
 {
     using System;
     using System.Collections.Generic;
@@ -13,7 +13,7 @@
         private readonly Action<IEnumerable<RiakString>> callback;
 
         /// <inheritdoc/>
-        public ListBucketsOptions(string bucketType, bool stream, Action<IEnumerable<RiakString>> callback, Timeout timeout)
+        public ListBucketsOptions(string bucketType, bool stream, Action<IEnumerable<RiakString>> callback, TimeSpan timeout)
             : base(new Args(bucketType, null, false, null, false), timeout)
         {
             if (stream && callback == null)

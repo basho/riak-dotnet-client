@@ -1,21 +1,3 @@
-﻿// <copyright file="CommandOptions.cs" company="Basho Technologies, Inc.">
-// Copyright 2015 - Basho Technologies, Inc.
-//
-// This file is provided to you under the Apache License,
-// Version 2.0 (the "License"); you may not use this file
-// except in compliance with the License.  You may obtain
-// a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-// </copyright>
-
 namespace RiakClient.Commands
 {
     using System;
@@ -28,15 +10,14 @@ namespace RiakClient.Commands
         private readonly RiakString bucketType;
         private readonly RiakString bucket;
         private readonly RiakString key;
-
-        private Timeout timeout;
+        private TimeSpan timeout;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CommandOptions"/> class.
         /// </summary>
         /// <param name="args">Arguments to this ctor. Required.</param>
         protected CommandOptions(Args args)
-            : this(args, Timeout.DefaultCommandTimeout)
+            : this(args, Riak.Constants.DefaultCommandTimeout)
         {
         }
 
@@ -45,7 +26,7 @@ namespace RiakClient.Commands
         /// </summary>
         /// <param name="args">Arguments to this ctor. Required.</param>
         /// <param name="timeout">The command timeout in Riak.</param>
-        protected CommandOptions(Args args, Timeout timeout)
+        protected CommandOptions(Args args, TimeSpan timeout)
         {
             if (args == null)
             {
@@ -89,7 +70,7 @@ namespace RiakClient.Commands
         /// <summary>
         /// The timeout for this command.
         /// </summary>
-        public Timeout Timeout
+        public TimeSpan Timeout
         {
             get { return timeout; }
             set { timeout = value; }

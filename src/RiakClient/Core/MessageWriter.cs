@@ -1,4 +1,4 @@
-﻿namespace Riak.Core
+namespace Riak.Core
 {
     using System;
     using System.Diagnostics;

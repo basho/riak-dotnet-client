@@ -1,4 +1,4 @@
-﻿namespace Test.Unit
+namespace Test.Unit
 {
     using System.IO;
     using System.Threading.Tasks;

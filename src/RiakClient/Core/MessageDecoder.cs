@@ -1,4 +1,4 @@
-﻿namespace Riak.Core
+namespace Riak.Core
 {
     using System;
     using System.IO;
@@ -102,11 +102,11 @@
             byte actualCode = data[0];
             if (expectedCode != actualCode)
             {
-                string errorMessage = string.Format(
+                var message = string.Format(
                     Properties.Resources.Riak_Core_MessageUnexpectedResponseCodeException_fmt,
                     expectedCode,
                     actualCode);
-                throw new ConnectionException(errorMessage);
+                throw new ConnectionException(message);
             }
         }
     }

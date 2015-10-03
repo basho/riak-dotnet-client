@@ -1,9 +1,8 @@
-﻿namespace Test.Unit
+namespace Test.Unit
 {
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
     using NUnit.Framework;
@@ -126,7 +125,7 @@
                     called++;
                 };
 
-            var opts = new ListBucketsOptions(BucketType, true, cb, Timeout.DefaultCommandTimeout);
+            var opts = new ListBucketsOptions(BucketType, true, cb, Riak.Constants.DefaultCommandTimeout);
             var cmd = new ListBuckets(opts);
 
             using (var ms = new MemoryStream())
