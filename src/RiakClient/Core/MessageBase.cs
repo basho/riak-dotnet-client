@@ -6,10 +6,10 @@ namespace Riak.Core
 
     internal abstract class MessageBase
     {
-        protected readonly IRiakCommand Command;
+        protected readonly IRCommand Command;
         protected readonly Stream Stream;
 
-        public MessageBase(IRiakCommand command, Stream stream)
+        public MessageBase(IRCommand command, Stream stream)
         {
             if (command == null)
             {

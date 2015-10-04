@@ -33,7 +33,7 @@ namespace Riak.Core
             {
                 throw new ArgumentException(
                     "minConnections",
-                    Properties.Resources.Riak_Core_ConnectionManagerMaxMustBeGreaterThanMinException);
+                    Properties.Resources.Riak_Core_MaxConnectionsMustBeGreaterThanMinConnectionsException);
             }
 
             this.address = address;

@@ -39,5 +39,13 @@ namespace RiakClient.Commands
                 Response = new Response<bool>(true);
             }
         }
+
+        public class Builder : CommandBuilder<Builder, Ping>
+        {
+            public override IRCommand Build()
+            {
+                return new Ping();
+            }
+        }
     }
 }

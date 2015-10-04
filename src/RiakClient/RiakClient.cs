@@ -1082,7 +1082,7 @@ namespace RiakClient
             return UseConnection(conn => conn.PbcWriteRead(request, MessageCode.RpbPutResp));
         }
 
-        public RiakResult Execute(IRiakCommand command)
+        public RiakResult Execute(IRCommand command)
         {
             return UseConnection(conn => conn.Execute(command));
         }

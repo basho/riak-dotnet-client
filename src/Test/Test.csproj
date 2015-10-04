@@ -49,7 +49,10 @@
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Integration\Core\ConnectionManagerTests.cs" />
+    <Compile Include="Integration\Core\NodeTests.cs" />
+    <Compile Include="Integration\Core\TestNode.cs" />
     <Compile Include="Unit\Core\ConnectionManagerTests.cs" />
+    <Compile Include="Unit\Core\NodeTests.cs" />
     <Compile Include="Unit\Core\StateManagerTests.cs" />
     <Compile Include="Unit\Core\MessageReaderTests.cs" />
     <Compile Include="Unit\Core\MessageWriterTests.cs" />

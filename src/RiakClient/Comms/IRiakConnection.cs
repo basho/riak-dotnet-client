@@ -60,6 +60,6 @@ namespace RiakClient.Comms
             Action onFinish)
             where TResult : class, new();
 
-        RiakResult Execute(IRiakCommand command);
+        RiakResult Execute(IRCommand command);
     }
 }

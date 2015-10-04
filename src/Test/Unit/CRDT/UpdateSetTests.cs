@@ -5,6 +5,7 @@ namespace Test.Unit.CRDT
     using System.Text;
     using NUnit.Framework;
     using RiakClient;
+    using RiakClient.Commands;
     using RiakClient.Commands.CRDT;
     using RiakClient.Messages;
 
@@ -50,9 +51,9 @@ namespace Test.Unit.CRDT
                 .WithContext(Context)
                 .WithTimeout(TimeSpan.FromSeconds(20));
 
-            UpdateSet updateSetCommand = updateSetCommandBuilder.Build();
+            IRCommand cmd = updateSetCommandBuilder.Build();
 
-            DtUpdateReq protobuf = (DtUpdateReq)updateSetCommand.ConstructPbRequest();
+            DtUpdateReq protobuf = (DtUpdateReq)cmd.ConstructPbRequest();
 
             Assert.AreEqual(Encoding.UTF8.GetBytes(BucketType), protobuf.type);
             Assert.AreEqual(Encoding.UTF8.GetBytes(Bucket), protobuf.bucket);
@@ -80,14 +81,15 @@ namespace Test.Unit.CRDT
             updateResp.context = Context;
             updateResp.set_value.AddRange(DefaultAdds);
 
-            var update = new UpdateSet.Builder(DefaultAdds, null)
+            IRCommand cmd = new UpdateSet.Builder(DefaultAdds, null)
                 .WithBucketType(BucketType)
                 .WithBucket(Bucket)
                 .Build();
 
-            update.OnSuccess(updateResp);
+            cmd.OnSuccess(updateResp);
 
-            SetResponse response = update.Response;
+            var ucmd = (UpdateSet)cmd;
+            SetResponse response = ucmd.Response;
 
             Assert.NotNull(response);
             Assert.AreEqual(key, response.Key);

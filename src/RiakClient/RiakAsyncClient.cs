@@ -352,7 +352,7 @@ namespace RiakClient
         }
 
         /// <inheritdoc/>
-        public Task<RiakResult> Execute(IRiakCommand command)
+        public Task<RiakResult> Execute(IRCommand command)
         {
             return Task.Factory.StartNew(() => client.Execute(command));
         }

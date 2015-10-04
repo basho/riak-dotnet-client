@@ -64,7 +64,7 @@ namespace RiakClient.Comms
             NetworkStream.Write(messageBody, 0, PbMsgHeaderSize);
         }
 
-        public RiakResult Write(IRiakCommand command)
+        public RiakResult Write(IRCommand command)
         {
             RpbReq request = command.ConstructPbRequest();
             if (request == null)
@@ -104,7 +104,7 @@ namespace RiakClient.Comms
             return messageCode;
         }
 
-        public RiakResult Read(IRiakCommand command)
+        public RiakResult Read(IRCommand command)
         {
             MessageCode expectedCode = command.ResponseCode;
             Type expectedType = MessageCodeTypeMapBuilder.GetTypeFor(expectedCode);

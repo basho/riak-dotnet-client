@@ -30,16 +30,16 @@ namespace Test.Integration.Core
             Connection c = null;
             using (c = new Connection(o))
             {
-                Assert.AreEqual(Connection.ConnectionState.Created, c.State);
-                await c.Connect();
+                Assert.AreEqual(Connection.State.Created, c.GetState());
+                await c.ConnectAsync();
 
                 l.Wait(w);
 
                 Assert.True(sawConn);
-                Assert.AreEqual(Connection.ConnectionState.Active, c.State);
+                Assert.AreEqual(Connection.State.Active, c.GetState());
             }
 
-            Assert.AreEqual(Connection.ConnectionState.Inactive, c.State);
+            Assert.AreEqual(Connection.State.Inactive, c.GetState());
 
             l.Stop();
         }
@@ -61,19 +61,19 @@ namespace Test.Integration.Core
 
             var o = new ConnectionOptions(l.EndPoint);
             var c = new Connection(o);
-            Assert.AreEqual(Connection.ConnectionState.Created, c.State);
-            await c.Connect();
+            Assert.AreEqual(Connection.State.Created, c.GetState());
+            await c.ConnectAsync();
 
             l.Wait(w);
 
             Assert.True(sawConn);
-            Assert.AreEqual(Connection.ConnectionState.Active, c.State);
+            Assert.AreEqual(Connection.State.Active, c.GetState());
 
             var cmd = new Ping();
 
             Assert.Throws<IOException>(async () =>
             {
-                await c.Execute(cmd);
+                await c.ExecuteAsync(cmd);
             });
 
             c.Close();

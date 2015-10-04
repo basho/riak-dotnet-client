@@ -18,7 +18,7 @@ namespace Riak.Core
 
             if (address.Port <= IPEndPoint.MinPort || address.Port > IPEndPoint.MaxPort)
             {
-                throw new ArgumentException(Properties.Resources.Riak_Core_ConnectionPortMustBeInRange);
+                throw new ArgumentException(Properties.Resources.Riak_Core_PortMustBeInRange);
             }
 
             this.address = address;

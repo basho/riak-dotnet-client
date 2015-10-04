@@ -42,7 +42,7 @@ namespace RiakClient.Commands.CRDT
             this.context = source.context;
         }
 
-        public override TCommand Build()
+        public override IRCommand Build()
         {
             Options = BuildOptions();
 

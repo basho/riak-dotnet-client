@@ -23,7 +23,7 @@ namespace RiakClient.Commands.CRDT
         private bool includeContext = true;
         private bool useBasicQuorum = false;
 
-        public override TCommand Build()
+        public override IRCommand Build()
         {
             Options = BuildOptions();
             Options.R = r;

@@ -106,6 +106,15 @@ namespace Riak.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to connected to: {0}.
+        /// </summary>
+        internal static string Riak_Core_ConnectionConnectedTo_fmt {
+            get {
+                return ResourceManager.GetString("Riak_Core_ConnectionConnectedTo_fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Expected to read PB message of size {0} bytes but only read {1} bytes..
         /// </summary>
         internal static string Riak_Core_ConnectionDidNotReadFullMessageException_fmt {
@@ -133,6 +142,15 @@ namespace Riak.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0}|expiration routine cancelled..
+        /// </summary>
+        internal static string Riak_Core_ConnectionManagerExpirationCancelled_fmt {
+            get {
+                return ResourceManager.GetString("Riak_Core_ConnectionManagerExpirationCancelled_fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0}|connection expiration routine is starting..
         /// </summary>
         internal static string Riak_Core_ConnectionManagerExpirationRoutineStarting_fmt {
@@ -151,6 +169,15 @@ namespace Riak.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0}|expiration routine sleeping for {1}.
+        /// </summary>
+        internal static string Riak_Core_ConnectionManagerExpirationSleeping_fmt {
+            get {
+                return ResourceManager.GetString("Riak_Core_ConnectionManagerExpirationSleeping_fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0}|expired {1} connections..
         /// </summary>
         internal static string Riak_Core_ConnectionManagerExpiredConnections_fmt {
@@ -160,7 +187,7 @@ namespace Riak.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0}|connection manager expiring connections at {1}.
+        ///   Looks up a localized string similar to {0}|expiring connections at {1}.
         /// </summary>
         internal static string Riak_Core_ConnectionManagerExpiringAt_fmt {
             get {
@@ -169,11 +196,11 @@ namespace Riak.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to maxConnections must be greater than or equal to minConnections..
+        ///   Looks up a localized string similar to {0}|expiration thread timeout while waiting for queue lock to iterate on {1} items..
         /// </summary>
-        internal static string Riak_Core_ConnectionManagerMaxMustBeGreaterThanMinException {
+        internal static string Riak_Core_ConnectionManagerIteratingConnectionQueueForExpirationTimeout_fmt {
             get {
-                return ResourceManager.GetString("Riak_Core_ConnectionManagerMaxMustBeGreaterThanMinException", resourceCulture);
+                return ResourceManager.GetString("Riak_Core_ConnectionManagerIteratingConnectionQueueForExpirationTimeout_fmt", resourceCulture);
             }
         }
         
@@ -205,15 +232,6 @@ namespace Riak.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0}|stop already called. Current state: {1}.
-        /// </summary>
-        internal static string Riak_Core_ConnectionManagerStopAlreadyCalled_fmt {
-            get {
-                return ResourceManager.GetString("Riak_Core_ConnectionManagerStopAlreadyCalled_fmt", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to {0}|connection count &apos;{1}&apos; does NOT equal queue count &apos;{2}&apos;..
         /// </summary>
         internal static string Riak_Core_ConnectionManagerStopConnectionCountNotEqualQueueCount_fmt {
@@ -223,11 +241,29 @@ namespace Riak.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Connection port must be between 1 and 65535, inclusive..
+        ///   Looks up a localized string similar to {0}|timeout while waiting for expiration thread to complete..
         /// </summary>
-        internal static string Riak_Core_ConnectionPortMustBeInRange {
+        internal static string Riak_Core_ConnectionManagerStopExpirationStopTimeout_fmt {
             get {
-                return ResourceManager.GetString("Riak_Core_ConnectionPortMustBeInRange", resourceCulture);
+                return ResourceManager.GetString("Riak_Core_ConnectionManagerStopExpirationStopTimeout_fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}|timeout waiting for queue lock to iterate on {1} items..
+        /// </summary>
+        internal static string Riak_Core_ConnectionManagerStopIteratingConnectionQueueTimeout_fmt {
+            get {
+                return ResourceManager.GetString("Riak_Core_ConnectionManagerStopIteratingConnectionQueueTimeout_fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}|waiting for expiration task to complete..
+        /// </summary>
+        internal static string Riak_Core_ConnectionManagerWaitingExpirationTask_fmt {
+            get {
+                return ResourceManager.GetString("Riak_Core_ConnectionManagerWaitingExpirationTask_fmt", resourceCulture);
             }
         }
         
@@ -237,6 +273,24 @@ namespace Riak.Properties {
         internal static string Riak_Core_ConnectionZeroLengthResponseException {
             get {
                 return ResourceManager.GetString("Riak_Core_ConnectionZeroLengthResponseException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}|executing command {1}.
+        /// </summary>
+        internal static string Riak_Core_ExecutingCommand_fmt {
+            get {
+                return ResourceManager.GetString("Riak_Core_ExecutingCommand_fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to maxConnections must be greater than or equal to minConnections..
+        /// </summary>
+        internal static string Riak_Core_MaxConnectionsMustBeGreaterThanMinConnectionsException {
+            get {
+                return ResourceManager.GetString("Riak_Core_MaxConnectionsMustBeGreaterThanMinConnectionsException", resourceCulture);
             }
         }
         
@@ -268,6 +322,123 @@ namespace Riak.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0}|already health checking or shutting down..
+        /// </summary>
+        internal static string Riak_Core_NodeAlreadyHealthChecking_fmt {
+            get {
+                return ResourceManager.GetString("Riak_Core_NodeAlreadyHealthChecking_fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}|health check routine cancelled..
+        /// </summary>
+        internal static string Riak_Core_NodeHealthCheckCancelled_fmt {
+            get {
+                return ResourceManager.GetString("Riak_Core_NodeHealthCheckCancelled_fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}|health check routine quitting ({1})..
+        /// </summary>
+        internal static string Riak_Core_NodeHealthCheckQuitting_fmt {
+            get {
+                return ResourceManager.GetString("Riak_Core_NodeHealthCheckQuitting_fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}|health check routine sleeping for {1}.
+        /// </summary>
+        internal static string Riak_Core_NodeHealthCheckSleeping_fmt {
+            get {
+                return ResourceManager.GetString("Riak_Core_NodeHealthCheckSleeping_fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to maxConnections must be less than {0}.
+        /// </summary>
+        internal static string Riak_Core_NodeMaxConnectionsMustBeLessThanException_fmt {
+            get {
+                return ResourceManager.GetString("Riak_Core_NodeMaxConnectionsMustBeLessThanException_fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to minConnections must be greater than or equal to 1..
+        /// </summary>
+        internal static string Riak_Core_NodeMinConnectionsMustBeOneOrGreaterException {
+            get {
+                return ResourceManager.GetString("Riak_Core_NodeMinConnectionsMustBeOneOrGreaterException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Node requires address..
+        /// </summary>
+        internal static string Riak_Core_NodeRequiresAddressException {
+            get {
+                return ResourceManager.GetString("Riak_Core_NodeRequiresAddressException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Node requires options..
+        /// </summary>
+        internal static string Riak_Core_NodeRequiresOptionsException {
+            get {
+                return ResourceManager.GetString("Riak_Core_NodeRequiresOptionsException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}|running health check at {1}.
+        /// </summary>
+        internal static string Riak_Core_NodeRunningHealthCheckAt_fmt {
+            get {
+                return ResourceManager.GetString("Riak_Core_NodeRunningHealthCheckAt_fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}|starting health check routine..
+        /// </summary>
+        internal static string Riak_Core_NodeStartingHealthCheck_fmt {
+            get {
+                return ResourceManager.GetString("Riak_Core_NodeStartingHealthCheck_fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}|timeout while waiting for health check thread to complete..
+        /// </summary>
+        internal static string Riak_Core_NodeStopHealthCheckStopTimeout_fmt {
+            get {
+                return ResourceManager.GetString("Riak_Core_NodeStopHealthCheckStopTimeout_fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}|waiting for health check task to complete..
+        /// </summary>
+        internal static string Riak_Core_NodeWaitingHealthCheckTask_fmt {
+            get {
+                return ResourceManager.GetString("Riak_Core_NodeWaitingHealthCheckTask_fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Port must be between 1 and 65535, inclusive..
+        /// </summary>
+        internal static string Riak_Core_PortMustBeInRange {
+            get {
+                return ResourceManager.GetString("Riak_Core_PortMustBeInRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0}|running..
         /// </summary>
         internal static string Riak_Core_Running_fmt {
@@ -282,6 +453,24 @@ namespace Riak.Properties {
         internal static string Riak_Core_ShuttingDown_fmt {
             get {
                 return ResourceManager.GetString("Riak_Core_ShuttingDown_fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}|starting..
+        /// </summary>
+        internal static string Riak_Core_Starting_fmt {
+            get {
+                return ResourceManager.GetString("Riak_Core_Starting_fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to StateManager is disposed..
+        /// </summary>
+        internal static string Riak_Core_StateManagerDisposedException {
+            get {
+                return ResourceManager.GetString("Riak_Core_StateManagerDisposedException", resourceCulture);
             }
         }
         
@@ -318,6 +507,15 @@ namespace Riak.Properties {
         internal static string Riak_Core_StateManagerStateCheckExpectedStateButGot_fmt {
             get {
                 return ResourceManager.GetString("Riak_Core_StateManagerStateCheckExpectedStateButGot_fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}|stop already called. Current state: {1}.
+        /// </summary>
+        internal static string Riak_Core_StopAlreadyCalled_fmt {
+            get {
+                return ResourceManager.GetString("Riak_Core_StopAlreadyCalled_fmt", resourceCulture);
             }
         }
     }

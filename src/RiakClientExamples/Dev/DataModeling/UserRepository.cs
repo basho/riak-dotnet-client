@@ -2,6 +2,7 @@ namespace RiakClientExamples.Dev.DataModeling
 {
     using System.Linq;
     using RiakClient;
+    using RiakClient.Commands;
     using RiakClient.Commands.CRDT;
 
     public class UserRepository : Repository<User>
@@ -19,7 +20,7 @@ namespace RiakClientExamples.Dev.DataModeling
 
         public override User Get(string key, bool notFoundOK = false)
         {
-            FetchMap cmd = new FetchMap.Builder()
+            IRCommand cmd = new FetchMap.Builder()
                 .WithBucketType(BucketType)
                 .WithBucket(Bucket)
                 .WithKey(key)
@@ -27,7 +28,9 @@ namespace RiakClientExamples.Dev.DataModeling
 
             RiakResult rslt = client.Execute(cmd);
             CheckResult(rslt);
-            MapResponse response = cmd.Response;
+
+            var fcmd = (FetchMap)cmd;
+            MapResponse response = fcmd.Response;
             Map map = response.Value;
 
             string firstName = map.Registers.GetValue(firstNameRegister);

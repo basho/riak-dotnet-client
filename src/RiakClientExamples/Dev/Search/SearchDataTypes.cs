@@ -159,7 +159,8 @@
             rslt = client.Execute(cmd);
             CheckResult(rslt);
 
-            PrintObject(cmd.Response.Value);
+            var fcmd = (FetchMap)cmd;
+            PrintObject(fcmd.Response.Value);
 
             WaitForSearch();
 

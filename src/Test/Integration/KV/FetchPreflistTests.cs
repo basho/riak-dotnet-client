@@ -3,6 +3,7 @@ namespace Test.Integration.CRDT
     using System.Linq;
     using NUnit.Framework;
     using RiakClient;
+    using RiakClient.Commands;
     using RiakClient.Commands.KV;
 
     public class FetchPreflistTests : TestBase
@@ -22,16 +23,17 @@ namespace Test.Integration.CRDT
         {
             RiakMinVersion(2, 1, 0);
 
-            var fetch = new FetchPreflist.Builder()
+            IRCommand cmd = new FetchPreflist.Builder()
                     .WithBucketType(BucketType)
                     .WithBucket(Bucket)
                     .WithKey("key_1")
                     .Build();
 
-            RiakResult rslt = client.Execute(fetch);
+            RiakResult rslt = client.Execute(cmd);
             if (rslt.IsSuccess)
             {
-                PreflistResponse response = fetch.Response;
+                var fcmd = (FetchPreflist)cmd;
+                PreflistResponse response = fcmd.Response;
                 Assert.IsNotNull(response);
 
                 Assert.AreEqual(3, response.Value.Count());

@@ -10,7 +10,7 @@ namespace Riak.Core
 
     internal class MessageWriter : MessageBase
     {
-        public MessageWriter(IRiakCommand command, Stream stream)
+        public MessageWriter(IRCommand command, Stream stream)
             : base(command, stream)
         {
         }

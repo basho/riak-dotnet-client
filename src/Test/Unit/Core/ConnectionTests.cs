@@ -79,7 +79,7 @@ namespace Test.Unit.Core
         {
             var o = new ConnectionOptions(IPAddress.Parse("10.0.0.1"), 8087);
             var c = new Connection(o);
-            Assert.AreEqual(Connection.ConnectionState.Created, c.State);
+            Assert.AreEqual(Connection.State.Created, c.GetState());
         }
     }
 }

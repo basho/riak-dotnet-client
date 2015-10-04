@@ -4,6 +4,7 @@ namespace Test.Unit.CRDT
     using System.Collections.Generic;
     using NUnit.Framework;
     using RiakClient;
+    using RiakClient.Commands;
     using RiakClient.Commands.CRDT;
     using RiakClient.Messages;
 
@@ -111,15 +112,16 @@ namespace Test.Unit.CRDT
                 Assert.IsTrue(map.Flags["flag_1"]);
             };
 
-            var fetch = new FetchMap.Builder()
+            IRCommand cmd = new FetchMap.Builder()
                 .WithBucketType(BucketType)
                 .WithBucket(Bucket)
                 .WithKey(key)
                 .Build();
 
-            fetch.OnSuccess(fetchResp);
+            cmd.OnSuccess(fetchResp);
 
-            MapResponse response = fetch.Response;
+            var fcmd = (FetchMap)cmd;
+            MapResponse response = fcmd.Response;
 
             Assert.NotNull(response);
             Assert.AreEqual(key, response.Key);

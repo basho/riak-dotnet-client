@@ -3,6 +3,7 @@
     using System;
     using System.Text;
     using RiakClient;
+    using RiakClient.Commands;
     using RiakClient.Commands.CRDT;
     using RiakClient.Models;
 
@@ -82,15 +83,17 @@
                 builder.WithKey(model.ID);
             }
 
-            UpdateMap cmd = builder.Build();
+            IRCommand cmd = builder.Build();
             RiakResult rslt = client.Execute(cmd);
             CheckResult(rslt);
-            return cmd.Response.Key;
+
+            var ucmd = (UpdateMap)cmd;
+            return ucmd.Response.Key;
         }
 
         protected MapResponse FetchMap(TModel model)
         {
-            var cmd = new FetchMap.Builder()
+            IRCommand cmd = new FetchMap.Builder()
                 .WithBucketType(BucketType)
                 .WithBucket(Bucket)
                 .WithKey(model.ID)
@@ -99,7 +102,9 @@
 
             RiakResult rslt = client.Execute(cmd);
             CheckResult(rslt);
-            return cmd.Response;
+
+            var fcmd = (FetchMap)cmd;
+            return fcmd.Response;
         }
 
         protected void CheckResult(RiakResult result, bool notFoundOK = false)

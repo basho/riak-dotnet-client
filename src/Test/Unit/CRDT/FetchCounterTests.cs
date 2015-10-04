@@ -3,6 +3,7 @@ namespace Test.Unit.CRDT
     using System;
     using NUnit.Framework;
     using RiakClient;
+    using RiakClient.Commands;
     using RiakClient.Commands.CRDT;
     using RiakClient.Messages;
 
@@ -49,15 +50,16 @@ namespace Test.Unit.CRDT
             fetchResp.value = value;
             fetchResp.type = DtFetchResp.DataType.COUNTER;
 
-            var fetch = new FetchCounter.Builder()
+            IRCommand cmd = new FetchCounter.Builder()
                 .WithBucketType(BucketType)
                 .WithBucket(Bucket)
                 .WithKey(Key)
                 .Build();
 
-            fetch.OnSuccess(fetchResp);
+            cmd.OnSuccess(fetchResp);
 
-            Assert.AreEqual(42, fetch.Response.Value);
+            var fcmd = (FetchCounter)cmd;
+            Assert.AreEqual(42, fcmd.Response.Value);
         }
     }
 }

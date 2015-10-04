@@ -4,6 +4,7 @@ namespace Test.Integration.CRDT
     using Common.Logging;
     using NUnit.Framework;
     using RiakClient;
+    using RiakClient.Commands;
     using RiakClient.Commands.CRDT;
     using RiakClient.Util;
 
@@ -27,16 +28,17 @@ namespace Test.Integration.CRDT
             string key = Guid.NewGuid().ToString();
             SaveMap(key);
 
-            var fetch = new FetchMap.Builder()
+            IRCommand cmd = new FetchMap.Builder()
                     .WithBucketType(BucketType)
                     .WithBucket(Bucket)
                     .WithKey(key)
                     .Build();
 
-            RiakResult rslt = client.Execute(fetch);
+            RiakResult rslt = client.Execute(cmd);
             Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
 
-            MapResponse response = fetch.Response;
+            var fcmd = (FetchMap)cmd;
+            MapResponse response = fcmd.Response;
             Assert.IsNotNull(response);
 
             Assert.IsNotEmpty(response.Context);
@@ -65,7 +67,7 @@ namespace Test.Integration.CRDT
             var mapOp = new UpdateMap.MapOperation();
             mapOp.RemoveCounter("counter_1");
 
-            var update = new UpdateMap.Builder(mapOp)
+            IRCommand cmd = new UpdateMap.Builder(mapOp)
                 .WithBucketType(BucketType)
                 .WithBucket(Bucket)
                 .WithKey(key)
@@ -74,10 +76,11 @@ namespace Test.Integration.CRDT
                 .WithTimeout(TimeSpan.FromMilliseconds(20000))
                 .Build();
 
-            RiakResult rslt = client.Execute(update);
+            RiakResult rslt = client.Execute(cmd);
             Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
 
-            MapResponse response = update.Response;
+            var ucmd = (UpdateMap)cmd;
+            MapResponse response = ucmd.Response;
             Assert.False(response.Value.Counters.ContainsKey("counter_1"));
         }
 
@@ -92,15 +95,17 @@ namespace Test.Integration.CRDT
         [Test]
         public void Fetching_An_Unknown_Map_Results_In_Not_Found()
         {
-            var fetch = new FetchMap.Builder()
+            IRCommand cmd = new FetchMap.Builder()
                     .WithBucketType(BucketType)
                     .WithBucket(Bucket)
                     .WithKey(Guid.NewGuid().ToString())
                     .Build();
 
-            RiakResult rslt = client.Execute(fetch);
+            RiakResult rslt = client.Execute(cmd);
             Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
-            MapResponse response = fetch.Response;
+
+            var fcmd = (FetchMap)cmd;
+            MapResponse response = fcmd.Response;
             Assert.IsTrue(response.NotFound);
         }
 
@@ -132,11 +137,12 @@ namespace Test.Integration.CRDT
                 updateBuilder.WithKey(key);
             }
 
-            UpdateMap cmd = updateBuilder.Build();
+            IRCommand cmd = updateBuilder.Build();
             RiakResult rslt = client.Execute(cmd);
             Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
 
-            MapResponse response = cmd.Response;
+            var ucmd = (UpdateMap)cmd;
+            MapResponse response = ucmd.Response;
             Keys.Add(response.Key);
 
             Assert.True(EnumerableUtil.NotNullOrEmpty(response.Context));

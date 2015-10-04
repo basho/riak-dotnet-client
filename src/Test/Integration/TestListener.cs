@@ -50,6 +50,24 @@ namespace Test.Integration
             get { return (IPEndPoint)listener.LocalEndpoint; }
         }
 
+        public static async Task<bool> ReadWritePingRespAsync(TcpClient client, bool shouldClose)
+        {
+            // TODO 3.0 do anything with data read?
+            // TODO 3.0 exception handling?
+            Stream s = client.GetStream();
+
+            await MessageReader.ReadPbMessageAsync(s);
+
+            await MessageWriter.SerializeAndStreamAsync(null, MessageCode.RpbPingResp, s);
+
+            if (shouldClose)
+            {
+                client.Close();
+            }
+
+            return true;
+        }
+
         public async Task Start()
         {
             listener.Start();
@@ -104,24 +122,6 @@ namespace Test.Integration
             {
                 listener.Stop();
             }
-        }
-
-        private static async Task<bool> ReadWritePingRespAsync(TcpClient client, bool shouldClose)
-        {
-            // TODO 3.0 do anything with data read?
-            // TODO 3.0 exception handling?
-            Stream s = client.GetStream();
-
-            await MessageReader.ReadPbMessageAsync(s);
-
-            await MessageWriter.SerializeAndStreamAsync(null, MessageCode.RpbPingResp, s);
-
-            if (shouldClose)
-            {
-                client.Close();
-            }
-
-            return true;
         }
     }
 }

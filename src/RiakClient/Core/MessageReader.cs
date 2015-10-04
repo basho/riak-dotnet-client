@@ -8,7 +8,7 @@ namespace Riak.Core
 
     internal class MessageReader : MessageBase
     {
-        public MessageReader(IRiakCommand command, Stream stream)
+        public MessageReader(IRCommand command, Stream stream)
             : base(command, stream)
         {
         }
@@ -61,7 +61,7 @@ namespace Riak.Core
             return totalBytesReceived;
         }
 
-        public async Task<Result> ReadAsync()
+        public async Task<ExecuteResult> ReadAsync()
         {
             bool done = false;
             IStreamingCommand streamingCommand = Command as IStreamingCommand;
@@ -76,7 +76,7 @@ namespace Riak.Core
                 if (err != null)
                 {
                     Command.OnError(err);
-                    return new Result(err);
+                    return new ExecuteResult(err);
                 }
 
                 RpbResp decoded = decoder.DecodeMessage();
@@ -90,7 +90,7 @@ namespace Riak.Core
                 }
             }
 
-            return new Result();
+            return new ExecuteResult();
         }
 
         private static void CheckRead(int actualRead, uint expectedRead)

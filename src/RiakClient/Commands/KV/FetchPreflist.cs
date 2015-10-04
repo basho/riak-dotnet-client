@@ -70,9 +70,9 @@ namespace RiakClient.Commands.KV
 
         /// <inheritdoc />
         public class Builder
-            : CommandBuilder<FetchPreflist.Builder, FetchPreflist, FetchPreflistOptions>
+            : CommandBuilder<Builder, FetchPreflist, FetchPreflistOptions>
         {
-            public override FetchPreflist Build()
+            public override IRCommand Build()
             {
                 Options = BuildOptions();
                 return new FetchPreflist(Options);

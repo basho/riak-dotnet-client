@@ -522,6 +522,6 @@ namespace RiakClient
         /// <returns>
         /// A <see cref="Task{RiakResult}"/>, which will indicate success. The passed in command will contain the response.
         /// </returns>
-        Task<RiakResult> Execute(IRiakCommand command);
+        Task<RiakResult> Execute(IRCommand command);
     }
 }

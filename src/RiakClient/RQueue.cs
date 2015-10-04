@@ -5,6 +5,8 @@
 
     internal class RQueue<T> : System.Collections.Generic.Queue<T>
     {
+        private static readonly TimeSpan IterateWriteLockTimeout = TimeSpan.FromMilliseconds(125);
+
         private readonly ReaderWriterLockSlim sync;
 
         public RQueue(ReaderWriterLockSlim sync)
@@ -18,32 +20,43 @@
             this.sync = sync;
         }
 
-        public void Iterate(Func<T, RQIterRslt> onItem)
+        public bool Iterate(Func<T, RQIterRslt> onItem, TimeSpan timeout = default(TimeSpan))
         {
-            sync.EnterWriteLock();
-            try
+            bool iterated = false;
+
+            if (timeout == default(TimeSpan))
             {
-                for (int items = this.Count; items > 0; items--)
+                timeout = IterateWriteLockTimeout;
+            }
+
+            if (iterated = sync.TryEnterWriteLock(timeout))
+            {
+                try
                 {
-                    T item = this.Dequeue();
-
-                    RQIterRslt rslt = onItem(item);
-
-                    if (rslt.ReQueue)
+                    for (int items = this.Count; items > 0; items--)
                     {
-                        this.Enqueue(item);
-                    }
+                        T item = this.Dequeue();
 
-                    if (rslt.Break)
-                    {
-                        break;
+                        RQIterRslt rslt = onItem(item);
+
+                        if (rslt.ReQueue)
+                        {
+                            this.Enqueue(item);
+                        }
+
+                        if (rslt.Break)
+                        {
+                            break;
+                        }
                     }
                 }
+                finally
+                {
+                    sync.ExitWriteLock();
+                }
             }
-            finally
-            {
-                sync.ExitWriteLock();
-            }
+
+            return iterated;
         }
     }
 }

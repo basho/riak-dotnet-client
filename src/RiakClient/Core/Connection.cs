@@ -4,54 +4,51 @@ namespace Riak.Core
     using System.Net.Sockets;
     using System.Threading;
     using System.Threading.Tasks;
+    using Common.Logging;
     using RiakClient.Commands;
 
     internal class Connection : IDisposable
     {
+        private static readonly ILog Log = LogManager.GetLogger<Connection>();
+
         private readonly ReaderWriterLockSlim sync = new ReaderWriterLockSlim();
-        private readonly StateManager sm;
         private readonly ConnectionOptions opts;
+        private readonly StateManager sm;
+        private readonly TcpClient client;
 
         private bool disposed = false;
-        private ConnectionState finalState;
 
-        private TcpClient client;
         private bool inFlight = false;
         private DateTime lastUsed = DateTime.Now;
 
         public Connection(ConnectionOptions opts)
         {
-            if (opts == null)
+            this.opts = opts;
+            if (this.opts == null)
             {
                 throw new ArgumentNullException("opts");
             }
 
-            this.sm = StateManager.FromEnum<ConnectionState>(sync);
-            this.opts = opts;
+            this.sm = StateManager.FromEnum<State>(this, sync);
 
             client = new TcpClient(AddressFamily.InterNetwork);
             client.NoDelay = true;
             client.ReceiveTimeout = (int)opts.RequestTimeout.TotalMilliseconds;
             client.SendTimeout = client.ReceiveTimeout;
 
-            sm.State = (byte)ConnectionState.Created;
+            // TODO 3.0
+            // http://www.extensionmethod.net/csharp/net/setsocketkeepalivevalues
+            // http://www.codeproject.com/Articles/117557/Set-Keep-Alive-Values
+            sm.SetState((byte)State.Created);
         }
 
-        public enum ConnectionState : byte
+        public enum State : byte
         {
             // NB: order matters!
             Created,
             TlsStarting,
             Active,
             Inactive
-        }
-
-        public ConnectionState State
-        {
-            get
-            {
-                return disposed ? finalState : (ConnectionState)sm.State;
-            }
         }
 
         public DateTime LastUsed
@@ -68,7 +65,7 @@ namespace Riak.Core
                 {
                     return client != null &&
                         inFlight == false &&
-                        sm.IsStateLessThan((byte)ConnectionState.Inactive);
+                        sm.IsStateLessThan((byte)State.Inactive, alreadyLocked: true);
                 }
                 finally
                 {
@@ -82,18 +79,32 @@ namespace Riak.Core
             return this.opts.Address.ToString();
         }
 
-        public async Task Connect()
+        public State GetState()
         {
+            return (State)sm.GetState();
+        }
+
+        public async Task ConnectAsync()
+        {
+            // TODO 3.0 retry on fail?
             await client.ConnectAsync(opts.Address.Address, opts.Address.Port);
-            sm.State = (byte)ConnectionState.Active;
+            OnConnected();
+        }
+
+        public void Connect()
+        {
+            // TODO 3.0 retry on fail?
+            client.Connect(opts.Address.Address, opts.Address.Port);
+            OnConnected();
         }
 
         public void Close()
         {
-            Dispose();
+            client.Close();
+            sm.SetState((byte)State.Inactive);
         }
 
-        public async Task<Result> Execute(IRiakCommand command)
+        public async Task<ExecuteResult> ExecuteAsync(IRCommand command)
         {
             NetworkStream stream = client.GetStream();
             if (stream.CanWrite)
@@ -126,22 +137,14 @@ namespace Riak.Core
         {
             if (!disposed)
             {
-                if (client != null)
-                {
-                    client.Close();
-                    client = null;
-                }
-
-                finalState = ConnectionState.Inactive;
-                sm.State = (byte)finalState;
+                Close();
                 sm.Dispose();
-
                 sync.Dispose();
                 disposed = true;
             }
         }
 
-        private void StartExecute(IRiakCommand command)
+        private void StartExecute(IRCommand command)
         {
             sync.EnterWriteLock();
             try
@@ -172,6 +175,12 @@ namespace Riak.Core
             {
                 sync.ExitWriteLock();
             }
+        }
+
+        private void OnConnected()
+        {
+            Log.DebugFormat(Properties.Resources.Riak_Core_ConnectionConnectedTo_fmt, opts.Address);
+            sm.SetState((byte)State.Active);
         }
     }
 }

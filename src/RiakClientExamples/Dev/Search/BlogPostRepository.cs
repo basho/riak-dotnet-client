@@ -3,6 +3,7 @@ namespace RiakClientExamples.Dev.Search
     using System;
     using System.Globalization;
     using RiakClient;
+    using RiakClient.Commands;
     using RiakClient.Commands.CRDT;
 
     public class BlogPostRepository : Repository<BlogPost>
@@ -46,7 +47,7 @@ namespace RiakClientExamples.Dev.Search
             mapOp.SetFlag(publishedFlag, model.Published);
 
             // NB: no key so Riak will generate it
-            var cmd = new UpdateMap.Builder()
+            IRCommand cmd = new UpdateMap.Builder()
                 .WithBucketType(BucketType)
                 .WithBucket(this.bucket)
                 .WithMapOperation(mapOp)
@@ -54,7 +55,9 @@ namespace RiakClientExamples.Dev.Search
 
             RiakResult rslt = client.Execute(cmd);
             CheckResult(rslt);
-            MapResponse response = cmd.Response;
+
+            var ucmd = (UpdateMap)cmd;
+            MapResponse response = ucmd.Response;
             return response.Key;
         }
 

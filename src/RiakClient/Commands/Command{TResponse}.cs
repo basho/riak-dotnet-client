@@ -3,15 +3,17 @@ namespace RiakClient.Commands
     using System;
     using Messages;
     using Riak;
+    using Riak.Core;
 
     /// <summary>
     /// Base class for Riak commands that don't have options.
     /// </summary>
     /// <typeparam name="TResponse">The type of the response data from Riak.</typeparam>
-    public abstract class Command<TResponse> : IRiakCommand
+    public abstract class Command<TResponse> : IRCommand
         where TResponse : Response
     {
         private RError error;
+        private Node lastNode;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Command{TResponse}"/> class.
@@ -26,6 +28,11 @@ namespace RiakClient.Commands
         public RError Error
         {
             get { return error; }
+        }
+
+        public string Name
+        {
+            get { return GetType().Name; }
         }
 
         /// <summary>
@@ -51,6 +58,11 @@ namespace RiakClient.Commands
             }
 
             this.error = error;
+        }
+
+        public void SetLastNode(Node lastNode)
+        {
+            this.lastNode = lastNode;
         }
     }
 }

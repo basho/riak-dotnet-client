@@ -3,6 +3,7 @@ namespace Test.Unit.CRDT
     using System.Linq;
     using NUnit.Framework;
     using RiakClient;
+    using RiakClient.Commands;
     using RiakClient.Commands.KV;
     using RiakClient.Messages;
 
@@ -43,15 +44,16 @@ namespace Test.Unit.CRDT
             var fetchResp = new RpbGetBucketKeyPreflistResp();
             fetchResp.preflist.Add(preflistItem);
 
-            var fetch = new FetchPreflist.Builder()
+            IRCommand cmd = new FetchPreflist.Builder()
                 .WithBucketType(BucketType)
                 .WithBucket(Bucket)
                 .WithKey(Key)
                 .Build();
 
-            fetch.OnSuccess(fetchResp);
+            cmd.OnSuccess(fetchResp);
 
-            Assert.AreEqual(1, fetch.Response.Value.Count());
+            var fcmd = (FetchPreflist)cmd;
+            Assert.AreEqual(1, fcmd.Response.Value.Count());
         }
     }
 }

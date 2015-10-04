@@ -34,8 +34,8 @@ namespace Test.Unit
                 ms.Seek(0, SeekOrigin.Begin);
 
                 var reader = new MessageReader(cmd, ms);
-                Result rslt = await reader.ReadAsync();
-                Assert.False(rslt.Success);
+                ExecuteResult rslt = await reader.ReadAsync();
+                Assert.True(rslt.Executed);
                 Assert.AreEqual(ErrMsg, rslt.Error.Message);
                 Assert.AreSame(rslt.Error, cmd.Error);
             }
@@ -56,7 +56,7 @@ namespace Test.Unit
 
                 Assert.Throws<ConnectionException>(async () =>
                 {
-                    Result rslt = await reader.ReadAsync();
+                    ExecuteResult rslt = await reader.ReadAsync();
                     Assert.Null(rslt);
                 });
             }
@@ -81,8 +81,8 @@ namespace Test.Unit
                 ms.Seek(0, SeekOrigin.Begin);
 
                 var reader = new MessageReader(cmd, ms);
-                Result rslt = await reader.ReadAsync();
-                Assert.True(rslt.Success);
+                ExecuteResult rslt = await reader.ReadAsync();
+                Assert.True(rslt.Executed);
                 Assert.Null(rslt.Error);
 
                 var info = cmd.Response.Value;
@@ -138,8 +138,8 @@ namespace Test.Unit
                 ms.Seek(0, SeekOrigin.Begin);
 
                 var reader = new MessageReader(cmd, ms);
-                Result rslt = await reader.ReadAsync();
-                Assert.True(rslt.Success);
+                ExecuteResult rslt = await reader.ReadAsync();
+                Assert.True(rslt.Executed);
                 Assert.Null(rslt.Error);
                 Assert.Null(cmd.Response.Key);
                 CollectionAssert.IsEmpty(cmd.Response.Value);

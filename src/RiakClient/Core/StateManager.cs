@@ -9,68 +9,51 @@ namespace Riak.Core
     {
         private static readonly Type ByteType = typeof(byte);
 
+        private readonly string ownerName;
         private readonly ReaderWriterLockSlim sync;
         private readonly IDictionary<byte, string> states;
 
         private bool disposed = false;
         private byte state;
+        private byte finalState;
 
-        private StateManager(IDictionary<byte, string> states, byte state, ReaderWriterLockSlim sync = null)
+        private StateManager(object owner, IDictionary<byte, string> states, byte state, ReaderWriterLockSlim sync = null)
         {
-            this.sync = sync;
-
-            if (this.sync == null)
+            if (owner == null)
             {
-                this.sync = new ReaderWriterLockSlim();
+                throw new ArgumentNullException("owner");
             }
 
-            if (states == null)
+            ownerName = string.Format("{0}|{1}", owner.GetType().Name, owner.ToString());
+
+            this.states = states;
+            if (this.states == null)
             {
                 throw new ArgumentNullException("states");
             }
 
-            if (states.Count == 0)
+            if (this.states.Count == 0)
             {
                 throw new ArgumentException("states", Properties.Resources.Riak_Core_StateManagerRequiresAtLeastOneState);
             }
 
-            this.states = states;
             this.state = state;
-        }
 
-        public byte State
-        {
-            get
+            this.sync = sync;
+            if (this.sync == null)
             {
-                sync.EnterReadLock();
-                try
-                {
-                    return state;
-                }
-                finally
-                {
-                    sync.ExitReadLock();
-                }
-            }
-
-            set
-            {
-                sync.EnterWriteLock();
-                try
-                {
-                    state = value;
-                }
-                finally
-                {
-                    sync.ExitWriteLock();
-                }
+                this.sync = new ReaderWriterLockSlim();
             }
         }
 
-        public static StateManager FromEnum<T>(ReaderWriterLockSlim sync = null) where T : struct, IConvertible
+        public static StateManager FromEnum<T>(object owner, ReaderWriterLockSlim sync = null) where T : struct, IConvertible
         {
+            if (owner == null)
+            {
+                throw new ArgumentNullException("owner");
+            }
+
             Type enumType = typeof(T);
-
             if (!enumType.IsEnum)
             {
                 throw new ArgumentException(Properties.Resources.Riak_Core_StateManagerMustUseEnum);
@@ -90,11 +73,54 @@ namespace Riak.Core
                 dict[values[i]] = names[i];
             }
 
-            return new StateManager(dict, values.First(), sync);
+            return new StateManager(owner, dict, values.First(), sync);
+        }
+
+        public byte GetState()
+        {
+            if (disposed)
+            {
+                return finalState;
+            }
+            else
+            {
+                sync.EnterReadLock();
+                try
+                {
+                    return state;
+                }
+                finally
+                {
+                    sync.ExitReadLock();
+                }
+            }
+        }
+
+        public void SetState(byte state)
+        {
+            if (disposed)
+            {
+                throw new ObjectDisposedException(ownerName, Properties.Resources.Riak_Core_StateManagerDisposedException);
+            }
+
+            sync.EnterWriteLock();
+            try
+            {
+                this.state = state;
+            }
+            finally
+            {
+                sync.ExitWriteLock();
+            }
         }
 
         public bool IsCurrentState(params byte[] states)
         {
+            if (disposed)
+            {
+                throw new ObjectDisposedException(ownerName, Properties.Resources.Riak_Core_StateManagerDisposedException);
+            }
+
             sync.EnterReadLock();
             try
             {
@@ -106,30 +132,48 @@ namespace Riak.Core
             }
         }
 
-        public bool IsStateLessThan(byte state)
+        public bool IsStateLessThan(byte state, bool alreadyLocked = false)
         {
-            sync.EnterReadLock();
+            if (disposed)
+            {
+                throw new ObjectDisposedException(ownerName, Properties.Resources.Riak_Core_StateManagerDisposedException);
+            }
+
+            if (!alreadyLocked)
+            {
+                sync.EnterReadLock();
+            }
+
             try
             {
                 return this.state < state;
             }
             finally
             {
-                sync.ExitReadLock();
+                if (!alreadyLocked)
+                {
+                    sync.ExitReadLock();
+                }
             }
         }
 
-        public void StateCheck(byte state)
+        public void StateCheck(params byte[] states)
         {
+            if (disposed)
+            {
+                throw new ObjectDisposedException(ownerName, Properties.Resources.Riak_Core_StateManagerDisposedException);
+            }
+
             sync.EnterReadLock();
             try
             {
-                if (this.state != state)
+                if (!states.Contains(state))
                 {
+                    string expected = string.Join(", ", states.Select(s => this.states[s]));
                     var message = string.Format(
                         Properties.Resources.Riak_Core_StateManagerStateCheckExpectedStateButGot_fmt,
-                        states[state],
-                        states[this.state]);
+                        expected,
+                        this.states[this.state]);
                     throw new InvalidOperationException(message);
                 }
             }
@@ -144,13 +188,14 @@ namespace Riak.Core
             if (!disposed)
             {
                 sync.Dispose();
+                finalState = state;
                 disposed = true;
             }
         }
 
         public override string ToString()
         {
-            return states[State];
+            return states[GetState()];
         }
     }
 }

@@ -8,10 +8,10 @@ namespace Riak.Core
 
     internal class MessageDecoder
     {
-        private readonly IRiakCommand command;
+        private readonly IRCommand command;
         private readonly byte[] data;
 
-        public MessageDecoder(IRiakCommand command, byte[] data)
+        public MessageDecoder(IRCommand command, byte[] data)
         {
             if (command == null)
             {

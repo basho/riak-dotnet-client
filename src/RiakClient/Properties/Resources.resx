@@ -132,6 +132,9 @@
   <data name="Riak_Core_ConnectionCantWriteException_fmt" xml:space="preserve">
     <value>Failed to send data to server - Can't write: {0}</value>
   </data>
+  <data name="Riak_Core_ConnectionConnectedTo_fmt" xml:space="preserve">
+    <value>connected to: {0}</value>
+  </data>
   <data name="Riak_Core_ConnectionDidNotReadFullMessageException_fmt" xml:space="preserve">
     <value>Expected to read PB message of size {0} bytes but only read {1} bytes.</value>
   </data>
@@ -141,20 +144,26 @@
   <data name="Riak_Core_ConnectionManagerAllConnectionsInUseException_fmt" xml:space="preserve">
     <value>{0}|all connections in use / max connections reached.</value>
   </data>
+  <data name="Riak_Core_ConnectionManagerExpirationCancelled_fmt" xml:space="preserve">
+    <value>{0}|expiration routine cancelled.</value>
+  </data>
   <data name="Riak_Core_ConnectionManagerExpirationRoutineStarting_fmt" xml:space="preserve">
     <value>{0}|connection expiration routine is starting.</value>
   </data>
   <data name="Riak_Core_ConnectionManagerExpirationRoutineStopping_fmt" xml:space="preserve">
     <value>{0}|connection expiration routine is stopping.</value>
   </data>
+  <data name="Riak_Core_ConnectionManagerExpirationSleeping_fmt" xml:space="preserve">
+    <value>{0}|expiration routine sleeping for {1}</value>
+  </data>
   <data name="Riak_Core_ConnectionManagerExpiredConnections_fmt" xml:space="preserve">
     <value>{0}|expired {1} connections.</value>
   </data>
   <data name="Riak_Core_ConnectionManagerExpiringAt_fmt" xml:space="preserve">
-    <value>{0}|connection manager expiring connections at {1}</value>
+    <value>{0}|expiring connections at {1}</value>
   </data>
-  <data name="Riak_Core_ConnectionManagerMaxMustBeGreaterThanMinException" xml:space="preserve">
-    <value>maxConnections must be greater than or equal to minConnections.</value>
+  <data name="Riak_Core_ConnectionManagerIteratingConnectionQueueForExpirationTimeout_fmt" xml:space="preserve">
+    <value>{0}|expiration thread timeout while waiting for queue lock to iterate on {1} items.</value>
   </data>
   <data name="Riak_Core_ConnectionManagerRequiresAddressException" xml:space="preserve">
     <value>ConnectionManagerOptions requires a non-null address.</value>
@@ -165,17 +174,26 @@
   <data name="Riak_Core_ConnectionManagerReturnedShutdown_fmt" xml:space="preserve">
     <value>{0}|connection returned at shutdown.</value>
   </data>
-  <data name="Riak_Core_ConnectionManagerStopAlreadyCalled_fmt" xml:space="preserve">
-    <value>{0}|stop already called. Current state: {1}</value>
-  </data>
   <data name="Riak_Core_ConnectionManagerStopConnectionCountNotEqualQueueCount_fmt" xml:space="preserve">
     <value>{0}|connection count '{1}' does NOT equal queue count '{2}'.</value>
   </data>
-  <data name="Riak_Core_ConnectionPortMustBeInRange" xml:space="preserve">
-    <value>Connection port must be between 1 and 65535, inclusive.</value>
+  <data name="Riak_Core_ConnectionManagerStopExpirationStopTimeout_fmt" xml:space="preserve">
+    <value>{0}|timeout while waiting for expiration thread to complete.</value>
+  </data>
+  <data name="Riak_Core_ConnectionManagerStopIteratingConnectionQueueTimeout_fmt" xml:space="preserve">
+    <value>{0}|timeout waiting for queue lock to iterate on {1} items.</value>
+  </data>
+  <data name="Riak_Core_ConnectionManagerWaitingExpirationTask_fmt" xml:space="preserve">
+    <value>{0}|waiting for expiration task to complete.</value>
   </data>
   <data name="Riak_Core_ConnectionZeroLengthResponseException" xml:space="preserve">
     <value>Attempt to decode zero byte data response from Riak.</value>
+  </data>
+  <data name="Riak_Core_ExecutingCommand_fmt" xml:space="preserve">
+    <value>{0}|executing command {1}</value>
+  </data>
+  <data name="Riak_Core_MaxConnectionsMustBeGreaterThanMinConnectionsException" xml:space="preserve">
+    <value>maxConnections must be greater than or equal to minConnections.</value>
   </data>
   <data name="Riak_Core_MessageDataCantBeNull" xml:space="preserve">
     <value>Message data must not be null when decoding.</value>
@@ -186,11 +204,56 @@
   <data name="Riak_Core_MessageUnexpectedResponseCodeException_fmt" xml:space="preserve">
     <value>Unexpected message code from Riak - expected {0}, actual {1}</value>
   </data>
+  <data name="Riak_Core_NodeAlreadyHealthChecking_fmt" xml:space="preserve">
+    <value>{0}|already health checking or shutting down.</value>
+  </data>
+  <data name="Riak_Core_NodeHealthCheckCancelled_fmt" xml:space="preserve">
+    <value>{0}|health check routine cancelled.</value>
+  </data>
+  <data name="Riak_Core_NodeHealthCheckQuitting_fmt" xml:space="preserve">
+    <value>{0}|health check routine quitting ({1}).</value>
+  </data>
+  <data name="Riak_Core_NodeHealthCheckSleeping_fmt" xml:space="preserve">
+    <value>{0}|health check routine sleeping for {1}</value>
+  </data>
+  <data name="Riak_Core_NodeMaxConnectionsMustBeLessThanException_fmt" xml:space="preserve">
+    <value>maxConnections must be less than {0}</value>
+  </data>
+  <data name="Riak_Core_NodeMinConnectionsMustBeOneOrGreaterException" xml:space="preserve">
+    <value>minConnections must be greater than or equal to 1.</value>
+  </data>
+  <data name="Riak_Core_NodeRequiresAddressException" xml:space="preserve">
+    <value>Node requires address.</value>
+  </data>
+  <data name="Riak_Core_NodeRequiresOptionsException" xml:space="preserve">
+    <value>Node requires options.</value>
+  </data>
+  <data name="Riak_Core_NodeRunningHealthCheckAt_fmt" xml:space="preserve">
+    <value>{0}|running health check at {1}</value>
+  </data>
+  <data name="Riak_Core_NodeStartingHealthCheck_fmt" xml:space="preserve">
+    <value>{0}|starting health check routine.</value>
+  </data>
+  <data name="Riak_Core_NodeStopHealthCheckStopTimeout_fmt" xml:space="preserve">
+    <value>{0}|timeout while waiting for health check thread to complete.</value>
+  </data>
+  <data name="Riak_Core_NodeWaitingHealthCheckTask_fmt" xml:space="preserve">
+    <value>{0}|waiting for health check task to complete.</value>
+  </data>
+  <data name="Riak_Core_PortMustBeInRange" xml:space="preserve">
+    <value>Port must be between 1 and 65535, inclusive.</value>
+  </data>
   <data name="Riak_Core_Running_fmt" xml:space="preserve">
     <value>{0}|running.</value>
   </data>
   <data name="Riak_Core_ShuttingDown_fmt" xml:space="preserve">
     <value>{0}|shutting down.</value>
+  </data>
+  <data name="Riak_Core_Starting_fmt" xml:space="preserve">
+    <value>{0}|starting.</value>
+  </data>
+  <data name="Riak_Core_StateManagerDisposedException" xml:space="preserve">
+    <value>StateManager is disposed.</value>
   </data>
   <data name="Riak_Core_StateManagerMustUseByteEnum" xml:space="preserve">
     <value>StateManager requires an enum using a byte as the underyling type.</value>
@@ -203,5 +266,8 @@
   </data>
   <data name="Riak_Core_StateManagerStateCheckExpectedStateButGot_fmt" xml:space="preserve">
     <value>Illegal state! Expected state {0} but got {1}</value>
+  </data>
+  <data name="Riak_Core_StopAlreadyCalled_fmt" xml:space="preserve">
+    <value>{0}|stop already called. Current state: {1}</value>
   </data>
 </root>

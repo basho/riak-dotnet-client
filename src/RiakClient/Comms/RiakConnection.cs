@@ -256,7 +256,7 @@ namespace RiakClient.Comms
             return RiakResult<IEnumerable<RiakResult<TResult>>>.Success(streamer);
         }
 
-        public RiakResult Execute(IRiakCommand command)
+        public RiakResult Execute(IRCommand command)
         {
             RiakResult executeResult = DoExecute(() => socket.Write(command));
 

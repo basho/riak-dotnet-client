@@ -36,6 +36,6 @@ namespace RiakClient
         /// <returns>
         /// A <see cref="RiakResult"/>, which will indicate success. The passed in command will contain the response.
         /// </returns>
-        RiakResult Execute(IRiakCommand command);
+        RiakResult Execute(IRCommand command);
     }
 }

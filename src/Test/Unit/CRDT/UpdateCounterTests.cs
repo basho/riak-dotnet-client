@@ -4,6 +4,7 @@ namespace Test.Unit.CRDT
     using System.Text;
     using NUnit.Framework;
     using RiakClient;
+    using RiakClient.Commands;
     using RiakClient.Commands.CRDT;
     using RiakClient.Messages;
 
@@ -35,9 +36,9 @@ namespace Test.Unit.CRDT
                 .WithIncludeContext(false)
                 .WithTimeout(TimeSpan.FromSeconds(20));
 
-            UpdateCounter updateCounterCommand = updateCounterCommandBuilder.Build();
+            IRCommand cmd = updateCounterCommandBuilder.Build();
 
-            DtUpdateReq protobuf = (DtUpdateReq)updateCounterCommand.ConstructPbRequest();
+            DtUpdateReq protobuf = (DtUpdateReq)cmd.ConstructPbRequest();
 
             Assert.AreEqual(Encoding.UTF8.GetBytes(BucketType), protobuf.type);
             Assert.AreEqual(Encoding.UTF8.GetBytes(Bucket), protobuf.bucket);
@@ -65,14 +66,15 @@ namespace Test.Unit.CRDT
             updateResp.context = context;
             updateResp.counter_value = DefaultIncrement;
 
-            var update = new UpdateCounter.Builder(DefaultIncrement)
+            IRCommand cmd = new UpdateCounter.Builder(DefaultIncrement)
                 .WithBucketType(BucketType)
                 .WithBucket(Bucket)
                 .Build();
 
-            update.OnSuccess(updateResp);
+            cmd.OnSuccess(updateResp);
 
-            CounterResponse response = update.Response;
+            var ucmd = (UpdateCounter)cmd;
+            CounterResponse response = ucmd.Response;
 
             Assert.NotNull(response);
             Assert.AreEqual(key, response.Key);

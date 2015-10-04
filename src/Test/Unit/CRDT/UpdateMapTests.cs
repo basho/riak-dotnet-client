@@ -5,6 +5,7 @@ namespace Test.Unit.CRDT
     using System.Text;
     using NUnit.Framework;
     using RiakClient;
+    using RiakClient.Commands;
     using RiakClient.Commands.CRDT;
     using RiakClient.Messages;
     using RiakClient.Util;
@@ -61,9 +62,9 @@ namespace Test.Unit.CRDT
                 .WithIncludeContext(false)
                 .WithTimeout(TimeSpan.FromSeconds(20));
 
-            UpdateMap updateMapCommand = updateMapCommandBuilder.Build();
+            IRCommand cmd = updateMapCommandBuilder.Build();
 
-            DtUpdateReq protobuf = (DtUpdateReq)updateMapCommand.ConstructPbRequest();
+            DtUpdateReq protobuf = (DtUpdateReq)cmd.ConstructPbRequest();
 
             Assert.AreEqual(Encoding.UTF8.GetBytes(BucketType), protobuf.type);
             Assert.AreEqual(Encoding.UTF8.GetBytes(Bucket), protobuf.bucket);
@@ -156,15 +157,16 @@ namespace Test.Unit.CRDT
 
             var mapOp = new UpdateMap.MapOperation();
 
-            var update = new UpdateMap.Builder(mapOp)
+            IRCommand cmd = new UpdateMap.Builder(mapOp)
                 .WithBucketType("maps")
                 .WithBucket("myBucket")
                 .WithKey("map_1")
                 .Build();
 
-            update.OnSuccess(updateResp);
+            cmd.OnSuccess(updateResp);
 
-            MapResponse response = update.Response;
+            var ucmd = (UpdateMap)cmd;
+            MapResponse response = ucmd.Response;
 
             Assert.NotNull(response);
             Assert.AreEqual(key, response.Key);

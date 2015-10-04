@@ -5,6 +5,7 @@
     using System.Linq;
     using NUnit.Framework;
     using RiakClient;
+    using RiakClient.Commands;
     using RiakClient.Commands.CRDT;
     using RiakClient.Util;
 
@@ -16,7 +17,7 @@
         [Test]
         public void CountersIdAndFetch()
         {
-            FetchCounter cmd = new FetchCounter.Builder()
+            IRCommand cmd = new FetchCounter.Builder()
                 .WithBucketType("counters")
                 .WithBucket("counters")
                 .WithKey("<insert_key_here>")
@@ -25,11 +26,12 @@
             RiakResult rslt = client.Execute(cmd);
             CheckResult(rslt);
 
-            CounterResponse response = cmd.Response;
+            var fcmd = (FetchCounter)cmd;
+            CounterResponse response = fcmd.Response;
             Assert.AreEqual(0, response.Value);
 
             // NB: for cleanup on test teardown
-            options = cmd.Options;
+            options = fcmd.Options;
         }
 
         // Note: decrement example as well
@@ -37,41 +39,44 @@
         public void TrafficTicketsCounterFetchAndUpdate()
         {
             var fetchCounterOptions = new FetchCounterOptions("counters", "counters", "traffic_tickts");
-            FetchCounter cmd = new FetchCounter(fetchCounterOptions);
+            IRCommand cmd = new FetchCounter(fetchCounterOptions);
+            var fcmd = (FetchCounter)cmd;
 
             // NB: for cleanup on test teardown
-            options = cmd.Options;
+            options = fcmd.Options;
 
             RiakResult rslt = client.Execute(cmd);
             CheckResult(rslt);
 
-            CounterResponse response = cmd.Response;
+            CounterResponse response = fcmd.Response;
             Assert.AreEqual(0, response.Value);
 
-            UpdateCounter updateCmd = new UpdateCounter.Builder()
+            cmd = new UpdateCounter.Builder()
                 .WithBucketType("counters")
                 .WithBucket("counters")
                 .WithKey("traffic_tickets")
                 .WithIncrement(1)
                 .Build();
 
-            rslt = client.Execute(updateCmd);
+            rslt = client.Execute(cmd);
             CheckResult(rslt);
 
-            response = updateCmd.Response;
+            var ucmd = (UpdateCounter)cmd;
+            response = ucmd.Response;
             Assert.AreEqual(1, response.Value);
 
-            updateCmd = new UpdateCounter.Builder()
+            cmd = new UpdateCounter.Builder()
                 .WithBucketType("counters")
                 .WithBucket("counters")
                 .WithKey("traffic_tickets")
                 .WithIncrement(-1)
                 .Build();
 
-            rslt = client.Execute(updateCmd);
+            rslt = client.Execute(cmd);
             CheckResult(rslt);
 
-            response = updateCmd.Response;
+            ucmd = (UpdateCounter)cmd;
+            response = ucmd.Response;
             Assert.AreEqual(0, response.Value);
         }
 
@@ -80,7 +85,7 @@
         public void WhoopsIGotFiveTrafficTickets()
         {
             var fetchCounterOptions = new FetchCounterOptions("counters", "counters", "traffic_tickts");
-            FetchCounter cmd = new FetchCounter(fetchCounterOptions);
+            IRCommand cmd = new FetchCounter(fetchCounterOptions);
 
             // NB: for cleanup
             options = fetchCounterOptions;
@@ -88,7 +93,8 @@
             RiakResult rslt = client.Execute(cmd);
             CheckResult(rslt);
 
-            CounterResponse response = cmd.Response;
+            var fcmd = (FetchCounter)cmd;
+            CounterResponse response = fcmd.Response;
             Assert.AreEqual(0, response.Value);
 
             var builder = new UpdateCounter.Builder();
@@ -98,22 +104,24 @@
                 .WithKey("traffic_tickets")
                 .WithIncrement(5);
 
-            UpdateCounter updateCmd = builder.Build();
+            cmd = builder.Build();
 
-            rslt = client.Execute(updateCmd);
+            rslt = client.Execute(cmd);
             CheckResult(rslt);
 
-            response = updateCmd.Response;
+            var ucmd = (UpdateCounter)cmd;
+            response = ucmd.Response;
             Assert.AreEqual(5, response.Value);
 
             // Modify the builder's increment, then construct a new command
             builder.WithIncrement(-5);
-            updateCmd = builder.Build();
+            cmd = builder.Build();
 
-            rslt = client.Execute(updateCmd);
+            rslt = client.Execute(cmd);
             CheckResult(rslt);
 
-            response = updateCmd.Response;
+            ucmd = (UpdateCounter)cmd;
+            response = ucmd.Response;
             Assert.AreEqual(0, response.Value);
         }
 
@@ -126,15 +134,16 @@
                 .WithKey("cities");
 
             // NB: builder.Options will only be set after Build() is called.
-            FetchSet fetchSetCommand = builder.Build();
+            IRCommand cmd = builder.Build();
 
             FetchSetOptions options = new FetchSetOptions("sets", "travel", "cities");
             Assert.AreEqual(options, builder.Options);
 
-            RiakResult rslt = client.Execute(fetchSetCommand);
+            RiakResult rslt = client.Execute(cmd);
             CheckResult(rslt);
 
-            SetResponse response = fetchSetCommand.Response;
+            var fcmd = (FetchSet)cmd;
+            SetResponse response = fcmd.Response;
             Assert.IsTrue(EnumerableUtil.IsNullOrEmpty(response.Value));
         }
 
@@ -149,10 +158,12 @@
                 .WithKey("cities")
                 .WithAdditions(adds);
 
-            UpdateSet cmd = builder.Build();
+            IRCommand cmd = builder.Build();
             RiakResult rslt = client.Execute(cmd);
             CheckResult(rslt);
-            SetResponse response = cmd.Response;
+
+            var scmd = (UpdateSet)cmd;
+            SetResponse response = scmd.Response;
 
             Assert.Contains("Toronto", response.AsStrings.ToArray());
             Assert.Contains("Montreal", response.AsStrings.ToArray());
@@ -171,7 +182,8 @@
 
             rslt = client.Execute(cmd);
             CheckResult(rslt);
-            response = cmd.Response;
+            scmd = (UpdateSet)cmd;
+            response = scmd.Response;
 
             var responseStrings = response.AsStrings.ToArray();
 
@@ -370,11 +382,12 @@
 
         private MapResponse SaveMap(UpdateMap.Builder builder)
         {
-            UpdateMap cmd = builder.Build();
+            IRCommand cmd = builder.Build();
             RiakResult rslt = client.Execute(cmd);
             CheckResult(rslt);
 
-            MapResponse response = cmd.Response;
+            var ucmd = (UpdateMap)cmd;
+            MapResponse response = ucmd.Response;
             PrintObject(response.Value);
             return response;
         }

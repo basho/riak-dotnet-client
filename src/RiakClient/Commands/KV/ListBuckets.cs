@@ -100,7 +100,7 @@ namespace RiakClient.Commands.KV
         public class Builder
             : CommandBuilder<ListBuckets.Builder, ListBuckets, ListBucketsOptions>
         {
-            public override ListBuckets Build()
+            public override IRCommand Build()
             {
                 Options = BuildOptions();
                 return new ListBuckets(Options);

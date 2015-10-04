@@ -30,15 +30,15 @@ namespace Test.Unit.Core
         [Test]
         public void Creating_StateManager_With_Enum_Works()
         {
-            var sm = StateManager.FromEnum<States>();
+            var sm = StateManager.FromEnum<States>(this);
 
-            Assert.AreEqual(States.STATE_ZERO, (States)sm.State);
+            Assert.AreEqual(States.STATE_ZERO, (States)sm.GetState());
             Assert.AreEqual("STATE_ZERO", sm.ToString());
             Assert.True(sm.IsCurrentState((byte)States.STATE_ZERO));
 
-            sm.State = (byte)States.STATE_TWO;
+            sm.SetState((byte)States.STATE_TWO);
 
-            Assert.AreEqual(States.STATE_TWO, (States)sm.State);
+            Assert.AreEqual(States.STATE_TWO, (States)sm.GetState());
             Assert.AreEqual("STATE_TWO", sm.ToString());
             Assert.True(sm.IsCurrentState((byte)States.STATE_TWO));
         }

@@ -4,6 +4,7 @@ namespace Test.Unit.CRDT
     using System.Linq;
     using NUnit.Framework;
     using RiakClient;
+    using RiakClient.Commands;
     using RiakClient.Commands.CRDT;
     using RiakClient.Messages;
 
@@ -53,15 +54,16 @@ namespace Test.Unit.CRDT
             fetchResp.value = value;
             fetchResp.type = DtFetchResp.DataType.SET;
 
-            var fetch = new FetchSet.Builder()
+            IRCommand cmd = new FetchSet.Builder()
                 .WithBucketType(BucketType)
                 .WithBucket(Bucket)
                 .WithKey(Key)
                 .Build();
 
-            fetch.OnSuccess(fetchResp);
+            cmd.OnSuccess(fetchResp);
 
-            var itemList = fetch.Response.Value.Select(v => new RiakString(v)).ToList();
+            var fcmd = (FetchSet)cmd;
+            var itemList = fcmd.Response.Value.Select(v => new RiakString(v)).ToList();
             Assert.AreEqual(set_item_1, itemList[0]);
             Assert.AreEqual(set_item_2, itemList[1]);
         }
