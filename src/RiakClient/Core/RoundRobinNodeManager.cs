@@ -1,12 +1,13 @@
 ﻿namespace Riak.Core
 {
+    using System;
     using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
     using Common.Logging;
     using RiakClient.Commands;
 
-    public class RoundRobinNodeManager : NodeManager, INodeManager
+    public class RoundRobinNodeManager : NodeManager, INodeManager, IDisposable
     {
         private static readonly ILog Log = LogManager.GetLogger<RoundRobinNodeManager>();
 
@@ -22,28 +23,53 @@
         {
             Validate(nodes, cmd);
 
-            ushort startingIndex = nodeIndex;
+            bool first = true;
+            ushort startingIndex = 0;
+
+            sync.EnterReadLock();
+            try
+            {
+                startingIndex = nodeIndex;
+            }
+            finally
+            {
+                sync.ExitReadLock();
+            }
 
             var rslt = new ExecuteResult(executed: false);
-            do
+            for (;;)
             {
                 INode node = null;
+                sync.EnterUpgradeableReadLock();
                 try
                 {
-                    sync.EnterWriteLock();
-
                     // Check index before accessing {nodes} because elements can be removed from {nodes}.
                     if (nodeIndex >= nodes.Count)
                     {
                         nodeIndex = 0;
                     }
 
+                    if (!first && nodeIndex == startingIndex)
+                    {
+                        break;
+                    }
+
+                    first = false;
                     node = nodes[nodeIndex];
-                    nodeIndex++;
+
+                    sync.EnterWriteLock();
+                    try
+                    {
+                        nodeIndex++;
+                    }
+                    finally
+                    {
+                        sync.ExitWriteLock();
+                    }
                 }
                 finally
                 {
-                    sync.ExitWriteLock();
+                    sync.ExitUpgradeableReadLock();
                 }
 
                 // don't try the same node twice in a row if we have multiple nodes
@@ -58,9 +84,13 @@
                     break;
                 }
             }
-            while (nodeIndex != startingIndex);
 
             return rslt;
+        }
+
+        public void Dispose()
+        {
+            sync.Dispose();
         }
     }
 }

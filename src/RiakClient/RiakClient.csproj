@@ -78,6 +78,7 @@
     <Compile Include="Core\INode.cs" />
     <Compile Include="Core\INodeManager.cs" />
     <Compile Include="Core\NodeManager.cs" />
+    <Compile Include="Core\LeastExecutingNodeManager.cs" />
     <Compile Include="Core\RoundRobinNodeManager.cs" />
     <Compile Include="Core\SecurityManager.cs">
       <ExcludeFromStyleCop>False</ExcludeFromStyleCop>

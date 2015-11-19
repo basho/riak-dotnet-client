@@ -6,5 +6,10 @@
     public interface INode
     {
         Task<ExecuteResult> ExecuteAsync(IRCommand cmd);
+
+        ushort ExecuteCount
+        {
+            get;
+        }
     }
 }
