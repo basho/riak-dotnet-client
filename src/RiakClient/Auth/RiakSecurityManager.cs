@@ -239,6 +239,7 @@ namespace RiakClient.Auth
             // http://stackoverflow.com/questions/18462064/associate-a-private-key-with-the-x509certificate2-class-in-net
             if (!string.IsNullOrWhiteSpace(authConfig.ClientCertificateFile) && File.Exists(authConfig.ClientCertificateFile))
             {
+                // TODO 3.0 FUTURE exception if config is set but file doesn't actually exist
                 var cert = new X509Certificate2(authConfig.ClientCertificateFile);
                 clientCertificates.Add(cert);
             }
@@ -267,6 +268,7 @@ namespace RiakClient.Auth
                 }
             }
 
+            // TODO 3.0 FUTURE exception if expected to get certs but count is 0 here
             return clientCertificates;
         }
     }
