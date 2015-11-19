@@ -1,16 +1,16 @@
-namespace RiakClient.Auth
+namespace Riak.Core
 {
     using System;
     using System.IO;
     using System.Linq;
     using System.Net.Security;
     using System.Security.Cryptography.X509Certificates;
-    using Config;
-    using Extensions;
-    using Messages;
-    using Util;
+    using RiakClient.Config;
+    using RiakClient.Extensions;
+    using RiakClient.Messages;
+    using RiakClient.Util;
 
-    internal class RiakSecurityManager
+    internal class SecurityManager
     {
         private static readonly StoreLocation[] StoreLocations =
             new StoreLocation[] { StoreLocation.CurrentUser, StoreLocation.LocalMachine };
@@ -25,7 +25,7 @@ namespace RiakClient.Auth
         // Interesting discussion:
         // http://stackoverflow.com/questions/3780801/whats-the-difference-between-a-public-constructor-in-an-internal-class-and-an-i
         // http://stackoverflow.com/questions/9302236/why-use-a-public-method-in-an-internal-class
-        internal RiakSecurityManager(string targetHost, IRiakAuthenticationConfiguration authConfig)
+        internal SecurityManager(string targetHost, IRiakAuthenticationConfiguration authConfig)
         {
             if (string.IsNullOrWhiteSpace(targetHost))
             {
@@ -237,11 +237,17 @@ namespace RiakClient.Auth
             var clientCertificates = new X509CertificateCollection();
 
             // http://stackoverflow.com/questions/18462064/associate-a-private-key-with-the-x509certificate2-class-in-net
-            if (!string.IsNullOrWhiteSpace(authConfig.ClientCertificateFile) && File.Exists(authConfig.ClientCertificateFile))
+            if (!string.IsNullOrWhiteSpace(authConfig.ClientCertificateFile))
             {
-                // TODO 3.0 FUTURE exception if config is set but file doesn't actually exist
-                var cert = new X509Certificate2(authConfig.ClientCertificateFile);
-                clientCertificates.Add(cert);
+                if (File.Exists(authConfig.ClientCertificateFile))
+                {
+                    var cert = new X509Certificate2(authConfig.ClientCertificateFile);
+                    clientCertificates.Add(cert);
+                }
+                else
+                {
+                    throw new FileNotFoundException(Riak.Properties.Resources.Riak_Core_Auth_SecurityManager_ClientCertificateFileNotFound, authConfig.ClientCertificateFile);
+                }
             }
 
             if (!string.IsNullOrWhiteSpace(authConfig.ClientCertificateSubject))

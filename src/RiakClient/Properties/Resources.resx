@@ -120,6 +120,9 @@
   <data name="Riak_Commands_StreamingCommandRequiresCallbackException" xml:space="preserve">
     <value>Streaming command requires a callback.</value>
   </data>
+  <data name="Riak_Core_Auth_SecurityManager_ClientCertificateFileNotFound" xml:space="preserve">
+    <value>Client certificate file not found.</value>
+  </data>
   <data name="Riak_Core_CommandHasNoResponseTypeButDataPresentException_fmt" xml:space="preserve">
     <value>Command '{0}' should not have response data but {1} bytes of data present.</value>
   </data>

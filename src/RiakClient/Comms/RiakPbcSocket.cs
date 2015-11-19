@@ -6,7 +6,6 @@ namespace RiakClient.Comms
     using System.Net.Security;
     using System.Net.Sockets;
     using System.Security.Authentication;
-    using Auth;
     using Commands;
     using Config;
     using Exceptions;
@@ -24,7 +23,7 @@ namespace RiakClient.Comms
         private readonly TimeSpan connectTimeout;
         private readonly TimeSpan readTimeout;
         private readonly TimeSpan writeTimeout;
-        private readonly RiakSecurityManager securityManager;
+        private readonly Riak.Core.SecurityManager securityManager;
         private readonly bool checkCertificateRevocation = false;
 
         private Stream networkStream = null;
@@ -36,7 +35,7 @@ namespace RiakClient.Comms
             readTimeout = nodeConfig.NetworkReadTimeout;
             writeTimeout = nodeConfig.NetworkWriteTimeout;
             connectTimeout = nodeConfig.NetworkConnectTimeout;
-            securityManager = new RiakSecurityManager(server, authConfig);
+            securityManager = new Riak.Core.SecurityManager(server, authConfig);
             checkCertificateRevocation = authConfig.CheckCertificateRevocation;
         }
 

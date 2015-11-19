@@ -2,7 +2,6 @@ namespace RiakClientTests.Auth
 {
     using System.Security.Cryptography.X509Certificates;
     using NUnit.Framework;
-    using RiakClient.Auth;
     using RiakClient.Config;
 
     [TestFixture, UnitTest]
@@ -31,7 +30,7 @@ namespace RiakClientTests.Auth
         public void WhenSecurityNotConfiguredInAppConfig_SecurityManagerIndicatesIt()
         {
             var authConfig = noAuthClusterConfig.Authentication;
-            var securityManager = new RiakSecurityManager("riak-test", authConfig);
+            var securityManager = new Riak.Core.SecurityManager("riak-test", authConfig);
             Assert.IsFalse(securityManager.IsSecurityEnabled);
         }
 
@@ -39,7 +38,7 @@ namespace RiakClientTests.Auth
         public void WhenSecurityConfiguredInAppConfig_SecurityManagerIndicatesIt()
         {
             var authConfig = clusterConfig.Authentication;
-            var securityManager = new RiakSecurityManager("riak-test", authConfig);
+            var securityManager = new Riak.Core.SecurityManager("riak-test", authConfig);
             Assert.IsTrue(securityManager.IsSecurityEnabled);
         }
 
@@ -47,7 +46,7 @@ namespace RiakClientTests.Auth
         public void WhenClientCertificateFileIsConfigured_ItIsPartOfCertificatesCollection()
         {
             var authConfig = clusterConfig.Authentication;
-            var securityManager = new RiakSecurityManager("riak-test", authConfig);
+            var securityManager = new Riak.Core.SecurityManager("riak-test", authConfig);
             Assert.True(securityManager.ClientCertificatesConfigured);
 
             var certFromFile = new X509Certificate2(authConfig.ClientCertificateFile);
@@ -62,7 +61,7 @@ namespace RiakClientTests.Auth
              * to the current user's "My" store
              */
             var authConfig = certSubjectOnlyClusterConfig.Authentication;
-            var securityManager = new RiakSecurityManager("riak-test", authConfig);
+            var securityManager = new Riak.Core.SecurityManager("riak-test", authConfig);
             Assert.True(securityManager.ClientCertificatesConfigured);
             Assert.False(string.IsNullOrWhiteSpace(authConfig.ClientCertificateSubject));
 

@@ -70,6 +70,15 @@ namespace Riak.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Client certificate file not found..
+        /// </summary>
+        internal static string Riak_Core_Auth_SecurityManager_ClientCertificateFileNotFound {
+            get {
+                return ResourceManager.GetString("Riak_Core_Auth_SecurityManager_ClientCertificateFileNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Command &apos;{0}&apos; should not have response data but {1} bytes of data present..
         /// </summary>
         internal static string Riak_Core_CommandHasNoResponseTypeButDataPresentException_fmt {
