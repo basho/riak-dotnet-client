@@ -36,7 +36,7 @@ namespace Riak.Core
             client.ReceiveTimeout = (int)opts.RequestTimeout.TotalMilliseconds;
             client.SendTimeout = client.ReceiveTimeout;
 
-            // TODO 3.0
+            // TODO 3.0 CLIENTS-606, CLIENTS-621
             // http://www.extensionmethod.net/csharp/net/setsocketkeepalivevalues
             // http://www.codeproject.com/Articles/117557/Set-Keep-Alive-Values
             sm.SetState((byte)State.Created);

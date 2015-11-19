@@ -120,9 +120,6 @@
   <data name="Riak_Commands_StreamingCommandRequiresCallbackException" xml:space="preserve">
     <value>Streaming command requires a callback.</value>
   </data>
-  <data name="Riak_Core_Auth_SecurityManager_ClientCertificateFileNotFound" xml:space="preserve">
-    <value>Client certificate file not found.</value>
-  </data>
   <data name="Riak_Core_CommandHasNoResponseTypeButDataPresentException_fmt" xml:space="preserve">
     <value>Command '{0}' should not have response data but {1} bytes of data present.</value>
   </data>
@@ -219,6 +216,15 @@
   <data name="Riak_Core_NodeHealthCheckSleeping_fmt" xml:space="preserve">
     <value>{0}|health check routine sleeping for {1}</value>
   </data>
+  <data name="Riak_Core_NodeManagerCommandRequiredException" xml:space="preserve">
+    <value>Node manager requires a non-null command argument.</value>
+  </data>
+  <data name="Riak_Core_NodeManagerZeroLengthNodes_fmt" xml:space="preserve">
+    <value>Zero nodes for executon of command {0}</value>
+  </data>
+  <data name="Riak_Core_NodeManager_ExecutedCommand_fmt" xml:space="preserve">
+    <value>executed {0} on node {1}</value>
+  </data>
   <data name="Riak_Core_NodeMaxConnectionsMustBeLessThanException_fmt" xml:space="preserve">
     <value>maxConnections must be less than {0}</value>
   </data>
@@ -248,6 +254,9 @@
   </data>
   <data name="Riak_Core_Running_fmt" xml:space="preserve">
     <value>{0}|running.</value>
+  </data>
+  <data name="Riak_Core_SecurityManager_ClientCertificateFileNotFound" xml:space="preserve">
+    <value>Client certificate file not found.</value>
   </data>
   <data name="Riak_Core_ShuttingDown_fmt" xml:space="preserve">
     <value>{0}|shutting down.</value>

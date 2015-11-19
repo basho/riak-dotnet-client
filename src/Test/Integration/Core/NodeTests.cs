@@ -30,7 +30,7 @@ namespace Test.Integration.Core
 
             using (var l = new TestListener(onConn))
             {
-                var w = l.Start();
+                var w = l.StartAsync();
 
                 var o = new NodeOptions(
                     l.EndPoint,
@@ -51,7 +51,7 @@ namespace Test.Integration.Core
             }
         }
 
-        [Test, Ignore("TODO 3.0 CLIENTS-621")]
+        [Test, Ignore("TODO 3.0 CLIENTS-606, CLIENTS-621")]
         public async Task Node_Recovers_From_Connection_Error_Via_Ping_Check()
         {
             ushort connects = 0;
@@ -90,7 +90,7 @@ namespace Test.Integration.Core
 
             using (var l = new TestListener(onConnAsync: oca))
             {
-                var w = l.Start();
+                var w = l.StartAsync();
 
                 var o = new NodeOptions(address: l.EndPoint, minConnections: 1, healthCheckInterval: fiftyMillis);
                 using (var n = new TestNode(o, observer))

@@ -70,15 +70,6 @@ namespace Riak.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Client certificate file not found..
-        /// </summary>
-        internal static string Riak_Core_Auth_SecurityManager_ClientCertificateFileNotFound {
-            get {
-                return ResourceManager.GetString("Riak_Core_Auth_SecurityManager_ClientCertificateFileNotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Command &apos;{0}&apos; should not have response data but {1} bytes of data present..
         /// </summary>
         internal static string Riak_Core_CommandHasNoResponseTypeButDataPresentException_fmt {
@@ -367,6 +358,33 @@ namespace Riak.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to executed {0} on node {1}.
+        /// </summary>
+        internal static string Riak_Core_NodeManager_ExecutedCommand_fmt {
+            get {
+                return ResourceManager.GetString("Riak_Core_NodeManager_ExecutedCommand_fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Node manager requires a non-null command argument..
+        /// </summary>
+        internal static string Riak_Core_NodeManagerCommandRequiredException {
+            get {
+                return ResourceManager.GetString("Riak_Core_NodeManagerCommandRequiredException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Zero nodes for executon of command {0}.
+        /// </summary>
+        internal static string Riak_Core_NodeManagerZeroLengthNodes_fmt {
+            get {
+                return ResourceManager.GetString("Riak_Core_NodeManagerZeroLengthNodes_fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to maxConnections must be less than {0}.
         /// </summary>
         internal static string Riak_Core_NodeMaxConnectionsMustBeLessThanException_fmt {
@@ -453,6 +471,15 @@ namespace Riak.Properties {
         internal static string Riak_Core_Running_fmt {
             get {
                 return ResourceManager.GetString("Riak_Core_Running_fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Client certificate file not found..
+        /// </summary>
+        internal static string Riak_Core_SecurityManager_ClientCertificateFileNotFound {
+            get {
+                return ResourceManager.GetString("Riak_Core_SecurityManager_ClientCertificateFileNotFound", resourceCulture);
             }
         }
         

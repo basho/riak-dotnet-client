@@ -24,7 +24,7 @@ namespace Test.Integration.Core
             };
 
             var l = new TestListener(onConn);
-            var w = l.Start();
+            var w = l.StartAsync();
 
             var o = new ConnectionOptions(l.EndPoint);
             Connection c = null;
@@ -57,7 +57,7 @@ namespace Test.Integration.Core
             };
 
             var l = new TestListener(onConn);
-            var w = l.Start();
+            var w = l.StartAsync();
 
             var o = new ConnectionOptions(l.EndPoint);
             var c = new Connection(o);

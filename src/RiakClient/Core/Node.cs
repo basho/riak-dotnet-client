@@ -6,7 +6,7 @@
     using Common.Logging;
     using RiakClient.Commands;
 
-    public class Node : IDisposable
+    public class Node : IDisposable, INode
     {
         private static readonly ILog Log = LogManager.GetLogger<Node>();
 
@@ -74,7 +74,8 @@
 
                 try
                 {
-                    ExecuteResult executeResult = await conn.ExecuteAsync(cmd);
+                    // TODO 3.0 CLIENTS-606 Write test to ensure rv has the correct ExecuteResult
+                    rv = await conn.ExecuteAsync(cmd);
 
                     // NB: any errors here do not require closing the connection
                     cm.Put(conn);

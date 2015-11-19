@@ -26,7 +26,7 @@ namespace Test.Integration.Core
 
             using (var l = new TestListener(onConn))
             {
-                var w = l.Start();
+                var w = l.StartAsync();
 
                 var opts = new ConnectionManagerOptions(l.EndPoint, minConnections, maxConnections);
                 using (var cm = new ConnectionManager(opts))
@@ -57,7 +57,7 @@ namespace Test.Integration.Core
                     idleExpirationInterval,
                     idleTimeout);
 
-                var w = l.Start();
+                var w = l.StartAsync();
 
                 using (var cm = new ConnectionManager(opts))
                 {

@@ -68,7 +68,7 @@ namespace Test.Integration
             return true;
         }
 
-        public async Task Start()
+        public async Task StartAsync()
         {
             listener.Start();
 

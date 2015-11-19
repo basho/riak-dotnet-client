@@ -52,6 +52,7 @@
     <Compile Include="Integration\Core\NodeTests.cs" />
     <Compile Include="Integration\Core\TestNode.cs" />
     <Compile Include="Unit\Core\ConnectionManagerTests.cs" />
+    <Compile Include="Unit\Core\NodeManagerTests.cs" />
     <Compile Include="Unit\Core\NodeTests.cs" />
     <Compile Include="Unit\Core\StateManagerTests.cs" />
     <Compile Include="Unit\Core\MessageReaderTests.cs" />

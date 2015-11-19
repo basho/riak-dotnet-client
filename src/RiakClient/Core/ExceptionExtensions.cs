@@ -16,6 +16,7 @@
                 {
                     switch ((SocketError)sockex.ErrorCode)
                     {
+                        // TODO 3.0 CLIENTS-606, CLIENTS-621 ADD TO THIS LIST
                         case SocketError.TimedOut:
                             return true;
                         default:

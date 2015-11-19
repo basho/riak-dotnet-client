@@ -246,7 +246,7 @@ namespace Riak.Core
                 }
                 else
                 {
-                    throw new FileNotFoundException(Riak.Properties.Resources.Riak_Core_Auth_SecurityManager_ClientCertificateFileNotFound, authConfig.ClientCertificateFile);
+                    throw new FileNotFoundException(Riak.Properties.Resources.Riak_Core_SecurityManager_ClientCertificateFileNotFound, authConfig.ClientCertificateFile);
                 }
             }
 
