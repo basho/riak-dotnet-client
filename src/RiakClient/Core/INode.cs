@@ -5,11 +5,11 @@
 
     public interface INode
     {
-        Task<ExecuteResult> ExecuteAsync(IRCommand cmd);
-
-        ushort ExecuteCount
+        int ExecuteCount
         {
             get;
         }
+
+        Task<ExecuteResult> ExecuteAsync(IRCommand cmd);
     }
 }

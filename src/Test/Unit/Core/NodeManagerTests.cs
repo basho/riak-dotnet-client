@@ -1,5 +1,6 @@
 namespace Test.Unit.Core
 {
+    using System.Collections.Generic;
     using System.Threading.Tasks;
     using NUnit.Framework;
     using Riak;
@@ -41,7 +42,7 @@ namespace Test.Unit.Core
         [Test]
         public async void LeastExecutingNodeManager_Tries_Lowest_Count_Nodes_First_When_Executing()
         {
-            INodeManager m = new LeastExecutingNodeManager();
+            INodeManager m = new LeastExecutingNodeManager(false);
 
             var nodes = new[]
             {
@@ -56,7 +57,7 @@ namespace Test.Unit.Core
 
             var rslt = await m.ExecuteAsyncOnNode(nodes, cmd);
 
-            ushort lastExecuteCount = nodes[0].ExecuteCount;
+            var lastExecuteCount = nodes[0].ExecuteCount;
             foreach (var n in nodes)
             {
                 Assert.True(n.ExecuteTried);
@@ -66,9 +67,47 @@ namespace Test.Unit.Core
             Assert.False(rslt.Executed);
         }
 
+        [Test]
+        public async void LeastExecutingNodeManager_Shuffles_Nodes()
+        {
+            INodeManager m = new LeastExecutingNodeManager(true);
+
+            var nodes = new[]
+            {
+                new TestNode(1),
+                new TestNode(4),
+                new TestNode(1),
+                new TestNode(6),
+                new TestNode(1),
+            };
+
+            var cmd = new Ping();
+
+            var rslt = await m.ExecuteAsyncOnNode(nodes, cmd);
+
+            int i = 0;
+            var ne = TestNode.Executed;
+            Assert.AreEqual(nodes.Length, ne.Count);
+
+            for (; i < 3; i++)
+            {
+                Assert.True(ne[i].ExecuteTried);
+                Assert.AreEqual(1, ne[i].ExecuteCount, string.Format("i: {0}", i));
+            }
+
+            for (; i < ne.Count; i++)
+            {
+                Assert.True(ne[i].ExecuteTried);
+                Assert.GreaterOrEqual(ne[i].ExecuteCount, 1);
+            }
+
+            Assert.False(rslt.Executed);
+        }
+
         private class TestNode : INode
         {
             private static ushort idx = 0;
+            private static List<TestNode> executed = new List<TestNode>();
 
             private readonly ushort executeCount = 0;
 
@@ -77,11 +116,20 @@ namespace Test.Unit.Core
 
             public TestNode()
             {
+                Reset();
             }
 
-            public TestNode(ushort executeCount)
+            public TestNode(ushort executeCount) : this()
             {
                 this.executeCount = executeCount;
+            }
+
+            public static IList<TestNode> Executed
+            {
+                get
+                {
+                    return executed;
+                }
             }
 
             public bool ExecuteTried
@@ -100,11 +148,20 @@ namespace Test.Unit.Core
                 }
             }
 
-            public ushort ExecuteCount
+            public int ExecuteCount
             {
                 get
                 {
                     return executeCount;
+                }
+            }
+
+            public static void Reset()
+            {
+                idx = 0;
+                if (executed.Count > 0)
+                {
+                    executed = new List<TestNode>();
                 }
             }
 
@@ -113,6 +170,7 @@ namespace Test.Unit.Core
                 executeTried = true;
                 executeIdx = idx;
                 idx++;
+                executed.Add(this);
                 return Task.FromResult(new ExecuteResult(executed: false));
             }
         }

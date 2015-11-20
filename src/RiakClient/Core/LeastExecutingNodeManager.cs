@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Common.Logging;
@@ -40,7 +41,8 @@
 
                 if (j > 1)
                 {
-                    var s = shuffleArray(n, 0, j);
+                    var s = ShuffleArray(n.Take(j).ToList());
+                    n = s.Concat(n.Skip(j)).ToList();
                 }
             }
 
@@ -63,15 +65,24 @@
             sync.Dispose();
         }
 
-        private static IList<T> shuffleArray<T>(IList<T> a, int start, int end)
+        /*
+         * Randomize array element order in-place.
+         * Using Durstenfeld shuffle algorithm.
+         * http://stackoverflow.com/a/12646864
+         */
+        private static IList<T> ShuffleArray<T>(IList<T> array)
         {
             var r = new Random((int)DateTime.Now.ToBinary());
 
-            for (var i = a.Count - 1; i > 0; i--)
+            for (var i = array.Count - 1; i > 0; i--)
             {
-                // TODO between 0 and 1 ?? compare with Node.js random()
-                var j = Math.Floor(r.NextDouble() * (i + 1));
+                int j = (int)Math.Floor(r.NextDouble() * (i + 1));
+                var temp = array[i];
+                array[i] = array[j];
+                array[j] = temp;
             }
+
+            return array;
         }
     }
 }

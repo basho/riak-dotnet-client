@@ -57,6 +57,14 @@
             Error
         }
 
+        public int ExecuteCount
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         public async Task<ExecuteResult> ExecuteAsync(IRCommand cmd)
         {
             ExecuteResult rv = null;
