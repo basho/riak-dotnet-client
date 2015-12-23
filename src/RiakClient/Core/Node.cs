@@ -23,6 +23,8 @@
         private Task healthCheckTask;
         private bool disposed = false;
 
+        private int executeCount = 0;
+
         public Node(NodeOptions opts)
         {
             this.opts = opts;
@@ -61,7 +63,8 @@
         {
             get
             {
-                throw new NotImplementedException();
+                // TODO 3.0 CLIENTS-621 best way to read?
+                return Interlocked.Add(ref executeCount, 0);
             }
         }
 
@@ -82,33 +85,43 @@
 
                 try
                 {
-                    // TODO 3.0 CLIENTS-606 Write test to ensure rv has the correct ExecuteResult
-                    rv = await conn.ExecuteAsync(cmd);
+                    Interlocked.Increment(ref executeCount);
 
-                    // NB: any errors here do not require closing the connection
-                    cm.Put(conn);
-
-                    if (!rv.Executed)
+                    try
                     {
-                        healthCheckTask = Task.Run((Action)DoHealthCheck);
+                        // TODO 3.0 CLIENTS-606 Write test to ensure rv has the correct ExecuteResult
+                        rv = await conn.ExecuteAsync(cmd);
+
+                        // NB: any errors here do not require closing the connection
+                        cm.Put(conn);
+
+                        if (!rv.Executed)
+                        {
+                            DoHealthCheck();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        // Determine if the connection should be kept open or nuked, then do health check.
+                        // timeout errors should be temporary
+                        rv = new ExecuteResult(ex);
+
+                        // TODO Should ex be temporary or part of ExecuteResult?
+                        if (ex.Temporary())
+                        {
+                            cm.Put(conn);
+                        }
+                        else
+                        {
+                            conn.Dispose();
+                        }
+
+                        DoHealthCheck();
                     }
                 }
-                catch (Exception ex)
+                finally
                 {
-                    // Determine if the connection should be kept open or nuked, then do health check.
-                    // timeout errors should be temporary
-                    rv = new ExecuteResult(ex);
-
-                    if (ex.Temporary())
-                    {
-                        cm.Put(conn);
-                    }
-                    else
-                    {
-                        conn.Dispose();
-                    }
-
-                    healthCheckTask = Task.Run((Action)DoHealthCheck);
+                    Interlocked.Decrement(ref executeCount);
                 }
             }
             else
@@ -160,29 +173,31 @@
                 sm.StateCheck((byte)State.Running, (byte)State.HealthChecking);
 
                 SetState(State.ShuttingDown);
-
                 Log.DebugFormat(Properties.Resources.Riak_Core_ShuttingDown_fmt, this);
+
+                if (healthCheckTask != null)
+                {
+                    Log.DebugFormat(
+                        Properties.Resources.Riak_Core_NodeWaitingHealthCheckTask_fmt,
+                        this);
+
+                    cts.Cancel();
+
+                    // TODO 3.0: exceptions in health check task
+                    if (!Task.WaitAll(new[] { healthCheckTask }, Constants.FiveSeconds))
+                    {
+                        Log.ErrorFormat(
+                            Properties.Resources.Riak_Core_NodeStopHealthCheckStopTimeout_fmt,
+                            this);
+                    }
+                }
+
+                SetState(State.Shutdown);
+                Log.DebugFormat(Properties.Resources.Riak_Core_Shutdown_fmt, this);
             }
             finally
             {
                 sync.ExitUpgradeableReadLock();
-            }
-
-            if (healthCheckTask != null)
-            {
-                Log.DebugFormat(
-                    Properties.Resources.Riak_Core_NodeWaitingHealthCheckTask_fmt,
-                    this);
-
-                cts.Cancel();
-
-                // TODO 3.0: exceptions in health check task
-                if (!Task.WaitAll(new[] { healthCheckTask }, Constants.FiveSeconds))
-                {
-                    Log.ErrorFormat(
-                        Properties.Resources.Riak_Core_NodeStopHealthCheckStopTimeout_fmt,
-                        this);
-                }
             }
         }
 
@@ -218,7 +233,7 @@
                 if (sm.IsStateLessThan((byte)State.HealthChecking))
                 {
                     SetState(State.HealthChecking);
-                    healthCheckTask = Task.Run((Action)HealthCheck);
+                    healthCheckTask = Task.Run(async () => await HealthCheck());
                 }
                 else
                 {
@@ -231,7 +246,7 @@
             }
         }
 
-        private void HealthCheck()
+        private async Task HealthCheck()
         {
             Log.DebugFormat(Properties.Resources.Riak_Core_NodeStartingHealthCheck_fmt, this);
 
@@ -245,7 +260,27 @@
 
                 Log.DebugFormat(Properties.Resources.Riak_Core_NodeRunningHealthCheckAt_fmt, this, DateTime.Now);
 
-                Connection conn = cm.CreateConnection();
+                try
+                {
+                    IRCommand healthCheckCommand = opts.HealthCheckBuilder.Build();
+                    Connection conn = cm.CreateConnection();
+                    ExecuteResult rslt = await conn.ExecuteAsync(healthCheckCommand);
+                    if (rslt.Success)
+                    {
+                        Log.DebugFormat(Properties.Resources.Riak_Core_Node_HealthcheckSuccess_fmt, this);
+                        SetState(State.Running);
+                    }
+                    else
+                    {
+                        Log.DebugFormat(Properties.Resources.Riak_Core_Node_HealthcheckFailed_fmt, this, rslt);
+                    }
+
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    Log.ErrorFormat(Properties.Resources.Riak_Core_NodeHealthCheckException_fmt, this, ex);
+                }
 
                 Log.DebugFormat(Properties.Resources.Riak_Core_NodeHealthCheckSleeping_fmt, this, opts.HealthCheckInterval);
                 bool cancelled = ct.WaitHandle.WaitOne(opts.HealthCheckInterval);

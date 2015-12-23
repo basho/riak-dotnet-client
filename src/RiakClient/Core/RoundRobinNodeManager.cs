@@ -7,7 +7,7 @@
     using Common.Logging;
     using RiakClient.Commands;
 
-    public class RoundRobinNodeManager : NodeManager, INodeManager, IDisposable
+    public sealed class RoundRobinNodeManager : NodeManager, INodeManager, IDisposable
     {
         private static readonly ILog Log = LogManager.GetLogger<RoundRobinNodeManager>();
 
@@ -49,7 +49,7 @@
                         nodeIndex = 0;
                     }
 
-                    if (!first && nodeIndex == startingIndex)
+                    if (!first && (nodeIndex == startingIndex || nodes.Count == 1))
                     {
                         break;
                     }

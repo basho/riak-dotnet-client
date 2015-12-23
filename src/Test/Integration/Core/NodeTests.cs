@@ -3,6 +3,7 @@ namespace Test.Integration.Core
     using System;
     using System.Collections.Generic;
     using System.Net.Sockets;
+    using System.Threading;
     using System.Threading.Tasks;
     using NUnit.Framework;
     using Riak;
@@ -28,10 +29,9 @@ namespace Test.Integration.Core
                 return connCount == count;
             };
 
+            Node n = null;
             using (var l = new TestListener(onConn))
             {
-                var w = l.StartAsync();
-
                 var o = new NodeOptions(
                     l.EndPoint,
                     count,
@@ -41,22 +41,24 @@ namespace Test.Integration.Core
                     timeout,
                     healthCheckInterval,
                     healthCheckBuilder);
-                using (var n = new Node(o))
+                using (n = new Node(o))
                 {
                     await n.StartAsync();
-                }
 
-                Assert.AreEqual(count, connCount);
-                l.Wait(w);
+                    l.WaitOnConn();
+                    Assert.AreEqual(count, connCount);
+                }
             }
+
+            Assert.AreEqual(Node.State.Shutdown, n.GetState());
         }
 
-        [Test, Ignore("TODO 3.0 CLIENTS-606, CLIENTS-621")]
+        [Test]
         public async Task Node_Recovers_From_Connection_Error_Via_Ping_Check()
         {
             ushort connects = 0;
-            TimeSpan timeout = Constants.ThirtySeconds;
-            TimeSpan fiftyMillis = TimeSpan.FromMilliseconds(50);
+            TimeSpan fiftyMillis = TimeSpan.FromMilliseconds(125);
+
             var expectedStates = new[]
             {
                 Node.State.Running,
@@ -82,44 +84,36 @@ namespace Test.Integration.Core
                 return true;
             };
 
+            var evt = new ManualResetEvent(false);
             var observedStates = new List<Node.State>();
             Action<Node.State> observer = (s) =>
             {
                 observedStates.Add(s);
+                if (observedStates.Count == 3 || observedStates.Count == expectedStates.Length)
+                {
+                    evt.Set();
+                }
             };
 
             using (var l = new TestListener(onConnAsync: oca))
             {
-                var w = l.StartAsync();
-
                 var o = new NodeOptions(address: l.EndPoint, minConnections: 1, healthCheckInterval: fiftyMillis);
                 using (var n = new TestNode(o, observer))
                 {
                     await n.StartAsync();
 
                     IRCommand cmd = new Ping();
-
                     ExecuteResult r = await n.ExecuteAsync(cmd);
-                    Assert.True(r.Executed, "expected Ping to be executed");
-                    Assert.Null(r.Error, "expected Ping Error to be null");
+                    Assert.False(r.Executed);
 
-                    // NB: wait until we see expected four states
-                    // then continue to shut down node
-                    while (observedStates.Count < 4)
-                    {
-                        await Task.Delay(500);
-                    }
+                    Assert.True(evt.WaitOne());
+                    Assert.True(evt.Reset());
                 }
-
-                l.Wait(w);
             }
 
             // NB: wait until we see expected three states
             // then continue to shut down node
-            while (observedStates.Count < expectedStates.Length)
-            {
-                await Task.Delay(500);
-            }
+            Assert.True(evt.WaitOne());
 
             CollectionAssert.AreEqual(expectedStates, observedStates);
         }

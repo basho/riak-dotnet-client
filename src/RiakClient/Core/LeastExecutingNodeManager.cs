@@ -8,7 +8,7 @@
     using Common.Logging;
     using RiakClient.Commands;
 
-    public class LeastExecutingNodeManager : NodeManager, INodeManager, IDisposable
+    public sealed class LeastExecutingNodeManager : NodeManager, INodeManager, IDisposable
     {
         private static readonly ILog Log = LogManager.GetLogger<LeastExecutingNodeManager>();
 

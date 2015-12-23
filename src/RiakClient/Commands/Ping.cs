@@ -30,14 +30,7 @@ namespace RiakClient.Commands
 
         public override void OnSuccess(RpbResp response)
         {
-            if (response == null)
-            {
-                Response = new Response<bool>(false);
-            }
-            else
-            {
-                Response = new Response<bool>(true);
-            }
+            Response = new Response<bool>(true);
         }
 
         public class Builder : CommandBuilder<Builder, Ping>

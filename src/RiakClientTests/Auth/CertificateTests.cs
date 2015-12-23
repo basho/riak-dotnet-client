@@ -1,7 +1,7 @@
 namespace RiakClientTests.Auth
 {
     using NUnit.Framework;
-    using RiakClient.Config;
+    using Riak.Config;
 
     [TestFixture, UnitTest]
     public class CertificateTests : AuthTestBase
@@ -9,7 +9,7 @@ namespace RiakClientTests.Auth
         [Test]
         public void Configuration_CanSpecifyX509Certificates()
         {
-            var config = RiakClusterConfiguration.LoadFromConfig("riakConfiguration");
+            var config = ClusterConfiguration.LoadFromConfig("riakConfiguration");
             Assert.IsNotNull(config);
 
             var authConfig = config.Authentication;
@@ -24,7 +24,7 @@ namespace RiakClientTests.Auth
         [Test]
         public void Configuration_CanSpecifyX509CertificateAndRootCA()
         {
-            var config = RiakClusterConfiguration.LoadFromConfig("riakCAConfiguration");
+            var config = ClusterConfiguration.LoadFromConfig("riakCAConfiguration");
             Assert.IsNotNull(config);
 
             var authConfig = config.Authentication;

@@ -26,15 +26,11 @@ namespace Test.Integration.Core
 
             using (var l = new TestListener(onConn))
             {
-                var w = l.StartAsync();
-
                 var opts = new ConnectionManagerOptions(l.EndPoint, minConnections, maxConnections);
                 using (var cm = new ConnectionManager(opts))
                 {
                     await cm.StartAsync();
                 }
-
-                l.Wait(w);
             }
 
             Assert.AreEqual(minConnections, connCount);
@@ -57,8 +53,6 @@ namespace Test.Integration.Core
                     idleExpirationInterval,
                     idleTimeout);
 
-                var w = l.StartAsync();
-
                 using (var cm = new ConnectionManager(opts))
                 {
                     await cm.StartAsync();
@@ -69,8 +63,6 @@ namespace Test.Integration.Core
                         Assert.GreaterOrEqual(cm.ConnectionCount, minConnections);
                     }
                 }
-
-                l.Wait(w);
             }
         }
     }

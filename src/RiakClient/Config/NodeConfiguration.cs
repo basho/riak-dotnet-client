@@ -1,4 +1,4 @@
-namespace RiakClient.Config
+namespace Riak.Config
 {
     using System;
     using System.Configuration;
@@ -6,7 +6,7 @@ namespace RiakClient.Config
     /// <summary>
     /// Represents a configuration element for a Riak Node.
     /// </summary>
-    public sealed class RiakNodeConfiguration : ConfigurationElement, IRiakNodeConfiguration
+    public sealed class NodeConfiguration : ConfigurationElement, INodeConfiguration
     {
         private static readonly TimeSpan DefaultTimeout = TimeSpan.FromMilliseconds(4000);
 

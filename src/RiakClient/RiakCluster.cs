@@ -8,8 +8,8 @@ namespace RiakClient
     using System.Threading.Tasks;
     using Comms;
     using Comms.LoadBalancing;
-    using Config;
     using Messages;
+    using Riak.Config;
 
     /// <summary>
     /// Represents a collection of <see cref="RiakEndPoint"/>s. 
@@ -29,10 +29,10 @@ namespace RiakClient
         /// <summary>
         /// Initializes a new instance of the <see cref="RiakCluster"/> class.
         /// </summary>
-        /// <param name="clusterConfig">The <see cref="IRiakClusterConfiguration"/> to use for this RiakCluster.</param>
+        /// <param name="clusterConfig">The <see cref="IClusterConfiguration"/> to use for this RiakCluster.</param>
         /// <param name="connectionFactory">The <see cref="IRiakConnectionFactory"/> instance to use for this RiakCluster.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="clusterConfig" /> contains no node information.</exception>
-        public RiakCluster(IRiakClusterConfiguration clusterConfig, IRiakConnectionFactory connectionFactory)
+        public RiakCluster(IClusterConfiguration clusterConfig, IRiakConnectionFactory connectionFactory)
         {
             nodePollTime = clusterConfig.NodePollTime;
             nodes = clusterConfig.RiakNodes.Select(rn =>
@@ -49,9 +49,9 @@ namespace RiakClient
         /// <summary>
         /// Initializes a new instance of the <see cref="RiakCluster"/> class using the default connection factory.
         /// </summary>
-        /// <param name="clusterConfig">The <see cref="IRiakClusterConfiguration"/> to use for this RiakCluster.</param>
+        /// <param name="clusterConfig">The <see cref="IClusterConfiguration"/> to use for this RiakCluster.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="clusterConfig" /> contains no node information.</exception>
-        public RiakCluster(IRiakClusterConfiguration clusterConfig)
+        public RiakCluster(IClusterConfiguration clusterConfig)
             : this(clusterConfig, new RiakConnectionFactory())
         {
         }
@@ -70,7 +70,7 @@ namespace RiakClient
         /// <returns>A fully configured <see cref="IRiakEndPoint"/></returns>
         public static IRiakEndPoint FromConfig(string configSectionName)
         {
-            return new RiakCluster(RiakClusterConfiguration.LoadFromConfig(configSectionName), new RiakConnectionFactory());
+            return new RiakCluster(ClusterConfiguration.LoadFromConfig(configSectionName), new RiakConnectionFactory());
         }
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace RiakClient
         /// <returns>A fully configured <see cref="IRiakEndPoint"/></returns>
         public static IRiakEndPoint FromConfig(string configSectionName, string configFileName)
         {
-            return new RiakCluster(RiakClusterConfiguration.LoadFromConfig(configSectionName, configFileName), new RiakConnectionFactory());
+            return new RiakCluster(ClusterConfiguration.LoadFromConfig(configSectionName, configFileName), new RiakConnectionFactory());
         }
 
         /// <summary>

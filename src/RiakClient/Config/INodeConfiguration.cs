@@ -1,11 +1,11 @@
-namespace RiakClient.Config
+namespace Riak.Config
 {
     using System;
 
     /// <summary>
     /// Represents a configuration for a Riak Node.
     /// </summary>
-    public interface IRiakNodeConfiguration
+    public interface INodeConfiguration
     {
         /// <summary>
         /// The name of the node.

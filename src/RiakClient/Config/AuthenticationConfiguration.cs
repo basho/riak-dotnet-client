@@ -1,12 +1,11 @@
-namespace RiakClient.Config
+namespace Riak.Config
 {
     using System.Configuration;
-    using System.Runtime.InteropServices;
 
     /// <summary>
     /// Represents a configuration file element for configuring Riak Authentication.
     /// </summary>
-    public class RiakAuthenticationConfiguration : ConfigurationElement, IRiakAuthenticationConfiguration
+    public class AuthenticationConfiguration : ConfigurationElement, IAuthenticationConfiguration
     {
         /// <inheritdoc/>
         [ConfigurationProperty("username", DefaultValue = "", IsRequired = true)]

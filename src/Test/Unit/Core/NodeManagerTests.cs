@@ -10,6 +10,8 @@ namespace Test.Unit.Core
     [TestFixture, UnitTest]
     public class NodeManagerTests
     {
+        private readonly IRCommand cmd = new Ping();
+
         [Test]
         public async void RoundRobinNodeManager_Tries_All_Nodes_When_Executing()
         {
@@ -23,8 +25,6 @@ namespace Test.Unit.Core
                 new TestNode(),
                 new TestNode(),
             };
-
-            var cmd = new Ping();
 
             var rslt = await m.ExecuteAsyncOnNode(nodes, cmd);
 
@@ -53,8 +53,6 @@ namespace Test.Unit.Core
                 new TestNode(1),
             };
 
-            var cmd = new Ping();
-
             var rslt = await m.ExecuteAsyncOnNode(nodes, cmd);
 
             var lastExecuteCount = nodes[0].ExecuteCount;
@@ -81,8 +79,6 @@ namespace Test.Unit.Core
                 new TestNode(1),
             };
 
-            var cmd = new Ping();
-
             var rslt = await m.ExecuteAsyncOnNode(nodes, cmd);
 
             int i = 0;
@@ -102,6 +98,34 @@ namespace Test.Unit.Core
             }
 
             Assert.False(rslt.Executed);
+        }
+
+        [Test]
+        public async void NodeManagers_Work_With_Single_Node()
+        {
+            var mgrs = new INodeManager[]
+            {
+                new RoundRobinNodeManager(),
+                new LeastExecutingNodeManager(true)
+            };
+
+            foreach (var m in mgrs)
+            {
+                var nodes = new[]
+                {
+                    new TestNode(4)
+                };
+
+                var rslt = await m.ExecuteAsyncOnNode(nodes, cmd);
+
+                var ne = TestNode.Executed;
+                Assert.AreEqual(nodes.Length, ne.Count);
+
+                Assert.True(ne[0].ExecuteTried);
+                Assert.AreEqual(4, ne[0].ExecuteCount);
+
+                Assert.False(rslt.Executed);
+            }
         }
 
         private class TestNode : INode

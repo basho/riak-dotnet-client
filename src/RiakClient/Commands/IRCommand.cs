@@ -10,7 +10,7 @@ namespace RiakClient.Commands
     /// </summary>
     public interface IRCommand
     {
-        // TODO 3.0 make this a generic interfact with TResult, Name only
+        // TODO 3.0 make this a generic interfact with TResult, Name, Success (?) only
         string Name
         {
             get;

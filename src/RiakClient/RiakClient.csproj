@@ -75,6 +75,7 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Core\ConnectionFactory.cs" />
     <Compile Include="Core\INode.cs" />
     <Compile Include="Core\INodeManager.cs" />
     <Compile Include="Core\NodeManager.cs" />
@@ -135,10 +136,10 @@
     <Compile Include="Comms\IRiakConnectionFactory.cs" />
     <Compile Include="Comms\RiakOnTheFlyConnection.cs" />
     <Compile Include="Comms\RiakPbcSocket.cs" />
-    <Compile Include="Config\IRiakAuthenticationConfiguration.cs" />
-    <Compile Include="Config\IRiakClusterConfiguration.cs" />
-    <Compile Include="Config\IRiakNodeConfiguration.cs" />
-    <Compile Include="Config\RiakAuthenticationConfiguration.cs" />
+    <Compile Include="Config\IAuthenticationConfiguration.cs" />
+    <Compile Include="Config\IClusterConfiguration.cs" />
+    <Compile Include="Config\INodeConfiguration.cs" />
+    <Compile Include="Config\AuthenticationConfiguration.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Containers\ConcurrentEnumerable.cs" />
     <Compile Include="Containers\ConcurrentEnumerator.cs" />
@@ -348,9 +349,9 @@
     <Compile Include="Models\MapReduce\RiakMapReduceResult.cs" />
     <Compile Include="RiakEndPoint.cs" />
     <Compile Include="RiakResult.cs" />
-    <Compile Include="Config\RiakClusterConfiguration.cs" />
-    <Compile Include="Config\RiakNodeConfiguration.cs" />
-    <Compile Include="Config\RiakNodeConfigurationCollection.cs" />
+    <Compile Include="Config\ClusterConfiguration.cs" />
+    <Compile Include="Config\NodeConfiguration.cs" />
+    <Compile Include="Config\NodeConfigurationCollection.cs" />
     <Compile Include="Extensions\SetExtensions.cs" />
     <Compile Include="Extensions\JsonExtensions.cs" />
     <Compile Include="Util\MonoUtil.cs" />

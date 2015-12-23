@@ -79,6 +79,7 @@ namespace Riak.Core
                     return new ExecuteResult(err);
                 }
 
+                // NB: can be null for messages that don't have responses
                 RpbResp decoded = decoder.DecodeMessage();
                 Command.OnSuccess(decoded);
 

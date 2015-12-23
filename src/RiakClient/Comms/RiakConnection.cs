@@ -3,15 +3,15 @@ namespace RiakClient.Comms
     using System;
     using System.Collections.Generic;
     using Commands;
-    using Config;
     using Exceptions;
     using Messages;
+    using Riak.Config;
 
     internal class RiakConnection : IRiakConnection
     {
         private readonly RiakPbcSocket socket;
 
-        public RiakConnection(IRiakNodeConfiguration nodeConfiguration, IRiakAuthenticationConfiguration authConfiguration)
+        public RiakConnection(INodeConfiguration nodeConfiguration, IAuthenticationConfiguration authConfiguration)
         {
             socket = new RiakPbcSocket(nodeConfiguration, authConfiguration);
         }

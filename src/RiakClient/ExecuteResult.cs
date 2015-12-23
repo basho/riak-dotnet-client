@@ -49,6 +49,17 @@ namespace Riak
         }
 
         /// <summary>
+        /// <b>true</b> if the operation executed on Riak and there are no errors, otherwise <b>false</b>.
+        /// </summary>
+        public bool Success
+        {
+            get
+            {
+                return executed && error == null && exception == null;
+            }
+        }
+
+        /// <summary>
         /// <b>true</b> if the operation executed on Riak, otherwise <b>false</b>.
         /// </summary>
         public bool Executed

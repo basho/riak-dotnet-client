@@ -3,7 +3,7 @@ namespace RiakClient.Comms
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
-    using Config;
+    using Riak.Config;
 
     internal class RiakConnectionPool : IRiakConnectionManager
     {
@@ -12,8 +12,8 @@ namespace RiakClient.Comms
         private bool disposing;
 
         public RiakConnectionPool(
-            IRiakNodeConfiguration nodeConfig,
-            IRiakAuthenticationConfiguration authConfig,
+            INodeConfiguration nodeConfig,
+            IAuthenticationConfiguration authConfig,
             IRiakConnectionFactory connFactory)
         {
             int poolSize = nodeConfig.PoolSize;

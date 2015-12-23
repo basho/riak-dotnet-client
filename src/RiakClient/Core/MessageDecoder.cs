@@ -61,7 +61,8 @@ namespace Riak.Core
             {
                 if (data.Length <= MessageConstants.PbMsgCodeSize)
                 {
-                    return Activator.CreateInstance(command.ResponseType) as RpbResp;
+                    // No ResponseType so just return null
+                    return null;
                 }
                 else
                 {

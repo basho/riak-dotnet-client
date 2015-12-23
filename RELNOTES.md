@@ -229,7 +229,7 @@ To make life easier for developers we've added a GetIndex method. Developers who
 We think that this will make it easier for developers to work with secondary indexes in Riak.
 
 #### Configuration
-After a bit of work and time on OJ's part (everybody thank OJ), we've pushed out fluent configuration code. The relevant code is in [`RiakClusterConfiguration`](https://github.com/basho/riak-dotnet-client/blob/master/CorrugatedIron/Config/Fluent/RiakClusterConfiguration.cs), [`RiakNodeConfiguration`](https://github.com/basho/riak-dotnet-client/blob/master/CorrugatedIron/Config/Fluent/RiakNodeConfiguration.cs), and [`RiakExternalLoadBalancerConfiguration`](https://github.com/basho/riak-dotnet-client/blob/master/CorrugatedIron/Config/Fluent/RiakExternalLoadBalancerConfiguration.cs).
+After a bit of work and time on OJ's part (everybody thank OJ), we've pushed out fluent configuration code. The relevant code is in [`ClusterConfiguration`](https://github.com/basho/riak-dotnet-client/blob/master/CorrugatedIron/Config/Fluent/ClusterConfiguration.cs), [`RiakNodeConfiguration`](https://github.com/basho/riak-dotnet-client/blob/master/CorrugatedIron/Config/Fluent/RiakNodeConfiguration.cs), and [`RiakExternalLoadBalancerConfiguration`](https://github.com/basho/riak-dotnet-client/blob/master/CorrugatedIron/Config/Fluent/RiakExternalLoadBalancerConfiguration.cs).
 
 ### Fixes
 

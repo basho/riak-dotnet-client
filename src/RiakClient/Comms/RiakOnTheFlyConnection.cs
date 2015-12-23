@@ -1,18 +1,18 @@
 namespace RiakClient.Comms
 {
     using System;
-    using Config;
+    using Riak.Config;
 
     internal class RiakOnTheFlyConnection : IRiakConnectionManager
     {
-        private readonly IRiakNodeConfiguration nodeConfig;
-        private readonly IRiakAuthenticationConfiguration authConfig;
+        private readonly INodeConfiguration nodeConfig;
+        private readonly IAuthenticationConfiguration authConfig;
         private readonly IRiakConnectionFactory connFactory;
         private bool disposing;
 
         public RiakOnTheFlyConnection(
-            IRiakNodeConfiguration nodeConfig,
-            IRiakAuthenticationConfiguration authConfig,
+            INodeConfiguration nodeConfig,
+            IAuthenticationConfiguration authConfig,
             IRiakConnectionFactory connFactory)
         {
             this.nodeConfig = nodeConfig;

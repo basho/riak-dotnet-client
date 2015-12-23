@@ -6,7 +6,7 @@ namespace RiakClientTests.Live.GeneralIntegrationTests
     using System.Threading.Tasks;
     using NUnit.Framework;
     using RiakClient;
-    using RiakClient.Config;
+    using Riak.Config;
     using RiakClient.Models;
 
     [TestFixture, Example]
@@ -50,11 +50,11 @@ namespace RiakClientTests.Live.GeneralIntegrationTests
                 objs.Add(obj);
             }
 
-            IRiakClusterConfiguration clusterConfig = new RiakClusterConfiguration();
+            IClusterConfiguration clusterConfig = new ClusterConfiguration();
 
             for (ushort port = startingPort; port <= endingPort; port += portInterval)
             {
-                IRiakNodeConfiguration nc = new RiakNodeConfiguration();
+                INodeConfiguration nc = new NodeConfiguration();
                 nc.PoolSize = poolSize;
                 nc.HostAddress = riakHost;
                 nc.PbcPort = port;

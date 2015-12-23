@@ -322,6 +322,24 @@ namespace Riak.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0}|health check failed: {1}.
+        /// </summary>
+        internal static string Riak_Core_Node_HealthcheckFailed_fmt {
+            get {
+                return ResourceManager.GetString("Riak_Core_Node_HealthcheckFailed_fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}|health check success..
+        /// </summary>
+        internal static string Riak_Core_Node_HealthcheckSuccess_fmt {
+            get {
+                return ResourceManager.GetString("Riak_Core_Node_HealthcheckSuccess_fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0}|already health checking or shutting down..
         /// </summary>
         internal static string Riak_Core_NodeAlreadyHealthChecking_fmt {
@@ -336,6 +354,15 @@ namespace Riak.Properties {
         internal static string Riak_Core_NodeHealthCheckCancelled_fmt {
             get {
                 return ResourceManager.GetString("Riak_Core_NodeHealthCheckCancelled_fmt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}|health check exception: {1}.
+        /// </summary>
+        internal static string Riak_Core_NodeHealthCheckException_fmt {
+            get {
+                return ResourceManager.GetString("Riak_Core_NodeHealthCheckException_fmt", resourceCulture);
             }
         }
         
@@ -480,6 +507,15 @@ namespace Riak.Properties {
         internal static string Riak_Core_SecurityManager_ClientCertificateFileNotFound {
             get {
                 return ResourceManager.GetString("Riak_Core_SecurityManager_ClientCertificateFileNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}|shut down..
+        /// </summary>
+        internal static string Riak_Core_Shutdown_fmt {
+            get {
+                return ResourceManager.GetString("Riak_Core_Shutdown_fmt", resourceCulture);
             }
         }
         

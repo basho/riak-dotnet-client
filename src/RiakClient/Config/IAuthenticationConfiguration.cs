@@ -1,9 +1,9 @@
-namespace RiakClient.Config
+namespace Riak.Config
 {
     /// <summary>
     /// Represents a configuration element interface for Riak authentication.
     /// </summary>
-    public interface IRiakAuthenticationConfiguration
+    public interface IAuthenticationConfiguration
     {
         /// <summary>
         /// The username to authenticate with.

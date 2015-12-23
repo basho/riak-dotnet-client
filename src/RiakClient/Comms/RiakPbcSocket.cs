@@ -7,11 +7,11 @@ namespace RiakClient.Comms
     using System.Net.Sockets;
     using System.Security.Authentication;
     using Commands;
-    using Config;
     using Exceptions;
     using Extensions;
     using Messages;
     using ProtoBuf;
+    using Riak.Config;
 
     internal class RiakPbcSocket : IDisposable
     {
@@ -28,7 +28,7 @@ namespace RiakClient.Comms
 
         private Stream networkStream = null;
 
-        public RiakPbcSocket(IRiakNodeConfiguration nodeConfig, IRiakAuthenticationConfiguration authConfig)
+        public RiakPbcSocket(INodeConfiguration nodeConfig, IAuthenticationConfiguration authConfig)
         {
             server = nodeConfig.HostAddress;
             port = nodeConfig.PbcPort;

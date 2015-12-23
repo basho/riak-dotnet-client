@@ -2,26 +2,26 @@ namespace RiakClientTests.Auth
 {
     using System.Security.Cryptography.X509Certificates;
     using NUnit.Framework;
-    using RiakClient.Config;
+    using Riak.Config;
 
     [TestFixture, UnitTest]
     public class RiakSecurityManagerTests : AuthTestBase
     {
-        private readonly IRiakClusterConfiguration clusterConfig;
-        private readonly IRiakClusterConfiguration noAuthClusterConfig;
-        private readonly IRiakClusterConfiguration certSubjectOnlyClusterConfig;
+        private readonly IClusterConfiguration clusterConfig;
+        private readonly IClusterConfiguration noAuthClusterConfig;
+        private readonly IClusterConfiguration certSubjectOnlyClusterConfig;
 
         public RiakSecurityManagerTests()
         {
-            clusterConfig = RiakClusterConfiguration.LoadFromConfig("riakConfiguration");
+            clusterConfig = ClusterConfiguration.LoadFromConfig("riakConfiguration");
             Assert.IsNotNull(clusterConfig, "riakConfiguration is not present?");
             Assert.IsNotNull(clusterConfig.Authentication, "Authentication should NOT be null");
 
-            noAuthClusterConfig = RiakClusterConfiguration.LoadFromConfig("riakNoAuthConfiguration");
+            noAuthClusterConfig = ClusterConfiguration.LoadFromConfig("riakNoAuthConfiguration");
             Assert.IsNotNull(noAuthClusterConfig, "riakNoAuthConfiguration is not present?");
             Assert.IsNotNull(noAuthClusterConfig.Authentication, "Authentication should NOT be null");
 
-            certSubjectOnlyClusterConfig = RiakClusterConfiguration.LoadFromConfig("riakCertSubjectOnlyConfiguration");
+            certSubjectOnlyClusterConfig = ClusterConfiguration.LoadFromConfig("riakCertSubjectOnlyConfiguration");
             Assert.IsNotNull(certSubjectOnlyClusterConfig, "riakCertSubjectOnlyConfiguration is not present?");
             Assert.IsNotNull(certSubjectOnlyClusterConfig.Authentication, "Authentication should NOT be null");
         }

@@ -210,6 +210,9 @@
   <data name="Riak_Core_NodeHealthCheckCancelled_fmt" xml:space="preserve">
     <value>{0}|health check routine cancelled.</value>
   </data>
+  <data name="Riak_Core_NodeHealthCheckException_fmt" xml:space="preserve">
+    <value>{0}|health check exception: {1}</value>
+  </data>
   <data name="Riak_Core_NodeHealthCheckQuitting_fmt" xml:space="preserve">
     <value>{0}|health check routine quitting ({1}).</value>
   </data>
@@ -249,6 +252,12 @@
   <data name="Riak_Core_NodeWaitingHealthCheckTask_fmt" xml:space="preserve">
     <value>{0}|waiting for health check task to complete.</value>
   </data>
+  <data name="Riak_Core_Node_HealthcheckFailed_fmt" xml:space="preserve">
+    <value>{0}|health check failed: {1}</value>
+  </data>
+  <data name="Riak_Core_Node_HealthcheckSuccess_fmt" xml:space="preserve">
+    <value>{0}|health check success.</value>
+  </data>
   <data name="Riak_Core_PortMustBeInRange" xml:space="preserve">
     <value>Port must be between 1 and 65535, inclusive.</value>
   </data>
@@ -257,6 +266,9 @@
   </data>
   <data name="Riak_Core_SecurityManager_ClientCertificateFileNotFound" xml:space="preserve">
     <value>Client certificate file not found.</value>
+  </data>
+  <data name="Riak_Core_Shutdown_fmt" xml:space="preserve">
+    <value>{0}|shut down.</value>
   </data>
   <data name="Riak_Core_ShuttingDown_fmt" xml:space="preserve">
     <value>{0}|shutting down.</value>

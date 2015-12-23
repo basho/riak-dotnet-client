@@ -2,7 +2,7 @@ namespace RiakClient.Comms
 {
     using System;
     using System.Collections.Generic;
-    using Config;
+    using Riak.Config;
 
     internal class RiakNode : IRiakNode
     {
@@ -10,8 +10,8 @@ namespace RiakClient.Comms
         private bool disposing;
 
         public RiakNode(
-            IRiakNodeConfiguration nodeConfig,
-            IRiakAuthenticationConfiguration authConfig,
+            INodeConfiguration nodeConfig,
+            IAuthenticationConfiguration authConfig,
             IRiakConnectionFactory connectionFactory)
         {
             // assume that if the node has a pool size of 0 then the intent is to have the connections

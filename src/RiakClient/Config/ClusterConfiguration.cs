@@ -1,4 +1,4 @@
-namespace RiakClient.Config
+namespace Riak.Config
 {
     using System;
     using System.Collections.Generic;
@@ -8,26 +8,26 @@ namespace RiakClient.Config
     /// <summary>
     /// Represents the configuration file section for a Riak Cluster.
     /// </summary>
-    public sealed class RiakClusterConfiguration : ConfigurationSection, IRiakClusterConfiguration
+    public sealed class ClusterConfiguration : ConfigurationSection, IClusterConfiguration
     {
         private static readonly TimeSpan DefaultNodePollTime = TimeSpan.FromSeconds(5);
         private static readonly TimeSpan DefaultDefaultRetryWaitTime = TimeSpan.FromMilliseconds(200);
 
         /// <summary>
-        /// A collection of <see cref="IRiakNodeConfiguration"/> configurations detailing the Riak nodes that can be connected to.
+        /// A collection of <see cref="INodeConfiguration"/> configurations detailing the Riak nodes that can be connected to.
         /// </summary>
         [ConfigurationProperty("nodes", IsDefaultCollection = true, IsRequired = true)]
-        [ConfigurationCollection(typeof(RiakNodeConfigurationCollection), AddItemName = "node")]
-        public RiakNodeConfigurationCollection Nodes
+        [ConfigurationCollection(typeof(NodeConfigurationCollection), AddItemName = "node")]
+        public NodeConfigurationCollection Nodes
         {
-            get { return (RiakNodeConfigurationCollection)this["nodes"]; }
+            get { return (NodeConfigurationCollection)this["nodes"]; }
             set { this["nodes"] = value; }
         }
 
         /// <inheritdoc/>
-        IEnumerable<IRiakNodeConfiguration> IRiakClusterConfiguration.RiakNodes
+        IEnumerable<INodeConfiguration> IClusterConfiguration.RiakNodes
         {
-            get { return this.Nodes.Cast<IRiakNodeConfiguration>().ToArray(); }
+            get { return this.Nodes.Cast<INodeConfiguration>().ToArray(); }
         }
 
         /// <inheritdoc/>
@@ -86,20 +86,20 @@ namespace RiakClient.Config
         }
 
         /// <summary>
-        /// A <see cref="IRiakAuthenticationConfiguration"/> configuration that details any authentication information.
+        /// A <see cref="IAuthenticationConfiguration"/> configuration that details any authentication information.
         /// </summary>
         [ConfigurationProperty("authentication", IsRequired = false)]
-        public RiakAuthenticationConfiguration Authentication
+        public AuthenticationConfiguration Authentication
         {
-            get { return (RiakAuthenticationConfiguration)this["authentication"]; }
+            get { return (AuthenticationConfiguration)this["authentication"]; }
             set { this["authentication"] = value; }
         }
 
         /// <inheritdoc/>
-        IRiakAuthenticationConfiguration IRiakClusterConfiguration.Authentication
+        IAuthenticationConfiguration IClusterConfiguration.Authentication
         {
             get { return this.Authentication; }
-            set { this.Authentication = (RiakAuthenticationConfiguration)value; }
+            set { this.Authentication = (AuthenticationConfiguration)value; }
         }
 
         [ConfigurationProperty("defaultRetryWaitTime", DefaultValue = "200", IsRequired = false)]
@@ -117,34 +117,34 @@ namespace RiakClient.Config
         }
 
         /// <summary>
-        /// Load a <see cref="RiakClusterConfiguration"/> from the local configuration file,
-        /// and return a new <see cref="IRiakClusterConfiguration"/>. 
+        /// Load a <see cref="ClusterConfiguration"/> from the local configuration file,
+        /// and return a new <see cref="IClusterConfiguration"/>. 
         /// </summary>
         /// <param name="sectionName">The section to load the configuration from.</param>
-        /// <returns>An initialized and configured <see cref="IRiakClusterConfiguration"/>.</returns>
-        public static IRiakClusterConfiguration LoadFromConfig(string sectionName)
+        /// <returns>An initialized and configured <see cref="IClusterConfiguration"/>.</returns>
+        public static IClusterConfiguration LoadFromConfig(string sectionName)
         {
-            return (IRiakClusterConfiguration)ConfigurationManager.GetSection(sectionName);
+            return (IClusterConfiguration)ConfigurationManager.GetSection(sectionName);
         }
 
         /// <summary>
-        /// Load a <see cref="RiakClusterConfiguration"/> from a specified configuration file,
-        /// and return a new <see cref="IRiakClusterConfiguration"/>.
+        /// Load a <see cref="ClusterConfiguration"/> from a specified configuration file,
+        /// and return a new <see cref="IClusterConfiguration"/>.
         /// </summary>
         /// <param name="sectionName">The section to load the configuration from.</param>
         /// <param name="fileName">The file containing the configuration section.</param>
-        /// <returns>An initialized and configured <see cref="IRiakClusterConfiguration"/>.</returns>
-        public static IRiakClusterConfiguration LoadFromConfig(string sectionName, string fileName)
+        /// <returns>An initialized and configured <see cref="IClusterConfiguration"/>.</returns>
+        public static IClusterConfiguration LoadFromConfig(string sectionName, string fileName)
         {
             var map = new ConfigurationFileMap(fileName);
             var config = ConfigurationManager.OpenMappedMachineConfiguration(map);
-            return (IRiakClusterConfiguration)config.GetSection(sectionName);
+            return (IClusterConfiguration)config.GetSection(sectionName);
         }
 
         /// <inheritdoc/>
-        void IRiakClusterConfiguration.AddNode(IRiakNodeConfiguration nodeConfiguration)
+        void IClusterConfiguration.AddNode(INodeConfiguration nodeConfiguration)
         {
-            this.Nodes.Add((RiakNodeConfiguration)nodeConfiguration);
+            this.Nodes.Add((NodeConfiguration)nodeConfiguration);
         }
     }
 }

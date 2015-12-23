@@ -5,7 +5,7 @@ namespace Riak.Core
     using System.Linq;
     using System.Net.Security;
     using System.Security.Cryptography.X509Certificates;
-    using RiakClient.Config;
+    using Riak.Config;
     using RiakClient.Extensions;
     using RiakClient.Messages;
     using RiakClient.Util;
@@ -18,14 +18,14 @@ namespace Riak.Core
         private static readonly string[] SubjectSplit = new[] { ", " };
 
         private readonly string targetHostCommonName;
-        private readonly IRiakAuthenticationConfiguration authConfig;
+        private readonly IAuthenticationConfiguration authConfig;
         private readonly X509CertificateCollection clientCertificates;
         private readonly X509Certificate2 certificateAuthorityCert;
 
         // Interesting discussion:
         // http://stackoverflow.com/questions/3780801/whats-the-difference-between-a-public-constructor-in-an-internal-class-and-an-i
         // http://stackoverflow.com/questions/9302236/why-use-a-public-method-in-an-internal-class
-        internal SecurityManager(string targetHost, IRiakAuthenticationConfiguration authConfig)
+        public SecurityManager(string targetHost, IAuthenticationConfiguration authConfig)
         {
             if (string.IsNullOrWhiteSpace(targetHost))
             {

@@ -4,7 +4,7 @@ namespace RiakClientTests.Live.RiakConfigurationTests
     using System.IO;
     using System.Linq;
     using NUnit.Framework;
-    using RiakClient.Config;
+    using Riak.Config;
 
     [TestFixture, IntegrationTest]
     public class WhenLoadingFromExternalConfiguration
@@ -12,7 +12,7 @@ namespace RiakClientTests.Live.RiakConfigurationTests
         private const string SampleConfig = @"<?xml version=""1.0"" encoding=""utf-8"" ?>
             <configuration>
               <configSections>
-                <section name=""riakConfig"" type=""RiakClient.Config.RiakClusterConfiguration, RiakClient"" />
+                <section name=""riakConfig"" type=""Riak.Config.ClusterConfiguration, RiakClient"" />
               </configSections>
               <riakConfig nodePollTime=""5000"" defaultRetryWaitTime=""200"" defaultRetryCount=""3"">
                 <nodes>
@@ -36,14 +36,14 @@ namespace RiakClientTests.Live.RiakConfigurationTests
             {
                 File.WriteAllText(fileName, SampleConfig);
 
-                var config = RiakClusterConfiguration.LoadFromConfig("riakConfig", fileName);
+                var config = ClusterConfiguration.LoadFromConfig("riakConfig", fileName);
                 config.DefaultRetryCount.ShouldEqual(3);
                 config.DefaultRetryWaitTime.ShouldEqual(twoHundredMillis);
                 config.NodePollTime.ShouldEqual(fiveSecsAsMillis);
                 config.RiakNodes.Count().ShouldEqual(2);
 
                 var nodes = config.RiakNodes.ToArray();
-                IRiakNodeConfiguration node1 = nodes[0];
+                INodeConfiguration node1 = nodes[0];
                 node1.Name.ShouldEqual("node1");
                 node1.HostAddress.ShouldEqual("host1");
                 node1.PbcPort.ShouldEqual(8081);
@@ -52,7 +52,7 @@ namespace RiakClientTests.Live.RiakConfigurationTests
                 node1.NetworkReadTimeout.ShouldEqual(fourSecsAsMillis);
                 node1.NetworkWriteTimeout.ShouldEqual(fourSecsAsMillis);
 
-                IRiakNodeConfiguration node2 = nodes[1];
+                INodeConfiguration node2 = nodes[1];
                 node2.Name.ShouldEqual("node2");
                 node2.HostAddress.ShouldEqual("host2");
                 node2.PbcPort.ShouldEqual(8081);

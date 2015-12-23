@@ -3,9 +3,9 @@ namespace Test.Integration
     using System;
     using System.Collections.Generic;
     using NUnit.Framework;
+    using Riak.Config;
     using RiakClient;
     using RiakClient.Commands;
-    using RiakClient.Config;
     using RiakClient.Models;
     using RiakClient.Util;
 
@@ -18,7 +18,7 @@ namespace Test.Integration
 
         protected IRiakEndPoint cluster;
         protected IRiakClient client;
-        protected IRiakClusterConfiguration clusterConfig;
+        protected IClusterConfiguration clusterConfig;
 
         private static Version riakVersion = null;
 

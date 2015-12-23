@@ -23,25 +23,22 @@ namespace Test.Integration.Core
                 return true;
             };
 
-            var l = new TestListener(onConn);
-            var w = l.StartAsync();
-
-            var o = new ConnectionOptions(l.EndPoint);
             Connection c = null;
-            using (c = new Connection(o))
+            using (var l = new TestListener(onConn))
             {
-                Assert.AreEqual(Connection.State.Created, c.GetState());
-                await c.ConnectAsync();
+                var o = new ConnectionOptions(l.EndPoint);
+                using (c = new Connection(o))
+                {
+                    Assert.AreEqual(Connection.State.Created, c.GetState());
+                    await c.ConnectAsync();
 
-                l.Wait(w);
+                    l.WaitOnConn();
+                    Assert.True(sawConn);
+                    Assert.AreEqual(Connection.State.Active, c.GetState());
+                }
 
-                Assert.True(sawConn);
-                Assert.AreEqual(Connection.State.Active, c.GetState());
+                Assert.AreEqual(Connection.State.Inactive, c.GetState());
             }
-
-            Assert.AreEqual(Connection.State.Inactive, c.GetState());
-
-            l.Stop();
         }
 
         [Test]
@@ -56,28 +53,28 @@ namespace Test.Integration.Core
                 return true;
             };
 
-            var l = new TestListener(onConn);
-            var w = l.StartAsync();
-
-            var o = new ConnectionOptions(l.EndPoint);
-            var c = new Connection(o);
-            Assert.AreEqual(Connection.State.Created, c.GetState());
-            await c.ConnectAsync();
-
-            l.Wait(w);
-
-            Assert.True(sawConn);
-            Assert.AreEqual(Connection.State.Active, c.GetState());
-
-            var cmd = new Ping();
-
-            Assert.Throws<IOException>(async () =>
+            using (var l = new TestListener(onConn))
             {
-                await c.ExecuteAsync(cmd);
-            });
+                var o = new ConnectionOptions(l.EndPoint);
+                Connection c = null;
+                using (c = new Connection(o))
+                {
+                    Assert.AreEqual(Connection.State.Created, c.GetState());
+                    await c.ConnectAsync();
 
-            c.Close();
-            l.Stop();
+                    l.WaitOnConn();
+                    Assert.True(sawConn);
+                    Assert.AreEqual(Connection.State.Active, c.GetState());
+
+                    var cmd = new Ping();
+                    Assert.Throws<IOException>(async () =>
+                    {
+                        await c.ExecuteAsync(cmd);
+                    });
+                }
+
+                Assert.AreEqual(Connection.State.Inactive, c.GetState());
+            }
         }
     }
 }
