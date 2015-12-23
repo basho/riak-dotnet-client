@@ -360,12 +360,12 @@
     <CallTarget Targets="CleanCommonAssemblyInfo" />
   </Target>
   <Target Name="AfterBuild" Condition="'$(Configuration)' == 'Release'">
-    <ItemGroup>
+    <ItemGroup Condition="$(OS) == 'Windows_NT'">
       <ZipFiles Include="$(OutputPath)*.dll" />
       <ZipFiles Include="$(OutputPath)*.xml" />
       <ZipFiles Include="$(OutputPath)*.pdb" />
     </ItemGroup>
-    <Zip Files="@(ZipFiles)" WorkingDirectory="$(OutputPath)" ZipFileName="$(OutputPath)$(AssemblyName)-$(VersionString).zip" ZipLevel="9" />
+    <Zip Condition="$(OS) == 'Windows_NT'" Files="@(ZipFiles)" WorkingDirectory="$(OutputPath)" ZipFileName="$(OutputPath)$(AssemblyName)-$(VersionString).zip" ZipLevel="9" />
   </Target>
   <Import Project="..\..\packages\StyleCop.MSBuild.4.7.49.1\build\StyleCop.MSBuild.Targets" Condition="'$(OS)' == 'Windows_NT' And Exists('..\..\packages\StyleCop.MSBuild.4.7.49.1\build\StyleCop.MSBuild.Targets')" />
 </Project>
