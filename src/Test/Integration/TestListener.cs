@@ -101,6 +101,7 @@ namespace Test.Integration
             {
                 Stop();
                 evt.Dispose();
+                listenerTask.Dispose(); // TODO CLIENTS-621 Wait?
             }
         }
 

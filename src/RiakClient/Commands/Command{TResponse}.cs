@@ -40,6 +40,12 @@ namespace RiakClient.Commands
         /// </summary>
         public TResponse Response { get; protected set; }
 
+        // TODO CLIENTS-621
+        public Node LastNode
+        {
+            get { return lastNode; }
+        }
+
         public abstract MessageCode RequestCode { get; }
 
         public abstract MessageCode ResponseCode { get; }
