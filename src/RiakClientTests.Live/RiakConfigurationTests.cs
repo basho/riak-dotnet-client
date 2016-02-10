@@ -1,28 +1,9 @@
-// <copyright file="RiakConfigurationTests.cs" company="Basho Technologies, Inc.">
-// Copyright 2011 - OJ Reeves & Jeremiah Peschka
-// Copyright 2014 - Basho Technologies, Inc.
-//
-// This file is provided to you under the Apache License,
-// Version 2.0 (the "License"); you may not use this file
-// except in compliance with the License.  You may obtain
-// a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-// </copyright>
-
 namespace RiakClientTests.Live.RiakConfigurationTests
 {
+    using System;
     using System.IO;
     using System.Linq;
     using NUnit.Framework;
-    using RiakClient;
     using RiakClient.Config;
 
     [TestFixture, IntegrationTest]
@@ -46,9 +27,9 @@ namespace RiakClientTests.Live.RiakConfigurationTests
         [Test]
         public void ConfigurationLoadsProperly()
         {
-            int twoHundredMillis = 200;
-            int fourSecsAsMillis = 4000;
-            int fiveSecsAsMillis = 5000;
+            TimeSpan twoHundredMillis = TimeSpan.FromMilliseconds(200);
+            TimeSpan fourSecsAsMillis = TimeSpan.FromMilliseconds(4000);
+            TimeSpan fiveSecsAsMillis = TimeSpan.FromMilliseconds(5000);
 
             var fileName = Path.GetTempFileName();
             try
@@ -57,8 +38,8 @@ namespace RiakClientTests.Live.RiakConfigurationTests
 
                 var config = RiakClusterConfiguration.LoadFromConfig("riakConfig", fileName);
                 config.DefaultRetryCount.ShouldEqual(3);
-                config.DefaultRetryWaitTime.ShouldEqual((Timeout)twoHundredMillis);
-                config.NodePollTime.ShouldEqual((Timeout)fiveSecsAsMillis);
+                config.DefaultRetryWaitTime.ShouldEqual(twoHundredMillis);
+                config.NodePollTime.ShouldEqual(fiveSecsAsMillis);
                 config.RiakNodes.Count().ShouldEqual(2);
 
                 var nodes = config.RiakNodes.ToArray();
@@ -67,18 +48,18 @@ namespace RiakClientTests.Live.RiakConfigurationTests
                 node1.HostAddress.ShouldEqual("host1");
                 node1.PbcPort.ShouldEqual(8081);
                 node1.PoolSize.ShouldEqual(5);
-                node1.NetworkConnectTimeout.ShouldEqual((Timeout)fourSecsAsMillis);
-                node1.NetworkReadTimeout.ShouldEqual((Timeout)fourSecsAsMillis);
-                node1.NetworkWriteTimeout.ShouldEqual((Timeout)fourSecsAsMillis);
+                node1.NetworkConnectTimeout.ShouldEqual(fourSecsAsMillis);
+                node1.NetworkReadTimeout.ShouldEqual(fourSecsAsMillis);
+                node1.NetworkWriteTimeout.ShouldEqual(fourSecsAsMillis);
 
                 IRiakNodeConfiguration node2 = nodes[1];
                 node2.Name.ShouldEqual("node2");
                 node2.HostAddress.ShouldEqual("host2");
                 node2.PbcPort.ShouldEqual(8081);
                 node2.PoolSize.ShouldEqual(6);
-                node2.NetworkConnectTimeout.ShouldEqual((Timeout)fiveSecsAsMillis);
-                node2.NetworkReadTimeout.ShouldEqual((Timeout)fiveSecsAsMillis);
-                node2.NetworkWriteTimeout.ShouldEqual((Timeout)fiveSecsAsMillis);
+                node2.NetworkConnectTimeout.ShouldEqual(fiveSecsAsMillis);
+                node2.NetworkReadTimeout.ShouldEqual(fiveSecsAsMillis);
+                node2.NetworkWriteTimeout.ShouldEqual(fiveSecsAsMillis);
             }
             finally
             {

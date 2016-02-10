@@ -1,21 +1,3 @@
-﻿// <copyright file="CommandOptions.cs" company="Basho Technologies, Inc.">
-// Copyright 2015 - Basho Technologies, Inc.
-//
-// This file is provided to you under the Apache License,
-// Version 2.0 (the "License"); you may not use this file
-// except in compliance with the License.  You may obtain
-// a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-// </copyright>
-
 namespace RiakClient.Commands
 {
     using System;
@@ -28,66 +10,32 @@ namespace RiakClient.Commands
         private readonly RiakString bucketType;
         private readonly RiakString bucket;
         private readonly RiakString key;
-
-        private Timeout timeout = CommandDefaults.Timeout;
+        private TimeSpan timeout;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CommandOptions"/> class.
         /// </summary>
-        /// <param name="bucketType">The bucket type in Riak. Required.</param>
-        /// <param name="bucket">The bucket in Riak. Required.</param>
-        /// <param name="key">The key in Riak.</param>
-        /// <param name="keyIsRequired">If <b>true</b> and no key given, an exception is thrown.</param>
-        public CommandOptions(
-            string bucketType,
-            string bucket,
-            string key,
-            bool keyIsRequired)
-            : this(bucketType, bucket, key, keyIsRequired, CommandDefaults.Timeout)
+        /// <param name="args">Arguments to this ctor. Required.</param>
+        protected CommandOptions(Args args)
+            : this(args, Riak.Constants.DefaultCommandTimeout)
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CommandOptions"/> class.
         /// </summary>
-        /// <param name="bucketType">The bucket type in Riak. Required.</param>
-        /// <param name="bucket">The bucket in Riak. Required.</param>
-        /// <param name="key">The key in Riak.</param>
-        /// <param name="keyIsRequired">If <b>true</b> and no key given, an exception is thrown.</param>
-        /// <param name="timeout">The command timeout in Riak. Default is <b>60 seconds</b></param>
-        public CommandOptions(
-            string bucketType,
-            string bucket,
-            string key,
-            bool keyIsRequired,
-            Timeout timeout)
+        /// <param name="args">Arguments to this ctor. Required.</param>
+        /// <param name="timeout">The command timeout in Riak.</param>
+        protected CommandOptions(Args args, TimeSpan timeout)
         {
-            if (string.IsNullOrEmpty(bucketType))
+            if (args == null)
             {
-                throw new ArgumentNullException("bucketType");
-            }
-            else
-            {
-                this.bucketType = bucketType;
+                throw new ArgumentNullException("args");
             }
 
-            if (string.IsNullOrEmpty(bucket))
-            {
-                throw new ArgumentNullException("bucket");
-            }
-            else
-            {
-                this.bucket = bucket;
-            }
-
-            if (keyIsRequired && string.IsNullOrEmpty(key))
-            {
-                throw new ArgumentNullException("key");
-            }
-            else
-            {
-                this.key = key;
-            }
+            this.bucketType = args.BucketType;
+            this.bucket = args.Bucket;
+            this.key = args.Key;
 
             this.timeout = timeout;
         }
@@ -122,7 +70,7 @@ namespace RiakClient.Commands
         /// <summary>
         /// The timeout for this command.
         /// </summary>
-        public Timeout Timeout
+        public TimeSpan Timeout
         {
             get { return timeout; }
             set { timeout = value; }
@@ -162,6 +110,68 @@ namespace RiakClient.Commands
                 result = (result * 397) ^ (key != null ? key.GetHashCode() : 0);
                 result = (result * 397) ^ timeout.GetHashCode();
                 return result;
+            }
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Args"/> class.
+        /// </summary>
+        /// <param name="bucketType">The bucket type in Riak. Default is "default"</param>
+        /// <param name="bucket">The bucket in Riak.</param>
+        /// <param name="bucketRequired">Set to <b>true</b> if bucket is required.</param>
+        /// <param name="key">The key in Riak.</param>
+        /// <param name="keyRequired">If <b>true</b> and no key given, an exception is thrown.</param>
+        protected class Args
+        {
+            private readonly RiakString bucketType;
+            private readonly RiakString bucket;
+            private readonly RiakString key;
+
+            public Args(
+                string bucketType,
+                string bucket,
+                bool bucketRequired,
+                string key,
+                bool keyRequired)
+            {
+                if (string.IsNullOrWhiteSpace(bucketType))
+                {
+                    // TODO 3.0 constant somewhere
+                    this.bucketType = new RiakString("default");
+                }
+                else
+                {
+                    this.bucketType = new RiakString(bucketType);
+                }
+
+                if (bucketRequired && string.IsNullOrWhiteSpace(bucket))
+                {
+                    throw new ArgumentNullException("bucket");
+                }
+
+                this.bucket = new RiakString(bucket);
+
+                if (keyRequired && string.IsNullOrWhiteSpace(key))
+                {
+                    throw new ArgumentNullException("key");
+                }
+
+                this.key = new RiakString(key);
+            }
+
+            public RiakString BucketType
+            {
+                get { return bucketType; }
+            }
+
+            public RiakString Bucket
+            {
+                get { return bucket; }
+            }
+
+            public RiakString Key
+            {
+                get { return key; }
             }
         }
     }
