@@ -216,4 +216,31 @@ namespace RiakClient.Messages
     public sealed partial class RpbGetBucketKeyPreflistResp : RpbResp { }
 
     public sealed partial class RpbBucketKeyPreflistItem { }
+
+    [CLSCompliant(false)]
+    public sealed partial class RpbIndexBodyResp {}
+
+    [CLSCompliant(false)]
+    public sealed partial class RpbCoverageReq {}
+
+    [CLSCompliant(false)]
+    public sealed partial class RpbCoverageResp {}
+
+    [CLSCompliant(false)]
+    public sealed partial class RpbCoverageEntry {}
+
+    [CLSCompliant(false)]
+    public sealed partial class TsListKeysReq { }
+
+    [CLSCompliant(false)]
+    public sealed partial class TsGetReq { }
+
+    [CLSCompliant(false)]
+    public sealed partial class TsDelReq { }
+
+    [CLSCompliant(false)]
+    public sealed partial class TsCoverageEntry { }
+
+    [CLSCompliant(false)]
+    public sealed partial class TsCoverageResp { }
 }

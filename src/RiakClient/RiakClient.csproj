@@ -152,6 +152,7 @@
     <Compile Include="Messages\riak_dt.cs" />
     <Compile Include="Messages\riak_kv.cs" />
     <Compile Include="Messages\riak_search.cs" />
+    <Compile Include="Messages\riak_ts.cs" />
     <Compile Include="Messages\riak_yokozuna.cs" />
     <Compile Include="Models\Index\IRiakIndexResult.cs" />
     <Compile Include="Models\Index\BinIndex.cs" />
