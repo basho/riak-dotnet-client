@@ -7,6 +7,8 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+// Option: missing-value detection (*Specified/ShouldSerialize*/Reset*) enabled
+    
 // Generated from: riak_yokozuna.proto
 namespace RiakClient.Messages
 {
@@ -22,22 +24,40 @@ namespace RiakClient.Messages
       get { return _name; }
       set { _name = value; }
     }
-    private byte[] _schema = null;
+    private byte[] _schema;
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"schema", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    [global::System.ComponentModel.DefaultValue(null)]
     public byte[] schema
     {
-      get { return _schema; }
+      get { return _schema?? null; }
       set { _schema = value; }
     }
-    private uint _n_val = default(uint);
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool schemaSpecified
+    {
+      get { return this._schema != null; }
+      set { if (value == (this._schema== null)) this._schema = value ? this.schema : (byte[])null; }
+    }
+    private bool ShouldSerializeschema() { return schemaSpecified; }
+    private void Resetschema() { schemaSpecified = false; }
+    
+    private uint? _n_val;
     [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"n_val", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(uint))]
     public uint n_val
     {
-      get { return _n_val; }
+      get { return _n_val?? default(uint); }
       set { _n_val = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool n_valSpecified
+    {
+      get { return this._n_val != null; }
+      set { if (value == (this._n_val== null)) this._n_val = value ? this.n_val : (uint?)null; }
+    }
+    private bool ShouldSerializen_val() { return n_valSpecified; }
+    private void Resetn_val() { n_valSpecified = false; }
+    
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -48,14 +68,23 @@ namespace RiakClient.Messages
   {
     public RpbYokozunaIndexGetReq() {}
     
-    private byte[] _name = null;
+    private byte[] _name;
     [global::ProtoBuf.ProtoMember(1, IsRequired = false, Name=@"name", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    [global::System.ComponentModel.DefaultValue(null)]
     public byte[] name
     {
-      get { return _name; }
+      get { return _name?? null; }
       set { _name = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool nameSpecified
+    {
+      get { return this._name != null; }
+      set { if (value == (this._name== null)) this._name = value ? this.name : (byte[])null; }
+    }
+    private bool ShouldSerializename() { return nameSpecified; }
+    private void Resetname() { nameSpecified = false; }
+    
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -90,14 +119,23 @@ namespace RiakClient.Messages
       get { return _index; }
       set { _index = value; }
     }
-    private uint _timeout = default(uint);
+    private uint? _timeout;
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"timeout", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(uint))]
     public uint timeout
     {
-      get { return _timeout; }
+      get { return _timeout?? default(uint); }
       set { _timeout = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool timeoutSpecified
+    {
+      get { return this._timeout != null; }
+      set { if (value == (this._timeout== null)) this._timeout = value ? this.timeout : (uint?)null; }
+    }
+    private bool ShouldSerializetimeout() { return timeoutSpecified; }
+    private void Resettimeout() { timeoutSpecified = false; }
+    
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -132,14 +170,23 @@ namespace RiakClient.Messages
       get { return _name; }
       set { _name = value; }
     }
-    private byte[] _content = null;
+    private byte[] _content;
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"content", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    [global::System.ComponentModel.DefaultValue(null)]
     public byte[] content
     {
-      get { return _content; }
+      get { return _content?? null; }
       set { _content = value; }
     }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool contentSpecified
+    {
+      get { return this._content != null; }
+      set { if (value == (this._content== null)) this._content = value ? this.content : (byte[])null; }
+    }
+    private bool ShouldSerializecontent() { return contentSpecified; }
+    private void Resetcontent() { contentSpecified = false; }
+    
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }

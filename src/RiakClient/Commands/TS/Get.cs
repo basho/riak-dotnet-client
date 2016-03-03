@@ -29,7 +29,7 @@
             var req = new TsGetReq();
 
             req.table = CommandOptions.Table;
-            req.key.AddRange(CommandOptions.Key.ToCells());
+            req.key.AddRange(CommandOptions.Key.ToTsCells());
 
             return req;
         }

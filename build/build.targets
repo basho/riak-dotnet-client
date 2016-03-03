@@ -109,7 +109,7 @@
 
   <Target Name="ProtoGen">
     <Exec WorkingDirectory="$(ProtoDir)"
-          Command="$(ProtoGenExe) -ns:RiakClient.Messages -i:%(ProtoFile.Identity) -o:$(ProtoMsgDir)\@(ProtoFile->'%(filename)').cs" />
+          Command="$(ProtoGenExe) -ns:RiakClient.Messages -p:detectMissing -i:%(ProtoFile.Identity) -o:$(ProtoMsgDir)\@(ProtoFile->'%(filename)').cs" />
   </Target>
 
   <Target Name="PublishNuGetPackage" DependsOnTargets="PublishValidation">

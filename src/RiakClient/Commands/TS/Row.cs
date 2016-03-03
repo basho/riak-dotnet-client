@@ -1,14 +1,21 @@
 ﻿namespace RiakClient.Commands.TS
 {
-    using System;
     using System.Collections.Generic;
+    using System.Linq;
     using Messages;
 
     public class Row
     {
-        internal IEnumerable<TsCell> ToCells()
+        private readonly IEnumerable<Cell> cells;
+
+        public Row(IEnumerable<Cell> cells)
         {
-            throw new NotImplementedException();
+            this.cells = cells;
+        }
+
+        internal IEnumerable<TsCell> ToTsCells()
+        {
+            return cells.Select(c => c.ToTsCell());
         }
     }
 }

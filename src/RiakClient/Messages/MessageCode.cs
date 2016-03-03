@@ -196,6 +196,11 @@ namespace RiakClient.Messages
         RpbCSBucketResp = 41,
 
         /// <summary>
+        /// Riak Index Body Response.
+        /// </summary>
+        RpbIndexBodyResp = 42,
+
+        /// <summary>
         /// Riak 1.4 Counter Update Request.
         /// </summary>
         RpbCounterUpdateReq = 50,
@@ -249,6 +254,16 @@ namespace RiakClient.Messages
         /// Yokozuna Schema Put Request.
         /// </summary>
         RpbYokozunaSchemaPutReq = 60,
+
+        /// <summary>
+        /// Coverage Request.
+        /// </summary>
+        RpbCoverageReq = 70,
+
+        /// <summary>
+        /// Coverage Response
+        /// </summary>
+        RpbCoverageResp = 71,
 
         /// <summary>
         /// DataType Fetch Request.
@@ -319,6 +334,41 @@ namespace RiakClient.Messages
         /// TS List Keys Response
         /// </summary>
         TsListKeysResp = 99,
+
+        /// <summary>
+        /// TS Coverage Request
+        /// </summary>
+        TsCoverageReq = 100,
+
+        /// <summary>
+        /// TS Coverage Response
+        /// </summary>
+        TsCoverageResp = 101,
+
+        /// <summary>
+        /// TS Coverage Entry
+        /// </summary>
+        TsCoverageEntry = 102,
+
+        /// <summary>
+        /// TS Range
+        /// </summary>
+        TsRange = 103,
+
+        /// <summary>
+        /// TS TTB Put Request
+        /// </summary>
+        TsTtbPutReq = 104,
+
+        /// <summary>
+        /// Toggle TTB Encoding Request
+        /// </summary>
+        RpbToggleEncodingReq = 110,
+
+        /// <summary>
+        /// Toggle TTB Encoding Response
+        /// </summary>
+        RpbToggleEncodingResp = 111,
 
         /// <summary>
         /// Authentication Request.
