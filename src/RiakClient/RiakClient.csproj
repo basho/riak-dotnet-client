@@ -69,7 +69,14 @@
     <Compile Include="Auth\RiakSecurityManager.cs">
       <ExcludeFromStyleCop>False</ExcludeFromStyleCop>
     </Compile>
+    <Compile Include="Commands\CommandBuilder{TBuilder,TCommand,TOptions}.cs" />
+    <Compile Include="Commands\KvCommandBuilder{TBuilder,TCommand,TOptions}.cs" />
     <Compile Include="Commands\CommandDefaults.cs" />
+    <Compile Include="Commands\CommandOptions.cs" />
+    <Compile Include="Commands\Response{TValue}.cs" />
+    <Compile Include="Commands\TS\TimeseriesCommandBuilder{TBuilder,TCommand,TOptions}.cs" />
+    <Compile Include="Commands\TS\GetResponse.cs" />
+    <Compile Include="Commands\TS\TimeseriesCommandOptions.cs" />
     <Compile Include="Commands\Command{TResponse}.cs" />
     <Compile Include="Commands\CRDT\FetchSetOptions.cs" />
     <Compile Include="Commands\CRDT\DataTypeResponse{TValue}.cs" />
@@ -84,7 +91,7 @@
     <Compile Include="Commands\KV\FetchPreflist.cs" />
     <Compile Include="Commands\KV\FetchPreflistOptions.cs" />
     <Compile Include="Commands\Response.cs" />
-    <Compile Include="Commands\Response{TValue}.cs" />
+    <Compile Include="Commands\Response{TKey,TValue}.cs" />
     <Compile Include="Commands\CRDT\FetchCommandBuilder{TBuilder,TCommand,TOptions,TResponse}.cs" />
     <Compile Include="Commands\CRDT\FetchCommand{TResponse}.cs" />
     <Compile Include="Commands\CRDT\FetchCounter.cs" />
@@ -95,7 +102,6 @@
     <Compile Include="Commands\CRDT\MapResponse.cs" />
     <Compile Include="Commands\CRDT\Map.cs" />
     <Compile Include="Commands\CRDT\UpdateCommandBuilder{TBuilder,TCommand,TOptions,TResponse}.cs" />
-    <Compile Include="Commands\CommandBuilder{TBuilder,TCommand,TOptions}.cs" />
     <Compile Include="Commands\CRDT\UpdateSetOptions.cs" />
     <Compile Include="Commands\CRDT\UpdateSet.cs" />
     <Compile Include="Commands\CRDT\UpdateCounter.cs" />
@@ -105,8 +111,11 @@
     <Compile Include="Commands\CRDT\FetchMapOptions.cs" />
     <Compile Include="Commands\CRDT\UpdateCounterOptions.cs" />
     <Compile Include="Commands\CRDT\UpdateMapOptions.cs" />
-    <Compile Include="Commands\CommandOptions.cs" />
+    <Compile Include="Commands\KvCommandOptions.cs" />
     <Compile Include="Commands\IRiakCommand.cs" />
+    <Compile Include="Commands\TS\GetOptions.cs" />
+    <Compile Include="Commands\TS\Get.cs" />
+    <Compile Include="Commands\TS\Row.cs" />
     <Compile Include="Comms\IRiakConnectionManager.cs" />
     <Compile Include="Comms\LoadBalancing\ILoadBalancingStrategy.cs" />
     <Compile Include="Comms\LoadBalancing\RoundRobinStrategy.cs" />

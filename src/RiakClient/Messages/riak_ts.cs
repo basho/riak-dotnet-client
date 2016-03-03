@@ -11,7 +11,7 @@
 // Note: requires additional types generated from: riak.proto
 namespace RiakClient.Messages
 {
-  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"TsQueryReq")]
+    [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"TsQueryReq")]
   public partial class TsQueryReq : global::ProtoBuf.IExtensible
   {
     public TsQueryReq() {}

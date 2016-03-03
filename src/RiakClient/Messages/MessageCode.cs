@@ -1,22 +1,3 @@
-// <copyright file="MessageCode.cs" company="Basho Technologies, Inc.">
-// Copyright 2011 - OJ Reeves & Jeremiah Peschka
-// Copyright 2014 - Basho Technologies, Inc.
-//
-// This file is provided to you under the Apache License,
-// Version 2.0 (the "License"); you may not use this file
-// except in compliance with the License.  You may obtain
-// a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-// </copyright>
-
 namespace RiakClient.Messages
 {
     /// <summary>
@@ -288,6 +269,56 @@ namespace RiakClient.Messages
         /// DataType Update Response.
         /// </summary>
         DtUpdateResp = 83,
+
+        /// <summary>
+        /// TS Query Request
+        /// </summary>
+        TsQueryReq = 90,
+
+        /// <summary>
+        /// TS Query Response
+        /// </summary>
+        TsQueryResp = 91,
+
+        /// <summary>
+        /// TS Put Request
+        /// </summary>
+        TsPutReq = 92,
+
+        /// <summary>
+        /// TS Put Response
+        /// </summary>
+        TsPutResp = 93,
+
+        /// <summary>
+        /// TS Delete Request
+        /// </summary>
+        TsDelReq = 94,
+
+        /// <summary>
+        /// TS Delete Response
+        /// </summary>
+        TsDelResp = 95,
+
+        /// <summary>
+        /// TS Get Request
+        /// </summary>
+        TsGetReq = 96,
+
+        /// <summary>
+        /// TS Get Response
+        /// </summary>
+        TsGetResp = 97,
+
+        /// <summary>
+        /// TS List Keys Request
+        /// </summary>
+        TsListKeysReq = 98,
+
+        /// <summary>
+        /// TS List Keys Response
+        /// </summary>
+        TsListKeysResp = 99,
 
         /// <summary>
         /// Authentication Request.
