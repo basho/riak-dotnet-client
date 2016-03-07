@@ -1,22 +1,3 @@
-// <copyright file="LiveRiakConnectionTestBase.cs" company="Basho Technologies, Inc.">
-// Copyright 2011 - OJ Reeves & Jeremiah Peschka
-// Copyright 2014 - Basho Technologies, Inc.
-//
-// This file is provided to you under the Apache License,
-// Version 2.0 (the "License"); you may not use this file
-// except in compliance with the License.  You may obtain
-// a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-// </copyright>
-
 namespace RiakClientTests.Live
 {
     using System;
@@ -29,6 +10,9 @@ namespace RiakClientTests.Live
 
     public abstract class LiveRiakConnectionTestBase
     {
+        private static readonly string testBucket = Guid.NewGuid().ToString();
+        private static readonly string testKey = Guid.NewGuid().ToString();
+
         public static class BucketTypeNames
         {
             public const string Sets = "sets";
@@ -36,9 +20,7 @@ namespace RiakClientTests.Live
             public const string Maps = "maps";
         }
 
-        protected const string TestBucketType = "leveldb_type";
-        protected const string TestBucket = "test_bucket";
-        protected const string TestKey = "test_json";
+        protected const string TestBucketType = "plain";
         protected static readonly string TestJson;
         protected const string MapReduceBucket = "map_reduce_bucket";
 
@@ -71,6 +53,7 @@ namespace RiakClientTests.Live
             }.ToJson();
         }
 
+
         public LiveRiakConnectionTestBase()
         {
             string userName = Environment.GetEnvironmentVariable("USERNAME");
@@ -96,6 +79,16 @@ namespace RiakClientTests.Live
         public virtual void SetUp()
         {
             Client = Cluster.CreateClient();
+        }
+
+        public string TestBucket
+        {
+            get { return testBucket; }
+        }
+
+        public string TestKey
+        {
+            get { return testKey; }
         }
     }
 }

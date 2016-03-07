@@ -35,7 +35,6 @@ namespace RiakClientTests.Live
     [TestFixture, IntegrationTest, SkipMono]
     public class WhenUsingIndexes : RiakMapReduceTestBase
     {
-        private const string BucketType = "leveldb_type";
         private const string LegacyBucket = "riak_index_tests";
         private const int DefaultKeyCount = 10;
 
@@ -439,7 +438,7 @@ namespace RiakClientTests.Live
         {
             var id = useLegacyBucket
                 ? new RiakObjectId(LegacyBucket, key)
-                : new RiakObjectId(BucketType, Bucket, key);
+                : new RiakObjectId(TestBucketType, Bucket, key);
             return CreateRiakObject(id, "{ value: \"this is an object\" }");
         }
 
