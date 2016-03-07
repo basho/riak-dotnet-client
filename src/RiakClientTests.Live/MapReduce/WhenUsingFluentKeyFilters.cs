@@ -30,12 +30,6 @@ namespace RiakClientTests.Live.MapReduce
     [TestFixture, Ignore("TODO-TIMEOUT"), IntegrationTest]
     public class WhenUsingFluentKeyFilters : RiakMapReduceTestBase
     {
-        [TearDown]
-        public void TearDown()
-        {
-            Client.DeleteBucket(Bucket);
-        }
-
         [Test]
         public void EqualsFindsOneKey()
         {

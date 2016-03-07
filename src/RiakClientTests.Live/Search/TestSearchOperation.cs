@@ -74,12 +74,6 @@ namespace RiakClientTests.Live.Search
             PrepSearch();
         }
 
-        [TestFixtureTearDown]
-        public void TearDown()
-        {
-            Client.DeleteBucket(BucketType, Bucket);
-        }
-
         private void PrepSearch()
         {
             _randomId = _random.Next();

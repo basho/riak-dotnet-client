@@ -44,13 +44,6 @@ namespace RiakClientTests.Live
             Bucket = LegacyBucket;
         }
 
-        [TearDown]
-        public void TearDown()
-        {
-            Client.DeleteBucket(BucketType, Bucket);
-            Client.DeleteBucket(LegacyBucket);
-        }
-
         [Test]
         public void IndexesAreSavedWithAnObject()
         {
@@ -71,8 +64,6 @@ namespace RiakClientTests.Live
 
             ro.BinIndex("tacos").Values[0].ShouldEqual("are great!");
             ro.IntIndex("age").Values[0].ShouldEqual(12);
-
-            Client.DeleteBucket(LegacyBucket);
         }
 
         [Test]
@@ -91,8 +82,6 @@ namespace RiakClientTests.Live
                 key.ShouldBeLessThan(DefaultKeyCount);
                 key.ShouldBeGreaterThan(-1);
             }
-
-            Client.DeleteBucket(LegacyBucket);
         }
 
         [Test]
@@ -110,8 +99,6 @@ namespace RiakClientTests.Live
                 key.ShouldBeLessThan(DefaultKeyCount);
                 key.ShouldBeGreaterThan(-1);
             }
-
-            Client.DeleteBucket(LegacyBucket);
         }
 
         private static int ParseIntKeyWithPrefix(RiakIndexKeyTerm indexKeyTerm)
@@ -139,8 +126,6 @@ namespace RiakClientTests.Live
                 key.Bucket.ShouldNotBeNullOrEmpty();
                 key.Key.ShouldNotBeNullOrEmpty();
             }
-
-            Client.DeleteBucket(LegacyBucket);
         }
 
         [Test]
@@ -151,7 +136,6 @@ namespace RiakClientTests.Live
             var result = Client.GetSecondaryIndex(new RiakIndexId(LegacyBucket, "age"), 27, 30);
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
             result.Value.IndexKeyTerms.Count().ShouldEqual(4);
-            Client.DeleteBucket(LegacyBucket);
         }
 
         [Test]
@@ -181,8 +165,6 @@ namespace RiakClientTests.Live
                 key.Key.ShouldNotBeNullOrEmpty();
                 insertedKeys.Contains(key.Key).ShouldBeTrue();
             }
-
-            Client.DeleteBucket(LegacyBucket);
         }
 
         [Test]
@@ -219,7 +201,6 @@ namespace RiakClientTests.Live
                 key.Key.ShouldNotBeNullOrEmpty();
                 originalKeys.Contains(key.Key).ShouldBeTrue();
             }
-            Client.DeleteBucket(LegacyBucket);
         }
 
         [Test]
@@ -242,8 +223,6 @@ namespace RiakClientTests.Live
                 key.ShouldNotBeNullOrEmpty();
                 originalKeys.Contains(key).ShouldBeTrue();
             }
-
-            Client.DeleteBucket(LegacyBucket);
         }
 
         [Test]
@@ -272,8 +251,6 @@ namespace RiakClientTests.Live
                 keysAndTerms.Keys.ShouldContain(indexResult.Key);
                 keysAndTerms[indexResult.Key].ShouldEqual(int.Parse(indexResult.Term));
             }
-
-            Client.DeleteBucket(LegacyBucket);
         }
 
         [Test]
@@ -292,8 +269,6 @@ namespace RiakClientTests.Live
             results.Done.ShouldNotEqual(true);
             results.Done.ShouldEqual(null);
             results.Continuation.ShouldNotBeNull();
-
-            Client.DeleteBucket(LegacyBucket);
         }
 
         [Test]
@@ -311,8 +286,6 @@ namespace RiakClientTests.Live
 
             results.IsSuccess.ShouldBeTrue(results.ErrorMessage);
             results.Value.IndexKeyTerms.Count().ShouldEqual(5);
-
-            Client.DeleteBucket(LegacyBucket);
         }
 
         [Test]
@@ -331,8 +304,6 @@ namespace RiakClientTests.Live
             results.Done.ShouldNotEqual(true);
             results.Done.ShouldEqual(null);
             results.Continuation.ShouldBeNull();
-
-            Client.DeleteBucket(LegacyBucket);
         }
 
         [Test]
@@ -350,8 +321,6 @@ namespace RiakClientTests.Live
             results.Value.ShouldNotBeNull();
             var keyTerms = results.Value.IndexKeyTerms.ToList();
             keyTerms.Count.ShouldEqual(500);
-
-            Client.DeleteBucket(LegacyBucket);
         }
 
         [Test]
@@ -382,8 +351,6 @@ namespace RiakClientTests.Live
 
             var keyTerms2 = results2.Value.IndexKeyTerms.ToList();
             keyTerms2[0].Term.ShouldEqual("11");
-
-            Client.DeleteBucket(LegacyBucket);
         }
 
         [Test]
@@ -412,8 +379,6 @@ namespace RiakClientTests.Live
                 resultKeys.ShouldContain(insertedKey,
                     string.Format("Could not find key {0} in index result set", insertedKey));
             }
-
-            Client.DeleteBucket(LegacyBucket);
         }
 
         private List<string> GenerateIntKeyObjects(

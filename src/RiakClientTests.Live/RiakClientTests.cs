@@ -228,8 +228,6 @@ namespace RiakClientTests.Live
             {
                 originalKeyList.ShouldContain(key);
             }
-
-            Client.DeleteBucket(TestBucketType, listKeysBucket);
         }
 
         [Test]

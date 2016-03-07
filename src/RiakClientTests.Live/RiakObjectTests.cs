@@ -114,12 +114,6 @@ namespace RiakClientTests.Live
             Client.SetBucketProperties(Bucket, props);
         }
 
-        [TearDown]
-        public void TearDown()
-        {
-            Client.DeleteBucket(Bucket);
-        }
-
         [Test]
         public void WriteableVectorClocksCanBeUsedToForceSiblings()
         {
@@ -158,12 +152,6 @@ namespace RiakClientTests.Live
 
             var props = new RiakBucketProperties().SetAllowMultiple(false);
             Client.SetBucketProperties(TestBucket, props);
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            Client.DeleteBucket(TestBucket);
         }
 
         [Test]

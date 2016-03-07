@@ -25,29 +25,9 @@ namespace RiakClientTests.Live
     using System.Threading;
     using NUnit.Framework;
     using RiakClient;
-    using RiakClient.Models;
 
     public static class IntegrationTestExtensions
     {
-        // TESTING PURPOSES ONLY
-        public static void DeleteBucket(this IRiakBatchClient client, string bucket)
-        {
-            DeleteBucket(client, null, bucket);
-        }
-
-        // TESTING PURPOSES ONLY
-        public static void DeleteBucket(this IRiakBatchClient client, string bucketType, string bucket)
-        {
-            var keylistResult = client.ListKeys(bucketType, bucket);
-            if (keylistResult.Value == null)
-            {
-                return;
-            }
-
-            var objectIds = keylistResult.Value.Select(key => new RiakObjectId(bucketType, bucket, key));
-            client.Delete(objectIds);
-        }
-
         private static readonly Func<RiakResult, bool> DefaultSuccessFunc = result => result.IsSuccess;
 
         public static T WaitUntil<T>(this Func<T> action, int attempts = 10) where T : RiakResult
