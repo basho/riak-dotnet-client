@@ -27,7 +27,7 @@ namespace RiakClientTests.Live.MapReduce
     using RiakClient.Models;
     using RiakClient.Models.MapReduce;
 
-    [TestFixture, IntegrationTest]
+    [TestFixture, Ignore("TODO-TIMEOUT"), IntegrationTest]
     public class WhenUsingFluentKeyFilters : RiakMapReduceTestBase
     {
         [TearDown]

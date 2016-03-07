@@ -52,6 +52,10 @@ Set-StrictMode -Version Latest
 # Note:
 # Set to Continue to see DEBUG messages
 # $DebugPreference = 'Continue'
+$IsVerbose = $VerbosePreference -ne 'SilentlyContinue'
+if ($IsVerbose) {
+    $DebugPreference = 'Continue'
+}
 
 trap
 {
@@ -204,7 +208,7 @@ $msbuild_exe = Get-PathToMSBuildExe
 Restore-Dependencies
 
 $verbose_property = ''
-if ($Verbosity -eq 'detailed' -or $Verbosity -eq 'd' -or
+if ($IsVerbose -or $Verbosity -eq 'detailed' -or $Verbosity -eq 'd' -or
     $Verbosity -eq 'diagnostic' -or $Verbosity -eq 'diag') {
     $verbose_property = '/property:Verbose=true'
 }
