@@ -5,12 +5,21 @@
 
     public class Cell
     {
-        public virtual object AsObject
+        private readonly object value;
+
+        protected Cell(object value)
         {
-            get
+            if (value == null)
             {
-                throw new NotImplementedException("Must be implemented by Cell subclasses.");
+                throw new ArgumentNullException("value");
             }
+
+            this.value = value;
+        }
+
+        public object AsObject
+        {
+            get { return value; }
         }
 
         internal virtual TsCell ToTsCell()

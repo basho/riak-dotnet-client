@@ -45,11 +45,13 @@ namespace Test.Unit.TS
             Assert.True(pb.key[2].sint64_valueSpecified);
             Assert.AreEqual(cells[2].AsObject, pb.key[2].sint64_value);
 
+            var dt = (DateTime)cells[3].AsObject;
             Assert.True(pb.key[3].timestamp_valueSpecified);
-            Assert.AreEqual(cells[3].AsObject, pb.key[3].timestamp_value);
+            Assert.AreEqual(dt.ToUnixTimeMillis(), pb.key[3].timestamp_value);
 
-            Assert.True(pb.key[3].varchar_valueSpecified);
-            Assert.AreEqual(cells[3].AsObject, pb.key[3].varchar_value);
+            var s = RiakString.ToBytes((string)cells[4].AsObject);
+            Assert.True(pb.key[4].varchar_valueSpecified);
+            CollectionAssert.AreEqual(s, pb.key[4].varchar_value);
         }
     }
 }
