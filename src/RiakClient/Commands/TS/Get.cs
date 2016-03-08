@@ -49,7 +49,7 @@
             }
             else
             {
-                TsGetResp resp = (TsGetResp)response;
+                // TsGetResp resp = (TsGetResp)response;
 
                 IEnumerable<Row> rows = Enumerable.Empty<Row>();
 
