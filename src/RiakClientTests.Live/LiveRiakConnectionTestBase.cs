@@ -6,6 +6,10 @@ namespace RiakClientTests.Live
     using RiakClient;
     using RiakClient.Config;
     using RiakClient.Extensions;
+#if NOAUTH
+#else
+    using RiakClient.Util;
+#endif
 
     public abstract class LiveRiakConnectionTestBase
     {
