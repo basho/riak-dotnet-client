@@ -55,7 +55,12 @@ namespace RiakClient.Commands.CRDT
             req.r = CommandOptions.R;
             req.pr = CommandOptions.PR;
 
-            req.timeout = (uint)CommandOptions.Timeout;
+            req.timeoutSpecified = false;
+            if (CommandOptions.Timeout.HasValue)
+            {
+                req.timeout = (uint)CommandOptions.Timeout;
+            }
+
             req.notfound_ok = CommandOptions.NotFoundOK;
             req.include_context = CommandOptions.IncludeContext;
             req.basic_quorum = CommandOptions.UseBasicQuorum;
