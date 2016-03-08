@@ -11,6 +11,7 @@
     public abstract class TimeseriesCommandBuilder<TBuilder, TCommand, TOptions>
         : CommandBuilder<TBuilder, TCommand, TOptions>
         where TBuilder : TimeseriesCommandBuilder<TBuilder, TCommand, TOptions>
+        where TOptions : TimeseriesCommandOptions
     {
         protected string table;
 

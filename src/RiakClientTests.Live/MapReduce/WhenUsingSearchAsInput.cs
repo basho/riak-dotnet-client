@@ -32,7 +32,7 @@ namespace RiakClientTests.Live.MapReduce
     using RiakClient.Models.MapReduce.Inputs;
     using RiakClient.Models.Search;
 
-    [TestFixture, Ignore("TODO-TIMEOUT"), IntegrationTest, SkipMono]
+    [TestFixture, IntegrationTest, SkipMono]
     public class WhenUsingSearchAsInput : RiakMapReduceTestBase
     {
         private const string BucketType = "search_type";

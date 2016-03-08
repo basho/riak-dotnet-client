@@ -10,8 +10,9 @@
     /// <typeparam name="TOptions">The type of the options for this command.</typeparam>
     public abstract class CommandBuilder<TBuilder, TCommand, TOptions>
         where TBuilder : CommandBuilder<TBuilder, TCommand, TOptions>
+        where TOptions : CommandOptions
     {
-        protected Timeout timeout = CommandDefaults.Timeout;
+        protected Timeout? timeout;
 
         public CommandBuilder()
         {
@@ -40,7 +41,7 @@
         {
             if (timeout == default(TimeSpan))
             {
-                this.timeout = CommandDefaults.Timeout;
+                this.timeout = null;
             }
             else
             {

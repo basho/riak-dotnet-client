@@ -15,36 +15,37 @@ namespace RiakClientTests.Live
         [Test]
         public void TestKVOperations()
         {
-            const string key = "bucket_type_test_key";
+            string key = Guid.NewGuid().ToString();
             var id = new RiakObjectId(TestBucketType, TestBucket, key);
             var obj = new RiakObject(id, Value);
 
             // put
             var putResult = Client.Put(obj, new RiakPutOptions().SetReturnBody(true).SetDw(3));
-            putResult.IsSuccess.ShouldBeTrue();
-            putResult.Value.BucketType.ShouldEqual(TestBucketType);
+            Assert.True(putResult.IsSuccess, putResult.ErrorMessage);
+            Assert.AreEqual(TestBucketType, putResult.Value.BucketType);
 
             // get
             var getResult = Client.Get(id);
-            getResult.IsSuccess.ShouldBeTrue();
-            getResult.Value.BucketType.ShouldEqual(TestBucketType);
+            Assert.True(getResult.IsSuccess);
+            Assert.AreEqual(TestBucketType, getResult.Value.BucketType);
 
             // delete
             var deleteResult = Client.Delete(id, new RiakDeleteOptions().SetDw(3));
-            deleteResult.IsSuccess.ShouldBeTrue();
+            Assert.True(deleteResult.IsSuccess);
 
             // multiget
             var ids = new List<RiakObjectId>();
             for (int i = 0; i < 3; i++)
             {
                 obj = new RiakObject(new RiakObjectId(TestBucketType, TestBucket, key + i), Value);
-                Client.Put(obj, new RiakPutOptions().SetReturnBody(true).SetDw(3));
+                Client.Put(obj, new RiakPutOptions().SetReturnBody(false).SetDw(3));
                 ids.Add(obj.ToRiakObjectId());
             }
 
             var multiGetResult = Client.Get(ids).ToList();
-            multiGetResult.All(r => r.IsSuccess).ShouldBeTrue();
-            multiGetResult.All(r => r.Value.BucketType == TestBucketType).ShouldBeTrue();
+            Assert.True(multiGetResult.All(r => r.IsSuccess));
+            Assert.True(multiGetResult.All(r => r.IsSuccess));
+            Assert.True(multiGetResult.All(r => r.Value.BucketType == TestBucketType));
         }
 
         [Test]
@@ -115,31 +116,32 @@ namespace RiakClientTests.Live
 
             // get
             var getPropsResult = Client.GetBucketProperties(bucketType, bucket);
-            getPropsResult.IsSuccess.ShouldBeTrue();
-            getPropsResult.Value.LastWriteWins.Value.ShouldBeFalse();
+            Assert.True(getPropsResult.IsSuccess, getPropsResult.ErrorMessage);
+            Assert.True(getPropsResult.Value.AllowMultiple.Value);
 
             // set
             var props = getPropsResult.Value;
-            props.SetLastWriteWins(true);
+            props.SetAllowMultiple(false);
 
             var setPropsResult = Client.SetBucketProperties(bucketType, bucket, props);
-            setPropsResult.IsSuccess.ShouldBeTrue();
+            Assert.IsTrue(setPropsResult.IsSuccess, setPropsResult.ErrorMessage);
 
             Func<RiakResult<RiakBucketProperties>> getFunc = () =>
                 {
                     var getResult = Client.GetBucketProperties(bucketType, bucket);
-                    getResult.IsSuccess.ShouldBeTrue(getResult.ErrorMessage);
+                    Assert.IsTrue(getResult.IsSuccess, getResult.ErrorMessage);
                     return getResult;
                 };
 
-            Func<RiakResult<RiakBucketProperties>, bool> successFunc = (r) => r.Value.LastWriteWins.Value;
+            Func<RiakResult<RiakBucketProperties>, bool> successFunc =
+                (r) => r.Value.AllowMultiple.Value == false;
             getFunc.WaitUntil(successFunc);
 
             // reset
             var resetPropsResult = Client.ResetBucketProperties(bucketType, bucket);
-            resetPropsResult.IsSuccess.ShouldBeTrue();
+            Assert.IsTrue(resetPropsResult.IsSuccess, resetPropsResult.ErrorMessage);
 
-            successFunc = (r) => !r.Value.LastWriteWins.Value;
+            successFunc = (r) => r.Value.AllowMultiple.Value == true;
             getFunc.WaitUntil(successFunc);
         }
     }

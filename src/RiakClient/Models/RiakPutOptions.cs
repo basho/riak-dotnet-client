@@ -19,7 +19,6 @@
 
 namespace RiakClient.Models
 {
-    using System.Runtime.InteropServices;
     using Messages;
 
     /// <summary>
@@ -131,7 +130,12 @@ namespace RiakClient.Models
             request.if_none_match = IfNoneMatch;
             request.return_head = ReturnHead;
             request.return_body = ReturnBody;
-            request.timeout = (uint)Timeout;
+
+            request.timeoutSpecified = false;
+            if (Timeout.HasValue)
+            {
+                request.timeout = (uint)Timeout;
+            }
         }
     }
 }

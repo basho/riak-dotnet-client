@@ -6,7 +6,6 @@ namespace RiakClientTests.Live
     using RiakClient;
     using RiakClient.Config;
     using RiakClient.Extensions;
-    using RiakClient.Util;
 
     public abstract class LiveRiakConnectionTestBase
     {

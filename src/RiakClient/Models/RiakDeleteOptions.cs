@@ -19,7 +19,6 @@
 
 namespace RiakClient.Models
 {
-    using System.Runtime.InteropServices;
     using Messages;
 
     /// <summary>
@@ -62,7 +61,12 @@ namespace RiakClient.Models
             request.w = W;
             request.pw = Pw;
             request.dw = Dw;
-            request.timeout = (uint)Timeout;
+
+            request.timeoutSpecified = false;
+            if (Timeout.HasValue)
+            {
+                request.timeout = (uint)Timeout;
+            }
 
             if (Vclock != null)
             {

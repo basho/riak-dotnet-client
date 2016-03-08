@@ -71,7 +71,6 @@
     </Compile>
     <Compile Include="Commands\CommandBuilder{TBuilder,TCommand,TOptions}.cs" />
     <Compile Include="Commands\KvCommandBuilder{TBuilder,TCommand,TOptions}.cs" />
-    <Compile Include="Commands\CommandDefaults.cs" />
     <Compile Include="Commands\CommandOptions.cs" />
     <Compile Include="Commands\Response{TValue}.cs" />
     <Compile Include="Commands\TS\Cell{TValue}.cs" />

@@ -29,6 +29,13 @@
             var req = new TsGetReq();
 
             req.table = CommandOptions.Table;
+
+            req.timeoutSpecified = false;
+            if (CommandOptions.Timeout.HasValue)
+            {
+                req.timeout = (uint)CommandOptions.Timeout;
+            }
+
             req.key.AddRange(CommandOptions.Key.ToTsCells());
 
             return req;
@@ -72,13 +79,13 @@
                 }
 
                 this.key = key;
-
                 return this;
             }
 
             protected override void PopulateOptions(GetOptions options)
             {
                 options.Key = key;
+                options.Timeout = timeout;
             }
         }
     }

@@ -25,7 +25,7 @@ namespace RiakClientTests.Live.Search
     using RiakClient;
     using RiakClient.Models.Search;
 
-    [TestFixture, Ignore("TODO-TIMEOUT"), IntegrationTest, SkipMono]
+    [TestFixture, IntegrationTest, SkipMono]
     public class TestSearchAdminOperations : LiveRiakConnectionTestBase
     {
         [SetUp]

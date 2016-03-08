@@ -19,7 +19,6 @@
 
 namespace RiakClient.Models
 {
-    using System.Runtime.InteropServices;
     using Messages;
 
     /// <summary>
@@ -125,7 +124,11 @@ namespace RiakClient.Models
                 request.if_modified = IfModified;
             }
 
-            request.timeout = (uint)Timeout;
+            request.timeoutSpecified = false;
+            if (Timeout.HasValue)
+            {
+                request.timeout = (uint)Timeout;
+            }
         }
     }
 }

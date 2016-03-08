@@ -124,7 +124,7 @@ namespace RiakClient.Models.Search
         /// <summary>
         /// The <see cref="Timeout"/> value for storing index entries.
         /// </summary>
-        public Timeout Timeout
+        public Timeout? Timeout
         {
             get;
             set;

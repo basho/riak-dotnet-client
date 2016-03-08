@@ -30,7 +30,6 @@ namespace RiakClientTests.Live
     using RiakClient.Models.Index;
     using RiakClient.Models.MapReduce;
     using RiakClient.Models.MapReduce.Inputs;
-    using RiakClient.Util;
 
     [TestFixture, IntegrationTest, SkipMono]
     public class WhenUsingIndexes : RiakMapReduceTestBase

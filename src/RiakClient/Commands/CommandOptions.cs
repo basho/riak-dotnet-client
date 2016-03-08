@@ -7,32 +7,15 @@
     /// </summary>
     public abstract class CommandOptions : IEquatable<CommandOptions>
     {
-        private Timeout timeout = CommandDefaults.Timeout;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CommandOptions"/> class.
-        /// </summary>
-        public CommandOptions()
-            : this(CommandDefaults.Timeout)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CommandOptions"/> class.
-        /// </summary>
-        /// <param name="timeout">The command timeout in Riak. Default is <b>60 seconds</b></param>
-        public CommandOptions(Timeout timeout)
-        {
-            this.timeout = timeout;
-        }
+        protected Timeout? commandTimeout;
 
         /// <summary>
         /// The timeout for this command.
         /// </summary>
-        public Timeout Timeout
+        public Timeout? Timeout
         {
-            get { return timeout; }
-            set { timeout = value; }
+            get { return commandTimeout; }
+            set { commandTimeout = value; }
         }
 
         public bool Equals(CommandOptions other)
@@ -62,7 +45,14 @@
         /// <returns>A hash code for the current object.</returns>
         public override int GetHashCode()
         {
-            return timeout.GetHashCode();
+            int result = base.GetHashCode();
+
+            if (commandTimeout.HasValue)
+            {
+                result = (result * 397) ^ commandTimeout.GetHashCode();
+            }
+
+            return result;
         }
     }
 }
