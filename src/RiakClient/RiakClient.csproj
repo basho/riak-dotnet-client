@@ -75,6 +75,8 @@
     <Compile Include="Commands\Response{TValue}.cs" />
     <Compile Include="Commands\TS\Cell{TValue}.cs" />
     <Compile Include="Commands\TS\Cell.cs" />
+    <Compile Include="Commands\TS\Column.cs" />
+    <Compile Include="Commands\TS\ColumnType.cs" />
     <Compile Include="Commands\TS\TimeseriesCommandBuilder{TBuilder,TCommand,TOptions}.cs" />
     <Compile Include="Commands\TS\GetResponse.cs" />
     <Compile Include="Commands\TS\TimeseriesCommandOptions.cs" />
@@ -135,7 +137,7 @@
     <Compile Include="Containers\IConcurrentEnumerable.cs" />
     <Compile Include="Containers\IConcurrentEnumerator.cs" />
     <Compile Include="Exceptions\RiakUnsupportedException.cs" />
-    <Compile Include="Exts.cs" />
+    <Compile Include="Util\DateTimeUtil.cs" />
     <Compile Include="IRiakAsyncClient.cs" />
     <Compile Include="IRiakClient.cs" />
     <Compile Include="Messages\RpbClasses.cs" />

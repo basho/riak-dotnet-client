@@ -2,6 +2,7 @@
 {
     using System;
     using Messages;
+    using Util;
 
     public class Cell<TValue> : Cell
     {
@@ -11,6 +12,11 @@
         public Cell(TValue value)
             : base(value)
         {
+            if (ReferenceEquals(null, value))
+            {
+                throw new ArgumentNullException("value", "typed Cells require a non-null value");
+            }
+
             v = value;
         }
 
@@ -19,18 +25,13 @@
             get { return v; }
         }
 
-        internal static Cell From(TsCell tsc)
-        {
-            throw new NotImplementedException();
-        }
-
         internal override TsCell ToTsCell()
         {
             TsCell rv = null;
 
             if (ReferenceEquals(null, v))
             {
-                return new TsCell();
+                throw new InvalidOperationException("typed Cells require a non-null value");
             }
 
             if (vtype == typeof(string))
@@ -60,7 +61,7 @@
                 var dt = (DateTime)Convert.ChangeType(v, TypeCode.DateTime);
                 rv = new TsCell
                 {
-                    timestamp_value = dt.ToUnixTimeMillis()
+                    timestamp_value = DateTimeUtil.ToUnixTimeMillis(dt)
                 };
             }
             else if (vtype == typeof(bool))
@@ -79,6 +80,8 @@
             }
             else
             {
+                string msg = string.Format("could not convert {0}, type: {1}", v.ToString(), v.GetType().Name);
+                throw new InvalidOperationException(msg);
             }
 
             return rv;

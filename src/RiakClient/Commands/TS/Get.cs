@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using Messages;
+    using Util;
 
     /// <summary>
     /// Fetches timeseries data from Riak
@@ -49,19 +50,24 @@
             }
             else
             {
-                // TsGetResp resp = (TsGetResp)response;
+                TsGetResp resp = (TsGetResp)response;
+
+                IEnumerable<Column> cols = Enumerable.Empty<Column>();
+
+                if (EnumerableUtil.NotNullOrEmpty(resp.columns))
+                {
+                    cols = resp.columns.Select(tsc =>
+                        new Column(RiakString.FromBytes(tsc.name), (ColumnType)tsc.type));
+                }
 
                 IEnumerable<Row> rows = Enumerable.Empty<Row>();
 
-                /*
-                if (EnumerableUtil.NotNullOrEmpty(resp.preflist))
+                if (EnumerableUtil.NotNullOrEmpty(resp.rows))
                 {
-                    preflistItems = resp.preflist.Select(i =>
-                        new PreflistItem(RiakString.FromBytes(i.node), i.partition, i.primary));
+                    rows = resp.rows.Select(tsr => new Row(tsr));
                 }
-                */
 
-                Response = new GetResponse(CommandOptions.Key, rows);
+                Response = new GetResponse(CommandOptions.Key, cols, rows);
             }
         }
 

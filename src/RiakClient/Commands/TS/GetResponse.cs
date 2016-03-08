@@ -7,6 +7,8 @@
     /// </summary>
     public class GetResponse : Response<Row, IEnumerable<Row>>
     {
+        private readonly IEnumerable<Column> columns;
+
         /// <inheritdoc />
         public GetResponse()
             : base(notFound: true)
@@ -17,10 +19,20 @@
         /// Initializes a new instance of the <see cref="GetResponse"/> class.
         /// </summary>
         /// <param name="key">A <see cref="Row"/> representing the key.</param>
-        /// <param name="values">The values for the fetched TS key.</param>
-        public GetResponse(Row key, IEnumerable<Row> values)
+        /// <param name="columns">The columns for the fetched TS data.</param>
+        /// <param name="values">The rows for the fetched TS data.</param>
+        public GetResponse(Row key, IEnumerable<Column> columns, IEnumerable<Row> values)
             : base(key, values)
         {
+            this.columns = columns;
+        }
+
+        /// <summary>
+        /// Returns the columns for this response.
+        /// </summary>
+        public IEnumerable<Column> Columns
+        {
+            get { return columns; }
         }
     }
 }
