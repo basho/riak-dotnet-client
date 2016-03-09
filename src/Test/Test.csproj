@@ -63,6 +63,7 @@
     <Compile Include="Unit\CRDT\UpdateCounterTests.cs" />
     <Compile Include="Unit\CRDT\UpdateMapTests.cs" />
     <Compile Include="Unit\KV\FetchPreflistTests.cs" />
+    <Compile Include="Unit\TS\TsCellTests.cs" />
     <Compile Include="Unit\TS\TimeseriesTest.cs" />
     <Compile Include="Unit\TS\PutTests.cs" />
     <Compile Include="Unit\TS\GetTests.cs" />

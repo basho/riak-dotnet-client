@@ -12,11 +12,16 @@ namespace Test.Unit.TS
         {
             var cmd = new Put.Builder()
                 .WithTable(Table)
+                .WithColumns(Columns)
+                .WithRows(Rows)
                 .Build();
 
             Assert.AreEqual(MessageCode.TsPutResp, cmd.ExpectedCode);
 
             TsPutReq pb = (TsPutReq)cmd.ConstructPbRequest();
+
+            CollectionAssert.AreEqual(TsCols, pb.columns);
+            CollectionAssert.AreEqual(TsRows, pb.rows);
         }
     }
 }

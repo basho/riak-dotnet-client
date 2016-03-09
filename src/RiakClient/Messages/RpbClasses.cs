@@ -248,13 +248,7 @@
 
     public sealed partial class TsTtbPutReq { }
 
-    public sealed partial class TsRow { }
-
     public sealed partial class TsRange { }
-
-    public sealed partial class TsCell { }
-
-    public sealed partial class TsColumnDescription { }
 
     public sealed partial class TsInterpolation { }
 }

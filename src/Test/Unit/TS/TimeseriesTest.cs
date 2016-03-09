@@ -30,13 +30,28 @@ namespace Test.Unit.TS
         protected static readonly string Varchar1 = "bazbat";
 
         protected static readonly Cell[] Cells0 = new Cell[]
-            {
-                new Cell<bool>(Boolean0),
-                new Cell<double>(Double0),
-                new Cell<long>(Long0),
-                new Cell<DateTime>(Timestamp0),
-                new Cell<string>(Varchar0),
-            };
+        {
+            new Cell<bool>(Boolean0),
+            new Cell<double>(Double0),
+            new Cell<long>(Long0),
+            new Cell<DateTime>(Timestamp0),
+            new Cell<string>(Varchar0),
+        };
+
+        protected static readonly Cell[] Cells1 = new Cell[]
+        {
+            new Cell<bool>(Boolean1),
+            new Cell<double>(Double1),
+            new Cell<long>(Long1),
+            new Cell<DateTime>(Timestamp1),
+            new Cell<string>(Varchar1),
+        };
+
+        protected static readonly Row[] Rows = new Row[]
+        {
+            new Row(Cells0),
+            new Row(Cells1)
+        };
 
         protected static readonly Row Key = new Row(Cells0);
 

@@ -40,8 +40,11 @@
 
             req.table = CommandOptions.Table;
 
-            // TODO: do we care?
-            // req.columns =
+            if (EnumerableUtil.NotNullOrEmpty(CommandOptions.Columns))
+            {
+                req.columns.AddRange(CommandOptions.Columns.Select(c => c.ToTsColumn()));
+            }
+
             req.rows.AddRange(CommandOptions.Rows.Select(r => r.ToTsRow()));
 
             return req;
@@ -63,7 +66,19 @@
         public class Builder
             : TimeseriesCommandBuilder<Builder, Put, PutOptions>
         {
+            private IEnumerable<Column> columns;
             private IEnumerable<Row> rows;
+
+            public Builder WithColumns(IEnumerable<Column> columns)
+            {
+                if (EnumerableUtil.IsNullOrEmpty(columns))
+                {
+                    throw new ArgumentNullException("columns", "columns are required");
+                }
+
+                this.columns = columns;
+                return this;
+            }
 
             public Builder WithRows(IEnumerable<Row> rows)
             {
@@ -78,6 +93,7 @@
 
             protected override void PopulateOptions(PutOptions options)
             {
+                options.Columns = columns;
                 options.Rows = rows;
             }
         }

@@ -1,6 +1,7 @@
 ﻿namespace RiakClient.Commands.TS
 {
     using System;
+    using Messages;
 
     public class Column : IEquatable<Column>
     {
@@ -61,6 +62,15 @@
                 result = (result * 397) ^ type.GetHashCode();
                 return result;
             }
+        }
+
+        internal TsColumnDescription ToTsColumn()
+        {
+            return new TsColumnDescription
+            {
+                name = RiakString.ToBytes(name),
+                type = (TsColumnType)type
+            };
         }
     }
 }

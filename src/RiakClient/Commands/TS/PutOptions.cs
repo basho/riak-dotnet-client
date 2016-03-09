@@ -8,12 +8,22 @@
     /// <inheritdoc/>
     public class PutOptions : TimeseriesCommandOptions
     {
+        private IEnumerable<Column> columns;
         private IEnumerable<Row> rows;
 
         /// <inheritdoc/>
         public PutOptions(string table)
             : base(table)
         {
+        }
+
+        /// <summary>
+        /// The columns corresponding to the rows
+        /// </summary>
+        public IEnumerable<Column> Columns
+        {
+            get { return columns; }
+            set { columns = value; }
         }
 
         /// <summary>
