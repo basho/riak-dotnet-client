@@ -9,104 +9,8 @@ namespace Test.Unit.TS
     using RiakClient.Util;
 
     [TestFixture, UnitTest]
-    public class GetTests
+    public class GetTests : TimeseriesTest
     {
-        private static readonly DateTime Now = DateTime.Now;
-        private static readonly DateTime NowPlusFive = Now.AddSeconds(5);
-        private static readonly TimeSpan Timeout = TimeSpan.FromSeconds(1);
-
-        private static readonly RiakString Table = "GeoCheckin";
-
-        private static readonly bool Boolean0 = false;
-        private static readonly bool Boolean1 = true;
-
-        private static readonly double Double0 = 12.34F;
-        private static readonly double Double1 = 56.78F;
-
-        private static readonly long Long0 = 32;
-        private static readonly long Long1 = 54;
-
-        private static readonly DateTime Timestamp0 = Now;
-        private static readonly DateTime Timestamp1 = NowPlusFive;
-
-        private static readonly string Varchar0 = "foobar";
-        private static readonly string Varchar1 = "bazbat";
-
-        private static readonly Cell[] Cells0 = new Cell[]
-            {
-                new Cell<bool>(Boolean0),
-                new Cell<double>(Double0),
-                new Cell<long>(Long0),
-                new Cell<DateTime>(Timestamp0),
-                new Cell<string>(Varchar0),
-            };
-
-        private static readonly Row Key = new Row(Cells0);
-
-        private static readonly Column[] Columns = new[]
-        {
-            new Column("bool", ColumnType.Boolean),
-            new Column("double", ColumnType.Double),
-            new Column("long", ColumnType.Int64),
-            new Column("timestamp", ColumnType.Timestamp),
-            new Column("string", ColumnType.Varchar),
-        };
-
-        private static readonly TsColumnDescription[] TsCols = new[]
-        {
-            new TsColumnDescription
-            {
-                name = RiakString.ToBytes("bool"),
-                type = TsColumnType.BOOLEAN
-            },
-            new TsColumnDescription
-            {
-                name = RiakString.ToBytes("double"),
-                type = TsColumnType.DOUBLE
-            },
-            new TsColumnDescription
-            {
-                name = RiakString.ToBytes("long"),
-                type = TsColumnType.SINT64
-            },
-            new TsColumnDescription
-            {
-                name = RiakString.ToBytes("timestamp"),
-                type = TsColumnType.TIMESTAMP
-            },
-            new TsColumnDescription
-            {
-                name = RiakString.ToBytes("string"),
-                type = TsColumnType.VARCHAR
-            }
-        };
-
-        private static readonly TsCell[] TsCells0 = new[]
-        {
-            new TsCell { boolean_value = Boolean0 },
-            new TsCell { double_value = Double0 },
-            new TsCell { sint64_value = Long0 },
-            new TsCell { timestamp_value = DateTimeUtil.ToUnixTimeMillis(Timestamp0) },
-            new TsCell { varchar_value = RiakString.ToBytes(Varchar0) }
-        };
-
-        private static readonly TsCell[] TsCells1 = new[]
-        {
-            new TsCell { boolean_value = Boolean1 },
-            new TsCell { double_value = Double1 },
-            new TsCell { sint64_value = Long1 },
-            new TsCell { timestamp_value = DateTimeUtil.ToUnixTimeMillis(Timestamp1) },
-            new TsCell { varchar_value = RiakString.ToBytes(Varchar1) }
-        };
-
-        private static readonly TsRow[] TsRows = new[] { new TsRow(), new TsRow() };
-
-        static GetTests()
-        {
-            TsRows[0].cells.AddRange(TsCells0);
-            TsRows[1].cells.AddRange(TsCells1);
-        }
-
         [Test]
         public void Should_Build_Req()
         {
@@ -212,16 +116,6 @@ namespace Test.Unit.TS
                     }
                 }
             }
-        }
-
-        private static Get BuildReqWithTimeout()
-        {
-            var cmd = new Get.Builder()
-                .WithTable(Table)
-                .WithKey(Key)
-                .WithTimeout(Timeout)
-                .Build();
-            return cmd;
         }
     }
 }

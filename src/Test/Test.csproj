@@ -63,6 +63,8 @@
     <Compile Include="Unit\CRDT\UpdateCounterTests.cs" />
     <Compile Include="Unit\CRDT\UpdateMapTests.cs" />
     <Compile Include="Unit\KV\FetchPreflistTests.cs" />
+    <Compile Include="Unit\TS\TimeseriesTest.cs" />
+    <Compile Include="Unit\TS\PutTests.cs" />
     <Compile Include="Unit\TS\GetTests.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -121,6 +123,9 @@
     <ExcludeFromStyleCop Include="$(IntermediateOutputPath)\**\*.cs">
       <Visible>False</Visible>
     </ExcludeFromStyleCop>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Integration\TS\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

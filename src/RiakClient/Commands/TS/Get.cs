@@ -18,6 +18,20 @@
         public Get(GetOptions options)
             : base(options)
         {
+            if (options == null)
+            {
+                throw new ArgumentNullException("options");
+            }
+
+            if (options.Key == null)
+            {
+                throw new ArgumentNullException("options.Key", "options.Key can not be null");
+            }
+
+            if (EnumerableUtil.IsNullOrEmpty(options.Key.Cells))
+            {
+                throw new ArgumentNullException("options.Key.Cells", "options.Key.Cells can not be null or empty");
+            }
         }
 
         public override MessageCode ExpectedCode

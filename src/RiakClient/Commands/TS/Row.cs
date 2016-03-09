@@ -70,6 +70,13 @@
             }
         }
 
+        internal TsRow ToTsRow()
+        {
+            var rv = new TsRow();
+            rv.cells.AddRange(ToTsCells());
+            return rv;
+        }
+
         internal IEnumerable<TsCell> ToTsCells()
         {
             return cells.Select(c => c.ToTsCell());
