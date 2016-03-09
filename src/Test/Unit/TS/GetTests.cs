@@ -8,7 +8,6 @@ namespace Test.Unit.TS
     using RiakClient.Messages;
     using RiakClient.Util;
 
-    [TestFixture, UnitTest]
     public class GetTests : TimeseriesTest
     {
         [Test]
@@ -45,7 +44,7 @@ namespace Test.Unit.TS
         [Test]
         public void Should_Build_Req_With_Timeout()
         {
-            Get cmd = BuildReqWithTimeout();
+            Get cmd = BuildGetReqWithTimeout();
             Assert.AreEqual(MessageCode.TsGetResp, cmd.ExpectedCode);
 
             TsGetReq pb = (TsGetReq)cmd.ConstructPbRequest();
@@ -60,7 +59,7 @@ namespace Test.Unit.TS
             rsp.columns.AddRange(TsCols);
             rsp.rows.AddRange(TsRows);
 
-            Get cmd = BuildReqWithTimeout();
+            Get cmd = BuildGetReqWithTimeout();
             cmd.OnSuccess(rsp);
 
             GetResponse response = cmd.Response;

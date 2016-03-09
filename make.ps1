@@ -28,7 +28,7 @@
 Param(
     [Parameter(Mandatory=$False, Position=0)]
     [ValidateSet('Debug','Release', 'All', 'Publish', 'Clean', 'CleanAll',
-        'Test','TestAll','UnitTest','IntegrationTest','DeprecatedTest',
+        'Test','TestAll','UnitTest','IntegrationTest','DeprecatedTest','TimeseriesTest',
         'CodeAnalysis','Documentation','ProtoGen',
         IgnoreCase = $True)]
     [string]$Target = 'Debug',

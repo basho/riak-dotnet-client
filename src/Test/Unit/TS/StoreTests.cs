@@ -4,18 +4,12 @@ namespace Test.Unit.TS
     using RiakClient.Commands.TS;
     using RiakClient.Messages;
 
-    [TestFixture, UnitTest]
-    public class PutTests : TimeseriesTest
+    public class StoreTests : TimeseriesTest
     {
         [Test]
         public void Should_Build_Req()
         {
-            var cmd = new Put.Builder()
-                .WithTable(Table)
-                .WithColumns(Columns)
-                .WithRows(Rows)
-                .Build();
-
+            Store cmd = BuildStoreReq();
             Assert.AreEqual(MessageCode.TsPutResp, cmd.ExpectedCode);
 
             TsPutReq pb = (TsPutReq)cmd.ConstructPbRequest();

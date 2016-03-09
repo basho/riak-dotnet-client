@@ -6,15 +6,22 @@
 
     public class Cell : IEquatable<Cell>
     {
+        public static readonly Cell Null = new Cell();
+        private const int NullHashCode = 0;
         private readonly object value;
 
-        protected Cell()
+        public Cell()
         {
             value = null;
         }
 
-        protected Cell(object value)
+        public Cell(object value)
         {
+            if (value == null)
+            {
+                throw new ArgumentNullException("value", "value must be non-null. Use paramaterless ctor for null Cell");
+            }
+
             this.value = value;
         }
 
@@ -35,6 +42,12 @@
                 return true;
             }
 
+            if (ReferenceEquals(this, Null) &&
+                ReferenceEquals(other, Null))
+            {
+                return true;
+            }
+
             return GetHashCode() == other.GetHashCode();
         }
 
@@ -50,13 +63,23 @@
         /// <returns>A hash code for the current object.</returns>
         public override int GetHashCode()
         {
+            if (ReferenceEquals(value, null))
+            {
+                return NullHashCode;
+            }
+
+            return value.GetHashCode();
+        }
+
+        public override string ToString()
+        {
             if (ReferenceEquals(null, value))
             {
-                return base.GetHashCode();
+                return "Null";
             }
             else
             {
-                return value.GetHashCode();
+                return value.ToString();
             }
         }
 

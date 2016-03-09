@@ -3,16 +3,16 @@
     using System.Collections.Generic;
 
     /// <summary>
-    /// Represents options for a <see cref="Put"/> operation.
+    /// Represents options for a <see cref="Store"/> operation.
     /// </summary>
     /// <inheritdoc/>
-    public class PutOptions : TimeseriesCommandOptions
+    public class StoreOptions : TimeseriesCommandOptions
     {
         private IEnumerable<Column> columns;
         private IEnumerable<Row> rows;
 
         /// <inheritdoc/>
-        public PutOptions(string table)
+        public StoreOptions(string table)
             : base(table)
         {
         }

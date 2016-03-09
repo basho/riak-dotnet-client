@@ -4,7 +4,7 @@
     using Messages;
     using Util;
 
-    public class Cell<TValue> : Cell
+    public class Cell<TValue> : Cell, IEquatable<Cell<TValue>>
     {
         private readonly Type vtype = typeof(TValue);
         private readonly TValue v;
@@ -23,6 +23,31 @@
         public TValue Value
         {
             get { return v; }
+        }
+
+        public bool Equals(Cell<TValue> other)
+        {
+            if (ReferenceEquals(null, other))
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(this, other))
+            {
+                return true;
+            }
+
+            return GetHashCode() == other.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            return base.Equals(obj as Cell<TValue>);
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
         }
 
         internal override TsCell ToTsCell()

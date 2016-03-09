@@ -49,6 +49,7 @@
     </Compile>
     <Compile Include="Integration\KV\FetchPreflistTests.cs" />
     <Compile Include="Integration\Issues\GitHub_277.cs" />
+    <Compile Include="Integration\TS\TimeseriesTests.cs" />
     <Compile Include="Traits.cs" />
     <Compile Include="Integration\CRDT\UpdateAndFetchSetTests.cs" />
     <Compile Include="Integration\CRDT\UpdateAndFetchCounterTests.cs" />
@@ -65,7 +66,7 @@
     <Compile Include="Unit\KV\FetchPreflistTests.cs" />
     <Compile Include="Unit\TS\TsCellTests.cs" />
     <Compile Include="Unit\TS\TimeseriesTest.cs" />
-    <Compile Include="Unit\TS\PutTests.cs" />
+    <Compile Include="Unit\TS\StoreTests.cs" />
     <Compile Include="Unit\TS\GetTests.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -125,9 +126,7 @@
       <Visible>False</Visible>
     </ExcludeFromStyleCop>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Integration\TS\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

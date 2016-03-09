@@ -9,13 +9,13 @@
     /// <summary>
     /// Fetches timeseries data from Riak
     /// </summary>
-    public class Put : Command<PutOptions, PutResponse>
+    public class Store : Command<StoreOptions, StoreResponse>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="Put"/> class.
+        /// Initializes a new instance of the <see cref="Store"/> class.
         /// </summary>
-        /// <param name="options">Options for this operation. See <see cref="PutOptions"/></param>
-        public Put(PutOptions options)
+        /// <param name="options">Options for this operation. See <see cref="StoreOptions"/></param>
+        public Store(StoreOptions options)
             : base(options)
         {
             if (options == null)
@@ -52,19 +52,12 @@
 
         public override void OnSuccess(RpbResp response)
         {
-            if (response == null)
-            {
-                Response = new PutResponse(false);
-            }
-            else
-            {
-                Response = new PutResponse();
-            }
+            Response = new StoreResponse();
         }
 
         /// <inheritdoc />
         public class Builder
-            : TimeseriesCommandBuilder<Builder, Put, PutOptions>
+            : TimeseriesCommandBuilder<Builder, Store, StoreOptions>
         {
             private IEnumerable<Column> columns;
             private IEnumerable<Row> rows;
@@ -91,7 +84,7 @@
                 return this;
             }
 
-            protected override void PopulateOptions(PutOptions options)
+            protected override void PopulateOptions(StoreOptions options)
             {
                 options.Columns = columns;
                 options.Rows = rows;

@@ -1,11 +1,13 @@
 namespace Test.Unit.TS
 {
     using System;
+    using NUnit.Framework;
     using RiakClient;
     using RiakClient.Commands.TS;
     using RiakClient.Messages;
     using RiakClient.Util;
 
+    [TestFixture, UnitTest]
     public abstract class TimeseriesTest
     {
         protected static readonly DateTime Now = DateTime.Now;
@@ -119,12 +121,22 @@ namespace Test.Unit.TS
             TsRows[1].cells.AddRange(TsCells1);
         }
 
-        protected static Get BuildReqWithTimeout()
+        protected static Get BuildGetReqWithTimeout()
         {
             var cmd = new Get.Builder()
                 .WithTable(Table)
                 .WithKey(Key)
                 .WithTimeout(Timeout)
+                .Build();
+            return cmd;
+        }
+
+        protected static Store BuildStoreReq()
+        {
+            var cmd = new Store.Builder()
+                .WithTable(Table)
+                .WithColumns(Columns)
+                .WithRows(Rows)
                 .Build();
             return cmd;
         }

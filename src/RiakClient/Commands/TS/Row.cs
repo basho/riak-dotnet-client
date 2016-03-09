@@ -59,11 +59,21 @@
 
             unchecked
             {
-                int result = base.GetHashCode();
+                int result = 1;
+                bool hashed = false;
 
-                foreach (Cell cell in cells)
+                if (EnumerableUtil.NotNullOrEmpty(cells))
                 {
-                    result = (result * 397) ^ cell.GetHashCode();
+                    hashed = true;
+                    foreach (Cell cell in cells)
+                    {
+                        result = (result * 397) ^ cell.GetHashCode();
+                    }
+                }
+
+                if (!hashed)
+                {
+                    result = base.GetHashCode();
                 }
 
                 return result;
