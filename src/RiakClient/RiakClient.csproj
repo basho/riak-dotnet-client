@@ -77,6 +77,9 @@
     <Compile Include="Commands\TS\Cell.cs" />
     <Compile Include="Commands\TS\Column.cs" />
     <Compile Include="Commands\TS\ColumnType.cs" />
+    <Compile Include="Commands\TS\Delete.cs" />
+    <Compile Include="Commands\TS\DeleteOptions.cs" />
+    <Compile Include="Commands\TS\DeleteResponse.cs" />
     <Compile Include="Commands\TS\StoreResponse.cs" />
     <Compile Include="Commands\TS\StoreOptions.cs" />
     <Compile Include="Commands\TS\Store.cs" />

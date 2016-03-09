@@ -234,9 +234,9 @@
     public sealed partial class TsQueryResp : RpbResp { }
 
     [CLSCompliant(false)]
-    public sealed partial class TsDelReq { }
+    public sealed partial class TsDelReq : RpbReq { }
 
-    public sealed partial class TsDelResp { }
+    public sealed partial class TsDelResp : RpbResp { }
 
     [CLSCompliant(false)]
     public sealed partial class TsCoverageEntry { }
