@@ -175,5 +175,48 @@ namespace Test.Integration.TS
                 Assert.AreEqual(Columns.Length, row.Cells.Count());
             }
         }
+
+        [Test]
+        public void Query_Matching_No_Data()
+        {
+            var qry = "SELECT * from GeoCheckin WHERE time > 0 and time < 10 and geohash = 'hash1' and user = 'user1'";
+            var cmd = new Query.Builder()
+                .WithTable("GeoCheckin")
+                .WithQuery(qry)
+                .Build();
+
+            RiakResult rslt = client.Execute(cmd);
+            Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
+
+            QueryResponse rsp = cmd.Response;
+            Assert.IsTrue(rsp.NotFound);
+
+            CollectionAssert.IsEmpty(rsp.Columns);
+            CollectionAssert.IsEmpty(rsp.Value);
+        }
+
+        [Test]
+        public void Query_Matching_Some_Data()
+        {
+            var qfmt = "SELECT * FROM GeoCheckin WHERE time > {0} and time < {1} and geohash = 'hash1' and user = 'user2'";
+            var q = string.Format(
+                qfmt,
+                DateTimeUtil.ToUnixTimeMillis(TenMinsAgo),
+                DateTimeUtil.ToUnixTimeMillis(Now));
+
+            var cmd = new Query.Builder()
+                .WithTable("GeoCheckin")
+                .WithQuery(q)
+                .Build();
+
+            RiakResult rslt = client.Execute(cmd);
+            Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
+
+            QueryResponse rsp = cmd.Response;
+            Assert.IsFalse(rsp.NotFound);
+
+            Assert.AreEqual(Columns.Length, rsp.Columns.Count());
+            Assert.AreEqual(1, rsp.Value.Count());
+        }
     }
 }
