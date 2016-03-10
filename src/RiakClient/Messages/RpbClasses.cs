@@ -233,6 +233,10 @@
 
     public sealed partial class TsQueryResp : RpbResp, IRpbStreamingResp { }
 
+    public sealed partial class TsListKeysReq : RpbReq { }
+
+    public sealed partial class TsListKeysResp : RpbResp, IRpbStreamingResp { }
+
     [CLSCompliant(false)]
     public sealed partial class TsDelReq : RpbReq, ITsByKeyReq { }
 

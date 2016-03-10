@@ -273,5 +273,27 @@ namespace Test.Integration.TS
             Assert.IsFalse(rsp.NotFound);
             Assert.Greater(i, 0);
         }
+
+        [Test]
+        public void List_Keys_In_Table()
+        {
+            int i = 0;
+            Action<ListKeysResponse> cb = (ListKeysResponse qr) =>
+            {
+                i += qr.Value.Count();
+            };
+
+            var cmd = new ListKeys.Builder()
+                .WithTable("GeoCheckin")
+                .WithCallback(cb)
+                .Build();
+
+            RiakResult rslt = client.Execute(cmd);
+            Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
+
+            ListKeysResponse rsp = cmd.Response;
+            Assert.IsFalse(rsp.NotFound);
+            Assert.AreEqual(4, i);
+        }
     }
 }

@@ -1,10 +1,7 @@
 ﻿namespace RiakClient.Commands.TS
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using Messages;
-    using Util;
 
     /// <summary>
     /// Fetches timeseries data from Riak

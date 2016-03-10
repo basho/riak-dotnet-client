@@ -74,6 +74,8 @@
     <Compile Include="Commands\CommandOptions.cs" />
     <Compile Include="Commands\Response{TValue}.cs" />
     <Compile Include="Commands\TS\DecodedResponse.cs" />
+    <Compile Include="Commands\TS\ListKeys.cs" />
+    <Compile Include="Commands\TS\ListKeysOptions.cs" />
     <Compile Include="Commands\TS\QueryOptions.cs" />
     <Compile Include="Commands\TS\Cell{TValue}.cs" />
     <Compile Include="Commands\TS\Cell.cs" />
@@ -82,6 +84,7 @@
     <Compile Include="Commands\TS\ByKeyCommand{TResponse}.cs" />
     <Compile Include="Commands\TS\Delete.cs" />
     <Compile Include="Commands\TS\ByKeyOptions.cs" />
+    <Compile Include="Commands\TS\ListKeysResponse.cs" />
     <Compile Include="Commands\TS\QueryResponse.cs" />
     <Compile Include="Commands\TS\Query.cs" />
     <Compile Include="Commands\TS\ResponseDecoder.cs" />

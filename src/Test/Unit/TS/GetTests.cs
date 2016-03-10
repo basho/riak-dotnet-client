@@ -21,6 +21,7 @@ namespace Test.Unit.TS
             Assert.AreEqual(MessageCode.TsGetResp, cmd.ExpectedCode);
 
             TsGetReq pb = (TsGetReq)cmd.ConstructPbRequest();
+            Assert.AreEqual(Table, RiakString.FromBytes(pb.table));
             Assert.IsFalse(pb.timeoutSpecified);
 
             Assert.True(pb.key[0].boolean_valueSpecified);
@@ -48,6 +49,8 @@ namespace Test.Unit.TS
             Assert.AreEqual(MessageCode.TsGetResp, cmd.ExpectedCode);
 
             TsGetReq pb = (TsGetReq)cmd.ConstructPbRequest();
+            Assert.AreEqual(Table, RiakString.FromBytes(pb.table));
+
             Assert.IsTrue(pb.timeoutSpecified);
             Assert.AreEqual(Timeout.TotalMilliseconds, pb.timeout);
         }
