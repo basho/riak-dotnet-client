@@ -1,12 +1,8 @@
 namespace Test.Unit.TS
 {
-    using System;
-    using System.Linq;
     using NUnit.Framework;
-    using RiakClient;
     using RiakClient.Commands.TS;
     using RiakClient.Messages;
-    using RiakClient.Util;
 
     public class DeleteTests : TimeseriesTest
     {
@@ -22,6 +18,22 @@ namespace Test.Unit.TS
 
             TsDelReq pb = (TsDelReq)cmd.ConstructPbRequest();
             Assert.IsFalse(pb.timeoutSpecified);
+        }
+
+        [Test]
+        public void Should_Build_Req_With_Timeout()
+        {
+            var cmd = new Delete.Builder()
+                .WithTable(Table)
+                .WithKey(Key)
+                .WithTimeout(Timeout)
+                .Build();
+
+            Assert.AreEqual(MessageCode.TsDelResp, cmd.ExpectedCode);
+
+            TsDelReq pb = (TsDelReq)cmd.ConstructPbRequest();
+            Assert.IsTrue(pb.timeoutSpecified);
+            Assert.AreEqual(Timeout.TotalMilliseconds, pb.timeout);
         }
     }
 }

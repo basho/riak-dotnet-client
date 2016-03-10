@@ -84,6 +84,17 @@
                 return this;
             }
 
+            public Builder WithRow(Row row)
+            {
+                if (row == null)
+                {
+                    throw new ArgumentNullException("row", "row is required");
+                }
+
+                rows = new[] { row };
+                return this;
+            }
+
             protected override void PopulateOptions(StoreOptions options)
             {
                 options.Columns = columns;

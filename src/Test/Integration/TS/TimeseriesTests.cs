@@ -62,6 +62,15 @@ namespace Test.Integration.TS
             new Row(Cells3)
         };
 
+        private static readonly Cell[] KeyCells1 = new Cell[]
+        {
+            new Cell<string>("hash1"),
+            new Cell<string>("user2"),
+            new Cell<DateTime>(FifteenMinsAgo)
+        };
+
+        private static readonly Row KeyToDelete = new Row(KeyCells1);
+
         private static readonly Cell[] KeyCells = new Cell[]
         {
             new Cell<string>("hash1"),
@@ -70,6 +79,7 @@ namespace Test.Integration.TS
         };
 
         private static readonly Row Key = new Row(KeyCells);
+        private static readonly Row RowToRestore = new Row(Cells1);
 
         private static readonly Column[] Columns = new[]
         {
@@ -110,6 +120,36 @@ namespace Test.Integration.TS
 
             Cell[] cells = rows[0].Cells.ToArray();
             CollectionAssert.AreEqual(Cells2, cells);
+        }
+
+        [Test]
+        public void Delete_One_Row()
+        {
+            var delete = new Delete.Builder()
+                    .WithTable(Table)
+                    .WithKey(KeyToDelete)
+                    .Build();
+
+            RiakResult rslt = client.Execute(delete);
+            Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
+            Assert.IsFalse(delete.Response.NotFound);
+
+            var get = new Get.Builder()
+                .WithTable(Table)
+                .WithKey(KeyToDelete)
+                .Build();
+
+            rslt = client.Execute(get);
+            Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
+            Assert.IsTrue(get.Response.NotFound);
+
+            var store = new Store.Builder()
+                    .WithTable(Table)
+                    .WithRow(RowToRestore)
+                    .Build();
+
+            rslt = client.Execute(store);
+            Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
         }
     }
 }
