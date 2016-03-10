@@ -77,9 +77,9 @@
     <Compile Include="Commands\TS\Cell.cs" />
     <Compile Include="Commands\TS\Column.cs" />
     <Compile Include="Commands\TS\ColumnType.cs" />
+    <Compile Include="Commands\TS\ByKeyCommand{TResponse}.cs" />
     <Compile Include="Commands\TS\Delete.cs" />
-    <Compile Include="Commands\TS\DeleteOptions.cs" />
-    <Compile Include="Commands\TS\DeleteResponse.cs" />
+    <Compile Include="Commands\TS\ByKeyOptions.cs" />
     <Compile Include="Commands\TS\StoreResponse.cs" />
     <Compile Include="Commands\TS\StoreOptions.cs" />
     <Compile Include="Commands\TS\Store.cs" />
@@ -122,7 +122,6 @@
     <Compile Include="Commands\CRDT\UpdateMapOptions.cs" />
     <Compile Include="Commands\KvCommandOptions.cs" />
     <Compile Include="Commands\IRiakCommand.cs" />
-    <Compile Include="Commands\TS\GetOptions.cs" />
     <Compile Include="Commands\TS\Get.cs" />
     <Compile Include="Commands\TS\Row.cs" />
     <Compile Include="Comms\IRiakConnectionManager.cs" />
@@ -143,6 +142,7 @@
     <Compile Include="Containers\IConcurrentEnumerable.cs" />
     <Compile Include="Containers\IConcurrentEnumerator.cs" />
     <Compile Include="Exceptions\RiakUnsupportedException.cs" />
+    <Compile Include="Messages\ITsByKeyReq.cs" />
     <Compile Include="Messages\TsColumnDescription.cs" />
     <Compile Include="Messages\TsRow.cs" />
     <Compile Include="Messages\TsCell.cs" />

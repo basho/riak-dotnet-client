@@ -221,7 +221,7 @@
     public sealed partial class TsListKeysResp { }
 
     [CLSCompliant(false)]
-    public sealed partial class TsGetReq : RpbReq { }
+    public sealed partial class TsGetReq : RpbReq, ITsByKeyReq { }
 
     public sealed partial class TsGetResp : RpbResp { }
 
@@ -234,7 +234,7 @@
     public sealed partial class TsQueryResp : RpbResp { }
 
     [CLSCompliant(false)]
-    public sealed partial class TsDelReq : RpbReq { }
+    public sealed partial class TsDelReq : RpbReq, ITsByKeyReq { }
 
     public sealed partial class TsDelResp : RpbResp { }
 

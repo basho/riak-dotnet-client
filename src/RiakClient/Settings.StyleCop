@@ -8,6 +8,7 @@
     <SourceFile>riak_search.cs</SourceFile>
     <SourceFile>riak_yokozuna.cs</SourceFile>
     <SourceFile>RpbClasses.cs</SourceFile>
+    <SourceFile>ITsByKeyReq.cs</SourceFile>
     <Settings>
       <GlobalSettings>
         <BooleanProperty Name="RulesEnabledByDefault">False</BooleanProperty>

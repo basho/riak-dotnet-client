@@ -1,19 +1,16 @@
 ﻿namespace RiakClient.Commands.TS
 {
-    /// <summary>
-    /// Represents options for a <see cref="Delete"/> operation.
-    /// </summary>
     /// <inheritdoc/>
-    public class DeleteOptions : TimeseriesCommandOptions
+    public class ByKeyOptions : TimeseriesCommandOptions
     {
         /// <inheritdoc/>
-        public DeleteOptions(string table)
+        public ByKeyOptions(string table)
             : base(table)
         {
         }
 
         /// <summary>
-        /// The key to delete from Riak TS
+        /// The key in Riak TS
         /// </summary>
         public Row Key
         {

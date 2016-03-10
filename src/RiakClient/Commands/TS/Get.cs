@@ -9,51 +9,21 @@
     /// <summary>
     /// Fetches timeseries data from Riak
     /// </summary>
-    public class Get : Command<GetOptions, GetResponse>
+    [CLSCompliant(false)]
+    public class Get : ByKeyCommand<GetResponse>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Get"/> class.
         /// </summary>
-        /// <param name="options">Options for this operation. See <see cref="GetOptions"/></param>
-        public Get(GetOptions options)
+        /// <param name="options">Options for this operation. See <see cref="ByKeyOptions"/></param>
+        public Get(ByKeyOptions options)
             : base(options)
         {
-            if (options == null)
-            {
-                throw new ArgumentNullException("options");
-            }
-
-            if (options.Key == null)
-            {
-                throw new ArgumentNullException("options.Key", "options.Key can not be null");
-            }
-
-            if (EnumerableUtil.IsNullOrEmpty(options.Key.Cells))
-            {
-                throw new ArgumentNullException("options.Key.Cells", "options.Key.Cells can not be null or empty");
-            }
         }
 
         public override MessageCode ExpectedCode
         {
             get { return MessageCode.TsGetResp; }
-        }
-
-        public override RpbReq ConstructPbRequest()
-        {
-            var req = new TsGetReq();
-
-            req.table = CommandOptions.Table;
-
-            req.timeoutSpecified = false;
-            if (CommandOptions.Timeout.HasValue)
-            {
-                req.timeout = (uint)CommandOptions.Timeout;
-            }
-
-            req.key.AddRange(CommandOptions.Key.ToTsCells());
-
-            return req;
         }
 
         public override void OnSuccess(RpbResp response)
@@ -85,28 +55,15 @@
             }
         }
 
+        protected override ITsByKeyReq GetByKeyReq()
+        {
+            return new TsGetReq();
+        }
+
         /// <inheritdoc />
         public class Builder
-            : TimeseriesCommandBuilder<Builder, Get, GetOptions>
+            : Builder<Get>
         {
-            private Row key;
-
-            public Builder WithKey(Row key)
-            {
-                if (key == null)
-                {
-                    throw new ArgumentNullException("key", "key is required");
-                }
-
-                this.key = key;
-                return this;
-            }
-
-            protected override void PopulateOptions(GetOptions options)
-            {
-                options.Key = key;
-                options.Timeout = timeout;
-            }
         }
     }
 }
