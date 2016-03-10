@@ -231,7 +231,7 @@
 
     public sealed partial class TsQueryReq : RpbReq { }
 
-    public sealed partial class TsQueryResp : RpbResp { }
+    public sealed partial class TsQueryResp : RpbResp, IRpbStreamingResp { }
 
     [CLSCompliant(false)]
     public sealed partial class TsDelReq : RpbReq, ITsByKeyReq { }

@@ -28,7 +28,7 @@
 
         public override void OnSuccess(RpbResp response)
         {
-            var decoder = new ResponseDecoder(response);
+            var decoder = new ResponseDecoder((TsGetResp)response);
             DecodedResponse dr = decoder.Decode();
 
             Response = new GetResponse(CommandOptions.Key, dr.Columns, dr.Rows);

@@ -189,7 +189,7 @@ namespace Test.Integration.TS
             Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
 
             QueryResponse rsp = cmd.Response;
-            Assert.IsTrue(rsp.NotFound);
+            Assert.IsFalse(rsp.NotFound);
 
             CollectionAssert.IsEmpty(rsp.Columns);
             CollectionAssert.IsEmpty(rsp.Value);
@@ -217,6 +217,61 @@ namespace Test.Integration.TS
 
             Assert.AreEqual(Columns.Length, rsp.Columns.Count());
             Assert.AreEqual(1, rsp.Value.Count());
+        }
+
+        [Test]
+        public void Query_Matching_All_Data()
+        {
+            var qfmt = "SELECT * FROM GeoCheckin WHERE time >= {0} and time <= {1} and geohash = 'hash1' and user = 'user2'";
+            var q = string.Format(
+                qfmt,
+                DateTimeUtil.ToUnixTimeMillis(TwentyMinsAgo),
+                DateTimeUtil.ToUnixTimeMillis(Now));
+
+            var cmd = new Query.Builder()
+                .WithTable("GeoCheckin")
+                .WithQuery(q)
+                .Build();
+
+            RiakResult rslt = client.Execute(cmd);
+            Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
+
+            QueryResponse rsp = cmd.Response;
+            Assert.IsFalse(rsp.NotFound);
+
+            Assert.AreEqual(Columns.Length, rsp.Columns.Count());
+            Assert.AreEqual(Rows.Length, rsp.Value.Count());
+        }
+
+        [Test]
+        public void Query_Streaming_Matching_All_Data()
+        {
+            var qfmt = "SELECT * FROM GeoCheckin WHERE time >= {0} and time <= {1} and geohash = 'hash1' and user = 'user2'";
+            var q = string.Format(
+                qfmt,
+                DateTimeUtil.ToUnixTimeMillis(TwentyMinsAgo),
+                DateTimeUtil.ToUnixTimeMillis(Now));
+
+            ushort i = 0;
+            Action<QueryResponse> cb = (QueryResponse qr) =>
+            {
+                i++;
+                Assert.AreEqual(Columns.Length, qr.Columns.Count());
+                CollectionAssert.IsNotEmpty(qr.Value);
+            };
+
+            var cmd = new Query.Builder()
+                .WithTable("GeoCheckin")
+                .WithQuery(q)
+                .WithCallback(cb)
+                .Build();
+
+            RiakResult rslt = client.Execute(cmd);
+            Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
+
+            QueryResponse rsp = cmd.Response;
+            Assert.IsFalse(rsp.NotFound);
+            Assert.Greater(i, 0);
         }
     }
 }

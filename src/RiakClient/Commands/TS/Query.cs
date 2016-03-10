@@ -1,6 +1,7 @@
 ﻿namespace RiakClient.Commands.TS
 {
     using System;
+    using System.Collections.Generic;
     using Messages;
 
     /// <summary>
@@ -9,6 +10,8 @@
     [CLSCompliant(false)]
     public class Query : Command<QueryOptions, QueryResponse>
     {
+        private readonly List<Row> rows = new List<Row>();
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Query"/> class.
         /// </summary>
@@ -36,17 +39,33 @@
                 @base = CommandOptions.Query
             };
 
-            req.stream = CommandOptions.Streaming;
+            // NB: always stream, collect results unless callback is passed.
+            req.stream = true;
 
             return req;
         }
 
         public override void OnSuccess(RpbResp response)
         {
-            var decoder = new ResponseDecoder(response);
+            var decoder = new ResponseDecoder((TsQueryResp)response);
             DecodedResponse dr = decoder.Decode();
 
             Response = new QueryResponse(CommandOptions.Query, dr.Columns, dr.Rows);
+
+            if (CommandOptions.Callback != null)
+            {
+                CommandOptions.Callback(Response);
+            }
+            else
+            {
+                rows.AddRange(Response.Value);
+            }
+
+            var streamingResponse = response as IRpbStreamingResp;
+            if (streamingResponse != null && streamingResponse.done)
+            {
+                Response = new QueryResponse(CommandOptions.Query, dr.Columns, rows);
+            }
         }
 
         /// <inheritdoc />
@@ -54,7 +73,7 @@
             : TimeseriesCommandBuilder<Builder, Query, QueryOptions>
         {
             private string query;
-            private bool streaming;
+            private Action<QueryResponse> callback;
 
             public Builder WithQuery(string query)
             {
@@ -67,16 +86,21 @@
                 return this;
             }
 
-            public Builder WithStreaming(bool streaming = true)
+            public Builder WithCallback(Action<QueryResponse> callback)
             {
-                this.streaming = streaming;
+                if (callback == null)
+                {
+                    throw new ArgumentNullException("callback");
+                }
+
+                this.callback = callback;
                 return this;
             }
 
             protected override void PopulateOptions(QueryOptions options)
             {
                 options.Query = query;
-                options.Streaming = streaming;
+                options.Callback = callback;
             }
         }
     }

@@ -9,6 +9,7 @@
     <SourceFile>riak_yokozuna.cs</SourceFile>
     <SourceFile>RpbClasses.cs</SourceFile>
     <SourceFile>ITsByKeyReq.cs</SourceFile>
+    <SourceFile>IRpbStreamingResp.cs</SourceFile>
     <Settings>
       <GlobalSettings>
         <BooleanProperty Name="RulesEnabledByDefault">False</BooleanProperty>

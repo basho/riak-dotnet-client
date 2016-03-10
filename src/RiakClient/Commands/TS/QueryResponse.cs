@@ -1,7 +1,6 @@
 ﻿namespace RiakClient.Commands.TS
 {
     using System.Collections.Generic;
-    using Util;
 
     /// <summary>
     /// Response to a <see cref="Query"/> command.
@@ -25,11 +24,6 @@
         public QueryResponse(string query, IEnumerable<Column> columns, IEnumerable<Row> values)
             : base(query, values)
         {
-            if (EnumerableUtil.IsNullOrEmpty(values))
-            {
-                isNotFound = true;
-            }
-
             this.columns = columns;
         }
 

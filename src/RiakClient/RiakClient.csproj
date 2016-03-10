@@ -147,6 +147,7 @@
     <Compile Include="Containers\IConcurrentEnumerable.cs" />
     <Compile Include="Containers\IConcurrentEnumerator.cs" />
     <Compile Include="Exceptions\RiakUnsupportedException.cs" />
+    <Compile Include="Messages\IRpbStreamingResp.cs" />
     <Compile Include="Messages\ITsByKeyReq.cs" />
     <Compile Include="Messages\TsColumnDescription.cs" />
     <Compile Include="Messages\TsRow.cs" />

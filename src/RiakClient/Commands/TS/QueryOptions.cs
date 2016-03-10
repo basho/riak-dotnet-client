@@ -1,5 +1,7 @@
 ﻿namespace RiakClient.Commands.TS
 {
+    using System;
+
     /// <inheritdoc/>
     public class QueryOptions : TimeseriesCommandOptions
     {
@@ -18,9 +20,9 @@
         }
 
         /// <summary>
-        /// Set to <b>true</b> to stream the response.
+        /// Set to a function to receive streamed data.
         /// </summary>
-        public bool Streaming
+        public Action<QueryResponse> Callback
         {
             get; set;
         }

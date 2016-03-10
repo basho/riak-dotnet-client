@@ -1,5 +1,6 @@
 namespace Test.Unit.TS
 {
+    using System;
     using NUnit.Framework;
     using RiakClient;
     using RiakClient.Commands.TS;
@@ -22,23 +23,29 @@ namespace Test.Unit.TS
 
             TsQueryReq pb = (TsQueryReq)cmd.ConstructPbRequest();
             Assert.AreEqual(QueryRS, RiakString.FromBytes(pb.query.@base));
+            
+            // NB: Query always streams
             Assert.IsTrue(pb.streamSpecified);
-            Assert.IsFalse(pb.stream);
+            Assert.IsTrue(pb.stream);
         }
 
         [Test]
         public void Should_Build_Req_With_Streaming()
         {
+            Action<QueryResponse> cb = (QueryResponse qr) => { };
+
             var cmd = new Query.Builder()
                 .WithTable(Table)
                 .WithQuery(Query)
-                .WithStreaming()
+                .WithCallback(cb)
                 .Build();
 
             Assert.AreEqual(MessageCode.TsQueryResp, cmd.ExpectedCode);
 
             TsQueryReq pb = (TsQueryReq)cmd.ConstructPbRequest();
             Assert.AreEqual(QueryRS, RiakString.FromBytes(pb.query.@base));
+
+            // NB: Query always streams
             Assert.IsTrue(pb.streamSpecified);
             Assert.IsTrue(pb.stream);
         }

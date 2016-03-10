@@ -1,6 +1,5 @@
 ﻿namespace RiakClient.Commands.TS
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using Messages;
@@ -10,27 +9,23 @@
     {
         private readonly IEnumerable<TsColumnDescription> tscols;
         private readonly IEnumerable<TsRow> tsrows;
-
-        public ResponseDecoder(RpbResp response)
+        
+        public ResponseDecoder(TsQueryResp response)
+            : this(response.columns, response.rows)
         {
-            TsGetResp gr = response as TsGetResp;
-            if (gr != null)
-            {
-                tscols = gr.columns;
-                tsrows = gr.rows;
-                return;
-            }
+        }
 
-            TsQueryResp qr = response as TsQueryResp;
-            if (qr != null)
-            {
-                tscols = qr.columns;
-                tsrows = qr.rows;
-                return;
-            }
+        public ResponseDecoder(TsGetResp response)
+            : this(response.columns, response.rows)
+        {
+        }
 
-            var msg = string.Format("Can't decode message of type: {0}", response.GetType().Name);
-            throw new InvalidOperationException(msg);
+        private ResponseDecoder(
+            IEnumerable<TsColumnDescription> tscols,
+            IEnumerable<TsRow> tsrows)
+        {
+            this.tscols = tscols;
+            this.tsrows = tsrows;
         }
 
         public DecodedResponse Decode()
