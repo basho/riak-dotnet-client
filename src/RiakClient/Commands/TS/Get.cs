@@ -28,38 +28,10 @@
 
         public override void OnSuccess(RpbResp response)
         {
-            if (response == null)
-            {
-                Response = new GetResponse();
-            }
-            else
-            {
-                TsGetResp resp = (TsGetResp)response;
+            var decoder = new ResponseDecoder(response);
+            DecodedResponse dr = decoder.Decode();
 
-                if (EnumerableUtil.IsNullOrEmpty(resp.rows))
-                {
-                    Response = new GetResponse();
-                }
-                else
-                {
-                    IEnumerable<Column> cols = Enumerable.Empty<Column>();
-
-                    if (EnumerableUtil.NotNullOrEmpty(resp.columns))
-                    {
-                        cols = resp.columns.Select(tsc =>
-                            new Column(RiakString.FromBytes(tsc.name), (ColumnType)tsc.type));
-                    }
-
-                    IEnumerable<Row> rows = Enumerable.Empty<Row>();
-
-                    if (EnumerableUtil.NotNullOrEmpty(resp.rows))
-                    {
-                        rows = resp.rows.Select(tsr => new Row(tsr));
-                    }
-
-                    Response = new GetResponse(CommandOptions.Key, cols, rows);
-                }
-            }
+            Response = new GetResponse(CommandOptions.Key, dr.Columns, dr.Rows);
         }
 
         protected override ITsByKeyReq GetByKeyReq()

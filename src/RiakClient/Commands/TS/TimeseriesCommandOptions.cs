@@ -19,10 +19,8 @@
             {
                 throw new ArgumentNullException("table");
             }
-            else
-            {
-                this.table = table;
-            }
+
+            this.table = table;
         }
 
         /// <summary>
