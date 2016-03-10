@@ -151,5 +151,29 @@ namespace Test.Integration.TS
             rslt = client.Execute(store);
             Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
         }
+
+        [Test]
+        public void Query_Table_Description()
+        {
+            var cmd = new Query.Builder()
+                .WithTable("GeoCheckin")
+                .WithQuery("DESCRIBE GeoCheckin")
+                .Build();
+
+            RiakResult rslt = client.Execute(cmd);
+            Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
+
+            QueryResponse rsp = cmd.Response;
+            Assert.IsFalse(rsp.NotFound);
+            CollectionAssert.IsNotEmpty(rsp.Columns);
+            CollectionAssert.IsNotEmpty(rsp.Value);
+
+            Assert.AreEqual(Columns.Length, rsp.Columns.Count());
+            Assert.AreEqual(Columns.Length, rsp.Value.Count());
+            foreach (Row row in rsp.Value)
+            {
+                Assert.AreEqual(Columns.Length, row.Cells.Count());
+            }
+        }
     }
 }

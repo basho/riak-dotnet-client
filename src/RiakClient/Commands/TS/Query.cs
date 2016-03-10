@@ -1,10 +1,7 @@
 ﻿namespace RiakClient.Commands.TS
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using Messages;
-    using Util;
 
     /// <summary>
     /// Fetches timeseries data from Riak
@@ -39,10 +36,9 @@
                 @base = CommandOptions.Query
             };
 
-            // TODO
-            req.stream = false;
+            req.stream = CommandOptions.Streaming;
 
-            return (RpbReq)req;
+            return req;
         }
 
         public override void OnSuccess(RpbResp response)
@@ -58,6 +54,7 @@
             : TimeseriesCommandBuilder<Builder, Query, QueryOptions>
         {
             private string query;
+            private bool streaming;
 
             public Builder WithQuery(string query)
             {
@@ -70,9 +67,16 @@
                 return this;
             }
 
+            public Builder WithStreaming(bool streaming = true)
+            {
+                this.streaming = streaming;
+                return this;
+            }
+
             protected override void PopulateOptions(QueryOptions options)
             {
                 options.Query = query;
+                options.Streaming = streaming;
             }
         }
     }

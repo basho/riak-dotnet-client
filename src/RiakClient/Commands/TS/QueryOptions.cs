@@ -16,5 +16,13 @@
         {
             get; set;
         }
+
+        /// <summary>
+        /// Set to <b>true</b> to stream the response.
+        /// </summary>
+        public bool Streaming
+        {
+            get; set;
+        }
     }
 }
