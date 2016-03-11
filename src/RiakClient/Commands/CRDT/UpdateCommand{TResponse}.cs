@@ -58,11 +58,7 @@ namespace RiakClient.Commands.CRDT
 
             req.return_body = CommandOptions.ReturnBody;
 
-            req.timeoutSpecified = false;
-            if (CommandOptions.Timeout.HasValue)
-            {
-                req.timeout = (uint)CommandOptions.Timeout;
-            }
+            req.timeout = (uint)CommandOptions.Timeout;
 
             req.context = CommandOptions.Context;
             req.include_context = CommandOptions.IncludeContext;

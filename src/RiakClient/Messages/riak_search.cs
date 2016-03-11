@@ -7,8 +7,6 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// Option: missing-value detection (*Specified/ShouldSerialize*/Reset*) enabled
-    
 // Generated from: riak_search.proto
 // Note: requires additional types generated from: riak.proto
 namespace RiakClient.Messages
@@ -49,108 +47,54 @@ namespace RiakClient.Messages
       get { return _index; }
       set { _index = value; }
     }
-    private uint? _rows;
+    private uint _rows = default(uint);
     [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"rows", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(uint))]
     public uint rows
     {
-      get { return _rows?? default(uint); }
+      get { return _rows; }
       set { _rows = value; }
     }
-    [global::System.Xml.Serialization.XmlIgnore]
-    [global::System.ComponentModel.Browsable(false)]
-    public bool rowsSpecified
-    {
-      get { return this._rows != null; }
-      set { if (value == (this._rows== null)) this._rows = value ? this.rows : (uint?)null; }
-    }
-    private bool ShouldSerializerows() { return rowsSpecified; }
-    private void Resetrows() { rowsSpecified = false; }
-    
-    private uint? _start;
+    private uint _start = default(uint);
     [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"start", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(uint))]
     public uint start
     {
-      get { return _start?? default(uint); }
+      get { return _start; }
       set { _start = value; }
     }
-    [global::System.Xml.Serialization.XmlIgnore]
-    [global::System.ComponentModel.Browsable(false)]
-    public bool startSpecified
-    {
-      get { return this._start != null; }
-      set { if (value == (this._start== null)) this._start = value ? this.start : (uint?)null; }
-    }
-    private bool ShouldSerializestart() { return startSpecified; }
-    private void Resetstart() { startSpecified = false; }
-    
-    private byte[] _sort;
+    private byte[] _sort = null;
     [global::ProtoBuf.ProtoMember(5, IsRequired = false, Name=@"sort", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(null)]
     public byte[] sort
     {
-      get { return _sort?? null; }
+      get { return _sort; }
       set { _sort = value; }
     }
-    [global::System.Xml.Serialization.XmlIgnore]
-    [global::System.ComponentModel.Browsable(false)]
-    public bool sortSpecified
-    {
-      get { return this._sort != null; }
-      set { if (value == (this._sort== null)) this._sort = value ? this.sort : (byte[])null; }
-    }
-    private bool ShouldSerializesort() { return sortSpecified; }
-    private void Resetsort() { sortSpecified = false; }
-    
-    private byte[] _filter;
+    private byte[] _filter = null;
     [global::ProtoBuf.ProtoMember(6, IsRequired = false, Name=@"filter", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(null)]
     public byte[] filter
     {
-      get { return _filter?? null; }
+      get { return _filter; }
       set { _filter = value; }
     }
-    [global::System.Xml.Serialization.XmlIgnore]
-    [global::System.ComponentModel.Browsable(false)]
-    public bool filterSpecified
-    {
-      get { return this._filter != null; }
-      set { if (value == (this._filter== null)) this._filter = value ? this.filter : (byte[])null; }
-    }
-    private bool ShouldSerializefilter() { return filterSpecified; }
-    private void Resetfilter() { filterSpecified = false; }
-    
-    private byte[] _df;
+    private byte[] _df = null;
     [global::ProtoBuf.ProtoMember(7, IsRequired = false, Name=@"df", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(null)]
     public byte[] df
     {
-      get { return _df?? null; }
+      get { return _df; }
       set { _df = value; }
     }
-    [global::System.Xml.Serialization.XmlIgnore]
-    [global::System.ComponentModel.Browsable(false)]
-    public bool dfSpecified
-    {
-      get { return this._df != null; }
-      set { if (value == (this._df== null)) this._df = value ? this.df : (byte[])null; }
-    }
-    private bool ShouldSerializedf() { return dfSpecified; }
-    private void Resetdf() { dfSpecified = false; }
-    
-    private byte[] _op;
+    private byte[] _op = null;
     [global::ProtoBuf.ProtoMember(8, IsRequired = false, Name=@"op", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(null)]
     public byte[] op
     {
-      get { return _op?? null; }
+      get { return _op; }
       set { _op = value; }
     }
-    [global::System.Xml.Serialization.XmlIgnore]
-    [global::System.ComponentModel.Browsable(false)]
-    public bool opSpecified
-    {
-      get { return this._op != null; }
-      set { if (value == (this._op== null)) this._op = value ? this.op : (byte[])null; }
-    }
-    private bool ShouldSerializeop() { return opSpecified; }
-    private void Resetop() { opSpecified = false; }
-    
     private readonly global::System.Collections.Generic.List<byte[]> _fl = new global::System.Collections.Generic.List<byte[]>();
     [global::ProtoBuf.ProtoMember(9, Name=@"fl", DataFormat = global::ProtoBuf.DataFormat.Default)]
     public global::System.Collections.Generic.List<byte[]> fl
@@ -158,23 +102,14 @@ namespace RiakClient.Messages
       get { return _fl; }
     }
   
-    private byte[] _presort;
+    private byte[] _presort = null;
     [global::ProtoBuf.ProtoMember(10, IsRequired = false, Name=@"presort", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(null)]
     public byte[] presort
     {
-      get { return _presort?? null; }
+      get { return _presort; }
       set { _presort = value; }
     }
-    [global::System.Xml.Serialization.XmlIgnore]
-    [global::System.ComponentModel.Browsable(false)]
-    public bool presortSpecified
-    {
-      get { return this._presort != null; }
-      set { if (value == (this._presort== null)) this._presort = value ? this.presort : (byte[])null; }
-    }
-    private bool ShouldSerializepresort() { return presortSpecified; }
-    private void Resetpresort() { presortSpecified = false; }
-    
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -192,40 +127,22 @@ namespace RiakClient.Messages
       get { return _docs; }
     }
   
-    private float? _max_score;
+    private float _max_score = default(float);
     [global::ProtoBuf.ProtoMember(2, IsRequired = false, Name=@"max_score", DataFormat = global::ProtoBuf.DataFormat.FixedSize)]
+    [global::System.ComponentModel.DefaultValue(default(float))]
     public float max_score
     {
-      get { return _max_score?? default(float); }
+      get { return _max_score; }
       set { _max_score = value; }
     }
-    [global::System.Xml.Serialization.XmlIgnore]
-    [global::System.ComponentModel.Browsable(false)]
-    public bool max_scoreSpecified
-    {
-      get { return this._max_score != null; }
-      set { if (value == (this._max_score== null)) this._max_score = value ? this.max_score : (float?)null; }
-    }
-    private bool ShouldSerializemax_score() { return max_scoreSpecified; }
-    private void Resetmax_score() { max_scoreSpecified = false; }
-    
-    private uint? _num_found;
+    private uint _num_found = default(uint);
     [global::ProtoBuf.ProtoMember(3, IsRequired = false, Name=@"num_found", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    [global::System.ComponentModel.DefaultValue(default(uint))]
     public uint num_found
     {
-      get { return _num_found?? default(uint); }
+      get { return _num_found; }
       set { _num_found = value; }
     }
-    [global::System.Xml.Serialization.XmlIgnore]
-    [global::System.ComponentModel.Browsable(false)]
-    public bool num_foundSpecified
-    {
-      get { return this._num_found != null; }
-      set { if (value == (this._num_found== null)) this._num_found = value ? this.num_found : (uint?)null; }
-    }
-    private bool ShouldSerializenum_found() { return num_foundSpecified; }
-    private void Resetnum_found() { num_foundSpecified = false; }
-    
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }

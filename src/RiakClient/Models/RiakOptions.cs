@@ -78,7 +78,7 @@ namespace RiakClient.Models
         /// The <see cref="Timeout"/> period for an operation.
         /// </summary>
         /// <remarks>Developers can leave this unset by default.</remarks>
-        public Timeout? Timeout
+        public Timeout Timeout
         {
             get;
             protected set;

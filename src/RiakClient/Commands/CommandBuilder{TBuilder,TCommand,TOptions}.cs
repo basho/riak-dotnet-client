@@ -12,7 +12,7 @@
         where TBuilder : CommandBuilder<TBuilder, TCommand, TOptions>
         where TOptions : CommandOptions
     {
-        protected Timeout? timeout;
+        protected Timeout timeout;
 
         public CommandBuilder()
         {
@@ -39,15 +39,7 @@
 
         public TBuilder WithTimeout(TimeSpan timeout)
         {
-            if (timeout == default(TimeSpan))
-            {
-                this.timeout = null;
-            }
-            else
-            {
-                this.timeout = new Timeout(timeout);
-            }
-
+            this.timeout = new Timeout(timeout);
             return (TBuilder)this;
         }
 

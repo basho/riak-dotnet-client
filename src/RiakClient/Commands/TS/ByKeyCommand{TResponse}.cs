@@ -42,7 +42,7 @@
             req.table = CommandOptions.Table;
 
             req.timeoutSpecified = false;
-            if (CommandOptions.Timeout.HasValue)
+            if (CommandOptions.Timeout != default(Timeout))
             {
                 req.timeout = (uint)CommandOptions.Timeout;
             }

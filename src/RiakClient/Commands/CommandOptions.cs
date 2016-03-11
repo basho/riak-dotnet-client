@@ -7,12 +7,12 @@
     /// </summary>
     public abstract class CommandOptions : IEquatable<CommandOptions>
     {
-        protected Timeout? commandTimeout;
+        protected Timeout commandTimeout;
 
         /// <summary>
         /// The timeout for this command.
         /// </summary>
-        public Timeout? Timeout
+        public Timeout Timeout
         {
             get { return commandTimeout; }
             set { commandTimeout = value; }
@@ -45,14 +45,7 @@
         /// <returns>A hash code for the current object.</returns>
         public override int GetHashCode()
         {
-            int result = base.GetHashCode();
-
-            if (commandTimeout.HasValue)
-            {
-                result = (result * 397) ^ commandTimeout.GetHashCode();
-            }
-
-            return result;
+            return commandTimeout.GetHashCode();
         }
     }
 }

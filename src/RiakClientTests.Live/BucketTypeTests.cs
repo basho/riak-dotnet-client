@@ -20,7 +20,11 @@ namespace RiakClientTests.Live
             var obj = new RiakObject(id, Value);
 
             // put
-            var putResult = Client.Put(obj, new RiakPutOptions().SetReturnBody(true).SetDw(3));
+            var putOptions = new RiakPutOptions();
+            putOptions.SetReturnBody(true);
+            putOptions.SetDw(3);
+            putOptions.SetTimeout(new Timeout(TimeSpan.FromSeconds(60)));
+            var putResult = Client.Put(obj, putOptions);
             Assert.True(putResult.IsSuccess, putResult.ErrorMessage);
             Assert.AreEqual(TestBucketType, putResult.Value.BucketType);
 

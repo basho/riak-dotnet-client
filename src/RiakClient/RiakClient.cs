@@ -1069,11 +1069,7 @@ namespace RiakClient
                 index = searchIndex.ToMessage(),
             };
 
-            request.timeoutSpecified = false;
-            if (searchIndex.Timeout.HasValue)
-            {
-                request.timeout = (uint)searchIndex.Timeout;
-            }
+            request.timeout = (uint)searchIndex.Timeout;
 
             return UseConnection(conn => conn.PbcWriteRead(request, MessageCode.RpbPutResp));
         }

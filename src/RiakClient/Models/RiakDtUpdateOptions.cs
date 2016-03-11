@@ -144,11 +144,7 @@ namespace RiakClient.Models
 
             request.return_body = ReturnBody;
 
-            request.timeoutSpecified = false;
-            if (Timeout.HasValue)
-            {
-                request.timeout = (uint)Timeout;
-            }
+            request.timeout = (uint)Timeout;
 
             request.sloppy_quorum = SloppyQuorum;
 

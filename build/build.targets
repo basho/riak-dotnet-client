@@ -108,8 +108,20 @@
   </Target>
 
   <Target Name="ProtoGen">
+    <!-- NB: do NOT use detectMissing for these (yet) -->
     <Exec WorkingDirectory="$(ProtoDir)"
-          Command="$(ProtoGenExe) -ns:RiakClient.Messages -p:detectMissing -i:%(ProtoFile.Identity) -o:$(ProtoMsgDir)\@(ProtoFile->'%(filename)').cs" />
+          Command="$(ProtoGenExe) -ns:RiakClient.Messages -i:riak.proto -o:$(ProtoMsgDir)\riak.cs" />
+    <Exec WorkingDirectory="$(ProtoDir)"
+          Command="$(ProtoGenExe) -ns:RiakClient.Messages -i:riak_dt.proto -o:$(ProtoMsgDir)\riak_dt.cs" />
+    <Exec WorkingDirectory="$(ProtoDir)"
+          Command="$(ProtoGenExe) -ns:RiakClient.Messages -i:riak_kv.proto -o:$(ProtoMsgDir)\riak_kv.cs" />
+    <Exec WorkingDirectory="$(ProtoDir)"
+          Command="$(ProtoGenExe) -ns:RiakClient.Messages -i:riak_search.proto -o:$(ProtoMsgDir)\riak_search.cs" />
+    <Exec WorkingDirectory="$(ProtoDir)"
+          Command="$(ProtoGenExe) -ns:RiakClient.Messages -i:riak_yokozuna.proto -o:$(ProtoMsgDir)\riak_yokozuna.cs" />
+    <!-- NB: MUST use detectMissing for TS optional fields -->
+    <Exec WorkingDirectory="$(ProtoDir)"
+          Command="$(ProtoGenExe) -ns:RiakClient.Messages -p:detectMissing -i:riak_ts.proto -o:$(ProtoMsgDir)\riak_ts.cs" />
   </Target>
 
   <Target Name="PublishNuGetPackage" DependsOnTargets="PublishValidation">
