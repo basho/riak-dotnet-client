@@ -30,6 +30,9 @@ namespace RiakClientTests.Live
             Assert.AreEqual(TestBucketType, getResult.Value.BucketType);
 
             // delete
+            var deleteOptions = new RiakDeleteOptions();
+            deleteOptions.Vclock = getResult.Value.VectorClock;
+            deleteOptions.SetDw(3);
             var deleteResult = Client.Delete(id, new RiakDeleteOptions().SetDw(3));
             Assert.True(deleteResult.IsSuccess);
 
@@ -44,16 +47,15 @@ namespace RiakClientTests.Live
 
             var multiGetResult = Client.Get(ids).ToList();
             Assert.True(multiGetResult.All(r => r.IsSuccess));
-            Assert.True(multiGetResult.All(r => r.IsSuccess));
             Assert.True(multiGetResult.All(r => r.Value.BucketType == TestBucketType));
         }
 
         [Test]
         public void TestListingOperations()
         {
-            const string bucket1 = "bucket1";
-            const string bucket2 = "bucket2";
-            const string key = "1";
+            string bucket1 = Guid.NewGuid().ToString();
+            string bucket2 = Guid.NewGuid().ToString();
+            string key = Guid.NewGuid().ToString();
 
             Client.Put(new RiakObject(new RiakObjectId(TestBucketType, bucket1, key), Value),
                 new RiakPutOptions().SetDw(3));
