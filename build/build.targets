@@ -111,8 +111,11 @@
     <!-- NB: do NOT use detectMissing for these (yet) -->
     <Exec WorkingDirectory="$(ProtoDir)"
           Command="$(ProtoGenExe) -ns:RiakClient.Messages -i:riak.proto -o:$(ProtoMsgDir)\riak.cs" />
+
+    <!-- NB: MUST EDIT THE src\RiakClient\Messages\riak_dt.cs file -->
     <Exec WorkingDirectory="$(ProtoDir)"
           Command="$(ProtoGenExe) -ns:RiakClient.Messages -i:riak_dt.proto -o:$(ProtoMsgDir)\riak_dt.cs" />
+    <Warning Text="NOTICE: *MUST* manually edit src\RiakClient\Messages\riak_dt.cs file. REMOVE the '[global::System.ComponentModel.DefaultValue(MapUpdate.FlagOp.ENABLE)]' attribute from the flag_op property of the MapUpdate class" />
     <Exec WorkingDirectory="$(ProtoDir)"
           Command="$(ProtoGenExe) -ns:RiakClient.Messages -i:riak_kv.proto -o:$(ProtoMsgDir)\riak_kv.cs" />
     <Exec WorkingDirectory="$(ProtoDir)"

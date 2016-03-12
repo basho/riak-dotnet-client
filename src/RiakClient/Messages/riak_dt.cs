@@ -363,7 +363,6 @@ namespace RiakClient.Messages
     }
     private MapUpdate.FlagOp _flag_op = MapUpdate.FlagOp.ENABLE;
     [global::ProtoBuf.ProtoMember(5, IsRequired = false, Name=@"flag_op", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(MapUpdate.FlagOp.ENABLE)]
     public MapUpdate.FlagOp flag_op
     {
       get { return _flag_op; }
