@@ -109,9 +109,6 @@
 
   <Target Name="ProtoGen">
     <!-- NB: do NOT use detectMissing for these (yet) -->
-    <Exec WorkingDirectory="$(ProtoDir)"
-          Command="$(ProtoGenExe) -ns:RiakClient.Messages -i:riak.proto -o:$(ProtoMsgDir)\riak.cs" />
-
     <!-- NB: MUST EDIT THE src\RiakClient\Messages\riak_dt.cs file -->
     <Exec WorkingDirectory="$(ProtoDir)"
           Command="$(ProtoGenExe) -ns:RiakClient.Messages -i:riak_dt.proto -o:$(ProtoMsgDir)\riak_dt.cs" />
@@ -122,6 +119,9 @@
           Command="$(ProtoGenExe) -ns:RiakClient.Messages -i:riak_search.proto -o:$(ProtoMsgDir)\riak_search.cs" />
     <Exec WorkingDirectory="$(ProtoDir)"
           Command="$(ProtoGenExe) -ns:RiakClient.Messages -i:riak_yokozuna.proto -o:$(ProtoMsgDir)\riak_yokozuna.cs" />
+    <!-- NB: MUST use detectMissing for bucket props optional fields -->
+    <Exec WorkingDirectory="$(ProtoDir)"
+          Command="$(ProtoGenExe) -ns:RiakClient.Messages -p:detectMissing -i:riak.proto -o:$(ProtoMsgDir)\riak.cs" />
     <!-- NB: MUST use detectMissing for TS optional fields -->
     <Exec WorkingDirectory="$(ProtoDir)"
           Command="$(ProtoGenExe) -ns:RiakClient.Messages -p:detectMissing -i:riak_ts.proto -o:$(ProtoMsgDir)\riak_ts.cs" />

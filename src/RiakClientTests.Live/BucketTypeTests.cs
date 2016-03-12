@@ -114,11 +114,11 @@ namespace RiakClientTests.Live
             terms.ShouldContain("2");
         }
 
-        [Test, Ignore("TODO-BROKEN")]
+        [Test]
         public void TestBucketPropertyOperations()
         {
             const string bucketType = "plain";
-            string bucket = Guid.NewGuid().ToString();
+            const string bucket = "tbpo";
 
             // get
             var getPropsResult = Client.GetBucketProperties(bucketType, bucket);
