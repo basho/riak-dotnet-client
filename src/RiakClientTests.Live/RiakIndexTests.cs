@@ -285,8 +285,7 @@ namespace RiakClientTests.Live
 
             Assert.IsTrue(results.IsSuccess, results.ErrorMessage);
             CollectionAssert.IsNotEmpty(results.Value.IndexKeyTerms);
-            // TODO-BROKEN
-            // results.Value.IndexKeyTerms.Count().ShouldEqual(5);
+            Assert.GreaterOrEqual(results.Value.IndexKeyTerms.Count(), 5);
         }
 
         [Test]

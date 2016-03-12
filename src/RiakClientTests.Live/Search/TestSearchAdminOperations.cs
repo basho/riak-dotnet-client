@@ -100,7 +100,6 @@ namespace RiakClientTests.Live.Search
 
             if (MultiNodeEnvironment)
             {
-                // TODO-BROKEN
                 Assert.Pass("TODO-BROKEN https://github.com/basho/yokozuna/issues/619");
             }
             else

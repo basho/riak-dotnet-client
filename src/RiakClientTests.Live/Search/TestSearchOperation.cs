@@ -101,7 +101,7 @@ namespace RiakClientTests.Live.Search
             put2Result.IsSuccess.ShouldBeTrue(put2Result.ErrorMessage);
         }
 
-        [Test, Ignore("TODO-BROKEN")]
+        [Test]
         public void SearchingWithSimpleFluentQueryWorksCorrectly()
         {
             var req = new RiakSearchRequest
@@ -123,7 +123,7 @@ namespace RiakClientTests.Live.Search
             searchResult.Value.Documents[0].RiakObjectId.ShouldEqual(_alyssaRiakId);
         }
 
-        [Test, Ignore("TODO-BROKEN")]
+        [Test]
         public void SearchingWithWildcardFluentQueryWorksCorrectly()
         {
             var req = new RiakSearchRequest
@@ -137,7 +137,7 @@ namespace RiakClientTests.Live.Search
             searchResult.Value.Documents.Count.ShouldEqual(2);
         }
 
-        [Test, Ignore("TODO-BROKEN")]
+        [Test]
         public void SearchingWithMoreComplexFluentQueryWorksCorrectly()
         {
             var req = new RiakSearchRequest
@@ -166,7 +166,7 @@ namespace RiakClientTests.Live.Search
             id.Contains("a.public").ShouldBeTrue(string.Format("{0} does not contain {1}", id, "a.public"));
         }
 
-        [Test, Ignore("TODO-BROKEN")]
+        [Test]
         public void SettingFieldListReturnsOnlyFieldsSpecified()
         {
             var req = new RiakSearchRequest
