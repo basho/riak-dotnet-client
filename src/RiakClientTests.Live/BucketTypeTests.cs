@@ -114,11 +114,11 @@ namespace RiakClientTests.Live
             terms.ShouldContain("2");
         }
 
-        [Test]
+        [Test, Ignore("TODO-BROKEN")]
         public void TestBucketPropertyOperations()
         {
             const string bucketType = "plain";
-            const string bucket = "BucketPropsTestBucket";
+            string bucket = Guid.NewGuid().ToString();
 
             // get
             var getPropsResult = Client.GetBucketProperties(bucketType, bucket);
@@ -139,16 +139,22 @@ namespace RiakClientTests.Live
                     return getResult;
                 };
 
-            Func<RiakResult<RiakBucketProperties>, bool> successFunc =
-                (r) => r.Value.AllowMultiple.Value == false;
-            getFunc.WaitUntil(successFunc);
+            Func<RiakResult<RiakBucketProperties>, bool> successFunc = (r) =>
+                {
+                    return r.Value.AllowMultiple.Value == false;
+                };
+            getPropsResult = getFunc.WaitUntil(successFunc);
+            Assert.IsTrue(getPropsResult.IsSuccess, getPropsResult.ErrorMessage);
+            Assert.IsFalse(getPropsResult.Value.AllowMultiple.Value);
 
             // reset
             var resetPropsResult = Client.ResetBucketProperties(bucketType, bucket);
             Assert.IsTrue(resetPropsResult.IsSuccess, resetPropsResult.ErrorMessage);
 
             successFunc = (r) => r.Value.AllowMultiple.Value == true;
-            getFunc.WaitUntil(successFunc);
+            getPropsResult = getFunc.WaitUntil(successFunc);
+            Assert.IsTrue(getPropsResult.IsSuccess, getPropsResult.ErrorMessage);
+            Assert.IsTrue(getPropsResult.Value.AllowMultiple.Value);
         }
     }
 }
