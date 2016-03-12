@@ -73,8 +73,7 @@ namespace RiakClientTests.Live
             var result = Client.GetSecondaryIndex(idxid, 32);
             Assert.IsTrue(result.IsSuccess, result.ErrorMessage);
             CollectionAssert.IsNotEmpty(result.Value.IndexKeyTerms);
-            // TODO-BROKEN
-            // result.Value.IndexKeyTerms.Count().ShouldEqual(DefaultKeyCount);
+            Assert.GreaterOrEqual(result.Value.IndexKeyTerms.Count(), DefaultKeyCount);
 
             foreach (var v in result.Value.IndexKeyTerms)
             {
@@ -118,8 +117,7 @@ namespace RiakClientTests.Live
             Assert.IsTrue(result.IsSuccess, result.ErrorMessage);
 
             var keys = result.Value.PhaseResults.SelectMany(x => x.GetObjectIds()).ToList();
-            // TODO-BROKEN
-            // keys.Count().ShouldEqual(DefaultKeyCount);
+            Assert.GreaterOrEqual(keys.Count(), DefaultKeyCount);
 
             foreach (var key in keys)
             {
@@ -158,8 +156,7 @@ namespace RiakClientTests.Live
             }
 
             CollectionAssert.IsNotEmpty(queriedKeys);
-            // TODO-BROKEN
-            // queriedKeys.Count.ShouldEqual(DefaultKeyCount, foundKeys);
+            Assert.AreEqual(DefaultKeyCount, queriedKeys.Count());
 
             foreach (var key in queriedKeys)
             {
@@ -208,22 +205,22 @@ namespace RiakClientTests.Live
         [Test]
         public void ListKeysUsingIndexReturnsAllKeys()
         {
-            GenerateGuidKeyObjects("ListKeysUsingIndex");
-            // TODO-BROKEN
-            // var generatedKeys = GenerateGuidKeyObjects("ListKeysUsingIndex");
-            // var originalKeys = new HashSet<string>(generatedKeys);
+            var generatedKeys = GenerateGuidKeyObjects("ListKeysUsingIndex");
+            var originalKeys = new HashSet<string>(generatedKeys);
 
             var result = Client.ListKeysFromIndex(LegacyBucket);
             Assert.True(result.IsSuccess, result.ErrorMessage);
 
             var keys = result.Value;
             CollectionAssert.IsNotEmpty(keys);
-
             foreach (var key in keys)
             {
                 Assert.IsNotNullOrEmpty(key);
-                // TODO-BROKEN
-                // CollectionAssert.Contains(originalKeys, key);
+            }
+
+            foreach (string origKey in originalKeys)
+            {
+                CollectionAssert.Contains(keys, origKey);
             }
         }
 
@@ -407,7 +404,8 @@ namespace RiakClientTests.Live
         }
 
         private List<string> GenerateGuidKeyObjects(
-            string keyPrefix, Action<RiakObject, int> indexAction = null, int maxKeys = DefaultKeyCount,
+            string keyPrefix, Action<RiakObject, int> indexAction = null,
+            int maxKeys = DefaultKeyCount,
             bool useLegacyBucket = true)
         {
             var insertedKeys = new List<string>();
