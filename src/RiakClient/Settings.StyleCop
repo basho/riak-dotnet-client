@@ -4,9 +4,12 @@
     <SourceFile>riak.cs</SourceFile>
     <SourceFile>riak_dt.cs</SourceFile>
     <SourceFile>riak_kv.cs</SourceFile>
+    <SourceFile>riak_ts.cs</SourceFile>
     <SourceFile>riak_search.cs</SourceFile>
     <SourceFile>riak_yokozuna.cs</SourceFile>
     <SourceFile>RpbClasses.cs</SourceFile>
+    <SourceFile>ITsByKeyReq.cs</SourceFile>
+    <SourceFile>IRpbStreamingResp.cs</SourceFile>
     <Settings>
       <GlobalSettings>
         <BooleanProperty Name="RulesEnabledByDefault">False</BooleanProperty>
@@ -35,6 +38,11 @@
     </Analyzer>
     <Analyzer AnalyzerId="StyleCop.CSharp.DocumentationRules">
       <Rules>
+        <Rule Name="FileMustHaveHeader">
+          <RuleSettings>
+            <BooleanProperty Name="Enabled">False</BooleanProperty>
+          </RuleSettings>
+        </Rule>
         <Rule Name="PropertySummaryDocumentationMustMatchAccessors">
           <RuleSettings>
             <BooleanProperty Name="Enabled">False</BooleanProperty>

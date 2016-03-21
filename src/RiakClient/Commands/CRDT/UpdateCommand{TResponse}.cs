@@ -81,12 +81,12 @@ namespace RiakClient.Commands.CRDT
             }
             else
             {
-                Response = CreateResponse(GetKey(response), (DtUpdateResp)response);
+                Response = CreateResponse((DtUpdateResp)response);
             }
         }
 
         protected abstract DtOp GetRequestOp();
 
-        protected abstract TResponse CreateResponse(RiakString key, DtUpdateResp response);
+        protected abstract TResponse CreateResponse(DtUpdateResp response);
     }
 }

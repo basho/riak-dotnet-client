@@ -152,8 +152,6 @@ namespace RiakClientTests.Live.BucketPropertyTests
             props.PreCommitHooks.Count.ShouldEqual(2);
             props.PostCommitHooks.ShouldNotBeNull();
             props.PostCommitHooks.Count.ShouldEqual(1);
-
-            Client.DeleteBucket(bucket);
         }
 
         [Test]

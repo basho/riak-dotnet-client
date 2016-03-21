@@ -73,9 +73,9 @@ namespace RiakClientTests.Messages
                     parsedMessageCode.Equals(MessageCode.RpbPingResp) ||
                     parsedMessageCode.Equals(MessageCode.RpbGetClientIdReq) || // NB: unused
                     parsedMessageCode.Equals(MessageCode.RpbGetClientIdResp) ||
+                    parsedMessageCode.Equals(MessageCode.RpbGetServerInfoReq) ||
                     parsedMessageCode.Equals(MessageCode.RpbSetClientIdReq) ||
                     parsedMessageCode.Equals(MessageCode.RpbSetClientIdResp) ||
-                    parsedMessageCode.Equals(MessageCode.RpbGetServerInfoReq) ||
                     parsedMessageCode.Equals(MessageCode.RpbDelResp) ||
                     parsedMessageCode.Equals(MessageCode.RpbSetBucketResp) ||
                     parsedMessageCode.Equals(MessageCode.RpbResetBucketResp) ||

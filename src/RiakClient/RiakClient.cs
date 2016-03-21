@@ -1067,8 +1067,10 @@ namespace RiakClient
             var request = new RpbYokozunaIndexPutReq
             {
                 index = searchIndex.ToMessage(),
-                timeout = (uint)searchIndex.Timeout
             };
+
+            request.timeout = (uint)searchIndex.Timeout;
+
             return UseConnection(conn => conn.PbcWriteRead(request, MessageCode.RpbPutResp));
         }
 

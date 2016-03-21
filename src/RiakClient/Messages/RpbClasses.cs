@@ -1,22 +1,4 @@
-﻿// <copyright file="RpbClasses.cs" company="Basho Technologies, Inc.">
-// Copyright 2014 - Basho Technologies, Inc.
-//
-// This file is provided to you under the Apache License,
-// Version 2.0 (the "License"); you may not use this file
-// except in compliance with the License.  You may obtain
-// a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-// </copyright>
-
-namespace RiakClient.Messages
+﻿namespace RiakClient.Messages
 {
     using System;
     using Util;
@@ -216,4 +198,61 @@ namespace RiakClient.Messages
     public sealed partial class RpbGetBucketKeyPreflistResp : RpbResp { }
 
     public sealed partial class RpbBucketKeyPreflistItem { }
+
+    [CLSCompliant(false)]
+    public sealed partial class RpbIndexBodyResp {}
+
+    [CLSCompliant(false)]
+    public sealed partial class RpbCoverageReq {}
+
+    [CLSCompliant(false)]
+    public sealed partial class RpbCoverageResp {}
+
+    [CLSCompliant(false)]
+    public sealed partial class RpbCoverageEntry {}
+
+    public sealed partial class RpbToggleEncodingReq {}
+
+    public sealed partial class RpbToggleEncodingResp {}
+
+    [CLSCompliant(false)]
+    public sealed partial class TsListKeysReq { }
+
+    public sealed partial class TsListKeysResp { }
+
+    [CLSCompliant(false)]
+    public sealed partial class TsGetReq : RpbReq, ITsByKeyReq { }
+
+    public sealed partial class TsGetResp : RpbResp { }
+
+    public sealed partial class TsPutReq : RpbReq { }
+
+    public sealed partial class TsPutResp : RpbResp { }
+
+    public sealed partial class TsQueryReq : RpbReq { }
+
+    public sealed partial class TsQueryResp : RpbResp, IRpbStreamingResp { }
+
+    public sealed partial class TsListKeysReq : RpbReq { }
+
+    public sealed partial class TsListKeysResp : RpbResp, IRpbStreamingResp { }
+
+    [CLSCompliant(false)]
+    public sealed partial class TsDelReq : RpbReq, ITsByKeyReq { }
+
+    public sealed partial class TsDelResp : RpbResp { }
+
+    [CLSCompliant(false)]
+    public sealed partial class TsCoverageEntry { }
+
+    public sealed partial class TsCoverageReq { }
+
+    [CLSCompliant(false)]
+    public sealed partial class TsCoverageResp { }
+
+    public sealed partial class TsTtbPutReq { }
+
+    public sealed partial class TsRange { }
+
+    public sealed partial class TsInterpolation { }
 }

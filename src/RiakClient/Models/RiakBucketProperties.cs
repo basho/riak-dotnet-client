@@ -577,56 +577,67 @@ namespace RiakClient.Models
         {
             var message = new RpbBucketProps();
 
+            message.allow_multSpecified = false;
             if (AllowMultiple.HasValue)
             {
                 message.allow_mult = AllowMultiple.Value;
             }
 
+            message.n_valSpecified = false;
             if (NVal != null)
             {
                 message.n_val = NVal;
             }
 
+            message.last_write_winsSpecified = false;
             if (LastWriteWins.HasValue)
             {
                 message.last_write_wins = LastWriteWins.Value;
             }
 
+            message.rSpecified = false;
             if (R != null)
             {
                 message.r = R;
             }
 
+            message.rwSpecified = false;
             if (Rw != null)
             {
                 message.rw = Rw;
             }
 
+            message.dwSpecified = false;
             if (Dw != null)
             {
                 message.dw = Dw;
             }
 
+            message.wSpecified = false;
             if (W != null)
             {
                 message.w = W;
             }
 
+            message.prSpecified = false;
             if (Pr != null)
             {
                 message.pr = Pr;
             }
 
+            message.pwSpecified = false;
             if (Pw != null)
             {
                 message.pw = Pw;
             }
 
+            message.searchSpecified = false;
             if (LegacySearch.HasValue)
             {
                 message.search = LegacySearch.Value;
             }
 
+            message.has_precommitSpecified = false;
             if (HasPrecommit.HasValue)
             {
                 message.has_precommit = HasPrecommit.Value;
@@ -659,6 +670,7 @@ namespace RiakClient.Models
                     });
             }
 
+            message.has_postcommitSpecified = false;
             if (HasPostcommit.HasValue)
             {
                 message.has_postcommit = HasPostcommit.Value;
@@ -676,6 +688,7 @@ namespace RiakClient.Models
                     });
             }
 
+            message.search_indexSpecified = false;
             if (!string.IsNullOrEmpty(SearchIndex))
             {
                 message.search_index = SearchIndex.ToRiakString();
