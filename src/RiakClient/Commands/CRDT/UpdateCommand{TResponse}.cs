@@ -81,15 +81,12 @@ namespace RiakClient.Commands.CRDT
             }
             else
             {
-                DtUpdateResp resp = (DtUpdateResp)response;
-                RiakString key = EnumerableUtil.NotNullOrEmpty(resp.key) ?
-                    new RiakString(resp.key) : CommandOptions.Key;
-                Response = CreateResponse(key, resp);
+                Response = CreateResponse((DtUpdateResp)response);
             }
         }
 
         protected abstract DtOp GetRequestOp();
 
-        protected abstract TResponse CreateResponse(RiakString key, DtUpdateResp resp);
+        protected abstract TResponse CreateResponse(DtUpdateResp response);
     }
 }

@@ -19,7 +19,6 @@
 
 namespace RiakClient.Models
 {
-    using System.Runtime.InteropServices;
     using Messages;
 
     /// <summary>

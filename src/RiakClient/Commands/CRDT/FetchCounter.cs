@@ -63,7 +63,7 @@ namespace RiakClient.Commands.CRDT
 
         /// <inheritdoc />
         public class Builder
-            : FetchCommandBuilder<FetchCounter.Builder, FetchCounter, FetchCounterOptions, CounterResponse>
+            : FetchCommandBuilder<Builder, FetchCounter, FetchCounterOptions, CounterResponse>
         {
         }
     }

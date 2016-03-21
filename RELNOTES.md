@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+v2.3.0
+------
+
+* [Add Riak Timeseries support](https://github.com/basho/riak-dotnet-client/pull/302)
+
 v2.2.0
 ------
 

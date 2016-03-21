@@ -1,22 +1,4 @@
-﻿// <copyright file="Command{TOptions,TResponse}.cs" company="Basho Technologies, Inc.">
-// Copyright 2015 - Basho Technologies, Inc.
-//
-// This file is provided to you under the Apache License,
-// Version 2.0 (the "License"); you may not use this file
-// except in compliance with the License.  You may obtain
-// a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-// </copyright>
-
-namespace RiakClient.Commands
+﻿namespace RiakClient.Commands
 {
     using System;
     using Messages;
@@ -43,7 +25,7 @@ namespace RiakClient.Commands
                 throw new ArgumentNullException("options");
             }
 
-            this.CommandOptions = options;
+            CommandOptions = options;
         }
 
         public TOptions Options
@@ -61,5 +43,18 @@ namespace RiakClient.Commands
         public abstract RpbReq ConstructPbRequest();
 
         public abstract void OnSuccess(RpbResp rpbResp);
+
+        protected RiakString GetKey(RiakString optskey, RpbResp response)
+        {
+            RiakString key = optskey;
+
+            IRpbGeneratedKey krsp = response as IRpbGeneratedKey;
+            if (krsp != null && krsp.HasKey)
+            {
+                key = new RiakString(krsp.key);
+            }
+
+            return key;
+        }
     }
 }

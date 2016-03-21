@@ -1,14 +1,11 @@
+sudo: false
+
 branches:
   only:
     - master
     - develop
 
-language: c
-
-install:
-    - make install-deps
-    - make install-certs
+language: csharp
 
 script:
     - make unit-test
-

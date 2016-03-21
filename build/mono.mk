@@ -1,6 +1,6 @@
 PROJDIR = $(SLNDIR)/src
 
-MONO_EXE = mono --runtime='v4.0.30319'
+MONO_EXE = mono
 
 NUGET_PKGDIR = $(SLNDIR)/packages
 NUGET_EXE = $(SLNDIR)/.nuget/NuGet.exe

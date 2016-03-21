@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+if [[ $TRAVIS == 'true' ]]
+then
+    exit 0
+fi
+
 PLATFORM=$(uname -s)
 
 set -o nounset
@@ -31,4 +36,3 @@ else
         sudo apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install mono-devel
     fi
 fi
-

@@ -207,19 +207,19 @@ namespace RiakClientTests.Live
         public void ListKeysFromIndexReturnsAllKeys()
         {
             const int keyCount = 10;
-            const string listKeysBucket = "listKeysBucket";
+            var bucket = TestBucket + "_" + Guid.NewGuid();
             var originalKeyList = new List<string>();
 
             for (var i = 0; i < keyCount; i++)
             {
                 string idx = i.ToString();
-                var id = new RiakObjectId(TestBucketType, listKeysBucket, idx);
+                var id = new RiakObjectId(TestBucketType, bucket, idx);
                 var o = new RiakObject(id, "{ value: \"this is an object\" }");
                 originalKeyList.Add(idx);
                 Client.Put(o);
             }
 
-            var result = Client.ListKeysFromIndex(TestBucketType, listKeysBucket);
+            var result = Client.ListKeysFromIndex(TestBucketType, bucket);
             var keys = result.Value;
 
             keys.Count.ShouldEqual(keyCount);
@@ -228,8 +228,6 @@ namespace RiakClientTests.Live
             {
                 originalKeyList.ShouldContain(key);
             }
-
-            Client.DeleteBucket(TestBucketType, listKeysBucket);
         }
 
         [Test]

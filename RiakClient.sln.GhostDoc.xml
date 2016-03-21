@@ -12,6 +12,9 @@
       <IgnoreFile>.\src\RiakClient\Messages\riak.cs</IgnoreFile>
       <IgnoreFile>.\src\RiakClient\Messages\riak_dt.cs</IgnoreFile>
       <IgnoreFile>.\src\RiakClient\Messages\riak_kv.cs</IgnoreFile>
+      <IgnoreFile>.\src\RiakClient\Messages\riak_ts.cs</IgnoreFile>
+      <IgnoreFile>.\src\RiakClient\Messages\riak_search.cs</IgnoreFile>
+      <IgnoreFile>.\src\RiakClient\Messages\riak_yokozuna.cs</IgnoreFile>
       <IgnoreFile>.\src\RiakClient\Models\MapReduce\KeyFilters\UrlDecode.cs</IgnoreFile>
     </IgnoreFiles>
   </SpellChecker>

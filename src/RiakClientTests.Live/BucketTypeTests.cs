@@ -1,22 +1,3 @@
-// <copyright file="BucketTypeTests.cs" company="Basho Technologies, Inc.">
-// Copyright 2011 - OJ Reeves & Jeremiah Peschka
-// Copyright 2014 - Basho Technologies, Inc.
-//
-// This file is provided to you under the Apache License,
-// Version 2.0 (the "License"); you may not use this file
-// except in compliance with the License.  You may obtain
-// a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-// </copyright>
-
 namespace RiakClientTests.Live
 {
     using System;
@@ -31,53 +12,54 @@ namespace RiakClientTests.Live
     {
         private const string Value = "value";
 
-        [TearDown]
-        public void TearDown()
-        {
-            Client.DeleteBucket(TestBucketType, TestBucket);
-        }
-
         [Test]
         public void TestKVOperations()
         {
-            const string key = "bucket_type_test_key";
+            string key = Guid.NewGuid().ToString();
             var id = new RiakObjectId(TestBucketType, TestBucket, key);
             var obj = new RiakObject(id, Value);
 
             // put
-            var putResult = Client.Put(obj, new RiakPutOptions().SetReturnBody(true).SetDw(3));
-            putResult.IsSuccess.ShouldBeTrue();
-            putResult.Value.BucketType.ShouldEqual(TestBucketType);
+            var putOptions = new RiakPutOptions();
+            putOptions.SetReturnBody(true);
+            putOptions.SetDw(3);
+            putOptions.SetTimeout(new Timeout(TimeSpan.FromSeconds(60)));
+            var putResult = Client.Put(obj, putOptions);
+            Assert.True(putResult.IsSuccess, putResult.ErrorMessage);
+            Assert.AreEqual(TestBucketType, putResult.Value.BucketType);
 
             // get
             var getResult = Client.Get(id);
-            getResult.IsSuccess.ShouldBeTrue();
-            getResult.Value.BucketType.ShouldEqual(TestBucketType);
+            Assert.True(getResult.IsSuccess);
+            Assert.AreEqual(TestBucketType, getResult.Value.BucketType);
 
             // delete
+            var deleteOptions = new RiakDeleteOptions();
+            deleteOptions.Vclock = getResult.Value.VectorClock;
+            deleteOptions.SetDw(3);
             var deleteResult = Client.Delete(id, new RiakDeleteOptions().SetDw(3));
-            deleteResult.IsSuccess.ShouldBeTrue();
+            Assert.True(deleteResult.IsSuccess);
 
             // multiget
             var ids = new List<RiakObjectId>();
             for (int i = 0; i < 3; i++)
             {
                 obj = new RiakObject(new RiakObjectId(TestBucketType, TestBucket, key + i), Value);
-                Client.Put(obj, new RiakPutOptions().SetReturnBody(true).SetDw(3));
+                Client.Put(obj, new RiakPutOptions().SetReturnBody(false).SetDw(3));
                 ids.Add(obj.ToRiakObjectId());
             }
 
             var multiGetResult = Client.Get(ids).ToList();
-            multiGetResult.All(r => r.IsSuccess).ShouldBeTrue();
-            multiGetResult.All(r => r.Value.BucketType == TestBucketType).ShouldBeTrue();
+            Assert.True(multiGetResult.All(r => r.IsSuccess));
+            Assert.True(multiGetResult.All(r => r.Value.BucketType == TestBucketType));
         }
 
         [Test]
         public void TestListingOperations()
         {
-            const string bucket1 = "bucket1";
-            const string bucket2 = "bucket2";
-            const string key = "1";
+            string bucket1 = Guid.NewGuid().ToString();
+            string bucket2 = Guid.NewGuid().ToString();
+            string key = Guid.NewGuid().ToString();
 
             Client.Put(new RiakObject(new RiakObjectId(TestBucketType, bucket1, key), Value),
                 new RiakPutOptions().SetDw(3));
@@ -101,7 +83,6 @@ namespace RiakClientTests.Live
             buckets.ShouldContain(bucket2);
         }
 
-        [Test]
         public void Test2iOperations()
         {
             const string indexName = "num";
@@ -137,36 +118,43 @@ namespace RiakClientTests.Live
         public void TestBucketPropertyOperations()
         {
             const string bucketType = "plain";
-            const string bucket = "BucketPropsTestBucket";
+            const string bucket = "tbpo";
 
             // get
             var getPropsResult = Client.GetBucketProperties(bucketType, bucket);
-            getPropsResult.IsSuccess.ShouldBeTrue();
-            getPropsResult.Value.LastWriteWins.Value.ShouldBeFalse();
+            Assert.True(getPropsResult.IsSuccess, getPropsResult.ErrorMessage);
+            Assert.True(getPropsResult.Value.AllowMultiple.Value);
 
             // set
             var props = getPropsResult.Value;
-            props.SetLastWriteWins(true);
+            props.SetAllowMultiple(false);
 
             var setPropsResult = Client.SetBucketProperties(bucketType, bucket, props);
-            setPropsResult.IsSuccess.ShouldBeTrue();
+            Assert.IsTrue(setPropsResult.IsSuccess, setPropsResult.ErrorMessage);
 
             Func<RiakResult<RiakBucketProperties>> getFunc = () =>
                 {
                     var getResult = Client.GetBucketProperties(bucketType, bucket);
-                    getResult.IsSuccess.ShouldBeTrue(getResult.ErrorMessage);
+                    Assert.IsTrue(getResult.IsSuccess, getResult.ErrorMessage);
                     return getResult;
                 };
 
-            Func<RiakResult<RiakBucketProperties>, bool> successFunc = (r) => r.Value.LastWriteWins.Value;
-            getFunc.WaitUntil(successFunc);
+            Func<RiakResult<RiakBucketProperties>, bool> successFunc = (r) =>
+                {
+                    return r.Value.AllowMultiple.Value == false;
+                };
+            getPropsResult = getFunc.WaitUntil(successFunc);
+            Assert.IsTrue(getPropsResult.IsSuccess, getPropsResult.ErrorMessage);
+            Assert.IsFalse(getPropsResult.Value.AllowMultiple.Value);
 
             // reset
             var resetPropsResult = Client.ResetBucketProperties(bucketType, bucket);
-            resetPropsResult.IsSuccess.ShouldBeTrue();
+            Assert.IsTrue(resetPropsResult.IsSuccess, resetPropsResult.ErrorMessage);
 
-            successFunc = (r) => !r.Value.LastWriteWins.Value;
-            getFunc.WaitUntil(successFunc);
+            successFunc = (r) => r.Value.AllowMultiple.Value == true;
+            getPropsResult = getFunc.WaitUntil(successFunc);
+            Assert.IsTrue(getPropsResult.IsSuccess, getPropsResult.ErrorMessage);
+            Assert.IsTrue(getPropsResult.Value.AllowMultiple.Value);
         }
     }
 }

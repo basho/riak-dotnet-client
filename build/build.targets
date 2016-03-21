@@ -27,6 +27,7 @@
   </Target>
 
   <Target Name="PublishValidation" DependsOnTargets="PublishValidateVersionString;PublishValidateOnDevelopBranch;PopulateVersionInformation">
+    <Error Condition="'$(OS)' != 'Windows_NT'" Text="Publish target is Windows-only!" />
     <!-- Validate parsed VersionString -->
     <RegexMatch Input="$(VMajor)" Expression="^[1-9]$">
       <Output PropertyName="VMajorValidated" TaskParameter="Output" />
@@ -102,13 +103,28 @@
   </Target>
 
   <Target Name="PublishRelease" DependsOnTargets="GenerateCommonAssemblyInfo">
-    <Message Text="MSBuild properties: Configuration=Release;SolutionDir=$(SolutionDir)" />
-    <MSBuild Projects="$(SolutionFile)" Properties="Configuration=Release;SolutionDir=$(SolutionDir)" />
+    <Message Text="MSBuild properties: Configuration=Release;SolutionDir=$(SolutionDir);VersionString=$(VersionString)" />
+    <MSBuild Projects="$(SolutionFile)" Properties="Configuration=Release;SolutionDir=$(SolutionDir);VersionString=$(VersionString)" />
   </Target>
 
   <Target Name="ProtoGen">
+    <!-- NB: do NOT use detectMissing for these (yet) -->
+    <!-- NB: MUST EDIT THE src\RiakClient\Messages\riak_dt.cs file -->
     <Exec WorkingDirectory="$(ProtoDir)"
-          Command="$(ProtoGenExe) -ns:RiakClient.Messages -i:%(ProtoFile.Identity) -o:$(ProtoMsgDir)\@(ProtoFile->'%(filename)').cs" />
+          Command="$(ProtoGenExe) -ns:RiakClient.Messages -i:riak_dt.proto -o:$(ProtoMsgDir)\riak_dt.cs" />
+    <Warning Text="NOTICE: *MUST* manually edit src\RiakClient\Messages\riak_dt.cs file. REMOVE the '[global::System.ComponentModel.DefaultValue(MapUpdate.FlagOp.ENABLE)]' attribute from the flag_op property of the MapUpdate class" />
+    <Exec WorkingDirectory="$(ProtoDir)"
+          Command="$(ProtoGenExe) -ns:RiakClient.Messages -i:riak_kv.proto -o:$(ProtoMsgDir)\riak_kv.cs" />
+    <Exec WorkingDirectory="$(ProtoDir)"
+          Command="$(ProtoGenExe) -ns:RiakClient.Messages -i:riak_search.proto -o:$(ProtoMsgDir)\riak_search.cs" />
+    <Exec WorkingDirectory="$(ProtoDir)"
+          Command="$(ProtoGenExe) -ns:RiakClient.Messages -i:riak_yokozuna.proto -o:$(ProtoMsgDir)\riak_yokozuna.cs" />
+    <!-- NB: MUST use detectMissing for bucket props optional fields -->
+    <Exec WorkingDirectory="$(ProtoDir)"
+          Command="$(ProtoGenExe) -ns:RiakClient.Messages -p:detectMissing -i:riak.proto -o:$(ProtoMsgDir)\riak.cs" />
+    <!-- NB: MUST use detectMissing for TS optional fields -->
+    <Exec WorkingDirectory="$(ProtoDir)"
+          Command="$(ProtoGenExe) -ns:RiakClient.Messages -p:detectMissing -i:riak_ts.proto -o:$(ProtoMsgDir)\riak_ts.cs" />
   </Target>
 
   <Target Name="PublishNuGetPackage" DependsOnTargets="PublishValidation">
@@ -157,27 +173,28 @@
   </Target>
 
   <Target Name="All" DependsOnTargets="GenerateCommonAssemblyInfo">
-    <MSBuild Projects="@(ProjectToBuild)" BuildInParallel="True" />
+    <MSBuild Projects="@(ProjectToBuild)" Properties="VersionString=$(VersionString)" BuildInParallel="True" />
   </Target>
 
   <Target Name="CleanAll">
-    <MSBuild Projects="@(ProjectToBuild)" Targets="Clean" BuildInParallel="True" />
+    <MSBuild Projects="@(ProjectToBuild)" Properties="VersionString=$(VersionString)" Targets="Clean" BuildInParallel="True" />
   </Target>
 
   <Target Name="Release" DependsOnTargets="GenerateCommonAssemblyInfo">
-    <MSBuild Projects="$(SolutionFile)" Properties="Configuration=Release" />
+    <MSBuild Projects="$(SolutionFile)" Properties="Configuration=Release;VersionString=$(VersionString)" />
   </Target>
 
   <Target Name="Debug" DependsOnTargets="GenerateCommonAssemblyInfo">
-    <MSBuild Projects="$(SolutionFile)" Properties="Configuration=Debug" />
+    <MSBuild Projects="$(SolutionFile)" Properties="Configuration=Debug;VersionString=$(VersionString)" />
   </Target>
 
   <Target Name="SetupTests">
-    <XmlQuery XmlFileName="$(NuGetPackagesConfig)" XPath="/packages/package[@id='NUnit.Runners']/@version">
+    <XmlQuery Condition="'$(OS)' == 'Windows_NT'" XmlFileName="$(NuGetPackagesConfig)" XPath="/packages/package[@id='NUnit.Runners']/@version">
       <Output TaskParameter="Values" PropertyName="NUnitRunnersVersion" />
     </XmlQuery>
     <PropertyGroup>
-      <NUnitConsoleRunnerExe>$(SolutionDir)packages\NUnit.Runners.$(NunitRunnersVersion)\tools\nunit-console.exe </NUnitConsoleRunnerExe>
+      <NUnitRunnersVersion Condition="'$(OS)' != 'Windows_NT'">2.6.4</NUnitRunnersVersion>
+      <NUnitConsoleRunnerExe>$(SolutionDir)packages\NUnit.Runners.$(NUnitRunnersVersion)\tools\nunit-console.exe </NUnitConsoleRunnerExe>
       <NUnitConsoleRunnerArgs Condition="'$(Verbose)' != 'true'">-nologo -nodots</NUnitConsoleRunnerArgs>
       <NUnitConsoleRunnerArgs Condition="'$(Verbose)' == 'true'">-labels</NUnitConsoleRunnerArgs>
       <NUnitConsoleRunnerCommand Condition="'$(OS)' == 'Windows_NT'">$(NUnitConsoleRunnerExe) $(NUnitConsoleRunnerArgs) -config Debug</NUnitConsoleRunnerCommand>
@@ -214,7 +231,12 @@
     <Exec WorkingDirectory="$(SolutionDir)"
           Command="$(NUnitConsoleRunnerCommand) -work=$(ProjDir)\RiakClientTests.Live $(ProjDir)\RiakClientTests.Live\RiakClientTests.Live.nunit" />
     <Exec WorkingDirectory="$(SolutionDir)"
-          Command="$(NUnitConsoleRunnerCommand) -work=$(ProjDir)\Test -run=Test.Integration $(ProjDir)\Test\Test.nunit" />
+          Command="$(NUnitConsoleRunnerCommand) -work=$(ProjDir)\Test -run=Test.Integration.CRDT,Test.Integration.KV $(ProjDir)\Test\Test.nunit" />
+  </Target>
+
+  <Target Name="TimeseriesTest" DependsOnTargets="SetupTests;Debug">
+    <Exec WorkingDirectory="$(SolutionDir)"
+          Command="$(NUnitConsoleRunnerCommand) -work=$(ProjDir)\Test -run=Test.Integration.TS $(ProjDir)\Test\Test.nunit" />
   </Target>
 
   <Target Name="TestAll" DependsOnTargets="UnitTest;IntegrationTest" />
