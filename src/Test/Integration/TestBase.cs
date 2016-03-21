@@ -28,12 +28,12 @@ namespace Test.Integration
             RiakClient.DisableListBucketsWarning = true;
         }
 
-        public TestBase()
+        public TestBase(bool auth = true)
         {
 #if NOAUTH
             cluster = RiakCluster.FromConfig("riak1NodeNoAuthConfiguration");
 #else
-            if (MonoUtil.IsRunningOnMono)
+            if (auth == false || MonoUtil.IsRunningOnMono)
             {
                 cluster = RiakCluster.FromConfig("riak1NodeNoAuthConfiguration");
             }
@@ -41,6 +41,7 @@ namespace Test.Integration
             {
                 cluster = RiakCluster.FromConfig("riak1NodeConfiguration");
             }
+
 #endif
             client = cluster.CreateClient();
         }

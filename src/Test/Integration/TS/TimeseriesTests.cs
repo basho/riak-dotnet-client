@@ -90,6 +90,14 @@ namespace Test.Integration.TS
             new Column("temperature", ColumnType.Double)
         };
 
+        /*
+         * TODO NB: timeseries does not work with security yet
+         */
+        public TimeseriesTests()
+            : base(auth: false)
+        {
+        }
+
         public override void TestFixtureSetUp()
         {
             var cmd = new Store.Builder()
@@ -277,6 +285,8 @@ namespace Test.Integration.TS
         [Test]
         public void List_Keys_In_Table()
         {
+            TestFixtureSetUp();
+
             int i = 0;
             Action<ListKeysResponse> cb = (ListKeysResponse qr) =>
             {
