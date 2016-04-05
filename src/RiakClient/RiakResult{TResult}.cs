@@ -43,7 +43,7 @@ namespace RiakClient
         }
 
         public RiakResult(RiakResult result)
-            : base(result.IsSuccess, result.ResultCode, result.Exception, result.ErrorMessage)
+            : base(result.IsSuccess, result.ResultCode, result.Exception, result.ErrorMessage, result.NodeOffline)
         {
             this.value = default(TResult);
         }
