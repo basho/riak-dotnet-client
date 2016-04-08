@@ -186,13 +186,12 @@ namespace RiakClient
             return Task.Factory.StartNew(() => client.ListKeysFromIndex(bucket));
         }
 
+#pragma warning disable 618
         /// <inheritdoc/>
         [Obsolete("Linkwalking has been deprecated as of Riak 2.0. This method will be removed in the next major version.")]
         public Task<RiakResult<IList<RiakObject>>> WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks)
         {
-#pragma warning disable 618
             return Task.Factory.StartNew(() => client.WalkLinks(riakObject, riakLinks));
-#pragma warning restore 618
         }
 
         /// <inheritdoc/>
@@ -201,6 +200,7 @@ namespace RiakClient
         {
             return Task.Factory.StartNew(() => client.GetServerInfo());
         }
+#pragma warning restore 618
 
         /// <inheritdoc/>
         public Task<RiakResult<RiakIndexResult>> GetSecondaryIndex(RiakIndexId index, BigInteger value, RiakIndexGetOptions options = null)
@@ -363,12 +363,14 @@ namespace RiakClient
             ExecAsync(() => callback(client.SetBucketProperties(bucket, properties)));
         }
 
+#pragma warning disable 618
         /// <inheritdoc/>
         [System.Obsolete("Please use RiakClient.Commands.ServerInfo instead.")]
         public void GetServerInfo(Action<RiakResult<RiakServerInfo>> callback)
         {
             ExecAsync(() => callback(client.GetServerInfo()));
         }
+#pragma warning restore 618
 
         /// <inheritdoc/>
         public Task<RiakResult> Execute(IRiakCommand command)

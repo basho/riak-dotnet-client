@@ -97,7 +97,6 @@
         {
             Console.WriteLine("[ChaosMonkeyApp] fetch server info thread starting");
             IRiakClient client = cluster.CreateClient();
-            var r = new Random((int)DateTimeUtil.ToUnixTimeMillis(DateTime.Now));
             try
             {
                 while (true)
