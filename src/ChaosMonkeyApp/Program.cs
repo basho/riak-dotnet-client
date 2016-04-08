@@ -14,8 +14,8 @@
         private static readonly CancellationTokenSource cts = new CancellationTokenSource();
         private static readonly CancellationToken ct = cts.Token;
 
-        private static readonly TimeSpan storeDataInterval = TimeSpan.FromMilliseconds(120);
-        private static readonly TimeSpan fetchDataInterval = TimeSpan.FromMilliseconds(120);
+        private static readonly TimeSpan storeDataInterval = TimeSpan.FromMilliseconds(10);
+        private static readonly TimeSpan fetchDataInterval = TimeSpan.FromMilliseconds(10);
 
         private static volatile int key = 0;
 

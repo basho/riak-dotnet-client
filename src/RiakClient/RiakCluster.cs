@@ -187,6 +187,7 @@ namespace RiakClient
                 {
                 }
 
+                cts.Dispose();
                 nodes.ForEach(n => n.Dispose());
                 disposed = true;
             }
