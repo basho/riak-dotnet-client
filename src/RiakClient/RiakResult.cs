@@ -59,11 +59,17 @@ namespace RiakClient
         }
 
         protected RiakResult(bool isSuccess, ResultCode resultCode, Exception exception, string errorMessage)
+            : this(isSuccess, resultCode, exception, errorMessage, false)
+        {
+        }
+
+        protected RiakResult(bool isSuccess, ResultCode resultCode, Exception exception, string errorMessage, bool nodeOffline)
         {
             this.isSuccess = isSuccess;
             this.resultCode = resultCode;
             this.exception = exception;
             this.errorMessage = errorMessage;
+            this.NodeOffline = nodeOffline;
 
             if (string.IsNullOrWhiteSpace(this.errorMessage) &&
                 exception != null &&
