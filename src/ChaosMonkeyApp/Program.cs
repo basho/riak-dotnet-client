@@ -4,6 +4,7 @@
     using System.Threading;
     using System.Threading.Tasks;
     using RiakClient;
+    using RiakClient.Commands;
     using RiakClient.Models;
     using RiakClient.Util;
 
@@ -28,7 +29,8 @@
             var tf = new TaskFactory(ct);
             var s = tf.StartNew(StoreData, ct);
             var f = tf.StartNew(FetchData, ct);
-            var tasks = new[] { s, f };
+            var fsi = tf.StartNew(FetchServerInfo, ct);
+            var tasks = new[] { s, f, fsi };
 
             Console.WriteLine("Hit any key to stop.");
             Console.ReadLine();
@@ -88,6 +90,38 @@
             finally
             {
                 Console.WriteLine("[ChaosMonkeyApp] store thread stopping");
+            }
+        }
+
+        private static void FetchServerInfo()
+        {
+            Console.WriteLine("[ChaosMonkeyApp] fetch server info thread starting");
+            IRiakClient client = cluster.CreateClient();
+            var r = new Random((int)DateTimeUtil.ToUnixTimeMillis(DateTime.Now));
+            try
+            {
+                while (true)
+                {
+                    var cmd = new FetchServerInfo();
+                    var rslt = client.Execute(cmd);
+                    if (rslt.IsSuccess)
+                    {
+                        var rsp = cmd.Response;
+                        var n = rsp.Value.Node;
+                        var v = rsp.Value.ServerVersion;
+                        Console.WriteLine("[ChaosMonkeyApp] got server info: {0}, {1}", n, v);
+                    }
+                    else
+                    {
+                        Console.WriteLine("[ChaosMonkeyApp] error getting server info: {0}", rslt.ErrorMessage);
+                    }
+                    Thread.Sleep(fetchDataInterval);
+                    ct.ThrowIfCancellationRequested();
+                }
+            }
+            finally
+            {
+                Console.WriteLine("[ChaosMonkeyApp] fetch server info thread stopping");
             }
         }
 
