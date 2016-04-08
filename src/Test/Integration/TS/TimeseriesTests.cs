@@ -161,6 +161,32 @@ namespace Test.Integration.TS
         }
 
         [Test]
+        public void Query_Create_Table()
+        {
+            string tableName = Guid.NewGuid().ToString();
+            string sqlFmt = string.Format(
+                @"CREATE TABLE {0} (geohash varchar not null,
+                                    user varchar not null,
+                                    time timestamp not null,
+                                    weather varchar not null,
+                                    temperature double,
+                  PRIMARY KEY((geohash, user, quantum(time, 15, m)), geohash, user, time))",
+                tableName);
+            var cmd = new Query.Builder()
+                .WithTable(tableName)
+                .WithQuery(sqlFmt)
+                .Build();
+
+            RiakResult rslt = client.Execute(cmd);
+            Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
+
+            QueryResponse rsp = cmd.Response;
+            Assert.IsFalse(rsp.NotFound);
+            CollectionAssert.IsEmpty(rsp.Columns);
+            CollectionAssert.IsEmpty(rsp.Value);
+        }
+
+        [Test]
         public void Query_Table_Description()
         {
             var cmd = new Query.Builder()
