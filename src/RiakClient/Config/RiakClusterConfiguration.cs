@@ -104,6 +104,15 @@ namespace RiakClient.Config
             set { this["defaultRetryCount"] = value; }
         }
 
+        /// <inheritdoc/>
+        /// <remarks>Defaults to True if omitted from the configuration file.</remarks>
+        [ConfigurationProperty("deactivateOfflineNodes", DefaultValue = "True", IsRequired = false)]
+        public bool DeactivateOfflineNodes
+        {
+            get { return (bool)this["deactivateOfflineNodes"]; }
+            set { this["deactivateOfflineNodes"] = value; }
+        }
+
         /// <summary>
         /// A <see cref="IRiakAuthenticationConfiguration"/> configuration that details any authentication information.
         /// </summary>

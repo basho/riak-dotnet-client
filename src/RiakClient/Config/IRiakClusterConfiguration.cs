@@ -42,6 +42,12 @@ namespace RiakClient.Config
         Timeout DefaultRetryWaitTime { get; set; }
 
         /// <summary>
+        /// If True (default), nodes that report offline will be removed from the pool and moved to a de-activated list until a background thread detects they have come back online.
+        /// If False offline nodes will not be removed from the pool. Set to False if you have a load balancer that is handling node deactivation for you.
+        /// </summary>
+        bool DeactivateOfflineNodes { get; set; }
+
+        /// <summary>
         /// The max number of retry attempts to make when the client encounters 
         /// <see cref="ResultCode"/>.NoConnections or <see cref="ResultCode"/>.CommunicationError errors.
         /// </summary>
