@@ -43,7 +43,11 @@ namespace RiakClient
         private readonly TimeSpan nodePollTime;
         private readonly int defaultRetryCount;
 
+        private readonly CancellationTokenSource cts = new CancellationTokenSource();
+        private readonly CancellationToken ct;
+        private readonly Task monitorTask;
         private bool disposing = false;
+        private bool disposed = false;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RiakCluster"/> class.
@@ -62,7 +66,8 @@ namespace RiakClient
             defaultRetryCount = clusterConfig.DefaultRetryCount;
             RetryWaitTime = clusterConfig.DefaultRetryWaitTime;
 
-            Task.Factory.StartNew(NodeMonitor);
+            ct = cts.Token;
+            monitorTask = Task.Factory.StartNew(NodeMonitor, ct);
         }
 
         /// <summary>
@@ -162,10 +167,29 @@ namespace RiakClient
         protected override void Dispose(bool disposing)
         {
             this.disposing = disposing;
-
-            if (disposing)
+            if (disposing && disposed == false)
             {
+                cts.Cancel();
+                try
+                {
+                    Task.WaitAll(monitorTask);
+                }
+                catch (AggregateException ex)
+                {
+                    bool rethrow = ex.InnerExceptions.Any(
+                        iex => (iex is TaskCanceledException) == false);
+                    if (rethrow)
+                    {
+                        throw;
+                    }
+                }
+                catch (TaskCanceledException)
+                {
+                }
+
+                cts.Dispose();
                 nodes.ForEach(n => n.Dispose());
+                disposed = true;
             }
         }
 
@@ -236,17 +260,20 @@ namespace RiakClient
             }
         }
 
-        // TODO: move to own class
         private void NodeMonitor()
         {
-            while (!disposing)
+            while (true)
             {
+                ct.ThrowIfCancellationRequested();
+
                 var deadNodes = new List<IRiakNode>();
                 IRiakNode node = null;
-                while (offlineNodes.TryDequeue(out node) && !disposing)
+                while (offlineNodes.TryDequeue(out node))
                 {
+                    ct.ThrowIfCancellationRequested();
                     var result = node.UseConnection(c => c.PbcWriteRead(MessageCode.RpbPingReq, MessageCode.RpbPingResp));
 
+                    ct.ThrowIfCancellationRequested();
                     if (result.IsSuccess)
                     {
                         loadBalancer.AddNode(node);
@@ -257,15 +284,13 @@ namespace RiakClient
                     }
                 }
 
-                if (!disposing)
+                foreach (var deadNode in deadNodes)
                 {
-                    foreach (var deadNode in deadNodes)
-                    {
-                        offlineNodes.Enqueue(deadNode);
-                    }
-
-                    Thread.Sleep(nodePollTime);
+                    ct.ThrowIfCancellationRequested();
+                    offlineNodes.Enqueue(deadNode);
                 }
+
+                ct.WaitHandle.WaitOne(nodePollTime);
             }
         }
     }

@@ -32,6 +32,7 @@ namespace RiakClient
         private readonly Exception exception;
 
         private readonly ResultCode resultCode;
+        private readonly bool nodeOffline = false;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RiakResult"/> class.
@@ -40,7 +41,7 @@ namespace RiakClient
         /// <param name="errorMessage">The error message, if any. Defaults to <b>null</b>.</param>
         /// <param name="resultCode">The <see cref="ResultCode"/>. Defaults to <b>ResultCode.Success</b>.</param>
         public RiakResult(bool isSuccess = true, string errorMessage = null, ResultCode resultCode = ResultCode.Success)
-            : this(isSuccess, resultCode, null, errorMessage)
+            : this(isSuccess, resultCode, null, errorMessage, false)
         {
         }
 
@@ -50,7 +51,7 @@ namespace RiakClient
         /// <param name="resultCode">The <see cref="ResultCode"/>.</param>
         /// <param name="exception">The <see cref="System.Exception"/>. Required.</param>
         public RiakResult(ResultCode resultCode, Exception exception)
-            : this(false, resultCode, exception, null)
+            : this(false, resultCode, exception, null, false)
         {
             if (exception == null)
             {
@@ -58,12 +59,13 @@ namespace RiakClient
             }
         }
 
-        protected RiakResult(bool isSuccess, ResultCode resultCode, Exception exception, string errorMessage)
+        protected RiakResult(bool isSuccess, ResultCode resultCode, Exception exception, string errorMessage, bool nodeOffline)
         {
             this.isSuccess = isSuccess;
             this.resultCode = resultCode;
             this.exception = exception;
             this.errorMessage = errorMessage;
+            this.nodeOffline = nodeOffline;
 
             if (string.IsNullOrWhiteSpace(this.errorMessage) &&
                 exception != null &&
@@ -105,7 +107,10 @@ namespace RiakClient
             get { return resultCode; }
         }
 
-        internal bool NodeOffline { get; set; }
+        internal bool NodeOffline
+        {
+            get { return nodeOffline; }
+        }
 
         internal static RiakResult Success()
         {
@@ -114,16 +119,12 @@ namespace RiakClient
 
         internal static RiakResult FromError(ResultCode code, string message, bool nodeOffline)
         {
-            var riakResult = new RiakResult(false, message, code);
-            riakResult.NodeOffline = nodeOffline;
-            return riakResult;
+            return new RiakResult(false, code, null, message, nodeOffline);
         }
 
         internal static RiakResult FromException(ResultCode code, Exception ex, bool nodeOffline)
         {
-            var riakResult = new RiakResult(code, ex);
-            riakResult.NodeOffline = nodeOffline;
-            return riakResult;
+            return new RiakResult(false, code, ex, null, nodeOffline);
         }
     }
 }
