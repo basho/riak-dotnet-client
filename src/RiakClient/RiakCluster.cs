@@ -42,6 +42,7 @@ namespace RiakClient
         private readonly ConcurrentQueue<IRiakNode> offlineNodes;
         private readonly TimeSpan nodePollTime;
         private readonly int defaultRetryCount;
+        private readonly bool externalLoadBalancer = false;
 
         private readonly CancellationTokenSource cts = new CancellationTokenSource();
         private readonly CancellationToken ct;
@@ -58,6 +59,7 @@ namespace RiakClient
         public RiakCluster(IRiakClusterConfiguration clusterConfig, IRiakConnectionFactory connectionFactory)
         {
             nodePollTime = clusterConfig.NodePollTime;
+            externalLoadBalancer = clusterConfig.ExternalLoadBalancer;
             nodes = clusterConfig.RiakNodes.Select(rn =>
                 new RiakNode(rn, clusterConfig.Authentication, connectionFactory)).Cast<IRiakNode>().ToList();
             loadBalancer = new RoundRobinStrategy();
@@ -84,6 +86,22 @@ namespace RiakClient
         protected override int DefaultRetryCount
         {
             get { return defaultRetryCount; }
+        }
+
+        private bool CanMarkNodesOffline
+        {
+            get
+            {
+                // Assume OK to mark nodes offline.
+                bool rv = true;
+
+                if (externalLoadBalancer && nodes.Count == 1)
+                {
+                    rv = false; // Only one node configured and LB present, never mark it offline.
+                }
+
+                return rv;
+            }
         }
 
         /// <summary>
@@ -148,11 +166,7 @@ namespace RiakClient
 
                     if (result.ResultCode == ResultCode.CommunicationError)
                     {
-                        if (result.NodeOffline)
-                        {
-                            DeactivateNode(node);
-                        }
-
+                        MaybeDeactivateNode(result.NodeOffline, node);
                         Thread.Sleep(RetryWaitTime);
                         return UseDelayedConnection(useFun, retryAttempts - 1);
                     }
@@ -222,11 +236,7 @@ namespace RiakClient
                     }
                     else if (result.ResultCode == ResultCode.CommunicationError)
                     {
-                        if (result.NodeOffline)
-                        {
-                            DeactivateNode(node);
-                        }
-
+                        MaybeDeactivateNode(result.NodeOffline, node);
                         Thread.Sleep(RetryWaitTime);
                         nextResult = UseConnection(useFun, onError, retryAttempts - 1);
                     }
@@ -248,14 +258,17 @@ namespace RiakClient
             return onError(ResultCode.ClusterOffline, "Unable to access functioning Riak node", true);
         }
 
-        private void DeactivateNode(IRiakNode node)
+        private void MaybeDeactivateNode(bool nodeOffline, IRiakNode node)
         {
-            lock (node)
+            if (nodeOffline && CanMarkNodesOffline)
             {
-                if (!offlineNodes.Contains(node))
+                lock (node)
                 {
-                    loadBalancer.RemoveNode(node);
-                    offlineNodes.Enqueue(node);
+                    if (!offlineNodes.Contains(node))
+                    {
+                        loadBalancer.RemoveNode(node);
+                        offlineNodes.Enqueue(node);
+                    }
                 }
             }
         }

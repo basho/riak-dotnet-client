@@ -28,16 +28,29 @@ namespace RiakClientTests.Live.RiakConfigurationTests
     [TestFixture, IntegrationTest]
     public class WhenLoadingFromExternalConfiguration
     {
-        private const string SampleConfig = @"<?xml version=""1.0"" encoding=""utf-8"" ?>
+        private const string Cfg1 = @"<?xml version=""1.0"" encoding=""utf-8"" ?>
             <configuration>
               <configSections>
                 <section name=""riakConfig"" type=""RiakClient.Config.RiakClusterConfiguration, RiakClient"" />
               </configSections>
-              <riakConfig nodePollTime=""5000"" defaultRetryWaitTime=""200"" defaultRetryCount=""3"">
+              <riakConfig nodePollTime=""5000"" defaultRetryWaitTime=""200"" defaultRetryCount=""3"" externalLoadBalancer=""true"">
                 <nodes>
                   <node name=""node1"" hostAddress=""host1"" pbcPort=""8081"" poolSize=""5"" />
                   <node name=""node2"" hostAddress=""host2"" pbcPort=""8081"" poolSize=""6""
                         networkReadTimeout=""5000"" networkWriteTimeout=""5000"" networkConnectTimeout=""5000"" />
+                </nodes>
+              </riakConfig>
+            </configuration>
+            ";
+
+        private const string Cfg2 = @"<?xml version=""1.0"" encoding=""utf-8"" ?>
+            <configuration>
+              <configSections>
+                <section name=""riakConfig"" type=""RiakClient.Config.RiakClusterConfiguration, RiakClient"" />
+              </configSections>
+              <riakConfig>
+                <nodes>
+                  <node name=""node"" hostAddress=""127.0.0.1"" />
                 </nodes>
               </riakConfig>
             </configuration>
@@ -53,13 +66,14 @@ namespace RiakClientTests.Live.RiakConfigurationTests
             var fileName = Path.GetTempFileName();
             try
             {
-                File.WriteAllText(fileName, SampleConfig);
+                File.WriteAllText(fileName, Cfg1);
 
                 var config = RiakClusterConfiguration.LoadFromConfig("riakConfig", fileName);
                 config.DefaultRetryCount.ShouldEqual(3);
                 config.DefaultRetryWaitTime.ShouldEqual((Timeout)twoHundredMillis);
                 config.NodePollTime.ShouldEqual((Timeout)fiveSecsAsMillis);
                 config.RiakNodes.Count().ShouldEqual(2);
+                Assert.IsTrue(config.ExternalLoadBalancer);
 
                 var nodes = config.RiakNodes.ToArray();
                 IRiakNodeConfiguration node1 = nodes[0];
@@ -79,6 +93,37 @@ namespace RiakClientTests.Live.RiakConfigurationTests
                 node2.NetworkConnectTimeout.ShouldEqual((Timeout)fiveSecsAsMillis);
                 node2.NetworkReadTimeout.ShouldEqual((Timeout)fiveSecsAsMillis);
                 node2.NetworkWriteTimeout.ShouldEqual((Timeout)fiveSecsAsMillis);
+            }
+            finally
+            {
+                File.Delete(fileName);
+            }
+        }
+
+        [Test]
+        public void ConfigurationLoadsDefaults()
+        {
+            var fileName = Path.GetTempFileName();
+            try
+            {
+                File.WriteAllText(fileName, Cfg2);
+
+                var config = RiakClusterConfiguration.LoadFromConfig("riakConfig", fileName);
+                Assert.AreEqual(3, config.DefaultRetryCount);
+                Assert.AreEqual(200, (int)config.DefaultRetryWaitTime);
+                Assert.AreEqual(5000, (int)config.NodePollTime);
+                Assert.AreEqual(1, config.RiakNodes.Count());
+                Assert.IsFalse(config.ExternalLoadBalancer);
+
+                var nodes = config.RiakNodes.ToArray();
+                IRiakNodeConfiguration node = nodes[0];
+                Assert.AreEqual("node", node.Name);
+                Assert.AreEqual("127.0.0.1", node.HostAddress);
+                Assert.AreEqual(8087, node.PbcPort);
+                Assert.AreEqual(30, node.PoolSize);
+                Assert.AreEqual(4000, (int)node.NetworkConnectTimeout);
+                Assert.AreEqual(4000, (int)node.NetworkReadTimeout);
+                Assert.AreEqual(4000, (int)node.NetworkWriteTimeout);
             }
             finally
             {

@@ -42,6 +42,12 @@ namespace RiakClient.Config
         Timeout DefaultRetryWaitTime { get; set; }
 
         /// <summary>
+        /// If True and only one node is configured, the node (pointing to the load balancer) will not be marked offline and requests will always be routed to that node.
+        /// If False (default) offline nodes will be removed from the pool until health check determines they are healthy again.
+        /// </summary>
+        bool ExternalLoadBalancer { get; set; }
+
+        /// <summary>
         /// The max number of retry attempts to make when the client encounters 
         /// <see cref="ResultCode"/>.NoConnections or <see cref="ResultCode"/>.CommunicationError errors.
         /// </summary>

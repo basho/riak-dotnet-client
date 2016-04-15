@@ -104,6 +104,15 @@ namespace RiakClient.Config
             set { this["defaultRetryCount"] = value; }
         }
 
+        /// <inheritdoc/>
+        /// <remarks>Defaults to False if omitted from the configuration file.</remarks>
+        [ConfigurationProperty("externalLoadBalancer", DefaultValue = "False", IsRequired = false)]
+        public bool ExternalLoadBalancer
+        {
+            get { return (bool)this["externalLoadBalancer"]; }
+            set { this["externalLoadBalancer"] = value; }
+        }
+
         /// <summary>
         /// A <see cref="IRiakAuthenticationConfiguration"/> configuration that details any authentication information.
         /// </summary>
