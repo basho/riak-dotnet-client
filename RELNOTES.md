@@ -1,9 +1,11 @@
 Release Notes
 =============
 
-v2.3.0
+[v2.3.0](https://github.com/basho/riak-dotnet-client/issues?q=milestone%3Ariak-dotnet-client-2.3.0)
 ------
 
+* Add support for external load balancers via the `externalLoadBalancer` cluster option.
+* Fix issue where offline state of node not getting passed corectly.
 * [Add Riak Timeseries support](https://github.com/basho/riak-dotnet-client/pull/302)
 
 v2.2.0
