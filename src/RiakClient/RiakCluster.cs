@@ -42,6 +42,7 @@ namespace RiakClient
         private readonly ConcurrentQueue<IRiakNode> offlineNodes;
         private readonly TimeSpan nodePollTime;
         private readonly int defaultRetryCount;
+        private readonly bool deactivateOfflineNodes = true;
 
         private readonly CancellationTokenSource cts = new CancellationTokenSource();
         private readonly CancellationToken ct;
@@ -58,6 +59,7 @@ namespace RiakClient
         public RiakCluster(IRiakClusterConfiguration clusterConfig, IRiakConnectionFactory connectionFactory)
         {
             nodePollTime = clusterConfig.NodePollTime;
+            deactivateOfflineNodes = clusterConfig.DeactivateOfflineNodes;
             nodes = clusterConfig.RiakNodes.Select(rn =>
                 new RiakNode(rn, clusterConfig.Authentication, connectionFactory)).Cast<IRiakNode>().ToList();
             loadBalancer = new RoundRobinStrategy();
@@ -148,7 +150,7 @@ namespace RiakClient
 
                     if (result.ResultCode == ResultCode.CommunicationError)
                     {
-                        if (result.NodeOffline)
+                        if (result.NodeOffline && deactivateOfflineNodes)
                         {
                             DeactivateNode(node);
                         }
@@ -222,7 +224,7 @@ namespace RiakClient
                     }
                     else if (result.ResultCode == ResultCode.CommunicationError)
                     {
-                        if (result.NodeOffline)
+                        if (result.NodeOffline && deactivateOfflineNodes)
                         {
                             DeactivateNode(node);
                         }
