@@ -33,7 +33,7 @@ namespace RiakClientTests.Live.RiakConfigurationTests
               <configSections>
                 <section name=""riakConfig"" type=""RiakClient.Config.RiakClusterConfiguration, RiakClient"" />
               </configSections>
-              <riakConfig nodePollTime=""5000"" defaultRetryWaitTime=""200"" defaultRetryCount=""3"">
+              <riakConfig nodePollTime=""5000"" defaultRetryWaitTime=""200"" defaultRetryCount=""3"" externalLoadBalancer=""true"">
                 <nodes>
                   <node name=""node1"" hostAddress=""host1"" pbcPort=""8081"" poolSize=""5"" />
                   <node name=""node2"" hostAddress=""host2"" pbcPort=""8081"" poolSize=""6""
@@ -60,6 +60,7 @@ namespace RiakClientTests.Live.RiakConfigurationTests
                 config.DefaultRetryWaitTime.ShouldEqual((Timeout)twoHundredMillis);
                 config.NodePollTime.ShouldEqual((Timeout)fiveSecsAsMillis);
                 config.RiakNodes.Count().ShouldEqual(2);
+                Assert.IsTrue(config.ExternalLoadBalancer);
 
                 var nodes = config.RiakNodes.ToArray();
                 IRiakNodeConfiguration node1 = nodes[0];

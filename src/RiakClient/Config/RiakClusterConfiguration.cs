@@ -105,12 +105,12 @@ namespace RiakClient.Config
         }
 
         /// <inheritdoc/>
-        /// <remarks>Defaults to True if omitted from the configuration file.</remarks>
-        [ConfigurationProperty("deactivateOfflineNodes", DefaultValue = "True", IsRequired = false)]
-        public bool DeactivateOfflineNodes
+        /// <remarks>Defaults to False if omitted from the configuration file.</remarks>
+        [ConfigurationProperty("externalLoadBalancer", DefaultValue = "False", IsRequired = false)]
+        public bool ExternalLoadBalancer
         {
-            get { return (bool)this["deactivateOfflineNodes"]; }
-            set { this["deactivateOfflineNodes"] = value; }
+            get { return (bool)this["externalLoadBalancer"]; }
+            set { this["externalLoadBalancer"] = value; }
         }
 
         /// <summary>
