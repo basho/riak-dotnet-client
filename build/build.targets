@@ -17,7 +17,16 @@
            Text="Must set VersionString property on command line!" />
   </Target>
 
-  <Target Name="PublishValidation" DependsOnTargets="PublishValidateVersionString;PopulateVersionInformation">
+  <Target Name="PublishValidateOnDevelopBranch">
+    <!-- Validate that we are on develop branch -->
+    <GitBranch LocalPath="$(SolutionDir)">
+      <Output TaskParameter="Branch" PropertyName="GitBranch" />
+    </GitBranch>
+    <Error Condition="'$(GitBranch)' != '$(DevelopBranchName)'"
+           Text="Please ensure all features have been merged into $(DevelopBranchName) and that you are on the $(DevelopBranchName) branch." />
+  </Target>
+
+  <Target Name="PublishValidation" DependsOnTargets="PublishValidateVersionString;PublishValidateOnDevelopBranch;PopulateVersionInformation">
     <Error Condition="'$(OS)' != 'Windows_NT'" Text="Publish target is Windows-only!" />
     <!-- Validate parsed VersionString -->
     <RegexMatch Input="$(VMajor)" Expression="^[1-9]$">
@@ -79,17 +88,8 @@
     <GitClient Command="clean" Arguments="-fxd" LocalPath="$(SolutionDir)" />
   </Target>
 
-  <Target Name="PublishValidateOnDevelopBranch">
-    <!-- Validate that we are on develop branch -->
-    <GitBranch LocalPath="$(SolutionDir)">
-      <Output TaskParameter="Branch" PropertyName="GitBranch" />
-    </GitBranch>
-    <Error Condition="'$(GitBranch)' != '$(DevelopBranchName)'"
-           Text="Please ensure all features have been merged into $(DevelopBranchName) and that you are on the $(DevelopBranchName) branch." />
-  </Target>
-
-  <Target Name="PublishMergeMasterAndTag" DependsOnTargets="PublishValidateOnDevelopBranch;PublishCloneToTemp">
-    <Message Text="Merging '$(DevelopBranchName)' into '$(MasterBranchName)' NOTE: this will fail if the merge can't be done via fast-forward!" />
+  <Target Name="PublishMergeMasterAndTag" DependsOnTargets="PublishCloneToTemp">
+    <Message Text="Merging '$(DevelopRemoteBranchName)' into '$(MasterBranchName)' NOTE: this will fail if the merge can't be done via fast-forward!" />
     <GitClient Command="merge" Arguments="--no-ff --commit --ff-only $(DevelopRemoteBranchName)" LocalPath="$(SolutionDir)" />
 
     <Message Text="Tagging with $(GitTagMessage)" />
