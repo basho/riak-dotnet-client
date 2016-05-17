@@ -47,6 +47,12 @@ namespace RiakClient.Config
         int PoolSize { get; set; }
 
         /// <summary>
+        /// If True, this node (pointing to a load balancer) will not be marked offline and requests will always be routed to it.
+        /// If False (default) and this node is offline, it will be removed from the pool until health check determines it is healthy again.
+        /// </summary>
+        bool ExternalLoadBalancer { get; set; }
+
+        /// <summary>
         /// The network timeout to use when attempting to read data from Riak.
         /// </summary>
         Timeout NetworkReadTimeout { get; set; }

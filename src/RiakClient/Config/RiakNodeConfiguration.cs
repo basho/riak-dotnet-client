@@ -73,6 +73,15 @@ namespace RiakClient.Config
          */
 
         /// <inheritdoc/>
+        /// <remarks>Defaults to False if omitted from the configuration file.</remarks>
+        [ConfigurationProperty("externalLoadBalancer", DefaultValue = "False", IsRequired = false)]
+        public bool ExternalLoadBalancer
+        {
+            get { return (bool)this["externalLoadBalancer"]; }
+            set { this["externalLoadBalancer"] = value; }
+        }
+
+        /// <inheritdoc/>
         /// <remarks>Defaults to 4000ms if omitted from the configuration file.</remarks>
         public Timeout NetworkReadTimeout
         {

@@ -33,9 +33,9 @@ namespace RiakClientTests.Live.RiakConfigurationTests
               <configSections>
                 <section name=""riakConfig"" type=""RiakClient.Config.RiakClusterConfiguration, RiakClient"" />
               </configSections>
-              <riakConfig nodePollTime=""5000"" defaultRetryWaitTime=""200"" defaultRetryCount=""3"" externalLoadBalancer=""true"">
+              <riakConfig nodePollTime=""5000"" defaultRetryWaitTime=""200"" defaultRetryCount=""3"">
                 <nodes>
-                  <node name=""node1"" hostAddress=""host1"" pbcPort=""8081"" poolSize=""5"" />
+                  <node name=""node1"" hostAddress=""host1"" pbcPort=""8081"" poolSize=""5"" externalLoadBalancer=""true"" />
                   <node name=""node2"" hostAddress=""host2"" pbcPort=""8081"" poolSize=""6""
                         networkReadTimeout=""5000"" networkWriteTimeout=""5000"" networkConnectTimeout=""5000"" />
                 </nodes>
@@ -73,7 +73,6 @@ namespace RiakClientTests.Live.RiakConfigurationTests
                 config.DefaultRetryWaitTime.ShouldEqual((Timeout)twoHundredMillis);
                 config.NodePollTime.ShouldEqual((Timeout)fiveSecsAsMillis);
                 config.RiakNodes.Count().ShouldEqual(2);
-                Assert.IsTrue(config.ExternalLoadBalancer);
 
                 var nodes = config.RiakNodes.ToArray();
                 IRiakNodeConfiguration node1 = nodes[0];
@@ -81,6 +80,7 @@ namespace RiakClientTests.Live.RiakConfigurationTests
                 node1.HostAddress.ShouldEqual("host1");
                 node1.PbcPort.ShouldEqual(8081);
                 node1.PoolSize.ShouldEqual(5);
+                Assert.IsTrue(node1.ExternalLoadBalancer);
                 node1.NetworkConnectTimeout.ShouldEqual((Timeout)fourSecsAsMillis);
                 node1.NetworkReadTimeout.ShouldEqual((Timeout)fourSecsAsMillis);
                 node1.NetworkWriteTimeout.ShouldEqual((Timeout)fourSecsAsMillis);
@@ -90,6 +90,7 @@ namespace RiakClientTests.Live.RiakConfigurationTests
                 node2.HostAddress.ShouldEqual("host2");
                 node2.PbcPort.ShouldEqual(8081);
                 node2.PoolSize.ShouldEqual(6);
+                Assert.IsFalse(node2.ExternalLoadBalancer);
                 node2.NetworkConnectTimeout.ShouldEqual((Timeout)fiveSecsAsMillis);
                 node2.NetworkReadTimeout.ShouldEqual((Timeout)fiveSecsAsMillis);
                 node2.NetworkWriteTimeout.ShouldEqual((Timeout)fiveSecsAsMillis);
@@ -113,7 +114,6 @@ namespace RiakClientTests.Live.RiakConfigurationTests
                 Assert.AreEqual(200, (int)config.DefaultRetryWaitTime);
                 Assert.AreEqual(5000, (int)config.NodePollTime);
                 Assert.AreEqual(1, config.RiakNodes.Count());
-                Assert.IsFalse(config.ExternalLoadBalancer);
 
                 var nodes = config.RiakNodes.ToArray();
                 IRiakNodeConfiguration node = nodes[0];
