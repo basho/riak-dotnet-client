@@ -2,14 +2,20 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
+    using Erlang;
     using Messages;
 
     /// <summary>
     /// Fetches timeseries data from Riak
     /// </summary>
     [CLSCompliant(false)]
-    public class Query : Command<QueryOptions, QueryResponse>
+    public class Query : Command<QueryOptions, QueryResponse>, IRiakTtbCommand
     {
+        private const string TsQueryReqAtom = "tsqueryreq";
+        private const string TsInterpolationAtom = "tsinterpolation";
+        private const string UndefinedAtom = "undefined";
+
         private readonly List<Row> rows = new List<Row>();
 
         /// <summary>
@@ -45,10 +51,48 @@
             return req;
         }
 
+        public Action<MemoryStream> GetSerializer()
+        {
+            return (ms) =>
+            {
+                // using (var os = new OtpOutputStream(writeVersion: true))
+                using (var os = new OtpOutputStream())
+                {
+                    // TsQueryReq is a 4-tuple: {'tsqueryreq', TsInterpolation, boolIsStreaming, bytesCoverContext}
+                    os.WriteTupleHead(4);
+                    os.WriteAtom(TsQueryReqAtom);
+
+                    // TsInterpolation is a 3-tuple
+                    // {'tsinterpolation', query, []} empty list is interpolations
+                    os.WriteTupleHead(3);
+                    os.WriteAtom(TsInterpolationAtom);
+                    os.WriteStringAsBinary(CommandOptions.Query);
+                    os.WriteNil();
+
+                    os.WriteBoolean(false);
+                    os.WriteAtom(UndefinedAtom);
+
+                    os.WriteTo(ms);
+                }
+            };
+        }
+
         public override void OnSuccess(RpbResp response)
         {
-            var decoder = new ResponseDecoder((TsQueryResp)response);
-            DecodedResponse dr = decoder.Decode();
+            DecodedResponse dr = null;
+            ResponseDecoder decoder = null;
+
+            var ttbresp = response as TsTtbResp;
+            if (ttbresp == null)
+            {
+                decoder = new ResponseDecoder((TsQueryResp)response);
+            }
+            else
+            {
+                decoder = new ResponseDecoder(ttbresp);
+            }
+
+            dr = decoder.Decode();
 
             Response = new QueryResponse(CommandOptions.Query, dr.Columns, dr.Rows);
 

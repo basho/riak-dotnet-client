@@ -1,6 +1,8 @@
 ﻿namespace RiakClient.Messages
 {
     using System;
+    using Erlang;
+    using Exceptions;
     using Util;
 
     public class RpbReq
@@ -211,10 +213,6 @@
     [CLSCompliant(false)]
     public sealed partial class RpbCoverageEntry {}
 
-    public sealed partial class RpbToggleEncodingReq {}
-
-    public sealed partial class RpbToggleEncodingResp {}
-
     [CLSCompliant(false)]
     public sealed partial class TsListKeysReq { }
 
@@ -250,9 +248,58 @@
     [CLSCompliant(false)]
     public sealed partial class TsCoverageResp { }
 
-    public sealed partial class TsTtbPutReq { }
-
     public sealed partial class TsRange { }
 
     public sealed partial class TsInterpolation { }
+
+    public sealed class TsTtbMsg { }
+
+    public sealed class TsTtbResp : RpbResp
+    {
+        // private static readonly ErlAtom RpbErrorRespAtom = new ErlAtom("rpberrorresp");
+        private readonly byte[] response;
+
+        public TsTtbResp(byte[] response)
+        {
+            if (response == null)
+            {
+                throw new ArgumentNullException("response");
+            }
+
+            this.response = response;
+            maybeRiakError(response);
+        }
+
+        private static void maybeRiakError(byte[] response)
+        {
+            if (response.Length == 0)
+            {
+                // TODO: should this be an error?
+                return;
+            }
+
+            // using (var istream = new OtpInputStream(response, checkVersion: true))
+            /* TODO
+            using (var istream = new OtpInputStream(response))
+            {
+                int arity = istream.ReadTupleHead();
+                if (arity == 3 && istream.PeekAtom())
+                {
+                    ErlAtom atom = istream.ReadAtom();
+                    if (atom.Equals(RpbErrorRespAtom))
+                    {
+                        ErlBinary errMsgBin = istream.ReadBinary();
+                        ErlLong errCodeLong = istream.ReadLong();
+                        throw new RiakException(errCodeLong.ValueAsInt, errMsgBin.ValueAsString, false);
+                    }
+                }
+            }
+            */
+        }
+
+        public byte[] Response
+        {
+            get { return response; }
+        }
+    }
 }

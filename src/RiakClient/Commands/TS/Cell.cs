@@ -1,18 +1,67 @@
 ﻿namespace RiakClient.Commands.TS
 {
     using System;
+    using System.Collections;
+    using Erlang;
     using Messages;
     using Util;
 
     public class Cell : IEquatable<Cell>
     {
         public static readonly Cell Null = new Cell();
+
         private const int NullHashCode = 0;
+        private static readonly IList EmptyList = new object[0];
+
         private readonly object value;
+        private readonly bool isNull = false;
+
+        private readonly string varcharValue;
+        private readonly long sint64Value;
+        private readonly double doubleValue;
+        private readonly DateTime timestampValue;
+        private readonly bool booleanValue;
+        private readonly ColumnType valueType;
 
         public Cell()
         {
             value = null;
+            isNull = true;
+        }
+
+        public Cell(string value)
+        {
+            if (value == null)
+            {
+                throw new ArgumentNullException("value", "Value must not be null.");
+            }
+
+            varcharValue = value;
+            valueType = ColumnType.Varchar;
+        }
+
+        public Cell(long value)
+        {
+            sint64Value = value;
+            valueType = ColumnType.SInt64;
+        }
+
+        public Cell(double value)
+        {
+            doubleValue = value;
+            valueType = ColumnType.Double;
+        }
+
+        public Cell(DateTime value)
+        {
+            timestampValue = value;
+            valueType = ColumnType.Timestamp;
+        }
+
+        public Cell(bool value)
+        {
+            booleanValue = value;
+            valueType = ColumnType.Boolean;
         }
 
         public Cell(object value)
@@ -108,6 +157,41 @@
             }
 
             return new Cell();
+        }
+
+        internal void ToTtbCell(OtpOutputStream os)
+        {
+            if (isNull)
+            {
+                os.WriteNil();
+                return;
+            }
+
+            if (valueType == ColumnType.Varchar)
+            {
+                os.WriteStringAsBinary(varcharValue);
+            }
+            else if (valueType == ColumnType.SInt64)
+            {
+                os.WriteLong(sint64Value);
+            }
+            else if (valueType == ColumnType.Timestamp)
+            {
+                long ts = DateTimeUtil.ToUnixTimeMillis(timestampValue);
+                os.WriteLong(ts);
+            }
+            else if (valueType == ColumnType.Boolean)
+            {
+                os.WriteBoolean(booleanValue);
+            }
+            else if (valueType == ColumnType.Double)
+            {
+                os.WriteDouble(doubleValue);
+            }
+            else
+            {
+                throw new InvalidOperationException("Could not convert to TTB value.");
+            }
         }
 
         internal virtual TsCell ToTsCell()

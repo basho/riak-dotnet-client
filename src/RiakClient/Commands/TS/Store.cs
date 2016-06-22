@@ -2,15 +2,19 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
+    using Erlang;
     using Messages;
     using Util;
 
     /// <summary>
     /// Fetches timeseries data from Riak
     /// </summary>
-    public class Store : Command<StoreOptions, StoreResponse>
+    public class Store : Command<StoreOptions, StoreResponse>, IRiakTtbCommand
     {
+        private const string TsPutReqAtom = "tsputreq";
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Store"/> class.
         /// </summary>
@@ -50,8 +54,56 @@
             return req;
         }
 
+        public Action<MemoryStream> GetSerializer()
+        {
+            string tableName = CommandOptions.Table;
+            ICollection<Row> rows = CommandOptions.Rows;
+
+            return (ms) =>
+            {
+                // using (var os = new ErlOutputStream(writeVersion: true))
+                using (var os = new OtpOutputStream())
+                {
+                    // {tsputreq, tableName, emptyList, rows}
+                    os.WriteTupleHead(4);
+                    os.WriteAtom(TsPutReqAtom);
+                    os.WriteStringAsBinary(tableName);
+                    os.WriteNil();
+
+                    if (rows.Count > 0)
+                    {
+                        os.WriteListHead(rows.Count);
+
+                        foreach (Row r in CommandOptions.Rows)
+                        {
+                            os.WriteTupleHead(r.Cells.Count);
+                            foreach (Cell c in r.Cells)
+                            {
+                                c.ToTtbCell(os);
+                            }
+                        }
+
+                        os.WriteNil();
+                    }
+                    else
+                    {
+                        os.WriteNil();
+                    }
+
+                    os.WriteTo(ms);
+                }
+            };
+        }
+
         public override void OnSuccess(RpbResp response)
         {
+            var ttbresp = response as TsTtbResp;
+            if (ttbresp != null)
+            {
+                // TODO check for true?
+                // Bert rsp = ttbresp.Response;
+            }
+
             Response = new StoreResponse();
         }
 
@@ -59,10 +111,10 @@
         public class Builder
             : TimeseriesCommandBuilder<Builder, Store, StoreOptions>
         {
-            private IEnumerable<Column> columns;
-            private IEnumerable<Row> rows;
+            private ICollection<Column> columns;
+            private ICollection<Row> rows;
 
-            public Builder WithColumns(IEnumerable<Column> columns)
+            public Builder WithColumns(ICollection<Column> columns)
             {
                 if (EnumerableUtil.IsNullOrEmpty(columns))
                 {
@@ -73,7 +125,7 @@
                 return this;
             }
 
-            public Builder WithRows(IEnumerable<Row> rows)
+            public Builder WithRows(ICollection<Row> rows)
             {
                 if (EnumerableUtil.IsNullOrEmpty(rows))
                 {

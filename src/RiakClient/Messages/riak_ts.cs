@@ -202,37 +202,6 @@ namespace RiakClient.Messages
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
   }
   
-  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"TsTtbPutReq")]
-  public partial class TsTtbPutReq : global::ProtoBuf.IExtensible
-  {
-    public TsTtbPutReq() {}
-    
-    private byte[] _table;
-    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"table", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public byte[] table
-    {
-      get { return _table; }
-      set { _table = value; }
-    }
-    private readonly global::System.Collections.Generic.List<TsColumnDescription> _columns = new global::System.Collections.Generic.List<TsColumnDescription>();
-    [global::ProtoBuf.ProtoMember(2, Name=@"columns", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public global::System.Collections.Generic.List<TsColumnDescription> columns
-    {
-      get { return _columns; }
-    }
-  
-    private readonly global::System.Collections.Generic.List<TsRow> _rows = new global::System.Collections.Generic.List<TsRow>();
-    [global::ProtoBuf.ProtoMember(3, Name=@"rows", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public global::System.Collections.Generic.List<TsRow> rows
-    {
-      get { return _rows; }
-    }
-  
-    private global::ProtoBuf.IExtension extensionObject;
-    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
-  }
-  
   [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"TsPutResp")]
   public partial class TsPutResp : global::ProtoBuf.IExtensible
   {

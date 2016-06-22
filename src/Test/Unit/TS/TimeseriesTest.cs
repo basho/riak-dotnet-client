@@ -61,7 +61,7 @@ namespace Test.Unit.TS
         {
             new Column("bool", ColumnType.Boolean),
             new Column("double", ColumnType.Double),
-            new Column("long", ColumnType.Int64),
+            new Column("long", ColumnType.SInt64),
             new Column("timestamp", ColumnType.Timestamp),
             new Column("string", ColumnType.Varchar),
         };

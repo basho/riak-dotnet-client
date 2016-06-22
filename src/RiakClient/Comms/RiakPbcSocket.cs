@@ -38,6 +38,7 @@ namespace RiakClient.Comms
         private const int SizeOfInt = sizeof(int);
         private const int PbMsgHeaderSize = SizeOfInt + sizeof(byte);
 
+        private static readonly Type TtbType = typeof(TsTtbMsg);
         private readonly string server;
         private readonly int port;
         private readonly Timeout connectTimeout;
@@ -85,15 +86,23 @@ namespace RiakClient.Comms
 
         public RiakResult Write(IRiakCommand command)
         {
-            RpbReq request = command.ConstructPbRequest();
-            if (request.IsMessageCodeOnly)
+            var ttbcmd = command as IRiakTtbCommand;
+            if (ttbcmd == null)
             {
-                Write(request.MessageCode);
-                return RiakResult.Success();
+                RpbReq request = command.ConstructPbRequest();
+                if (request.IsMessageCodeOnly)
+                {
+                    Write(request.MessageCode);
+                    return RiakResult.Success();
+                }
+                else
+                {
+                    return DoWrite(s => Serializer.Serialize(s, request), request.GetType());
+                }
             }
             else
             {
-                return DoWrite(s => Serializer.Serialize(s, request), request.GetType());
+                return DoWrite(ttbcmd.GetSerializer(), TtbType);
             }
         }
 
@@ -119,24 +128,39 @@ namespace RiakClient.Comms
         public RiakResult Read(IRiakCommand command)
         {
             bool done = false;
+            var ttbcmd = command as IRiakTtbCommand;
             do
             {
-                MessageCode expectedCode = command.ExpectedCode;
-                Type expectedType = MessageCodeTypeMapBuilder.GetTypeFor(expectedCode);
-
-                int size = DoRead(expectedCode, expectedType);
-
-                RpbResp response = DeserializeInstance(expectedType, size);
-                command.OnSuccess(response);
-
-                var streamingResponse = response as IRpbStreamingResp;
-                if (streamingResponse == null)
+                MessageCode expectedCode;
+                if (ttbcmd == null)
                 {
-                    done = true;
+                    expectedCode = command.ExpectedCode;
+                    Type expectedType = MessageCodeTypeMapBuilder.GetTypeFor(expectedCode);
+                    int size = DoRead(expectedCode, expectedType);
+
+                    RpbResp response = DeserializeInstance(expectedType, size);
+                    command.OnSuccess(response);
+
+                    var streamingResponse = response as IRpbStreamingResp;
+                    if (streamingResponse == null)
+                    {
+                        done = true;
+                    }
+                    else
+                    {
+                        done = streamingResponse.done;
+                    }
                 }
                 else
                 {
-                    done = streamingResponse.done;
+                    expectedCode = MessageCode.TsTtbMsg;
+                    int size = DoRead(expectedCode, TtbType);
+
+                    byte[] resultBuffer = ReceiveAll(new byte[size - 1]);
+                    RpbResp response = new TsTtbResp(resultBuffer);
+                    ttbcmd.OnSuccess(response);
+
+                    done = true;
                 }
             }
             while (done == false);

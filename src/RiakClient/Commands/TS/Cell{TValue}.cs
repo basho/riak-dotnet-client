@@ -130,6 +130,18 @@
             }
         }
 
+        private static bool IsBigIntegerType(Type type)
+        {
+            switch (Type.GetTypeCode(type))
+            {
+                case TypeCode.UInt64:
+                case TypeCode.Int64:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
         private static bool IsDoubleType(Type type)
         {
             switch (Type.GetTypeCode(type))

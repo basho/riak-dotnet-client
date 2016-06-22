@@ -68,7 +68,7 @@ namespace RiakClient.Auth
         {
             get
             {
-                return (false == MonoUtil.IsRunningOnMono) &&
+                return (MonoUtil.IsRunningOnMono == false) &&
                        (authConfig != null && (!string.IsNullOrWhiteSpace(authConfig.Username)));
             }
         }
