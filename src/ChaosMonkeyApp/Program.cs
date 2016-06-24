@@ -108,7 +108,7 @@
                         var rsp = cmd.Response;
                         var n = rsp.Value.Node;
                         var v = rsp.Value.ServerVersion;
-                        Console.WriteLine("[ChaosMonkeyApp] got server info: {0}, {1}", n, v);
+                        // Console.WriteLine("[ChaosMonkeyApp] got server info: {0}, {1}", n, v);
                     }
                     else
                     {
