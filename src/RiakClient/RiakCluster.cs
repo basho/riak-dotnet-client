@@ -125,7 +125,7 @@ namespace RiakClient
         {
             if (retryAttempts < 0)
             {
-                return RiakResult<IEnumerable<TResult>>.FromError(ResultCode.NoRetries, "Unable to access a connection on the cluster.", false);
+                return RiakResult<IEnumerable<TResult>>.FromError(ResultCode.NoRetries, "Unable to access a connection on the cluster (no more retries).", false);
             }
 
             if (disposing)
@@ -133,13 +133,15 @@ namespace RiakClient
                 return RiakResult<IEnumerable<TResult>>.FromError(ResultCode.ShuttingDown, "System currently shutting down", true);
             }
 
+            var errorMessages = new List<string>();
             var node = loadBalancer.SelectNode();
-
             if (node != null)
             {
                 var result = node.UseDelayedConnection(useFun);
                 if (!result.IsSuccess)
                 {
+                    errorMessages.Add(result.ErrorMessage);
+
                     if (result.ResultCode == ResultCode.NoConnections)
                     {
                         Thread.Sleep(RetryWaitTime);
@@ -157,7 +159,8 @@ namespace RiakClient
                 return result;
             }
 
-            return RiakResult<IEnumerable<TResult>>.FromError(ResultCode.ClusterOffline, "Unable to access functioning Riak node", true);
+            string msg = string.Format("Unable to access functioning Riak node, error(s): {0}", string.Join(", ", errorMessages));
+            return RiakResult<IEnumerable<TResult>>.FromError(ResultCode.ClusterOffline, msg, true);
         }
 
         protected override void Dispose(bool disposing)
@@ -196,7 +199,7 @@ namespace RiakClient
         {
             if (retryAttempts < 0)
             {
-                return onError(ResultCode.NoRetries, "Unable to access a connection on the cluster.", false);
+                return onError(ResultCode.NoRetries, "Unable to access a connection on the cluster (no more retries).", false);
             }
 
             if (disposing)
@@ -207,9 +210,12 @@ namespace RiakClient
             var node = loadBalancer.SelectNode();
             if (node != null)
             {
+                var errorMessages = new List<string>();
                 var result = node.UseConnection(useFun);
                 if (!result.IsSuccess)
                 {
+                    errorMessages.Add(result.ErrorMessage);
+
                     TRiakResult nextResult = null;
                     if (result.ResultCode == ResultCode.NoConnections)
                     {
@@ -223,21 +229,29 @@ namespace RiakClient
                         nextResult = UseConnection(useFun, onError, retryAttempts - 1);
                     }
 
-                    // if the next result is successful then return that
-                    if (nextResult != null && nextResult.IsSuccess)
+                    if (nextResult != null)
                     {
-                        return nextResult;
+                        // if the next result is successful then return that
+                        if (nextResult.IsSuccess)
+                        {
+                            return nextResult;
+                        }
+                        else
+                        {
+                            errorMessages.Add(nextResult.ErrorMessage);
+                        }
                     }
 
                     // otherwise we'll return the result that we had at this call to make sure that
                     // the correct/initial error is shown
-                    return onError(result.ResultCode, result.ErrorMessage, result.NodeOffline);
+                    string errorMessage = string.Join(", ", errorMessages);
+                    return onError(result.ResultCode, errorMessage, result.NodeOffline);
                 }
 
                 return (TRiakResult)result;
             }
 
-            return onError(ResultCode.ClusterOffline, "Unable to access functioning Riak node", true);
+            return onError(ResultCode.ClusterOffline, "Unable to access functioning Riak node (load balancer returned no nodes).", true);
         }
 
         private void MaybeDeactivateNode(bool nodeOffline, IRiakNode node)
