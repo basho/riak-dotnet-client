@@ -8,11 +8,11 @@
 //------------------------------------------------------------------------------
 
 // Option: missing-value detection (*Specified/ShouldSerialize*/Reset*) enabled
-    
+
 // Generated from: riak.proto
 namespace RiakClient.Messages
 {
-  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"RpbErrorResp")]
+    [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"RpbErrorResp")]
   public partial class RpbErrorResp : global::ProtoBuf.IExtensible
   {
     public RpbErrorResp() {}
@@ -828,39 +828,4 @@ namespace RiakClient.Messages
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
   }
-  
-  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"RpbToggleEncodingReq")]
-  public partial class RpbToggleEncodingReq : global::ProtoBuf.IExtensible
-  {
-    public RpbToggleEncodingReq() {}
-    
-    private bool _use_native;
-    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"use_native", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public bool use_native
-    {
-      get { return _use_native; }
-      set { _use_native = value; }
-    }
-    private global::ProtoBuf.IExtension extensionObject;
-    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
-  }
-  
-  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"RpbToggleEncodingResp")]
-  public partial class RpbToggleEncodingResp : global::ProtoBuf.IExtensible
-  {
-    public RpbToggleEncodingResp() {}
-    
-    private bool _use_native;
-    [global::ProtoBuf.ProtoMember(1, IsRequired = true, Name=@"use_native", DataFormat = global::ProtoBuf.DataFormat.Default)]
-    public bool use_native
-    {
-      get { return _use_native; }
-      set { _use_native = value; }
-    }
-    private global::ProtoBuf.IExtension extensionObject;
-    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
-      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
-  }
-  
 }

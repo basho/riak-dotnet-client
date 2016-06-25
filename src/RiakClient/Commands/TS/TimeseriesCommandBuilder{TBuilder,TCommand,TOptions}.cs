@@ -11,6 +11,7 @@
     public abstract class TimeseriesCommandBuilder<TBuilder, TCommand, TOptions>
         : CommandBuilder<TBuilder, TCommand, TOptions>
         where TBuilder : TimeseriesCommandBuilder<TBuilder, TCommand, TOptions>
+        where TCommand : IRCommand
         where TOptions : TimeseriesCommandOptions
     {
         protected string table;
@@ -21,11 +22,11 @@
 
         public TimeseriesCommandBuilder(TimeseriesCommandBuilder<TBuilder, TCommand, TOptions> source)
         {
-            this.table = source.table;
-            this.timeout = source.timeout;
+            table = source.table;
+            timeout = source.timeout;
         }
 
-        public override TCommand Build()
+        public override IRCommand Build()
         {
             Options = BuildOptions();
             PopulateOptions(Options);

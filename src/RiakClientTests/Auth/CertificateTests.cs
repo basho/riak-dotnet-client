@@ -1,34 +1,15 @@
-// <copyright file="CertificateTests.cs" company="Basho Technologies, Inc.">
-// Copyright 2011 - OJ Reeves & Jeremiah Peschka
-// Copyright 2014 - Basho Technologies, Inc.
-//
-// This file is provided to you under the Apache License,
-// Version 2.0 (the "License"); you may not use this file
-// except in compliance with the License.  You may obtain
-// a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-// </copyright>
-
-using NUnit.Framework;
-using RiakClient.Config;
-
 namespace RiakClientTests.Auth
 {
+    using NUnit.Framework;
+    using Riak.Config;
+
     [TestFixture, UnitTest]
     public class CertificateTests : AuthTestBase
     {
         [Test]
         public void Configuration_CanSpecifyX509Certificates()
         {
-            var config = RiakClusterConfiguration.LoadFromConfig("riakConfiguration");
+            var config = ClusterConfiguration.LoadFromConfig("riakConfiguration");
             Assert.IsNotNull(config);
 
             var authConfig = config.Authentication;
@@ -43,7 +24,7 @@ namespace RiakClientTests.Auth
         [Test]
         public void Configuration_CanSpecifyX509CertificateAndRootCA()
         {
-            var config = RiakClusterConfiguration.LoadFromConfig("riakCAConfiguration");
+            var config = ClusterConfiguration.LoadFromConfig("riakCAConfiguration");
             Assert.IsNotNull(config);
 
             var authConfig = config.Authentication;

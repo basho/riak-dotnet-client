@@ -1,4 +1,4 @@
-﻿namespace RiakClient.Commands.KV
+namespace RiakClient.Commands.KV
 {
     using System;
     using System.Collections.Generic;
@@ -7,7 +7,7 @@
     using Util;
 
     /// <summary>
-    /// Fetches a Map from Riak
+    /// Fetches an object's preflist from Riak
     /// </summary>
     public class FetchPreflist : Command<FetchPreflistOptions, PreflistResponse>
     {
@@ -20,9 +20,19 @@
         {
         }
 
-        public override MessageCode ExpectedCode
+        public override MessageCode RequestCode
+        {
+            get { return MessageCode.RpbGetBucketKeyPreflistReq; }
+        }
+
+        public override MessageCode ResponseCode
         {
             get { return MessageCode.RpbGetBucketKeyPreflistResp; }
+        }
+
+        public override Type ResponseType
+        {
+            get { return typeof(RpbGetBucketKeyPreflistResp); }
         }
 
         public override RpbReq ConstructPbRequest()
@@ -60,12 +70,55 @@
 
         /// <inheritdoc />
         public class Builder
-            : KvCommandBuilder<Builder, FetchPreflist, FetchPreflistOptions>
+            : CommandBuilder<Builder, FetchPreflist, FetchPreflistOptions>
         {
-            public override FetchPreflist Build()
+            // TODO 3.0 KvCommandBuilder?
+            private string bucketType;
+            private string bucket;
+            private string key;
+
+            public override IRCommand Build()
             {
                 Options = BuildOptions();
                 return new FetchPreflist(Options);
+            }
+
+            public Builder WithBucketType(string bucketType)
+            {
+                if (string.IsNullOrWhiteSpace(bucketType))
+                {
+                    throw new ArgumentNullException("bucketType");
+                }
+
+                this.bucketType = bucketType;
+                return this;
+            }
+
+            public Builder WithBucket(string bucket)
+            {
+                if (string.IsNullOrWhiteSpace(bucket))
+                {
+                    throw new ArgumentNullException("bucket");
+                }
+
+                this.bucket = bucket;
+                return this;
+            }
+
+            public Builder WithKey(string key)
+            {
+                if (string.IsNullOrWhiteSpace(key))
+                {
+                    throw new ArgumentNullException("key");
+                }
+
+                this.key = key;
+                return this;
+            }
+
+            protected override FetchPreflistOptions BuildOptions()
+            {
+                return new FetchPreflistOptions(bucketType, bucket, key);
             }
         }
     }

@@ -5,6 +5,7 @@
 
     public class RpbReq
     {
+        // TODO 3.0 not needed
         private readonly MessageCode messageCode;
         private readonly bool isMessageCodeOnly = false;
 
@@ -18,11 +19,13 @@
             this.isMessageCodeOnly = true;
         }
 
+        // TODO 3.0 not needed
         public MessageCode MessageCode
         {
             get { return messageCode; }
         }
 
+        // TODO 3.0 not needed
         public bool IsMessageCodeOnly
         {
             get { return isMessageCodeOnly; }
@@ -121,9 +124,9 @@
     public sealed partial class RpbDelReq { }
 
     [CLSCompliant(false)]
-    public sealed partial class RpbListBucketsReq { }
+    public sealed partial class RpbListBucketsReq : RpbReq { }
 
-    public sealed partial class RpbListBucketsResp { }
+    public sealed partial class RpbListBucketsResp : RpbResp { }
 
     [CLSCompliant(false)]
     public sealed partial class RpbListKeysReq { }
@@ -141,6 +144,9 @@
     public sealed partial class RpbIndexResp { }
 
     [CLSCompliant(false)]
+    public sealed partial class RpbIndexBodyResp { }
+
+    [CLSCompliant(false)]
     public sealed partial class RpbCSBucketReq { }
 
     [CLSCompliant(false)]
@@ -151,6 +157,15 @@
 
     [CLSCompliant(false)]
     public sealed partial class RpbContent { }
+
+    [CLSCompliant(false)]
+    public sealed partial class RpbCoverageEntry { }
+
+    [CLSCompliant(false)]
+    public sealed partial class RpbCoverageReq { }
+
+    [CLSCompliant(false)]
+    public sealed partial class RpbCoverageResp { }
 
     public sealed partial class RpbLink { }
 
@@ -200,20 +215,10 @@
     public sealed partial class RpbBucketKeyPreflistItem { }
 
     [CLSCompliant(false)]
-    public sealed partial class RpbIndexBodyResp {}
+    public sealed partial class TsCoverageEntry { }
 
     [CLSCompliant(false)]
-    public sealed partial class RpbCoverageReq {}
-
-    [CLSCompliant(false)]
-    public sealed partial class RpbCoverageResp {}
-
-    [CLSCompliant(false)]
-    public sealed partial class RpbCoverageEntry {}
-
-    public sealed partial class RpbToggleEncodingReq {}
-
-    public sealed partial class RpbToggleEncodingResp {}
+    public sealed partial class TsCoverageResp { }
 
     [CLSCompliant(false)]
     public sealed partial class TsListKeysReq { }
@@ -242,17 +247,11 @@
 
     public sealed partial class TsDelResp : RpbResp { }
 
-    [CLSCompliant(false)]
-    public sealed partial class TsCoverageEntry { }
-
     public sealed partial class TsCoverageReq { }
-
-    [CLSCompliant(false)]
-    public sealed partial class TsCoverageResp { }
-
-    public sealed partial class TsTtbPutReq { }
 
     public sealed partial class TsRange { }
 
     public sealed partial class TsInterpolation { }
+
+    public sealed class TsTtbMsg { }
 }

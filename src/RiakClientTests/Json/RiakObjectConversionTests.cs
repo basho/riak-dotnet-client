@@ -1,22 +1,3 @@
-// <copyright file="RiakObjectConversionTests.cs" company="Basho Technologies, Inc.">
-// Copyright 2011 - OJ Reeves & Jeremiah Peschka
-// Copyright 2014 - Basho Technologies, Inc.
-//
-// This file is provided to you under the Apache License,
-// Version 2.0 (the "License"); you may not use this file
-// except in compliance with the License.  You may obtain
-// a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-// </copyright>
-
 namespace RiakClientTests.Json.RiakObjectConversionTests
 {
     using System;
@@ -27,7 +8,6 @@ namespace RiakClientTests.Json.RiakObjectConversionTests
     using RiakClient;
     using RiakClient.Extensions;
     using RiakClient.Models;
-    using RiakClient.Util;
 
     [TestFixture, UnitTest]
     public class WhenStoringDataIntoRiakObjectsAsJson
@@ -53,6 +33,7 @@ namespace RiakClientTests.Json.RiakObjectConversionTests
                     }
                 }
             };
+
             var obj = new RiakObject("bucket", "key");
             obj.SetObject(testPerson);
             obj.Value.ShouldNotBeNull();
@@ -106,7 +87,7 @@ namespace RiakClientTests.Json.RiakObjectConversionTests
                 obj.SetObject(testPerson);
             }
             sw.Stop();
-            Console.WriteLine("Serialisation took a total of {0} - {1} per iteration", sw.Elapsed, new TimeSpan(sw.ElapsedTicks / iterations));
+            Console.WriteLine("Serialisation took a total of {0} - {1} per iteration", sw.Elapsed, TimeSpan.FromTicks(sw.ElapsedTicks / iterations));
 
             sw.Reset();
             sw.Start();
@@ -117,7 +98,7 @@ namespace RiakClientTests.Json.RiakObjectConversionTests
                 obj.GetObject<Person>();
             }
             sw.Stop();
-            Console.WriteLine("Deserialisation took a total of {0} - {1} per iteration", sw.Elapsed, new TimeSpan(sw.ElapsedTicks / iterations));
+            Console.WriteLine("Deserialisation took a total of {0} - {1} per iteration", sw.Elapsed, TimeSpan.FromTicks(sw.ElapsedTicks / iterations));
         }
 
         [Test]

@@ -1,32 +1,14 @@
-// <copyright file="RiakNodeConfiguration.cs" company="Basho Technologies, Inc.">
-// Copyright 2011 - OJ Reeves & Jeremiah Peschka
-// Copyright 2014 - Basho Technologies, Inc.
-//
-// This file is provided to you under the Apache License,
-// Version 2.0 (the "License"); you may not use this file
-// except in compliance with the License.  You may obtain
-// a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-// </copyright>
-
-namespace RiakClient.Config
+namespace Riak.Config
 {
+    using System;
     using System.Configuration;
 
     /// <summary>
     /// Represents a configuration element for a Riak Node.
     /// </summary>
-    public sealed class RiakNodeConfiguration : ConfigurationElement, IRiakNodeConfiguration
+    public sealed class NodeConfiguration : ConfigurationElement, INodeConfiguration
     {
-        private static readonly Timeout DefaultTimeout = new Timeout(4000);
+        private static readonly TimeSpan DefaultTimeout = TimeSpan.FromMilliseconds(4000);
 
         /// <inheritdoc/>
         [ConfigurationProperty("name", IsRequired = true)]
@@ -83,14 +65,14 @@ namespace RiakClient.Config
 
         /// <inheritdoc/>
         /// <remarks>Defaults to 4000ms if omitted from the configuration file.</remarks>
-        public Timeout NetworkReadTimeout
+        public TimeSpan NetworkReadTimeout
         {
             get
             {
                 int networkReadTimeoutMilliseconds;
                 if (int.TryParse(NetworkReadTimeoutProperty, out networkReadTimeoutMilliseconds))
                 {
-                    return new Timeout(networkReadTimeoutMilliseconds);
+                    return TimeSpan.FromMilliseconds(networkReadTimeoutMilliseconds);
                 }
                 else
                 {
@@ -106,14 +88,14 @@ namespace RiakClient.Config
 
         /// <inheritdoc/>
         /// <remarks>Defaults to 4000ms if omitted from the configuration file.</remarks>
-        public Timeout NetworkWriteTimeout
+        public TimeSpan NetworkWriteTimeout
         {
             get
             {
                 int networkWriteTimeoutMilliseconds;
                 if (int.TryParse(this.NetworkWriteTimeoutProperty, out networkWriteTimeoutMilliseconds))
                 {
-                    return new Timeout(networkWriteTimeoutMilliseconds);
+                    return TimeSpan.FromMilliseconds(networkWriteTimeoutMilliseconds);
                 }
                 else
                 {
@@ -129,14 +111,14 @@ namespace RiakClient.Config
 
         /// <inheritdoc/>
         /// <remarks>Defaults to 4000ms if omitted from the configuration file.</remarks>
-        public Timeout NetworkConnectTimeout
+        public TimeSpan NetworkConnectTimeout
         {
             get
             {
                 int networkConnectTimeoutMilliseconds;
                 if (int.TryParse(this.NetworkConnectTimeoutProperty, out networkConnectTimeoutMilliseconds))
                 {
-                    return new Timeout(networkConnectTimeoutMilliseconds);
+                    return TimeSpan.FromMilliseconds(networkConnectTimeoutMilliseconds);
                 }
                 else
                 {

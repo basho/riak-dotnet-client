@@ -21,9 +21,19 @@
         {
         }
 
-        public override MessageCode ExpectedCode
+        public override MessageCode RequestCode
+        {
+            get { return MessageCode.TsListKeysReq; }
+        }
+
+        public override MessageCode ResponseCode
         {
             get { return MessageCode.TsListKeysResp; }
+        }
+
+        public override Type ResponseType
+        {
+            get { return typeof(TsListKeysResp); }
         }
 
         public override RpbReq ConstructPbRequest()
@@ -33,9 +43,9 @@
             req.table = CommandOptions.Table;
 
             req.timeoutSpecified = false;
-            if (CommandOptions.Timeout != default(Timeout))
+            if (CommandOptions.Timeout != default(TimeSpan))
             {
-                req.timeout = (uint)CommandOptions.Timeout;
+                req.timeout = (uint)CommandOptions.Timeout.TotalMilliseconds;
             }
 
             return req;

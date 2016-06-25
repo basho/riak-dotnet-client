@@ -1,4 +1,4 @@
-﻿namespace RiakClient.Commands.CRDT
+namespace RiakClient.Commands.CRDT
 {
     using System;
 

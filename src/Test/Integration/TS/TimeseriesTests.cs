@@ -121,7 +121,8 @@ namespace Test.Integration.TS
             RiakResult rslt = client.Execute(cmd);
             Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
 
-            GetResponse rsp = cmd.Response;
+            Get get = (Get)cmd;
+            GetResponse rsp = get.Response;
 
             Row[] rows = rsp.Value.ToArray();
             Assert.AreEqual(1, rows.Length);
@@ -133,30 +134,32 @@ namespace Test.Integration.TS
         [Test]
         public void Delete_One_Row()
         {
-            var delete = new Delete.Builder()
+            var cmd = new Delete.Builder()
                     .WithTable(Table)
                     .WithKey(KeyToDelete)
                     .Build();
 
-            RiakResult rslt = client.Execute(delete);
+            RiakResult rslt = client.Execute(cmd);
             Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
-            Assert.IsFalse(delete.Response.NotFound);
+            Delete del = (Delete)cmd;
+            Assert.IsFalse(del.Response.NotFound);
 
-            var get = new Get.Builder()
+            cmd = new Get.Builder()
                 .WithTable(Table)
                 .WithKey(KeyToDelete)
                 .Build();
 
-            rslt = client.Execute(get);
+            rslt = client.Execute(cmd);
             Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
+            Get get = (Get)cmd;
             Assert.IsTrue(get.Response.NotFound);
 
-            var store = new Store.Builder()
+            cmd = new Store.Builder()
                     .WithTable(Table)
                     .WithRow(RowToRestore)
                     .Build();
 
-            rslt = client.Execute(store);
+            rslt = client.Execute(cmd);
             Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
         }
 
@@ -180,7 +183,8 @@ namespace Test.Integration.TS
             RiakResult rslt = client.Execute(cmd);
             Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
 
-            QueryResponse rsp = cmd.Response;
+            Query q = (Query)cmd;
+            QueryResponse rsp = q.Response;
             Assert.IsFalse(rsp.NotFound);
             CollectionAssert.IsEmpty(rsp.Columns);
             CollectionAssert.IsEmpty(rsp.Value);
@@ -197,7 +201,8 @@ namespace Test.Integration.TS
             RiakResult rslt = client.Execute(cmd);
             Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
 
-            QueryResponse rsp = cmd.Response;
+            Query q = (Query)cmd;
+            QueryResponse rsp = q.Response;
             Assert.IsFalse(rsp.NotFound);
             CollectionAssert.IsNotEmpty(rsp.Columns);
             CollectionAssert.IsNotEmpty(rsp.Value);
@@ -222,7 +227,8 @@ namespace Test.Integration.TS
             RiakResult rslt = client.Execute(cmd);
             Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
 
-            QueryResponse rsp = cmd.Response;
+            Query q = (Query)cmd;
+            QueryResponse rsp = q.Response;
             Assert.IsFalse(rsp.NotFound);
 
             CollectionAssert.IsEmpty(rsp.Columns);
@@ -233,20 +239,21 @@ namespace Test.Integration.TS
         public void Query_Matching_Some_Data()
         {
             var qfmt = "SELECT * FROM GeoCheckin WHERE time > {0} and time < {1} and geohash = 'hash1' and user = 'user2'";
-            var q = string.Format(
+            var qry = string.Format(
                 qfmt,
                 DateTimeUtil.ToUnixTimeMillis(TenMinsAgo),
                 DateTimeUtil.ToUnixTimeMillis(Now));
 
             var cmd = new Query.Builder()
                 .WithTable("GeoCheckin")
-                .WithQuery(q)
+                .WithQuery(qry)
                 .Build();
 
             RiakResult rslt = client.Execute(cmd);
             Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
 
-            QueryResponse rsp = cmd.Response;
+            Query q = (Query)cmd;
+            QueryResponse rsp = q.Response;
             Assert.IsFalse(rsp.NotFound);
 
             Assert.AreEqual(Columns.Length, rsp.Columns.Count());
@@ -257,20 +264,21 @@ namespace Test.Integration.TS
         public void Query_Matching_All_Data()
         {
             var qfmt = "SELECT * FROM GeoCheckin WHERE time >= {0} and time <= {1} and geohash = 'hash1' and user = 'user2'";
-            var q = string.Format(
+            var qry = string.Format(
                 qfmt,
                 DateTimeUtil.ToUnixTimeMillis(TwentyMinsAgo),
                 DateTimeUtil.ToUnixTimeMillis(Now));
 
             var cmd = new Query.Builder()
                 .WithTable("GeoCheckin")
-                .WithQuery(q)
+                .WithQuery(qry)
                 .Build();
 
             RiakResult rslt = client.Execute(cmd);
             Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
 
-            QueryResponse rsp = cmd.Response;
+            Query q = (Query)cmd;
+            QueryResponse rsp = q.Response;
             Assert.IsFalse(rsp.NotFound);
 
             Assert.AreEqual(Columns.Length, rsp.Columns.Count());
@@ -281,7 +289,7 @@ namespace Test.Integration.TS
         public void Query_Streaming_Matching_All_Data()
         {
             var qfmt = "SELECT * FROM GeoCheckin WHERE time >= {0} and time <= {1} and geohash = 'hash1' and user = 'user2'";
-            var q = string.Format(
+            var qry = string.Format(
                 qfmt,
                 DateTimeUtil.ToUnixTimeMillis(TwentyMinsAgo),
                 DateTimeUtil.ToUnixTimeMillis(Now));
@@ -296,14 +304,15 @@ namespace Test.Integration.TS
 
             var cmd = new Query.Builder()
                 .WithTable("GeoCheckin")
-                .WithQuery(q)
+                .WithQuery(qry)
                 .WithCallback(cb)
                 .Build();
 
             RiakResult rslt = client.Execute(cmd);
             Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
 
-            QueryResponse rsp = cmd.Response;
+            Query q = (Query)cmd;
+            QueryResponse rsp = q.Response;
             Assert.IsFalse(rsp.NotFound);
             Assert.Greater(i, 0);
         }
@@ -327,7 +336,8 @@ namespace Test.Integration.TS
             RiakResult rslt = client.Execute(cmd);
             Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
 
-            ListKeysResponse rsp = cmd.Response;
+            ListKeys lk = (ListKeys)cmd;
+            ListKeysResponse rsp = lk.Response;
             Assert.IsFalse(rsp.NotFound);
             Assert.AreEqual(4, i);
         }

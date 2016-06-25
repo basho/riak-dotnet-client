@@ -128,7 +128,7 @@ namespace Test.Unit.TS
                 .WithKey(Key)
                 .WithTimeout(Timeout)
                 .Build();
-            return cmd;
+            return (Get)cmd;
         }
 
         protected static Store BuildStoreReq()
@@ -138,7 +138,7 @@ namespace Test.Unit.TS
                 .WithColumns(Columns)
                 .WithRows(Rows)
                 .Build();
-            return cmd;
+            return (Store)cmd;
         }
     }
 }

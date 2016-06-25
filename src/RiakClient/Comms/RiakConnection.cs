@@ -3,15 +3,15 @@ namespace RiakClient.Comms
     using System;
     using System.Collections.Generic;
     using Commands;
-    using Config;
     using Exceptions;
     using Messages;
+    using Riak.Config;
 
     internal class RiakConnection : IRiakConnection
     {
         private readonly RiakPbcSocket socket;
 
-        public RiakConnection(IRiakNodeConfiguration nodeConfiguration, IRiakAuthenticationConfiguration authConfiguration)
+        public RiakConnection(INodeConfiguration nodeConfiguration, IAuthenticationConfiguration authConfiguration)
         {
             socket = new RiakPbcSocket(nodeConfiguration, authConfiguration);
         }
@@ -256,7 +256,7 @@ namespace RiakClient.Comms
             return RiakResult<IEnumerable<RiakResult<TResult>>>.Success(streamer);
         }
 
-        public RiakResult Execute(IRiakCommand command)
+        public RiakResult Execute(IRCommand command)
         {
             RiakResult executeResult = DoExecute(() => socket.Write(command));
 

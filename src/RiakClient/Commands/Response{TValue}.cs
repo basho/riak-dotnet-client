@@ -1,10 +1,10 @@
-﻿namespace RiakClient.Commands
+namespace RiakClient.Commands
 {
     /// <summary>
     /// Response to a Riak command with a return value.
     /// </summary>
     /// <typeparam name="TValue">The type of the Riak response.</typeparam>
-    public abstract class Response<TValue> : Response
+    public class Response<TValue> : Response
     {
         private readonly TValue value;
 
@@ -23,7 +23,6 @@
         /// </summary>
         /// <param name="value">The response data.</param>
         public Response(TValue value)
-            : base(false)
         {
             this.value = value;
         }

@@ -1,26 +1,9 @@
-﻿// <copyright file="Repository.cs" company="Basho Technologies, Inc.">
-// Copyright 2015 - Basho Technologies, Inc.
-//
-// This file is provided to you under the Apache License,
-// Version 2.0 (the "License"); you may not use this file
-// except in compliance with the License.  You may obtain
-// a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-// </copyright>
-
-namespace RiakClientExamples.Dev
+﻿namespace RiakClientExamples.Dev
 {
     using System;
     using System.Text;
     using RiakClient;
+    using RiakClient.Commands;
     using RiakClient.Commands.CRDT;
     using RiakClient.Models;
 
@@ -100,15 +83,17 @@ namespace RiakClientExamples.Dev
                 builder.WithKey(model.ID);
             }
 
-            UpdateMap cmd = builder.Build();
+            IRCommand cmd = builder.Build();
             RiakResult rslt = client.Execute(cmd);
             CheckResult(rslt);
-            return cmd.Response.Key;
+
+            var ucmd = (UpdateMap)cmd;
+            return ucmd.Response.Key;
         }
 
         protected MapResponse FetchMap(TModel model)
         {
-            var cmd = new FetchMap.Builder()
+            IRCommand cmd = new FetchMap.Builder()
                 .WithBucketType(BucketType)
                 .WithBucket(Bucket)
                 .WithKey(model.ID)
@@ -117,7 +102,9 @@ namespace RiakClientExamples.Dev
 
             RiakResult rslt = client.Execute(cmd);
             CheckResult(rslt);
-            return cmd.Response;
+
+            var fcmd = (FetchMap)cmd;
+            return fcmd.Response;
         }
 
         protected void CheckResult(RiakResult result, bool notFoundOK = false)

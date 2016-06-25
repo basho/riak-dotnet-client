@@ -1,26 +1,9 @@
-// <copyright file="FetchCounterTests.cs" company="Basho Technologies, Inc.">
-// Copyright 2015 - Basho Technologies, Inc.
-//
-// This file is provided to you under the Apache License,
-// Version 2.0 (the "License"); you may not use this file
-// except in compliance with the License.  You may obtain
-// a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-// </copyright>
-
 namespace Test.Unit.CRDT
 {
     using System;
     using NUnit.Framework;
     using RiakClient;
+    using RiakClient.Commands;
     using RiakClient.Commands.CRDT;
     using RiakClient.Messages;
 
@@ -67,15 +50,16 @@ namespace Test.Unit.CRDT
             fetchResp.value = value;
             fetchResp.type = DtFetchResp.DataType.COUNTER;
 
-            var fetch = new FetchCounter.Builder()
+            IRCommand cmd = new FetchCounter.Builder()
                 .WithBucketType(BucketType)
                 .WithBucket(Bucket)
                 .WithKey(Key)
                 .Build();
 
-            fetch.OnSuccess(fetchResp);
+            cmd.OnSuccess(fetchResp);
 
-            Assert.AreEqual(42, fetch.Response.Value);
+            var fcmd = (FetchCounter)cmd;
+            Assert.AreEqual(42, fcmd.Response.Value);
         }
     }
 }

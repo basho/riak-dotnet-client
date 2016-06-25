@@ -11,6 +11,7 @@
     public abstract class KvCommandBuilder<TBuilder, TCommand, TOptions>
         : CommandBuilder<TBuilder, TCommand, TOptions>
         where TBuilder : KvCommandBuilder<TBuilder, TCommand, TOptions>
+        where TCommand : IRCommand
         where TOptions : KvCommandOptions
     {
         protected string bucketType;

@@ -1,35 +1,16 @@
-// <copyright file="RiakSecurityManager.cs" company="Basho Technologies, Inc.">
-// Copyright 2011 - OJ Reeves & Jeremiah Peschka
-// Copyright 2014 - Basho Technologies, Inc.
-//
-// This file is provided to you under the Apache License,
-// Version 2.0 (the "License"); you may not use this file
-// except in compliance with the License.  You may obtain
-// a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-// </copyright>
-
-namespace RiakClient.Auth
+namespace Riak.Core
 {
     using System;
     using System.IO;
     using System.Linq;
     using System.Net.Security;
     using System.Security.Cryptography.X509Certificates;
-    using Config;
-    using Extensions;
-    using Messages;
-    using Util;
+    using Riak.Config;
+    using RiakClient.Extensions;
+    using RiakClient.Messages;
+    using RiakClient.Util;
 
-    internal class RiakSecurityManager
+    internal class SecurityManager
     {
         private static readonly StoreLocation[] StoreLocations =
             new StoreLocation[] { StoreLocation.CurrentUser, StoreLocation.LocalMachine };
@@ -37,14 +18,14 @@ namespace RiakClient.Auth
         private static readonly string[] SubjectSplit = new[] { ", " };
 
         private readonly string targetHostCommonName;
-        private readonly IRiakAuthenticationConfiguration authConfig;
+        private readonly IAuthenticationConfiguration authConfig;
         private readonly X509CertificateCollection clientCertificates;
         private readonly X509Certificate2 certificateAuthorityCert;
 
         // Interesting discussion:
         // http://stackoverflow.com/questions/3780801/whats-the-difference-between-a-public-constructor-in-an-internal-class-and-an-i
         // http://stackoverflow.com/questions/9302236/why-use-a-public-method-in-an-internal-class
-        internal RiakSecurityManager(string targetHost, IRiakAuthenticationConfiguration authConfig)
+        public SecurityManager(string targetHost, IAuthenticationConfiguration authConfig)
         {
             if (string.IsNullOrWhiteSpace(targetHost))
             {
@@ -256,11 +237,18 @@ namespace RiakClient.Auth
             var clientCertificates = new X509CertificateCollection();
 
             // http://stackoverflow.com/questions/18462064/associate-a-private-key-with-the-x509certificate2-class-in-net
-            if (!string.IsNullOrWhiteSpace(authConfig.ClientCertificateFile) && File.Exists(authConfig.ClientCertificateFile))
+            if (!string.IsNullOrWhiteSpace(authConfig.ClientCertificateFile))
             {
+                if (File.Exists(authConfig.ClientCertificateFile))
+                {
                 // TODO 3.0 FUTURE exception if config is set but file doesn't actually exist
-                var cert = new X509Certificate2(authConfig.ClientCertificateFile);
-                clientCertificates.Add(cert);
+                    var cert = new X509Certificate2(authConfig.ClientCertificateFile);
+                    clientCertificates.Add(cert);
+                }
+                else
+                {
+                    throw new FileNotFoundException(Riak.Properties.Resources.Riak_Core_SecurityManager_ClientCertificateFileNotFound, authConfig.ClientCertificateFile);
+                }
             }
 
             if (!string.IsNullOrWhiteSpace(authConfig.ClientCertificateSubject))

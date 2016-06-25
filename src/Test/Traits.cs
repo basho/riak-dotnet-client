@@ -1,4 +1,4 @@
-﻿namespace Test
+namespace Test
 {
     using NUnit.Framework;
 

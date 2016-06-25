@@ -252,5 +252,10 @@ if ($? -ne $True) {
     throw "$msbuild_exe failed: $LastExitCode"
 }
 Write-Debug "$msbuild_exe exit code: $LastExitCode"
+
+if ($Target -eq 'Clean') {
+    Get-ChildItem -Recurse | Where-Object { ($_.Name -eq 'bin' -or $_.Name -eq 'obj') -and $_.PSIsContainer } | Remove-Item -Force -Recurse -ErrorAction SilentlyContinue
+}
+
 exit 0
 

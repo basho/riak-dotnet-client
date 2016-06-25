@@ -1,30 +1,12 @@
-// <copyright file="UpdateAndFetchSetTests.cs" company="Basho Technologies, Inc.">
-// Copyright 2015 - Basho Technologies, Inc.
-//
-// This file is provided to you under the Apache License,
-// Version 2.0 (the "License"); you may not use this file
-// except in compliance with the License.  You may obtain
-// a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-// </copyright>
-
 namespace Test.Integration.CRDT
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Text;
     using Common.Logging;
     using NUnit.Framework;
     using RiakClient;
+    using RiakClient.Commands;
     using RiakClient.Commands.CRDT;
     using RiakClient.Util;
 
@@ -54,16 +36,17 @@ namespace Test.Integration.CRDT
             string key = Guid.NewGuid().ToString();
             SaveSet(key);
 
-            var fetch = new FetchSet.Builder()
+            IRCommand cmd = new FetchSet.Builder()
                     .WithBucketType(BucketType)
                     .WithBucket(Bucket)
                     .WithKey(key)
                     .Build();
 
-            RiakResult rslt = client.Execute(fetch);
+            RiakResult rslt = client.Execute(cmd);
             Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
 
-            SetResponse response = fetch.Response;
+            var fcmd = (FetchSet)cmd;
+            SetResponse response = fcmd.Response;
             Assert.IsNotNull(response);
 
             Assert.IsNotNull(response.Context);
@@ -83,7 +66,7 @@ namespace Test.Integration.CRDT
             var add_1 = new RiakString("add_1");
             var removes = new HashSet<string> { add_1 };
 
-            var update = new UpdateSet.Builder(adds, removes)
+            IRCommand cmd = new UpdateSet.Builder(adds, removes)
                 .WithBucketType(BucketType)
                 .WithBucket(Bucket)
                 .WithKey(key)
@@ -92,10 +75,11 @@ namespace Test.Integration.CRDT
                 .WithTimeout(TimeSpan.FromMilliseconds(20000))
                 .Build();
 
-            RiakResult rslt = client.Execute(update);
+            RiakResult rslt = client.Execute(cmd);
             Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
 
-            SetResponse response = update.Response;
+            var ucmd = (UpdateSet)cmd;
+            SetResponse response = ucmd.Response;
             bool found_add_1 = false;
             bool found_add_3 = false;
             foreach (RiakString value in response.Value)
@@ -126,15 +110,17 @@ namespace Test.Integration.CRDT
         [Test]
         public void Fetching_An_Unknown_Set_Results_In_Not_Found()
         {
-            var fetch = new FetchSet.Builder()
+            IRCommand cmd = new FetchSet.Builder()
                     .WithBucketType(BucketType)
                     .WithBucket(Bucket)
                     .WithKey(Guid.NewGuid().ToString())
                     .Build();
 
-            RiakResult rslt = client.Execute(fetch);
+            RiakResult rslt = client.Execute(cmd);
             Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
-            SetResponse response = fetch.Response;
+
+            var fcmd = (FetchSet)cmd;
+            SetResponse response = fcmd.Response;
             Assert.IsTrue(response.NotFound);
         }
 
@@ -150,11 +136,12 @@ namespace Test.Integration.CRDT
                 updateBuilder.WithKey(key);
             }
 
-            UpdateSet cmd = updateBuilder.Build();
+            IRCommand cmd = updateBuilder.Build();
             RiakResult rslt = client.Execute(cmd);
             Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
 
-            SetResponse response = cmd.Response;
+            var ucmd = (UpdateSet)cmd;
+            SetResponse response = ucmd.Response;
             Keys.Add(response.Key);
 
             Assert.True(EnumerableUtil.NotNullOrEmpty(response.Context));

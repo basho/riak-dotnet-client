@@ -19,7 +19,7 @@ namespace Test.Unit.TS
                 .WithQuery(Query)
                 .Build();
 
-            Assert.AreEqual(MessageCode.TsQueryResp, cmd.ExpectedCode);
+            Assert.AreEqual(MessageCode.TsQueryResp, cmd.ResponseCode);
 
             TsQueryReq pb = (TsQueryReq)cmd.ConstructPbRequest();
             Assert.AreEqual(QueryRS, RiakString.FromBytes(pb.query.@base));
@@ -40,7 +40,7 @@ namespace Test.Unit.TS
                 .WithCallback(cb)
                 .Build();
 
-            Assert.AreEqual(MessageCode.TsQueryResp, cmd.ExpectedCode);
+            Assert.AreEqual(MessageCode.TsQueryResp, cmd.ResponseCode);
 
             TsQueryReq pb = (TsQueryReq)cmd.ConstructPbRequest();
             Assert.AreEqual(QueryRS, RiakString.FromBytes(pb.query.@base));

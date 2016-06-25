@@ -1,4 +1,4 @@
-﻿namespace RiakClient.Commands
+namespace RiakClient.Commands
 {
     /// <summary>
     /// Response to a <see cref="FetchServerInfo"/> command.

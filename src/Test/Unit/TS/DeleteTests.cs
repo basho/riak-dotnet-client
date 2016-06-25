@@ -15,7 +15,7 @@ namespace Test.Unit.TS
                 .WithKey(Key)
                 .Build();
 
-            Assert.AreEqual(MessageCode.TsDelResp, cmd.ExpectedCode);
+            Assert.AreEqual(MessageCode.TsDelResp, cmd.ResponseCode);
 
             TsDelReq pb = (TsDelReq)cmd.ConstructPbRequest();
             Assert.AreEqual(Table, RiakString.FromBytes(pb.table));
@@ -31,7 +31,7 @@ namespace Test.Unit.TS
                 .WithTimeout(Timeout)
                 .Build();
 
-            Assert.AreEqual(MessageCode.TsDelResp, cmd.ExpectedCode);
+            Assert.AreEqual(MessageCode.TsDelResp, cmd.ResponseCode);
 
             TsDelReq pb = (TsDelReq)cmd.ConstructPbRequest();
             Assert.AreEqual(Table, RiakString.FromBytes(pb.table));

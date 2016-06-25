@@ -18,9 +18,19 @@
         {
         }
 
-        public override MessageCode ExpectedCode
+        public override MessageCode RequestCode
+        {
+            get { return MessageCode.TsGetReq; }
+        }
+
+        public override MessageCode ResponseCode
         {
             get { return MessageCode.TsGetResp; }
+        }
+
+        public override Type ResponseType
+        {
+            get { return typeof(TsGetResp); }
         }
 
         public override void OnSuccess(RpbResp response)

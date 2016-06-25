@@ -1,31 +1,11 @@
-// <copyright file="UpdateAndFetchCounterTests.cs" company="Basho Technologies, Inc.">
-// Copyright 2015 - Basho Technologies, Inc.
-//
-// This file is provided to you under the Apache License,
-// Version 2.0 (the "License"); you may not use this file
-// except in compliance with the License.  You may obtain
-// a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-// </copyright>
-
 namespace Test.Integration.CRDT
 {
     using System;
-    using System.Collections.Generic;
     using Common.Logging;
     using NUnit.Framework;
     using RiakClient;
+    using RiakClient.Commands;
     using RiakClient.Commands.CRDT;
-    using RiakClient.Models;
-    using RiakClient.Util;
 
     public class UpdateAndFetchCounterTests : TestBase
     {
@@ -48,16 +28,17 @@ namespace Test.Integration.CRDT
             string key = Guid.NewGuid().ToString();
             SaveCounter(key);
 
-            var fetch = new FetchCounter.Builder()
+            IRCommand cmd = new FetchCounter.Builder()
                     .WithBucketType(BucketType)
                     .WithBucket(Bucket)
                     .WithKey(key)
                     .Build();
 
-            RiakResult rslt = client.Execute(fetch);
+            RiakResult rslt = client.Execute(cmd);
             Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
 
-            CounterResponse response = fetch.Response;
+            var fcmd = (FetchCounter)cmd;
+            CounterResponse response = fcmd.Response;
             Assert.IsNotNull(response);
 
             Assert.AreEqual(DefaultIncrement, response.Value);
@@ -69,7 +50,7 @@ namespace Test.Integration.CRDT
             string key = Guid.NewGuid().ToString();
             SaveCounter(key);
 
-            var update = new UpdateCounter.Builder(DefaultIncrement)
+            IRCommand cmd = new UpdateCounter.Builder(DefaultIncrement)
                 .WithBucketType(BucketType)
                 .WithBucket(Bucket)
                 .WithKey(key)
@@ -77,10 +58,11 @@ namespace Test.Integration.CRDT
                 .WithTimeout(TimeSpan.FromMilliseconds(20000))
                 .Build();
 
-            RiakResult rslt = client.Execute(update);
+            RiakResult rslt = client.Execute(cmd);
             Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
 
-            CounterResponse response = update.Response;
+            var ucmd = (UpdateCounter)cmd;
+            CounterResponse response = ucmd.Response;
             Assert.AreEqual(20, response.Value);
         }
 
@@ -95,15 +77,17 @@ namespace Test.Integration.CRDT
         [Test]
         public void Fetching_An_Unknown_Counter_Results_In_Not_Found()
         {
-            var fetch = new FetchCounter.Builder()
+            IRCommand cmd = new FetchCounter.Builder()
                     .WithBucketType(BucketType)
                     .WithBucket(Bucket)
                     .WithKey(Guid.NewGuid().ToString())
                     .Build();
 
-            RiakResult rslt = client.Execute(fetch);
+            RiakResult rslt = client.Execute(cmd);
             Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
-            CounterResponse response = fetch.Response;
+
+            var fcmd = (FetchCounter)cmd;
+            CounterResponse response = fcmd.Response;
             Assert.IsTrue(response.NotFound);
         }
 
@@ -119,11 +103,12 @@ namespace Test.Integration.CRDT
                 updateBuilder.WithKey(key);
             }
 
-            UpdateCounter cmd = updateBuilder.Build();
+            IRCommand cmd = updateBuilder.Build();
             RiakResult rslt = client.Execute(cmd);
             Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
 
-            CounterResponse response = cmd.Response;
+            var ucmd = (UpdateCounter)cmd;
+            CounterResponse response = ucmd.Response;
             Keys.Add(response.Key);
 
             return response;

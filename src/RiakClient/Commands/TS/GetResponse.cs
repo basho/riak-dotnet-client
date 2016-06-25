@@ -10,12 +10,6 @@
     {
         private readonly IEnumerable<Column> columns;
 
-        /// <inheritdoc />
-        public GetResponse()
-            : base(notFound: true)
-        {
-        }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="GetResponse"/> class.
         /// </summary>
@@ -25,12 +19,12 @@
         public GetResponse(Row key, IEnumerable<Column> columns, IEnumerable<Row> values)
             : base(key, values)
         {
-            if (EnumerableUtil.IsNullOrEmpty(values))
-            {
-                isNotFound = true;
-            }
-
             this.columns = columns;
+        }
+
+        public override bool NotFound
+        {
+            get { return EnumerableUtil.IsNullOrEmpty(Value); }
         }
 
         /// <summary>

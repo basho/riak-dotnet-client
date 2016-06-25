@@ -356,19 +356,9 @@ namespace RiakClient.Messages
         TsRange = 103,
 
         /// <summary>
-        /// TS TTB Put Request
+        /// TS TTB Message
         /// </summary>
-        TsTtbPutReq = 104,
-
-        /// <summary>
-        /// Toggle TTB Encoding Request
-        /// </summary>
-        RpbToggleEncodingReq = 110,
-
-        /// <summary>
-        /// Toggle TTB Encoding Response
-        /// </summary>
-        RpbToggleEncodingResp = 111,
+        TsTtbMsg = 104,
 
         /// <summary>
         /// Authentication Request.

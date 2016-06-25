@@ -1,28 +1,11 @@
-﻿// <copyright file="DataTypes.cs" company="Basho Technologies, Inc.">
-// Copyright 2015 - Basho Technologies, Inc.
-//
-// This file is provided to you under the Apache License,
-// Version 2.0 (the "License"); you may not use this file
-// except in compliance with the License.  You may obtain
-// a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-// </copyright>
-
-namespace RiakClientExamples.Dev.Using
+﻿namespace RiakClientExamples.Dev.Using
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using NUnit.Framework;
     using RiakClient;
+    using RiakClient.Commands;
     using RiakClient.Commands.CRDT;
     using RiakClient.Util;
 
@@ -34,7 +17,7 @@ namespace RiakClientExamples.Dev.Using
         [Test]
         public void CountersIdAndFetch()
         {
-            FetchCounter cmd = new FetchCounter.Builder()
+            IRCommand cmd = new FetchCounter.Builder()
                 .WithBucketType("counters")
                 .WithBucket("counters")
                 .WithKey("<insert_key_here>")
@@ -43,11 +26,12 @@ namespace RiakClientExamples.Dev.Using
             RiakResult rslt = client.Execute(cmd);
             CheckResult(rslt);
 
-            CounterResponse response = cmd.Response;
+            var fcmd = (FetchCounter)cmd;
+            CounterResponse response = fcmd.Response;
             Assert.AreEqual(0, response.Value);
 
             // NB: for cleanup on test teardown
-            options = cmd.Options;
+            options = fcmd.Options;
         }
 
         // Note: decrement example as well
@@ -55,41 +39,44 @@ namespace RiakClientExamples.Dev.Using
         public void TrafficTicketsCounterFetchAndUpdate()
         {
             var fetchCounterOptions = new FetchCounterOptions("counters", "counters", "traffic_tickts");
-            FetchCounter cmd = new FetchCounter(fetchCounterOptions);
+            IRCommand cmd = new FetchCounter(fetchCounterOptions);
+            var fcmd = (FetchCounter)cmd;
 
             // NB: for cleanup on test teardown
-            options = cmd.Options;
+            options = fcmd.Options;
 
             RiakResult rslt = client.Execute(cmd);
             CheckResult(rslt);
 
-            CounterResponse response = cmd.Response;
+            CounterResponse response = fcmd.Response;
             Assert.AreEqual(0, response.Value);
 
-            UpdateCounter updateCmd = new UpdateCounter.Builder()
+            cmd = new UpdateCounter.Builder()
                 .WithBucketType("counters")
                 .WithBucket("counters")
                 .WithKey("traffic_tickets")
                 .WithIncrement(1)
                 .Build();
 
-            rslt = client.Execute(updateCmd);
+            rslt = client.Execute(cmd);
             CheckResult(rslt);
 
-            response = updateCmd.Response;
+            var ucmd = (UpdateCounter)cmd;
+            response = ucmd.Response;
             Assert.AreEqual(1, response.Value);
 
-            updateCmd = new UpdateCounter.Builder()
+            cmd = new UpdateCounter.Builder()
                 .WithBucketType("counters")
                 .WithBucket("counters")
                 .WithKey("traffic_tickets")
                 .WithIncrement(-1)
                 .Build();
 
-            rslt = client.Execute(updateCmd);
+            rslt = client.Execute(cmd);
             CheckResult(rslt);
 
-            response = updateCmd.Response;
+            ucmd = (UpdateCounter)cmd;
+            response = ucmd.Response;
             Assert.AreEqual(0, response.Value);
         }
 
@@ -98,7 +85,7 @@ namespace RiakClientExamples.Dev.Using
         public void WhoopsIGotFiveTrafficTickets()
         {
             var fetchCounterOptions = new FetchCounterOptions("counters", "counters", "traffic_tickts");
-            FetchCounter cmd = new FetchCounter(fetchCounterOptions);
+            IRCommand cmd = new FetchCounter(fetchCounterOptions);
 
             // NB: for cleanup
             options = fetchCounterOptions;
@@ -106,7 +93,8 @@ namespace RiakClientExamples.Dev.Using
             RiakResult rslt = client.Execute(cmd);
             CheckResult(rslt);
 
-            CounterResponse response = cmd.Response;
+            var fcmd = (FetchCounter)cmd;
+            CounterResponse response = fcmd.Response;
             Assert.AreEqual(0, response.Value);
 
             var builder = new UpdateCounter.Builder();
@@ -116,22 +104,24 @@ namespace RiakClientExamples.Dev.Using
                 .WithKey("traffic_tickets")
                 .WithIncrement(5);
 
-            UpdateCounter updateCmd = builder.Build();
+            cmd = builder.Build();
 
-            rslt = client.Execute(updateCmd);
+            rslt = client.Execute(cmd);
             CheckResult(rslt);
 
-            response = updateCmd.Response;
+            var ucmd = (UpdateCounter)cmd;
+            response = ucmd.Response;
             Assert.AreEqual(5, response.Value);
 
             // Modify the builder's increment, then construct a new command
             builder.WithIncrement(-5);
-            updateCmd = builder.Build();
+            cmd = builder.Build();
 
-            rslt = client.Execute(updateCmd);
+            rslt = client.Execute(cmd);
             CheckResult(rslt);
 
-            response = updateCmd.Response;
+            ucmd = (UpdateCounter)cmd;
+            response = ucmd.Response;
             Assert.AreEqual(0, response.Value);
         }
 
@@ -144,15 +134,16 @@ namespace RiakClientExamples.Dev.Using
                 .WithKey("cities");
 
             // NB: builder.Options will only be set after Build() is called.
-            FetchSet fetchSetCommand = builder.Build();
+            IRCommand cmd = builder.Build();
 
             FetchSetOptions options = new FetchSetOptions("sets", "travel", "cities");
             Assert.AreEqual(options, builder.Options);
 
-            RiakResult rslt = client.Execute(fetchSetCommand);
+            RiakResult rslt = client.Execute(cmd);
             CheckResult(rslt);
 
-            SetResponse response = fetchSetCommand.Response;
+            var fcmd = (FetchSet)cmd;
+            SetResponse response = fcmd.Response;
             Assert.IsTrue(EnumerableUtil.IsNullOrEmpty(response.Value));
         }
 
@@ -167,10 +158,12 @@ namespace RiakClientExamples.Dev.Using
                 .WithKey("cities")
                 .WithAdditions(adds);
 
-            UpdateSet cmd = builder.Build();
+            IRCommand cmd = builder.Build();
             RiakResult rslt = client.Execute(cmd);
             CheckResult(rslt);
-            SetResponse response = cmd.Response;
+
+            var scmd = (UpdateSet)cmd;
+            SetResponse response = scmd.Response;
 
             Assert.Contains("Toronto", response.AsStrings.ToArray());
             Assert.Contains("Montreal", response.AsStrings.ToArray());
@@ -189,7 +182,8 @@ namespace RiakClientExamples.Dev.Using
 
             rslt = client.Execute(cmd);
             CheckResult(rslt);
-            response = cmd.Response;
+            scmd = (UpdateSet)cmd;
+            response = scmd.Response;
 
             var responseStrings = response.AsStrings.ToArray();
 
@@ -388,11 +382,12 @@ namespace RiakClientExamples.Dev.Using
 
         private MapResponse SaveMap(UpdateMap.Builder builder)
         {
-            UpdateMap cmd = builder.Build();
+            IRCommand cmd = builder.Build();
             RiakResult rslt = client.Execute(cmd);
             CheckResult(rslt);
 
-            MapResponse response = cmd.Response;
+            var ucmd = (UpdateMap)cmd;
+            MapResponse response = ucmd.Response;
             PrintObject(response.Value);
             return response;
         }

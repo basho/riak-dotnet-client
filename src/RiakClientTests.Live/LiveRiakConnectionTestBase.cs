@@ -4,7 +4,7 @@ namespace RiakClientTests.Live
     using System.Collections.Generic;
     using NUnit.Framework;
     using RiakClient;
-    using RiakClient.Config;
+    using Riak.Config;
     using RiakClient.Extensions;
 #if NOAUTH
 #else
@@ -37,7 +37,7 @@ namespace RiakClientTests.Live
 
         protected IRiakEndPoint Cluster;
         protected IRiakClient Client;
-        protected IRiakClusterConfiguration ClusterConfig;
+        protected IClusterConfiguration ClusterConfig;
 
         protected readonly bool MultiNodeEnvironment = false;
 

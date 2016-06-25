@@ -16,7 +16,7 @@
         public Response(bool notFound)
             : base(notFound)
         {
-            this.key = default(TKey);
+            key = default(TKey);
         }
 
         /// <summary>

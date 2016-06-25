@@ -25,9 +25,19 @@
             }
         }
 
-        public override MessageCode ExpectedCode
+        public override MessageCode RequestCode
+        {
+            get { return MessageCode.TsQueryReq; }
+        }
+
+        public override MessageCode ResponseCode
         {
             get { return MessageCode.TsQueryResp; }
+        }
+
+        public override Type ResponseType
+        {
+            get { return typeof(TsQueryResp); }
         }
 
         public override RpbReq ConstructPbRequest()

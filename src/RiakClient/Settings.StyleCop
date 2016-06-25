@@ -19,6 +19,7 @@
   <SourceFileList>
     <SourceFile>AssemblyInfo.cs</SourceFile>
     <SourceFile>CommonAssemblyInfo.cs</SourceFile>
+    <SourceFile>Resources.Designer.cs</SourceFile>
     <Settings>
       <GlobalSettings>
         <BooleanProperty Name="RulesEnabledByDefault">False</BooleanProperty>

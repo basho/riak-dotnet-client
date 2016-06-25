@@ -14,7 +14,7 @@ namespace Test.Unit.TS
                 .WithTable(Table)
                 .Build();
 
-            Assert.AreEqual(MessageCode.TsListKeysResp, cmd.ExpectedCode);
+            Assert.AreEqual(MessageCode.TsListKeysResp, cmd.ResponseCode);
 
             TsListKeysReq pb = (TsListKeysReq)cmd.ConstructPbRequest();
             Assert.AreEqual(Table, RiakString.FromBytes(pb.table));
@@ -29,7 +29,7 @@ namespace Test.Unit.TS
                 .WithTimeout(Timeout)
                 .Build();
 
-            Assert.AreEqual(MessageCode.TsListKeysResp, cmd.ExpectedCode);
+            Assert.AreEqual(MessageCode.TsListKeysResp, cmd.ResponseCode);
 
             TsListKeysReq pb = (TsListKeysReq)cmd.ConstructPbRequest();
             Assert.AreEqual(Table, RiakString.FromBytes(pb.table));

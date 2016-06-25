@@ -1,21 +1,3 @@
-// <copyright file="UpdateMapTests.cs" company="Basho Technologies, Inc.">
-// Copyright 2015 - Basho Technologies, Inc.
-//
-// This file is provided to you under the Apache License,
-// Version 2.0 (the "License"); you may not use this file
-// except in compliance with the License.  You may obtain
-// a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-// </copyright>
-
 namespace Test.Unit.CRDT
 {
     using System;
@@ -23,6 +5,7 @@ namespace Test.Unit.CRDT
     using System.Text;
     using NUnit.Framework;
     using RiakClient;
+    using RiakClient.Commands;
     using RiakClient.Commands.CRDT;
     using RiakClient.Messages;
     using RiakClient.Util;
@@ -79,9 +62,9 @@ namespace Test.Unit.CRDT
                 .WithIncludeContext(false)
                 .WithTimeout(TimeSpan.FromSeconds(20));
 
-            UpdateMap updateMapCommand = updateMapCommandBuilder.Build();
+            IRCommand cmd = updateMapCommandBuilder.Build();
 
-            DtUpdateReq protobuf = (DtUpdateReq)updateMapCommand.ConstructPbRequest();
+            DtUpdateReq protobuf = (DtUpdateReq)cmd.ConstructPbRequest();
 
             Assert.AreEqual(Encoding.UTF8.GetBytes(BucketType), protobuf.type);
             Assert.AreEqual(Encoding.UTF8.GetBytes(Bucket), protobuf.bucket);
@@ -174,15 +157,16 @@ namespace Test.Unit.CRDT
 
             var mapOp = new UpdateMap.MapOperation();
 
-            var update = new UpdateMap.Builder(mapOp)
+            IRCommand cmd = new UpdateMap.Builder(mapOp)
                 .WithBucketType("maps")
                 .WithBucket("myBucket")
                 .WithKey("map_1")
                 .Build();
 
-            update.OnSuccess(updateResp);
+            cmd.OnSuccess(updateResp);
 
-            MapResponse response = update.Response;
+            var ucmd = (UpdateMap)cmd;
+            MapResponse response = ucmd.Response;
 
             Assert.NotNull(response);
             Assert.AreEqual(key, response.Key);

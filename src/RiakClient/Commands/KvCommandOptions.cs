@@ -14,42 +14,28 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="KvCommandOptions"/> class.
         /// </summary>
-        /// <param name="bucketType">The bucket type in Riak. Required.</param>
-        /// <param name="bucket">The bucket in Riak. Required.</param>
-        /// <param name="key">The key in Riak.</param>
-        /// <param name="keyIsRequired">If <b>true</b> and no key given, an exception is thrown.</param>
-        public KvCommandOptions(
-            string bucketType,
-            string bucket,
-            string key,
-            bool keyIsRequired)
+        /// <param name="args">The command args</param>
+        public KvCommandOptions(Args args)
+            : this(args, Riak.Constants.DefaultCommandTimeout)
         {
-            if (string.IsNullOrEmpty(bucketType))
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="KvCommandOptions"/> class.
+        /// </summary>
+        /// <param name="args">The command args</param>
+        /// <param name="timeout">The command's timeout</param>
+        public KvCommandOptions(Args args, TimeSpan timeout)
+            : base(timeout)
+        {
+            if (args == null)
             {
-                throw new ArgumentNullException("bucketType");
-            }
-            else
-            {
-                this.bucketType = bucketType;
+                throw new ArgumentNullException("args");
             }
 
-            if (string.IsNullOrEmpty(bucket))
-            {
-                throw new ArgumentNullException("bucket");
-            }
-            else
-            {
-                this.bucket = bucket;
-            }
-
-            if (keyIsRequired && string.IsNullOrEmpty(key))
-            {
-                throw new ArgumentNullException("key");
-            }
-            else
-            {
-                this.key = key;
-            }
+            bucketType = args.BucketType;
+            bucket = args.Bucket;
+            key = args.Key;
         }
 
         /// <summary>
@@ -81,12 +67,12 @@
 
         public bool Equals(KvCommandOptions other)
         {
-            if (object.ReferenceEquals(other, null))
+            if (ReferenceEquals(other, null))
             {
                 return false;
             }
 
-            if (object.ReferenceEquals(this, other))
+            if (ReferenceEquals(this, other))
             {
                 return true;
             }

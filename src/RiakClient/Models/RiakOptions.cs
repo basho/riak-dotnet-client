@@ -1,23 +1,7 @@
-﻿// <copyright file="RiakOptions.cs" company="Basho Technologies, Inc.">
-// Copyright 2015 - Basho Technologies, Inc.
-//
-// This file is provided to you under the Apache License,
-// Version 2.0 (the "License"); you may not use this file
-// except in compliance with the License.  You may obtain
-// a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-// </copyright>
-
 namespace RiakClient.Models
 {
+    using System;
+
     /// <summary>
     /// A collection of common options for most Riak operations.
     /// </summary>
@@ -78,11 +62,7 @@ namespace RiakClient.Models
         /// The <see cref="Timeout"/> period for an operation.
         /// </summary>
         /// <remarks>Developers can leave this unset by default.</remarks>
-        public Timeout Timeout
-        {
-            get;
-            protected set;
-        }
+        public TimeSpan Timeout { get; protected set; }
 
         /// <summary>
         /// A fluent setter for the <see cref="R"/> property.
@@ -221,7 +201,7 @@ namespace RiakClient.Models
         /// </summary>
         /// <param name="value">The value to set the property to.</param>
         /// <returns>A reference to the current options object.</returns>
-        public T SetTimeout(Timeout value)
+        public T SetTimeout(TimeSpan value)
         {
             Timeout = value;
             return (T)this;

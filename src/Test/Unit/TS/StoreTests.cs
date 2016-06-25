@@ -2,7 +2,7 @@ namespace Test.Unit.TS
 {
     using NUnit.Framework;
     using RiakClient;
-    using RiakClient.Commands.TS;
+    using RiakClient.Commands;
     using RiakClient.Messages;
 
     public class StoreTests : TimeseriesTest
@@ -10,8 +10,8 @@ namespace Test.Unit.TS
         [Test]
         public void Should_Build_Req()
         {
-            Store cmd = BuildStoreReq();
-            Assert.AreEqual(MessageCode.TsPutResp, cmd.ExpectedCode);
+            IRCommand cmd = BuildStoreReq();
+            Assert.AreEqual(MessageCode.TsPutResp, cmd.ResponseCode);
 
             TsPutReq pb = (TsPutReq)cmd.ConstructPbRequest();
             Assert.AreEqual(Table, RiakString.FromBytes(pb.table));

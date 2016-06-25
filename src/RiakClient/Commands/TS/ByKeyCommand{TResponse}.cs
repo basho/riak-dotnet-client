@@ -42,9 +42,9 @@
             req.table = CommandOptions.Table;
 
             req.timeoutSpecified = false;
-            if (CommandOptions.Timeout != default(Timeout))
+            if (CommandOptions.Timeout != default(TimeSpan))
             {
-                req.timeout = (uint)CommandOptions.Timeout;
+                req.timeout = (uint)CommandOptions.Timeout.TotalMilliseconds;
             }
 
             req.key.AddRange(CommandOptions.Key.ToTsCells());
@@ -55,8 +55,8 @@
         protected abstract ITsByKeyReq GetByKeyReq();
 
         /// <inheritdoc />
-        public abstract class Builder<TCommand>
-            : TimeseriesCommandBuilder<Builder<TCommand>, TCommand, ByKeyOptions>
+        public abstract class Builder<TCommand> : TimeseriesCommandBuilder<Builder<TCommand>, TCommand, ByKeyOptions>
+            where TCommand : IRCommand
         {
             private Row key;
 

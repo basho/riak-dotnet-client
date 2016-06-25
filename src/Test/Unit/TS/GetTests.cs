@@ -4,6 +4,7 @@ namespace Test.Unit.TS
     using System.Linq;
     using NUnit.Framework;
     using RiakClient;
+    using RiakClient.Commands;
     using RiakClient.Commands.TS;
     using RiakClient.Messages;
     using RiakClient.Util;
@@ -18,7 +19,7 @@ namespace Test.Unit.TS
                 .WithKey(Key)
                 .Build();
 
-            Assert.AreEqual(MessageCode.TsGetResp, cmd.ExpectedCode);
+            Assert.AreEqual(MessageCode.TsGetResp, cmd.ResponseCode);
 
             TsGetReq pb = (TsGetReq)cmd.ConstructPbRequest();
             Assert.AreEqual(Table, RiakString.FromBytes(pb.table));
@@ -45,8 +46,8 @@ namespace Test.Unit.TS
         [Test]
         public void Should_Build_Req_With_Timeout()
         {
-            Get cmd = BuildGetReqWithTimeout();
-            Assert.AreEqual(MessageCode.TsGetResp, cmd.ExpectedCode);
+            IRCommand cmd = BuildGetReqWithTimeout();
+            Assert.AreEqual(MessageCode.TsGetResp, cmd.ResponseCode);
 
             TsGetReq pb = (TsGetReq)cmd.ConstructPbRequest();
             Assert.AreEqual(Table, RiakString.FromBytes(pb.table));
