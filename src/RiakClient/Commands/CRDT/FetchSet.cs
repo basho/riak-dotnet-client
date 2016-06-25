@@ -49,7 +49,7 @@ namespace RiakClient.Commands.CRDT
 
         /// <inheritdoc />
         public class Builder
-            : FetchCommandBuilder<FetchSet.Builder, FetchSet, FetchSetOptions, SetResponse>
+            : FetchCommandBuilder<Builder, FetchSet, FetchSetOptions, SetResponse>
         {
         }
     }

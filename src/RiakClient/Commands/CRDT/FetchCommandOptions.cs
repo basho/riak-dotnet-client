@@ -3,7 +3,7 @@ namespace RiakClient.Commands.CRDT
     /// <summary>
     /// Represents options for a CRDT command that fetches data.
     /// </summary>
-    public abstract class FetchCommandOptions : CommandOptions
+    public abstract class FetchCommandOptions : KvCommandOptions
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="FetchCommandOptions"/> class.

@@ -10,6 +10,14 @@ namespace RiakClient.Comms
     public interface IRiakNode : IDisposable
     {
         /// <summary>
+        /// Indicates if this node can be marked offline. <b>false</b> if the node points to a load balancer.
+        /// </summary>
+        /// <returns>
+        /// <b>true</b> or <b>false</b> depending on the node's configuration.
+        /// </returns>
+        bool CanMarkOffline { get; }
+
+        /// <summary>
         /// Execute the <paramref name="useFun"/> delegate using this one of this <see cref="IRiakNode"/>'s connections.
         /// </summary>
         /// <param name="useFun">The delegate function to execute using one of this <see cref="IRiakNode"/>'s connections.</param>

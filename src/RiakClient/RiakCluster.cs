@@ -24,7 +24,11 @@ namespace RiakClient
         private readonly TimeSpan nodePollTime;
         private readonly int defaultRetryCount;
 
+        private readonly CancellationTokenSource cts = new CancellationTokenSource();
+        private readonly CancellationToken ct;
+        private readonly Task monitorTask;
         private bool disposing = false;
+        private bool disposed = false;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RiakCluster"/> class.
@@ -43,7 +47,8 @@ namespace RiakClient
             defaultRetryCount = clusterConfig.DefaultRetryCount;
             RetryWaitTime = clusterConfig.DefaultRetryWaitTime;
 
-            Task.Factory.StartNew(NodeMonitor);
+            ct = cts.Token;
+            monitorTask = Task.Factory.StartNew(NodeMonitor, ct);
         }
 
         /// <summary>
@@ -101,7 +106,7 @@ namespace RiakClient
         {
             if (retryAttempts < 0)
             {
-                return RiakResult<IEnumerable<TResult>>.FromError(ResultCode.NoRetries, "Unable to access a connection on the cluster.", false);
+                return RiakResult<IEnumerable<TResult>>.FromError(ResultCode.NoRetries, "Unable to access a connection on the cluster (no more retries).", false);
             }
 
             if (disposing)
@@ -109,13 +114,15 @@ namespace RiakClient
                 return RiakResult<IEnumerable<TResult>>.FromError(ResultCode.ShuttingDown, "System currently shutting down", true);
             }
 
+            var errorMessages = new List<string>();
             var node = loadBalancer.SelectNode();
-
             if (node != null)
             {
                 var result = node.UseDelayedConnection(useFun);
                 if (!result.IsSuccess)
                 {
+                    errorMessages.Add(result.ErrorMessage);
+
                     if (result.ResultCode == ResultCode.NoConnections)
                     {
                         Thread.Sleep(RetryWaitTime);
@@ -124,11 +131,7 @@ namespace RiakClient
 
                     if (result.ResultCode == ResultCode.CommunicationError)
                     {
-                        if (result.NodeOffline)
-                        {
-                            DeactivateNode(node);
-                        }
-
+                        MaybeDeactivateNode(result.NodeOffline, node);
                         Thread.Sleep(RetryWaitTime);
                         return UseDelayedConnection(useFun, retryAttempts - 1);
                     }
@@ -137,16 +140,36 @@ namespace RiakClient
                 return result;
             }
 
-            return RiakResult<IEnumerable<TResult>>.FromError(ResultCode.ClusterOffline, "Unable to access functioning Riak node", true);
+            string msg = string.Format("Unable to access functioning Riak node, error(s): {0}", string.Join(", ", errorMessages));
+            return RiakResult<IEnumerable<TResult>>.FromError(ResultCode.ClusterOffline, msg, true);
         }
 
         protected override void Dispose(bool disposing)
         {
             this.disposing = disposing;
-
-            if (disposing)
+            if (disposing && disposed == false)
             {
+                cts.Cancel();
+                try
+                {
+                    Task.WaitAll(monitorTask);
+                }
+                catch (AggregateException ex)
+                {
+                    bool rethrow = ex.InnerExceptions.Any(
+                        iex => (iex is TaskCanceledException) == false);
+                    if (rethrow)
+                    {
+                        throw;
+                    }
+                }
+                catch (TaskCanceledException)
+                {
+                }
+
+                cts.Dispose();
                 nodes.ForEach(n => n.Dispose());
+                disposed = true;
             }
         }
 
@@ -157,7 +180,7 @@ namespace RiakClient
         {
             if (retryAttempts < 0)
             {
-                return onError(ResultCode.NoRetries, "Unable to access a connection on the cluster.", false);
+                return onError(ResultCode.NoRetries, "Unable to access a connection on the cluster (no more retries).", false);
             }
 
             if (disposing)
@@ -168,9 +191,12 @@ namespace RiakClient
             var node = loadBalancer.SelectNode();
             if (node != null)
             {
+                var errorMessages = new List<string>();
                 var result = node.UseConnection(useFun);
                 if (!result.IsSuccess)
                 {
+                    errorMessages.Add(result.ErrorMessage);
+
                     TRiakResult nextResult = null;
                     if (result.ResultCode == ResultCode.NoConnections)
                     {
@@ -179,55 +205,65 @@ namespace RiakClient
                     }
                     else if (result.ResultCode == ResultCode.CommunicationError)
                     {
-                        if (result.NodeOffline)
-                        {
-                            DeactivateNode(node);
-                        }
-
+                        MaybeDeactivateNode(result.NodeOffline, node);
                         Thread.Sleep(RetryWaitTime);
                         nextResult = UseConnection(useFun, onError, retryAttempts - 1);
                     }
 
-                    // if the next result is successful then return that
-                    if (nextResult != null && nextResult.IsSuccess)
+                    if (nextResult != null)
                     {
-                        return nextResult;
+                        // if the next result is successful then return that
+                        if (nextResult.IsSuccess)
+                        {
+                            return nextResult;
+                        }
+                        else
+                        {
+                            errorMessages.Add(nextResult.ErrorMessage);
+                        }
                     }
 
                     // otherwise we'll return the result that we had at this call to make sure that
                     // the correct/initial error is shown
-                    return onError(result.ResultCode, result.ErrorMessage, result.NodeOffline);
+                    string errorMessage = string.Join(", ", errorMessages);
+                    return onError(result.ResultCode, errorMessage, result.NodeOffline);
                 }
 
                 return (TRiakResult)result;
             }
 
-            return onError(ResultCode.ClusterOffline, "Unable to access functioning Riak node", true);
+            return onError(ResultCode.ClusterOffline, "Unable to access functioning Riak node (load balancer returned no nodes).", true);
         }
 
-        private void DeactivateNode(IRiakNode node)
+        private void MaybeDeactivateNode(bool nodeOffline, IRiakNode node)
         {
-            lock (node)
+            if (nodeOffline && node.CanMarkOffline)
             {
-                if (!offlineNodes.Contains(node))
+                lock (node)
                 {
-                    loadBalancer.RemoveNode(node);
-                    offlineNodes.Enqueue(node);
+                    if (!offlineNodes.Contains(node))
+                    {
+                        loadBalancer.RemoveNode(node);
+                        offlineNodes.Enqueue(node);
+                    }
                 }
             }
         }
 
-        // TODO: move to own class
         private void NodeMonitor()
         {
-            while (!disposing)
+            while (true)
             {
+                ct.ThrowIfCancellationRequested();
+
                 var deadNodes = new List<IRiakNode>();
                 IRiakNode node = null;
-                while (offlineNodes.TryDequeue(out node) && !disposing)
+                while (offlineNodes.TryDequeue(out node))
                 {
+                    ct.ThrowIfCancellationRequested();
                     var result = node.UseConnection(c => c.PbcWriteRead(MessageCode.RpbPingReq, MessageCode.RpbPingResp));
 
+                    ct.ThrowIfCancellationRequested();
                     if (result.IsSuccess)
                     {
                         loadBalancer.AddNode(node);
@@ -238,15 +274,13 @@ namespace RiakClient
                     }
                 }
 
-                if (!disposing)
+                foreach (var deadNode in deadNodes)
                 {
-                    foreach (var deadNode in deadNodes)
-                    {
-                        offlineNodes.Enqueue(deadNode);
-                    }
-
-                    Thread.Sleep(nodePollTime);
+                    ct.ThrowIfCancellationRequested();
+                    offlineNodes.Enqueue(deadNode);
                 }
+
+                ct.WaitHandle.WaitOne(nodePollTime);
             }
         }
     }

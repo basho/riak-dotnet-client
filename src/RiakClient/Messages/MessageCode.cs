@@ -196,6 +196,11 @@ namespace RiakClient.Messages
         RpbCSBucketResp = 41,
 
         /// <summary>
+        /// Riak Index Body Response.
+        /// </summary>
+        RpbIndexBodyResp = 42,
+
+        /// <summary>
         /// Riak 1.4 Counter Update Request.
         /// </summary>
         RpbCounterUpdateReq = 50,
@@ -251,6 +256,16 @@ namespace RiakClient.Messages
         RpbYokozunaSchemaPutReq = 60,
 
         /// <summary>
+        /// Coverage Request.
+        /// </summary>
+        RpbCoverageReq = 70,
+
+        /// <summary>
+        /// Coverage Response
+        /// </summary>
+        RpbCoverageResp = 71,
+
+        /// <summary>
         /// DataType Fetch Request.
         /// </summary>
         DtFetchReq = 80,
@@ -269,6 +284,81 @@ namespace RiakClient.Messages
         /// DataType Update Response.
         /// </summary>
         DtUpdateResp = 83,
+
+        /// <summary>
+        /// TS Query Request
+        /// </summary>
+        TsQueryReq = 90,
+
+        /// <summary>
+        /// TS Query Response
+        /// </summary>
+        TsQueryResp = 91,
+
+        /// <summary>
+        /// TS Put Request
+        /// </summary>
+        TsPutReq = 92,
+
+        /// <summary>
+        /// TS Put Response
+        /// </summary>
+        TsPutResp = 93,
+
+        /// <summary>
+        /// TS Delete Request
+        /// </summary>
+        TsDelReq = 94,
+
+        /// <summary>
+        /// TS Delete Response
+        /// </summary>
+        TsDelResp = 95,
+
+        /// <summary>
+        /// TS Get Request
+        /// </summary>
+        TsGetReq = 96,
+
+        /// <summary>
+        /// TS Get Response
+        /// </summary>
+        TsGetResp = 97,
+
+        /// <summary>
+        /// TS List Keys Request
+        /// </summary>
+        TsListKeysReq = 98,
+
+        /// <summary>
+        /// TS List Keys Response
+        /// </summary>
+        TsListKeysResp = 99,
+
+        /// <summary>
+        /// TS Coverage Request
+        /// </summary>
+        TsCoverageReq = 100,
+
+        /// <summary>
+        /// TS Coverage Response
+        /// </summary>
+        TsCoverageResp = 101,
+
+        /// <summary>
+        /// TS Coverage Entry
+        /// </summary>
+        TsCoverageEntry = 102,
+
+        /// <summary>
+        /// TS Range
+        /// </summary>
+        TsRange = 103,
+
+        /// <summary>
+        /// TS TTB Message
+        /// </summary>
+        TsTtbMsg = 104,
 
         /// <summary>
         /// Authentication Request.

@@ -1,7 +1,5 @@
 namespace RiakClient.Commands
 {
-    using System;
-
     /// <summary>
     /// Base class for all Riak command builders.
     /// </summary>
@@ -9,8 +7,9 @@ namespace RiakClient.Commands
     /// <typeparam name="TCommand">The type of the command.</typeparam>
     /// <typeparam name="TOptions">The type of the options for this command.</typeparam>
     public abstract class CommandBuilder<TBuilder, TCommand, TOptions> : CommandBuilder<TBuilder, TCommand>
-        where TCommand : IRCommand
         where TBuilder : CommandBuilder<TBuilder, TCommand, TOptions>
+        where TCommand : IRCommand
+        where TOptions : CommandOptions
     {
         public CommandBuilder()
         {
@@ -27,9 +26,6 @@ namespace RiakClient.Commands
             protected set;
         }
 
-        protected TOptions BuildOptions()
-        {
-            return (TOptions)Activator.CreateInstance(typeof(TOptions), bucketType, bucket, key);
-        }
+        protected abstract TOptions BuildOptions();
     }
 }

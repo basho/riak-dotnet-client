@@ -241,6 +241,7 @@ namespace Riak.Core
             {
                 if (File.Exists(authConfig.ClientCertificateFile))
                 {
+                // TODO 3.0 FUTURE exception if config is set but file doesn't actually exist
                     var cert = new X509Certificate2(authConfig.ClientCertificateFile);
                     clientCertificates.Add(cert);
                 }

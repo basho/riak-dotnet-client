@@ -3,7 +3,7 @@ namespace RiakClient.Commands.CRDT
     /// <summary>
     /// Represents options for a <see cref="UpdateCommand{TResponse}"/> operation.
     /// </summary>
-    public abstract class UpdateCommandOptions : CommandOptions
+    public abstract class UpdateCommandOptions : KvCommandOptions
     {
         private bool returnBody = true;
         private bool includeContext = true;

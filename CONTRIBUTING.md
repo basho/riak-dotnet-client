@@ -5,10 +5,9 @@ This repo's maintainers are engineers at Basho and we welcome your contribution 
 ### An honest disclaimer
 
 Due to our obsession with stability and our rich ecosystem of users, community updates on this repo may take a little longer to review. 
-
 The most helpful way to contribute is by reporting your experience through issues. Issues may not be updated while we review internally, but they're still incredibly appreciated.
 
-Thank you for being part of the community! We love you for it. 
+Thank you for being part of the community.
 
 ## Helping through sample code
 
@@ -33,6 +32,4 @@ Once you're ready to contribute code back to this repo, start with these steps:
      * Contributors will review your pull request, suggest changes, and merge it when it’s ready and/or offer feedback.
      * To report a bug or issue, please open a new issue against this repository.
 
-You can [read the full guidelines for bug reporting and code contributions](http://docs.basho.com/riak/latest/community/bugs/) on the Riak Docs. 
-
-And **thank you!** Your contribution is incredibly important to us.
+You can [read the full guidelines for bug reporting and code contributions](http://docs.basho.com/riak/latest/community/bugs/) on the Riak Docs.

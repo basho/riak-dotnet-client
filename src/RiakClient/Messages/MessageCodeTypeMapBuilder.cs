@@ -37,6 +37,7 @@ namespace RiakClient.Messages
                 { MessageCode.RpbResetBucketReq, typeof(RpbResetBucketReq) },
                 { MessageCode.RpbCSBucketReq, typeof(RpbCSBucketReq) },
                 { MessageCode.RpbCSBucketResp, typeof(RpbCSBucketResp) },
+                { MessageCode.RpbIndexBodyResp, typeof(RpbIndexBodyResp) },
                 { MessageCode.RpbCounterUpdateReq, typeof(RpbCounterUpdateReq) },
                 { MessageCode.RpbCounterUpdateResp, typeof(RpbCounterUpdateResp) },
                 { MessageCode.RpbCounterGetReq, typeof(RpbCounterGetReq) },
@@ -50,10 +51,31 @@ namespace RiakClient.Messages
                 { MessageCode.RpbYokozunaSchemaGetResp, typeof(RpbYokozunaSchemaGetResp) },
                 { MessageCode.RpbYokozunaSchemaPutReq, typeof(RpbYokozunaSchemaPutReq) },
 
+                { MessageCode.RpbCoverageReq, typeof(RpbCoverageReq) },
+                { MessageCode.RpbCoverageResp, typeof(RpbCoverageResp) },
+
                 { MessageCode.DtFetchReq, typeof(DtFetchReq) },
                 { MessageCode.DtFetchResp, typeof(DtFetchResp) },
                 { MessageCode.DtUpdateReq, typeof(DtUpdateReq) },
                 { MessageCode.DtUpdateResp, typeof(DtUpdateResp) },
+
+                { MessageCode.TsQueryReq, typeof(TsQueryReq) },
+                { MessageCode.TsQueryResp, typeof(TsQueryResp) },
+                { MessageCode.TsPutReq, typeof(TsPutReq) },
+                { MessageCode.TsPutResp, typeof(TsPutResp) },
+                { MessageCode.TsDelReq, typeof(TsDelReq) },
+                { MessageCode.TsDelResp, typeof(TsDelResp) },
+                { MessageCode.TsGetReq, typeof(TsGetReq) },
+                { MessageCode.TsGetResp, typeof(TsGetResp) },
+                { MessageCode.TsListKeysReq, typeof(TsListKeysReq) },
+                { MessageCode.TsListKeysResp, typeof(TsListKeysResp) },
+                { MessageCode.TsCoverageReq, typeof(TsCoverageReq) },
+                { MessageCode.TsCoverageResp, typeof(TsCoverageResp) },
+                { MessageCode.TsCoverageEntry, typeof(TsCoverageEntry) },
+                { MessageCode.TsRange, typeof(TsRange) },
+
+                // TTB pseudo-message
+                { MessageCode.TsTtbMsg, typeof(TsTtbMsg) },
 
                 { MessageCode.RpbGetBucketTypeReq, typeof(RpbGetBucketTypeReq) },
                 { MessageCode.RpbSetBucketTypeReq, typeof(RpbSetBucketTypeReq) },

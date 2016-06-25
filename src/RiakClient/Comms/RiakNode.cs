@@ -7,6 +7,7 @@ namespace RiakClient.Comms
     internal class RiakNode : IRiakNode
     {
         private readonly IRiakConnectionManager connections;
+        private readonly bool externalLoadBalancer = false;
         private bool disposing;
 
         public RiakNode(
@@ -14,6 +15,8 @@ namespace RiakClient.Comms
             IAuthenticationConfiguration authConfig,
             IRiakConnectionFactory connectionFactory)
         {
+            externalLoadBalancer = nodeConfig.ExternalLoadBalancer;
+
             // assume that if the node has a pool size of 0 then the intent is to have the connections
             // made on the fly
             if (nodeConfig.PoolSize == 0)
@@ -24,6 +27,11 @@ namespace RiakClient.Comms
             {
                 connections = new RiakConnectionPool(nodeConfig, authConfig, connectionFactory);
             }
+        }
+
+        public bool CanMarkOffline
+        {
+            get { return externalLoadBalancer == false; }
         }
 
         public RiakResult UseConnection(Func<IRiakConnection, RiakResult> useFun)

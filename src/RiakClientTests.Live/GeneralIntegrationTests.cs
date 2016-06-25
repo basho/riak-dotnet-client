@@ -291,15 +291,16 @@ namespace RiakClientTests.Live.GeneralIntegrationTests
         public void DeletingIsSuccessful()
         {
             var doc = new RiakObject(TestBucket, TestKey, TestJson, RiakConstants.ContentTypes.ApplicationJson);
-            Client.Put(doc).IsSuccess.ShouldBeTrue();
+            var pr = Client.Put(doc);
+            Assert.True(pr.IsSuccess, pr.ErrorMessage);
 
-            var result = Client.Get(TestBucket, TestKey);
-            result.IsSuccess.ShouldBeTrue();
+            var gr = Client.Get(TestBucket, TestKey);
+            Assert.True(gr.IsSuccess, gr.ErrorMessage);
 
             Client.Delete(doc.Bucket, doc.Key).IsSuccess.ShouldBeTrue();
-            result = Client.Get(TestBucket, TestKey);
-            result.IsSuccess.ShouldBeFalse();
-            result.ResultCode.ShouldEqual(ResultCode.NotFound);
+            gr = Client.Get(TestBucket, TestKey);
+            Assert.False(gr.IsSuccess);
+            Assert.AreEqual(ResultCode.NotFound, gr.ResultCode);
         }
 
         [Test]

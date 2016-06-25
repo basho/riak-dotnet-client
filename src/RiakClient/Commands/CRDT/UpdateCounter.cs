@@ -39,13 +39,14 @@ namespace RiakClient.Commands.CRDT
             return op;
         }
 
-        protected override CounterResponse CreateResponse(RiakString key, DtUpdateResp response)
+        protected override CounterResponse CreateResponse(DtUpdateResp response)
         {
+            RiakString key = GetKey(CommandOptions.Key, response);
             return new CounterResponse(key, response.context, response.counter_value);
         }
 
         public class Builder :
-            UpdateCommandBuilder<UpdateCounter.Builder, UpdateCounter, UpdateCounterOptions, CounterResponse>
+            UpdateCommandBuilder<Builder, UpdateCounter, UpdateCounterOptions, CounterResponse>
         {
             private long increment;
 

@@ -28,12 +28,12 @@ namespace Test.Integration
             RiakClient.DisableListBucketsWarning = true;
         }
 
-        public TestBase()
+        public TestBase(bool auth = true)
         {
 #if NOAUTH
             cluster = RiakCluster.FromConfig("riak1NodeNoAuthConfiguration");
 #else
-            if (MonoUtil.IsRunningOnMono)
+            if (auth == false || MonoUtil.IsRunningOnMono)
             {
                 cluster = RiakCluster.FromConfig("riak1NodeNoAuthConfiguration");
             }
@@ -41,32 +41,36 @@ namespace Test.Integration
             {
                 cluster = RiakCluster.FromConfig("riak1NodeConfiguration");
             }
+
 #endif
             client = cluster.CreateClient();
         }
 
-        protected abstract RiakString BucketType
+        protected virtual RiakString BucketType
         {
-            get;
+            get { return "bucketType_unset"; }
         }
 
-        protected abstract RiakString Bucket
+        protected virtual RiakString Bucket
         {
-            get;
+            get { return "bucket_unset"; }
         }
 
         [TestFixtureSetUp]
-        protected virtual void TestFixtureSetUp()
+        public virtual void TestFixtureSetUp()
         {
         }
 
         [TestFixtureTearDown]
-        protected virtual void TestFixtureTearDown()
+        public virtual void TestFixtureTearDown()
         {
-            foreach (string key in Keys)
+            if (EnumerableUtil.NotNullOrEmpty(Keys))
             {
-                var id = new RiakObjectId(BucketType, Bucket, key);
-                client.Delete(id);
+                foreach (string key in Keys)
+                {
+                    var id = new RiakObjectId(BucketType, Bucket, key);
+                    client.Delete(id);
+                }
             }
         }
 

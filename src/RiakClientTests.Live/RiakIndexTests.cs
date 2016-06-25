@@ -15,20 +15,12 @@ namespace RiakClientTests.Live
     [TestFixture, IntegrationTest, SkipMono]
     public class WhenUsingIndexes : RiakMapReduceTestBase
     {
-        private const string BucketType = "leveldb_type";
         private const string LegacyBucket = "riak_index_tests";
         private const int DefaultKeyCount = 10;
 
         public WhenUsingIndexes()
         {
             Bucket = LegacyBucket;
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            Client.DeleteBucket(BucketType, Bucket);
-            Client.DeleteBucket(LegacyBucket);
         }
 
         [Test]
@@ -51,8 +43,6 @@ namespace RiakClientTests.Live
 
             ro.BinIndex("tacos").Values[0].ShouldEqual("are great!");
             ro.IntIndex("age").Values[0].ShouldEqual(12);
-
-            Client.DeleteBucket(LegacyBucket);
         }
 
         [Test]
@@ -62,8 +52,9 @@ namespace RiakClientTests.Live
 
             var idxid = new RiakIndexId(LegacyBucket, "age");
             var result = Client.GetSecondaryIndex(idxid, 32);
-            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
-            result.Value.IndexKeyTerms.Count().ShouldEqual(DefaultKeyCount);
+            Assert.IsTrue(result.IsSuccess, result.ErrorMessage);
+            CollectionAssert.IsNotEmpty(result.Value.IndexKeyTerms);
+            Assert.GreaterOrEqual(result.Value.IndexKeyTerms.Count(), DefaultKeyCount);
 
             foreach (var v in result.Value.IndexKeyTerms)
             {
@@ -71,8 +62,6 @@ namespace RiakClientTests.Live
                 key.ShouldBeLessThan(DefaultKeyCount);
                 key.ShouldBeGreaterThan(-1);
             }
-
-            Client.DeleteBucket(LegacyBucket);
         }
 
         [Test]
@@ -90,8 +79,6 @@ namespace RiakClientTests.Live
                 key.ShouldBeLessThan(DefaultKeyCount);
                 key.ShouldBeGreaterThan(-1);
             }
-
-            Client.DeleteBucket(LegacyBucket);
         }
 
         private static int ParseIntKeyWithPrefix(RiakIndexKeyTerm indexKeyTerm)
@@ -108,19 +95,16 @@ namespace RiakClientTests.Live
                 .Inputs(RiakIndex.Match(new RiakIndexId(LegacyBucket, "age"), 32));
 
             var result = Client.MapReduce(mr);
-            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
+            Assert.IsTrue(result.IsSuccess, result.ErrorMessage);
 
             var keys = result.Value.PhaseResults.SelectMany(x => x.GetObjectIds()).ToList();
-
-            keys.Count().ShouldEqual(DefaultKeyCount);
+            Assert.GreaterOrEqual(keys.Count(), DefaultKeyCount);
 
             foreach (var key in keys)
             {
-                key.Bucket.ShouldNotBeNullOrEmpty();
-                key.Key.ShouldNotBeNullOrEmpty();
+                Assert.IsNotNullOrEmpty(key.Bucket);
+                Assert.IsNotNullOrEmpty(key.Key);
             }
-
-            Client.DeleteBucket(LegacyBucket);
         }
 
         [Test]
@@ -131,7 +115,6 @@ namespace RiakClientTests.Live
             var result = Client.GetSecondaryIndex(new RiakIndexId(LegacyBucket, "age"), 27, 30);
             result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
             result.Value.IndexKeyTerms.Count().ShouldEqual(4);
-            Client.DeleteBucket(LegacyBucket);
         }
 
         [Test]
@@ -153,7 +136,8 @@ namespace RiakClientTests.Live
                 foundKeys = "Found keys: \"" + foundKeys + "\"";
             }
 
-            queriedKeys.Count.ShouldEqual(DefaultKeyCount, foundKeys);
+            CollectionAssert.IsNotEmpty(queriedKeys);
+            Assert.AreEqual(DefaultKeyCount, queriedKeys.Count());
 
             foreach (var key in queriedKeys)
             {
@@ -161,8 +145,6 @@ namespace RiakClientTests.Live
                 key.Key.ShouldNotBeNullOrEmpty();
                 insertedKeys.Contains(key.Key).ShouldBeTrue();
             }
-
-            Client.DeleteBucket(LegacyBucket);
         }
 
         [Test]
@@ -199,31 +181,28 @@ namespace RiakClientTests.Live
                 key.Key.ShouldNotBeNullOrEmpty();
                 originalKeys.Contains(key.Key).ShouldBeTrue();
             }
-            Client.DeleteBucket(LegacyBucket);
         }
 
         [Test]
         public void ListKeysUsingIndexReturnsAllKeys()
         {
-            const int keyCount = 10;
-
             var generatedKeys = GenerateGuidKeyObjects("ListKeysUsingIndex");
             var originalKeys = new HashSet<string>(generatedKeys);
 
             var result = Client.ListKeysFromIndex(LegacyBucket);
-
-            result.IsSuccess.ShouldBeTrue(result.ErrorMessage);
+            Assert.True(result.IsSuccess, result.ErrorMessage);
 
             var keys = result.Value;
-            keys.Count.ShouldEqual(keyCount);
-
+            CollectionAssert.IsNotEmpty(keys);
             foreach (var key in keys)
             {
-                key.ShouldNotBeNullOrEmpty();
-                originalKeys.Contains(key).ShouldBeTrue();
+                Assert.IsNotNullOrEmpty(key);
             }
 
-            Client.DeleteBucket(LegacyBucket);
+            foreach (string origKey in originalKeys)
+            {
+                CollectionAssert.Contains(keys, origKey);
+            }
         }
 
         [Test]
@@ -252,8 +231,6 @@ namespace RiakClientTests.Live
                 keysAndTerms.Keys.ShouldContain(indexResult.Key);
                 keysAndTerms[indexResult.Key].ShouldEqual(int.Parse(indexResult.Term));
             }
-
-            Client.DeleteBucket(LegacyBucket);
         }
 
         [Test]
@@ -272,8 +249,6 @@ namespace RiakClientTests.Live
             results.Done.ShouldNotEqual(true);
             results.Done.ShouldEqual(null);
             results.Continuation.ShouldNotBeNull();
-
-            Client.DeleteBucket(LegacyBucket);
         }
 
         [Test]
@@ -289,10 +264,9 @@ namespace RiakClientTests.Live
 
             var results = Client.StreamGetSecondaryIndex(new RiakIndexId(Bucket, "position"), 0);
 
-            results.IsSuccess.ShouldBeTrue(results.ErrorMessage);
-            results.Value.IndexKeyTerms.Count().ShouldEqual(5);
-
-            Client.DeleteBucket(LegacyBucket);
+            Assert.IsTrue(results.IsSuccess, results.ErrorMessage);
+            CollectionAssert.IsNotEmpty(results.Value.IndexKeyTerms);
+            Assert.GreaterOrEqual(results.Value.IndexKeyTerms.Count(), 5);
         }
 
         [Test]
@@ -311,8 +285,6 @@ namespace RiakClientTests.Live
             results.Done.ShouldNotEqual(true);
             results.Done.ShouldEqual(null);
             results.Continuation.ShouldBeNull();
-
-            Client.DeleteBucket(LegacyBucket);
         }
 
         [Test]
@@ -330,8 +302,6 @@ namespace RiakClientTests.Live
             results.Value.ShouldNotBeNull();
             var keyTerms = results.Value.IndexKeyTerms.ToList();
             keyTerms.Count.ShouldEqual(500);
-
-            Client.DeleteBucket(LegacyBucket);
         }
 
         [Test]
@@ -362,8 +332,6 @@ namespace RiakClientTests.Live
 
             var keyTerms2 = results2.Value.IndexKeyTerms.ToList();
             keyTerms2[0].Term.ShouldEqual("11");
-
-            Client.DeleteBucket(LegacyBucket);
         }
 
         [Test]
@@ -392,8 +360,6 @@ namespace RiakClientTests.Live
                 resultKeys.ShouldContain(insertedKey,
                     string.Format("Could not find key {0} in index result set", insertedKey));
             }
-
-            Client.DeleteBucket(LegacyBucket);
         }
 
         private List<string> GenerateIntKeyObjects(
@@ -418,7 +384,8 @@ namespace RiakClientTests.Live
         }
 
         private List<string> GenerateGuidKeyObjects(
-            string keyPrefix, Action<RiakObject, int> indexAction = null, int maxKeys = DefaultKeyCount,
+            string keyPrefix, Action<RiakObject, int> indexAction = null,
+            int maxKeys = DefaultKeyCount,
             bool useLegacyBucket = true)
         {
             var insertedKeys = new List<string>();
@@ -454,7 +421,7 @@ namespace RiakClientTests.Live
         {
             var id = useLegacyBucket
                 ? new RiakObjectId(LegacyBucket, key)
-                : new RiakObjectId(BucketType, Bucket, key);
+                : new RiakObjectId(TestBucketType, Bucket, key);
             return CreateRiakObject(id, "{ value: \"this is an object\" }");
         }
 

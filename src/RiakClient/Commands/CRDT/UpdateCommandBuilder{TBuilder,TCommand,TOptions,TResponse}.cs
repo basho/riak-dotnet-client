@@ -10,7 +10,7 @@ namespace RiakClient.Commands.CRDT
     /// <typeparam name="TOptions">The type of the options for the update command.</typeparam>
     /// <typeparam name="TResponse">The type of the update command's response.</typeparam>
     public abstract class UpdateCommandBuilder<TBuilder, TCommand, TOptions, TResponse>
-        : CommandBuilder<TBuilder, TCommand, TOptions>
+        : KvCommandBuilder<TBuilder, TCommand, TOptions>
         where TBuilder : UpdateCommandBuilder<TBuilder, TCommand, TOptions, TResponse>
         where TCommand : UpdateCommand<TResponse>
         where TOptions : UpdateCommandOptions

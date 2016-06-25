@@ -18,7 +18,7 @@ namespace RiakClient.Commands
         /// </summary>
         /// <param name="value">The fetched server information.</param>
         public ServerInfoResponse(ServerInfo value)
-            : base(false, value)
+            : base(value)
         {
         }
     }

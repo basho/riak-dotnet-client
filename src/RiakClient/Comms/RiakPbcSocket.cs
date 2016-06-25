@@ -106,12 +106,27 @@ namespace RiakClient.Comms
         public RiakResult Read(IRCommand command)
         {
             MessageCode expectedCode = command.ResponseCode;
-            Type expectedType = MessageCodeTypeMapBuilder.GetTypeFor(expectedCode);
+            bool done = false;
+            do
+            {
+                Type expectedType = MessageCodeTypeMapBuilder.GetTypeFor(expectedCode);
 
-            int size = DoRead(expectedCode, expectedType);
+                int size = DoRead(expectedCode, expectedType);
 
-            RpbResp response = DeserializeInstance(expectedType, size);
-            command.OnSuccess(response);
+                RpbResp response = DeserializeInstance(expectedType, size);
+                command.OnSuccess(response);
+
+                var streamingResponse = response as IRpbStreamingResp;
+                if (streamingResponse == null)
+                {
+                    done = true;
+                }
+                else
+                {
+                    done = streamingResponse.done;
+                }
+            }
+            while (done == false);
 
             return RiakResult.Success();
         }

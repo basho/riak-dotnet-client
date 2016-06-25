@@ -85,6 +85,30 @@
       <ExcludeFromStyleCop>False</ExcludeFromStyleCop>
     </Compile>
     <Compile Include="Commands\CommandBuilder{TBuilder,TCommand,TOptions}.cs" />
+    <Compile Include="Commands\KvCommandBuilder{TBuilder,TCommand,TOptions}.cs" />
+    <Compile Include="Commands\CommandOptions.cs" />
+    <Compile Include="Commands\Response{TValue}.cs" />
+    <Compile Include="Commands\TS\DecodedResponse.cs" />
+    <Compile Include="Commands\TS\ListKeys.cs" />
+    <Compile Include="Commands\TS\ListKeysOptions.cs" />
+    <Compile Include="Commands\TS\QueryOptions.cs" />
+    <Compile Include="Commands\TS\Cell{TValue}.cs" />
+    <Compile Include="Commands\TS\Cell.cs" />
+    <Compile Include="Commands\TS\Column.cs" />
+    <Compile Include="Commands\TS\ColumnType.cs" />
+    <Compile Include="Commands\TS\ByKeyCommand{TResponse}.cs" />
+    <Compile Include="Commands\TS\Delete.cs" />
+    <Compile Include="Commands\TS\ByKeyOptions.cs" />
+    <Compile Include="Commands\TS\ListKeysResponse.cs" />
+    <Compile Include="Commands\TS\QueryResponse.cs" />
+    <Compile Include="Commands\TS\Query.cs" />
+    <Compile Include="Commands\TS\ResponseDecoder.cs" />
+    <Compile Include="Commands\TS\StoreResponse.cs" />
+    <Compile Include="Commands\TS\StoreOptions.cs" />
+    <Compile Include="Commands\TS\Store.cs" />
+    <Compile Include="Commands\TS\TimeseriesCommandBuilder{TBuilder,TCommand,TOptions}.cs" />
+    <Compile Include="Commands\TS\GetResponse.cs" />
+    <Compile Include="Commands\TS\TimeseriesCommandOptions.cs" />
     <Compile Include="Commands\Command{TResponse}.cs" />
     <Compile Include="Commands\CRDT\FetchSetOptions.cs" />
     <Compile Include="Commands\CRDT\DataTypeResponse{TValue}.cs" />
@@ -105,7 +129,7 @@
     <Compile Include="Commands\KV\FetchPreflist.cs" />
     <Compile Include="Commands\KV\FetchPreflistOptions.cs" />
     <Compile Include="Commands\Response.cs" />
-    <Compile Include="Commands\Response{TValue}.cs" />
+    <Compile Include="Commands\Response{TKey,TValue}.cs" />
     <Compile Include="Commands\CRDT\FetchCommandBuilder{TBuilder,TCommand,TOptions,TResponse}.cs" />
     <Compile Include="Commands\CRDT\FetchCommand{TResponse}.cs" />
     <Compile Include="Commands\CRDT\FetchCounter.cs" />
@@ -126,8 +150,10 @@
     <Compile Include="Commands\CRDT\FetchMapOptions.cs" />
     <Compile Include="Commands\CRDT\UpdateCounterOptions.cs" />
     <Compile Include="Commands\CRDT\UpdateMapOptions.cs" />
-    <Compile Include="Commands\CommandOptions.cs" />
     <Compile Include="Commands\IRCommand.cs" />
+    <Compile Include="Commands\KvCommandOptions.cs" />
+    <Compile Include="Commands\TS\Get.cs" />
+    <Compile Include="Commands\TS\Row.cs" />
     <Compile Include="Comms\IRiakConnectionManager.cs" />
     <Compile Include="Comms\LoadBalancing\ILoadBalancingStrategy.cs" />
     <Compile Include="Comms\LoadBalancing\RoundRobinStrategy.cs" />
@@ -164,9 +190,14 @@
     <Compile Include="Core\NodeOptions.cs" />
     <Compile Include="Core\StateManager.cs" />
     <Compile Include="Exceptions\RiakUnsupportedException.cs" />
+    <Compile Include="Messages\IRpbStreamingResp.cs" />
+    <Compile Include="Messages\ITsByKeyReq.cs" />
+    <Compile Include="Messages\TsColumnDescription.cs" />
+    <Compile Include="Messages\TsRow.cs" />
+    <Compile Include="Messages\TsCell.cs" />
+    <Compile Include="Util\DateTimeUtil.cs" />
     <Compile Include="IRiakAsyncClient.cs" />
     <Compile Include="IRiakClient.cs" />
-    <Compile Include="Messages\riak_ts.cs" />
     <Compile Include="Messages\RpbClasses.cs" />
     <Compile Include="Models\CommitHook\IRiakCommitHook.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -201,6 +232,7 @@
     <Compile Include="Messages\riak_dt.cs" />
     <Compile Include="Messages\riak_kv.cs" />
     <Compile Include="Messages\riak_search.cs" />
+    <Compile Include="Messages\riak_ts.cs" />
     <Compile Include="Messages\riak_yokozuna.cs" />
     <Compile Include="Models\Index\IRiakIndexResult.cs" />
     <Compile Include="Models\Index\BinIndex.cs" />

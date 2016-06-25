@@ -141,7 +141,6 @@ namespace Test.Unit
                 ExecuteResult rslt = await reader.ReadAsync();
                 Assert.True(rslt.Executed);
                 Assert.Null(rslt.Error);
-                Assert.Null(cmd.Response.Key);
                 CollectionAssert.IsEmpty(cmd.Response.Value);
             }
 

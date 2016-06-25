@@ -1,7 +1,6 @@
 namespace RiakClient.Commands.CRDT
 {
     using System.Collections.Generic;
-    using System.Linq;
     using Extensions;
     using Messages;
     using Util;
@@ -53,8 +52,9 @@ namespace RiakClient.Commands.CRDT
             return op;
         }
 
-        protected override SetResponse CreateResponse(RiakString key, DtUpdateResp response)
+        protected override SetResponse CreateResponse(DtUpdateResp response)
         {
+            RiakString key = GetKey(CommandOptions.Key, response);
             return new SetResponse(key, response.context, new HashSet<byte[]>(response.set_value));
         }
 

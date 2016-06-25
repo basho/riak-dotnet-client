@@ -31,12 +31,6 @@ namespace RiakClientTests.Deprecated
             PrepSearchData();
         }
 
-        [TestFixtureTearDown]
-        public void TearDown()
-        {
-            Client.DeleteBucket(Bucket);
-        }
-
         private void PrepSearchData()
         {
             Func<RiakResult<RiakObject>> put1 = () => Client.Put(new RiakObject(Bucket, RiakSearchKey, RiakSearchDoc.ToRiakString(),

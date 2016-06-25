@@ -11,12 +11,6 @@ namespace RiakClientTests.Live.MapReduce
     [TestFixture, IntegrationTest]
     public class WhenUsingFluentKeyFilters : RiakMapReduceTestBase
     {
-        [TearDown]
-        public void TearDown()
-        {
-            Client.DeleteBucket(Bucket);
-        }
-
         [Test]
         public void EqualsFindsOneKey()
         {

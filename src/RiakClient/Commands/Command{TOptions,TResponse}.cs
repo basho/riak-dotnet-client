@@ -25,7 +25,7 @@
                 throw new ArgumentNullException("options");
             }
 
-            this.CommandOptions = options;
+            CommandOptions = options;
         }
 
         public TOptions Options
@@ -33,18 +33,14 @@
             get { return CommandOptions; }
         }
 
-        protected RiakString GetKey(RpbResp response)
+        protected RiakString GetKey(RiakString optskey, RpbResp response)
         {
-            RiakString key = null;
+            RiakString key = optskey;
 
             IRpbGeneratedKey krsp = response as IRpbGeneratedKey;
             if (krsp != null && krsp.HasKey)
             {
                 key = new RiakString(krsp.key);
-            }
-            else
-            {
-                key = CommandOptions.Key;
             }
 
             return key;

@@ -7,64 +7,23 @@ namespace RiakClient.Commands
     /// </summary>
     public abstract class CommandOptions : IEquatable<CommandOptions>
     {
-        private readonly RiakString bucketType;
-        private readonly RiakString bucket;
-        private readonly RiakString key;
         private TimeSpan timeout;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CommandOptions"/> class.
         /// </summary>
-        /// <param name="args">Arguments to this ctor. Required.</param>
-        protected CommandOptions(Args args)
-            : this(args, Riak.Constants.DefaultCommandTimeout)
+        protected CommandOptions()
+            : this(default(TimeSpan))
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CommandOptions"/> class.
         /// </summary>
-        /// <param name="args">Arguments to this ctor. Required.</param>
         /// <param name="timeout">The command timeout in Riak.</param>
-        protected CommandOptions(Args args, TimeSpan timeout)
+        protected CommandOptions(TimeSpan timeout)
         {
-            if (args == null)
-            {
-                throw new ArgumentNullException("args");
-            }
-
-            this.bucketType = args.BucketType;
-            this.bucket = args.Bucket;
-            this.key = args.Key;
-
             this.timeout = timeout;
-        }
-
-        /// <summary>
-        /// The bucket type
-        /// </summary>
-        /// <value>A <see cref="RiakString"/> representing the bucket type.</value>
-        public RiakString BucketType
-        {
-            get { return bucketType; }
-        }
-
-        /// <summary>
-        /// The bucket
-        /// </summary>
-        /// <value>A <see cref="RiakString"/> representing the bucket.</value>
-        public RiakString Bucket
-        {
-            get { return bucket; }
-        }
-
-        /// <summary>
-        /// The key
-        /// </summary>
-        /// <value>The <see cref="RiakString"/> representing the key.</value>
-        public RiakString Key
-        {
-            get { return key; }
         }
 
         /// <summary>
@@ -73,22 +32,22 @@ namespace RiakClient.Commands
         public TimeSpan Timeout
         {
             get { return timeout; }
-            set { timeout = value; }
+            set { timeout = value; } // TODO 3.0 allow setter?
         }
 
         public bool Equals(CommandOptions other)
         {
-            if (object.ReferenceEquals(other, null))
+            if (ReferenceEquals(other, null))
             {
                 return false;
             }
 
-            if (object.ReferenceEquals(this, other))
+            if (ReferenceEquals(this, other))
             {
                 return true;
             }
 
-            return this.GetHashCode() == other.GetHashCode();
+            return GetHashCode() == other.GetHashCode();
         }
 
         public override bool Equals(object obj)
@@ -103,14 +62,7 @@ namespace RiakClient.Commands
         /// <returns>A hash code for the current object.</returns>
         public override int GetHashCode()
         {
-            unchecked
-            {
-                int result = bucketType.GetHashCode();
-                result = (result * 397) ^ bucket.GetHashCode();
-                result = (result * 397) ^ (key != null ? key.GetHashCode() : 0);
-                result = (result * 397) ^ timeout.GetHashCode();
-                return result;
-            }
+            return timeout.GetHashCode();
         }
 
         /// <summary>
@@ -121,7 +73,7 @@ namespace RiakClient.Commands
         /// <param name="bucketRequired">Set to <b>true</b> if bucket is required.</param>
         /// <param name="key">The key in Riak.</param>
         /// <param name="keyRequired">If <b>true</b> and no key given, an exception is thrown.</param>
-        protected class Args
+        public class Args
         {
             private readonly RiakString bucketType;
             private readonly RiakString bucket;

@@ -103,9 +103,10 @@ catch {
 
 $response_json = ConvertFrom-Json -InputObject $response.Content
 # https://uploads.github.com/repos/basho/riak-dotnet-client/releases/890350/assets{?name,label}
-$upload_url_with_name = $response_json.upload_url -Replace '{\?name,label}', ('?name=' + $release_zip_name)
-
-$response = Get-Content $release_zip_path | Invoke-WebRequest -Headers $headers -ContentType 'application/zip' -Method Post -Uri $upload_url_with_name
+$upload_url_with_name = $response_json.upload_url -Replace '{\?name,label}', "?name=$release_zip_name"
+$body = Get-Content -Raw $release_zip_path
+Write-Debug "Asset: $release_zip_name Upload url: $upload_url_with_name"
+$response =  Invoke-WebRequest -Headers $headers -ContentType 'application/zip' -Method Post -Body $body -Uri $upload_url_with_name
 if ([int]$response.StatusCode -ne 201) {
     throw "Creating release asset failed: $response.StatusCode"
 }

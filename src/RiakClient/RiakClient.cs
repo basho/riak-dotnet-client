@@ -506,6 +506,7 @@ namespace RiakClient
             return ResetPbcBucketProperties(bucketType, bucket);
         }
 
+#pragma warning disable 618
         /// <inheritdoc/>
         [Obsolete("Linkwalking has been deprecated as of Riak 2.0. This method will be removed in the next major version.")]
         public RiakResult<IList<RiakObject>> WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks)
@@ -525,9 +526,7 @@ namespace RiakClient
                 var link = riakLink;
                 var keep = ReferenceEquals(link, lastLink);
 
-#pragma warning disable 618
                 query.Link(l => l.FromRiakLink(link).Keep(keep));
-#pragma warning restore 618
             }
 
             var result = MapReduce(query);
@@ -552,7 +551,9 @@ namespace RiakClient
 
             return new RiakResult<IList<RiakObject>>(result);
         }
+#pragma warning restore 618
 
+#pragma warning disable 618
         /// <inheritdoc/>
         [System.Obsolete("Please use RiakClient.Commands.ServerInfo instead.")]
         public RiakResult<RiakServerInfo> GetServerInfo()
@@ -566,6 +567,7 @@ namespace RiakClient
 
             return new RiakResult<RiakServerInfo>(result);
         }
+#pragma warning restore 618
 
         /// <inheritdoc/>
         public RiakResult<RiakStreamedIndexResult> StreamGetSecondaryIndex(RiakIndexId index, BigInteger value, RiakIndexGetOptions options = null)
@@ -661,6 +663,7 @@ namespace RiakClient
             return funResult;
         }
 
+#pragma warning disable 618
         /// <inheritdoc/>
         [System.Obsolete("RiakDt is deprecated. Please use Commands/CRDT namespace.")]
         public RiakCounterResult DtFetchCounter(
@@ -1026,6 +1029,7 @@ namespace RiakClient
 
             return riakMapResult;
         }
+#pragma warning restore 618
 
         /// <inheritdoc/>
         public RiakResult<SearchIndexResult> GetSearchIndex(string indexName)
@@ -1050,6 +1054,7 @@ namespace RiakClient
                 index = searchIndex.ToMessage(),
                 timeout = (uint)searchIndex.Timeout.TotalMilliseconds
             };
+
             return UseConnection(conn => conn.PbcWriteRead(request, MessageCode.RpbPutResp));
         }
 

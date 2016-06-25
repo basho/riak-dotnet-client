@@ -6,10 +6,16 @@ namespace RiakClientTests.Live
     using RiakClient;
     using Riak.Config;
     using RiakClient.Extensions;
+#if NOAUTH
+#else
     using RiakClient.Util;
+#endif
 
     public abstract class LiveRiakConnectionTestBase
     {
+        private static readonly string testBucket = Guid.NewGuid().ToString();
+        private static readonly string testKey = Guid.NewGuid().ToString();
+
         public static class BucketTypeNames
         {
             public const string Sets = "sets";
@@ -17,9 +23,7 @@ namespace RiakClientTests.Live
             public const string Maps = "maps";
         }
 
-        protected const string TestBucketType = "leveldb_type";
-        protected const string TestBucket = "test_bucket";
-        protected const string TestKey = "test_json";
+        protected const string TestBucketType = "plain";
         protected static readonly string TestJson;
         protected const string MapReduceBucket = "map_reduce_bucket";
 
@@ -34,6 +38,8 @@ namespace RiakClientTests.Live
         protected IRiakEndPoint Cluster;
         protected IRiakClient Client;
         protected IClusterConfiguration ClusterConfig;
+
+        protected readonly bool MultiNodeEnvironment = false;
 
         static LiveRiakConnectionTestBase()
         {
@@ -52,13 +58,22 @@ namespace RiakClientTests.Live
             }.ToJson();
         }
 
+
         public LiveRiakConnectionTestBase()
         {
             string userName = Environment.GetEnvironmentVariable("USERNAME");
             string configName = "riak1NodeConfiguration";
 #if NOAUTH
-            configName = userName == "buildbot" ?
-                "riak1NodeNoAuthConfiguration" : "riakDevrelNoAuthConfiguration";
+            if (userName == "buildbot")
+            {
+                configName = "riak1NodeNoAuthConfiguration";
+                MultiNodeEnvironment = false;
+            }
+            else
+            {
+                configName = "riakDevrelNoAuthConfiguration";
+                MultiNodeEnvironment = true;
+            }
 #else
             if (MonoUtil.IsRunningOnMono)
             {
@@ -66,8 +81,16 @@ namespace RiakClientTests.Live
             }
             else
             {
-                configName = userName == "buildbot" ?
-                    "riak1NodeConfiguration" : "riakDevrelConfiguration";
+                if (userName == "buildbot")
+                {
+                    configName = "riak1NodeConfiguration";
+                    MultiNodeEnvironment = false;
+                }
+                else
+                {
+                    configName = "riakDevrelConfiguration";
+                    MultiNodeEnvironment = true;
+                }
             }
 #endif
             Cluster = RiakCluster.FromConfig(configName);
@@ -77,6 +100,16 @@ namespace RiakClientTests.Live
         public virtual void SetUp()
         {
             Client = Cluster.CreateClient();
+        }
+
+        public string TestBucket
+        {
+            get { return testBucket; }
+        }
+
+        public string TestKey
+        {
+            get { return testKey; }
         }
     }
 }

@@ -223,9 +223,35 @@
     [CLSCompliant(false)]
     public sealed partial class TsListKeysReq { }
 
-    [CLSCompliant(false)]
-    public sealed partial class TsGetReq { }
+    public sealed partial class TsListKeysResp { }
 
     [CLSCompliant(false)]
-    public sealed partial class TsDelReq { }
+    public sealed partial class TsGetReq : RpbReq, ITsByKeyReq { }
+
+    public sealed partial class TsGetResp : RpbResp { }
+
+    public sealed partial class TsPutReq : RpbReq { }
+
+    public sealed partial class TsPutResp : RpbResp { }
+
+    public sealed partial class TsQueryReq : RpbReq { }
+
+    public sealed partial class TsQueryResp : RpbResp, IRpbStreamingResp { }
+
+    public sealed partial class TsListKeysReq : RpbReq { }
+
+    public sealed partial class TsListKeysResp : RpbResp, IRpbStreamingResp { }
+
+    [CLSCompliant(false)]
+    public sealed partial class TsDelReq : RpbReq, ITsByKeyReq { }
+
+    public sealed partial class TsDelResp : RpbResp { }
+
+    public sealed partial class TsCoverageReq { }
+
+    public sealed partial class TsRange { }
+
+    public sealed partial class TsInterpolation { }
+
+    public sealed class TsTtbMsg { }
 }

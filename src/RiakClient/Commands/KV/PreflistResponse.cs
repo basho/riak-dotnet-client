@@ -5,7 +5,7 @@ namespace RiakClient.Commands.KV
     /// <summary>
     /// Response to a <see cref="FetchPreflist"/> command.
     /// </summary>
-    public class PreflistResponse : Response<IEnumerable<PreflistItem>>
+    public class PreflistResponse : Response<RiakString, IEnumerable<PreflistItem>>
     {
         /// <inheritdoc />
         public PreflistResponse()

@@ -98,12 +98,45 @@ namespace RiakClient.Commands.KV
 
         /// <inheritdoc />
         public class Builder
-            : CommandBuilder<ListBuckets.Builder, ListBuckets, ListBucketsOptions>
+            : CommandBuilder<Builder, ListBuckets, ListBucketsOptions>
         {
+            // TODO 3.0 KvCommandBuilder?
+            private string bucketType;
+            private bool stream;
+            private Action<IEnumerable<RiakString>> callback;
+
             public override IRCommand Build()
             {
                 Options = BuildOptions();
                 return new ListBuckets(Options);
+            }
+
+            public Builder WithBucketType(string bucketType)
+            {
+                if (string.IsNullOrWhiteSpace(bucketType))
+                {
+                    throw new ArgumentNullException("bucketType"); // TODO: error text
+                }
+
+                this.bucketType = bucketType;
+                return this;
+            }
+
+            public Builder WithStreaming(Action<IEnumerable<RiakString>> callback)
+            {
+                if (callback == null)
+                {
+                    throw new ArgumentNullException("callback"); // TODO: error text
+                }
+
+                this.callback = callback;
+                this.stream = true;
+                return this;
+            }
+
+            protected override ListBucketsOptions BuildOptions()
+            {
+                return new ListBucketsOptions(bucketType, stream, callback, timeout);
             }
         }
     }

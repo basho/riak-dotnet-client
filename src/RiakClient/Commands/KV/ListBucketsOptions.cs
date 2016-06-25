@@ -7,7 +7,7 @@ namespace RiakClient.Commands.KV
     /// Represents options for a <see cref="ListBuckets"/> operation.
     /// </summary>
     /// <inheritdoc/>
-    public class ListBucketsOptions : CommandOptions
+    public class ListBucketsOptions : KvCommandOptions
     {
         private readonly bool stream;
         private readonly Action<IEnumerable<RiakString>> callback;

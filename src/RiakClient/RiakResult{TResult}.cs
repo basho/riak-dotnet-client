@@ -11,22 +11,27 @@ namespace RiakClient
     {
         private readonly TResult value;
 
-        public RiakResult(TResult value, bool isSuccess, string errorMessage = null, ResultCode resultCode = ResultCode.Success)
-            : base(isSuccess, resultCode, null, errorMessage)
+        public RiakResult(
+            TResult value,
+            bool isSuccess,
+            string errorMessage = null,
+            ResultCode resultCode = ResultCode.Success,
+            bool nodeOffline = false)
+            : base(isSuccess, resultCode, null, errorMessage, nodeOffline)
         {
             this.value = value;
         }
 
-        public RiakResult(Exception exception, ResultCode resultCode)
-            : base(false, resultCode, exception, null)
+        public RiakResult(Exception exception, ResultCode resultCode, bool nodeOffline = false)
+            : base(false, resultCode, exception, null, nodeOffline)
         {
             this.value = default(TResult);
         }
 
         public RiakResult(RiakResult result)
-            : base(result.IsSuccess, result.ResultCode, result.Exception, result.ErrorMessage)
+            : base(result.IsSuccess, result.ResultCode, result.Exception, result.ErrorMessage, result.NodeOffline)
         {
-            this.value = default(TResult);
+            value = default(TResult);
         }
 
         /// <summary>
@@ -122,16 +127,12 @@ namespace RiakClient
 
         internal static new RiakResult<TResult> FromError(ResultCode code, string message, bool nodeOffline)
         {
-            var riakResult = new RiakResult<TResult>(default(TResult), false, message, code);
-            riakResult.NodeOffline = nodeOffline;
-            return riakResult;
+            return new RiakResult<TResult>(default(TResult), false, message, code, nodeOffline);
         }
 
         internal static new RiakResult<TResult> FromException(ResultCode code, Exception exception, bool nodeOffline)
         {
-            var riakResult = new RiakResult<TResult>(exception, code);
-            riakResult.NodeOffline = nodeOffline;
-            return riakResult;
+            return new RiakResult<TResult>(exception, code, nodeOffline);
         }
 
         internal RiakResult SetDone(bool? value)

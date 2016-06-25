@@ -6,7 +6,7 @@ namespace RiakClient.Commands.CRDT
     /// Response to a Riak CRDT command.
     /// </summary>
     /// <typeparam name="TValue">The type of the value stored in this response.</typeparam>
-    public class DataTypeResponse<TValue> : Response<TValue>
+    public class DataTypeResponse<TValue> : Response<RiakString, TValue>
     {
         private readonly byte[] context;
 

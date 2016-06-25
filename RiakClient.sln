@@ -2,6 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RiakClient", "src\RiakClient\RiakClient.csproj", "{A2CA0CDC-85BB-489D-99D0-3EE1D135BE17}"
 EndProject
@@ -42,6 +43,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RiakClientExamples", "src\R
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "src\Test\Test.csproj", "{CAAE80FD-0AAB-49DC-B3C1-8B30B944B594}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChaosMonkeyApp", "src\ChaosMonkeyApp\ChaosMonkeyApp.csproj", "{5CB5DE09-C71D-4237-9B80-F89475FB146F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +74,10 @@ Global
 		{CAAE80FD-0AAB-49DC-B3C1-8B30B944B594}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CAAE80FD-0AAB-49DC-B3C1-8B30B944B594}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CAAE80FD-0AAB-49DC-B3C1-8B30B944B594}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5CB5DE09-C71D-4237-9B80-F89475FB146F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5CB5DE09-C71D-4237-9B80-F89475FB146F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5CB5DE09-C71D-4237-9B80-F89475FB146F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5CB5DE09-C71D-4237-9B80-F89475FB146F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

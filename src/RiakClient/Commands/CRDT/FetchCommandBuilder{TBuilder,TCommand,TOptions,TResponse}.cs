@@ -10,7 +10,7 @@ namespace RiakClient.Commands.CRDT
     /// <typeparam name="TOptions">The type of the options for the fetch command.</typeparam>
     /// <typeparam name="TResponse">The type of the fetch command's response.</typeparam>
     public abstract class FetchCommandBuilder<TBuilder, TCommand, TOptions, TResponse>
-        : CommandBuilder<TBuilder, TCommand, TOptions>
+        : KvCommandBuilder<TBuilder, TCommand, TOptions>
         where TBuilder : FetchCommandBuilder<TBuilder, TCommand, TOptions, TResponse>
         where TCommand : FetchCommand<TResponse>
         where TOptions : FetchCommandOptions

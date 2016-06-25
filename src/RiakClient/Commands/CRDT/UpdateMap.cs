@@ -50,8 +50,9 @@ namespace RiakClient.Commands.CRDT
             return op;
         }
 
-        protected override MapResponse CreateResponse(RiakString key, DtUpdateResp response)
+        protected override MapResponse CreateResponse(DtUpdateResp response)
         {
+            RiakString key = GetKey(CommandOptions.Key, response);
             return new MapResponse(key, response.context, response.map_value);
         }
 
@@ -551,7 +552,8 @@ namespace RiakClient.Commands.CRDT
             }
         }
 
-        public class Builder : UpdateCommandBuilder<UpdateMap.Builder, UpdateMap, UpdateMapOptions, MapResponse>
+        public class Builder :
+            UpdateCommandBuilder<Builder, UpdateMap, UpdateMapOptions, MapResponse>
         {
             private MapOperation mapOp;
 

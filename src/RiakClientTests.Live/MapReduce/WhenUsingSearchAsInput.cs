@@ -41,12 +41,6 @@ namespace RiakClientTests.Live.MapReduce
             LoadDataIntoRiak();
         }
 
-        [TestFixtureTearDown]
-        public void TearDown()
-        {
-            Client.DeleteBucket(BucketType, Bucket);
-        }
-
         private void SetupSearchIndexes()
         {
             var index = new SearchIndex(Index);

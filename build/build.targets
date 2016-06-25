@@ -12,6 +12,11 @@
     <Delete Files="$(CommonAssemblyInfoFile)" />
   </Target>
 
+  <Target Name="PublishValidateVersionString">
+    <Error Condition="'$(VersionString)' == '' Or '$(VersionString)' == 'unknown'"
+           Text="Must set VersionString property on command line!" />
+  </Target>
+
   <Target Name="PublishValidateOnDevelopBranch">
     <!-- Validate that we are on develop branch -->
     <GitBranch LocalPath="$(SolutionDir)">
@@ -19,11 +24,6 @@
     </GitBranch>
     <Error Condition="'$(GitBranch)' != '$(DevelopBranchName)'"
            Text="Please ensure all features have been merged into $(DevelopBranchName) and that you are on the $(DevelopBranchName) branch." />
-  </Target>
-
-  <Target Name="PublishValidateVersionString">
-    <Error Condition="'$(VersionString)' == '' Or '$(VersionString)' == 'unknown'"
-           Text="Must set VersionString property on command line!" />
   </Target>
 
   <Target Name="PublishValidation" DependsOnTargets="PublishValidateVersionString;PublishValidateOnDevelopBranch;PopulateVersionInformation">
@@ -89,7 +89,7 @@
   </Target>
 
   <Target Name="PublishMergeMasterAndTag" DependsOnTargets="PublishCloneToTemp">
-    <Message Text="Merging '$(DevelopBranchName)' into '$(MasterBranchName)' NOTE: this will fail if the merge can't be done via fast-forward!" />
+    <Message Text="Merging '$(DevelopRemoteBranchName)' into '$(MasterBranchName)' NOTE: this will fail if the merge can't be done via fast-forward!" />
     <GitClient Command="merge" Arguments="--no-ff --commit --ff-only $(DevelopRemoteBranchName)" LocalPath="$(SolutionDir)" />
 
     <Message Text="Tagging with $(GitTagMessage)" />
@@ -108,8 +108,23 @@
   </Target>
 
   <Target Name="ProtoGen">
+    <!-- NB: do NOT use detectMissing for these (yet) -->
+    <!-- NB: MUST EDIT THE src\RiakClient\Messages\riak_dt.cs file -->
     <Exec WorkingDirectory="$(ProtoDir)"
-          Command="$(ProtoGenExe) -ns:RiakClient.Messages -i:%(ProtoFile.Identity) -o:$(ProtoMsgDir)\@(ProtoFile->'%(filename)').cs" />
+          Command="$(ProtoGenExe) -ns:RiakClient.Messages -i:riak_dt.proto -o:$(ProtoMsgDir)\riak_dt.cs" />
+    <Warning Text="NOTICE: *MUST* manually edit src\RiakClient\Messages\riak_dt.cs file. REMOVE the '[global::System.ComponentModel.DefaultValue(MapUpdate.FlagOp.ENABLE)]' attribute from the flag_op property of the MapUpdate class" />
+    <Exec WorkingDirectory="$(ProtoDir)"
+          Command="$(ProtoGenExe) -ns:RiakClient.Messages -i:riak_kv.proto -o:$(ProtoMsgDir)\riak_kv.cs" />
+    <Exec WorkingDirectory="$(ProtoDir)"
+          Command="$(ProtoGenExe) -ns:RiakClient.Messages -i:riak_search.proto -o:$(ProtoMsgDir)\riak_search.cs" />
+    <Exec WorkingDirectory="$(ProtoDir)"
+          Command="$(ProtoGenExe) -ns:RiakClient.Messages -i:riak_yokozuna.proto -o:$(ProtoMsgDir)\riak_yokozuna.cs" />
+    <!-- NB: MUST use detectMissing for bucket props optional fields -->
+    <Exec WorkingDirectory="$(ProtoDir)"
+          Command="$(ProtoGenExe) -ns:RiakClient.Messages -p:detectMissing -i:riak.proto -o:$(ProtoMsgDir)\riak.cs" />
+    <!-- NB: MUST use detectMissing for TS optional fields -->
+    <Exec WorkingDirectory="$(ProtoDir)"
+          Command="$(ProtoGenExe) -ns:RiakClient.Messages -p:detectMissing -i:riak_ts.proto -o:$(ProtoMsgDir)\riak_ts.cs" />
   </Target>
 
   <Target Name="PublishNuGetPackage" DependsOnTargets="PublishValidation">
@@ -151,7 +166,7 @@
   </Target>
 
   <Target Name="Publish"
-          DependsOnTargets="PublishValidation;PublishCloneToTemp;PublishMergeMasterAndTag;PublishRelease;PublishNuGetPackage;PublishGitHubRelease" />
+          DependsOnTargets="PublishValidation;PublishMergeMasterAndTag;PublishRelease;PublishNuGetPackage;PublishGitHubRelease" />
 
   <Target Name="GitSubmodule" Condition="!Exists('$(ProtoMsgCsvFile)')">
     <GitClient Command="submodule" Arguments="update --init" LocalPath="$(SolutionDir)" />
@@ -216,7 +231,12 @@
     <Exec WorkingDirectory="$(SolutionDir)"
           Command="$(NUnitConsoleRunnerCommand) -work=$(ProjDir)\RiakClientTests.Live $(ProjDir)\RiakClientTests.Live\RiakClientTests.Live.nunit" />
     <Exec WorkingDirectory="$(SolutionDir)"
-          Command="$(NUnitConsoleRunnerCommand) -work=$(ProjDir)\Test -run=Test.Integration $(ProjDir)\Test\Test.nunit" />
+          Command="$(NUnitConsoleRunnerCommand) -work=$(ProjDir)\Test -run=Test.Integration.CRDT,Test.Integration.KV $(ProjDir)\Test\Test.nunit" />
+  </Target>
+
+  <Target Name="TimeseriesTest" DependsOnTargets="SetupTests;Debug">
+    <Exec WorkingDirectory="$(SolutionDir)"
+          Command="$(NUnitConsoleRunnerCommand) -work=$(ProjDir)\Test -run=Test.Integration.TS $(ProjDir)\Test\Test.nunit" />
   </Target>
 
   <Target Name="TestAll" DependsOnTargets="UnitTest;IntegrationTest" />

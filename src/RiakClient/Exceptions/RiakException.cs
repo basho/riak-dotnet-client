@@ -48,7 +48,7 @@ namespace RiakClient.Exceptions
         /// <param name="message">A message that describes the error.</param>
         /// <param name="nodeOffline">A flag to mark if the node was offline or unreachable at the time of the error.</param>
         public RiakException(int errorCode, string message, bool nodeOffline)
-            : this(string.Format("Riak returned an error. Code '{0}'. Message: {1}", errorCode, message))
+            : this(string.Format("Riak returned an error. Code '{0}'. Message: '{1}'", errorCode, message))
         {
             this.nodeOffline = nodeOffline;
             this.errorCode = errorCode;
