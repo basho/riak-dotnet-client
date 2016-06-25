@@ -144,6 +144,9 @@
     public sealed partial class RpbIndexResp { }
 
     [CLSCompliant(false)]
+    public sealed partial class RpbIndexBodyResp { }
+
+    [CLSCompliant(false)]
     public sealed partial class RpbCSBucketReq { }
 
     [CLSCompliant(false)]
@@ -154,6 +157,15 @@
 
     [CLSCompliant(false)]
     public sealed partial class RpbContent { }
+
+    [CLSCompliant(false)]
+    public sealed partial class RpbCoverageEntry { }
+
+    [CLSCompliant(false)]
+    public sealed partial class RpbCoverageReq { }
+
+    [CLSCompliant(false)]
+    public sealed partial class RpbCoverageResp { }
 
     public sealed partial class RpbLink { }
 
@@ -201,4 +213,19 @@
     public sealed partial class RpbGetBucketKeyPreflistResp : RpbResp { }
 
     public sealed partial class RpbBucketKeyPreflistItem { }
+
+    [CLSCompliant(false)]
+    public sealed partial class TsCoverageEntry { }
+
+    [CLSCompliant(false)]
+    public sealed partial class TsCoverageResp { }
+
+    [CLSCompliant(false)]
+    public sealed partial class TsListKeysReq { }
+
+    [CLSCompliant(false)]
+    public sealed partial class TsGetReq { }
+
+    [CLSCompliant(false)]
+    public sealed partial class TsDelReq { }
 }
