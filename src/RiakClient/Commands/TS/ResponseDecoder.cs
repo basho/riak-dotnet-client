@@ -1,6 +1,5 @@
 ﻿namespace RiakClient.Commands.TS
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using Messages;
@@ -9,7 +8,6 @@
     internal class ResponseDecoder
     {
         // private static readonly ErlAtom TsQueryRespAtom = new ErlAtom("tsqueryresp");
-
         private readonly DecodedResponse decodedResponse;
 
         public ResponseDecoder(TsQueryResp response)

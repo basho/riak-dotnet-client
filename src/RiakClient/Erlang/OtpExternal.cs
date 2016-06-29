@@ -21,10 +21,13 @@ namespace RiakClient.Erlang
      * Provides a collection of constants used when encoding and decoding Erlang
      * terms.
      */
-    public static class OtpExternal
+    internal static class OtpExternal
     {
         public const byte Negative = 0;
         public const byte Positive = 1;
+
+        /** The longest allowed Erlang atom */
+        public const byte MaxAtomLength = 255;
 
         /** The tag used for small integers */
         public const byte SmallIntTag = 97;
@@ -68,8 +71,5 @@ namespace RiakClient.Erlang
 
         /** The smallest value that can be encoded as an integer */
         public static readonly int ErlMin = -(1 << 27);
-
-        /** The longest allowed Erlang atom */
-        public const byte MaxAtomLength = 255;
     }
 }
