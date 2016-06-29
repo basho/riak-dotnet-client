@@ -202,8 +202,6 @@ namespace RiakClient.Erlang
         public void WriteDouble(double d)
         {
             Write(OtpExternal.NewFloatTag);
-
-            // TODO: endianness?
             Write8BE(BitConverter.DoubleToInt64Bits(d));
         }
 
