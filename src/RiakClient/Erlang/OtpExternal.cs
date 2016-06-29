@@ -65,11 +65,5 @@ namespace RiakClient.Erlang
 
         /** The version number used to mark serialized Erlang terms */
         public const byte VersionTag = 131;
-
-        /** The largest value that can be encoded as an integer */
-        public static readonly int ErlMax = (1 << 27) - 1;
-
-        /** The smallest value that can be encoded as an integer */
-        public static readonly int ErlMin = -(1 << 27);
     }
 }

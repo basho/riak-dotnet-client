@@ -154,6 +154,7 @@ namespace RiakClient.Erlang
             byte[] bytes = Latin1Encoding.GetBytes(atom);
             Write(OtpExternal.AtomTag);
             Write2BE(bytes.Length);
+            Write(bytes, 0, bytes.Length);
         }
 
         /// <summary>
@@ -211,7 +212,7 @@ namespace RiakClient.Erlang
         /// <param name="l">The long to use.</param>
         public void WriteLong(long l)
         {
-            if (l <= byte.MaxValue)
+            if (l >= 0 && l <= byte.MaxValue)
             {
                 // will fit in one byte
                 Write(OtpExternal.SmallIntTag);
@@ -220,7 +221,7 @@ namespace RiakClient.Erlang
             else
             {
                 // note that l != 0L
-                if (l < OtpExternal.ErlMin || l > OtpExternal.ErlMax)
+                if (l < int.MinValue || l > int.MaxValue)
                 {
                     // some kind of bignum
                     long abs = l < 0 ? -l : l;
