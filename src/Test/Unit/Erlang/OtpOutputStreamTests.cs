@@ -181,9 +181,22 @@
             CollectionAssert.AreEqual(want, got);
         }
 
+        // Fun with doubles!
+        // Max double value:
+        // Bin = <<131,70,127,239,255,255,255,255,255,255>>, rp(binary_to_term(Bin)).
+        // 1.7976931348623157e308
+        // double.MaxValue.ToString("R")
+        // 1.7976931348623157E+308
+        // Min double value:
+        // Bin = <<131,70,255,239,255,255,255,255,255,255>>, rp(binary_to_term(Bin)).
+        // -1.7976931348623157e308
+        // double.MinValue.ToString("R")
+        // -1.7976931348623157E+308
         [Test]
         [TestCase(1234.5678D, new byte[] { 131, 70, 64, 147, 74, 69, 109, 92, 250, 173 })]
         [TestCase(-4.567D, new byte[] { 131, 70, 192, 18, 68, 155, 165, 227, 83, 248 })]
+        [TestCase(double.MaxValue, new byte[] { 131, 70, 127, 239, 255, 255, 255, 255, 255, 255 })]
+        [TestCase(double.MinValue, new byte[] { 131, 70, 255, 239, 255, 255, 255, 255, 255, 255 })]
         public void Write_Double(double d, byte[] want)
         {
             byte[] got;
