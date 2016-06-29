@@ -181,6 +181,23 @@
             CollectionAssert.AreEqual(want, got);
         }
 
+        [Test]
+        [TestCase(true, new byte[] { 131, 100, 0, 4, 116, 114, 117, 101 })]
+        [TestCase(false, new byte[] { 131, 100, 0, 5, 102, 97, 108, 115, 101 })]
+        public void Write_Boolean(bool b, byte[] want)
+        {
+            byte[] got;
+            using (var os = new OtpOutputStream())
+            {
+                os.Write(OtpExternal.VersionTag);
+                os.WriteBoolean(b);
+                Assert.AreEqual(want.Length, os.Position);
+                got = os.ToArray();
+            }
+
+            CollectionAssert.AreEqual(want, got);
+        }
+
         // Fun with doubles!
         // Max double value:
         // Bin = <<131,70,127,239,255,255,255,255,255,255>>, rp(binary_to_term(Bin)).
@@ -236,15 +253,53 @@
         }
 
         [Test]
-        [TestCase(true, new byte[] { 131, 100, 0, 4, 116, 114, 117, 101 })]
-        [TestCase(false, new byte[] { 131, 100, 0, 5, 102, 97, 108, 115, 101 })]
-        public void Write_Boolean(bool b, byte[] want)
+        public void Write_List_Head()
         {
+            // [true, false]
+            byte[] want = new byte[] { 131, 108, 0, 0, 0, 2, 100, 0, 4, 116, 114, 117, 101, 100, 0, 5, 102, 97, 108, 115, 101, 106 };
             byte[] got;
             using (var os = new OtpOutputStream())
             {
-                os.Write(OtpExternal.VersionTag);
-                os.WriteBoolean(b);
+                os.WriteByte(OtpExternal.VersionTag);
+                os.WriteListHead(2);
+                os.WriteBoolean(true);
+                os.WriteBoolean(false);
+                os.WriteNil();
+                Assert.AreEqual(want.Length, os.Position);
+                got = os.ToArray();
+            }
+
+            CollectionAssert.AreEqual(want, got);
+        }
+
+        /*
+        T = [{true, false}, [true, false]], rp(term_to_binary(T)).
+        <<131,108,0,0,0,2,104,2,100,0,4,116,114,117,101,100,0,5,
+          102,97,108,115,101,108,0,0,0,2,100,0,4,116,114,117,101,
+          100,0,5,102,97,108,115,101,106,106>>
+        */
+        [Test]
+        public void Write_List_And_Tuple()
+        {
+            byte[] want = new byte[]
+            {
+                131, 108, 0, 0, 0, 2, 104, 2, 100, 0, 4, 116, 114, 117, 101, 100, 0, 5, 
+                102, 97, 108, 115, 101, 108, 0, 0, 0, 2, 100, 0, 4, 116, 114, 117, 101, 
+                100, 0, 5, 102, 97, 108, 115, 101, 106, 106
+            };
+            byte[] got;
+            using (var os = new OtpOutputStream())
+            {
+                os.WriteByte(OtpExternal.VersionTag);
+                os.WriteListHead(2);
+                os.WriteTupleHead(2);
+                os.WriteBoolean(true);
+                os.WriteBoolean(false);
+                os.WriteListHead(2);
+                os.WriteBoolean(true);
+                os.WriteBoolean(false);
+                os.WriteNil();
+                os.WriteNil();
                 Assert.AreEqual(want.Length, os.Position);
                 got = os.ToArray();
             }
