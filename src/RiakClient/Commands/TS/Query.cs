@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
     using Erlang;
     using Messages;
 
@@ -17,6 +16,9 @@
         private const string UndefinedAtom = "undefined";
 
         private readonly List<Row> rows = new List<Row>();
+
+        private bool usingTtb = false;
+        private MessageCode expectedCode = MessageCode.TsQueryResp;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Query"/> class.
@@ -33,28 +35,16 @@
 
         public override MessageCode ExpectedCode
         {
-            get { return MessageCode.TsQueryResp; }
+            get { return expectedCode; }
         }
 
-        public override RiakReq ConstructRequest()
+        public override RiakReq ConstructRequest(bool useTtb)
         {
-            var req = new TsQueryReq();
-
-            req.query = new TsInterpolation
+            if (useTtb)
             {
-                @base = CommandOptions.Query
-            };
+                expectedCode = MessageCode.TsTtbMsg;
+                usingTtb = true;
 
-            // NB: always stream, collect results unless callback is passed.
-            req.stream = true;
-
-            return req;
-        }
-
-        public Action<MemoryStream> GetSerializer()
-        {
-            return (ms) =>
-            {
                 using (var os = new OtpOutputStream())
                 {
                     os.WriteByte(OtpExternal.VersionTag);
@@ -72,10 +62,37 @@
 
                     os.WriteBoolean(false);
                     os.WriteAtom(UndefinedAtom);
+                    os.Flush();
 
-                    os.WriteTo(ms);
+                    return new TsTtbMsg(os.ToArray());
                 }
-            };
+            }
+            else
+            {
+                var req = new TsQueryReq();
+
+                req.query = new TsInterpolation
+                {
+                    @base = CommandOptions.Query
+                };
+
+                // NB: always stream, collect results unless callback is passed.
+                req.stream = true;
+
+                return req;
+            }
+        }
+
+        public override RiakResp DecodeResponse(byte[] buffer)
+        {
+            if (usingTtb)
+            {
+                return new TsTtbResp(buffer);
+            }
+            else
+            {
+                return base.DecodeResponse(buffer);
+            }
         }
 
         public override void OnSuccess(RiakResp response)
@@ -83,14 +100,15 @@
             DecodedResponse dr = null;
             ResponseDecoder decoder = null;
 
-            var ttbresp = response as TsTtbResp;
-            if (ttbresp == null)
+            if (usingTtb)
             {
-                decoder = new ResponseDecoder((TsQueryResp)response);
+                var rsp = (TsTtbResp)response;
+                decoder = new ResponseDecoder(rsp);
             }
             else
             {
-                decoder = new ResponseDecoder(ttbresp);
+                var rsp = (TsQueryResp)response;
+                decoder = new ResponseDecoder(rsp);
             }
 
             dr = decoder.Decode();

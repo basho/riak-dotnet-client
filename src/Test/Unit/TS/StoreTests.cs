@@ -8,12 +8,12 @@ namespace Test.Unit.TS
     public class StoreTests : TimeseriesTest
     {
         [Test]
-        public void Should_Build_Req()
+        public void Should_Build_PB_Req()
         {
             Store cmd = BuildStoreReq();
             Assert.AreEqual(MessageCode.TsPutResp, cmd.ExpectedCode);
 
-            TsPutReq pb = (TsPutReq)cmd.ConstructRequest();
+            TsPutReq pb = (TsPutReq)cmd.ConstructRequest(useTtb: false);
             Assert.AreEqual(Table, RiakString.FromBytes(pb.table));
 
             CollectionAssert.AreEqual(TsCols, pb.columns);

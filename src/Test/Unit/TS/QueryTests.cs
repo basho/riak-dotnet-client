@@ -21,7 +21,7 @@ namespace Test.Unit.TS
 
             Assert.AreEqual(MessageCode.TsQueryResp, cmd.ExpectedCode);
 
-            TsQueryReq pb = (TsQueryReq)cmd.ConstructRequest();
+            TsQueryReq pb = (TsQueryReq)cmd.ConstructRequest(false);
             Assert.AreEqual(QueryRS, RiakString.FromBytes(pb.query.@base));
             
             // NB: Query always streams
@@ -42,7 +42,7 @@ namespace Test.Unit.TS
 
             Assert.AreEqual(MessageCode.TsQueryResp, cmd.ExpectedCode);
 
-            TsQueryReq pb = (TsQueryReq)cmd.ConstructRequest();
+            TsQueryReq pb = (TsQueryReq)cmd.ConstructRequest(false);
             Assert.AreEqual(QueryRS, RiakString.FromBytes(pb.query.@base));
 
             // NB: Query always streams

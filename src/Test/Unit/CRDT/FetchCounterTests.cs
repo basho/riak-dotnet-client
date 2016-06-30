@@ -45,7 +45,7 @@ namespace Test.Unit.CRDT
                 .WithTimeout(TimeSpan.FromMilliseconds(20000))
                 .Build();
 
-            DtFetchReq protobuf = (DtFetchReq)fetch.ConstructRequest();
+            DtFetchReq protobuf = (DtFetchReq)fetch.ConstructRequest(false);
 
             Assert.AreEqual(BucketType, RiakString.FromBytes(protobuf.type));
             Assert.AreEqual(Bucket, RiakString.FromBytes(protobuf.bucket));

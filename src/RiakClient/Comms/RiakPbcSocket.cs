@@ -41,7 +41,7 @@ namespace RiakClient.Comms
         private static readonly Type TtbType = typeof(TsTtbMsg);
         private readonly string server;
         private readonly int port;
-        private readonly bool usettb;
+        private readonly bool useTtb;
         private readonly Timeout connectTimeout;
         private readonly Timeout readTimeout;
         private readonly Timeout writeTimeout;
@@ -54,7 +54,7 @@ namespace RiakClient.Comms
         {
             server = nodeConfig.HostAddress;
             port = nodeConfig.PbcPort;
-            usettb = nodeConfig.UseTtbEncoding;
+            useTtb = nodeConfig.UseTtbEncoding;
             readTimeout = nodeConfig.NetworkReadTimeout;
             writeTimeout = nodeConfig.NetworkWriteTimeout;
             connectTimeout = nodeConfig.NetworkConnectTimeout;
@@ -89,7 +89,7 @@ namespace RiakClient.Comms
 
         public RiakResult Write(IRiakCommand command)
         {
-            RiakReq request = command.ConstructRequest();
+            RiakReq request = command.ConstructRequest(useTtb);
             if (request.IsMessageCodeOnly)
             {
                 Write(request.MessageCode);
@@ -97,7 +97,7 @@ namespace RiakClient.Comms
             }
             else
             {
-                return DoWrite(s => request.WriteTo(s, usettb), request.MessageCode);
+                return DoWrite(s => request.WriteTo(s), request.MessageCode);
             }
         }
 
@@ -146,20 +146,6 @@ namespace RiakClient.Comms
                 {
                     done = streamingResponse.done;
                 }
-
-                /*
-                else
-                {
-                    expectedCode = MessageCode.TsTtbMsg;
-                    int size = ReadMessageSize(expectedCode, TtbType);
-
-                    byte[] resultBuffer = ReceiveAll(new byte[size1]);
-                    RpbResp response = new TsTtbResp(resultBuffer);
-                    ttbcmd.OnSuccess(response);
-
-                    done = true;
-                }
-                */
             }
             while (done == false);
 

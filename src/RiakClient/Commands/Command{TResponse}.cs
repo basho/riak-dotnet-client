@@ -26,7 +26,7 @@
 
         public abstract MessageCode ExpectedCode { get; }
 
-        public abstract RiakReq ConstructRequest();
+        public abstract RiakReq ConstructRequest(bool useTtb);
 
         public abstract void OnSuccess(RiakResp rpbResp);
 

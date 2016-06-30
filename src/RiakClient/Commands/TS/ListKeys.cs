@@ -26,7 +26,7 @@
             get { return MessageCode.TsListKeysResp; }
         }
 
-        public override RiakReq ConstructRequest()
+        public override RiakReq ConstructRequest(bool useTtb)
         {
             var req = new TsListKeysReq();
 

@@ -32,7 +32,7 @@
             get { return isMessageCodeOnly; }
         }
 
-        public virtual void WriteTo(Stream s, bool usettb)
+        public virtual void WriteTo(Stream s)
         {
             Serializer.Serialize(s, this);
         }
@@ -259,7 +259,25 @@
 
     public sealed partial class TsInterpolation { }
 
-    public sealed class TsTtbMsg : RiakReq { }
+    public sealed class TsTtbMsg : RiakReq
+    {
+        private readonly byte[] buffer;
+
+        public TsTtbMsg(byte[] buffer)
+        {
+            if (EnumerableUtil.IsNullOrEmpty(buffer))
+            {
+                throw new ArgumentNullException("buffer");
+            }
+
+            this.buffer = buffer;
+        }
+
+        public override void WriteTo(Stream s)
+        {
+            s.Write(buffer, 0, buffer.Length);
+        }
+    }
 
     public sealed class TsTtbResp : RiakResp
     {

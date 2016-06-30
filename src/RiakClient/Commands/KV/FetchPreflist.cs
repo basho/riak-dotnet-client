@@ -25,7 +25,7 @@
             get { return MessageCode.RpbGetBucketKeyPreflistResp; }
         }
 
-        public override RiakReq ConstructRequest()
+        public override RiakReq ConstructRequest(bool useTtb)
         {
             var req = new RpbGetBucketKeyPreflistReq();
 

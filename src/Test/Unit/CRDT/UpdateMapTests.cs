@@ -81,7 +81,7 @@ namespace Test.Unit.CRDT
 
             UpdateMap updateMapCommand = updateMapCommandBuilder.Build();
 
-            DtUpdateReq protobuf = (DtUpdateReq)updateMapCommand.ConstructRequest();
+            DtUpdateReq protobuf = (DtUpdateReq)updateMapCommand.ConstructRequest(false);
 
             Assert.AreEqual(Encoding.UTF8.GetBytes(BucketType), protobuf.type);
             Assert.AreEqual(Encoding.UTF8.GetBytes(Bucket), protobuf.bucket);

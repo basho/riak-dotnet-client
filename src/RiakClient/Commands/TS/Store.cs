@@ -16,6 +16,9 @@
         private const string TsPutReqAtom = "tsputreq";
         private const string TsPutRespAtom = "tsputresp";
 
+        private MessageCode expectedCode = MessageCode.TsPutResp;
+        private bool usingTtb = false;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Store"/> class.
         /// </summary>
@@ -36,32 +39,23 @@
 
         public override MessageCode ExpectedCode
         {
-            get { return MessageCode.TsPutResp; }
+            get { return expectedCode; }
         }
 
-        public override RiakReq ConstructRequest()
+        // TODO FUTURE this all really should be in a codec
+        public override RiakReq ConstructRequest(bool useTtb)
         {
-            var req = new TsPutReq();
+            RiakReq rv;
 
-            req.table = CommandOptions.Table;
-
-            if (EnumerableUtil.NotNullOrEmpty(CommandOptions.Columns))
+            if (useTtb)
             {
-                req.columns.AddRange(CommandOptions.Columns.Select(c => c.ToTsColumn()));
-            }
+                usingTtb = true;
+                expectedCode = MessageCode.TsTtbMsg;
 
-            req.rows.AddRange(CommandOptions.Rows.Select(r => r.ToTsRow()));
+                byte[] buffer;
+                string tableName = CommandOptions.Table;
+                ICollection<Row> rows = CommandOptions.Rows;
 
-            return req;
-        }
-
-        public Action<MemoryStream> GetSerializer()
-        {
-            string tableName = CommandOptions.Table;
-            ICollection<Row> rows = CommandOptions.Rows;
-
-            return (ms) =>
-            {
                 using (var os = new OtpOutputStream())
                 {
                     os.WriteByte(OtpExternal.VersionTag);
@@ -92,16 +86,47 @@
                         os.WriteNil();
                     }
 
-                    os.WriteTo(ms);
+                    buffer = os.ToArray();
                 }
-            };
+
+                rv = new TsTtbMsg(buffer);
+            }
+            else
+            {
+                var req = new TsPutReq();
+
+                req.table = CommandOptions.Table;
+
+                if (EnumerableUtil.NotNullOrEmpty(CommandOptions.Columns))
+                {
+                    req.columns.AddRange(CommandOptions.Columns.Select(c => c.ToTsColumn()));
+                }
+
+                req.rows.AddRange(CommandOptions.Rows.Select(r => r.ToTsRow()));
+
+                rv = req;
+            }
+
+            return rv;
+        }
+
+        public override RiakResp DecodeResponse(byte[] buffer)
+        {
+            if (usingTtb)
+            {
+                return new TsTtbResp(buffer);
+            }
+            else
+            {
+                return base.DecodeResponse(buffer);
+            }
         }
 
         public override void OnSuccess(RiakResp response)
         {
-            var ttbresp = response as TsTtbResp;
-            if (ttbresp != null)
+            if (usingTtb)
             {
+                var ttbresp = (TsTtbResp)response;
                 using (var s = new OtpInputStream(ttbresp.Response))
                 {
                     int arity = s.ReadTupleHead();
@@ -113,8 +138,10 @@
                     }
                 }
             }
-
-            Response = new StoreResponse();
+            else
+            {
+                Response = new StoreResponse();
+            }
         }
 
         /// <inheritdoc />

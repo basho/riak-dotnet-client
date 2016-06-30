@@ -35,7 +35,7 @@
             }
         }
 
-        public override RiakReq ConstructRequest()
+        public override RiakReq ConstructRequest(bool useTtb)
         {
             ITsByKeyReq req = GetByKeyReq();
 

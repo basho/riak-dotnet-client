@@ -33,7 +33,7 @@ namespace RiakClient.Commands
             get { return MessageCode.RpbGetServerInfoResp; }
         }
 
-        public override RiakReq ConstructRequest()
+        public override RiakReq ConstructRequest(bool useTtb)
         {
             return new RiakReq(MessageCode.RpbGetServerInfoReq);
         }
