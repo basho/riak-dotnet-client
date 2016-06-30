@@ -53,6 +53,11 @@ namespace RiakClient.Config
         bool ExternalLoadBalancer { get; set; }
 
         /// <summary>
+        /// Use term-to-binary encoding for messages that support it.
+        /// </summary>
+        bool UseTtbEncoding { get; set; }
+
+        /// <summary>
         /// The network timeout to use when attempting to read data from Riak.
         /// </summary>
         Timeout NetworkReadTimeout { get; set; }

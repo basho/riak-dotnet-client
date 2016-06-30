@@ -33,7 +33,7 @@
             get { return CommandOptions; }
         }
 
-        protected RiakString GetKey(RiakString optskey, RpbResp response)
+        protected RiakString GetKey(RiakString optskey, RiakResp response)
         {
             RiakString key = optskey;
 

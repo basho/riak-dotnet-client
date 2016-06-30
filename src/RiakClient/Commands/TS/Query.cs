@@ -78,7 +78,7 @@
             };
         }
 
-        public override void OnSuccess(RpbResp response)
+        public override void OnSuccess(RiakResp response)
         {
             DecodedResponse dr = null;
             ResponseDecoder decoder = null;

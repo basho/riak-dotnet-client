@@ -32,7 +32,7 @@
             get { return isMessageCodeOnly; }
         }
 
-        public virtual void WriteTo(Stream s)
+        public virtual void WriteTo(Stream s, bool usettb)
         {
             Serializer.Serialize(s, this);
         }
@@ -45,12 +45,12 @@
         byte[] key { get; }
     }
 
-    public abstract class RpbResp { }
+    public abstract class RiakResp { }
 
     [CLSCompliant(false)]
     public sealed partial class RpbErrorResp { }
 
-    public sealed partial class RpbGetServerInfoResp : RpbResp { }
+    public sealed partial class RpbGetServerInfoResp : RiakResp { }
 
     public sealed partial class RpbPair { }
 
@@ -87,7 +87,7 @@
 
     public sealed partial class DtValue { }
 
-    public sealed partial class DtFetchResp : RpbResp { }
+    public sealed partial class DtFetchResp : RiakResp { }
 
     public sealed partial class CounterOp { }
 
@@ -102,7 +102,7 @@
     [CLSCompliant(false)]
     public sealed partial class DtUpdateReq : RiakReq { }
 
-    public sealed partial class DtUpdateResp : RpbResp, IRpbGeneratedKey
+    public sealed partial class DtUpdateResp : RiakResp, IRpbGeneratedKey
     {
         public bool HasKey
         {
@@ -204,7 +204,7 @@
 
     public sealed partial class RpbGetBucketKeyPreflistReq : RiakReq { }
 
-    public sealed partial class RpbGetBucketKeyPreflistResp : RpbResp { }
+    public sealed partial class RpbGetBucketKeyPreflistResp : RiakResp { }
 
     public sealed partial class RpbBucketKeyPreflistItem { }
 
@@ -228,24 +228,24 @@
     [CLSCompliant(false)]
     public sealed partial class TsGetReq : RiakReq, ITsByKeyReq { }
 
-    public sealed partial class TsGetResp : RpbResp { }
+    public sealed partial class TsGetResp : RiakResp { }
 
     public sealed partial class TsPutReq : RiakReq { }
 
-    public sealed partial class TsPutResp : RpbResp { }
+    public sealed partial class TsPutResp : RiakResp { }
 
     public sealed partial class TsQueryReq : RiakReq { }
 
-    public sealed partial class TsQueryResp : RpbResp, IRpbStreamingResp { }
+    public sealed partial class TsQueryResp : RiakResp, IRpbStreamingResp { }
 
     public sealed partial class TsListKeysReq : RiakReq { }
 
-    public sealed partial class TsListKeysResp : RpbResp, IRpbStreamingResp { }
+    public sealed partial class TsListKeysResp : RiakResp, IRpbStreamingResp { }
 
     [CLSCompliant(false)]
     public sealed partial class TsDelReq : RiakReq, ITsByKeyReq { }
 
-    public sealed partial class TsDelResp : RpbResp { }
+    public sealed partial class TsDelResp : RiakResp { }
 
     [CLSCompliant(false)]
     public sealed partial class TsCoverageEntry { }
@@ -261,7 +261,7 @@
 
     public sealed class TsTtbMsg : RiakReq { }
 
-    public sealed class TsTtbResp : RpbResp
+    public sealed class TsTtbResp : RiakResp
     {
         private static readonly string RpbErrorRespAtom = "rpberrorresp";
         private readonly byte[] response;

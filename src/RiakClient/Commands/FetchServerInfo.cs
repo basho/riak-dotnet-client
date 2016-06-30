@@ -38,7 +38,7 @@ namespace RiakClient.Commands
             return new RiakReq(MessageCode.RpbGetServerInfoReq);
         }
 
-        public override void OnSuccess(RpbResp response)
+        public override void OnSuccess(RiakResp response)
         {
             if (response == null)
             {

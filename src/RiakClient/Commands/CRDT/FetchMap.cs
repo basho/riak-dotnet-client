@@ -35,7 +35,7 @@ namespace RiakClient.Commands.CRDT
         {
         }
 
-        public override void OnSuccess(RpbResp response)
+        public override void OnSuccess(RiakResp response)
         {
             if (response == null)
             {

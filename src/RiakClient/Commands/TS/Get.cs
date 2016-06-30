@@ -23,7 +23,7 @@
             get { return MessageCode.TsGetResp; }
         }
 
-        public override void OnSuccess(RpbResp response)
+        public override void OnSuccess(RiakResp response)
         {
             var decoder = new ResponseDecoder((TsGetResp)response);
             DecodedResponse dr = decoder.Decode();

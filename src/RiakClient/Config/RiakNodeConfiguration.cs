@@ -62,15 +62,14 @@ namespace RiakClient.Config
             set { this["poolSize"] = value; }
         }
 
-        /*
-         * TODO: put this back in when we've got the idling stuff figured out
-         * [ConfigurationProperty("idleTimeout", DefaultValue = 15000, IsRequired = false)]
-         * public int IdleTimeout
-         * {
-         *     get { return (int)this["idleTimeout"]; }
-         *     set { this["idleTimeout"] = value; }
-         * }
-         */
+        /// <inheritdoc/>
+        /// <remarks>Defaults to <b>true</b> if omitted from the configuration file.</remarks>
+        [ConfigurationProperty("useTtbEncoding", DefaultValue = true, IsRequired = false)]
+        public bool UseTtbEncoding
+        {
+            get { return (bool)this["useTtbEncoding"]; }
+            set { this["useTtbEncoding"] = value; }
+        }
 
         /// <inheritdoc/>
         /// <remarks>Defaults to False if omitted from the configuration file.</remarks>

@@ -48,6 +48,11 @@ namespace RiakClient.Config
         int DefaultRetryCount { get; set; }
 
         /// <summary>
+        /// Use term-to-binary encoding for messages that support it.
+        /// </summary>
+        bool UseTtbEncoding { get; set; }
+
+        /// <summary>
         /// A <see cref="IRiakAuthenticationConfiguration"/> configuration that details any authentication information.
         /// </summary>
         IRiakAuthenticationConfiguration Authentication { get; set; }

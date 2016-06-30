@@ -11,8 +11,8 @@
 
         RiakReq ConstructRequest();
 
-        RpbResp DecodeResponse(byte[] buffer);
+        RiakResp DecodeResponse(byte[] buffer);
 
-        void OnSuccess(RpbResp rpbResp);
+        void OnSuccess(RiakResp rpbResp);
     }
 }

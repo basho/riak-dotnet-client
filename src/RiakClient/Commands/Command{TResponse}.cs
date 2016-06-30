@@ -28,21 +28,21 @@
 
         public abstract RiakReq ConstructRequest();
 
-        public abstract void OnSuccess(RpbResp rpbResp);
+        public abstract void OnSuccess(RiakResp rpbResp);
 
-        public virtual RpbResp DecodeResponse(byte[] buffer)
+        public virtual RiakResp DecodeResponse(byte[] buffer)
         {
             Type expectedType = MessageCodeTypeMapBuilder.GetTypeFor(ExpectedCode);
 
             if (buffer == null || buffer.Length == 0)
             {
-                return Activator.CreateInstance(expectedType) as RpbResp;
+                return Activator.CreateInstance(expectedType) as RiakResp;
             }
             else
             {
                 using (var memStream = new MemoryStream(buffer))
                 {
-                    return Serializer.NonGeneric.Deserialize(expectedType, memStream) as RpbResp;
+                    return Serializer.NonGeneric.Deserialize(expectedType, memStream) as RiakResp;
                 }
             }
         }

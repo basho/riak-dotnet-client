@@ -41,6 +41,7 @@ namespace RiakClient.Comms
         private static readonly Type TtbType = typeof(TsTtbMsg);
         private readonly string server;
         private readonly int port;
+        private readonly bool usettb;
         private readonly Timeout connectTimeout;
         private readonly Timeout readTimeout;
         private readonly Timeout writeTimeout;
@@ -53,9 +54,11 @@ namespace RiakClient.Comms
         {
             server = nodeConfig.HostAddress;
             port = nodeConfig.PbcPort;
+            usettb = nodeConfig.UseTtbEncoding;
             readTimeout = nodeConfig.NetworkReadTimeout;
             writeTimeout = nodeConfig.NetworkWriteTimeout;
             connectTimeout = nodeConfig.NetworkConnectTimeout;
+
             securityManager = new RiakSecurityManager(server, authConfig);
             checkCertificateRevocation = authConfig.CheckCertificateRevocation;
         }
@@ -94,7 +97,7 @@ namespace RiakClient.Comms
             }
             else
             {
-                return DoWrite(s => request.WriteTo(s), request.MessageCode);
+                return DoWrite(s => request.WriteTo(s, usettb), request.MessageCode);
             }
         }
 
@@ -130,7 +133,7 @@ namespace RiakClient.Comms
                     buffer = ReceiveAll(new byte[size]);
                 }
 
-                RpbResp response = command.DecodeResponse(buffer);
+                RiakResp response = command.DecodeResponse(buffer);
 
                 command.OnSuccess(response);
 

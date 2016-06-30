@@ -41,7 +41,7 @@
             return req;
         }
 
-        public override void OnSuccess(RpbResp response)
+        public override void OnSuccess(RiakResp response)
         {
             TsListKeysResp rsp = (TsListKeysResp)response;
 

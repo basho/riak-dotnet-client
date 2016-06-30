@@ -26,7 +26,7 @@
             get { return MessageCode.TsDelResp; }
         }
 
-        public override void OnSuccess(RpbResp response)
+        public override void OnSuccess(RiakResp response)
         {
             if (response == null)
             {
