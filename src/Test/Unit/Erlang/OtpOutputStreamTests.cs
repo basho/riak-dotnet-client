@@ -232,10 +232,17 @@
         [TestCase(byte.MaxValue, new byte[] { 131, 97, 255 })]
         [TestCase(byte.MinValue, new byte[] { 131, 97, 0 })]
         [TestCase(256, new byte[] { 131, 98, 0, 0, 1, 0 })] // byte.MaxValue + 1
+        [TestCase(-123, new byte[] { 131, 98, 255, 255, 255, 133 })]
         [TestCase(int.MaxValue, new byte[] { 131, 98, 127, 255, 255, 255 })]
         [TestCase(int.MinValue, new byte[] { 131, 98, 128, 0, 0, 0 })]
         [TestCase(2147483648, new byte[] { 131, 110, 4, 0, 0, 0, 0, 128 })] // int.MaxValue + 1
         [TestCase(-2147483649, new byte[] { 131, 110, 4, 1, 1, 0, 0, 128 })] // int.MinValue - 1
+        [TestCase(uint.MaxValue, new byte[] { 131, 110, 4, 0, 255, 255, 255, 255 })]
+        [TestCase(4294967296, new byte[] { 131, 110, 5, 0, 0, 0, 0, 0, 1 })] // uint.MaxValue + 1
+        [TestCase(1099511627776, new byte[] { 131, 110, 6, 0, 0, 0, 0, 0, 0, 1 })] // uint.MaxValue * 256
+        [TestCase(281474976710656, new byte[] { 131, 110, 7, 0, 0, 0, 0, 0, 0, 0, 1 })] // uint.MaxValue * 65536
+        // NB: not supported just yet
+        // [TestCase(ulong.MaxValue, new byte[] { 131, 110, 8, 0, 255, 255, 255, 255, 255, 255, 255, 255 })]
         [TestCase(long.MaxValue, new byte[] { 131, 110, 8, 0, 255, 255, 255, 255, 255, 255, 255, 127 })]
         [TestCase(long.MinValue, new byte[] { 131, 110, 8, 1, 0, 0, 0, 0, 0, 0, 0, 128 })]
         public void Write_Long(long l, byte[] want)

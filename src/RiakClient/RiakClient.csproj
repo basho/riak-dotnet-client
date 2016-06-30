@@ -156,6 +156,8 @@
     <Compile Include="Containers\IConcurrentEnumerable.cs" />
     <Compile Include="Containers\IConcurrentEnumerator.cs" />
     <Compile Include="Erlang\OtpExternal.cs" />
+    <Compile Include="Erlang\OtpInputStream.cs" />
+    <Compile Include="Erlang\OtpUtils.cs" />
     <Compile Include="Erlang\OtpOutputStream.cs" />
     <Compile Include="Exceptions\RiakUnsupportedException.cs" />
     <Compile Include="Messages\IRpbStreamingResp.cs" />

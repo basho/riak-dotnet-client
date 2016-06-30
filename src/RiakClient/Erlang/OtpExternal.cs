@@ -23,8 +23,8 @@ namespace RiakClient.Erlang
      */
     internal static class OtpExternal
     {
-        public const byte Negative = 0;
-        public const byte Positive = 1;
+        public const byte Negative = 1;
+        public const byte Positive = 0;
 
         /** The longest allowed Erlang atom */
         public const byte MaxAtomLength = 255;

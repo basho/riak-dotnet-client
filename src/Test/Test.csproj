@@ -65,6 +65,7 @@
     <Compile Include="Unit\CRDT\UpdateSetTests.cs" />
     <Compile Include="Unit\CRDT\UpdateCounterTests.cs" />
     <Compile Include="Unit\CRDT\UpdateMapTests.cs" />
+    <Compile Include="Unit\Erlang\OtpInputStreamTests.cs" />
     <Compile Include="Unit\Erlang\OtpOutputStreamTests.cs" />
     <Compile Include="Unit\KV\FetchPreflistTests.cs" />
     <Compile Include="Unit\TS\DeleteTests.cs" />

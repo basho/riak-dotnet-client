@@ -20,6 +20,7 @@
 namespace RiakClient.Erlang
 {
     using System;
+    using System.Diagnostics;
     using System.IO;
     using System.Text;
 
@@ -28,12 +29,7 @@ namespace RiakClient.Erlang
     /// </summary>
     internal class OtpOutputStream : MemoryStream
     {
-        private static readonly Encoding Latin1Encoding =
-            Encoding.GetEncoding("ISO-8859-1", new EncoderExceptionFallback(), new DecoderExceptionFallback());
-
-        private static readonly byte[] TrueString = Latin1Encoding.GetBytes("true");
-
-        private static readonly byte[] FalseString = Latin1Encoding.GetBytes("false");
+        private static readonly byte[] Int64MinValueBytes = { 8, 1, 0, 0, 0, 0, 0, 0, 0, 128 };
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OtpOutputStream" /> class
@@ -151,7 +147,7 @@ namespace RiakClient.Erlang
         public void WriteAtom(string atom)
         {
             // NB: will throw exception if atom can't be converted to ISO-8859-1
-            byte[] bytes = Latin1Encoding.GetBytes(atom);
+            byte[] bytes = OtpUtils.Latin1Encoding.GetBytes(atom);
             Write(OtpExternal.AtomTag);
             Write2BE(bytes.Length);
             Write(bytes, 0, bytes.Length);
@@ -186,13 +182,13 @@ namespace RiakClient.Erlang
             Write(OtpExternal.AtomTag);
             if (b)
             {
-                Write2BE(TrueString.Length);
-                Write(TrueString, 0, TrueString.Length);
+                Write2BE(OtpUtils.TrueString.Length);
+                Write(OtpUtils.TrueString, 0, OtpUtils.TrueString.Length);
             }
             else
             {
-                Write2BE(FalseString.Length);
-                Write(FalseString, 0, FalseString.Length);
+                Write2BE(OtpUtils.FalseString.Length);
+                Write(OtpUtils.FalseString, 0, OtpUtils.FalseString.Length);
             }
         }
 
@@ -214,36 +210,64 @@ namespace RiakClient.Erlang
         {
             if (l >= 0 && l <= byte.MaxValue)
             {
-                // will fit in one byte
+                // 0 - 255 values
                 Write(OtpExternal.SmallIntTag);
                 Write((byte)l);
+                return;
+            }
+
+            Debug.Assert(l != 0, "zero value should be encoded as a byte");
+
+            if (l >= int.MinValue && l <= int.MaxValue)
+            {
+                Write(OtpExternal.IntTag);
+                Write4BE(l);
+                return;
+            }
+
+            bool negative = l < 0 ? true : false;
+            ulong v = (ulong)(negative ? -l : l);
+
+            byte[] b = BitConverter.GetBytes(v);
+
+            // Don't write unnecessary zero bytes
+            int count = 0;
+            int offset = 0;
+            if (BitConverter.IsLittleEndian)
+            {
+                count = b.Length - 1;
+                while (b[count] == 0)
+                {
+                    count--;
+                }
+
+                count++;
             }
             else
             {
-                // note that l != 0L
-                if (l < int.MinValue || l > int.MaxValue)
+                Array.Reverse(b);
+                while (b[offset] == 0)
                 {
-                    // some kind of bignum
-                    long abs = l < 0 ? -l : l;
-                    byte sign = l < 0 ? OtpExternal.Positive : OtpExternal.Negative;
-                    byte n;
-                    long mask;
-                    for (mask = 0xFFFFffffL, n = 4; (abs & mask) != abs; n++, mask = mask << 8 | 0xffL)
-                    {
-                        // count nonzero bytes
-                    }
+                    offset++;
+                }
 
-                    Write(OtpExternal.SmallBigTag);
-                    Write(n); // length
-                    Write(sign); // sign
-                    WriteLE(abs, n); // value. obs! little endian
-                }
-                else
-                {
-                    Write(OtpExternal.IntTag);
-                    Write4BE(l);
-                }
+                count = b.Length - offset;
             }
+
+            if (count <= byte.MaxValue)
+            {
+                Write(OtpExternal.SmallBigTag);
+                Write((byte)count);
+            }
+            else
+            {
+                Write(OtpExternal.LargeBigTag);
+                Write4BE(count);
+            }
+
+            Write(negative ? OtpExternal.Negative : OtpExternal.Positive);
+
+            Write(b, offset, count);
         }
 
         /// <summary>
