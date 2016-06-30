@@ -21,6 +21,7 @@ namespace RiakClient.Erlang
 {
     using System;
     using System.IO;
+    using System.Text;
 
     /// <summary>
     /// Provides a stream for decoding Erlang terms from external format.
@@ -226,6 +227,16 @@ namespace RiakClient.Erlang
             }
 
             return atom;
+        }
+
+        /// <summary>
+        /// Read an Erlang binary from the stream and converts to a UTF-8 string.
+        /// </summary>
+        /// <returns> A string containing the value of the binary.</returns>
+        public string ReadBinaryAsString()
+        {
+            byte[] bin = ReadBinary();
+            return Encoding.UTF8.GetString(bin);
         }
 
         /// <summary>

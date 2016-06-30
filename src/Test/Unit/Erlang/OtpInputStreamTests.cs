@@ -83,5 +83,39 @@
                 Assert.AreEqual(want, atom);
             }
         }
+
+        [Test]
+        [TestCase("The quick brown fox jumped over the lazy dog.")]
+        [TestCase("时间序列")]
+        [TestCase("временные ряды")]
+        public void Read_Binary(string want)
+        {
+            byte[] buf = null;
+            using (var os = new OtpOutputStream())
+            {
+                os.WriteStringAsBinary(want);
+                buf = os.ToArray();
+            }
+
+            using (var s = new OtpInputStream(buf))
+            {
+                string got = s.ReadBinaryAsString();
+                Assert.AreEqual(want, got);
+            }
+        }
+
+        [Test]
+        [TestCase(new byte[] { OtpExternal.VersionTag, OtpExternal.NewFloatTag, 64, 147, 74, 69, 109, 92, 250, 173 }, 1234.5678D)]
+        [TestCase(new byte[] { OtpExternal.VersionTag, OtpExternal.NewFloatTag, 192, 18, 68, 155, 165, 227, 83, 248 }, -4.567d)]
+        [TestCase(new byte[] { OtpExternal.VersionTag, OtpExternal.NewFloatTag, 127, 239, 255, 255, 255, 255, 255, 255 }, double.MaxValue)]
+        [TestCase(new byte[] { OtpExternal.VersionTag, OtpExternal.NewFloatTag, 255, 239, 255, 255, 255, 255, 255, 255 }, double.MinValue)]
+        public void Read_Double(byte[] buf, double want)
+        {
+            using (var s = new OtpInputStream(buf))
+            {
+                double got = s.ReadDouble();
+                Assert.AreEqual(want, got);
+            }
+        }
     }
 }
