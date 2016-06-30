@@ -82,7 +82,6 @@
     <Compile Include="Commands\TS\ListKeys.cs" />
     <Compile Include="Commands\TS\ListKeysOptions.cs" />
     <Compile Include="Commands\TS\QueryOptions.cs" />
-    <Compile Include="Commands\TS\Cell{TValue}.cs" />
     <Compile Include="Commands\TS\Cell.cs" />
     <Compile Include="Commands\TS\Column.cs" />
     <Compile Include="Commands\TS\ColumnType.cs" />

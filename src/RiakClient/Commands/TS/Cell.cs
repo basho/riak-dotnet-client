@@ -1,7 +1,6 @@
 ﻿namespace RiakClient.Commands.TS
 {
     using System;
-    using System.Collections;
     using Erlang;
     using Messages;
     using Util;
@@ -10,22 +9,16 @@
     {
         public static readonly Cell Null = new Cell();
 
-        private const int NullHashCode = 0;
-        private static readonly IList EmptyList = new object[0];
-
-        private readonly object value;
         private readonly bool isNull = false;
-
+        private readonly ColumnType valueType;
         private readonly string varcharValue;
         private readonly long sint64Value;
         private readonly double doubleValue;
         private readonly DateTime timestampValue;
         private readonly bool booleanValue;
-        private readonly ColumnType valueType;
 
         public Cell()
         {
-            value = null;
             isNull = true;
         }
 
@@ -64,19 +57,44 @@
             valueType = ColumnType.Boolean;
         }
 
-        public Cell(object value)
+        public ColumnType? ValueType
         {
-            if (value == null)
+            get
             {
-                throw new ArgumentNullException("value", "value must be non-null. Use paramaterless ctor for null Cell");
-            }
+                if (isNull)
+                {
+                    return null;
+                }
 
-            this.value = value;
+                return valueType;
+            }
         }
 
-        public object AsObject
+        public object Value
         {
-            get { return value; }
+            get
+            {
+                if (isNull)
+                {
+                    return null;
+                }
+
+                switch (valueType)
+                {
+                    case ColumnType.Boolean:
+                        return booleanValue;
+                    case ColumnType.Double:
+                        return doubleValue;
+                    case ColumnType.SInt64:
+                        return sint64Value;
+                    case ColumnType.Timestamp:
+                        return timestampValue;
+                    case ColumnType.Varchar:
+                        return varcharValue;
+                    default:
+                        throw new InvalidOperationException();
+                }
+            }
         }
 
         public bool Equals(Cell other)
@@ -112,48 +130,47 @@
         /// <returns>A hash code for the current object.</returns>
         public override int GetHashCode()
         {
-            if (ReferenceEquals(value, null))
+            if (isNull)
             {
-                return NullHashCode;
+                return isNull.GetHashCode();
             }
 
-            return value.GetHashCode();
+            unchecked
+            {
+                int result = valueType.GetHashCode();
+                result = (result * 397) ^ Value.GetHashCode();
+                return result;
+            }
         }
 
         public override string ToString()
         {
-            if (ReferenceEquals(null, value))
-            {
-                return "Null";
-            }
-            else
-            {
-                return value.ToString();
-            }
+            return Value.ToString();
         }
 
         internal static Cell FromTsCell(TsCell tsc)
         {
             if (tsc.boolean_valueSpecified)
             {
-                return new Cell<bool>(tsc.boolean_value);
+                return new Cell(tsc.boolean_value);
             }
             else if (tsc.double_valueSpecified)
             {
-                return new Cell<double>(tsc.double_value);
+                return new Cell(tsc.double_value);
             }
             else if (tsc.sint64_valueSpecified)
             {
-                return new Cell<long>(tsc.sint64_value);
+                return new Cell(tsc.sint64_value);
             }
             else if (tsc.timestamp_valueSpecified)
             {
-                return new Cell<DateTime>(
+                return new Cell(
                     DateTimeUtil.FromUnixTimeMillis(tsc.timestamp_value));
             }
             else if (tsc.varchar_valueSpecified)
             {
-                return new Cell<string>(RiakString.FromBytes(tsc.varchar_value));
+                string s = RiakString.FromBytes(tsc.varchar_value);
+                return new Cell(s);
             }
 
             return new Cell();
@@ -194,9 +211,29 @@
             }
         }
 
-        internal virtual TsCell ToTsCell()
+        internal TsCell ToTsCell()
         {
-            return new TsCell();
+            if (isNull)
+            {
+                return new TsCell();
+            }
+
+            switch (valueType)
+            {
+                case ColumnType.Boolean:
+                    return new TsCell { boolean_value = booleanValue };
+                case ColumnType.Double:
+                    return new TsCell { double_value = doubleValue };
+                case ColumnType.SInt64:
+                    return new TsCell { sint64_value = sint64Value };
+                case ColumnType.Timestamp:
+                    long ts = DateTimeUtil.ToUnixTimeMillis(timestampValue);
+                    return new TsCell { timestamp_value = ts };
+                case ColumnType.Varchar:
+                    return new TsCell { varchar_value = RiakString.ToBytes(varcharValue) };
+                default:
+                    throw new InvalidOperationException("Could not convert to TsCell.");
+            }
         }
     }
 }

@@ -33,20 +33,20 @@ namespace Test.Unit.TS
 
         protected static readonly Cell[] Cells0 = new Cell[]
         {
-            new Cell<bool>(Boolean0),
-            new Cell<double>(Double0),
-            new Cell<long>(Long0),
-            new Cell<DateTime>(Timestamp0),
-            new Cell<string>(Varchar0),
+            new Cell(Boolean0),
+            new Cell(Double0),
+            new Cell(Long0),
+            new Cell(Timestamp0),
+            new Cell(Varchar0),
         };
 
         protected static readonly Cell[] Cells1 = new Cell[]
         {
-            new Cell<bool>(Boolean1),
-            new Cell<double>(Double1),
-            new Cell<long>(Long1),
-            new Cell<DateTime>(Timestamp1),
-            new Cell<string>(Varchar1),
+            new Cell(Boolean1),
+            new Cell(Double1),
+            new Cell(Long1),
+            new Cell(Timestamp1),
+            new Cell(Varchar1),
         };
 
         protected static readonly Row[] Rows = new Row[]
@@ -59,11 +59,11 @@ namespace Test.Unit.TS
 
         protected static readonly Column[] Columns = new[]
         {
-            new Column("bool", ColumnType.Boolean),
-            new Column("double", ColumnType.Double),
-            new Column("long", ColumnType.SInt64),
-            new Column("timestamp", ColumnType.Timestamp),
-            new Column("string", ColumnType.Varchar),
+            new Column("bool", global::RiakClient.Commands.TS.ColumnType.Boolean),
+            new Column("double", global::RiakClient.Commands.TS.ColumnType.Double),
+            new Column("long", global::RiakClient.Commands.TS.ColumnType.SInt64),
+            new Column("timestamp", global::RiakClient.Commands.TS.ColumnType.Timestamp),
+            new Column("string", global::RiakClient.Commands.TS.ColumnType.Varchar),
         };
 
         protected static readonly TsColumnDescription[] TsCols = new[]

@@ -83,11 +83,11 @@ namespace Test.Integration.TS
 
         private static readonly Column[] Columns = new[]
         {
-            new Column("geohash",     ColumnType.Varchar),
-            new Column("user",        ColumnType.Varchar),
-            new Column("time",        ColumnType.Timestamp),
-            new Column("weather",     ColumnType.Varchar),
-            new Column("temperature", ColumnType.Double)
+            new Column("geohash",     global::RiakClient.Commands.TS.ColumnType.Varchar),
+            new Column("user",        global::RiakClient.Commands.TS.ColumnType.Varchar),
+            new Column("time",        global::RiakClient.Commands.TS.ColumnType.Timestamp),
+            new Column("weather",     global::RiakClient.Commands.TS.ColumnType.Varchar),
+            new Column("temperature", global::RiakClient.Commands.TS.ColumnType.Double)
         };
 
         /*
