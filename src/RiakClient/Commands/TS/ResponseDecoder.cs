@@ -1,13 +1,15 @@
 ﻿namespace RiakClient.Commands.TS
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Erlang;
     using Messages;
     using Util;
 
     internal class ResponseDecoder
     {
-        // private static readonly ErlAtom TsQueryRespAtom = new ErlAtom("tsqueryresp");
+        private static readonly string TsQueryRespAtom = "tsqueryresp";
         private readonly DecodedResponse decodedResponse;
 
         public ResponseDecoder(TsQueryResp response)
@@ -22,28 +24,23 @@
 
         public ResponseDecoder(TsTtbResp response)
         {
-            /*
-            using (var istream = new ErlInputStream(response.Response, checkVersion: true))
+            using (var s = new OtpInputStream(response.Response))
             {
-                bool isAtom = istream.PeekAtom();
-                if (isAtom)
+                byte tag = s.Peek();
+                switch (tag)
                 {
-                    ErlAtom atom = istream.ReadAtom();
-                    decodedResponse = DecodeResponseAtom(atom);
-                    return;
+                    case OtpExternal.AtomTag:
+                        string atom = s.ReadAtom();
+                        decodedResponse = DecodeResponseAtom(atom);
+                        break;
+                    case OtpExternal.SmallTupleTag:
+                    case OtpExternal.LargeTupleTag:
+                        decodedResponse = DecodeResponseTuple(s);
+                        break;
+                    default:
+                        throw new InvalidOperationException("Expected an atom or tuple.");
                 }
-
-                bool isTuple = istream.PeekTuple();
-                if (isTuple)
-                {
-                    ErlTuple tuple = istream.ReadTuple();
-                    decodedResponse = DecodeResponseTuple(tuple);
-                    return;
-                }
-
-                throw new InvalidOperationException("Expected an atom or tuple.");
             }
-            */
         }
 
         private ResponseDecoder(
@@ -73,56 +70,40 @@
             return decodedResponse;
         }
 
-        // private static DecodedResponse DecodeResponseAtom(ErlAtom resp)
-        private static DecodedResponse DecodeResponseAtom(object resp)
+        private static DecodedResponse DecodeResponseAtom(string atom)
         {
-            /*
-            if (resp.Equals(TsQueryRespAtom) == false)
+            if (atom.Equals(TsQueryRespAtom) == false)
             {
                 throw new InvalidOperationException("Expected tsqueryresp atom.");
             }
-            */
 
             var cols = Enumerable.Empty<Column>();
             var rows = Enumerable.Empty<Row>();
             return new DecodedResponse(cols, rows);
         }
 
-        private static DecodedResponse DecodeResponseTuple(object resp)
+        private static DecodedResponse DecodeResponseTuple(OtpInputStream s)
         {
-            IEnumerable<Column> rv_cols = Enumerable.Empty<Column>();
-            IEnumerable<Row> rv_rows = Enumerable.Empty<Row>();
-            return new DecodedResponse(rv_cols, rv_rows);
-            /*
             // Response is:
             // {'tsgetresp', {ColNames, ColTypes, Rows}}
             // {'tsqueryresp', {ColNames, ColTypes, Rows}}
-            if (resp.Count != 2)
+            int arity = s.ReadTupleHead();
+            if (arity != 2)
             {
                 throw new InvalidOperationException("Expected response to be a 2-tuple");
             }
 
-            if ((resp[0] is ErlAtom) == false)
-            {
-                throw new InvalidOperationException("First item in response tuple must be an atom.");
-            }
-
-            ErlAtom atom = (ErlAtom)resp[0];
+            string atom = s.ReadAtom();
             if (atom.Equals(TsQueryRespAtom) == false)
             {
                 string msg = string.Format("Expected tsqueryresp atom, got {0}", atom);
                 throw new InvalidOperationException(msg);
             }
 
-            if (resp[1].IsScalar)
+            arity = s.ReadTupleHead();
+            if (arity != 3)
             {
-                throw new InvalidOperationException("Second item in response tuple must not be a scalar.");
-            }
-
-            ErlTuple rt = resp[1] as ErlTuple;
-            if (rt == null)
-            {
-                throw new InvalidOperationException("Second item in response tuple must be a tuple.");
+                throw new InvalidOperationException("Second item in response tuple must be a 3-tuple.");
             }
 
             IEnumerable<Column> rv_cols = Enumerable.Empty<Column>();
@@ -150,6 +131,7 @@
                 }
             }
 
+            /*
             ErlList erows = rt[2] as ErlList;
             if (erows != null)
             {
@@ -202,7 +184,7 @@
             }
             */
 
-            // return new DecodedResponse(rv_cols, rv_rows);
+            return new DecodedResponse(rv_cols, rv_rows);
         }
     }
 }

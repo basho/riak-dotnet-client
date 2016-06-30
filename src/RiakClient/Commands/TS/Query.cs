@@ -55,9 +55,9 @@
         {
             return (ms) =>
             {
-                // using (var os = new OtpOutputStream(writeVersion: true))
                 using (var os = new OtpOutputStream())
                 {
+                    os.WriteByte(OtpExternal.VersionTag);
                     // TsQueryReq is a 4-tuple: {'tsqueryreq', TsInterpolation, boolIsStreaming, bytesCoverContext}
                     os.WriteTupleHead(4);
                     os.WriteAtom(TsQueryReqAtom);

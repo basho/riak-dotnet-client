@@ -61,9 +61,10 @@
 
             return (ms) =>
             {
-                // using (var os = new ErlOutputStream(writeVersion: true))
                 using (var os = new OtpOutputStream())
                 {
+                    os.WriteByte(OtpExternal.VersionTag);
+
                     // {tsputreq, tableName, emptyList, rows}
                     os.WriteTupleHead(4);
                     os.WriteAtom(TsPutReqAtom);

@@ -256,7 +256,7 @@
 
     public sealed class TsTtbResp : RpbResp
     {
-        // private static readonly ErlAtom RpbErrorRespAtom = new ErlAtom("rpberrorresp");
+        private static readonly string RpbErrorRespAtom = "rpberrorresp";
         private readonly byte[] response;
 
         public TsTtbResp(byte[] response)
@@ -278,23 +278,24 @@
                 return;
             }
 
-            // using (var istream = new OtpInputStream(response, checkVersion: true))
-            /* TODO
-            using (var istream = new OtpInputStream(response))
+            using (var s = new OtpInputStream(response))
             {
-                int arity = istream.ReadTupleHead();
-                if (arity == 3 && istream.PeekAtom())
+                int arity = s.ReadTupleHead();
+                if (arity == 3)
                 {
-                    ErlAtom atom = istream.ReadAtom();
-                    if (atom.Equals(RpbErrorRespAtom))
+                    byte tag = s.Peek();
+                    if (tag == OtpExternal.AtomTag)
                     {
-                        ErlBinary errMsgBin = istream.ReadBinary();
-                        ErlLong errCodeLong = istream.ReadLong();
-                        throw new RiakException(errCodeLong.ValueAsInt, errMsgBin.ValueAsString, false);
+                        string atom = s.ReadAtom();
+                        if (atom.Equals(RpbErrorRespAtom))
+                        {
+                            string errMsg = s.ReadBinaryAsString();
+                            long errCode = s.ReadLong();
+                            throw new RiakException(errCode, errMsg, false);
+                        }
                     }
                 }
             }
-            */
         }
 
         public byte[] Response

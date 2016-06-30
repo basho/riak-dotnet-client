@@ -311,6 +311,7 @@ namespace RiakClient.Erlang
 
                     if (arity > 8)
                     {
+                        // FUTURE: support BigInteger
                         throw new Exception("integer is too big to decode");
                     }
 
