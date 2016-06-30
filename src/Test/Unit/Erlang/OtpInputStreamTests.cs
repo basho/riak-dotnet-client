@@ -71,5 +71,17 @@
                 Assert.AreEqual(want, s.ReadBoolean());
             }
         }
+
+        [Test]
+        [TestCase(new byte[] { OtpExternal.VersionTag, OtpExternal.AtomTag, 0, 18, 102, 114, 97, 122, 122, 108, 101, 100, 97, 122, 122, 108, 101, 45, 49, 50, 51, 52 }, "frazzledazzle-1234")]
+        [TestCase(new byte[] { OtpExternal.AtomTag, 0, 7, 121, 111, 64, 109, 97, 109, 97 }, "yo@mama")]
+        public void Read_Atom(byte[] buf, string want)
+        {
+            using (var s = new OtpInputStream(buf))
+            {
+                string atom = s.ReadAtom();
+                Assert.AreEqual(want, atom);
+            }
+        }
     }
 }
