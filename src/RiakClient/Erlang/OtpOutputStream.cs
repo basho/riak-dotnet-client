@@ -87,59 +87,6 @@ namespace RiakClient.Erlang
         }
 
         /// <summary>
-        /// Write any number of bytes in little endian format.
-        /// </summary>
-        /// <param name="n">The value to use.</param>
-        /// <param name="b">The number of bytes to write from the little end.</param>
-        public void WriteLE(long n, int b)
-        {
-            long v = n;
-            for (int i = 0; i < b; i++)
-            {
-                Write((byte)(v & 0xff));
-                v >>= 8;
-            }
-        }
-
-        /// <summary>
-        /// Write the low two bytes of a value to the stream in little endian order.
-        /// </summary>
-        /// <param name="n">The value to use.</param>
-        public void Write2LE(long n)
-        {
-            Write((byte)(n & 0xff));
-            Write((byte)((n & 0xff00) >> 8));
-        }
-
-        /// <summary>
-        /// Write the low four bytes of a value to the stream in little endian order.
-        /// </summary>
-        /// <param name="n">The value to use.</param>
-        public void Write4LE(long n)
-        {
-            Write((byte)(n & 0xff));
-            Write((byte)((n & 0xff00) >> 8));
-            Write((byte)((n & 0xff0000) >> 16));
-            Write((byte)((n & 0xff000000) >> 24));
-        }
-
-        /// <summary>
-        /// Write the low eight bytes of a value to the stream in little endian order.
-        /// </summary>
-        /// <param name="n">The value to use.</param>
-        public void Write8LE(long n)
-        {
-            Write((byte)(n & 0xff));
-            Write((byte)(n >> 8 & 0xff));
-            Write((byte)(n >> 16 & 0xff));
-            Write((byte)(n >> 24 & 0xff));
-            Write((byte)(n >> 32 & 0xff));
-            Write((byte)(n >> 40 & 0xff));
-            Write((byte)(n >> 48 & 0xff));
-            Write((byte)(n >> 56 & 0xff));
-        }
-
-        /// <summary>
         /// Write a string to the stream as an Erlang atom. Assumes ISO-8859-1 encoding.
         /// This will throw an exception if the string can't be converted.
         /// </summary>

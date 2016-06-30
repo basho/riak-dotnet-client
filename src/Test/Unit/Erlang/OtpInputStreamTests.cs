@@ -1,11 +1,43 @@
 ﻿namespace Test.Unit.Erlang
 {
+    using System;
     using NUnit.Framework;
     using RiakClient.Erlang;
 
     [TestFixture, UnitTest]
     public class OtpInputStreamTests
     {
+        [Test]
+        public void Read_Throws_At_End()
+        {
+            byte[] inbuf = { 0, 1, 2, 3 };
+            byte[] outbuf = new byte[1];
+            using (var s = new OtpInputStream(inbuf))
+            {
+                s.ReadN(outbuf);
+                s.ReadN(outbuf);
+                s.ReadN(outbuf);
+                s.ReadN(outbuf);
+                Assert.Throws(typeof(Exception), () => s.ReadN(outbuf));
+            }
+        }
+
+        [Test]
+        public void Read_Zero_Does_Not_Throw_At_End()
+        {
+            byte[] inbuf = { 0, 1, 2, 3 };
+            byte[] outbuf = new byte[1];
+            using (var s = new OtpInputStream(inbuf))
+            {
+                s.ReadN(outbuf);
+                s.ReadN(outbuf);
+                s.ReadN(outbuf);
+                s.ReadN(outbuf);
+                Assert.DoesNotThrow(() => s.ReadN(outbuf, 0, 0));
+                Assert.AreEqual(0, s.ReadN(outbuf, 0, 0));
+            }
+        }
+
         [Test]
         [TestCase(new byte[] { OtpExternal.SmallIntTag, 0 }, byte.MinValue)]
         [TestCase(new byte[] { OtpExternal.SmallIntTag, 255 }, byte.MaxValue)]
@@ -27,6 +59,17 @@
             }
 
             Assert.AreEqual(want, got);
+        }
+
+        [Test]
+        [TestCase(new byte[] { OtpExternal.VersionTag, OtpExternal.AtomTag, 0, 4, 116, 114, 117, 101 }, true)]
+        [TestCase(new byte[] { OtpExternal.VersionTag, OtpExternal.AtomTag, 0, 5, 102, 97, 108, 115, 101 }, false)]
+        public void Read_Boolean(byte[] buf, bool want)
+        {
+            using (var s = new OtpInputStream(buf))
+            {
+                Assert.AreEqual(want, s.ReadBoolean());
+            }
         }
     }
 }

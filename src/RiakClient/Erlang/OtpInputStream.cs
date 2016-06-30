@@ -71,8 +71,7 @@ namespace RiakClient.Erlang
         /// <returns>The number of bytes read.</returns>
         public int ReadN(byte[] buffer, int offset, int count)
         {
-            // TODO: does this really mean we're at the end?
-            if ((count == 0) && (Length == (Position + 1)))
+            if ((count == 0) && (Length == Position))
             {
                 return 0;
             }
@@ -166,46 +165,6 @@ namespace RiakClient.Erlang
             byte b2 = Read1();
             byte b3 = Read1();
             return (b0 << 24) + (b1 << 16) + (b2 << 8) + b3;
-        }
-
-        /// <summary>
-        /// Read a two byte little endian integer from the stream.
-        /// </summary>
-        /// <returns>the bytes read, converted from little endian to an integer.</returns>
-        public int Read2LE()
-        {
-            byte b0 = Read1();
-            byte b1 = Read1();
-            return (b1 << 8) + b0;
-        }
-
-        /// <summary>
-        /// Read a four byte little endian integer from the stream.
-        /// </summary>
-        /// <returns>The bytes read, converted from little endian to an integer.</returns>
-        public int Read4LE()
-        {
-            byte b0 = Read1();
-            byte b1 = Read1();
-            byte b2 = Read1();
-            byte b3 = Read1();
-            return (b3 << 24) + (b2 << 16) + (b1 << 8) + b0;
-        }
-
-        // Read a little endian integer from the stream.
-        // @param n the number of bytes to read
-        // @return the bytes read, converted from little endian to an integer.
-        public long ReadLE(int n)
-        {
-            byte b = 0;
-            long v = 0;
-            for (int i = n; i > 0; i--)
-            {
-                b = Read1();
-                v = v << 8 | b;
-            }
-
-            return v;
         }
 
         /// <summary>
