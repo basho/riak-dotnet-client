@@ -75,7 +75,6 @@
       <ExcludeFromStyleCop>False</ExcludeFromStyleCop>
     </Compile>
     <Compile Include="Commands\CommandBuilder{TBuilder,TCommand,TOptions}.cs" />
-    <Compile Include="Commands\IRiakTtbCommand.cs" />
     <Compile Include="Commands\KvCommandBuilder{TBuilder,TCommand,TOptions}.cs" />
     <Compile Include="Commands\CommandOptions.cs" />
     <Compile Include="Commands\Response{TValue}.cs" />

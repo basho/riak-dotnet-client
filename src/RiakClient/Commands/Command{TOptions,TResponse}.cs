@@ -8,7 +8,7 @@
     /// </summary>
     /// <typeparam name="TOptions">The type of the options for this command.</typeparam>
     /// <typeparam name="TResponse">The type of the response data from Riak.</typeparam>
-    public abstract class Command<TOptions, TResponse> : IRiakCommand
+    public abstract class Command<TOptions, TResponse> : Command<TResponse>
         where TOptions : CommandOptions
         where TResponse : Response
     {
@@ -32,17 +32,6 @@
         {
             get { return CommandOptions; }
         }
-
-        /// <summary>
-        /// A sub-class instance of <see cref="Response"/> representing the response from Riak.
-        /// </summary>
-        public TResponse Response { get; protected set; }
-
-        public abstract MessageCode ExpectedCode { get; }
-
-        public abstract RpbReq ConstructPbRequest();
-
-        public abstract void OnSuccess(RpbResp rpbResp);
 
         protected RiakString GetKey(RiakString optskey, RpbResp response)
         {

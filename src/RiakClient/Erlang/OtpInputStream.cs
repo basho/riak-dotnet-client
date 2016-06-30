@@ -20,6 +20,7 @@
 namespace RiakClient.Erlang
 {
     using System;
+    using System.Globalization;
     using System.IO;
     using System.Text;
 
@@ -72,7 +73,7 @@ namespace RiakClient.Erlang
         /// <returns>The number of bytes read.</returns>
         public int ReadN(byte[] buffer, int offset, int count)
         {
-            if ((count == 0) && (Length == Position))
+            if ((count == 0) && (Position < Length))
             {
                 return 0;
             }
@@ -110,8 +111,14 @@ namespace RiakClient.Erlang
         /// <returns>The next byte in the stream.</returns>
         public byte Peek1()
         {
-            byte[] buf = GetBuffer();
-            return buf[Position];
+            try
+            {
+                return Read1();
+            }
+            finally
+            {
+                Position--;
+            }
         }
 
         /// <summary>
@@ -263,14 +270,29 @@ namespace RiakClient.Erlang
         /// <returns>The float value, as a double.</returns>
         public double ReadDouble()
         {
+            double d;
             byte tag = Read1SkipVersion();
             switch (tag)
             {
+                case OtpExternal.FloatTag:
+                    byte[] b = new byte[OtpExternal.FloatByteLength];
+                    ReadN(b);
+                    string ds = Encoding.ASCII.GetString(b);
+                    NumberStyles style = NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent | NumberStyles.AllowLeadingSign | NumberStyles.AllowLeadingWhite;
+                    if (!double.TryParse(ds, style, NumberFormatInfo.InvariantInfo, out d))
+                    {
+                        throw new InvalidOperationException(string.Format("invalid float encoding: \"{0}\"", ds));
+                    }
+
+                    break;
                 case OtpExternal.NewFloatTag:
-                    return BitConverter.Int64BitsToDouble(ReadBE(8));
+                    d = BitConverter.Int64BitsToDouble(ReadBE(8));
+                    break;
                 default:
                     throw OnBadTag(tag, OtpExternal.NewFloatTag);
             }
+
+            return d;
         }
 
         /// <summary>

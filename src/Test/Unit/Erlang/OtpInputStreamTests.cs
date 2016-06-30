@@ -23,7 +23,7 @@
         }
 
         [Test]
-        public void Read_Zero_Does_Not_Throw_At_End()
+        public void Read_Zero_Throws_At_End()
         {
             byte[] inbuf = { 0, 1, 2, 3 };
             byte[] outbuf = new byte[1];
@@ -33,8 +33,23 @@
                 s.ReadN(outbuf);
                 s.ReadN(outbuf);
                 s.ReadN(outbuf);
-                Assert.DoesNotThrow(() => s.ReadN(outbuf, 0, 0));
-                Assert.AreEqual(0, s.ReadN(outbuf, 0, 0));
+                Assert.Throws(typeof(Exception), () => s.ReadN(outbuf, 0, 0));
+            }
+        }
+
+        [Test]
+        [TestCase(new byte[] { OtpExternal.VersionTag, OtpExternal.AtomTag, 0, 4, 116, 114, 117, 101 }, true)]
+        [TestCase(new byte[] { OtpExternal.VersionTag, OtpExternal.AtomTag, 0, 5, 102, 97, 108, 115, 101 }, false)]
+        public void Can_Peek(byte[] buf, bool want)
+        {
+            using (var s = new OtpInputStream(buf))
+            {
+                byte b = s.Read1();
+                Assert.AreEqual(OtpExternal.VersionTag, b);
+                b = s.Peek();
+                Assert.AreEqual(OtpExternal.AtomTag, b);
+                string atom = s.ReadAtom();
+                Assert.AreEqual(want.ToString().ToLowerInvariant(), atom); 
             }
         }
 
@@ -87,6 +102,18 @@
         [TestCase(new byte[] { OtpExternal.VersionTag, OtpExternal.NewFloatTag, 127, 239, 255, 255, 255, 255, 255, 255 }, double.MaxValue)]
         [TestCase(new byte[] { OtpExternal.VersionTag, OtpExternal.NewFloatTag, 255, 239, 255, 255, 255, 255, 255, 255 }, double.MinValue)]
         public void Read_Double(byte[] buf, double want)
+        {
+            using (var s = new OtpInputStream(buf))
+            {
+                double got = s.ReadDouble();
+                Assert.AreEqual(want, got);
+            }
+        }
+
+        [Test]
+        [TestCase(new byte[] { OtpExternal.VersionTag, OtpExternal.FloatTag, 55, 46, 55, 53, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 101, 43, 48, 48, 0, 0, 0, 0, 0 },  7.75f)]
+        [TestCase(new byte[] { OtpExternal.VersionTag,  OtpExternal.FloatTag, 45, 57, 46, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 57, 50, 57, 55, 53, 55, 101, 43, 52, 52, 0, 0, 0, 0 },  -999999999999999999999999999999999999999999999.99d)]
+        public void Read_FloatAsDouble(byte[] buf, double want)
         {
             using (var s = new OtpInputStream(buf))
             {

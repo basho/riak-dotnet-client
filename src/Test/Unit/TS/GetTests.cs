@@ -20,7 +20,7 @@ namespace Test.Unit.TS
 
             Assert.AreEqual(MessageCode.TsGetResp, cmd.ExpectedCode);
 
-            TsGetReq pb = (TsGetReq)cmd.ConstructPbRequest();
+            TsGetReq pb = (TsGetReq)cmd.ConstructRequest();
             Assert.AreEqual(Table, RiakString.FromBytes(pb.table));
             Assert.IsFalse(pb.timeoutSpecified);
 
@@ -48,7 +48,7 @@ namespace Test.Unit.TS
             Get cmd = BuildGetReqWithTimeout();
             Assert.AreEqual(MessageCode.TsGetResp, cmd.ExpectedCode);
 
-            TsGetReq pb = (TsGetReq)cmd.ConstructPbRequest();
+            TsGetReq pb = (TsGetReq)cmd.ConstructRequest();
             Assert.AreEqual(Table, RiakString.FromBytes(pb.table));
 
             Assert.IsTrue(pb.timeoutSpecified);

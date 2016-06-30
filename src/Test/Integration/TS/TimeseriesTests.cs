@@ -20,38 +20,38 @@ namespace Test.Integration.TS
 
         private static readonly Cell[] Cells0 = new Cell[]
         {
-            new Cell<string>("hash1"),
-            new Cell<string>("user2"),
-            new Cell<DateTime>(TwentyMinsAgo),
-            new Cell<string>("hurricane"),
-            new Cell<double>(82.3)
+            new Cell("hash1"),
+            new Cell("user2"),
+            new Cell(TwentyMinsAgo),
+            new Cell("hurricane"),
+            new Cell(82.3)
         };
 
         private static readonly Cell[] Cells1 = new Cell[]
         {
-            new Cell<string>("hash1"),
-            new Cell<string>("user2"),
-            new Cell<DateTime>(FifteenMinsAgo),
-            new Cell<string>("rain"),
-            new Cell<double>(79.0)
+            new Cell("hash1"),
+            new Cell("user2"),
+            new Cell(FifteenMinsAgo),
+            new Cell("rain"),
+            new Cell(79.0)
         };
 
         private static readonly Cell[] Cells2 = new Cell[]
         {
-            new Cell<string>("hash1"),
-            new Cell<string>("user2"),
-            new Cell<DateTime>(FiveMinsAgo),
-            new Cell<string>("wind"),
+            new Cell("hash1"),
+            new Cell("user2"),
+            new Cell(FiveMinsAgo),
+            new Cell("wind"),
             Cell.Null
         };
 
         private static readonly Cell[] Cells3 = new Cell[]
         {
-            new Cell<string>("hash1"),
-            new Cell<string>("user2"),
-            new Cell<DateTime>(Now),
-            new Cell<string>("snow"),
-            new Cell<double>(20.1)
+            new Cell("hash1"),
+            new Cell("user2"),
+            new Cell(Now),
+            new Cell("snow"),
+            new Cell(20.1)
         };
 
         private static readonly Row[] Rows = new Row[]
@@ -64,18 +64,18 @@ namespace Test.Integration.TS
 
         private static readonly Cell[] KeyCells1 = new Cell[]
         {
-            new Cell<string>("hash1"),
-            new Cell<string>("user2"),
-            new Cell<DateTime>(FifteenMinsAgo)
+            new Cell("hash1"),
+            new Cell("user2"),
+            new Cell(FifteenMinsAgo)
         };
 
         private static readonly Row KeyToDelete = new Row(KeyCells1);
 
         private static readonly Cell[] KeyCells = new Cell[]
         {
-            new Cell<string>("hash1"),
-            new Cell<string>("user2"),
-            new Cell<DateTime>(FiveMinsAgo)
+            new Cell("hash1"),
+            new Cell("user2"),
+            new Cell(FiveMinsAgo)
         };
 
         private static readonly Row Key = new Row(KeyCells);

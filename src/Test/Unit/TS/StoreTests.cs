@@ -13,7 +13,7 @@ namespace Test.Unit.TS
             Store cmd = BuildStoreReq();
             Assert.AreEqual(MessageCode.TsPutResp, cmd.ExpectedCode);
 
-            TsPutReq pb = (TsPutReq)cmd.ConstructPbRequest();
+            TsPutReq pb = (TsPutReq)cmd.ConstructRequest();
             Assert.AreEqual(Table, RiakString.FromBytes(pb.table));
 
             CollectionAssert.AreEqual(TsCols, pb.columns);

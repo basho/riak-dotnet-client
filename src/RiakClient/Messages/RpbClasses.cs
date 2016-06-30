@@ -1,20 +1,22 @@
 ﻿namespace RiakClient.Messages
 {
     using System;
+    using System.IO;
     using Erlang;
     using Exceptions;
+    using ProtoBuf;
     using Util;
 
-    public class RpbReq
+    public class RiakReq
     {
         private readonly MessageCode messageCode;
         private readonly bool isMessageCodeOnly = false;
 
-        public RpbReq()
+        public RiakReq()
         {
         }
 
-        public RpbReq(MessageCode messageCode)
+        public RiakReq(MessageCode messageCode)
         {
             this.messageCode = messageCode;
             this.isMessageCodeOnly = true;
@@ -28,6 +30,11 @@
         public bool IsMessageCodeOnly
         {
             get { return isMessageCodeOnly; }
+        }
+
+        public virtual void WriteTo(Stream s)
+        {
+            Serializer.Serialize(s, this);
         }
     }
 
@@ -76,7 +83,7 @@
     public sealed partial class MapEntry { }
 
     [CLSCompliant(false)]
-    public sealed partial class DtFetchReq : RpbReq { }
+    public sealed partial class DtFetchReq : RiakReq { }
 
     public sealed partial class DtValue { }
 
@@ -93,7 +100,7 @@
     public sealed partial class DtOp { }
 
     [CLSCompliant(false)]
-    public sealed partial class DtUpdateReq : RpbReq { }
+    public sealed partial class DtUpdateReq : RiakReq { }
 
     public sealed partial class DtUpdateResp : RpbResp, IRpbGeneratedKey
     {
@@ -195,7 +202,7 @@
 
     public sealed partial class RpbYokozunaSchemaGetResp { }
 
-    public sealed partial class RpbGetBucketKeyPreflistReq : RpbReq { }
+    public sealed partial class RpbGetBucketKeyPreflistReq : RiakReq { }
 
     public sealed partial class RpbGetBucketKeyPreflistResp : RpbResp { }
 
@@ -219,24 +226,24 @@
     public sealed partial class TsListKeysResp { }
 
     [CLSCompliant(false)]
-    public sealed partial class TsGetReq : RpbReq, ITsByKeyReq { }
+    public sealed partial class TsGetReq : RiakReq, ITsByKeyReq { }
 
     public sealed partial class TsGetResp : RpbResp { }
 
-    public sealed partial class TsPutReq : RpbReq { }
+    public sealed partial class TsPutReq : RiakReq { }
 
     public sealed partial class TsPutResp : RpbResp { }
 
-    public sealed partial class TsQueryReq : RpbReq { }
+    public sealed partial class TsQueryReq : RiakReq { }
 
     public sealed partial class TsQueryResp : RpbResp, IRpbStreamingResp { }
 
-    public sealed partial class TsListKeysReq : RpbReq { }
+    public sealed partial class TsListKeysReq : RiakReq { }
 
     public sealed partial class TsListKeysResp : RpbResp, IRpbStreamingResp { }
 
     [CLSCompliant(false)]
-    public sealed partial class TsDelReq : RpbReq, ITsByKeyReq { }
+    public sealed partial class TsDelReq : RiakReq, ITsByKeyReq { }
 
     public sealed partial class TsDelResp : RpbResp { }
 
@@ -252,7 +259,7 @@
 
     public sealed partial class TsInterpolation { }
 
-    public sealed class TsTtbMsg { }
+    public sealed class TsTtbMsg : RiakReq { }
 
     public sealed class TsTtbResp : RpbResp
     {
@@ -290,7 +297,7 @@
                         if (atom.Equals(RpbErrorRespAtom))
                         {
                             string errMsg = s.ReadBinaryAsString();
-                            long errCode = s.ReadLong();
+                            int errCode = (int)s.ReadLong();
                             throw new RiakException(errCode, errMsg, false);
                         }
                     }

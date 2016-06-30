@@ -23,6 +23,8 @@ namespace RiakClient.Erlang
      */
     internal static class OtpExternal
     {
+        public const byte FloatByteLength = 31;
+
         public const byte Negative = 1;
         public const byte Positive = 0;
 

@@ -1,6 +1,9 @@
 ﻿namespace RiakClient.Commands
 {
+    using System;
+    using System.IO;
     using Messages;
+    using ProtoBuf;
 
     /// <summary>
     /// Base class for Riak commands that don't have options.
@@ -23,8 +26,25 @@
 
         public abstract MessageCode ExpectedCode { get; }
 
-        public abstract RpbReq ConstructPbRequest();
+        public abstract RiakReq ConstructRequest();
 
         public abstract void OnSuccess(RpbResp rpbResp);
+
+        public virtual RpbResp DecodeResponse(byte[] buffer)
+        {
+            Type expectedType = MessageCodeTypeMapBuilder.GetTypeFor(ExpectedCode);
+
+            if (buffer == null || buffer.Length == 0)
+            {
+                return Activator.CreateInstance(expectedType) as RpbResp;
+            }
+            else
+            {
+                using (var memStream = new MemoryStream(buffer))
+                {
+                    return Serializer.NonGeneric.Deserialize(expectedType, memStream) as RpbResp;
+                }
+            }
+        }
     }
 }

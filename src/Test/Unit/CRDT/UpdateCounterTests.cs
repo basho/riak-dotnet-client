@@ -55,7 +55,7 @@ namespace Test.Unit.CRDT
 
             UpdateCounter updateCounterCommand = updateCounterCommandBuilder.Build();
 
-            DtUpdateReq protobuf = (DtUpdateReq)updateCounterCommand.ConstructPbRequest();
+            DtUpdateReq protobuf = (DtUpdateReq)updateCounterCommand.ConstructRequest();
 
             Assert.AreEqual(Encoding.UTF8.GetBytes(BucketType), protobuf.type);
             Assert.AreEqual(Encoding.UTF8.GetBytes(Bucket), protobuf.bucket);

@@ -11,9 +11,10 @@
     /// <summary>
     /// Fetches timeseries data from Riak
     /// </summary>
-    public class Store : Command<StoreOptions, StoreResponse>, IRiakTtbCommand
+    public class Store : Command<StoreOptions, StoreResponse>
     {
         private const string TsPutReqAtom = "tsputreq";
+        private const string TsPutRespAtom = "tsputresp";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Store"/> class.
@@ -38,7 +39,7 @@
             get { return MessageCode.TsPutResp; }
         }
 
-        public override RpbReq ConstructPbRequest()
+        public override RiakReq ConstructRequest()
         {
             var req = new TsPutReq();
 
@@ -101,8 +102,16 @@
             var ttbresp = response as TsTtbResp;
             if (ttbresp != null)
             {
-                // TODO check for true?
-                // Bert rsp = ttbresp.Response;
+                using (var s = new OtpInputStream(ttbresp.Response))
+                {
+                    int arity = s.ReadTupleHead();
+                    string atom = s.ReadAtom();
+                    if (atom.Equals(TsPutRespAtom) == false)
+                    {
+                        throw new InvalidDataException(
+                            string.Format("Expected {0}, got {1}", TsPutRespAtom, atom));
+                    }
+                }
             }
 
             Response = new StoreResponse();

@@ -33,9 +33,9 @@ namespace RiakClient.Commands
             get { return MessageCode.RpbGetServerInfoResp; }
         }
 
-        public override RpbReq ConstructPbRequest()
+        public override RiakReq ConstructRequest()
         {
-            return new RpbReq(MessageCode.RpbGetServerInfoReq);
+            return new RiakReq(MessageCode.RpbGetServerInfoReq);
         }
 
         public override void OnSuccess(RpbResp response)

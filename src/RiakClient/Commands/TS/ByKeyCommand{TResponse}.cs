@@ -35,7 +35,7 @@
             }
         }
 
-        public override RpbReq ConstructPbRequest()
+        public override RiakReq ConstructRequest()
         {
             ITsByKeyReq req = GetByKeyReq();
 
@@ -49,7 +49,7 @@
 
             req.key.AddRange(CommandOptions.Key.ToTsCells());
 
-            return (RpbReq)req;
+            return (RiakReq)req;
         }
 
         protected abstract ITsByKeyReq GetByKeyReq();

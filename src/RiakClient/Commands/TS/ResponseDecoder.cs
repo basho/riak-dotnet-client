@@ -9,7 +9,8 @@
 
     internal class ResponseDecoder
     {
-        private static readonly string TsQueryRespAtom = "tsqueryresp";
+        private const string TsGetRespAtom = "tsgetresp";
+        private const string TsQueryRespAtom = "tsqueryresp";
         private readonly DecodedResponse decodedResponse;
 
         public ResponseDecoder(TsQueryResp response)
@@ -26,16 +27,26 @@
         {
             using (var s = new OtpInputStream(response.Response))
             {
-                byte tag = s.Peek();
+                byte tag = s.Read1();
+                if (tag != OtpExternal.VersionTag)
+                {
+                    string msg = string.Format(
+                        "Expected OTP input stream to start with {0}, got {1}",
+                        OtpExternal.VersionTag,
+                        tag);
+                    throw new InvalidOperationException(msg);
+                }
+
+                tag = s.Peek();
                 switch (tag)
                 {
                     case OtpExternal.AtomTag:
                         string atom = s.ReadAtom();
-                        decodedResponse = DecodeResponseAtom(atom);
+                        decodedResponse = ParseAtomResult(atom);
                         break;
                     case OtpExternal.SmallTupleTag:
                     case OtpExternal.LargeTupleTag:
-                        decodedResponse = DecodeResponseTuple(s);
+                        decodedResponse = ParseTupleResult(s);
                         break;
                     default:
                         throw new InvalidOperationException("Expected an atom or tuple.");
@@ -70,7 +81,7 @@
             return decodedResponse;
         }
 
-        private static DecodedResponse DecodeResponseAtom(string atom)
+        private static DecodedResponse ParseAtomResult(string atom)
         {
             if (atom.Equals(TsQueryRespAtom) == false)
             {
@@ -82,7 +93,7 @@
             return new DecodedResponse(cols, rows);
         }
 
-        private static DecodedResponse DecodeResponseTuple(OtpInputStream s)
+        private static DecodedResponse ParseTupleResult(OtpInputStream s)
         {
             // Response is:
             // {'tsgetresp', {ColNames, ColTypes, Rows}}
@@ -93,98 +104,182 @@
                 throw new InvalidOperationException("Expected response to be a 2-tuple");
             }
 
+            string msg;
             string atom = s.ReadAtom();
-            if (atom.Equals(TsQueryRespAtom) == false)
+            switch (atom)
             {
-                string msg = string.Format("Expected tsqueryresp atom, got {0}", atom);
+                case TsGetRespAtom:
+                case TsQueryRespAtom:
+                    arity = s.ReadTupleHead();
+                    if (arity != 3)
+                    {
+                        msg = string.Format(
+                            "Second item in {0} response tuple must be a 3-tuple.",
+                            atom);
+                        throw new InvalidOperationException(msg);
+                    }
+
+                    Column[] cols = ParseColumns(s);
+                    Row[] rows = ParseRows(s, cols);
+                    return new DecodedResponse(cols, rows);
+                default:
+                    msg = string.Format(
+                        "Expected tsgetresp or tsqueryresp atom, got {0}",
+                        atom);
+                    throw new InvalidOperationException(msg);
+            }
+        }
+
+        private static Column[] ParseColumns(OtpInputStream s)
+        {
+            int colNameCount = s.ReadListHead();
+            string[] columnNames = new string[colNameCount];
+            for (int i = 0; i < colNameCount; i++)
+            {
+                columnNames[i] = s.ReadBinaryAsString(); 
+            }
+
+            if (colNameCount > 0)
+            {
+                s.ReadNil();
+            }
+
+            int colTypeCount = s.ReadListHead();
+            ColumnType[] columnTypes = new ColumnType[colTypeCount];
+            for (int i = 0; i < colTypeCount; i++)
+            {
+                string a = s.ReadAtom();
+                columnTypes[i] = (ColumnType)Enum.Parse(typeof(ColumnType), a, true);
+            }
+
+            if (colTypeCount > 0)
+            {
+                s.ReadNil();
+            }
+
+            return columnNames.Zip(columnTypes, (cname, ctype) => new Column(cname, ctype)).ToArray();
+        }
+
+        private static Row[] ParseRows(OtpInputStream s, Column[] cols)
+        {
+            int rowCount = s.ReadListHead();
+            Row[] rows = new Row[rowCount];
+            for (int i = 0; i < rowCount; i++)
+            {
+                rows[i] = ParseRow(s, cols);
+            }
+
+            if (rowCount > 0)
+            {
+                s.ReadNil();
+            }
+
+            return rows;
+        }
+
+        private static Row ParseRow(OtpInputStream s, Column[] cols)
+        {
+            int cellCount = s.ReadTupleHead();
+            if (cellCount != cols.Length)
+            {
+                string msg = string.Format(
+                    "Expected cell count {0} to equal column count {1}",
+                    cellCount,
+                    cols.Length);
                 throw new InvalidOperationException(msg);
             }
 
-            arity = s.ReadTupleHead();
-            if (arity != 3)
+            Cell[] cells = new Cell[cellCount];
+            for (int i = 0; i < cellCount; i++)
             {
-                throw new InvalidOperationException("Second item in response tuple must be a 3-tuple.");
+                cells[i] = ParseCell(s, i, cols);
             }
 
-            IEnumerable<Column> rv_cols = Enumerable.Empty<Column>();
-            IEnumerable<Row> rv_rows = Enumerable.Empty<Row>();
+            return new Row(cells);
+        }
 
-            ErlList colNames = rt[0] as ErlList;
-            ErlList colTypes = rt[1] as ErlList;
-            if (colNames != null && colTypes != null)
+        private static Cell ParseCell(OtpInputStream s, int i, Column[] cols)
+        {
+            string msg;
+            Column col = cols[i];
+            byte tag = s.Peek();
+            switch (tag)
             {
-                if (colNames.Count > 0)
-                {
-                    var columns = new List<Column>();
-                    for (int i = 0; i < colNames.Count; i++)
+                case OtpExternal.NilTag:
+                    tag = s.Read1(); // NB: actually consume the byte
+                    return new Cell();
+
+                case OtpExternal.BinTag:
+                    if (col.Type != ColumnType.Varchar)
                     {
-                        var columnNameBin = (ErlBinary)colNames[i];
-                        string cname = columnNameBin.ValueAsString;
-
-                        var columnTypeAtom = (ErlAtom)colTypes[i];
-
-                        ColumnType ct = (ColumnType)Enum.Parse(typeof(ColumnType), columnTypeAtom.ValueAsString, true);
-                        columns.Add(new Column(cname, ct));
+                        throw OnBadTag(tag, col, ColumnType.Varchar);
                     }
 
-                    rv_cols = columns;
-                }
-            }
+                    return new Cell(s.ReadBinaryAsString());
 
-            /*
-            ErlList erows = rt[2] as ErlList;
-            if (erows != null)
-            {
-                if (erows.Count > 0)
-                {
-                    var rows = new List<Row>();
-                    for (int i = 0; i < erows.Count; i++)
+                case OtpExternal.SmallIntTag:
+                case OtpExternal.IntTag:
+                case OtpExternal.SmallBigTag:
+                case OtpExternal.LargeBigTag:
+                    if (col.Type != ColumnType.SInt64 && col.Type != ColumnType.Timestamp)
                     {
-                        ErlTuple erow = (ErlTuple)erows[i];
-                        var cells = new List<Cell>();
-                        for (int j = 0; j < erow.Count; j++)
-                        {
-                            IErlObject ecell = erow[j];
-                            if (ecell is ErlList)
-                            {
-                                cells.Add(Cell.Null);
-                            }
-                            else if (ecell is ErlBoolean)
-                            {
-                                cells.Add(new Cell(ecell.ValueAsBool));
-                            }
-                            else if (ecell is ErlBinary)
-                            {
-                                cells.Add(new Cell(ecell.ValueAsString));
-                            }
-                            else if (ecell is ErlLong || ecell is ErlByte)
-                            {
-                                cells.Add(new Cell(ecell.ValueAsLong));
-                            }
-                            else if (ecell is ErlDouble)
-                            {
-                                cells.Add(new Cell(ecell.ValueAsDouble));
-                            }
-                            else if (ecell is ErlBoolean)
-                            {
-                                cells.Add(new Cell(ecell.ValueAsBool));
-                            }
-                            else
-                            {
-                                string msg = string.Format("Can't convert bert value: {0}", ecell.ToString());
-                                throw new InvalidOperationException(msg);
-                            }
-                        }
-
-                        rows.Add(new Row(cells));
+                        throw OnBadTag(tag, col, ColumnType.SInt64, ColumnType.Timestamp);
                     }
 
-                    rv_rows = rows;
-                }
-            }
-            */
+                    // TODO timestamp conversion?
+                    return new Cell(s.ReadLong());
 
-            return new DecodedResponse(rv_cols, rv_rows);
+                case OtpExternal.FloatTag:
+                case OtpExternal.NewFloatTag:
+                    if (col.Type != ColumnType.Double)
+                    {
+                        throw OnBadTag(tag, col, ColumnType.Double);
+                    }
+
+                    return new Cell(s.ReadDouble());
+
+                case OtpExternal.AtomTag:
+                    if (col.Type != ColumnType.Boolean)
+                    {
+                        throw OnBadTag(tag, col, ColumnType.Boolean);
+                    }
+
+                    return new Cell(s.ReadBoolean());
+
+                case OtpExternal.ListTag:
+                    int arity = s.ReadNil();
+                    if (arity == 0)
+                    {
+                        // null cell
+                        return new Cell();
+                    }
+                    else
+                    {
+                        msg = string.Format(
+                            "Expected nil list, got one with arity {0}",
+                            arity);
+                        throw new InvalidOperationException(msg);
+                    }
+
+                default:
+                    msg = string.Format(
+                        "Unknown cell type encountered, tag {0}, '{1}:{2}'",
+                        tag,
+                        col.Name,
+                        col.Type);
+                    throw new InvalidOperationException(msg);
+            }
+        }
+
+        private static Exception OnBadTag(byte tag, Column cgot, params ColumnType[] ctex)
+        {
+            string msg = string.Format(
+                "Expected one of column types {0}, got '{1}:{2}' for data with tag {2}",
+                string.Join(", ", ctex),
+                cgot.Name,
+                cgot.Type,
+                tag);
+            return new InvalidOperationException(msg);
         }
     }
 }

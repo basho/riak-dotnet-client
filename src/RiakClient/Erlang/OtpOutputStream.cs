@@ -117,7 +117,14 @@ namespace RiakClient.Erlang
         /// <param name="s">The string to write.</param>
         public void WriteStringAsBinary(string s)
         {
-            WriteBinary(Encoding.UTF8.GetBytes(s));
+            if (s == null)
+            {
+                throw new ArgumentNullException("s");
+            }
+            else
+            {
+                WriteBinary(Encoding.UTF8.GetBytes(s));
+            }
         }
 
         /// <summary>

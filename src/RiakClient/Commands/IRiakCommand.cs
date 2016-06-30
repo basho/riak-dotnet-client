@@ -9,7 +9,9 @@
     {
         MessageCode ExpectedCode { get; }
 
-        RpbReq ConstructPbRequest();
+        RiakReq ConstructRequest();
+
+        RpbResp DecodeResponse(byte[] buffer);
 
         void OnSuccess(RpbResp rpbResp);
     }

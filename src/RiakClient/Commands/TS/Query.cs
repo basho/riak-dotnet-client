@@ -10,7 +10,7 @@
     /// Fetches timeseries data from Riak
     /// </summary>
     [CLSCompliant(false)]
-    public class Query : Command<QueryOptions, QueryResponse>, IRiakTtbCommand
+    public class Query : Command<QueryOptions, QueryResponse>
     {
         private const string TsQueryReqAtom = "tsqueryreq";
         private const string TsInterpolationAtom = "tsinterpolation";
@@ -36,7 +36,7 @@
             get { return MessageCode.TsQueryResp; }
         }
 
-        public override RpbReq ConstructPbRequest()
+        public override RiakReq ConstructRequest()
         {
             var req = new TsQueryReq();
 
@@ -58,6 +58,7 @@
                 using (var os = new OtpOutputStream())
                 {
                     os.WriteByte(OtpExternal.VersionTag);
+
                     // TsQueryReq is a 4-tuple: {'tsqueryreq', TsInterpolation, boolIsStreaming, bytesCoverContext}
                     os.WriteTupleHead(4);
                     os.WriteAtom(TsQueryReqAtom);
