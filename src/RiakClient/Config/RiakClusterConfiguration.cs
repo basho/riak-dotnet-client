@@ -169,6 +169,11 @@ namespace RiakClient.Config
             return (IRiakClusterConfiguration)config.GetSection(sectionName);
         }
 
+        public override bool IsReadOnly()
+        {
+            return false;
+        }
+
         /// <inheritdoc/>
         void IRiakClusterConfiguration.AddNode(IRiakNodeConfiguration nodeConfiguration)
         {

@@ -28,18 +28,25 @@ namespace Test.Integration
             RiakClient.DisableListBucketsWarning = true;
         }
 
-        public TestBase(bool auth = true)
+        public TestBase(bool useTtb = false, bool auth = true)
         {
+            var config = RiakClusterConfiguration.LoadFromConfig("riak1NodeConfiguration");
+            var noAuthConfig = RiakClusterConfiguration.LoadFromConfig("riak1NodeNoAuthConfiguration");
+            if (useTtb)
+            {
+                config.UseTtbEncoding = true;
+                noAuthConfig.UseTtbEncoding = true;
+            }
 #if NOAUTH
-            cluster = RiakCluster.FromConfig("riak1NodeNoAuthConfiguration");
+            cluster = new RiakCluster(noAuthConfig);
 #else
             if (auth == false || MonoUtil.IsRunningOnMono)
             {
-                cluster = RiakCluster.FromConfig("riak1NodeNoAuthConfiguration");
+                cluster = new RiakCluster(noAuthConfig);
             }
             else
             {
-                cluster = RiakCluster.FromConfig("riak1NodeConfiguration");
+                cluster = new RiakCluster(config);
             }
 
 #endif

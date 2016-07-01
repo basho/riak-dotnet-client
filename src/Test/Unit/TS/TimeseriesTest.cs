@@ -10,8 +10,12 @@ namespace Test.Unit.TS
     [TestFixture, UnitTest]
     public abstract class TimeseriesTest
     {
-        protected static readonly DateTime Now = DateTime.Now;
+        // 1449000732345
+        protected static readonly DateTime Now = new DateTime(2015, 12, 1, 12, 12, 12, 345);
+
+        // 1449000737345
         protected static readonly DateTime NowPlusFive = Now.AddSeconds(5);
+
         protected static readonly TimeSpan Timeout = TimeSpan.FromSeconds(1);
 
         protected static readonly RiakString Table = "GeoCheckin";
@@ -19,8 +23,8 @@ namespace Test.Unit.TS
         protected static readonly bool Boolean0 = false;
         protected static readonly bool Boolean1 = true;
 
-        protected static readonly double Double0 = 12.34F;
-        protected static readonly double Double1 = 56.78F;
+        protected static readonly double Double0 = 12.34f;
+        protected static readonly double Double1 = 56.78f;
 
         protected static readonly long Long0 = 32;
         protected static readonly long Long1 = 54;
@@ -131,6 +135,20 @@ namespace Test.Unit.TS
             return cmd;
         }
 
+        /*
+         * NB: MUST use 18.3 since R16 will generate floats as strings
+        T = {tsputreq,<<"GeoCheckin">>,[],[
+            {false,12.34,32,1449000732345,<<"foobar">>},
+            {true,56.78,54,1449000737345,<<"bazbat">>}]}.
+        rp(term_to_binary(T)).
+        <<131,104,4,100,0,8,116,115,112,117,116,114,101,113,109,0,
+          0,0,10,71,101,111,67,104,101,99,107,105,110,106,108,0,0,
+          0,2,104,5,100,0,5,102,97,108,115,101,70,64,40,174,20,
+          122,225,71,174,97,32,110,6,0,185,134,44,95,81,1,109,0,0,
+          0,6,102,111,111,98,97,114,104,5,100,0,4,116,114,117,101,
+          70,64,76,99,215,10,61,112,164,97,54,110,6,0,65,154,44,
+          95,81,1,109,0,0,0,6,98,97,122,98,97,116,106>>
+        */
         protected static Store BuildStoreReq()
         {
             var cmd = new Store.Builder()

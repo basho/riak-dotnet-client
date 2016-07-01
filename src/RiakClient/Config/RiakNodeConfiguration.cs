@@ -169,5 +169,10 @@ namespace RiakClient.Config
             get { return (string)this["networkConnectTimeout"]; }
             set { this["networkConnectTimeout"] = value; }
         }
+
+        public override bool IsReadOnly()
+        {
+            return false;
+        }
     }
 }

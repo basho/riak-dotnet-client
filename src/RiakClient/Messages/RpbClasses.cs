@@ -14,12 +14,13 @@
 
         public RiakReq()
         {
+            messageCode = MessageCodeTypeMapBuilder.GetMessageCodeFor(GetType());
         }
 
         public RiakReq(MessageCode messageCode)
         {
             this.messageCode = messageCode;
-            this.isMessageCodeOnly = true;
+            isMessageCodeOnly = true;
         }
 
         public MessageCode MessageCode
@@ -297,28 +298,35 @@
 
         private static void maybeRiakError(byte[] response)
         {
-            if (response.Length == 0)
+            if (EnumerableUtil.IsNullOrEmpty(response))
             {
-                // TODO: should this be an error?
-                return;
+                string errMsg = "TTB request returned null or zero-length data buffer.";
+                throw new RiakException(0, errMsg, false);
             }
 
             using (var s = new OtpInputStream(response))
             {
-                int arity = s.ReadTupleHead();
-                if (arity == 3)
+                byte tag = s.Peek();
+                switch (tag)
                 {
-                    byte tag = s.Peek();
-                    if (tag == OtpExternal.AtomTag)
-                    {
-                        string atom = s.ReadAtom();
-                        if (atom.Equals(RpbErrorRespAtom))
+                    case OtpExternal.SmallTupleTag:
+                    case OtpExternal.LargeTupleTag:
+                        int arity = s.ReadTupleHead();
+                        if (arity == 3)
                         {
-                            string errMsg = s.ReadBinaryAsString();
-                            int errCode = (int)s.ReadLong();
-                            throw new RiakException(errCode, errMsg, false);
+                            tag = s.Peek();
+                            if (tag == OtpExternal.AtomTag)
+                            {
+                                string atom = s.ReadAtom();
+                                if (atom.Equals(RpbErrorRespAtom))
+                                {
+                                    string errMsg = s.ReadBinaryAsString();
+                                    int errCode = (int)s.ReadLong();
+                                    throw new RiakException(errCode, errMsg, false);
+                                }
+                            }
                         }
-                    }
+                        break;
                 }
             }
         }

@@ -94,7 +94,12 @@ namespace Test.Integration.TS
          * TODO NB: timeseries does not work with security yet
          */
         public TimeseriesTests()
-            : base(auth: false)
+            : base(useTtb: false, auth: false)
+        {
+        }
+
+        public TimeseriesTests(bool useTtb, bool auth)
+            : base(useTtb, auth)
         {
         }
 
