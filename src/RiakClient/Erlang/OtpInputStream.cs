@@ -298,7 +298,7 @@ namespace RiakClient.Erlang
         /// <summary>
         /// Read an array of bytes
         /// </summary>
-        /// <returns>the value as a big endian 2's complement byte array.</returns>
+        /// <returns>the value as a long.</returns>
         public long ReadLong()
         {
             byte[] nb;
