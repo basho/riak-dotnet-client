@@ -274,7 +274,7 @@
         private static Exception OnBadTag(byte tag, Column cgot, params ColumnType[] ctex)
         {
             string msg = string.Format(
-                "Expected one of column types {0}, got '{1}:{2}' for data with tag {2}",
+                "Expected one of column types {0}, got '{1}:{2}' for data with tag {3}",
                 string.Join(", ", ctex),
                 cgot.Name,
                 cgot.Type,
