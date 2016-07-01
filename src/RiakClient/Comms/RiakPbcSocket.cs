@@ -38,7 +38,6 @@ namespace RiakClient.Comms
         private const int SizeOfInt = sizeof(int);
         private const int PbMsgHeaderSize = SizeOfInt + sizeof(byte);
 
-        private static readonly Type TtbType = typeof(TsTtbMsg);
         private readonly string server;
         private readonly int port;
         private readonly bool useTtb;

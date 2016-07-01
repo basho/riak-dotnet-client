@@ -29,8 +29,6 @@ namespace RiakClient.Erlang
     /// </summary>
     internal class OtpOutputStream : MemoryStream
     {
-        private static readonly byte[] Int64MinValueBytes = { 8, 1, 0, 0, 0, 0, 0, 0, 0, 128 };
-
         /// <summary>
         /// Initializes a new instance of the <see cref="OtpOutputStream" /> class
         /// with the default initial <see cref="MemoryStream"/>size.

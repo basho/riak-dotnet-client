@@ -42,7 +42,6 @@ namespace RiakClient
         private readonly ConcurrentQueue<IRiakNode> offlineNodes;
         private readonly TimeSpan nodePollTime;
         private readonly int defaultRetryCount;
-        private readonly bool useTTBEncoding;
 
         private readonly CancellationTokenSource cts = new CancellationTokenSource();
         private readonly CancellationToken ct;
@@ -60,7 +59,6 @@ namespace RiakClient
         {
             nodePollTime = clusterConfig.NodePollTime;
             defaultRetryCount = clusterConfig.DefaultRetryCount;
-            useTTBEncoding = clusterConfig.UseTtbEncoding;
             RetryWaitTime = clusterConfig.DefaultRetryWaitTime;
 
             nodes = clusterConfig.RiakNodes.Select(rn =>

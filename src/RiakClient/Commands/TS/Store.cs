@@ -129,7 +129,7 @@
                 var ttbresp = (TsTtbResp)response;
                 using (var s = new OtpInputStream(ttbresp.Response))
                 {
-                    int arity = s.ReadTupleHead();
+                    s.ReadTupleHead();
                     string atom = s.ReadAtom();
                     if (atom.Equals(TsPutRespAtom) == false)
                     {
