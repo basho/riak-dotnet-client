@@ -177,6 +177,10 @@ namespace RiakClient.Erlang
                 return;
             }
 
+            /*
+             * NB: from here on out the value is expected in little endian format
+             * http://erlang.org/doc/apps/erts/erl_ext_dist.html#id95895
+             */
             bool negative = l < 0 ? true : false;
             ulong v = (ulong)(negative ? -l : l);
 
