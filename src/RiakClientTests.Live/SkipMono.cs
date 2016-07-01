@@ -1,4 +1,4 @@
-﻿// <copyright file="SkipMono.cs" company="Basho Technologies, Inc.">
+// <copyright file="SkipMono.cs" company="Basho Technologies, Inc.">
 // Copyright 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,

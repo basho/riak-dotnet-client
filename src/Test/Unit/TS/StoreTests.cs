@@ -5,6 +5,7 @@ namespace Test.Unit.TS
     using RiakClient;
     using RiakClient.Commands.TS;
     using RiakClient.Messages;
+    using RiakClient.Util;
 
     public class StoreTests : TimeseriesTest
     {
@@ -24,6 +25,11 @@ namespace Test.Unit.TS
         [Test]
         public void Should_Build_TTB_Req()
         {
+            if (MonoUtil.IsRunningOnMono)
+            {
+                return;
+            }
+
             Store cmd = BuildStoreReq();
             Assert.AreEqual(MessageCode.TsPutResp, cmd.ExpectedCode);
 
