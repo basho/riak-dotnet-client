@@ -216,8 +216,11 @@
   </Target>
 
   <Target Name="CodeAnalysis">
+    <PropertyGroup Condition="'$(VisualStudioVersion)' == ''">
+      <VisualStudioVersion>12.0</VisualStudioVersion>
+    </PropertyGroup>
     <MSBuild Projects="$(SolutionFile)"
-             Properties="Configuration=Debug;VisualStudioVersion=12.0;CodeAnalysisTreatWarningsAsErrors=true;CodeAnalysisRuleSet=MinimumRecommendedRules.ruleset;RunCodeAnalysis=true" />
+             Properties="Configuration=Debug;VisualStudioVersion=$(VisualStudioVersion);CodeAnalysisTreatWarningsAsErrors=true;CodeAnalysisRuleSet=MinimumRecommendedRules.ruleset;RunCodeAnalysis=true" />
   </Target>
 
   <Target Name="UnitTest" DependsOnTargets="GitSubmodule;SetupTests;Debug;CodeAnalysis">
