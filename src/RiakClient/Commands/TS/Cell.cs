@@ -11,15 +11,84 @@
 
         private readonly bool isNull = false;
         private readonly ColumnType valueType;
-        private readonly string varcharValue;
+        private readonly byte[] varcharValue;
         private readonly long sint64Value;
         private readonly double doubleValue;
-        private readonly DateTime timestampValue;
+        private readonly long timestampValue;
         private readonly bool booleanValue;
 
         public Cell()
         {
             isNull = true;
+            valueType = ColumnType.Null;
+        }
+
+        public Cell(object value, ColumnType valueType)
+        {
+            if (value == null)
+            {
+                isNull = true;
+                this.valueType = ColumnType.Null;
+            }
+            else
+            {
+                this.valueType = valueType;
+                switch (valueType)
+                {
+                    case ColumnType.Boolean:
+                        booleanValue = Convert.ToBoolean(value);
+                        break;
+
+                    case ColumnType.Double:
+                        doubleValue = Convert.ToDouble(value);
+                        break;
+
+                    case ColumnType.SInt64:
+                        sint64Value = Convert.ToInt64(value);
+                        break;
+
+                    case ColumnType.Timestamp:
+                        if (value is DateTime)
+                        {
+                            timestampValue = DateTimeUtil.ToUnixTimeMillis((DateTime)value);
+                        }
+                        else
+                        {
+                            timestampValue = Convert.ToInt64(value);
+                        }
+
+                        break;
+
+                    case ColumnType.Varchar:
+                        var bytes = value as byte[];
+                        if (bytes != null)
+                        {
+                            varcharValue = bytes;
+                        }
+                        else
+                        {
+                            var s = Convert.ToString(value);
+                            varcharValue = RiakString.ToBytes(s);
+                        }
+
+                        break;
+
+                    default:
+                        string msg = string.Format("Unknown value type: {0}", valueType);
+                        throw new ArgumentException(msg);
+                }
+            }
+        }
+
+        public Cell(byte[] value)
+        {
+            if (EnumerableUtil.IsNullOrEmpty(value))
+            {
+                throw new ArgumentNullException("value", "Value must not be null or empty. Use the zero-arg ctor for null cells.");
+            }
+
+            varcharValue = value;
+            valueType = ColumnType.Varchar;
         }
 
         public Cell(string value)
@@ -29,14 +98,22 @@
                 throw new ArgumentNullException("value", "Value must not be null.");
             }
 
-            varcharValue = value;
+            varcharValue = RiakString.ToBytes(value);
             valueType = ColumnType.Varchar;
         }
 
-        public Cell(long value)
+        public Cell(long value, bool isUnixTimestamp = false)
         {
-            sint64Value = value;
-            valueType = ColumnType.SInt64;
+            if (isUnixTimestamp)
+            {
+                timestampValue = value;
+                valueType = ColumnType.Timestamp;
+            }
+            else
+            {
+                sint64Value = value;
+                valueType = ColumnType.SInt64;
+            }
         }
 
         public Cell(double value)
@@ -47,7 +124,7 @@
 
         public Cell(DateTime value)
         {
-            timestampValue = value;
+            timestampValue = DateTimeUtil.ToUnixTimeMillis(value);
             valueType = ColumnType.Timestamp;
         }
 
@@ -57,16 +134,122 @@
             valueType = ColumnType.Boolean;
         }
 
-        public ColumnType? ValueType
+        public ColumnType ValueType
+        {
+            get { return valueType; }
+        }
+
+        public bool ValueAsBoolean
         {
             get
             {
                 if (isNull)
                 {
-                    return null;
+                    throw new InvalidOperationException("Can't decode value as Boolean.");
                 }
 
-                return valueType;
+                if (valueType == ColumnType.Boolean)
+                {
+                    return booleanValue;
+                }
+
+                throw new InvalidOperationException("Can't decode value as Boolean.");
+            }
+        }
+
+        public double ValueAsDouble
+        {
+            get
+            {
+                if (isNull)
+                {
+                    throw new InvalidOperationException("Can't decode value as Double.");
+                }
+
+                if (valueType == ColumnType.Double)
+                {
+                    return doubleValue;
+                }
+
+                throw new InvalidOperationException("Can't decode value as Double.");
+            }
+        }
+
+        public long ValueAsLong
+        {
+            get
+            {
+                if (isNull)
+                {
+                    throw new InvalidOperationException("Can't decode value as Long.");
+                }
+
+                if (valueType == ColumnType.Timestamp)
+                {
+                    return timestampValue;
+                }
+
+                if (valueType == ColumnType.SInt64)
+                {
+                    return sint64Value;
+                }
+
+                throw new InvalidOperationException("Can't decode value as Long.");
+            }
+        }
+
+        public long ValueAsTimestamp
+        {
+            get
+            {
+                if (isNull)
+                {
+                    throw new InvalidOperationException("Can't decode value as Timestamp.");
+                }
+
+                if (valueType == ColumnType.Timestamp)
+                {
+                    return timestampValue;
+                }
+
+                throw new InvalidOperationException("Can't decode value as Timestamp.");
+            }
+        }
+
+        public DateTime ValueAsDateTime
+        {
+            get
+            {
+                long ts = ValueAsTimestamp;
+                return DateTimeUtil.FromUnixTimeMillis(ts);
+            }
+        }
+
+        public byte[] ValueAsBytes
+        {
+            get
+            {
+                if (valueType == ColumnType.Varchar)
+                {
+                    return varcharValue;
+                }
+
+                throw new InvalidOperationException("Can't decode value as byte array.");
+            }
+        }
+
+        public string ValueAsString
+        {
+            get
+            {
+                string s = null;
+                byte[] bytes = ValueAsBytes;
+                if (bytes != null)
+                {
+                    s = RiakString.FromBytes(varcharValue);
+                }
+
+                return s;
             }
         }
 
@@ -138,14 +321,32 @@
             unchecked
             {
                 int result = valueType.GetHashCode();
-                result = (result * 397) ^ Value.GetHashCode();
+                if (valueType == ColumnType.Varchar)
+                {
+                    for (int i = 0; i < varcharValue.Length; i++)
+                    {
+                        result = (result * 397) ^ varcharValue[i].GetHashCode();
+                    }
+                }
+                else
+                {
+                    result = (result * 397) ^ Value.GetHashCode();
+                }
+
                 return result;
             }
         }
 
         public override string ToString()
         {
-            return Value.ToString();
+            if (Value == null)
+            {
+                return "null";
+            }
+            else
+            {
+                return Value.ToString();
+            }
         }
 
         internal static Cell FromTsCell(TsCell tsc)
@@ -164,13 +365,11 @@
             }
             else if (tsc.timestamp_valueSpecified)
             {
-                return new Cell(
-                    DateTimeUtil.FromUnixTimeMillis(tsc.timestamp_value));
+                return new Cell(tsc.timestamp_value, isUnixTimestamp: true);
             }
             else if (tsc.varchar_valueSpecified)
             {
-                string s = RiakString.FromBytes(tsc.varchar_value);
-                return new Cell(s);
+                return new Cell(tsc.varchar_value);
             }
 
             return new Cell();
@@ -186,7 +385,7 @@
 
             if (valueType == ColumnType.Varchar)
             {
-                os.WriteStringAsBinary(varcharValue);
+                os.WriteBinary(varcharValue);
             }
             else if (valueType == ColumnType.SInt64)
             {
@@ -194,8 +393,7 @@
             }
             else if (valueType == ColumnType.Timestamp)
             {
-                long ts = DateTimeUtil.ToUnixTimeMillis(timestampValue);
-                os.WriteLong(ts);
+                os.WriteLong(timestampValue);
             }
             else if (valueType == ColumnType.Boolean)
             {
@@ -227,10 +425,9 @@
                 case ColumnType.SInt64:
                     return new TsCell { sint64_value = sint64Value };
                 case ColumnType.Timestamp:
-                    long ts = DateTimeUtil.ToUnixTimeMillis(timestampValue);
-                    return new TsCell { timestamp_value = ts };
+                    return new TsCell { timestamp_value = timestampValue };
                 case ColumnType.Varchar:
-                    return new TsCell { varchar_value = RiakString.ToBytes(varcharValue) };
+                    return new TsCell { varchar_value = varcharValue };
                 default:
                     throw new InvalidOperationException("Could not convert to TsCell.");
             }

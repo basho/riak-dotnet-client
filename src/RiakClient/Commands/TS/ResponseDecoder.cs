@@ -221,13 +221,16 @@
                 case OtpExternal.IntTag:
                 case OtpExternal.SmallBigTag:
                 case OtpExternal.LargeBigTag:
-                    if (col.Type != ColumnType.SInt64 && col.Type != ColumnType.Timestamp)
+                    long val = s.ReadLong();
+                    switch (col.Type)
                     {
-                        throw OnBadTag(tag, col, ColumnType.SInt64, ColumnType.Timestamp);
+                        case ColumnType.SInt64:
+                            return new Cell(val, isUnixTimestamp: false);
+                        case ColumnType.Timestamp:
+                            return new Cell(val, isUnixTimestamp: true);
+                        default:
+                            throw OnBadTag(tag, col, ColumnType.SInt64, ColumnType.Timestamp);
                     }
-
-                    // TODO timestamp conversion?
-                    return new Cell(s.ReadLong());
 
                 case OtpExternal.FloatTag:
                 case OtpExternal.NewFloatTag:

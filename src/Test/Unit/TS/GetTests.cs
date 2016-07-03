@@ -33,13 +33,13 @@ namespace Test.Unit.TS
             Assert.True(pb.key[2].sint64_valueSpecified);
             Assert.AreEqual(Cells0[2].Value, pb.key[2].sint64_value);
 
-            var dt = (DateTime)Cells0[3].Value;
+            var dt = Cells0[3].ValueAsDateTime;
             Assert.True(pb.key[3].timestamp_valueSpecified);
             Assert.AreEqual(DateTimeUtil.ToUnixTimeMillis(dt), pb.key[3].timestamp_value);
 
-            var s = RiakString.ToBytes((string)Cells0[4].Value);
+            var bytes = Cells0[4].ValueAsBytes;
             Assert.True(pb.key[4].varchar_valueSpecified);
-            CollectionAssert.AreEqual(s, pb.key[4].varchar_value);
+            CollectionAssert.AreEqual(bytes, pb.key[4].varchar_value);
         }
 
         [Test]
@@ -100,15 +100,14 @@ namespace Test.Unit.TS
                     }
                     else if (tsc.timestamp_valueSpecified)
                     {
-                        DateTime dt = (DateTime)c.Value;
                         Assert.AreEqual(
                             tsc.timestamp_value,
-                            DateTimeUtil.ToUnixTimeMillis(dt));
+                            c.Value);
                     }
                     else if (tsc.varchar_valueSpecified)
                     {
                         byte[] tsc_val = tsc.varchar_value;
-                        byte[] cell_val = RiakString.ToBytes((string)c.Value);
+                        byte[] cell_val = (byte[])c.Value;
                         CollectionAssert.AreEqual(tsc_val, cell_val);
                     }
                     else

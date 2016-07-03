@@ -2,10 +2,11 @@
 {
     public enum ColumnType
     {
-        Varchar,
-        SInt64,
-        Double,
-        Timestamp,
-        Boolean,
+        Null       = -1,
+        Varchar    = 0,
+        SInt64     = 1,
+        Double     = 2,
+        Timestamp  = 3,
+        Boolean    = 4
     }
 }

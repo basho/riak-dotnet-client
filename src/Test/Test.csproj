@@ -69,6 +69,7 @@
     <Compile Include="Unit\Erlang\OtpOutputStreamTests.cs" />
     <Compile Include="Unit\KV\FetchPreflistTests.cs" />
     <Compile Include="Unit\TS\DeleteTests.cs" />
+    <Compile Include="Unit\TS\CellTests.cs" />
     <Compile Include="Unit\TS\ListKeysTests.cs" />
     <Compile Include="Unit\TS\QueryTests.cs" />
     <Compile Include="Unit\TS\TsCellTests.cs" />
