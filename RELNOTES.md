@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+[v2.4.0](https://github.com/basho/riak-dotnet-client/issues?q=milestone%3Ariak-dotnet-client-2.4.0)
+------
+
+* Add support of encoding `Store` and `Query` Riak TS commands in Erlang term format. Compatible with Riak TS 1.3 and above.
+* Add `useTtbEncoding` cluster and node configuration option. Set `useTtbEncoding=false` to *disable* Erlang term format encoding when connecting to a Riak TS 1.2 cluster.
+
 [v2.3.0](https://github.com/basho/riak-dotnet-client/issues?q=milestone%3Ariak-dotnet-client-2.3.0)
 ------
 

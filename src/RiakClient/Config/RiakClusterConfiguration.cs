@@ -104,6 +104,15 @@ namespace RiakClient.Config
             set { this["defaultRetryCount"] = value; }
         }
 
+        /// <inheritdoc/>
+        /// <remarks>Defaults to <b>true</b> if omitted from the configuration file.</remarks>
+        [ConfigurationProperty("useTtbEncoding", DefaultValue = true, IsRequired = false)]
+        public bool UseTtbEncoding
+        {
+            get { return (bool)this["useTtbEncoding"]; }
+            set { this["useTtbEncoding"] = value; }
+        }
+
         /// <summary>
         /// A <see cref="IRiakAuthenticationConfiguration"/> configuration that details any authentication information.
         /// </summary>
@@ -160,10 +169,15 @@ namespace RiakClient.Config
             return (IRiakClusterConfiguration)config.GetSection(sectionName);
         }
 
+        public override bool IsReadOnly()
+        {
+            return false;
+        }
+
         /// <inheritdoc/>
         void IRiakClusterConfiguration.AddNode(IRiakNodeConfiguration nodeConfiguration)
         {
-            this.Nodes.Add((RiakNodeConfiguration)nodeConfiguration);
+            Nodes.Add((RiakNodeConfiguration)nodeConfiguration);
         }
     }
 }

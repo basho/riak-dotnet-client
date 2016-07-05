@@ -44,7 +44,7 @@ namespace RiakClient.Commands.CRDT
             get { return MessageCode.DtFetchResp; }
         }
 
-        public override RpbReq ConstructPbRequest()
+        public override RiakReq ConstructRequest(bool useTtb)
         {
             var req = new DtFetchReq();
 

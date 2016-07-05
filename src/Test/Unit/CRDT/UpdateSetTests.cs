@@ -70,7 +70,7 @@ namespace Test.Unit.CRDT
 
             UpdateSet updateSetCommand = updateSetCommandBuilder.Build();
 
-            DtUpdateReq protobuf = (DtUpdateReq)updateSetCommand.ConstructPbRequest();
+            DtUpdateReq protobuf = (DtUpdateReq)updateSetCommand.ConstructRequest(false);
 
             Assert.AreEqual(Encoding.UTF8.GetBytes(BucketType), protobuf.type);
             Assert.AreEqual(Encoding.UTF8.GetBytes(Bucket), protobuf.bucket);

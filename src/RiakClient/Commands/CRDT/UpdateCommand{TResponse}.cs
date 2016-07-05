@@ -44,7 +44,7 @@ namespace RiakClient.Commands.CRDT
             get { return MessageCode.DtUpdateResp; }
         }
 
-        public override RpbReq ConstructPbRequest()
+        public override RiakReq ConstructRequest(bool useTtb)
         {
             var req = new DtUpdateReq();
 
@@ -73,7 +73,7 @@ namespace RiakClient.Commands.CRDT
             return req;
         }
 
-        public override void OnSuccess(RpbResp response)
+        public override void OnSuccess(RiakResp response)
         {
             if (response == null)
             {

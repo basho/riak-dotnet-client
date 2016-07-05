@@ -20,26 +20,26 @@ namespace Test.Unit.TS
 
             Assert.AreEqual(MessageCode.TsGetResp, cmd.ExpectedCode);
 
-            TsGetReq pb = (TsGetReq)cmd.ConstructPbRequest();
+            TsGetReq pb = (TsGetReq)cmd.ConstructRequest(false);
             Assert.AreEqual(Table, RiakString.FromBytes(pb.table));
             Assert.IsFalse(pb.timeoutSpecified);
 
             Assert.True(pb.key[0].boolean_valueSpecified);
-            Assert.AreEqual(Cells0[0].AsObject, pb.key[0].boolean_value);
+            Assert.AreEqual(Cells0[0].Value, pb.key[0].boolean_value);
 
             Assert.True(pb.key[1].double_valueSpecified);
-            Assert.AreEqual(Cells0[1].AsObject, pb.key[1].double_value);
+            Assert.AreEqual(Cells0[1].Value, pb.key[1].double_value);
 
             Assert.True(pb.key[2].sint64_valueSpecified);
-            Assert.AreEqual(Cells0[2].AsObject, pb.key[2].sint64_value);
+            Assert.AreEqual(Cells0[2].Value, pb.key[2].sint64_value);
 
-            var dt = (DateTime)Cells0[3].AsObject;
+            var dt = Cells0[3].ValueAsDateTime;
             Assert.True(pb.key[3].timestamp_valueSpecified);
             Assert.AreEqual(DateTimeUtil.ToUnixTimeMillis(dt), pb.key[3].timestamp_value);
 
-            var s = RiakString.ToBytes((string)Cells0[4].AsObject);
+            var bytes = Cells0[4].ValueAsBytes;
             Assert.True(pb.key[4].varchar_valueSpecified);
-            CollectionAssert.AreEqual(s, pb.key[4].varchar_value);
+            CollectionAssert.AreEqual(bytes, pb.key[4].varchar_value);
         }
 
         [Test]
@@ -48,7 +48,7 @@ namespace Test.Unit.TS
             Get cmd = BuildGetReqWithTimeout();
             Assert.AreEqual(MessageCode.TsGetResp, cmd.ExpectedCode);
 
-            TsGetReq pb = (TsGetReq)cmd.ConstructPbRequest();
+            TsGetReq pb = (TsGetReq)cmd.ConstructRequest(false);
             Assert.AreEqual(Table, RiakString.FromBytes(pb.table));
 
             Assert.IsTrue(pb.timeoutSpecified);
@@ -88,28 +88,26 @@ namespace Test.Unit.TS
 
                     if (tsc.boolean_valueSpecified)
                     {
-                        Assert.AreEqual(tsc.boolean_value, c.AsObject);
+                        Assert.AreEqual(tsc.boolean_value, c.Value);
                     }
                     else if (tsc.double_valueSpecified)
                     {
-                        Assert.AreEqual(tsc.double_value, c.AsObject);
+                        Assert.AreEqual(tsc.double_value, c.Value);
                     }
                     else if (tsc.sint64_valueSpecified)
                     {
-                        Assert.AreEqual(tsc.sint64_value, c.AsObject);
+                        Assert.AreEqual(tsc.sint64_value, c.Value);
                     }
                     else if (tsc.timestamp_valueSpecified)
                     {
-                        var dt = (Cell<DateTime>)c;
-                        Assert.AreEqual(tsc.timestamp_value, DateTimeUtil.ToUnixTimeMillis(dt.Value));
+                        Assert.AreEqual(
+                            tsc.timestamp_value,
+                            c.Value);
                     }
                     else if (tsc.varchar_valueSpecified)
                     {
                         byte[] tsc_val = tsc.varchar_value;
-
-                        var cell_str = (Cell<string>)c;
-                        byte[] cell_val = RiakString.ToBytes(cell_str.Value);
-
+                        byte[] cell_val = (byte[])c.Value;
                         CollectionAssert.AreEqual(tsc_val, cell_val);
                     }
                     else

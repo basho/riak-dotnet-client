@@ -10,7 +10,7 @@ namespace Test.Integration
     using RiakClient.Util;
 
     [TestFixture, IntegrationTest]
-    public abstract class TestBase
+    public abstract class TestBase : IDisposable
     {
         protected static readonly Random R = new Random();
 
@@ -21,6 +21,7 @@ namespace Test.Integration
         protected IRiakClusterConfiguration clusterConfig;
 
         private static Version riakVersion = null;
+        private bool disposing = false;
 
         static TestBase()
         {
@@ -28,18 +29,25 @@ namespace Test.Integration
             RiakClient.DisableListBucketsWarning = true;
         }
 
-        public TestBase(bool auth = true)
+        public TestBase(bool useTtb = false, bool auth = true)
         {
+            var config = RiakClusterConfiguration.LoadFromConfig("riak1NodeConfiguration");
+            var noAuthConfig = RiakClusterConfiguration.LoadFromConfig("riak1NodeNoAuthConfiguration");
+            if (useTtb)
+            {
+                config.UseTtbEncoding = true;
+                noAuthConfig.UseTtbEncoding = true;
+            }
 #if NOAUTH
-            cluster = RiakCluster.FromConfig("riak1NodeNoAuthConfiguration");
+            cluster = new RiakCluster(noAuthConfig);
 #else
             if (auth == false || MonoUtil.IsRunningOnMono)
             {
-                cluster = RiakCluster.FromConfig("riak1NodeNoAuthConfiguration");
+                cluster = new RiakCluster(noAuthConfig);
             }
             else
             {
-                cluster = RiakCluster.FromConfig("riak1NodeConfiguration");
+                cluster = new RiakCluster(config);
             }
 
 #endif
@@ -71,6 +79,21 @@ namespace Test.Integration
                     var id = new RiakObjectId(BucketType, Bucket, key);
                     client.Delete(id);
                 }
+            }
+        }
+
+        public void Dispose()
+        {
+            disposing = true;
+            Dispose(disposing);
+            GC.SuppressFinalize(disposing);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing && cluster != null)
+            {
+                cluster.Dispose();
             }
         }
 

@@ -8,8 +8,8 @@
     /// <inheritdoc/>
     public class StoreOptions : TimeseriesCommandOptions
     {
-        private IEnumerable<Column> columns;
-        private IEnumerable<Row> rows;
+        private ICollection<Column> columns;
+        private ICollection<Row> rows;
 
         /// <inheritdoc/>
         public StoreOptions(string table)
@@ -20,7 +20,7 @@
         /// <summary>
         /// The columns corresponding to the rows
         /// </summary>
-        public IEnumerable<Column> Columns
+        public ICollection<Column> Columns
         {
             get { return columns; }
             set { columns = value; }
@@ -29,7 +29,7 @@
         /// <summary>
         /// The rows to store in Riak TS
         /// </summary>
-        public IEnumerable<Row> Rows
+        public ICollection<Row> Rows
         {
             get { return rows; }
             set { rows = value; }

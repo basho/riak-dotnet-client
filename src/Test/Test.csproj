@@ -17,7 +17,8 @@
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <NoWarn Condition="$(OS) == 'Windows_NT'">0618</NoWarn>
-    <NuGetPackageImportStamp>6d104edd</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
     <StyleCopTreatErrorsAsWarnings>false</StyleCopTreatErrorsAsWarnings>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -49,6 +50,7 @@
     </Compile>
     <Compile Include="Integration\KV\FetchPreflistTests.cs" />
     <Compile Include="Integration\Issues\GitHub_277.cs" />
+    <Compile Include="Integration\TS\TimeseriesTtbTests.cs" />
     <Compile Include="Integration\TS\TimeseriesTests.cs" />
     <Compile Include="Traits.cs" />
     <Compile Include="Integration\CRDT\UpdateAndFetchSetTests.cs" />
@@ -63,8 +65,11 @@
     <Compile Include="Unit\CRDT\UpdateSetTests.cs" />
     <Compile Include="Unit\CRDT\UpdateCounterTests.cs" />
     <Compile Include="Unit\CRDT\UpdateMapTests.cs" />
+    <Compile Include="Unit\Erlang\OtpInputStreamTests.cs" />
+    <Compile Include="Unit\Erlang\OtpOutputStreamTests.cs" />
     <Compile Include="Unit\KV\FetchPreflistTests.cs" />
     <Compile Include="Unit\TS\DeleteTests.cs" />
+    <Compile Include="Unit\TS\CellTests.cs" />
     <Compile Include="Unit\TS\ListKeysTests.cs" />
     <Compile Include="Unit\TS\QueryTests.cs" />
     <Compile Include="Unit\TS\TsCellTests.cs" />
@@ -108,6 +113,7 @@
       <HintPath>..\..\packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.configuration" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\RiakClient.snk">
@@ -137,7 +143,7 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
-    <Error Condition="'$(OS)' == 'Windows_NT' And !Exists('..\..\packages\StyleCop.MSBuild.4.7.49.1\build\StyleCop.MSBuild.Targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\StyleCop.MSBuild.4.7.49.1\build\StyleCop.MSBuild.Targets'))" />
+    <Error Condition="'$(OS)' == 'Windows_NT' And !Exists('..\..\packages\StyleCop.MSBuild.4.7.54.0\build\StyleCop.MSBuild.Targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\StyleCop.MSBuild.4.7.54.0\build\StyleCop.MSBuild.Targets'))" />
   </Target>
-  <Import Project="..\..\packages\StyleCop.MSBuild.4.7.49.1\build\StyleCop.MSBuild.Targets" Condition="'$(OS)' == 'Windows_NT' And Exists('..\..\packages\StyleCop.MSBuild.4.7.49.1\build\StyleCop.MSBuild.Targets')" />
+  <Import Project="..\..\packages\StyleCop.MSBuild.4.7.54.0\build\StyleCop.MSBuild.Targets" Condition="'$(OS)' == 'Windows_NT' And Exists('..\..\packages\StyleCop.MSBuild.4.7.54.0\build\StyleCop.MSBuild.Targets')" />
 </Project>

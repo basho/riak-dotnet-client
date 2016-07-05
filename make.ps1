@@ -199,6 +199,11 @@ if (! ([String]::IsNullOrEmpty($VersionString))) {
     $version_property = "/property:VersionString=$VersionString"
 }
 
+$vs_version_property = ''
+if (Test-Path -Path HKLM:\SOFTWARE\Microsoft\VisualStudio\14.0) {
+    $vs_version_property = '/property:VisualStudioVersion=14.0'
+}
+
 $script_path = Get-ScriptPath
 
 $build_targets_file = Get-BuildTargetsFile -ScriptPath $script_path
@@ -246,8 +251,8 @@ else
     $maxcpu_property = '/maxcpucount'
 }
 
-Write-Debug "MSBuild command: $msbuild_exe ""/verbosity:$Verbosity"" /nologo /m ""/property:SolutionDir=$script_path\"" ""$maxcpu_property"" ""$version_property"" ""$verbose_property"" ""$git_remote_property"" ""$protogen_property"" ""/target:$Target"" ""$build_targets_file"""
-& $msbuild_exe "/verbosity:$Verbosity" /nologo /m "/property:SolutionDir=$script_path\" "$maxcpu_property" "$version_property" "$verbose_property" "$git_remote_property" "$protogen_property" "/target:$Target" "$build_targets_file"
+Write-Debug "MSBuild command: $msbuild_exe ""/verbosity:$Verbosity"" /nologo /m ""/property:SolutionDir=$script_path\"" ""$maxcpu_property"" ""$version_property"" ""$vs_version_property"" ""$verbose_property"" ""$git_remote_property"" ""$protogen_property"" ""/target:$Target"" ""$build_targets_file"""
+& $msbuild_exe "/verbosity:$Verbosity" /nologo /m "/property:SolutionDir=$script_path\" "$maxcpu_property" "$version_property" "$vs_version_property" "$verbose_property" "$git_remote_property" "$protogen_property" "/target:$Target" "$build_targets_file"
 if ($? -ne $True) {
     throw "$msbuild_exe failed: $LastExitCode"
 }

@@ -40,7 +40,7 @@ namespace Test.Unit.CRDT
                 .WithKey(Key)
                 .Build();
 
-            RpbGetBucketKeyPreflistReq protobuf = (RpbGetBucketKeyPreflistReq)fetch.ConstructPbRequest();
+            RpbGetBucketKeyPreflistReq protobuf = (RpbGetBucketKeyPreflistReq)fetch.ConstructRequest(false);
 
             Assert.AreEqual(BucketType, RiakString.FromBytes(protobuf.type));
             Assert.AreEqual(Bucket, RiakString.FromBytes(protobuf.bucket));

@@ -40,6 +40,7 @@ namespace RiakClient.Comms
 
         private readonly string server;
         private readonly int port;
+        private readonly bool useTtb;
         private readonly Timeout connectTimeout;
         private readonly Timeout readTimeout;
         private readonly Timeout writeTimeout;
@@ -52,9 +53,11 @@ namespace RiakClient.Comms
         {
             server = nodeConfig.HostAddress;
             port = nodeConfig.PbcPort;
+            useTtb = nodeConfig.UseTtbEncoding;
             readTimeout = nodeConfig.NetworkReadTimeout;
             writeTimeout = nodeConfig.NetworkWriteTimeout;
             connectTimeout = nodeConfig.NetworkConnectTimeout;
+
             securityManager = new RiakSecurityManager(server, authConfig);
             checkCertificateRevocation = authConfig.CheckCertificateRevocation;
         }
@@ -85,7 +88,7 @@ namespace RiakClient.Comms
 
         public RiakResult Write(IRiakCommand command)
         {
-            RpbReq request = command.ConstructPbRequest();
+            RiakReq request = command.ConstructRequest(useTtb);
             if (request.IsMessageCodeOnly)
             {
                 Write(request.MessageCode);
@@ -93,13 +96,14 @@ namespace RiakClient.Comms
             }
             else
             {
-                return DoWrite(s => Serializer.Serialize(s, request), request.GetType());
+                return DoWrite(s => request.WriteTo(s), request.MessageCode);
             }
         }
 
         public void Write<T>(T message) where T : class
         {
-            DoWrite(s => Serializer.Serialize(s, message), typeof(T));
+            MessageCode messageCode = MessageCodeTypeMapBuilder.GetMessageCodeFor(typeof(T));
+            DoWrite(s => Serializer.Serialize(s, message), messageCode);
         }
 
         public MessageCode Read(MessageCode expectedCode)
@@ -121,12 +125,15 @@ namespace RiakClient.Comms
             bool done = false;
             do
             {
-                MessageCode expectedCode = command.ExpectedCode;
-                Type expectedType = MessageCodeTypeMapBuilder.GetTypeFor(expectedCode);
+                int size = ReadMessageSize(command.ExpectedCode);
+                byte[] buffer = null;
+                if (size > 0)
+                {
+                    buffer = ReceiveAll(new byte[size]);
+                }
 
-                int size = DoRead(expectedCode, expectedType);
+                RiakResp response = command.DecodeResponse(buffer);
 
-                RpbResp response = DeserializeInstance(expectedType, size);
                 command.OnSuccess(response);
 
                 var streamingResponse = response as IRpbStreamingResp;
@@ -148,8 +155,7 @@ namespace RiakClient.Comms
         {
             Type expectedType = typeof(T);
             MessageCode expectedCode = MessageCodeTypeMapBuilder.GetMessageCodeFor(expectedType);
-
-            int size = DoRead(expectedCode, expectedType);
+            int size = ReadMessageSize(expectedCode);
             return DeserializeInstance<T>(size);
         }
 
@@ -169,7 +175,7 @@ namespace RiakClient.Comms
             }
         }
 
-        private int DoRead(MessageCode expectedCode, Type expectedType)
+        private int ReadMessageSize(MessageCode expectedCode)
         {
             int size = 0;
             MessageCode messageCode = ReceiveHeader(out size);
@@ -185,37 +191,26 @@ namespace RiakClient.Comms
                 throw new RiakException(errorMessage, false);
             }
 
-            /*
-             * Removed #if DEBUG because this seems like a good check
-             * This message code validation is here to make sure that the caller
-             * is getting exactly what they expect.
-             * TODO: FUTURE - does this check impact performance?
-             */
-            Type typeForMessageCode = MessageCodeTypeMapBuilder.GetTypeFor(messageCode);
-            if (typeForMessageCode != expectedType)
-            {
-                string receivedMessageCodeTypeName = MessageCodeTypeMapBuilder.GetTypeNameFor(messageCode);
-                throw new InvalidOperationException(
-                    string.Format(
-                        "Attempt to decode message to type '{0}' when received type '{1}'.",
-                        expectedType.Name,
-                        receivedMessageCodeTypeName));
-            }
-
             return size;
         }
 
-        private MessageCode ReceiveHeader(out int size)
+        private MessageCode ReceiveHeader(out int messageSize)
         {
-            size = 0;
+            messageSize = 0;
 
             byte[] header = ReceiveAll(new byte[5]);
-            size = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(header, 0));
-            MessageCode messageCode = (MessageCode)header[sizeof(int)];
+
+            // NB: this value includes the one byte for message code.
+            messageSize = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(header, 0));
+
+            // NB: decrement messageSize to reflect only the size of the message itself
+            messageSize--;
+
+            MessageCode messageCode = (MessageCode)header[SizeOfInt];
 
             if (messageCode == MessageCode.RpbErrorResp)
             {
-                var error = DeserializeInstance<RpbErrorResp>(size);
+                var error = DeserializeInstance<RpbErrorResp>(messageSize);
                 string errorMessage = error.errmsg.FromRiakString();
                 throw new RiakException((int)error.errcode, errorMessage, false);
             }
@@ -223,7 +218,7 @@ namespace RiakClient.Comms
             return messageCode;
         }
 
-        private RiakResult DoWrite(Action<MemoryStream> serializer, Type messageType)
+        private RiakResult DoWrite(Action<MemoryStream> serializer, MessageCode messageCode)
         {
             byte[] messageBody;
             int messageLength = 0;
@@ -243,9 +238,14 @@ namespace RiakClient.Comms
                 messageBody = new byte[PbMsgHeaderSize];
             }
 
-            MessageCode messageCode = MessageCodeTypeMapBuilder.GetMessageCodeFor(messageType);
-            var size = BitConverter.GetBytes(IPAddress.HostToNetworkOrder((int)messageLength - PbMsgHeaderSize + 1));
+            byte[] size = BitConverter.GetBytes(messageLength - PbMsgHeaderSize + 1);
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(size);
+            }
+
             Array.Copy(size, messageBody, SizeOfInt);
+
             messageBody[SizeOfInt] = (byte)messageCode;
 
             if (NetworkStream.CanWrite)
@@ -335,29 +335,14 @@ namespace RiakClient.Comms
             Read(MessageCode.RpbAuthResp);
         }
 
-        private RpbResp DeserializeInstance(Type respType, int size)
-        {
-            if (size <= 1)
-            {
-                return Activator.CreateInstance(respType) as RpbResp;
-            }
-
-            byte[] resultBuffer = ReceiveAll(new byte[size - 1]);
-
-            using (var memStream = new MemoryStream(resultBuffer))
-            {
-                return Serializer.NonGeneric.Deserialize(respType, memStream) as RpbResp;
-            }
-        }
-
         private T DeserializeInstance<T>(int size) where T : new()
         {
-            if (size <= 1)
+            if (size <= 0)
             {
                 return new T();
             }
 
-            var resultBuffer = ReceiveAll(new byte[size - 1]);
+            var resultBuffer = ReceiveAll(new byte[size]);
 
             using (var memStream = new MemoryStream(resultBuffer))
             {

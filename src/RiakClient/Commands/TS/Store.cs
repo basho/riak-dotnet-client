@@ -2,7 +2,9 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
+    using Erlang;
     using Messages;
     using Util;
 
@@ -11,6 +13,12 @@
     /// </summary>
     public class Store : Command<StoreOptions, StoreResponse>
     {
+        private const string TsPutReqAtom = "tsputreq";
+        private const string TsPutRespAtom = "tsputresp";
+
+        private MessageCode expectedCode = MessageCode.TsPutResp;
+        private bool usingTtb = false;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Store"/> class.
         /// </summary>
@@ -31,38 +39,119 @@
 
         public override MessageCode ExpectedCode
         {
-            get { return MessageCode.TsPutResp; }
+            get { return expectedCode; }
         }
 
-        public override RpbReq ConstructPbRequest()
+        // TODO FUTURE this all really should be in a codec
+        public override RiakReq ConstructRequest(bool useTtb)
         {
-            var req = new TsPutReq();
+            RiakReq rv;
 
-            req.table = CommandOptions.Table;
-
-            if (EnumerableUtil.NotNullOrEmpty(CommandOptions.Columns))
+            if (useTtb)
             {
-                req.columns.AddRange(CommandOptions.Columns.Select(c => c.ToTsColumn()));
+                usingTtb = true;
+                expectedCode = MessageCode.TsTtbMsg;
+
+                byte[] buffer;
+                string tableName = CommandOptions.Table;
+                ICollection<Row> rows = CommandOptions.Rows;
+
+                using (var os = new OtpOutputStream())
+                {
+                    os.WriteByte(OtpExternal.VersionTag);
+
+                    // {tsputreq, tableName, emptyList, rows}
+                    os.WriteTupleHead(4);
+                    os.WriteAtom(TsPutReqAtom);
+                    os.WriteStringAsBinary(tableName);
+                    os.WriteNil();
+
+                    if (rows.Count > 0)
+                    {
+                        os.WriteListHead(rows.Count);
+
+                        foreach (Row r in CommandOptions.Rows)
+                        {
+                            os.WriteTupleHead(r.Cells.Count);
+                            foreach (Cell c in r.Cells)
+                            {
+                                c.ToTtbCell(os);
+                            }
+                        }
+
+                        os.WriteNil();
+                    }
+                    else
+                    {
+                        os.WriteNil();
+                    }
+
+                    buffer = os.ToArray();
+                }
+
+                rv = new TsTtbMsg(buffer);
+            }
+            else
+            {
+                var req = new TsPutReq();
+
+                req.table = CommandOptions.Table;
+
+                if (EnumerableUtil.NotNullOrEmpty(CommandOptions.Columns))
+                {
+                    req.columns.AddRange(CommandOptions.Columns.Select(c => c.ToTsColumn()));
+                }
+
+                req.rows.AddRange(CommandOptions.Rows.Select(r => r.ToTsRow()));
+
+                rv = req;
             }
 
-            req.rows.AddRange(CommandOptions.Rows.Select(r => r.ToTsRow()));
-
-            return req;
+            return rv;
         }
 
-        public override void OnSuccess(RpbResp response)
+        public override RiakResp DecodeResponse(byte[] buffer)
         {
-            Response = new StoreResponse();
+            if (usingTtb)
+            {
+                return new TsTtbResp(buffer);
+            }
+            else
+            {
+                return base.DecodeResponse(buffer);
+            }
+        }
+
+        public override void OnSuccess(RiakResp response)
+        {
+            if (usingTtb)
+            {
+                var ttbresp = (TsTtbResp)response;
+                using (var s = new OtpInputStream(ttbresp.Response))
+                {
+                    s.ReadTupleHead();
+                    string atom = s.ReadAtom();
+                    if (atom.Equals(TsPutRespAtom) == false)
+                    {
+                        throw new InvalidDataException(
+                            string.Format("Expected {0}, got {1}", TsPutRespAtom, atom));
+                    }
+                }
+            }
+            else
+            {
+                Response = new StoreResponse();
+            }
         }
 
         /// <inheritdoc />
         public class Builder
             : TimeseriesCommandBuilder<Builder, Store, StoreOptions>
         {
-            private IEnumerable<Column> columns;
-            private IEnumerable<Row> rows;
+            private ICollection<Column> columns;
+            private ICollection<Row> rows;
 
-            public Builder WithColumns(IEnumerable<Column> columns)
+            public Builder WithColumns(ICollection<Column> columns)
             {
                 if (EnumerableUtil.IsNullOrEmpty(columns))
                 {
@@ -73,7 +162,7 @@
                 return this;
             }
 
-            public Builder WithRows(IEnumerable<Row> rows)
+            public Builder WithRows(ICollection<Row> rows)
             {
                 if (EnumerableUtil.IsNullOrEmpty(rows))
                 {

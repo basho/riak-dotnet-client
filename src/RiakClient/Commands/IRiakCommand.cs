@@ -7,10 +7,14 @@
     /// </summary>
     public interface IRiakCommand
     {
+        // TODO FUTURE
+        // interface should not be concerned with encoding or Riak msg
         MessageCode ExpectedCode { get; }
 
-        RpbReq ConstructPbRequest();
+        RiakReq ConstructRequest(bool useTtb);
 
-        void OnSuccess(RpbResp rpbResp);
+        RiakResp DecodeResponse(byte[] buffer);
+
+        void OnSuccess(RiakResp rpbResp);
     }
 }

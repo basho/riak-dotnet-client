@@ -20,9 +20,9 @@
             cells = tsr.cells.Select(tsc => Cell.FromTsCell(tsc));
         }
 
-        public IEnumerable<Cell> Cells
+        public ICollection<Cell> Cells
         {
-            get { return cells; }
+            get { return cells.ToArray<Cell>(); }
         }
 
         public bool Equals(Row other)

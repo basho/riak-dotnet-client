@@ -27,7 +27,7 @@ namespace RiakClient.Util
 
         static MonoUtil()
         {
-            IsRunningOnMonoValue = null != Type.GetType("Mono.Runtime");
+            IsRunningOnMonoValue = Type.GetType("Mono.Runtime") != null;
         }
 
         internal static bool IsRunningOnMono

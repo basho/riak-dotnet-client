@@ -92,10 +92,8 @@ namespace RiakClient.Messages
                 { MessageCode.TsCoverageResp, typeof(TsCoverageResp) },
                 { MessageCode.TsCoverageEntry, typeof(TsCoverageEntry) },
                 { MessageCode.TsRange, typeof(TsRange) },
-                { MessageCode.TsTtbPutReq, typeof(TsTtbPutReq) },
 
-                { MessageCode.RpbToggleEncodingReq, typeof(RpbToggleEncodingReq) },
-                { MessageCode.RpbToggleEncodingResp, typeof(RpbToggleEncodingResp) },
+                { MessageCode.TsTtbMsg, typeof(TsTtbMsg) },
 
                 { MessageCode.RpbGetBucketTypeReq, typeof(RpbGetBucketTypeReq) },
                 { MessageCode.RpbSetBucketTypeReq, typeof(RpbSetBucketTypeReq) },

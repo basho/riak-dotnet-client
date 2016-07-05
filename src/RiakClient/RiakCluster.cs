@@ -58,13 +58,16 @@ namespace RiakClient
         public RiakCluster(IRiakClusterConfiguration clusterConfig, IRiakConnectionFactory connectionFactory)
         {
             nodePollTime = clusterConfig.NodePollTime;
-            nodes = clusterConfig.RiakNodes.Select(rn =>
-                new RiakNode(rn, clusterConfig.Authentication, connectionFactory)).Cast<IRiakNode>().ToList();
-            loadBalancer = new RoundRobinStrategy();
-            loadBalancer.Initialise(nodes);
-            offlineNodes = new ConcurrentQueue<IRiakNode>();
             defaultRetryCount = clusterConfig.DefaultRetryCount;
             RetryWaitTime = clusterConfig.DefaultRetryWaitTime;
+
+            nodes = clusterConfig.RiakNodes.Select(rn =>
+                new RiakNode(rn, clusterConfig.Authentication, connectionFactory)).Cast<IRiakNode>().ToList();
+
+            loadBalancer = new RoundRobinStrategy();
+            loadBalancer.Initialise(nodes);
+
+            offlineNodes = new ConcurrentQueue<IRiakNode>();
 
             ct = cts.Token;
             monitorTask = Task.Factory.StartNew(NodeMonitor, ct);
