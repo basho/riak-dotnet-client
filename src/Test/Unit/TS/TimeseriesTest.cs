@@ -11,7 +11,7 @@ namespace Test.Unit.TS
     public abstract class TimeseriesTest
     {
         // 1449000732345
-        protected static readonly DateTime Now = new DateTime(2015, 12, 1, 12, 12, 12, 345);
+        protected static readonly DateTime Now = new DateTime(2015, 12, 1, 20, 12, 12, 345, DateTimeKind.Utc);
 
         // 1449000737345
         protected static readonly DateTime NowPlusFive = Now.AddSeconds(5);
