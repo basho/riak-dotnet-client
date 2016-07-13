@@ -282,7 +282,6 @@
 
     public sealed class TsTtbResp : RiakResp
     {
-        private static readonly string RpbErrorRespAtom = "rpberrorresp";
         private readonly byte[] response;
 
         public TsTtbResp(byte[] response)
@@ -293,41 +292,10 @@
             }
 
             this.response = response;
-            maybeRiakError(response);
-        }
-
-        private static void maybeRiakError(byte[] response)
-        {
-            if (EnumerableUtil.IsNullOrEmpty(response))
+            RiakException ex = TtbErrorDecoder.MaybeRiakError(response);
+            if (ex != null)
             {
-                string errMsg = "TTB request returned null or zero-length data buffer.";
-                throw new RiakException(0, errMsg, false);
-            }
-
-            using (var s = new OtpInputStream(response))
-            {
-                byte tag = s.Peek();
-                switch (tag)
-                {
-                    case OtpExternal.SmallTupleTag:
-                    case OtpExternal.LargeTupleTag:
-                        int arity = s.ReadTupleHead();
-                        if (arity == 3)
-                        {
-                            tag = s.Peek();
-                            if (tag == OtpExternal.AtomTag)
-                            {
-                                string atom = s.ReadAtom();
-                                if (atom.Equals(RpbErrorRespAtom))
-                                {
-                                    string errMsg = s.ReadBinaryAsString();
-                                    int errCode = (int)s.ReadLong();
-                                    throw new RiakException(errCode, errMsg, false);
-                                }
-                            }
-                        }
-                        break;
-                }
+                throw ex;
             }
         }
 

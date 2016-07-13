@@ -72,6 +72,7 @@
     <Compile Include="Unit\TS\CellTests.cs" />
     <Compile Include="Unit\TS\ListKeysTests.cs" />
     <Compile Include="Unit\TS\QueryTests.cs" />
+    <Compile Include="Unit\Erlang\TtbErrorDecoderTests.cs" />
     <Compile Include="Unit\TS\TsCellTests.cs" />
     <Compile Include="Unit\TS\TimeseriesTest.cs" />
     <Compile Include="Unit\TS\StoreTests.cs" />

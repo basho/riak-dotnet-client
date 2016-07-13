@@ -296,6 +296,25 @@ namespace RiakClient.Erlang
         }
 
         /// <summary>
+        /// Can the tag be parsed as a long
+        /// </summary>
+        /// <param name="tag">the tag to check</param>
+        /// <returns>boolean indicating if tag can be parsed as a long.</returns>
+        public bool IsLongTag(byte tag)
+        {
+            switch (tag)
+            {
+                case OtpExternal.SmallIntTag:
+                case OtpExternal.IntTag:
+                case OtpExternal.SmallBigTag:
+                case OtpExternal.LargeBigTag:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>
         /// Read an array of bytes
         /// </summary>
         /// <returns>the value as a long.</returns>
