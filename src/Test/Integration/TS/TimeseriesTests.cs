@@ -207,11 +207,12 @@ namespace Test.Integration.TS
             CollectionAssert.IsNotEmpty(rsp.Columns);
             CollectionAssert.IsNotEmpty(rsp.Value);
 
-            Assert.AreEqual(Columns.Length, rsp.Columns.Count());
+            int columnCount = rsp.Columns.Count();
+            Assert.GreaterOrEqual(columnCount, 5);
             Assert.AreEqual(Columns.Length, rsp.Value.Count());
             foreach (Row row in rsp.Value)
             {
-                Assert.AreEqual(Columns.Length, row.Cells.Count());
+                Assert.AreEqual(columnCount, row.Cells.Count());
             }
         }
 
