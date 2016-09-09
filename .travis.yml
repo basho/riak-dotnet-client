@@ -1,11 +1,11 @@
 sudo: false
-
 branches:
   only:
-    - master
-    - develop
-
+  - master
+  - develop
 language: csharp
-
 script:
-    - make unit-test
+- make unit-test
+notifications:
+  slack:
+    secure: BMJUQTnX21bRh5T4U+dngrmNfMbn19y4c5SbCu3pvlwa1Y3gR7Y2XjKFyeBcWZa9hc5K8/UgEYg8lMIhXQI9gNAlV9h1nUAX332ZS2PbW0HyeK4hKk1Y6rMSOWWXPyQ48mWgTaSZjeBA7jhlJ1mfoX1/IB5qpx59Pn5ZT/cneiE=
