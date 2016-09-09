@@ -783,6 +783,23 @@ namespace RiakClient.Messages
     private bool ShouldSerializewrite_once() { return write_onceSpecified; }
     private void Resetwrite_once() { write_onceSpecified = false; }
     
+    private uint? _hll_precision;
+    [global::ProtoBuf.ProtoMember(29, IsRequired = false, Name=@"hll_precision", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
+    public uint hll_precision
+    {
+      get { return _hll_precision?? default(uint); }
+      set { _hll_precision = value; }
+    }
+    [global::System.Xml.Serialization.XmlIgnore]
+    [global::System.ComponentModel.Browsable(false)]
+    public bool hll_precisionSpecified
+    {
+      get { return this._hll_precision != null; }
+      set { if (value == (this._hll_precision== null)) this._hll_precision = value ? this.hll_precision : (uint?)null; }
+    }
+    private bool ShouldSerializehll_precision() { return hll_precisionSpecified; }
+    private void Resethll_precision() { hll_precisionSpecified = false; }
+    
     [global::ProtoBuf.ProtoContract(Name=@"RpbReplMode")]
     public enum RpbReplMode
     {
