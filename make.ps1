@@ -11,7 +11,7 @@
         * Clean              - clean build artifacts
         * Test               - Run all tests
         * UnitTest           - Run unit tests
-        * Run    - HllTest live integration tests
+        * IntegrationTest    - Run live integration tests
         * IntegrationHllTest - Run live hyperloglog integration tests
 .PARAMETER Verbosity
     Parameter to set MSBuild verbosity
