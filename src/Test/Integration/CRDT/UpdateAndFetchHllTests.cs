@@ -72,7 +72,7 @@ namespace Test.Integration.CRDT
         public void Can_Update_A_Hll()
         {
             string key = Guid.NewGuid().ToString();
-            HllResponse resp = SaveHll(key);
+            SaveHll(key);
 
             var add_3 = new RiakString("add_3");
             var adds = new HashSet<string> { add_3 };
