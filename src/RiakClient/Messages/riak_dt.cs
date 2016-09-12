@@ -231,10 +231,10 @@ namespace RiakClient.Messages
       get { return _map_value; }
     }
   
-    private ulong _hll_value = default(ulong);
+    private long _hll_value = default(long);
     [global::ProtoBuf.ProtoMember(4, IsRequired = false, Name=@"hll_value", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong hll_value
+    [global::System.ComponentModel.DefaultValue(default(long))]
+    public long hll_value
     {
       get { return _hll_value; }
       set { _hll_value = value; }
@@ -640,10 +640,10 @@ namespace RiakClient.Messages
       get { return _map_value; }
     }
   
-    private ulong _hll_value = default(ulong);
+    private long _hll_value = default(long);
     [global::ProtoBuf.ProtoMember(6, IsRequired = false, Name=@"hll_value", DataFormat = global::ProtoBuf.DataFormat.TwosComplement)]
-    [global::System.ComponentModel.DefaultValue(default(ulong))]
-    public ulong hll_value
+    [global::System.ComponentModel.DefaultValue(default(long))]
+    public long hll_value
     {
       get { return _hll_value; }
       set { _hll_value = value; }
