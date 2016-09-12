@@ -98,6 +98,8 @@
 
     public sealed partial class MapOp { }
 
+    public sealed partial class HllOp { }
+
     public sealed partial class DtOp { }
 
     [CLSCompliant(false)]
