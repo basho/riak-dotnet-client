@@ -22,6 +22,7 @@ namespace RiakClientTests.Models
     using System.Linq;
     using NUnit.Framework;
     using RiakClient.Extensions;
+    using RiakClient.Messages;
     using RiakClient.Models;
     using RiakClient.Models.CommitHook;
 
@@ -109,6 +110,23 @@ namespace RiakClientTests.Models
 
             var rpbMessageProps = props.ToMessage();
             Assert.AreEqual("foo", rpbMessageProps.search_index.FromRiakString());
+        }
+
+        [Test]
+        public void WhenRoundtrippingHllPrecisionItShouldStayTheSame()
+        {
+            var defaultProps = new RiakBucketProperties();
+            var defaultRpbBucketProps = defaultProps.ToMessage();
+            var newDefaultProps = new RiakBucketProperties(defaultRpbBucketProps);
+
+            Assert.IsFalse(newDefaultProps.HllPrecision.HasValue);
+
+            var props = new RiakBucketProperties().SetHllPrecision(14);
+            var rpbBucketProps = props.ToMessage();
+            var newProps = new RiakBucketProperties(rpbBucketProps);
+
+            Assert.IsTrue(newProps.HllPrecision.HasValue);
+            Assert.AreEqual(14, newProps.HllPrecision.Value);
         }
     }
 }
