@@ -75,6 +75,11 @@
       <ExcludeFromStyleCop>False</ExcludeFromStyleCop>
     </Compile>
     <Compile Include="Commands\CommandBuilder{TBuilder,TCommand,TOptions}.cs" />
+    <Compile Include="Commands\CRDT\HllResponse.cs" />
+    <Compile Include="Commands\CRDT\FetchHllOptions.cs" />
+    <Compile Include="Commands\CRDT\FetchHll.cs" />
+    <Compile Include="Commands\CRDT\UpdateHll.cs" />
+    <Compile Include="Commands\CRDT\UpdateHllOptions.cs" />
     <Compile Include="Commands\KvCommandBuilder{TBuilder,TCommand,TOptions}.cs" />
     <Compile Include="Commands\CommandOptions.cs" />
     <Compile Include="Commands\Response{TValue}.cs" />

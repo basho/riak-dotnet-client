@@ -90,6 +90,11 @@ namespace RiakClient.Models
             DataType = bucketProps.datatype.FromRiakString();
 
             Consistent = bucketProps.consistent;
+
+            if (bucketProps.hll_precisionSpecified)
+            {
+                HllPrecision = (int)bucketProps.hll_precision;
+            }
         }
 
         /// <summary>
@@ -228,6 +233,11 @@ namespace RiakClient.Models
         /// Indicates whether Riak Search (2.0+) is enabled for this bucket, and which Search Index is assigned to it.
         /// </summary>
         public string SearchIndex { get; private set; }
+
+        /// <summary>
+        /// The number of bits to use for HyperLogLog precision. 
+        /// </summary>
+        public int? HllPrecision { get; private set; }
 
         /// <summary>
         /// An indicator of whether legacy search indexing is enabled on the bucket. Please use <see cref="LegacySearchEnabled"/> instead.
@@ -437,6 +447,26 @@ namespace RiakClient.Models
         public RiakBucketProperties SetSearchIndex(string searchIndex)
         {
             SearchIndex = searchIndex;
+            return this;
+        }
+
+        /// <summary>
+        /// Fluent setter for the <see cref="HllPrecision"/> property.
+        /// Sets the number of bits to use for HyperLogLog precision. 
+        /// Valid values are [4 - 16] inclusive, default is 14 on new buckets.
+        /// <b>NOTE:</b> When changing precision, it may only be reduced from
+        /// it's current value, and never increased.
+        /// </summary>
+        /// <param name="precision">The number of bits to use for hyperloglogs in this bucket.</param>
+        /// <returns>A reference to the current properties object.</returns>
+        public RiakBucketProperties SetHllPrecision(int precision)
+        {
+            if (precision < 4 || precision > 16)
+            {
+                throw new ArgumentOutOfRangeException("precision", precision, "HllPrecision must be between 4 and 16 inclusive.");
+            }
+
+            HllPrecision = precision;
             return this;
         }
 
@@ -692,6 +722,11 @@ namespace RiakClient.Models
             if (!string.IsNullOrEmpty(SearchIndex))
             {
                 message.search_index = SearchIndex.ToRiakString();
+            }
+
+            if (HllPrecision.HasValue)
+            {
+                message.hll_precision = (uint)HllPrecision;
             }
 
             return message;
