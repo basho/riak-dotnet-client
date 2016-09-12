@@ -48,6 +48,7 @@
     <Compile Include="..\CommonAssemblyInfo.cs">
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Integration\CRDT\UpdateAndFetchHllTests.cs" />
     <Compile Include="Integration\KV\FetchPreflistTests.cs" />
     <Compile Include="Integration\Issues\GitHub_277.cs" />
     <Compile Include="Integration\TS\TimeseriesTtbTests.cs" />
@@ -59,9 +60,11 @@
     <Compile Include="Integration\TestBase.cs" />
     <Compile Include="Logging.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Unit\CRDT\FetchHllTests.cs" />
     <Compile Include="Unit\CRDT\FetchSetTests.cs" />
     <Compile Include="Unit\CRDT\FetchMapTests.cs" />
     <Compile Include="Unit\CRDT\FetchCounterTests.cs" />
+    <Compile Include="Unit\CRDT\UpdateHllTests.cs" />
     <Compile Include="Unit\CRDT\UpdateSetTests.cs" />
     <Compile Include="Unit\CRDT\UpdateCounterTests.cs" />
     <Compile Include="Unit\CRDT\UpdateMapTests.cs" />
