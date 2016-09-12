@@ -463,7 +463,7 @@ namespace RiakClient.Models
         {
             if (precision < 4 || precision > 16)
             {
-                throw new ArgumentOutOfRangeException(nameof(precision), precision, "HllPrecision must be between 4 and 16 inclusive.");
+                throw new ArgumentOutOfRangeException("precision", precision, "HllPrecision must be between 4 and 16 inclusive.");
             }
 
             HllPrecision = precision;

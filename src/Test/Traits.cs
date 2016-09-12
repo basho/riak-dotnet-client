@@ -9,4 +9,8 @@
     public class IntegrationTest : CategoryAttribute
     {
     }
+
+    public class IntegrationHllTest : CategoryAttribute
+    {
+    }
 }

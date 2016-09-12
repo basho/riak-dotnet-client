@@ -26,6 +26,7 @@ namespace Test.Integration.CRDT
     using RiakClient;
     using RiakClient.Commands.CRDT;
 
+    [TestFixture, IntegrationHllTest]
     public class UpdateAndFetchHllTests : TestBase
     {
         private static readonly ILog Log = Logging.GetLogger(typeof(UpdateAndFetchHllTests));

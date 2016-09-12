@@ -43,6 +43,9 @@ namespace RiakClient.Commands.CRDT
         /// Get the estimated cardinality of the HyperLogLog.
         /// Alias for Value.
         /// </summary>
-        public long Cardinality => Value;
+        public long Cardinality
+        {
+            get { return Value; }
+        }
     }
 }

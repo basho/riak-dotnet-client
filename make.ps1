@@ -5,13 +5,14 @@
     This script ensures that your build environment is sane and will run MSBuild.exe correctly depending on parameters passed to this script.
 .PARAMETER Target
     Target to build. Can be one of the following:
-        * Debug           - debug build that is not versioned (default)
-        * Release         - release build that versioned
-        * All             - debug and release build (parallel)
-        * Clean           - clean build artifacts
-        * Test            - Run all tests
-        * UnitTest        - Run unit tests
-        * IntegrationTest - Run live integration tests
+        * Debug              - debug build that is not versioned (default)
+        * Release            - release build that versioned
+        * All                - debug and release build (parallel)
+        * Clean              - clean build artifacts
+        * Test               - Run all tests
+        * UnitTest           - Run unit tests
+        * Run    - HllTest live integration tests
+        * IntegrationHllTest - Run live hyperloglog integration tests
 .PARAMETER Verbosity
     Parameter to set MSBuild verbosity
 .EXAMPLE
@@ -28,7 +29,7 @@
 Param(
     [Parameter(Mandatory=$False, Position=0)]
     [ValidateSet('Debug','Release', 'All', 'Publish', 'Clean', 'CleanAll',
-        'Test','TestAll','UnitTest','IntegrationTest','DeprecatedTest','TimeseriesTest',
+        'Test','TestAll','UnitTest','IntegrationTest','DeprecatedTest','TimeseriesTest','IntegrationHllTest',
         'CodeAnalysis','Documentation','ProtoGen',
         IgnoreCase = $True)]
     [string]$Target = 'Debug',

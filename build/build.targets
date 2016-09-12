@@ -234,7 +234,12 @@
     <Exec WorkingDirectory="$(SolutionDir)"
           Command="$(NUnitConsoleRunnerCommand) -work=$(ProjDir)\RiakClientTests.Live $(ProjDir)\RiakClientTests.Live\RiakClientTests.Live.nunit" />
     <Exec WorkingDirectory="$(SolutionDir)"
-          Command="$(NUnitConsoleRunnerCommand) -work=$(ProjDir)\Test -run=Test.Integration.CRDT,Test.Integration.KV,Test.Integration.Issues $(ProjDir)\Test\Test.nunit" />
+          Command="$(NUnitConsoleRunnerCommand) -work=$(ProjDir)\Test -run=Test.Integration.CRDT,Test.Integration.KV,Test.Integration.Issues -exclude=IntegrationHllTest $(ProjDir)\Test\Test.nunit" />
+  </Target>
+
+  <Target Name="IntegrationHllTest" DependsOnTargets="SetupTests;Debug">
+    <Exec WorkingDirectory="$(SolutionDir)"
+          Command="$(NUnitConsoleRunnerCommand) -work=$(ProjDir)\Test -run=Test.Integration.CRDT -include=IntegrationHllTest $(ProjDir)\Test\Test.nunit" />
   </Target>
 
   <Target Name="TimeseriesTest" DependsOnTargets="SetupTests;Debug">
