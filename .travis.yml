@@ -1,11 +1,18 @@
-sudo: false
-branches:
-  only:
-  - master
-  - develop
+sudo: required
+dist: trusty
 language: csharp
+addons:
+  hosts:
+  - riak-test
+before_script:
+- sudo ./tools/travis-ci/riak-install -i
+- sudo ./tools/devrel/gen-riak-conf /etc/riak/riak.conf 10018 10017
+- sudo ./tools/devrel/strong-consistency-conf /etc/riak/riak.conf
+- sudo ./tools/devrel/gen-adv-conf /etc/riak/advanced.config
+- sudo ./tools/travis-ci/riak-install -s
+- sudo ./tools/devrel/riak-cluster-config "$(which riak-admin)" 10018 true false
 script:
-- make unit-test
+  - make test
 notifications:
   slack:
-    secure: BMJUQTnX21bRh5T4U+dngrmNfMbn19y4c5SbCu3pvlwa1Y3gR7Y2XjKFyeBcWZa9hc5K8/UgEYg8lMIhXQI9gNAlV9h1nUAX332ZS2PbW0HyeK4hKk1Y6rMSOWWXPyQ48mWgTaSZjeBA7jhlJ1mfoX1/IB5qpx59Pn5ZT/cneiE=
+    secure: TsPQu/W0Wcn4vtej0mPlD09+Ww7lhaIFbXM5IcdpCKzpsTsx4tP8kTo1VoD/khBqfDLRw9RBDkzFb96ve5607tg0O1LW3ahSNV3gSEMb555fw5Fnb776/aHKb2qQhpXD+eMmqX1dEx1yaiCcKldXmEz8kKolxcU57xjPAQHlzQQ=
