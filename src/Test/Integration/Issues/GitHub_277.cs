@@ -16,7 +16,7 @@
 // under the License.
 // </copyright>
 
-namespace Test.Integration.CRDT
+namespace Test.Integration.Issues
 {
     using System;
     using NUnit.Framework;
@@ -41,11 +41,21 @@ namespace Test.Integration.CRDT
             string key = Guid.NewGuid().ToString();
             string value = "test value";
 
-            var id = new RiakObjectId(BucketType, Bucket, key);
-            var obj = new RiakObject(id, value, RiakConstants.ContentTypes.TextPlain);
+            var r = client.GetBucketProperties(BucketType, Bucket);
 
-            RiakResult<RiakObject> rslt = client.Put(obj);
-            Assert.True(rslt.IsSuccess, rslt.ErrorMessage);
+            // TODO FUTURE - someday Riak will return useful error codes
+            if (!r.IsSuccess && r.ErrorMessage.ToLowerInvariant().Contains("no bucket-type named"))
+            {
+                Assert.Pass("write_once bucket type not available, skipping");
+            }
+            else
+            {
+                var id = new RiakObjectId(BucketType, Bucket, key);
+                var obj = new RiakObject(id, value, RiakConstants.ContentTypes.TextPlain);
+
+                RiakResult<RiakObject> rslt = client.Put(obj);
+                Assert.True(rslt.IsSuccess, rslt.ErrorMessage);
+            }
         }
     }
 }
