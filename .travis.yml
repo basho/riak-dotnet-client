@@ -3,17 +3,13 @@ dist: trusty
 language: csharp
 addons:
   hosts:
-  - riak-test
+    - riak-test
 env:
   - RIAK_DOWNLOAD_URL=http://s3.amazonaws.com/downloads.basho.com/riak/2.0/2.0.7/ubuntu/trusty/riak_2.0.7-1_amd64.deb
   - RIAK_DOWNLOAD_URL=http://s3.amazonaws.com/downloads.basho.com/riak/2.1/2.1.4/ubuntu/trusty/riak_2.1.4-1_amd64.deb
 before_script:
-- sudo ./tools/travis-ci/riak-install -i -d "$RIAK_DOWNLOAD_URL"
-- sudo ./tools/devrel/gen-riak-conf /etc/riak/riak.conf 10018 10017
-- sudo ./tools/devrel/strong-consistency-conf /etc/riak/riak.conf
-- sudo ./tools/devrel/gen-adv-conf /etc/riak/advanced.config
-- sudo ./tools/travis-ci/riak-install -s
-- sudo ./tools/devrel/riak-cluster-config "$(which riak-admin)" 10018 true false
+  - sudo ./tools/travis-ci/riak-install -i -d "$RIAK_DOWNLOAD_URL"
+  - sudo ./tools/setup-riak -s -c -l 10017:10018
 script:
   - make test
 notifications:
