@@ -106,7 +106,7 @@ namespace RiakClientTests.Json.RiakObjectConversionTests
                 obj.SetObject(testPerson);
             }
             sw.Stop();
-            Console.WriteLine("Serialisation took a total of {0} - {1} per iteration", sw.Elapsed, new TimeSpan(sw.ElapsedTicks / iterations));
+            Console.WriteLine("Serialisation took a total of {0} - {1} per iteration", sw.Elapsed, new TimeSpan(sw.Elapsed.Ticks / iterations));
 
             sw.Reset();
             sw.Start();
@@ -117,7 +117,7 @@ namespace RiakClientTests.Json.RiakObjectConversionTests
                 obj.GetObject<Person>();
             }
             sw.Stop();
-            Console.WriteLine("Deserialisation took a total of {0} - {1} per iteration", sw.Elapsed, new TimeSpan(sw.ElapsedTicks / iterations));
+            Console.WriteLine("Deserialisation took a total of {0} - {1} per iteration", sw.Elapsed, new TimeSpan(sw.Elapsed.Ticks / iterations));
         }
 
         [Test]
