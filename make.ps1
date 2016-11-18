@@ -41,8 +41,6 @@ Param(
     [ValidatePattern("^v[1-9]\.[0-9]\.[0-9](-[a-z0-9]+)?")]
     [string]$VersionString,
     [Parameter(Mandatory=$False)]
-    [switch]$UpdateDependencies,
-    [Parameter(Mandatory=$False)]
     [ValidatePattern("^[a-zA-Z0-9-]+$")]
     [string]$GitRemoteName,
     [Parameter(Mandatory=$False)]
@@ -144,50 +142,27 @@ function Get-NuGetData {
     $script_path = Get-ScriptPath
 
     $nuget_dir = Join-Path -Path $script_path -ChildPath '.nuget'
-    $nuget_config = Join-Path -Path $nuget_dir -ChildPath 'NuGet.config'
     $nuget_exe = Get-PathToNuGetExe -NuGetDir $nuget_dir
     $nuget_packages_dir = Join-Path -Path $script_path -ChildPath 'packages'
-    $nuget_packages_config = Join-Path -Path $nuget_dir -ChildPath 'packages.config'
+    $solution_file = Join-Path -Path $script_path -ChildPath 'RiakClient.sln'
 
     $props = @{
         ScriptPath = $script_path
         Dir = $nuget_dir
-        Config = $nuget_config
         Exe = $nuget_exe
         PackagesDir = $nuget_packages_dir
-        PackagesConfig = $nuget_packages_config
+        SolutionFile = $solution_file
     }
     return New-Object PSObject -Property $props
 }
 
-function Update-Dependencies {
-    $nuget_data = Get-NuGetData
-    $build_dir = Join-Path -Path $nuget_data.ScriptPath -ChildPath 'build'
-    & $nuget_data.Exe install MSBuildTasks -OutputDirectory $build_dir -ConfigFile $nuget_data.Config -ExcludeVersion
-    if ($? -ne $True) {
-        throw "$nuget_data install MSBuildTasks failed: $LastExitCode"
-    }
-    Write-Debug "$nuget_data install MSBuildTasks exit code: $LastExitCode"
-
-    & $nuget_data.Exe update $nuget_data.PackagesConfig -RepositoryPath $nuget_data.PackagesDir -ConfigFile $nuget_data.Config -NonInteractive
-    if ($? -ne $True) {
-        throw "$nuget_data install MSBuildTasks failed: $LastExitCode"
-    }
-    Write-Debug "$nuget_data update exit code: $LastExitCode"
-}
-
 function Restore-Dependencies {
     $nuget_data = Get-NuGetData
-    & $nuget_data.Exe restore $nuget_data.PackagesConfig -PackagesDirectory $nuget_data.PackagesDir -ConfigFile $nuget_data.Config -NonInteractive
+    & $nuget_data.Exe restore -PackagesDirectory $nuget_data.PackagesDir -NonInteractive $nuget_data.SolutionFile
     if ($? -ne $True) {
         throw "$nuget_data restore failed: $LastExitCode"
     }
     Write-Debug "$nuget_data restore exit code: $LastExitCode"
-}
-
-if ($UpdateDependencies) {
-    Update-Dependencies
-    exit 0
 }
 
 Write-Debug "Target: $Target"

@@ -4,8 +4,7 @@ MONO_EXE = mono
 
 NUGET_PKGDIR = $(SLNDIR)/packages
 NUGET_EXE = $(SLNDIR)/.nuget/NuGet.exe
-NUGET_CFG = $(SLNDIR)/.nuget/NuGet.Config
-NUGET_RESTORE = $(MONO_EXE) $(NUGET_EXE) restore -PackagesDirectory $(NUGET_PKGDIR) -ConfigFile $(NUGET_CFG)
+NUGET_RESTORE = $(MONO_EXE) $(NUGET_EXE) restore -PackagesDirectory $(NUGET_PKGDIR)
 
 VERBOSITY = normal
 # NB: SolutionDir *must* end in slash here
@@ -22,7 +21,7 @@ install-deps:
 	$(SLNDIR)/build/install-deps
 
 package-restore:
-	$(NUGET_RESTORE) $(SLNDIR)/.nuget/packages.config
+	$(NUGET_RESTORE) $(SLNDIR)/RiakClient.sln
 
 release: package-restore
 	$(XBUILD) /target:Release $(SLNDIR)/build/build.targets
