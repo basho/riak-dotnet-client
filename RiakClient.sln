@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RiakClient", "src\RiakClient\RiakClient.csproj", "{A2CA0CDC-85BB-489D-99D0-3EE1D135BE17}"
 EndProject
@@ -20,14 +20,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{439A3CE3-A
 		README.md = README.md
 		RELNOTES.md = RELNOTES.md
 		src\RiakClient.shfbproj = src\RiakClient.shfbproj
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{FD5F81AF-F8DA-4A49-BCF9-8CC9BC5BB8BA}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\NuGet.Config = .nuget\NuGet.Config
-		.nuget\NuGet.csproj = .nuget\NuGet.csproj
-		.nuget\NuGet.exe = .nuget\NuGet.exe
-		.nuget\packages.config = .nuget\packages.config
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RiakClientTests.Deprecated", "src\RiakClientTests.Deprecated\RiakClientTests.Deprecated.csproj", "{977A6FBC-9704-4FBD-8F0C-A3BDCFE347C9}"
