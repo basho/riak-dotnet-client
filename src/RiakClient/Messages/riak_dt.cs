@@ -239,6 +239,13 @@ namespace RiakClient.Messages
       get { return _hll_value; }
       set { _hll_value = value; }
     }
+    private readonly global::System.Collections.Generic.List<byte[]> _gset_value = new global::System.Collections.Generic.List<byte[]>();
+    [global::ProtoBuf.ProtoMember(5, Name=@"gset_value", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public global::System.Collections.Generic.List<byte[]> gset_value
+    {
+      get { return _gset_value; }
+    }
+  
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
@@ -286,7 +293,10 @@ namespace RiakClient.Messages
       MAP = 3,
             
       [global::ProtoBuf.ProtoEnum(Name=@"HLL", Value=4)]
-      HLL = 4
+      HLL = 4,
+            
+      [global::ProtoBuf.ProtoEnum(Name=@"GSET", Value=5)]
+      GSET = 5
     }
   
     private global::ProtoBuf.IExtension extensionObject;
@@ -329,6 +339,23 @@ namespace RiakClient.Messages
     public global::System.Collections.Generic.List<byte[]> removes
     {
       get { return _removes; }
+    }
+  
+    private global::ProtoBuf.IExtension extensionObject;
+    global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
+      { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }
+  }
+  
+  [global::System.Serializable, global::ProtoBuf.ProtoContract(Name=@"GSetOp")]
+  public partial class GSetOp : global::ProtoBuf.IExtensible
+  {
+    public GSetOp() {}
+    
+    private readonly global::System.Collections.Generic.List<byte[]> _adds = new global::System.Collections.Generic.List<byte[]>();
+    [global::ProtoBuf.ProtoMember(1, Name=@"adds", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public global::System.Collections.Generic.List<byte[]> adds
+    {
+      get { return _adds; }
     }
   
     private global::ProtoBuf.IExtension extensionObject;
@@ -480,6 +507,14 @@ namespace RiakClient.Messages
     {
       get { return _hll_op; }
       set { _hll_op = value; }
+    }
+    private GSetOp _gset_op = null;
+    [global::ProtoBuf.ProtoMember(5, IsRequired = false, Name=@"gset_op", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    [global::System.ComponentModel.DefaultValue(null)]
+    public GSetOp gset_op
+    {
+      get { return _gset_op; }
+      set { _gset_op = value; }
     }
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
@@ -648,6 +683,13 @@ namespace RiakClient.Messages
       get { return _hll_value; }
       set { _hll_value = value; }
     }
+    private readonly global::System.Collections.Generic.List<byte[]> _gset_value = new global::System.Collections.Generic.List<byte[]>();
+    [global::ProtoBuf.ProtoMember(7, Name=@"gset_value", DataFormat = global::ProtoBuf.DataFormat.Default)]
+    public global::System.Collections.Generic.List<byte[]> gset_value
+    {
+      get { return _gset_value; }
+    }
+  
     private global::ProtoBuf.IExtension extensionObject;
     global::ProtoBuf.IExtension global::ProtoBuf.IExtensible.GetExtensionObject(bool createIfMissing)
       { return global::ProtoBuf.Extensible.GetExtensionObject(ref extensionObject, createIfMissing); }

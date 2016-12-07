@@ -682,7 +682,10 @@ namespace RiakClient.Messages
       TIMESTAMP = 3,
             
       [global::ProtoBuf.ProtoEnum(Name=@"BOOLEAN", Value=4)]
-      BOOLEAN = 4
+      BOOLEAN = 4,
+            
+      [global::ProtoBuf.ProtoEnum(Name=@"BLOB", Value=5)]
+      BLOB = 5
     }
   
 }

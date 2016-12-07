@@ -25,11 +25,6 @@ namespace Test.Unit.TS
         [Test]
         public void Should_Build_TTB_Req()
         {
-            if (MonoUtil.IsRunningOnMono)
-            {
-                return;
-            }
-
             Store cmd = BuildStoreReq();
             Assert.AreEqual(MessageCode.TsPutResp, cmd.ExpectedCode);
 
@@ -43,7 +38,7 @@ namespace Test.Unit.TS
                     109, 0, 0, 0, 10, 71, 101, 111, 67, 104, 101, 99, 107, 105, 110,
                     106, // empty columns
                     108, 0, 0, 0, 2, // 2-list
-                        104, 5, // 5-tuple (row)
+                        104, 6, // 6-tuple (row)
                             100, 0, 5, 102, 97, 108, 115, 101, // false atom
                             /*
                             4> f(Bin), Bin = <<131,70,64,40,174,20,128,0,0,0>>, binary_to_term(Bin).
@@ -53,11 +48,13 @@ namespace Test.Unit.TS
                             97, 32, // small int
                             110, 6, 0, 185, 134, 44, 95, 81, 1, // smallbig 1449000732345
                             109, 0, 0, 0, 6, 102, 111, 111, 98, 97, 114, // binary
-                        104, 5, // 5-tuple (row)
+                            109, 0, 0, 0, 6, 102, 111, 111, 98, 97, 114, // binary
+                        104, 6, // 6-tuple (row)
                             100, 0, 4, 116, 114, 117, 101,  // true atom
                             70, 64, 76, 99, 215, 0, 0, 0, 0, // 56.78 float as double
                             97, 54, // small int
                             110, 6, 0, 65, 154, 44, 95, 81, 1, // smallbig 1449000737345
+                            109, 0, 0, 0, 6, 98, 97, 122, 98, 97, 116, // binary
                             109, 0, 0, 0, 6, 98, 97, 122, 98, 97, 116, // binary
                     106 // 2-list end
             };

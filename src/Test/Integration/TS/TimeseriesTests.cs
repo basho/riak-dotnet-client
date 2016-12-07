@@ -175,6 +175,7 @@ namespace Test.Integration.TS
                                         time timestamp not null,
                                         weather varchar not null,
                                         temperature double,
+                                        data blob,
                   PRIMARY KEY((geohash, user, quantum(time, 15, m)), geohash, user, time))",
                 tableName);
             var cmd = new Query.Builder()
@@ -208,7 +209,7 @@ namespace Test.Integration.TS
             CollectionAssert.IsNotEmpty(rsp.Value);
 
             int columnCount = rsp.Columns.Count();
-            Assert.GreaterOrEqual(columnCount, 5);
+            Assert.True(columnCount >= 5 && columnCount <= 8);
             Assert.AreEqual(Columns.Length, rsp.Value.Count());
             foreach (Row row in rsp.Value)
             {

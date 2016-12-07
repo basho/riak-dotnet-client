@@ -32,16 +32,18 @@ debug: package-restore
 protogen:
 	@echo 'protogen is Windows-only'
 
-# NB: build.targets has debug as a dependency
+# NB: build.targets has debug as a dependency for tests
+test-all: package-restore
+	$(XBUILD) /target:TestAll $(SLNDIR)/build/build.targets
+
 unit-test: package-restore
 	$(XBUILD) /target:UnitTest $(SLNDIR)/build/build.targets
 
-# NB: build.targets has debug as a dependency
 integration-test: package-restore
 	$(XBUILD) /target:IntegrationTest $(SLNDIR)/build/build.targets
 
-test-all: package-restore
-	$(XBUILD) /target:TestAll $(SLNDIR)/build/build.targets
+timeseries-test: package-restore
+	$(XBUILD) /target:TimeseriesTest $(SLNDIR)/build/build.targets
 
 deprecated-test: package-restore
 	$(XBUILD) /target:DeprecatedTest $(SLNDIR)/build/build.targets
@@ -66,6 +68,7 @@ help:
 	@echo ' test             - Run all tests (except deprecated)'
 	@echo ' unit-test        - Run unit tests                   '
 	@echo ' integration-test - Run integration tests            '
+	@echo ' timeseries-test  - Run timeseries tests             '
 	@echo ' deprecated-test  - Run deprecated tests             '
 	@echo ' ----------------------------------------------------'
 	@echo ''

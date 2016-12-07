@@ -60,6 +60,7 @@
                         break;
 
                     case ColumnType.Varchar:
+                    case ColumnType.Blob:
                         var bytes = value as byte[];
                         if (bytes != null)
                         {
@@ -229,7 +230,7 @@
         {
             get
             {
-                if (valueType == ColumnType.Varchar)
+                if (valueType == ColumnType.Varchar || valueType == ColumnType.Blob)
                 {
                     return varcharValue;
                 }
@@ -273,6 +274,7 @@
                     case ColumnType.Timestamp:
                         return timestampValue;
                     case ColumnType.Varchar:
+                    case ColumnType.Blob:
                         return varcharValue;
                     default:
                         throw new InvalidOperationException();
@@ -321,7 +323,7 @@
             unchecked
             {
                 int result = valueType.GetHashCode();
-                if (valueType == ColumnType.Varchar)
+                if (valueType == ColumnType.Varchar || valueType == ColumnType.Blob)
                 {
                     for (int i = 0; i < varcharValue.Length; i++)
                     {
@@ -383,7 +385,7 @@
                 return;
             }
 
-            if (valueType == ColumnType.Varchar)
+            if (valueType == ColumnType.Varchar || valueType == ColumnType.Blob)
             {
                 os.WriteBinary(varcharValue);
             }
@@ -427,6 +429,7 @@
                 case ColumnType.Timestamp:
                     return new TsCell { timestamp_value = timestampValue };
                 case ColumnType.Varchar:
+                case ColumnType.Blob:
                     return new TsCell { varchar_value = varcharValue };
                 default:
                     throw new InvalidOperationException("Could not convert to TsCell.");

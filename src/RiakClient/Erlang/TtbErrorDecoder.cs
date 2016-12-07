@@ -21,7 +21,7 @@
             using (var s = new OtpInputStream(response))
             {
                 string atom;
-                byte tag = s.Peek();
+                byte tag = s.Peek1SkipVersion();
                 switch (tag)
                 {
                     case OtpExternal.AtomTag:
