@@ -122,6 +122,28 @@ namespace RiakClient.Erlang
         }
 
         /// <summary>
+        /// Look ahead one position in the stream, skipping the version tag if it's read.
+        /// </summary>
+        /// <returns>The next byte from the stream.</returns>
+        public byte Peek1SkipVersion()
+        {
+            try
+            {
+                byte tag = Read1();
+                if (tag == OtpExternal.VersionTag)
+                {
+                    tag = Read1();
+                }
+
+                return tag;
+            }
+            finally
+            {
+                Position--;
+            }
+        }
+
+        /// <summary>
         /// Read one byte from the stream.
         /// </summary>
         /// <returns>The next byte from the stream.</returns>

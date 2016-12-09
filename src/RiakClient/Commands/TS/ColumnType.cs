@@ -7,6 +7,7 @@
         SInt64     = 1,
         Double     = 2,
         Timestamp  = 3,
-        Boolean    = 4
+        Boolean    = 4,
+        Blob       = 5
     }
 }

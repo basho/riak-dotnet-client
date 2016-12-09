@@ -35,6 +35,9 @@ namespace Test.Unit.TS
         protected static readonly string Varchar0 = "foobar";
         protected static readonly string Varchar1 = "bazbat";
 
+        protected static readonly byte[] Blob0 = RiakString.ToBytes(Varchar0);
+        protected static readonly byte[] Blob1 = RiakString.ToBytes(Varchar1);
+
         protected static readonly Cell[] Cells0 = new Cell[]
         {
             new Cell(Boolean0),
@@ -42,6 +45,7 @@ namespace Test.Unit.TS
             new Cell(Long0),
             new Cell(Timestamp0),
             new Cell(Varchar0),
+            new Cell(Blob0)
         };
 
         protected static readonly Cell[] Cells1 = new Cell[]
@@ -51,6 +55,7 @@ namespace Test.Unit.TS
             new Cell(Long1),
             new Cell(Timestamp1),
             new Cell(Varchar1),
+            new Cell(Blob1)
         };
 
         protected static readonly Row[] Rows = new Row[]
@@ -68,6 +73,7 @@ namespace Test.Unit.TS
             new Column("long", global::RiakClient.Commands.TS.ColumnType.SInt64),
             new Column("timestamp", global::RiakClient.Commands.TS.ColumnType.Timestamp),
             new Column("string", global::RiakClient.Commands.TS.ColumnType.Varchar),
+            new Column("blob", global::RiakClient.Commands.TS.ColumnType.Blob)
         };
 
         protected static readonly TsColumnDescription[] TsCols = new[]
@@ -96,6 +102,11 @@ namespace Test.Unit.TS
             {
                 name = RiakString.ToBytes("string"),
                 type = TsColumnType.VARCHAR
+            },
+            new TsColumnDescription
+            {
+                name = RiakString.ToBytes("blob"),
+                type = TsColumnType.BLOB
             }
         };
 
@@ -105,7 +116,8 @@ namespace Test.Unit.TS
             new TsCell { double_value = Double0 },
             new TsCell { sint64_value = Long0 },
             new TsCell { timestamp_value = DateTimeUtil.ToUnixTimeMillis(Timestamp0) },
-            new TsCell { varchar_value = RiakString.ToBytes(Varchar0) }
+            new TsCell { varchar_value = RiakString.ToBytes(Varchar0) },
+            new TsCell { varchar_value = Blob0 }
         };
 
         protected static readonly TsCell[] TsCells1 = new[]
@@ -114,7 +126,8 @@ namespace Test.Unit.TS
             new TsCell { double_value = Double1 },
             new TsCell { sint64_value = Long1 },
             new TsCell { timestamp_value = DateTimeUtil.ToUnixTimeMillis(Timestamp1) },
-            new TsCell { varchar_value = RiakString.ToBytes(Varchar1) }
+            new TsCell { varchar_value = RiakString.ToBytes(Varchar1) },
+            new TsCell { varchar_value = Blob1 }
         };
 
         protected static readonly TsRow[] TsRows = new[] { new TsRow(), new TsRow() };

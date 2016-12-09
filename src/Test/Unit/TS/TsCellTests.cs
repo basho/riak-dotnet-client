@@ -31,6 +31,10 @@ namespace Test.Unit.TS
             c0 = new TsCell { varchar_value = RiakString.ToBytes(Varchar0) };
             c1 = new TsCell { varchar_value = RiakString.ToBytes(Varchar0) };
             Assert.AreEqual(c0, c1, string.Format("c0 {0} c1 {1}", c0, c1));
+
+            c0 = new TsCell { varchar_value = Blob0 };
+            c1 = new TsCell { varchar_value = Blob0 };
+            Assert.AreEqual(c0, c1, string.Format("c0 {0} c1 {1}", c0, c1));
         }
     }
 }

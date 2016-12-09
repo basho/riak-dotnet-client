@@ -94,6 +94,8 @@
 
     public sealed partial class SetOp { }
 
+    public sealed partial class GSetOp { }
+
     public sealed partial class MapUpdate { }
 
     public sealed partial class MapOp { }

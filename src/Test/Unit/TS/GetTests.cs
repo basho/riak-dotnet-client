@@ -40,6 +40,10 @@ namespace Test.Unit.TS
             var bytes = Cells0[4].ValueAsBytes;
             Assert.True(pb.key[4].varchar_valueSpecified);
             CollectionAssert.AreEqual(bytes, pb.key[4].varchar_value);
+
+            bytes = Cells0[5].ValueAsBytes;
+            Assert.True(pb.key[5].varchar_valueSpecified);
+            CollectionAssert.AreEqual(bytes, pb.key[5].varchar_value);
         }
 
         [Test]

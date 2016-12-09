@@ -210,12 +210,14 @@
                     return new Cell();
 
                 case OtpExternal.BinTag:
-                    if (col.Type != ColumnType.Varchar)
+                    if (col.Type == ColumnType.Varchar || col.Type == ColumnType.Blob)
                     {
-                        throw OnBadTag(tag, col, ColumnType.Varchar);
+                        return new Cell(s.ReadBinaryAsString());
                     }
-
-                    return new Cell(s.ReadBinaryAsString());
+                    else
+                    {
+                        throw OnBadTag(tag, col, ColumnType.Varchar, ColumnType.Blob);
+                    }
 
                 case OtpExternal.SmallIntTag:
                 case OtpExternal.IntTag:
