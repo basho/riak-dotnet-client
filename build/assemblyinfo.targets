@@ -11,19 +11,15 @@
     <Delete Files="$(CommonAssemblyInfoFile)" />
   </Target>
 
-  <Target Name="PopulateVersionInformation" Condition="'$(OS)' == 'Windows_NT'">
-
+  <Target Name="PopulateVersionInformation">
     <GitDescribe LocalPath="$(SolutionDir)" Condition="'$(VersionString)' == 'unknown'">
       <Output TaskParameter="CommitHash" PropertyName="GitCommitHash" />
       <Output TaskParameter="Tag" PropertyName="VersionString" />
     </GitDescribe>
-
     <GitDescribe LocalPath="$(SolutionDir)" Condition="'$(Configuration)' == 'Release' And '$(VersionString)' != 'unknown'">
       <Output TaskParameter="CommitHash" PropertyName="GitCommitHash" />
     </GitDescribe>
-
     <Message Text="Parsing VersionString: $(VersionString)" />
-
     <!--
       NB: these regexes are Mono and Windows compatible. "\." to represent literal period
           does not work on Mono 3.10
@@ -40,51 +36,15 @@
     <RegexReplace Input="$(VersionString)" Expression="v[0-9][.][0-9][.][0-9](-[a-z0-9]+)?" Replacement="$1" Count="1">
       <Output PropertyName="VPreRelease" TaskParameter="Output" />
     </RegexReplace>
-
     <Message Text="VersionString: $(VersionString) Version: $(VMajor).$(VMinor).$(VPatch) PreRelease: $(VPreRelease)"/>
-
   </Target>
 
-  <Target Name="GenerateCommonAssemblyInfo" DependsOnTargets="_GenAssemblyInfo_Mono;_GenAssemblyInfo_Win32" />
-
-  <Target Name="_GenAssemblyInfo_Mono" Condition="'$(OS)' != 'Windows_NT'">
-    <ItemGroup>
-      <AssemblyInfo Include="Content"><Text><![CDATA[
-[assembly: System.Reflection.AssemblyCompany("Basho Technologies")]
-[assembly: System.Reflection.AssemblyCopyright("Copyright 2015 Basho Technologies, Inc. All rights reserved.")]
-[assembly: System.Reflection.AssemblyProduct("riak-dotnet-client")]
-[assembly: System.Reflection.AssemblyTrademark("riak-dotnet-client")]
-[assembly: System.Reflection.AssemblyConfiguration("Debug")]
-[assembly: System.Reflection.AssemblyVersion("2.0.0")]
-[assembly: System.Reflection.AssemblyFileVersion("2.2.0")]
-[assembly: System.Reflection.AssemblyInformationalVersion("unknown")]
-internal sealed partial class ThisAssembly {
-    internal const string AssemblyCompany = "Basho Technologies";
-    internal const string AssemblyCopyright = "Copyright 2015 Basho Technologies, Inc. All rights reserved.";
-    internal const string AssemblyProduct = "riak-dotnet-client";
-    internal const string AssemblyTrademark = "riak-dotnet-client";
-    internal const string AssemblyConfiguration = "Debug";
-    internal const string AssemblyVersion = "2.0.0";
-    internal const string AssemblyFileVersion = "2.2.0";
-    internal const string AssemblyInformationalVersion = "unknown";
-    private ThisAssembly() {
-    }
-}
-]]></Text></AssemblyInfo>
-    </ItemGroup>
-    <WriteLinesToFile File="$(CommonAssemblyInfoFile)" Lines="@(AssemblyInfo->'%(Text)')" Overwrite="true" />
-  </Target>
-
-  <Target Name="_GenAssemblyInfo_Win32" DependsOnTargets="PopulateVersionInformation" Condition="'$(OS)' == 'Windows_NT'">
-
+  <Target Name="GenerateCommonAssemblyInfo" DependsOnTargets="PopulateVersionInformation">
     <Message Text="VersionString: $(VersionString) Version: $(VMajor).$(VMinor).$(VPatch) PreRelease: $(VPreRelease) Commit hash: $(GitCommitHash)"/>
-
     <Time>
       <Output TaskParameter="Year" PropertyName="Year" />
     </Time>
-
     <Attrib Files="$(CommonAssemblyInfoFile)" ReadOnly="False" />
-
     <!-- http://stackoverflow.com/questions/64602/what-are-differences-between-assemblyversion-assemblyfileversion-and-assemblyin -->
     <AssemblyInfo CodeLanguage="CS"
                   OutputFile="$(CommonAssemblyInfoFile)"

@@ -401,12 +401,12 @@
     <CallTarget Targets="CleanCommonAssemblyInfo" />
   </Target>
   <Target Name="AfterBuild" Condition="'$(Configuration)' == 'Release'">
-    <ItemGroup Condition="$(OS) == 'Windows_NT'">
+    <ItemGroup>
       <ZipFiles Include="$(OutputPath)*.dll" />
       <ZipFiles Include="$(OutputPath)*.xml" />
       <ZipFiles Include="$(OutputPath)*.pdb" />
     </ItemGroup>
-    <Zip Condition="$(OS) == 'Windows_NT'" Files="@(ZipFiles)" WorkingDirectory="$(OutputPath)" ZipFileName="$(OutputPath)$(AssemblyName)-$(VersionString).zip" ZipLevel="9" />
+    <Zip Files="@(ZipFiles)" WorkingDirectory="$(OutputPath)" ZipFileName="$(OutputPath)$(AssemblyName)-$(VersionString).zip" ZipLevel="9" />
   </Target>
-  <Import Project="..\..\packages\StyleCop.MSBuild.4.7.54.0\build\StyleCop.MSBuild.Targets" Condition="'$(OS)' == 'Windows_NT' And Exists('..\..\packages\StyleCop.MSBuild.4.7.54.0\build\StyleCop.MSBuild.Targets')" />
+  <Import Project="..\..\packages\StyleCop.MSBuild.4.7.54.0\build\StyleCop.MSBuild.Targets" Condition="Exists('..\..\packages\StyleCop.MSBuild.4.7.54.0\build\StyleCop.MSBuild.Targets')" />
 </Project>

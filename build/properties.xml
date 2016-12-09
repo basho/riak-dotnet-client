@@ -4,10 +4,10 @@
     <!-- NB: necessary to avoid MSB4011 warning -->
     <PropertiesImported>true</PropertiesImported>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">$(MSBuildProjectDirectory)\..\</SolutionDir>
-    <MSBuildCommunityTasksPath Condition="'$(OS)' == 'Windows_NT'">$(SolutionDir)build\MSBuildTasks</MSBuildCommunityTasksPath>
+    <MSBuildCommunityTasksPath>$(SolutionDir)build\MSBuildTasks</MSBuildCommunityTasksPath>
   </PropertyGroup>
 
-  <Import Project="$(MSBuildCommunityTasksPath)\MSBuild.Community.Tasks.targets" Condition="'$(OS)' == 'Windows_NT'"/>
+  <Import Project="$(MSBuildCommunityTasksPath)\MSBuild.Community.Tasks.targets"/>
 
   <PropertyGroup>
 
@@ -21,7 +21,7 @@
 
     <CommonAssemblyInfoFile>$(SolutionDir)src\CommonAssemblyInfo.cs</CommonAssemblyInfoFile>
 
-    <MonoExe Condition="'$(OS)' != 'Windows_NT'">mono --debug --runtime=v4.0.30319</MonoExe>
+    <MonoExe Condition="'$(OS)' != 'Windows_NT'">mono</MonoExe>
 
     <ProtoDir>$(SolutionDir)src\riak_pb\src</ProtoDir>
     <ProtoMsgDir>$(RiakClientProjDir)\Messages</ProtoMsgDir>
