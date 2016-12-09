@@ -4,7 +4,7 @@
     <!-- NB: necessary to avoid MSB4011 warning -->
     <PropertiesImported>true</PropertiesImported>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">$(MSBuildProjectDirectory)\..\</SolutionDir>
-    <MSBuildCommunityTasksPath Condition="'$(OS)' == 'Windows_NT'">$(SolutionDir)build\MSBuildTasks\tools</MSBuildCommunityTasksPath>
+    <MSBuildCommunityTasksPath Condition="'$(OS)' == 'Windows_NT'">$(SolutionDir)build\MSBuildTasks</MSBuildCommunityTasksPath>
   </PropertyGroup>
 
   <Import Project="$(MSBuildCommunityTasksPath)\MSBuild.Community.Tasks.targets" Condition="'$(OS)' == 'Windows_NT'"/>
