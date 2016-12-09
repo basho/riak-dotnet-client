@@ -256,11 +256,18 @@ namespace RiakClient.Auth
             var clientCertificates = new X509CertificateCollection();
 
             // http://stackoverflow.com/questions/18462064/associate-a-private-key-with-the-x509certificate2-class-in-net
-            if (!string.IsNullOrWhiteSpace(authConfig.ClientCertificateFile) && File.Exists(authConfig.ClientCertificateFile))
+            if (!string.IsNullOrWhiteSpace(authConfig.ClientCertificateFile))
             {
-                // TODO 3.0 FUTURE exception if config is set but file doesn't actually exist
-                var cert = new X509Certificate2(authConfig.ClientCertificateFile);
-                clientCertificates.Add(cert);
+                if (File.Exists(authConfig.ClientCertificateFile))
+                {
+                    var cert = new X509Certificate2(authConfig.ClientCertificateFile);
+                    clientCertificates.Add(cert);
+                }
+                else
+                {
+                    const string ErrMsg = "Client certificate file does not exist!";
+                    throw new FileNotFoundException(ErrMsg, authConfig.ClientCertificateFile);
+                }
             }
 
             if (!string.IsNullOrWhiteSpace(authConfig.ClientCertificateSubject))
@@ -287,7 +294,11 @@ namespace RiakClient.Auth
                 }
             }
 
-            // TODO 3.0 FUTURE exception if expected to get certs but count is 0 here
+            if (!(clientCertificates.Count > 0))
+            {
+                throw new InvalidOperationException("Expected one or more client certificates to be found!");
+            }
+
             return clientCertificates;
         }
     }

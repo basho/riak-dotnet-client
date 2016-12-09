@@ -28,7 +28,7 @@ namespace RiakClientTests.Live.Search
     using RiakClient.Models;
     using RiakClient.Models.Search;
 
-    [TestFixture, IntegrationTest, SkipMono]
+    [TestFixture, IntegrationTest]
     public class TestSearchOperation : LiveRiakConnectionTestBase
     {
         private const string BucketType = "search_type";
@@ -47,7 +47,7 @@ namespace RiakClientTests.Live.Search
         private const string RiakSearchDoc2 =
             "{{\"name_s\":\"{0}Alan Q. Public\", \"age_i\":38, \"bio_tsd\":\"I'm an exciting awesome mathematician\", \"favorites\":{{\"book_tsd\":\"Prelude to Mathematics\",\"album_tsd\":\"The Fame Monster\"}}}}";
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public void Init()
         {
             SetUp();

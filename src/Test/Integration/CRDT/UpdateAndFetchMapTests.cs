@@ -103,7 +103,7 @@ namespace Test.Integration.CRDT
         public void Riak_Can_Generate_Key()
         {
             MapResponse r = SaveMap();
-            Assert.IsNotNullOrEmpty(r.Key);
+            Assert.True(EnumerableUtil.NotNullOrEmpty((string)r.Key));
             Log.DebugFormat("Riak Generated Key: {0}", r.Key);
         }
 

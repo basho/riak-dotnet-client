@@ -15,14 +15,28 @@
             this.cells = cells;
         }
 
-        internal Row(TsRow tsr)
+        internal Row(TsRow tsr, TsColumnDescription[] tscols = null)
         {
-            cells = tsr.cells.Select(tsc => Cell.FromTsCell(tsc));
+            Cell[] cary = new Cell[tsr.cells.Count];
+            for (int i = 0; i < tsr.cells.Count; ++i)
+            {
+                TsCell tsc = tsr.cells[i];
+                TsColumnType tsct = TsColumnType.VARCHAR;
+                if (EnumerableUtil.NotNullOrEmpty(tscols))
+                {
+                    tsct = tscols[i].type;
+                }
+
+                Cell c = Cell.FromTsCell(tsc, tsct);
+                cary[i] = c;
+            }
+
+            cells = cary;
         }
 
         public ICollection<Cell> Cells
         {
-            get { return cells.ToArray<Cell>(); }
+            get { return cells.ToArray(); }
         }
 
         public bool Equals(Row other)

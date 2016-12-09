@@ -70,7 +70,7 @@
 
             if (EnumerableUtil.NotNullOrEmpty(tsrows))
             {
-                rows = tsrows.Select(tsr => new Row(tsr));
+                rows = tsrows.Select(tsr => new Row(tsr, tscols.ToArray()));
             }
 
             decodedResponse = new DecodedResponse(cols, rows);

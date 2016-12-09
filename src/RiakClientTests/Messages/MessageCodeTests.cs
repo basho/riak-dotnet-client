@@ -38,7 +38,7 @@ namespace RiakClientTests.Messages
 
             var currentDir = Environment.CurrentDirectory;
             string riak_pb_messages_file =
-                Path.GetFullPath(Path.Combine(currentDir, "..", "..", "..", "riak_pb", "src", "riak_pb_messages.csv"));
+                Path.GetFullPath(Path.Combine(currentDir, "src", "riak_pb", "src", "riak_pb_messages.csv"));
 
             if (!File.Exists(riak_pb_messages_file))
             {

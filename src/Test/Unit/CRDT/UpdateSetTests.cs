@@ -75,9 +75,9 @@ namespace Test.Unit.CRDT
             Assert.AreEqual(Encoding.UTF8.GetBytes(BucketType), protobuf.type);
             Assert.AreEqual(Encoding.UTF8.GetBytes(Bucket), protobuf.bucket);
             Assert.AreEqual(Encoding.UTF8.GetBytes(Key), protobuf.key);
-            Assert.AreEqual(q3, protobuf.w);
-            Assert.AreEqual(q1, protobuf.pw);
-            Assert.AreEqual(q2, protobuf.dw);
+            Assert.AreEqual((uint)q3, protobuf.w);
+            Assert.AreEqual((uint)q1, protobuf.pw);
+            Assert.AreEqual((uint)q2, protobuf.dw);
             Assert.IsTrue(protobuf.return_body);
             Assert.IsFalse(protobuf.include_context);
             Assert.AreEqual(20000, protobuf.timeout);

@@ -202,7 +202,7 @@ namespace RiakClientTests.KeyFilters
     public class WhenConstructingComplexPredicates : KeyFilterTests
     {
         [Test]
-        [Ignore]
+        [Ignore("Commented-out test")]
         public void AndCorrectlyConvertsToJson()
         {
             //var and = new And(new EndsWith("0603"), new StartsWith("basho"));
@@ -210,7 +210,7 @@ namespace RiakClientTests.KeyFilters
         }
 
         [Test]
-        [Ignore]
+        [Ignore("Commented-out test")]
         public void OrCorrectlyConvertsToJson()
         {
             //var or = new Or(new Equal<string>("google"), new LessThan<string>("g"));
@@ -218,7 +218,7 @@ namespace RiakClientTests.KeyFilters
         }
 
         [Test]
-        [Ignore]
+        [Ignore("Commented-out test")]
         public void NotCorrectlyConvertsToJson()
         {
             //var not = new Not(new Matches("solution"));
@@ -226,4 +226,3 @@ namespace RiakClientTests.KeyFilters
         }
     }
 }
-

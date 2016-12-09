@@ -32,7 +32,7 @@ namespace RiakClientExamples.Dev.Search
      */
     public sealed class SearchDataTypes : ExampleBase
     {
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public void SetUpFixture()
         {
             base.CreateClient();

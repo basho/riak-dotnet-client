@@ -31,8 +31,8 @@ namespace Test.Integration
 
         public TestBase(bool useTtb = false, bool auth = true)
         {
-            var config = RiakClusterConfiguration.LoadFromConfig("riak1NodeConfiguration");
-            var noAuthConfig = RiakClusterConfiguration.LoadFromConfig("riak1NodeNoAuthConfiguration");
+            var config = RiakClusterConfiguration.LoadFromConfig("riakConfiguration");
+            var noAuthConfig = RiakClusterConfiguration.LoadFromConfig("riakNoAuthConfiguration");
             if (useTtb)
             {
                 config.UseTtbEncoding = true;
@@ -64,12 +64,12 @@ namespace Test.Integration
             get { return "bucket_unset"; }
         }
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public virtual void TestFixtureSetUp()
         {
         }
 
-        [TestFixtureTearDown]
+        [OneTimeTearDown]
         public virtual void TestFixtureTearDown()
         {
             if (EnumerableUtil.NotNullOrEmpty(Keys))

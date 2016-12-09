@@ -19,6 +19,7 @@
 
 using NUnit.Framework;
 using RiakClient.Config;
+using RiakClient.Util;
 
 namespace RiakClientTests.Auth
 {
@@ -35,7 +36,7 @@ namespace RiakClientTests.Auth
             Assert.IsNotNull(authConfig);
 
             Assert.AreEqual("riakuser", authConfig.Username);
-            Assert.IsNullOrEmpty(authConfig.Password);
+            Assert.True(EnumerableUtil.IsNullOrEmpty(authConfig.Password));
             Assert.AreEqual(riakUserClientCertFileRelativePath, authConfig.ClientCertificateFile);
             Assert.AreEqual(riakUserClientCertSubject, authConfig.ClientCertificateSubject);
         }
@@ -50,7 +51,7 @@ namespace RiakClientTests.Auth
             Assert.IsNotNull(authConfig);
 
             Assert.AreEqual("riakuser", authConfig.Username);
-            Assert.IsNullOrEmpty(authConfig.Password);
+            Assert.True(EnumerableUtil.IsNullOrEmpty(authConfig.Password));
             Assert.AreEqual(riakUserClientCertSubject, authConfig.ClientCertificateSubject);
             Assert.AreEqual(rootCaCertFileRelativePath, authConfig.CertificateAuthorityFile);
         }

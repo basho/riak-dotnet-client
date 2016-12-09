@@ -27,7 +27,7 @@ namespace RiakClientTests.Live.BucketPropertyTests
     using RiakClient.Models.CommitHook;
     using RiakClient.Util;
 
-    [TestFixture, IntegrationTest, SkipMono]
+    [TestFixture, IntegrationTest]
     public class WhenDealingWithBucketProperties : LiveRiakConnectionTestBase
     {
         private readonly Random _random = new Random();
