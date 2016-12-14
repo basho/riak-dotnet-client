@@ -24,16 +24,16 @@
       NB: these regexes are Mono and Windows compatible. "\." to represent literal period
           does not work on Mono 3.10
     -->
-    <RegexReplace Input="$(VersionString)" Expression="^([0-9])[.][0-9][.][0-9](-[a-z0-9]+)?$" Replacement="$1" Count="1">
+    <RegexReplace Input="$(VersionString)" Expression="^v?([0-9])[.][0-9][.][0-9](-[a-z0-9]+)?$" Replacement="$1" Count="1">
       <Output PropertyName="VMajor" TaskParameter="Output" />
     </RegexReplace>
-    <RegexReplace Input="$(VersionString)" Expression="^[0-9][.]([0-9])[.][0-9](-[a-z0-9]+)?$" Replacement="$1" Count="1">
+    <RegexReplace Input="$(VersionString)" Expression="^v?[0-9][.]([0-9])[.][0-9](-[a-z0-9]+)?$" Replacement="$1" Count="1">
       <Output PropertyName="VMinor" TaskParameter="Output" />
     </RegexReplace>
-    <RegexReplace Input="$(VersionString)" Expression="^[0-9][.][0-9][.]([0-9])(-[a-z0-9]+)?$" Replacement="$1" Count="1">
+    <RegexReplace Input="$(VersionString)" Expression="^v?[0-9][.][0-9][.]([0-9])(-[a-z0-9]+)?$" Replacement="$1" Count="1">
       <Output PropertyName="VPatch" TaskParameter="Output" />
     </RegexReplace>
-    <RegexReplace Input="$(VersionString)" Expression="^[0-9][.][0-9][.][0-9](-[a-z0-9]+)?$" Replacement="$1" Count="1">
+    <RegexReplace Input="$(VersionString)" Expression="^v?[0-9][.][0-9][.][0-9](-[a-z0-9]+)?$" Replacement="$1" Count="1">
       <Output PropertyName="VPreRelease" TaskParameter="Output" />
     </RegexReplace>
     <Message Text="VersionString: $(VersionString) Version: $(VMajor).$(VMinor).$(VPatch) PreRelease: $(VPreRelease)"/>

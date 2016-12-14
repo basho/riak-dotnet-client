@@ -37,7 +37,7 @@
     <VersionString Condition="'$(Configuration)' == 'Release'">unknown</VersionString>
     <!-- NB: Hard-coded for non-Release builds to skip querying git for information.
          Increment this manually for non-Release builds -->
-    <VersionString Condition="'$(Configuration)' != 'Release'">v2.5.0</VersionString>
+    <VersionString Condition="'$(Configuration)' != 'Release'">2.5.0</VersionString>
     <GitCommitHash>unknown</GitCommitHash>
     <MasterBranchName>master</MasterBranchName>
   </PropertyGroup>

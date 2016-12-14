@@ -154,7 +154,7 @@
   </Target>
 
   <Target Name="SetupTests">
-    <XmlQuery XmlFileName="$(NuGetPackagesConfig)" XPath="/packages/package[@id='NUnit.Runners']/@version">
+    <XmlQuery XmlFileName="$(SolutionDir)src\Test\packages.config" XPath="/packages/package[@id='NUnit.Runners']/@version">
       <Output TaskParameter="Values" PropertyName="NUnitRunnersVersion" />
     </XmlQuery>
     <PropertyGroup>
