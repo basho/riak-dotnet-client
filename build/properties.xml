@@ -10,12 +10,17 @@
   <Import Project="$(MSBuildCommunityTasksPath)\MSBuild.Community.Tasks.targets"/>
 
   <PropertyGroup>
-
+    <IsDryRun>false</IsDryRun>
     <SolutionFileName>RiakClient.sln</SolutionFileName>
     <SolutionFile>$(SolutionDir)$(SolutionFileName)</SolutionFile>
     <ProjDir>$(SolutionDir)src</ProjDir>
+
+    <NuGetExe>$(SolutionDir).nuget\NuGet.exe</NuGetExe>
+    <NuGetDir>$(ProjDir)\NuGet</NuGetDir>
+    <NuGetSpecTemplate>$(NuGetDir)\RiakClient.nuspec.template</NuGetSpecTemplate>
+    <NuGetSpecFile>$(NuGetDir)\RiakClient.nuspec</NuGetSpecFile>
     <RiakClientProjDir>$(ProjDir)\RiakClient</RiakClientProjDir>
-    <NuGetPackagesConfig>$(SolutionDir).nuget\packages.config</NuGetPackagesConfig>
+    <RiakClientPackagesConfig>$(RiakClientProjDir)\packages.config</RiakClientPackagesConfig>
 
     <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
 
@@ -32,13 +37,9 @@
     <VersionString Condition="'$(Configuration)' == 'Release'">unknown</VersionString>
     <!-- NB: Hard-coded for non-Release builds to skip querying git for information.
          Increment this manually for non-Release builds -->
-    <VersionString Condition="'$(Configuration)' != 'Release'">v2.2.0</VersionString>
-    <GitRemoteName Condition="'$(GitRemoteName)' == ''">origin</GitRemoteName>
-    <GitRemoteUrl Condition="'$(GitRemoteUrl)' == ''">git@github.com:basho/riak-dotnet-client.git</GitRemoteUrl>
+    <VersionString Condition="'$(Configuration)' != 'Release'">v2.5.0</VersionString>
     <GitCommitHash>unknown</GitCommitHash>
     <MasterBranchName>master</MasterBranchName>
-    <DevelopBranchName>develop</DevelopBranchName>
-    <DevelopRemoteBranchName>$(GitRemoteName)/$(DevelopBranchName)</DevelopRemoteBranchName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -48,7 +49,6 @@
     <ProjectToBuild Include="$(SolutionFile)">
       <Properties>Configuration=Release</Properties>
     </ProjectToBuild>
-    <ProtoFile Include="$(ProtoDir)\*.proto" />
   </ItemGroup>
 
 </Project>

@@ -8,42 +8,39 @@
   <Import Project="$(BuildPath)\properties.xml" Condition="'$(PropertiesImported)' != 'true'" />
   <Import Project="$(BuildPath)\assemblyinfo.targets" />
 
-  <Target Name="CleanCommonAssemblyInfo">
-    <Delete Files="$(CommonAssemblyInfoFile)" />
-  </Target>
-
   <Target Name="PublishValidateVersionString">
     <Error Condition="'$(VersionString)' == '' Or '$(VersionString)' == 'unknown'"
            Text="Must set VersionString property on command line!" />
   </Target>
 
-  <Target Name="PublishValidateOnDevelopBranch">
-    <!-- Validate that we are on develop branch -->
+  <Target Name="PublishValidateBranch">
     <GitBranch LocalPath="$(SolutionDir)">
       <Output TaskParameter="Branch" PropertyName="GitBranch" />
     </GitBranch>
-    <Error Condition="'$(GitBranch)' != '$(DevelopBranchName)'"
-           Text="Please ensure all features have been merged into $(DevelopBranchName) and that you are on the $(DevelopBranchName) branch." />
+    <Message Condition="$(VPreRelease) != '' And '$(GitBranch)' != '$(MasterBranchName)'"
+             Text="NOTE: You are publishing from a non-master branch for pre-release version $(VPreRelease)" />
+    <Error Condition="$(VPreRelease) == '' And '$(GitBranch)' != '$(MasterBranchName)'"
+           Text="Please ensure all features have been merged into $(MasterBranchName) and that you are on the $(MasterBranchName) branch." />
   </Target>
 
-  <Target Name="PublishValidation" DependsOnTargets="PublishValidateVersionString;PublishValidateOnDevelopBranch;PopulateVersionInformation">
+  <Target Name="PublishValidation" DependsOnTargets="PublishValidateVersionString;PopulateVersionInformation;PublishValidateBranch">
     <Error Condition="'$(OS)' != 'Windows_NT'" Text="Publish target is Windows-only!" />
     <!-- Validate parsed VersionString -->
     <RegexMatch Input="$(VMajor)" Expression="^[1-9]$">
       <Output PropertyName="VMajorValidated" TaskParameter="Output" />
     </RegexMatch>
     <Error Condition="'$(VMajorValidated)' == '' Or (!($(VMajorValidated) &gt; 0))"
-           Text="VersionString must be in vX.Y.Z-PreRelStr where X &gt; 0 and -PreRelStr is optional" />
+           Text="VersionString must be in X.Y.Z-PreRelStr where X &gt; 0 and -PreRelStr is optional" />
     <RegexMatch Input="$(VMinor)" Expression="^[0-9]$">
       <Output PropertyName="VMinorValidated" TaskParameter="Output" />
     </RegexMatch>
     <Error Condition="'$(VMinorValidated)' == '' Or (!($(VMajorValidated) &gt;= 0))"
-           Text="VersionString must be in vX.Y.Z-PreRelStr where X &gt; 0 and -PreRelStr is optional" />
+           Text="VersionString must be in X.Y.Z-PreRelStr where X &gt; 0 and -PreRelStr is optional" />
     <RegexMatch Input="$(VPatch)" Expression="^[0-9]$">
       <Output PropertyName="VPatchValidated" TaskParameter="Output" />
     </RegexMatch>
     <Error Condition="'$(VPatchValidated)' == '' Or (!($(VMajorValidated) &gt;= 0))"
-           Text="VersionString must be in vX.Y.Z-PreRelStr where X &gt; 0 and -PreRelStr is optional" />
+           Text="VersionString must be in X.Y.Z-PreRelStr where X &gt; 0 and -PreRelStr is optional" />
 
     <PropertyGroup Condition="'$(VPreRelease)' == ''">
       <NuGetVersion>$(VMajor).$(VMinor).$(VPatch)</NuGetVersion>
@@ -52,23 +49,10 @@
       <NuGetVersion>$(VMajor).$(VMinor).$(VPatch)$(VPreRelease)</NuGetVersion> <!-- NB: VPreRelease starts with the dash -->
     </PropertyGroup>
     <PropertyGroup>
-      <GitTagVersion>v$(NuGetVersion)</GitTagVersion>
+      <GitTagVersion>$(NuGetVersion)</GitTagVersion>
+      <GitTagMessage>&quot;riak-dotnet-client $(NuGetVersion)&quot; &quot;$(GitTagVersion)&quot;</GitTagMessage>
     </PropertyGroup>
 
-    <!-- Since we're cloning to a TEMP dir, these properties must be set and/or modified -->
-    <PropertyGroup>
-      <GitTagMessage>&quot;riak-dotnet-client $(NuGetVersion)&quot; &quot;$(GitTagVersion)&quot;</GitTagMessage>
-      <SolutionDir>$(TEMP)\$(VersionString)\</SolutionDir>
-      <SolutionFile>$(SolutionDir)$(SolutionFileName)</SolutionFile>
-      <ProjDir>$(SolutionDir)src</ProjDir>
-      <CommonAssemblyInfoFile>$(SolutionDir)src\CommonAssemblyInfo.cs</CommonAssemblyInfoFile>
-      <NuGetExe>$(SolutionDir).nuget\NuGet.exe</NuGetExe>
-      <NuGetDir>$(ProjDir)\NuGet</NuGetDir>
-      <NuGetSpecTemplate>$(NuGetDir)\RiakClient.nuspec.template</NuGetSpecTemplate>
-      <NuGetSpecFile>$(NuGetDir)\RiakClient.nuspec</NuGetSpecFile>
-      <RiakClientProjDir>$(ProjDir)\RiakClient</RiakClientProjDir>
-      <RiakClientPackagesConfig>$(RiakClientProjDir)\packages.config</RiakClientPackagesConfig>
-    </PropertyGroup>
     <Message Text="Solution Dir: '$(SolutionDir)'" />
     <Message Text="Solution File: '$(SolutionFile)'" />
     <Message Text="Proj Dir: '$(ProjDir)'" />
@@ -76,32 +60,14 @@
     <Message Text="CommonAssemblyInfo.cs File: '$(CommonAssemblyInfoFile)'" />
   </Target>
 
-  <Target Name="PublishCloneToTemp" DependsOnTargets="PublishValidation">
-    <RemoveDir Directories="$(SolutionDir)"/>
-    <MakeDir Directories="$(SolutionDir)"/>
-
-    <Message Text="Cloning '$(MasterBranchName)' branch from $(GitRemoteUrl)" />
-    <GitClient Command="clone" Arguments="--branch $(MasterBranchName) $(GitRemoteUrl) $(SolutionDir)" LocalPath="$(TEMP)" />
-
-    <Message Text="Cleaning '$(MasterBranchName)' branch" />
-    <GitClient Command="clean" Arguments="-fxd" LocalPath="$(SolutionDir)" />
-  </Target>
-
-  <Target Name="PublishMergeMasterAndTag" DependsOnTargets="PublishCloneToTemp">
-    <Message Text="Merging '$(DevelopRemoteBranchName)' into '$(MasterBranchName)' NOTE: this will fail if the merge can't be done via fast-forward!" />
-    <GitClient Command="merge" Arguments="--no-ff --commit --ff-only $(DevelopRemoteBranchName)" LocalPath="$(SolutionDir)" />
-
+  <Target Name="PublishTag" DependsOnTargets="PublishValidation">
     <Message Text="Tagging with $(GitTagMessage)" />
     <GitClient Command="tag" Arguments="--message $(GitTagMessage)" LocalPath="$(SolutionDir)" />
-
     <Message Text="Pushing tag $(GitTagVersion)" />
-    <GitClient Command="push" Arguments="$(GitRemoteName) &quot;$(GitTagVersion)&quot;" LocalPath="$(SolutionDir)" />
-
-    <Message Text="Pushing master branch" />
-    <GitClient Command="push" Arguments="$(GitRemoteName) &quot;$(MasterBranchName)&quot;" LocalPath="$(SolutionDir)" />
+    <GitClient Command="push" Arguments="&quot;$(GitTagVersion)&quot;" LocalPath="$(SolutionDir)" />
   </Target>
 
-  <Target Name="PublishRelease" DependsOnTargets="GenerateCommonAssemblyInfo">
+  <Target Name="PublishBuildRelease" DependsOnTargets="GenerateCommonAssemblyInfo">
     <Message Text="MSBuild properties: Configuration=Release;SolutionDir=$(SolutionDir);VersionString=$(VersionString)" />
     <MSBuild Projects="$(SolutionFile)" Properties="Configuration=Release;SolutionDir=$(SolutionDir);VersionString=$(VersionString)" />
   </Target>
@@ -164,8 +130,10 @@
           Command="$(PowerShellExe) -NonInteractive -NoProfile -ExecutionPolicy Bypass -File $(SolutionDir)build\create-github-release.ps1 -VersionString $(GitTagVersion) $(IsPreReleaseArg)" />
   </Target>
 
-  <Target Name="Publish"
-          DependsOnTargets="PublishValidation;PublishMergeMasterAndTag;PublishRelease;PublishNuGetPackage;PublishGitHubRelease" />
+  <Target Name="Publish" Condition="$(IsDryRun) == 'false'"
+          DependsOnTargets="PublishValidation;PublishTag;PublishBuildRelease;PublishNuGetPackage;PublishGitHubRelease" />
+  <Target Name="Publish" Condition="$(IsDryRun) == 'true'"
+          DependsOnTargets="PublishValidation;PublishBuildRelease" />
 
   <Target Name="GitSubmodule" Condition="!Exists('$(ProtoMsgCsvFile)')">
     <GitClient Command="submodule" Arguments="update --init" LocalPath="$(SolutionDir)" />
@@ -188,8 +156,10 @@
   </Target>
 
   <Target Name="SetupTests">
+    <XmlQuery XmlFileName="$(NuGetPackagesConfig)" XPath="/packages/package[@id='NUnit.Runners']/@version">
+      <Output TaskParameter="Values" PropertyName="NUnitRunnersVersion" />
+    </XmlQuery>
     <PropertyGroup>
-      <NUnitRunnersVersion>2.6.4</NUnitRunnersVersion>
       <NUnitConsoleRunnerExe>$(SolutionDir)packages\NUnit.Runners.$(NUnitRunnersVersion)\tools\nunit-console.exe </NUnitConsoleRunnerExe>
       <NUnitConsoleRunnerArgs Condition="'$(Verbose)' != 'true'">-nologo -nodots</NUnitConsoleRunnerArgs>
       <NUnitConsoleRunnerArgs Condition="'$(Verbose)' == 'true'">-labels</NUnitConsoleRunnerArgs>

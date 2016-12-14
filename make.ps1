@@ -38,16 +38,16 @@ Param(
         'Detailed','d','Diagnostic','diag', IgnoreCase = $True)]
     [string]$Verbosity = 'Normal',
     [Parameter(Mandatory=$False)]
-    [ValidatePattern("^v[1-9]\.[0-9]\.[0-9](-[a-z0-9]+)?")]
+    [ValidatePattern("^[1-9]\.[0-9]\.[0-9](-[a-z0-9]+)?")]
     [string]$VersionString,
     [Parameter(Mandatory=$False)]
-    [ValidatePattern("^[a-zA-Z0-9-]+$")]
-    [string]$GitRemoteName,
+    [string]$ProtoGenExe,
     [Parameter(Mandatory=$False)]
-    [string]$ProtoGenExe
+    [switch]$DryRun
 )
 
 Set-StrictMode -Version Latest
+
 # Note:
 # Set to Continue to see DEBUG messages
 # $DebugPreference = 'Continue'
@@ -186,7 +186,17 @@ $build_targets_file = Get-BuildTargetsFile -ScriptPath $script_path
 
 $msbuild_exe = Get-PathToMSBuildExe
 
+if ($Target -eq 'Publish') {
+    Stop-Process -Name msbuild -ErrorAction SilentlyContinue
+    & git clean -fxd
+}
+
 Restore-Dependencies
+
+$dryrun_property = '/property:IsDryRun=false'
+if ($DryRun) {
+    $dryrun_property = '/property:IsDryRun=true'
+}
 
 $verbose_property = ''
 if ($IsVerbose -or $Verbosity -eq 'detailed' -or $Verbosity -eq 'd' -or
@@ -205,30 +215,13 @@ if ($Target -eq 'ProtoGen') {
     }
 }
 
-$git_remote_property = ''
-if (! ([String]::IsNullOrEmpty($GitRemoteName))) {
-    $git_remote_property = "/property:GitRemoteName=$GitRemoteName"
-}
-
 # Fix up Target to use CleanAll in build.targets file
 if ($Target -eq 'Clean') {
     $Target = 'CleanAll'
 }
 
-$maxcpu_property = ''
-if ($env:USERNAME -eq 'buildbot')
-{
-    $env:MSBUILDDISABLENODEREUSE = 1
-    $maxcpu_property = '/maxcpucount:1'
-}
-else
-{
-    $env:MSBUILDDISABLENODEREUSE = 0
-    $maxcpu_property = '/maxcpucount'
-}
-
-Write-Debug "MSBuild command: $msbuild_exe ""/verbosity:$Verbosity"" /nologo /m ""/property:SolutionDir=$script_path\"" ""$maxcpu_property"" ""$version_property"" ""$vs_version_property"" ""$verbose_property"" ""$git_remote_property"" ""$protogen_property"" ""/target:$Target"" ""$build_targets_file"""
-& $msbuild_exe "/verbosity:$Verbosity" /nologo /m "/property:SolutionDir=$script_path\" "$maxcpu_property" "$version_property" "$vs_version_property" "$verbose_property" "$git_remote_property" "$protogen_property" "/target:$Target" "$build_targets_file"
+Write-Debug "MSBuild command: $msbuild_exe ""/verbosity:$Verbosity"" /nologo /m ""/property:SolutionDir=$script_path\"" ""$dryrun_property"" ""$version_property"" ""$vs_version_property"" ""$verbose_property"" ""$protogen_property"" ""/target:$Target"" ""$build_targets_file"""
+& $msbuild_exe "/verbosity:$Verbosity" /nologo /m "/property:SolutionDir=$script_path\" "$dryrun_property" "$version_property" "$vs_version_property" "$verbose_property" "$protogen_property" "/target:$Target" "$build_targets_file"
 if ($? -ne $True) {
     throw "$msbuild_exe failed: $LastExitCode"
 }
