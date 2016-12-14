@@ -63,8 +63,8 @@
   <Target Name="PublishTag" Condition="$(IsDryRun) == 'false'" DependsOnTargets="PublishValidation">
     <Message Text="Tagging with $(GitTagMessage)" />
     <GitClient Command="tag" Arguments="--message $(GitTagMessage)" LocalPath="$(SolutionDir)" />
-    <Message Text="Pushing tag $(GitTagVersion)" />
-    <GitClient Command="push" Arguments="&quot;$(GitTagVersion)&quot;" LocalPath="$(SolutionDir)" />
+    <Message Text="Pushing tag $(GitTagVersion). NOTE: this requires a remote named &quot;basho&quot;" />
+    <GitClient Command="push" Arguments="basho &quot;$(GitTagVersion)&quot;" LocalPath="$(SolutionDir)" />
   </Target>
 
   <Target Name="PublishBuildRelease" DependsOnTargets="GenerateCommonAssemblyInfo">
