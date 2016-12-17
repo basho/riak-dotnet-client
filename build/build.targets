@@ -9,22 +9,24 @@
   <Import Project="$(BuildPath)\assemblyinfo.targets" />
 
   <Target Name="PublishValidateVersionString">
+    <Error Condition="'$(OS)' != 'Windows_NT'" Text="Publish targets are Windows-only!" />
     <Error Condition="'$(VersionString)' == '' Or '$(VersionString)' == 'unknown'"
            Text="Must set VersionString property on command line!" />
   </Target>
 
   <Target Name="PublishValidateBranch">
+    <Error Condition="'$(OS)' != 'Windows_NT'" Text="Publish targets are Windows-only!" />
     <GitBranch LocalPath="$(SolutionDir)">
       <Output TaskParameter="Branch" PropertyName="GitBranch" />
     </GitBranch>
-    <Message Condition="$(VPreRelease) != '' And '$(GitBranch)' != '$(MasterBranchName)'"
+    <Message Condition="$(IsDryRun) == 'true' And $(VPreRelease) != '' And '$(GitBranch)' != '$(MasterBranchName)'"
              Text="NOTE: You are publishing from a non-master branch for pre-release version $(VPreRelease)" />
-    <Error Condition="$(VPreRelease) == '' And '$(GitBranch)' != '$(MasterBranchName)'"
+    <Error Condition="$(IsDryRun) == 'false' And $(VPreRelease) == '' And '$(GitBranch)' != '$(MasterBranchName)'"
            Text="Please ensure all features have been merged into $(MasterBranchName) and that you are on the $(MasterBranchName) branch." />
   </Target>
 
   <Target Name="PublishValidation" DependsOnTargets="PublishValidateVersionString;PopulateVersionInformation;PublishValidateBranch">
-    <Error Condition="'$(OS)' != 'Windows_NT'" Text="Publish target is Windows-only!" />
+    <Error Condition="'$(OS)' != 'Windows_NT'" Text="Publish targets are Windows-only!" />
     <!-- Validate parsed VersionString -->
     <RegexMatch Input="$(VMajor)" Expression="^[1-9]$">
       <Output PropertyName="VMajorValidated" TaskParameter="Output" />
@@ -61,6 +63,7 @@
   </Target>
 
   <Target Name="PublishTag" Condition="$(IsDryRun) == 'false'" DependsOnTargets="PublishValidation">
+    <Error Condition="'$(OS)' != 'Windows_NT'" Text="Publish targets are Windows-only!" />
     <Message Text="Tagging with $(GitTagMessage)" />
     <GitClient Command="tag" Arguments="--message $(GitTagMessage)" LocalPath="$(SolutionDir)" />
     <Message Text="Pushing tag $(GitTagVersion). NOTE: this requires a remote named &quot;basho&quot;" />
@@ -68,6 +71,7 @@
   </Target>
 
   <Target Name="PublishBuildRelease" DependsOnTargets="GenerateCommonAssemblyInfo">
+    <Error Condition="'$(OS)' != 'Windows_NT'" Text="Publish targets are Windows-only!" />
     <Message Text="MSBuild properties: Configuration=Release;SolutionDir=$(SolutionDir);VersionString=$(VersionString)" />
     <MSBuild Projects="$(SolutionFile)" Properties="Configuration=Release;SolutionDir=$(SolutionDir);VersionString=$(VersionString)" />
   </Target>
@@ -93,6 +97,7 @@
   </Target>
 
   <Target Name="PublishNuGetPackage" Condition="$(IsDryRun) == 'false'" DependsOnTargets="PublishValidation">
+    <Error Condition="'$(OS)' != 'Windows_NT'" Text="Publish targets are Windows-only!" />
     <XmlQuery XmlFileName="$(RiakClientPackagesConfig)" XPath="/packages/package[@id='Newtonsoft.Json']/@version">
       <Output TaskParameter="Values" PropertyName="NewtonsoftJsonVersion" />
     </XmlQuery>
@@ -121,6 +126,7 @@
   </Target>
 
   <Target Name="PublishGitHubRelease" Condition="$(IsDryRun) == 'false'" DependsOnTargets="PublishValidation">
+    <Error Condition="'$(OS)' != 'Windows_NT'" Text="Publish targets are Windows-only!" />
     <PropertyGroup Condition="'$(VPreRelease)' != ''">
       <IsPreReleaseArg>-IsPreRelease</IsPreReleaseArg>
     </PropertyGroup>
@@ -129,7 +135,7 @@
   </Target>
 
   <Target Name="Publish"
-          DependsOnTargets="PublishValidation;PublishTag;PublishBuildRelease;PublishNuGetPackage;PublishGitHubRelease" />
+          DependsOnTargets="RestorePackages;PublishValidation;PublishTag;PublishBuildRelease;PublishNuGetPackage;PublishGitHubRelease" />
 
   <Target Name="GitSubmodule" Condition="!Exists('$(ProtoMsgCsvFile)')">
     <GitClient Command="submodule" Arguments="update --init" LocalPath="$(SolutionDir)" />
