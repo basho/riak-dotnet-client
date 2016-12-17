@@ -25,6 +25,7 @@ namespace Test.Integration.CRDT
     using NUnit.Framework;
     using RiakClient;
     using RiakClient.Commands.CRDT;
+    using RiakClient.Util;
 
     [TestFixture, IntegrationHllTest]
     public class UpdateAndFetchHllTests : TestBase
@@ -97,7 +98,7 @@ namespace Test.Integration.CRDT
         public void Riak_Can_Generate_Key()
         {
             HllResponse r = SaveHll();
-            Assert.IsNotNullOrEmpty(r.Key);
+            Assert.True(EnumerableUtil.NotNullOrEmpty((string)r.Key));
             Log.DebugFormat("Riak Generated Key: {0}", r.Key);
         }
 

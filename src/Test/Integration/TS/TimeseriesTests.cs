@@ -1,6 +1,7 @@
 namespace Test.Integration.TS
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using NUnit.Framework;
     using RiakClient;
@@ -337,6 +338,81 @@ namespace Test.Integration.TS
             ListKeysResponse rsp = cmd.Response;
             Assert.IsFalse(rsp.NotFound);
             Assert.AreEqual(4, i);
+        }
+
+        [Test]
+        public void Test_List_Key_With_Blob_Key_Cell()
+        {
+            const string TableName = "BLURB";
+
+            var testColumns = new List<Column>
+            {
+                new Column("blurb", ColumnType.Blob),
+                new Column("time", ColumnType.Timestamp)
+            };
+
+            Row testRow = new Row(
+                new List<Cell>
+                {
+                    new Cell(new byte[] { 0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7 }, ColumnType.Blob),
+                    new Cell(1443806900000, true)
+                });
+
+            // Store the key
+            var cmd = new Store.Builder()
+                   .WithTable(TableName)
+                   .WithColumns(testColumns)
+                   .WithRows(new List<Row> { testRow })
+                   .Build();
+
+            RiakResult rslt = client.Execute(cmd);
+            Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
+
+            // List the single key
+            var listedKeys = new List<Row>();
+            Action<ListKeysResponse> cb = qr =>
+            {
+                listedKeys.AddRange(qr.Value);
+            };
+
+            var listKeysCommand = new ListKeys.Builder()
+                .WithTable(TableName)
+                .WithCallback(cb)
+                .Build();
+
+            RiakResult listKeysResult = client.Execute(listKeysCommand);
+            Assert.IsTrue(listKeysResult.IsSuccess, listKeysResult.ErrorMessage);
+
+            ListKeysResponse listKeysResponse = listKeysCommand.Response;
+            Assert.IsFalse(listKeysResponse.NotFound);
+            Assert.AreEqual(1, listedKeys.Count);
+
+            var keyCells = listedKeys[0].Cells.ToList();
+            Assert.AreEqual(2, keyCells.Count);
+
+            // List keys should return the BLOB column as a VARCHAR
+            Assert.AreEqual(ColumnType.Varchar, keyCells[0].ValueType);
+            Assert.AreEqual(ColumnType.Timestamp, keyCells[1].ValueType);
+
+            // Get the single row
+            var getCmd = new Get.Builder()
+                .WithTable(TableName)
+                .WithKey(listedKeys[0])
+                .Build();
+
+            RiakResult getResult = client.Execute(getCmd);
+            Assert.IsTrue(getResult.IsSuccess, getResult.ErrorMessage);
+
+            GetResponse getResponse = getCmd.Response;
+
+            var getRows = getResponse.Value.ToArray();
+            Assert.AreEqual(1, getRows.Length);
+
+            var getCells = getRows[0].Cells.ToArray();
+            Assert.AreEqual(2, getCells.Length);
+
+            Assert.AreEqual(ColumnType.Blob, getCells[0].ValueType);
+            Assert.AreEqual(ColumnType.Timestamp, getCells[1].ValueType);
         }
     }
 }

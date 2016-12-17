@@ -17,7 +17,7 @@
 [CmdletBinding()]
 Param(
     [Parameter(Mandatory=$True, Position=0)]
-    [ValidatePattern("^v[1-9]\.[0-9]\.[0-9](-[a-z0-9]+)?$")]
+    [ValidatePattern("^[1-9]\.[0-9]\.[0-9](-[a-z0-9]+)?$")]
     [string]$VersionString,
     [Parameter(Mandatory=$False)]
     [switch]$IsPreRelease

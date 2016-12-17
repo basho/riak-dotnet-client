@@ -25,7 +25,7 @@ namespace RiakClientTests.Live.Search
     using RiakClient;
     using RiakClient.Models.Search;
 
-    [TestFixture, IntegrationTest, SkipMono]
+    [TestFixture, IntegrationTest]
     public class TestSearchAdminOperations : LiveRiakConnectionTestBase
     {
         [SetUp]
@@ -81,7 +81,7 @@ namespace RiakClientTests.Live.Search
             Assert.AreEqual(1, getIndexResult.Value.Indexes.Count);
             var fetchedIndex = getIndexResult.Value.Indexes.First();
             Assert.AreEqual(indexName, fetchedIndex.Name);
-            Assert.AreEqual(2, fetchedIndex.NVal);
+            Assert.AreEqual(2, (int)fetchedIndex.NVal);
         }
 
 
@@ -98,17 +98,10 @@ namespace RiakClientTests.Live.Search
             var fetchIndexResult = fetchIndex.WaitUntil();
             Assert.True(fetchIndexResult.IsSuccess, "Index Not Found After Creation: {0}", fetchIndexResult.ErrorMessage);
 
-            if (MultiNodeEnvironment)
-            {
-                Assert.Pass("TODO-BROKEN https://github.com/basho/yokozuna/issues/619");
-            }
-            else
-            {
-                Func<RiakResult> deleteIndex = () => Client.DeleteSearchIndex(indexName);
-                var deleteIndexResult = deleteIndex.WaitUntil();
+            Func<RiakResult> deleteIndex = () => Client.DeleteSearchIndex(indexName);
+            var deleteIndexResult = deleteIndex.WaitUntil();
 
-                Assert.True(deleteIndexResult.IsSuccess, "Index Not Deleted: {0}", deleteIndexResult.ErrorMessage);
-            }
+            Assert.True(deleteIndexResult.IsSuccess, "Index Not Deleted: {0}", deleteIndexResult.ErrorMessage);
         }
     }
 }

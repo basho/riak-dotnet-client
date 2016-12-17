@@ -89,7 +89,7 @@
             }
 
             varcharValue = value;
-            valueType = ColumnType.Varchar;
+            valueType = ColumnType.Blob;
         }
 
         public Cell(string value)
@@ -351,7 +351,7 @@
             }
         }
 
-        internal static Cell FromTsCell(TsCell tsc)
+        internal static Cell FromTsCell(TsCell tsc, TsColumnType tsct)
         {
             if (tsc.boolean_valueSpecified)
             {
@@ -371,7 +371,15 @@
             }
             else if (tsc.varchar_valueSpecified)
             {
-                return new Cell(tsc.varchar_value);
+                switch (tsct)
+                {
+                    case TsColumnType.BLOB:
+                        return new Cell(tsc.varchar_value, ColumnType.Blob);
+                    case TsColumnType.VARCHAR:
+                        return new Cell(tsc.varchar_value, ColumnType.Varchar);
+                    default:
+                        return new Cell(tsc.varchar_value, ColumnType.Varchar);
+                }
             }
 
             return new Cell();

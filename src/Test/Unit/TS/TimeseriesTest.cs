@@ -45,7 +45,7 @@ namespace Test.Unit.TS
             new Cell(Long0),
             new Cell(Timestamp0),
             new Cell(Varchar0),
-            new Cell(Blob0)
+            new Cell(Blob0, ColumnType.Blob)
         };
 
         protected static readonly Cell[] Cells1 = new Cell[]

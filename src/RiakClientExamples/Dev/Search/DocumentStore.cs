@@ -26,6 +26,7 @@ namespace RiakClientExamples.Dev.Search
     using NUnit.Framework;
     using RiakClient;
     using RiakClient.Models.Search;
+    using RiakClient.Util;
 
     /*
      * http://docs.basho.com/riak/latest/dev/search/document-store/
@@ -37,7 +38,7 @@ namespace RiakClientExamples.Dev.Search
         private static readonly Uri blogPostSchema =
             new Uri("https://github.com/basho/basho_docs/raw/master/source/data/blog_post_schema.xml");
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public void SetUpFixture()
         {
             if (!File.Exists(blogPostSchemaFileName))
@@ -92,7 +93,7 @@ namespace RiakClientExamples.Dev.Search
 
             var repo = new BlogPostRepository(client, "cat_pics_quarterly");
             string id = repo.Save(post);
-            Assert.IsNotNullOrEmpty(id);
+            Assert.True(EnumerableUtil.NotNullOrEmpty((string)id));
             Console.WriteLine("Blog post ID: {0}", id);
         }
 

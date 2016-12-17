@@ -52,7 +52,7 @@ namespace RiakClientTests.Models
             for (int i = -2; i >= -5; --i)
             {
                 var q = new Quorum(i);
-                Assert.AreEqual(i, q);
+                Assert.AreEqual(i, (int)q);
             }
         }
 

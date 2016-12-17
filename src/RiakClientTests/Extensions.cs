@@ -24,6 +24,7 @@ namespace RiakClientTests
     using System.Linq;
     using System.Text;
     using NUnit.Framework;
+    using RiakClient.Util;
 
     [System.Diagnostics.DebuggerNonUserCode]
     public static class Extensions
@@ -83,14 +84,9 @@ namespace RiakClientTests
             Assert.IsTrue(value, message);
         }
 
-        public static void ShouldBeNullOrEmpty(this string value, string message = null)
-        {
-            Assert.IsNullOrEmpty(value, message);
-        }
-
         public static void ShouldNotBeNullOrEmpty(this string value, string message = null)
         {
-            Assert.IsNotNullOrEmpty(value, message);
+            Assert.True(EnumerableUtil.NotNullOrEmpty(value), message);
         }
 
         public static void ShouldNotBeNull<T>(this T obj, string message = null) where T : class

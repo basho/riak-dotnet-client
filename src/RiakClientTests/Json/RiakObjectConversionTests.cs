@@ -66,11 +66,10 @@ namespace RiakClientTests.Json.RiakObjectConversionTests
         }
 
         [Test]
-        [ExpectedException(typeof(NotSupportedException))]
         public void NonJsonObjectsCantBeDeserialisedFromJson()
         {
             var obj = new RiakObject("bucket", "key", "{\"Name\":{\"FirstName\":\"OJ\",\"Surname\":\"Reeves\"},\"PhoneNumbers\":[{\"Number\":\"12345678\",\"NumberType\":1}],\"DateOfBirth\":\"1978-12-05T00:00:00Z\",\"Email\":\"oj@buffered.io\"}", RiakConstants.ContentTypes.TextPlain);
-            obj.GetObject<Person>();
+            Assert.Throws<NotSupportedException>(() => obj.GetObject<Person>());
         }
 
         [Test]

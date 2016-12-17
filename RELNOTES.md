@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+[2.5.0](https://github.com/basho/riak-dotnet-client/issues?q=milestone%3Ariak-dotnet-client-2.5.0)
+------
+
+* Add support for Riak TS 1.5
+
 [v2.4.0](https://github.com/basho/riak-dotnet-client/issues?q=milestone%3Ariak-dotnet-client-2.4.0)
 ------
 

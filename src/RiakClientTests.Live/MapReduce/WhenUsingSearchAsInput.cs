@@ -32,7 +32,7 @@ namespace RiakClientTests.Live.MapReduce
     using RiakClient.Models.MapReduce.Inputs;
     using RiakClient.Models.Search;
 
-    [TestFixture, IntegrationTest, SkipMono]
+    [TestFixture, IntegrationTest]
     public class WhenUsingSearchAsInput : RiakMapReduceTestBase
     {
         private const string BucketType = "search_type";
@@ -51,7 +51,7 @@ namespace RiakClientTests.Live.MapReduce
         private RiakObjectId _alyssaRiakId;
         private int _randomId;
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public override void SetUp()
         {
             base.SetUp();

@@ -2,11 +2,8 @@ PROJDIR = $(SLNDIR)/src
 
 MONO_EXE = mono
 
-NUGET_PKGDIR = $(SLNDIR)/packages
-NUGET_EXE = $(SLNDIR)/.nuget/NuGet.exe
-NUGET_RESTORE = $(MONO_EXE) $(NUGET_EXE) restore -PackagesDirectory $(NUGET_PKGDIR)
-
 VERBOSITY = normal
+
 # NB: SolutionDir *must* end in slash here
 XBUILD = xbuild /verbosity:$(VERBOSITY) /nologo /property:SolutionDir=$(SLNDIR)/
 
@@ -16,42 +13,41 @@ all: release debug
 install-certs:
 	mozroots --import --sync
 
-# NB: run this target if package-restore fails on download
 install-deps:
 	$(SLNDIR)/build/install-deps
 
-package-restore:
-	$(NUGET_RESTORE) $(SLNDIR)/RiakClient.sln
-
-release: package-restore
+release:
 	$(XBUILD) /target:Release $(SLNDIR)/build/build.targets
 
-debug: package-restore
+debug:
 	$(XBUILD) /target:Debug $(SLNDIR)/build/build.targets
 
 protogen:
 	@echo 'protogen is Windows-only'
 
 # NB: build.targets has debug as a dependency for tests
-test-all: package-restore
+test-all:
 	$(XBUILD) /target:TestAll $(SLNDIR)/build/build.targets
 
-unit-test: package-restore
+unit-test:
 	$(XBUILD) /target:UnitTest $(SLNDIR)/build/build.targets
 
-integration-test: package-restore
+integration-test:
 	$(XBUILD) /target:IntegrationTest $(SLNDIR)/build/build.targets
 
-timeseries-test: package-restore
+integration-hll-test:
+	$(XBUILD) /target:IntegrationHllTest $(SLNDIR)/build/build.targets
+
+timeseries-test:
 	$(XBUILD) /target:TimeseriesTest $(SLNDIR)/build/build.targets
 
-deprecated-test: package-restore
+deprecated-test:
 	$(XBUILD) /target:DeprecatedTest $(SLNDIR)/build/build.targets
 
 .PHONY: clean-release clean-debug clean
-clean-release: package-restore
+clean-release:
 	$(XBUILD) /target:Clean /property:Configuration=Release
-clean-debug: package-restore
+clean-debug:
 	$(XBUILD) /target:Clean /property:Configuration=Debug
 clean: clean-release clean-debug
 
@@ -60,15 +56,16 @@ clean: clean-release clean-debug
 help:
 	@echo ''
 	@echo ' Targets:'
-	@echo ' ----------------------------------------------------'
-	@echo ' debug            - Debug build                      '
-	@echo ' release          - Release build with versioning    '
-	@echo ' all              - Debug, then Release build        '
-	@echo ' clean            - Clean everything                 '
-	@echo ' test             - Run all tests (except deprecated)'
-	@echo ' unit-test        - Run unit tests                   '
-	@echo ' integration-test - Run integration tests            '
-	@echo ' timeseries-test  - Run timeseries tests             '
-	@echo ' deprecated-test  - Run deprecated tests             '
-	@echo ' ----------------------------------------------------'
+	@echo ' --------------------------------------------------------'
+	@echo ' debug                - Debug build                      '
+	@echo ' release              - Release build with versioning    '
+	@echo ' all                  - Debug, then Release build        '
+	@echo ' clean                - Clean everything                 '
+	@echo ' test                 - Run all tests (except deprecated)'
+	@echo ' unit-test            - Run unit tests                   '
+	@echo ' integration-test     - Run integration tests            '
+	@echo ' integration-hll-test - Run integration Hll tests        '
+	@echo ' timeseries-test      - Run timeseries tests             '
+	@echo ' deprecated-test      - Run deprecated tests             '
+	@echo ' --------------------------------------------------------'
 	@echo ''

@@ -10,7 +10,7 @@ env:
 before_script:
   - jdk_switcher use oraclejdk8
   - sudo ./tools/travis-ci/riak-install -i -d "$RIAK_DOWNLOAD_URL"
-  - sudo ./tools/setup-riak -c -l 10017:10018
+  - sudo ./tools/setup-riak -c
 script:
   - make test
 notifications:

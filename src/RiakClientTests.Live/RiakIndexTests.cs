@@ -30,8 +30,9 @@ namespace RiakClientTests.Live
     using RiakClient.Models.Index;
     using RiakClient.Models.MapReduce;
     using RiakClient.Models.MapReduce.Inputs;
+    using RiakClient.Util;
 
-    [TestFixture, IntegrationTest, SkipMono]
+    [TestFixture, IntegrationTest]
     public class WhenUsingIndexes : RiakMapReduceTestBase
     {
         private const string LegacyBucket = "riak_index_tests";
@@ -121,8 +122,8 @@ namespace RiakClientTests.Live
 
             foreach (var key in keys)
             {
-                Assert.IsNotNullOrEmpty(key.Bucket);
-                Assert.IsNotNullOrEmpty(key.Key);
+                Assert.True(EnumerableUtil.NotNullOrEmpty(key.Bucket));
+                Assert.True(EnumerableUtil.NotNullOrEmpty(key.Key));
             }
         }
 
@@ -215,7 +216,7 @@ namespace RiakClientTests.Live
             CollectionAssert.IsNotEmpty(keys);
             foreach (var key in keys)
             {
-                Assert.IsNotNullOrEmpty(key);
+                Assert.True(EnumerableUtil.NotNullOrEmpty(key));
             }
 
             foreach (string origKey in originalKeys)

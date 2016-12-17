@@ -28,7 +28,7 @@ namespace RiakClientTests.Live
     using RiakClient.Extensions;
     using RiakClient.Models;
 
-    [TestFixture, IntegrationTest, SkipMono]
+    [TestFixture, IntegrationTest]
     public class RiakClientTests : LiveRiakConnectionTestBase
     {
         [Test]

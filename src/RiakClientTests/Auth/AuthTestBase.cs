@@ -39,9 +39,7 @@ namespace RiakClientTests.Auth
         static AuthTestBase()
         {
             var currentDir = Environment.CurrentDirectory;
-            string[] testCertsDirRelativePathAry = new string[] {
-                "..", "..", "..", "..", "tools", "test-ca", "certs"
-            };
+            string[] testCertsDirRelativePathAry = new string[] { "tools", "test-ca", "certs" };
             string testCertsDirRelativePath = Path.Combine(testCertsDirRelativePathAry);
             testCertsDir = Path.GetFullPath(Path.Combine(currentDir, testCertsDirRelativePath));
 
@@ -52,7 +50,7 @@ namespace RiakClientTests.Auth
             riakUserClientCertFile = Path.GetFullPath(Path.Combine(currentDir, riakUserClientCertFileRelativePath));
         }
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public void ImportTestCertificates()
         {
             if (MonoUtil.IsRunningOnMono)

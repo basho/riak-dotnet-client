@@ -39,8 +39,6 @@ namespace RiakClientTests.Live
         protected IRiakClient Client;
         protected IRiakClusterConfiguration ClusterConfig;
 
-        protected readonly bool MultiNodeEnvironment = false;
-
         static LiveRiakConnectionTestBase()
         {
             RiakClient.DisableListKeysWarning = true;
@@ -61,36 +59,17 @@ namespace RiakClientTests.Live
 
         public LiveRiakConnectionTestBase()
         {
-            string userName = Environment.GetEnvironmentVariable("USERNAME");
-            string configName = "riak1NodeConfiguration";
+            string configName = "riakConfiguration";
 #if NOAUTH
-            if (userName == "buildbot")
-            {
-                configName = "riak1NodeNoAuthConfiguration";
-                MultiNodeEnvironment = false;
-            }
-            else
-            {
-                configName = "riakDevrelNoAuthConfiguration";
-                MultiNodeEnvironment = true;
-            }
+            configName = "riakNoAuthConfiguration";
 #else
             if (MonoUtil.IsRunningOnMono)
             {
-                configName = "riak1NodeNoAuthConfiguration";
+                configName = "riakNoAuthConfiguration";
             }
             else
             {
-                if (userName == "buildbot")
-                {
-                    configName = "riak1NodeConfiguration";
-                    MultiNodeEnvironment = false;
-                }
-                else
-                {
-                    configName = "riakDevrelConfiguration";
-                    MultiNodeEnvironment = true;
-                }
+                configName = "riakConfiguration";
             }
 #endif
             Cluster = RiakCluster.FromConfig(configName);

@@ -34,6 +34,8 @@ namespace RiakClientTests.Live.GeneralIntegrationTests
         [Test, Ignore("Example")]
         public void Parallel_ForEach_Can_Be_Used_To_Put_And_Get_Objects()
         {
+            /* NB: this example assumes a 4-node devrel available
+             * with localhost PB ports at 10017, 10027, 10037 and 10047 */
             const int numNodes = 4;
             const int poolSize = 8;
             const int totalConnectionCount = poolSize * numNodes;
