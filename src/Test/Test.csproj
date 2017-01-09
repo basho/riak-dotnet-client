@@ -51,6 +51,7 @@
     <Compile Include="Integration\CRDT\UpdateAndFetchHllTests.cs" />
     <Compile Include="Integration\KV\FetchPreflistTests.cs" />
     <Compile Include="Integration\Issues\GitHub_277.cs" />
+    <Compile Include="Integration\SecurityTests.cs" />
     <Compile Include="Integration\TS\TimeseriesTtbTests.cs" />
     <Compile Include="Integration\TS\TimeseriesTests.cs" />
     <Compile Include="Traits.cs" />

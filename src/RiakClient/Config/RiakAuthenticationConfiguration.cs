@@ -28,6 +28,22 @@ namespace RiakClient.Config
     public class RiakAuthenticationConfiguration : ConfigurationElement, IRiakAuthenticationConfiguration
     {
         /// <inheritdoc/>
+        [ConfigurationProperty("tls", DefaultValue = true, IsRequired = false)]
+        public bool Tls
+        {
+            get { return (bool)this["tls"]; }
+            set { this["tls"] = value; }
+        }
+
+        /// <inheritdoc/>
+        [ConfigurationProperty("start_tls", DefaultValue = true, IsRequired = false)]
+        public bool StartTls
+        {
+            get { return (bool)this["start_tls"]; }
+            set { this["start_tls"] = value; }
+        }
+
+        /// <inheritdoc/>
         [ConfigurationProperty("username", DefaultValue = "", IsRequired = true)]
         public string Username
         {

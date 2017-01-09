@@ -50,11 +50,21 @@ namespace RiakClient.Auth
             {
                 throw new ArgumentNullException("targetHost");
             }
+            else
+            {
+                targetHostCommonName = string.Format("CN={0}", targetHost);
+            }
 
-            targetHostCommonName = string.Format("CN={0}", targetHost);
-            this.authConfig = authConfig;
+            if (authConfig == null)
+            {
+                throw new ArgumentNullException("authConfig");
+            }
+            else
+            {
+                this.authConfig = authConfig;
+            }
 
-            if (IsSecurityEnabled)
+            if (IsSecurityEnabled && authConfig.Tls)
             {
                 clientCertificates = GetClientCertificates();
                 certificateAuthorityCert = GetCertificateAuthorityCert();

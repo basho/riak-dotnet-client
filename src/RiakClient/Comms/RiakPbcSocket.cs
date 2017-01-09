@@ -46,6 +46,8 @@ namespace RiakClient.Comms
         private readonly Timeout writeTimeout;
         private readonly RiakSecurityManager securityManager;
         private readonly bool checkCertificateRevocation = false;
+        private readonly bool tls = false;
+        private readonly bool startTls = false;
 
         private Stream networkStream = null;
 
@@ -60,6 +62,8 @@ namespace RiakClient.Comms
 
             securityManager = new RiakSecurityManager(server, authConfig);
             checkCertificateRevocation = authConfig.CheckCertificateRevocation;
+            tls = authConfig.Tls;
+            startTls = authConfig.StartTls;
         }
 
         private Stream NetworkStream
@@ -298,37 +302,43 @@ namespace RiakClient.Comms
                 return;
             }
 
-            Write(MessageCode.RpbStartTls);
-
-            // NB: the following will throw an exception if the returned code is not the expected code
-            // TODO: FUTURE -> should throw a RiakSslException
-            Read(MessageCode.RpbStartTls);
-
-            // http://stackoverflow.com/questions/9934975/does-sslstream-dispose-disposes-its-inner-stream
-            var sslStream = new SslStream(
-                networkStream,
-                false,
-                securityManager.ServerCertificateValidationCallback,
-                securityManager.ClientCertificateSelectionCallback);
-
-            sslStream.ReadTimeout = (int)readTimeout;
-            sslStream.WriteTimeout = (int)writeTimeout;
-
-            if (securityManager.ClientCertificatesConfigured)
+            if (startTls)
             {
-                sslStream.AuthenticateAsClient(
-                    targetHost: server,
-                    clientCertificates: securityManager.ClientCertificates,
-                    enabledSslProtocols: SslProtocols.Default,
-                    checkCertificateRevocation: checkCertificateRevocation);
-            }
-            else
-            {
-                sslStream.AuthenticateAsClient(server);
+                Write(MessageCode.RpbStartTls);
+
+                // NB: the following will throw an exception if the returned code is not the expected code
+                // TODO: FUTURE -> should throw a RiakSslException
+                Read(MessageCode.RpbStartTls);
             }
 
-            // NB: very important! Must make the Stream being using going forward the SSL Stream!
-            this.networkStream = sslStream;
+            if (tls)
+            {
+                // http://stackoverflow.com/questions/9934975/does-sslstream-dispose-disposes-its-inner-stream
+                var sslStream = new SslStream(
+                    networkStream,
+                    false,
+                    securityManager.ServerCertificateValidationCallback,
+                    securityManager.ClientCertificateSelectionCallback);
+
+                sslStream.ReadTimeout = (int)readTimeout;
+                sslStream.WriteTimeout = (int)writeTimeout;
+
+                if (securityManager.ClientCertificatesConfigured)
+                {
+                    sslStream.AuthenticateAsClient(
+                        targetHost: server,
+                        clientCertificates: securityManager.ClientCertificates,
+                        enabledSslProtocols: SslProtocols.Default,
+                        checkCertificateRevocation: checkCertificateRevocation);
+                }
+                else
+                {
+                    sslStream.AuthenticateAsClient(server);
+                }
+
+                // NB: very important! Must make the Stream being using going forward the SSL Stream!
+                this.networkStream = sslStream;
+            }
 
             RpbAuthReq authRequest = securityManager.GetAuthRequest();
             Write(authRequest);

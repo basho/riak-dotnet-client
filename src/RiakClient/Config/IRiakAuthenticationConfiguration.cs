@@ -25,6 +25,17 @@ namespace RiakClient.Config
     public interface IRiakAuthenticationConfiguration
     {
         /// <summary>
+        /// Whether to use TLS encryption or not.
+        /// </summary>
+        bool Tls { get; set; }
+
+        /// <summary>
+        /// Whether to use legacy RpbStartTls message to indicate
+        /// socket should switch to a TLS session
+        /// </summary>
+        bool StartTls { get; set; }
+
+        /// <summary>
         /// The username to authenticate with.
         /// </summary>
         string Username { get; set; }
