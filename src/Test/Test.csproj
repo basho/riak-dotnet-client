@@ -65,6 +65,7 @@
     <Compile Include="Unit\CRDT\FetchMapTests.cs" />
     <Compile Include="Unit\CRDT\FetchCounterTests.cs" />
     <Compile Include="Unit\CRDT\UpdateHllTests.cs" />
+    <Compile Include="Unit\CRDT\UpdateGSetTests.cs" />
     <Compile Include="Unit\CRDT\UpdateSetTests.cs" />
     <Compile Include="Unit\CRDT\UpdateCounterTests.cs" />
     <Compile Include="Unit\CRDT\UpdateMapTests.cs" />

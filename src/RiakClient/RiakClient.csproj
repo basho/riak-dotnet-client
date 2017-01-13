@@ -80,6 +80,9 @@
     <Compile Include="Commands\CRDT\FetchHll.cs" />
     <Compile Include="Commands\CRDT\UpdateHll.cs" />
     <Compile Include="Commands\CRDT\UpdateHllOptions.cs" />
+    <Compile Include="Commands\CRDT\UpdateGSet.cs" />
+    <Compile Include="Commands\CRDT\UpdateSet.cs" />
+    <Compile Include="Commands\CRDT\UpdateGSetOptions.cs" />
     <Compile Include="Commands\KvCommandBuilder{TBuilder,TCommand,TOptions}.cs" />
     <Compile Include="Commands\CommandOptions.cs" />
     <Compile Include="Commands\Response{TValue}.cs" />
@@ -130,7 +133,7 @@
     <Compile Include="Commands\CRDT\Map.cs" />
     <Compile Include="Commands\CRDT\UpdateCommandBuilder{TBuilder,TCommand,TOptions,TResponse}.cs" />
     <Compile Include="Commands\CRDT\UpdateSetOptions.cs" />
-    <Compile Include="Commands\CRDT\UpdateSet.cs" />
+    <Compile Include="Commands\CRDT\UpdateSetBase.cs" />
     <Compile Include="Commands\CRDT\UpdateCounter.cs" />
     <Compile Include="Commands\CRDT\UpdateCommandOptions.cs" />
     <Compile Include="Commands\CRDT\UpdateCommand{TResponse}.cs" />
