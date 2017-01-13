@@ -74,8 +74,6 @@ namespace Test.Integration.CRDT
             SetResponse response = fetch.Response;
             Assert.IsNotNull(response);
 
-            Assert.IsNotNull(response.Context);
-            Assert.IsNotEmpty(response.Context);
             Assert.AreEqual(DefaultAdds, response.Value);
         }
 
@@ -154,8 +152,6 @@ namespace Test.Integration.CRDT
 
             SetResponse response = cmd.Response;
             Keys.Add(response.Key);
-
-            Assert.True(EnumerableUtil.NotNullOrEmpty(response.Context));
 
             return response;
         }
