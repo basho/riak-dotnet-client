@@ -45,22 +45,30 @@ namespace RiakClient.Commands.CRDT
             else
             {
                 DtFetchResp fetchResp = (DtFetchResp)response;
-                if (fetchResp.type != DtFetchResp.DataType.SET)
-                {
-                    throw new RiakException(
-                        string.Format("Requested set, received {0}", fetchResp.type));
-                }
-
                 if (fetchResp.value == null)
                 {
                     Response = new SetResponse();
                 }
                 else
                 {
+                    List<byte[]> v = null;
+                    switch (fetchResp.type)
+                    {
+                        case DtFetchResp.DataType.SET:
+                            v = fetchResp.value.set_value;
+                            break;
+                        case DtFetchResp.DataType.GSET:
+                            v = fetchResp.value.gset_value;
+                            break;
+                        default:
+                            throw new RiakException(
+                                string.Format("Requested set, received {0}", fetchResp.type));
+                    }
+
                     Response = new SetResponse(
                         Options.Key,
                         fetchResp.context,
-                        new HashSet<byte[]>(fetchResp.value.set_value));
+                        new HashSet<byte[]>(v));
                 }
             }
         }
