@@ -169,6 +169,7 @@
     <Compile Include="Messages\TsColumnDescription.cs" />
     <Compile Include="Messages\TsRow.cs" />
     <Compile Include="Messages\TsCell.cs" />
+    <Compile Include="RiakClientOptions.cs" />
     <Compile Include="Util\DateTimeUtil.cs" />
     <Compile Include="IRiakAsyncClient.cs" />
     <Compile Include="IRiakClient.cs" />

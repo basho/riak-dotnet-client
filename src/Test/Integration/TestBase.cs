@@ -23,12 +23,6 @@ namespace Test.Integration
         private static Version riakVersion = null;
         private bool disposing = false;
 
-        static TestBase()
-        {
-            RiakClient.DisableListKeysWarning = true;
-            RiakClient.DisableListBucketsWarning = true;
-        }
-
         public TestBase(bool useTtb = false, bool auth = true)
         {
             var config = RiakClusterConfiguration.LoadFromConfig("riakConfiguration");

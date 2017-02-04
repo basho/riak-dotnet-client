@@ -42,15 +42,28 @@ namespace RiakClient
     /// </summary>
     public class RiakClient : IRiakClient
     {
-        private const string ListBucketsWarning = "*** [CI] -> ListBuckets has serious performance implications and should not be used in production applications. ***";
-        private const string ListKeysWarning = "*** [CI] -> ListKeys has serious performance implications and should not be used in production applications. ***";
+        private const string ListError = @"Bucket and key list operations are expensive and should not be used in production.";
 
         private readonly IRiakEndPoint endPoint;
         private readonly IRiakConnection batchConnection;
 
-        internal RiakClient(IRiakEndPoint endPoint)
+        internal RiakClient(IRiakEndPoint endPoint, RiakClientOptions opts)
         {
+            if (opts == null)
+            {
+                throw new ArgumentNullException("opts");
+            }
+
+            this.RetryCount = opts.DefaultRetryCount;
+            this.DisableListExceptions = opts.DisableListExceptions;
+
+            if (endPoint == null)
+            {
+                throw new ArgumentNullException("endPoint");
+            }
+
             this.endPoint = endPoint;
+            
             Async = new RiakAsyncClient(this);
         }
 
@@ -64,14 +77,10 @@ namespace RiakClient
         public int RetryCount { get; set; }
 
         /// <inheritdoc/>
+        public bool DisableListExceptions { get; set; }
+
+        /// <inheritdoc/>
         public IRiakAsyncClient Async { get; private set; }
-
-        /*
-         * TODO: these should be client options set via an options object and/or set in app.config
-         */
-        internal static bool DisableListBucketsWarning { get; set; }
-
-        internal static bool DisableListKeysWarning { get; set; }
 
         /// <inheritdoc/>
         public RiakResult Ping()
@@ -389,7 +398,10 @@ namespace RiakClient
         /// <inheritdoc/>
         public RiakResult<IEnumerable<string>> ListBuckets(string bucketType)
         {
-            WarnAboutListBuckets();
+            if (DisableListExceptions == false)
+            {
+                throw new InvalidOperationException(ListError);
+            }
 
             var listBucketReq = new RpbListBucketsReq
             {
@@ -410,6 +422,11 @@ namespace RiakClient
         /// <inheritdoc/>
         public RiakResult<IEnumerable<string>> StreamListBuckets()
         {
+            if (DisableListExceptions == false)
+            {
+                throw new InvalidOperationException(ListError);
+            }
+
             var listBucketsRequest = new RpbListBucketsReq { stream = true };
             var result = UseDelayedConnection(
                 (conn, onFinish) => conn.PbcWriteStreamRead<RpbListBucketsReq, RpbListBucketsResp>(
@@ -427,13 +444,13 @@ namespace RiakClient
         /// <inheritdoc/>
         public RiakResult<IEnumerable<string>> ListKeys(string bucket)
         {
-            return UseConnection(conn => ListKeys(conn, null, bucket));
+            return UseConnection(conn => ListKeys(DisableListExceptions, conn, null, bucket));
         }
 
         /// <inheritdoc/>
         public RiakResult<IEnumerable<string>> ListKeys(string bucketType, string bucket)
         {
-            return UseConnection(conn => ListKeys(conn, bucketType, bucket));
+            return UseConnection(conn => ListKeys(DisableListExceptions, conn, bucketType, bucket));
         }
 
         /// <inheritdoc/>
@@ -445,7 +462,10 @@ namespace RiakClient
         /// <inheritdoc/>
         public RiakResult<IEnumerable<string>> StreamListKeys(string bucketType, string bucket)
         {
-            WarnAboutListKeys();
+            if (DisableListExceptions == false)
+            {
+                throw new InvalidOperationException(ListError);
+            }
 
             var listKeysRequest = new RpbListKeysReq
             {
@@ -530,6 +550,11 @@ namespace RiakClient
         [Obsolete("Linkwalking has been deprecated as of Riak 2.0. This method will be removed in the next major version.")]
         public RiakResult<IList<RiakObject>> WalkLinks(RiakObject riakObject, IList<RiakLink> riakLinks)
         {
+            if (DisableListExceptions == false)
+            {
+                throw new InvalidOperationException(ListError);
+            }
+
             Debug.Assert(riakLinks.Count > 0, "Link walking requires at least one link");
 
             var input = new RiakBucketKeyInput()
@@ -659,7 +684,10 @@ namespace RiakClient
             {
                 try
                 {
-                    funResult = batchFunction(new RiakClient(conn));
+                    // TODO FIXME
+                    // RetryCount and DisableListExceptions are not set here
+                    var client = new RiakClient(conn);
+                    funResult = batchFunction(client);
                     return RiakResult<IEnumerable<RiakResult<object>>>.Success(null);
                 }
                 catch (Exception ex)
@@ -1158,21 +1186,13 @@ namespace RiakClient
                 lbr.IsSuccess && !lbr.Value.done;
         }
 
-        private static void WarnAboutListBuckets()
+        private static RiakResult<IEnumerable<string>> ListKeys(
+            bool disableListExceptions, IRiakConnection conn, string bucketType, string bucket)
         {
-            if (DisableListBucketsWarning)
+            if (disableListExceptions == false)
             {
-                return;
+                throw new InvalidOperationException(ListError);
             }
-
-            Debug.Write(ListBucketsWarning);
-            Trace.TraceWarning(ListBucketsWarning);
-            Console.WriteLine(ListBucketsWarning);
-        }
-
-        private static RiakResult<IEnumerable<string>> ListKeys(IRiakConnection conn, string bucketType, string bucket)
-        {
-            WarnAboutListKeys();
 
             var listKeysRequest = new RpbListKeysReq
             {
@@ -1194,18 +1214,6 @@ namespace RiakClient
         {
             return lkr =>
                 lkr.IsSuccess && !lkr.Value.done;
-        }
-
-        private static void WarnAboutListKeys()
-        {
-            if (DisableListKeysWarning)
-            {
-                return;
-            }
-
-            Debug.Write(ListKeysWarning);
-            Trace.TraceWarning(ListKeysWarning);
-            Console.WriteLine(ListKeysWarning);
         }
 
         private static bool ReturnTerms(RiakIndexGetOptions options)
