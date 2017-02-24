@@ -64,7 +64,11 @@ namespace RiakClientTests.Live
             brent.ContentType = RiakConstants.ContentTypes.ApplicationJson;
             rob.ContentType = RiakConstants.ContentTypes.ApplicationJson;
 
-            Client.Put(new[] { oj, jeremiah, brent, rob });
+            var riakResults = Client.Put(new[] { oj, jeremiah, brent, rob });
+            foreach (var riakResult in riakResults)
+            {
+                Assert.IsTrue(riakResult.IsSuccess, riakResult.ErrorMessage, riakResult);
+            }
         }
 
         protected void CreateLinkedObjects(string bucketName)

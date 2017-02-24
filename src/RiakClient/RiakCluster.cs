@@ -42,6 +42,7 @@ namespace RiakClient
         private readonly ConcurrentQueue<IRiakNode> offlineNodes;
         private readonly TimeSpan nodePollTime;
         private readonly int defaultRetryCount;
+        private readonly bool disableListExceptions;
 
         private readonly CancellationTokenSource cts = new CancellationTokenSource();
         private readonly CancellationToken ct;
@@ -59,6 +60,8 @@ namespace RiakClient
         {
             nodePollTime = clusterConfig.NodePollTime;
             defaultRetryCount = clusterConfig.DefaultRetryCount;
+            disableListExceptions = clusterConfig.DisableListExceptions;
+
             RetryWaitTime = clusterConfig.DefaultRetryWaitTime;
 
             nodes = clusterConfig.RiakNodes.Select(rn =>
@@ -87,6 +90,12 @@ namespace RiakClient
         protected override int DefaultRetryCount
         {
             get { return defaultRetryCount; }
+        }
+
+        /// <inheritdoc/>
+        protected override bool DisableListExceptions
+        {
+            get { return disableListExceptions; }
         }
 
         /// <summary>

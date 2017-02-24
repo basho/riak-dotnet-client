@@ -41,6 +41,12 @@ namespace RiakClient
         int RetryCount { get; set; }
 
         /// <summary>
+        /// Gets or sets a flag to disable exceptions thrown for expensive list operations.
+        /// </summary>
+        /// <value>The flag value.</value>
+        bool DisableListExceptions { get; set; }
+
+        /// <summary>
         /// Ping this instance of Riak.
         /// </summary>
         /// <description>

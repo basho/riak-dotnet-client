@@ -39,6 +39,11 @@ namespace RiakClient
         protected abstract int DefaultRetryCount { get; }
 
         /// <summary>
+        /// Disable the exceptions that are thrown when expensive list operations are tried.
+        /// </summary>
+        protected abstract bool DisableListExceptions { get; }
+
+        /// <summary>
         /// Creates a new instance of <see cref="RiakClient"/>.
         /// </summary>
         /// <returns>
@@ -46,7 +51,8 @@ namespace RiakClient
         /// </returns>
         public IRiakClient CreateClient()
         {
-            return new RiakClient(this) { RetryCount = DefaultRetryCount };
+            var opts = new RiakClientOptions(DefaultRetryCount, DisableListExceptions);
+            return new RiakClient(this, opts);
         }
 
         /// <inheritdoc />

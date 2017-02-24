@@ -33,7 +33,7 @@ namespace RiakClientTests.Live.RiakConfigurationTests
               <configSections>
                 <section name=""riakConfig"" type=""RiakClient.Config.RiakClusterConfiguration, RiakClient"" />
               </configSections>
-              <riakConfig useTtbEncoding=""true"" nodePollTime=""5000"" defaultRetryWaitTime=""200"" defaultRetryCount=""3"">
+              <riakConfig useTtbEncoding=""true"" disableListExceptions=""true"" nodePollTime=""5000"" defaultRetryWaitTime=""200"" defaultRetryCount=""3"">
                 <nodes>
                   <node name=""node1"" hostAddress=""host1"" pbcPort=""8081"" poolSize=""5"" externalLoadBalancer=""true"" />
                   <node name=""node2"" hostAddress=""host2"" pbcPort=""8081"" poolSize=""6"" useTtbEncoding=""false""
@@ -70,6 +70,7 @@ namespace RiakClientTests.Live.RiakConfigurationTests
 
                 IRiakClusterConfiguration config = RiakClusterConfiguration.LoadFromConfig("riakConfig", fileName);
                 Assert.IsTrue(config.UseTtbEncoding);
+                Assert.IsTrue(config.DisableListExceptions);
                 config.DefaultRetryCount.ShouldEqual(3);
                 config.DefaultRetryWaitTime.ShouldEqual((Timeout)twoHundredMillis);
                 config.NodePollTime.ShouldEqual((Timeout)fiveSecsAsMillis);
@@ -114,6 +115,7 @@ namespace RiakClientTests.Live.RiakConfigurationTests
 
                 var config = RiakClusterConfiguration.LoadFromConfig("riakConfig", fileName);
                 Assert.IsTrue(config.UseTtbEncoding);
+                Assert.IsFalse(config.DisableListExceptions);
                 Assert.AreEqual(3, config.DefaultRetryCount);
                 Assert.AreEqual(200, (int)config.DefaultRetryWaitTime);
                 Assert.AreEqual(5000, (int)config.NodePollTime);
