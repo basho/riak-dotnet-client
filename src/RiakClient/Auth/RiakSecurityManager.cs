@@ -50,11 +50,15 @@ namespace RiakClient.Auth
             {
                 throw new ArgumentNullException("targetHost");
             }
+            else
+            {
+                targetHostCommonName = string.Format("CN={0}", targetHost);
+            }
 
-            targetHostCommonName = string.Format("CN={0}", targetHost);
+            // NB: authConfig *can* be null
             this.authConfig = authConfig;
 
-            if (IsSecurityEnabled)
+            if (IsSecurityEnabled && IsTlsRequired)
             {
                 clientCertificates = GetClientCertificates();
                 certificateAuthorityCert = GetCertificateAuthorityCert();
@@ -70,6 +74,18 @@ namespace RiakClient.Auth
             {
                 return (MonoUtil.IsRunningOnMono == false) &&
                        (authConfig != null && (!string.IsNullOrWhiteSpace(authConfig.Username)));
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether TLS is required
+        /// </summary>
+        public bool IsTlsRequired
+        {
+            get
+            {
+                return (MonoUtil.IsRunningOnMono == false) &&
+                       (authConfig != null && authConfig.Tls);
             }
         }
 
