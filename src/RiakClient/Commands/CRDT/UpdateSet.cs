@@ -19,7 +19,7 @@
     ///           .Build();
     /// </code>
     /// </summary>
-    public class UpdateSet : UpdateCommand<SetResponse>
+    public class UpdateSet : UpdateSetBase
     {
         private readonly UpdateSetOptions setOptions;
 
@@ -31,7 +31,7 @@
         public UpdateSet(UpdateSetOptions options)
             : base(options)
         {
-            this.setOptions = options;
+            setOptions = options;
         }
 
         protected override DtOp GetRequestOp()
@@ -52,14 +52,8 @@
             return op;
         }
 
-        protected override SetResponse CreateResponse(DtUpdateResp response)
-        {
-            RiakString key = GetKey(CommandOptions.Key, response);
-            return new SetResponse(key, response.context, new HashSet<byte[]>(response.set_value));
-        }
-
         public class Builder
-            : UpdateCommandBuilder<UpdateSet.Builder, UpdateSet, UpdateSetOptions, SetResponse>
+            : UpdateCommandBuilder<Builder, UpdateSet, UpdateSetOptions, SetResponse>
         {
             private ISet<byte[]> additions;
             private ISet<byte[]> removals;

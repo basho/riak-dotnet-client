@@ -1,5 +1,5 @@
-// <copyright file="UpdateAndFetchHllTests.cs" company="Basho Technologies, Inc.">
-// Copyright 2016 - Basho Technologies, Inc.
+// <copyright file="UpdateAndFetchGSetTests.cs" company="Basho Technologies, Inc.">
+// Copyright 2015 - Basho Technologies, Inc.
 //
 // This file is provided to you under the Apache License,
 // Version 2.0 (the "License"); you may not use this file
@@ -27,10 +27,9 @@ namespace Test.Integration.CRDT
     using RiakClient.Commands.CRDT;
     using RiakClient.Util;
 
-    [TestFixture, IntegrationTest]
-    public class UpdateAndFetchHllTests : TestBase
+    public class UpdateAndFetchGSetTests : TestBase
     {
-        private static readonly ILog Log = Logging.GetLogger(typeof(UpdateAndFetchHllTests));
+        private static readonly ILog Log = Logging.GetLogger(typeof(UpdateAndFetchGSetTests));
 
         private static readonly ISet<byte[]> DefaultAdds = new HashSet<byte[]>
             {
@@ -40,12 +39,12 @@ namespace Test.Integration.CRDT
 
         protected override RiakString BucketType
         {
-            get { return new RiakString("hlls"); }
+            get { return new RiakString("gsets"); }
         }
 
         protected override RiakString Bucket
         {
-            get { return new RiakString("hll_tests"); }
+            get { return new RiakString("gset_tests"); }
         }
 
         public override void TestFixtureSetUp()
@@ -58,12 +57,12 @@ namespace Test.Integration.CRDT
         }
 
         [Test]
-        public void Fetching_A_Hll_Produces_Expected_Values()
+        public void Fetching_A_GSet_Produces_Expected_Values()
         {
             string key = Guid.NewGuid().ToString();
-            SaveHll(key);
+            SaveGSet(key);
 
-            var fetch = new FetchHll.Builder()
+            var fetch = new FetchSet.Builder()
                     .WithBucketType(BucketType)
                     .WithBucket(Bucket)
                     .WithKey(key)
@@ -72,26 +71,26 @@ namespace Test.Integration.CRDT
             RiakResult rslt = client.Execute(fetch);
             Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
 
-            HllResponse response = fetch.Response;
+            SetResponse response = fetch.Response;
             Assert.IsNotNull(response);
 
-            Assert.IsNull(response.Context);
-            Assert.AreEqual(2, response.Cardinality);
+            Assert.AreEqual(DefaultAdds, response.Value);
         }
 
         [Test]
-        public void Can_Update_A_Hll()
+        public void Can_Update_A_GSet()
         {
             string key = Guid.NewGuid().ToString();
-            SaveHll(key);
+            SetResponse resp = SaveGSet(key);
 
             var add_3 = new RiakString("add_3");
             var adds = new HashSet<string> { add_3 };
 
-            var update = new UpdateHll.Builder(adds)
+            var update = new UpdateGSet.Builder(adds)
                 .WithBucketType(BucketType)
                 .WithBucket(Bucket)
                 .WithKey(key)
+                .WithContext(resp.Context)
                 .WithReturnBody(true)
                 .WithTimeout(TimeSpan.FromMilliseconds(20000))
                 .Build();
@@ -99,22 +98,31 @@ namespace Test.Integration.CRDT
             RiakResult rslt = client.Execute(update);
             Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
 
-            HllResponse response = update.Response;
-            Assert.AreEqual(3, response.Cardinality);
+            SetResponse response = update.Response;
+            bool found_add_3 = false;
+            foreach (RiakString value in response.Value)
+            {
+                if (value.Equals(add_3))
+                {
+                    found_add_3 = true;
+                }
+            }
+
+            Assert.True(found_add_3);
         }
 
         [Test]
         public void Riak_Can_Generate_Key()
         {
-            HllResponse r = SaveHll();
+            SetResponse r = SaveGSet();
             Assert.True(EnumerableUtil.NotNullOrEmpty((string)r.Key));
             Log.DebugFormat("Riak Generated Key: {0}", r.Key);
         }
 
         [Test]
-        public void Fetching_An_Unknown_Hll_Results_In_Not_Found()
+        public void Fetching_An_Unknown_GSet_Results_In_Not_Found()
         {
-            var fetch = new FetchHll.Builder()
+            var fetch = new FetchSet.Builder()
                     .WithBucketType(BucketType)
                     .WithBucket(Bucket)
                     .WithKey(Guid.NewGuid().ToString())
@@ -122,13 +130,13 @@ namespace Test.Integration.CRDT
 
             RiakResult rslt = client.Execute(fetch);
             Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
-            HllResponse response = fetch.Response;
+            SetResponse response = fetch.Response;
             Assert.IsTrue(response.NotFound);
         }
 
-        private HllResponse SaveHll(string key = null)
+        private SetResponse SaveGSet(string key = null)
         {
-            var updateBuilder = new UpdateHll.Builder(DefaultAdds)
+            var updateBuilder = new UpdateGSet.Builder(DefaultAdds)
                 .WithBucketType(BucketType)
                 .WithBucket(Bucket)
                 .WithTimeout(TimeSpan.FromMilliseconds(20000));
@@ -138,13 +146,13 @@ namespace Test.Integration.CRDT
                 updateBuilder.WithKey(key);
             }
 
-            UpdateHll cmd = updateBuilder.Build();
+            UpdateGSet cmd = updateBuilder.Build();
             RiakResult rslt = client.Execute(cmd);
             Assert.IsTrue(rslt.IsSuccess, rslt.ErrorMessage);
 
-            HllResponse response = cmd.Response;
+            SetResponse response = cmd.Response;
             Keys.Add(response.Key);
-            Assert.IsNull(response.Context);
+
             return response;
         }
     }
