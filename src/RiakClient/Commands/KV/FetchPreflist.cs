@@ -1,13 +1,12 @@
 ﻿namespace RiakClient.Commands.KV
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using Messages;
     using Util;
 
     /// <summary>
-    /// Fetches a Map from Riak
+    /// Fetches a Preflist from Riak
     /// </summary>
     public class FetchPreflist : Command<FetchPreflistOptions, PreflistResponse>
     {
