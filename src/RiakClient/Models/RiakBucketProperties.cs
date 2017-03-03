@@ -22,14 +22,12 @@ namespace RiakClient.Models
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Runtime.InteropServices;
     using CommitHook;
     using Extensions;
     using Messages;
-    using Newtonsoft.Json.Linq;
 
     /// <summary>
-    /// Represents the collection of properties for a Riak bucket.
+    /// Represents the collection of properties for a Riak bucket or bucket type.
     /// </summary>
     /// <remarks>
     /// When creating new objects, any properties not set will default to the server default values upon saving.
@@ -130,7 +128,7 @@ namespace RiakClient.Models
         public bool? AllowMultiple { get; private set; }
 
         /// <summary>
-        /// The named backend being used for this bucket when using riak_kv_multi_backend.
+        /// The named backend being used for this bucket or bucket type when using riak_kv_multi_backend.
         /// Can be the named backend <i>to use</i> when creating bucket properties for new buckets,
         /// or the named backend <i>in use</i> for existing buckets &amp; bucket properties.
         /// </summary>
@@ -191,27 +189,26 @@ namespace RiakClient.Models
         public int? SmallVclock { get; private set; }
 
         /// <summary>
-        /// Indicates whether the bucket properties have any pre-commit hooks.
+        /// Indicates whether the bucket or bucket type properties have any pre-commit hooks.
         /// </summary>
         public bool? HasPrecommit { get; private set; }
 
         /// <summary>
-        /// Indicates whether the bucket properties have any post-commit hooks.
+        /// Indicates whether the bucket or bucket type properties have any post-commit hooks.
         /// </summary>
         public bool? HasPostcommit { get; private set; }
 
         /// <summary>
-        /// Indicates whether Legacy (Riak 1.0) Search is enabled for this bucket.
+        /// Indicates whether Legacy (Riak 1.0) Search is enabled for this bucket or bucket type.
         /// </summary>
         [Obsolete("Search is deprecated, please use LegacySearch instead.", true)]
         public bool? Search
         {
             get { return LegacySearch; }
-            private set { LegacySearch = value; }
         }
 
         /// <summary>
-        /// Indicates whether Legacy (Riak 1.0) Search is enabled for this bucket.
+        /// Indicates whether Legacy (Riak 1.0) Search is enabled for this bucket or bucket type.
         /// </summary>
         public bool? LegacySearch
         {
@@ -220,12 +217,12 @@ namespace RiakClient.Models
         }
 
         /// <summary>
-        /// Indicates whether strong consistency is enabled on this bucket.
+        /// Indicates whether strong consistency is enabled on this bucket or bucket type.
         /// </summary>
         public bool? Consistent { get; private set; }
 
         /// <summary>
-        /// Indicates which Riak Enterprise Edition replication modes are active for this bucket.
+        /// Indicates which Riak Enterprise Edition replication modes are active for this bucket or bucket type.
         /// </summary>
         public RiakConstants.RiakEnterprise.ReplicationMode ReplicationMode { get; private set; }
 
@@ -240,7 +237,7 @@ namespace RiakClient.Models
         public int? HllPrecision { get; private set; }
 
         /// <summary>
-        /// An indicator of whether legacy search indexing is enabled on the bucket. Please use <see cref="LegacySearchEnabled"/> instead.
+        /// An indicator of whether legacy search indexing is enabled on the bucket or bucket type. Please use <see cref="LegacySearchEnabled"/> instead.
         /// </summary>
         [Obsolete("SearchEnabled is deprecated, please use LegacySearchEnabled instead.", true)]
         public bool SearchEnabled
@@ -249,7 +246,7 @@ namespace RiakClient.Models
         }
 
         /// <summary>
-        /// An indicator of whether legacy search indexing is enabled on the bucket.
+        /// An indicator of whether legacy search indexing is enabled on the bucket or bucket type.
         /// </summary>
         public bool LegacySearchEnabled
         {
@@ -261,11 +258,11 @@ namespace RiakClient.Models
         }
 
         /// <summary>
-        /// The DataType (if any) associated with this bucket.
+        /// The DataType (if any) associated with this bucket or bucket type.
         /// </summary>
         /// <remarks>
-        /// A string representation of the DataType assigned to this bucket. 
-        /// Possible values include 'set', 'map', 'counter', or null for no data type.
+        /// A string representation of the DataType assigned to this bucket or bucket type. 
+        /// Possible values include 'set', 'map', 'counter', 'hll', 'gset', or null for no data type.
         /// </remarks>
         public string DataType { get; private set; }
 
@@ -395,7 +392,7 @@ namespace RiakClient.Models
 
         /// <summary>
         /// Fluent setter for the <see cref="Backend"/> property.
-        /// Sets the named backend being used for this bucket when using riak_kv_multi_backend.
+        /// Sets the named backend being used for this bucket or bucket type when using riak_kv_multi_backend.
         /// </summary>
         /// <param name="backend">The backend to set the property to.</param>
         /// <returns>A reference to the current properties object.</returns>
@@ -457,7 +454,7 @@ namespace RiakClient.Models
         /// <b>NOTE:</b> When changing precision, it may only be reduced from
         /// it's current value, and never increased.
         /// </summary>
-        /// <param name="precision">The number of bits to use for hyperloglogs in this bucket.</param>
+        /// <param name="precision">The number of bits to use for hyperloglogs in this bucket or bucket type.</param>
         /// <returns>A reference to the current properties object.</returns>
         public RiakBucketProperties SetHllPrecision(int precision)
         {
@@ -471,7 +468,7 @@ namespace RiakClient.Models
         }
 
         /// <summary>
-        /// Remove a pre-commit hook from the bucket properties.
+        /// Remove a pre-commit hook from the bucket or bucket type properties.
         /// </summary>
         /// <param name="commitHook">The <see cref="IRiakPreCommitHook"/> to remove.</param>
         /// <returns>A reference to the current properties object.</returns>
@@ -494,7 +491,7 @@ namespace RiakClient.Models
         }
 
         /// <summary>
-        /// Remove a post-commit hook from the bucket properties.
+        /// Remove a post-commit hook from the bucket or bucket type properties.
         /// </summary>
         /// <param name="commitHook">The <see cref="IRiakPreCommitHook"/> to remove.</param>
         /// <returns>A reference to the current properties object.</returns>
@@ -517,7 +514,7 @@ namespace RiakClient.Models
         }
 
         /// <summary>
-        /// Add a pre-commit hook to the bucket properties.
+        /// Add a pre-commit hook to the bucket or bucket type properties.
         /// </summary>
         /// <param name="commitHook">The <see cref="IRiakPreCommitHook"/> to add.</param>
         /// <param name="commitFlags">The option to set <see cref="HasPrecommit"/> to true at the same time.</param>
@@ -548,7 +545,7 @@ namespace RiakClient.Models
         }
 
         /// <summary>
-        /// Add a post-commit hook to the bucket properties.
+        /// Add a post-commit hook to the bucket or bucket type properties.
         /// </summary>
         /// <param name="commitHook">The commit hook to add.</param>
         /// <param name="commitFlags">The option to set <see cref="HasPostcommit"/> to true at the same time.</param>
@@ -574,7 +571,7 @@ namespace RiakClient.Models
         }
 
         /// <summary>
-        /// Clear any pre-commit hooks from the bucket properties.
+        /// Clear any pre-commit hooks from the bucket or bucket type properties.
         /// </summary>
         /// <param name="commitFlags">Not used.</param>
         /// <returns>A reference to the current properties object.</returns>
@@ -589,7 +586,7 @@ namespace RiakClient.Models
         }
 
         /// <summary>
-        /// Clear any post-commit hooks from the bucket properties.
+        /// Clear any post-commit hooks from the bucket or bucket type properties.
         /// </summary>
         /// <param name="commitFlags">Not used.</param>
         /// <returns>A reference to the current properties object.</returns>
@@ -744,42 +741,11 @@ namespace RiakClient.Models
                 hook.modfun.function.FromRiakString());
         }
 
-        private static IRiakPreCommitHook LoadPreCommitHook(JObject hook)
-        {
-            JToken token;
-            if (hook.TryGetValue("name", out token))
-            {
-                // must be a javascript hook
-                return new RiakJavascriptCommitHook(token.Value<string>());
-            }
-
-            // otherwise it has to be erlang
-            return new RiakErlangCommitHook(hook.Value<string>("mod"), hook.Value<string>("fun"));
-        }
-
-        private static IRiakPostCommitHook LoadPostCommitHook(JObject hook)
-        {
-            // only erlang hooks are supported
-            return new RiakErlangCommitHook(hook.Value<string>("mod"), hook.Value<string>("fun"));
-        }
-
         private static IRiakPostCommitHook LoadPostCommitHook(RpbCommitHook hook)
         {
             return new RiakErlangCommitHook(
                 hook.modfun.module.FromRiakString(),
                 hook.modfun.function.FromRiakString());
-        }
-
-        private static void ReadQuorum(JObject props, string key, Action<uint> setter)
-        {
-            if (props[key] == null)
-            {
-                return;
-            }
-
-            uint quorumValue = props[key].Type == JTokenType.String ? uint.Parse(props.Value<string>(key)) : props.Value<uint>(key);
-
-            setter(quorumValue);
         }
     }
 }

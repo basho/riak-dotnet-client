@@ -97,6 +97,7 @@ namespace RiakClient.Messages
 
                 { MessageCode.RpbGetBucketTypeReq, typeof(RpbGetBucketTypeReq) },
                 { MessageCode.RpbSetBucketTypeReq, typeof(RpbSetBucketTypeReq) },
+                { MessageCode.RpbSetBucketResp, typeof(RpbSetBucketResp) },
                 { MessageCode.RpbAuthReq, typeof(RpbAuthReq) },
 
                 { MessageCode.RpbGetBucketKeyPreflistReq, typeof(RpbGetBucketKeyPreflistReq) },

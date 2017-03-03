@@ -82,6 +82,12 @@
     <Compile Include="Commands\CRDT\UpdateHllOptions.cs" />
     <Compile Include="Commands\KvCommandBuilder{TBuilder,TCommand,TOptions}.cs" />
     <Compile Include="Commands\CommandOptions.cs" />
+    <Compile Include="Commands\KV\StoreBucketTypePropertiesOptions.cs" />
+    <Compile Include="Commands\KV\StoreBucketTypePropertiesResponse.cs" />
+    <Compile Include="Commands\KV\StoreBucketTypeProperties.cs" />
+    <Compile Include="Commands\KV\FetchBucketTypeProperties.cs" />
+    <Compile Include="Commands\KV\FetchBucketTypePropertiesOptions.cs" />
+    <Compile Include="Commands\KV\FetchBucketTypePropertiesResponse.cs" />
     <Compile Include="Commands\Response{TValue}.cs" />
     <Compile Include="Commands\TS\DecodedResponse.cs" />
     <Compile Include="Erlang\TtbErrorDecoder.cs" />
