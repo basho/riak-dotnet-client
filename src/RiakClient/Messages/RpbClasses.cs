@@ -58,17 +58,19 @@
     public sealed partial class RpbGetBucketReq { }
 
     [CLSCompliant(false)]
-    public sealed partial class RpbGetBucketResp { }
+    public sealed partial class RpbGetBucketResp : RiakResp { }
 
     [CLSCompliant(false)]
-    public sealed partial class RpbSetBucketReq { }
+    public sealed partial class RpbSetBucketReq : RiakReq { }
+
+    public sealed partial class RpbSetBucketResp : RiakResp { }
 
     public sealed partial class RpbResetBucketReq { }
 
-    public sealed partial class RpbGetBucketTypeReq { }
+    public sealed partial class RpbGetBucketTypeReq : RiakReq { }
 
     [CLSCompliant(false)]
-    public sealed partial class RpbSetBucketTypeReq { }
+    public sealed partial class RpbSetBucketTypeReq : RiakReq { }
 
     public sealed partial class RpbModFun { }
 

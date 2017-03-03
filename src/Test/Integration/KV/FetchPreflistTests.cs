@@ -16,7 +16,7 @@
 // under the License.
 // </copyright>
 
-namespace Test.Integration.CRDT
+namespace Test.Integration.KV
 {
     using System.Linq;
     using NUnit.Framework;

@@ -49,6 +49,7 @@
       <Link>Properties\CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Integration\CRDT\UpdateAndFetchHllTests.cs" />
+    <Compile Include="Integration\KV\BucketTypePropertiesTests.cs" />
     <Compile Include="Integration\CRDT\UpdateAndFetchGSetTests.cs" />
     <Compile Include="Integration\KV\FetchPreflistTests.cs" />
     <Compile Include="Integration\Issues\GitHub_277.cs" />
