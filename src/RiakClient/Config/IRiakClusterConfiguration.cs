@@ -53,6 +53,11 @@ namespace RiakClient.Config
         bool UseTtbEncoding { get; set; }
 
         /// <summary>
+        /// Set to <b>true</b> to disable exceptions thrown to prevent expensive operations.
+        /// </summary>
+        bool DisableListExceptions { get; set; }
+
+        /// <summary>
         /// A <see cref="IRiakAuthenticationConfiguration"/> configuration that details any authentication information.
         /// </summary>
         IRiakAuthenticationConfiguration Authentication { get; set; }

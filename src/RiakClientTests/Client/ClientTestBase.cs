@@ -33,7 +33,8 @@ namespace RiakClientTests.Client
         {
             Cluster = new MockCluster();
             ClientId = System.Text.Encoding.Default.GetBytes("fadjskl").Take(4).ToArray();
-            Client = new RiakClient(Cluster);
+            var opts = new RiakClientOptions(3, false);
+            Client = new RiakClient(Cluster, opts);
         }
 
         public void Dispose()

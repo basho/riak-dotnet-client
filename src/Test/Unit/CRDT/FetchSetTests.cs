@@ -83,5 +83,31 @@ namespace Test.Unit.CRDT
             Assert.AreEqual(set_item_1, itemList[0]);
             Assert.AreEqual(set_item_2, itemList[1]);
         }
+
+        [Test]
+        public void Should_Construct_GSetResponse_From_DtFetchResp()
+        {
+            var set_item_1 = new RiakString("gset_item_1");
+            var set_item_2 = new RiakString("gset_item_2");
+            var value = new DtValue();
+            value.gset_value.Add(set_item_1);
+            value.gset_value.Add(set_item_2);
+
+            var fetchResp = new DtFetchResp();
+            fetchResp.value = value;
+            fetchResp.type = DtFetchResp.DataType.GSET;
+
+            var fetch = new FetchSet.Builder()
+                .WithBucketType(BucketType)
+                .WithBucket(Bucket)
+                .WithKey(Key)
+                .Build();
+
+            fetch.OnSuccess(fetchResp);
+
+            var itemList = fetch.Response.Value.Select(v => new RiakString(v)).ToList();
+            Assert.AreEqual(set_item_1, itemList[0]);
+            Assert.AreEqual(set_item_2, itemList[1]);
+        }
     }
 }

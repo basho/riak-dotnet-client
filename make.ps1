@@ -12,7 +12,6 @@
         * Test               - Run all tests
         * UnitTest           - Run unit tests
         * IntegrationTest    - Run live integration tests
-        * IntegrationHllTest - Run live hyperloglog integration tests
 .PARAMETER Verbosity
     Parameter to set MSBuild verbosity
 .EXAMPLE
@@ -29,7 +28,7 @@
 Param(
     [Parameter(Mandatory=$False, Position=0)]
     [ValidateSet('Debug','Release', 'All', 'Publish', 'Clean', 'CleanAll',
-        'Test','TestAll','UnitTest','IntegrationTest','DeprecatedTest','TimeseriesTest','IntegrationHllTest',
+        'Test','TestAll','UnitTest','IntegrationTest','DeprecatedTest','TimeseriesTest',
         'CodeAnalysis','Documentation','ProtoGen',
         IgnoreCase = $True)]
     [string]$Target = 'Debug',

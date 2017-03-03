@@ -80,6 +80,9 @@
     <Compile Include="Commands\CRDT\FetchHll.cs" />
     <Compile Include="Commands\CRDT\UpdateHll.cs" />
     <Compile Include="Commands\CRDT\UpdateHllOptions.cs" />
+    <Compile Include="Commands\CRDT\UpdateGSet.cs" />
+    <Compile Include="Commands\CRDT\UpdateSet.cs" />
+    <Compile Include="Commands\CRDT\UpdateGSetOptions.cs" />
     <Compile Include="Commands\KvCommandBuilder{TBuilder,TCommand,TOptions}.cs" />
     <Compile Include="Commands\CommandOptions.cs" />
     <Compile Include="Commands\KV\StoreBucketTypePropertiesOptions.cs" />
@@ -136,7 +139,7 @@
     <Compile Include="Commands\CRDT\Map.cs" />
     <Compile Include="Commands\CRDT\UpdateCommandBuilder{TBuilder,TCommand,TOptions,TResponse}.cs" />
     <Compile Include="Commands\CRDT\UpdateSetOptions.cs" />
-    <Compile Include="Commands\CRDT\UpdateSet.cs" />
+    <Compile Include="Commands\CRDT\UpdateSetBase.cs" />
     <Compile Include="Commands\CRDT\UpdateCounter.cs" />
     <Compile Include="Commands\CRDT\UpdateCommandOptions.cs" />
     <Compile Include="Commands\CRDT\UpdateCommand{TResponse}.cs" />
@@ -175,6 +178,7 @@
     <Compile Include="Messages\TsColumnDescription.cs" />
     <Compile Include="Messages\TsRow.cs" />
     <Compile Include="Messages\TsCell.cs" />
+    <Compile Include="RiakClientOptions.cs" />
     <Compile Include="Util\DateTimeUtil.cs" />
     <Compile Include="IRiakAsyncClient.cs" />
     <Compile Include="IRiakClient.cs" />

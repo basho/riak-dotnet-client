@@ -35,9 +35,6 @@ unit-test:
 integration-test:
 	$(XBUILD) /target:IntegrationTest $(SLNDIR)/build/build.targets
 
-integration-hll-test:
-	$(XBUILD) /target:IntegrationHllTest $(SLNDIR)/build/build.targets
-
 timeseries-test:
 	$(XBUILD) /target:TimeseriesTest $(SLNDIR)/build/build.targets
 

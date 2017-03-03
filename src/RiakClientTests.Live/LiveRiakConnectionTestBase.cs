@@ -41,9 +41,6 @@ namespace RiakClientTests.Live
 
         static LiveRiakConnectionTestBase()
         {
-            RiakClient.DisableListKeysWarning = true;
-            RiakClient.DisableListBucketsWarning = true;
-
             TestJson = new
             {
                 @string = "value",
@@ -55,7 +52,6 @@ namespace RiakClientTests.Live
                 }
             }.ToJson();
         }
-
 
         public LiveRiakConnectionTestBase()
         {

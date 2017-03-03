@@ -50,6 +50,7 @@
     </Compile>
     <Compile Include="Integration\CRDT\UpdateAndFetchHllTests.cs" />
     <Compile Include="Integration\KV\BucketTypePropertiesTests.cs" />
+    <Compile Include="Integration\CRDT\UpdateAndFetchGSetTests.cs" />
     <Compile Include="Integration\KV\FetchPreflistTests.cs" />
     <Compile Include="Integration\Issues\GitHub_277.cs" />
     <Compile Include="Integration\TS\TimeseriesTtbTests.cs" />
@@ -66,6 +67,7 @@
     <Compile Include="Unit\CRDT\FetchMapTests.cs" />
     <Compile Include="Unit\CRDT\FetchCounterTests.cs" />
     <Compile Include="Unit\CRDT\UpdateHllTests.cs" />
+    <Compile Include="Unit\CRDT\UpdateGSetTests.cs" />
     <Compile Include="Unit\CRDT\UpdateSetTests.cs" />
     <Compile Include="Unit\CRDT\UpdateCounterTests.cs" />
     <Compile Include="Unit\CRDT\UpdateMapTests.cs" />
@@ -114,7 +116,9 @@
     </None>
     <None Include="packages.config" />
     <None Include="Settings.StyleCop" />
-    <None Include="Test.nunit" />
+    <None Include="Test.nunit">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />

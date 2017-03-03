@@ -113,6 +113,15 @@ namespace RiakClient.Config
             set { this["useTtbEncoding"] = value; }
         }
 
+        /// <inheritdoc/>
+        /// <remarks>Defaults to <b>false</b> if omitted from the configuration file.</remarks>
+        [ConfigurationProperty("disableListExceptions", DefaultValue = false, IsRequired = false)]
+        public bool DisableListExceptions
+        {
+            get { return (bool)this["disableListExceptions"]; }
+            set { this["disableListExceptions"] = value; }
+        }
+
         /// <summary>
         /// A <see cref="IRiakAuthenticationConfiguration"/> configuration that details any authentication information.
         /// </summary>
