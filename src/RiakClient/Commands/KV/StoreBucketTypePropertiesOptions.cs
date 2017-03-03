@@ -34,12 +34,12 @@ namespace RiakClient.Commands.KV
         {
             if (string.IsNullOrEmpty(bucketType))
             {
-                throw new ArgumentNullException(nameof(bucketType));
+                throw new ArgumentNullException("bucketType");
             }
 
             if (bucketProperties == null)
             {
-                throw new ArgumentNullException(nameof(bucketProperties));
+                throw new ArgumentNullException("bucketProperties");
             }
 
             this.bucketType = bucketType;

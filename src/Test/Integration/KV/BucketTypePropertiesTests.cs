@@ -73,6 +73,7 @@ namespace Test.Integration.KV
                 var storeBucketTypePropertiesResponse = storeNval4Props.Response;
                 Assert.IsFalse(storeBucketTypePropertiesResponse.NotFound);
             }
+
             {
                 var fetch = new FetchBucketTypeProperties(BucketType);
                 var fetchResult = client.Execute(fetch);
@@ -80,6 +81,7 @@ namespace Test.Integration.KV
                 Assert.IsTrue(fetchResult.IsSuccess, fetchResult.ErrorMessage);
                 Assert.AreEqual(4, (int)fetchResponse.Value.NVal);
             }
+
             {
                 var nval3Props = new RiakBucketProperties().SetNVal(new NVal(3));
                 var storeNval3Props = new StoreBucketTypeProperties(BucketType, nval3Props);
